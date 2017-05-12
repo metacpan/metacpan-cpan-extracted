@@ -1,0 +1,24 @@
+0.05 Wed Mar 05 00:15:00 UTC 2007
+
+ * support for situations when final priority is lower than initial
+ * use starts date if it's defined
+ * don't update priority if we havn't reached starts(created) date
+
+0.05 Tue Nov 21 09:52:57 EST 2006
+
+ *	Hi, Jesse.  I've been working on RT a bit lately, and fixed a bug in
+	the RT-Action-LinearEscalate extention.  It will fail if the due date
+	is before the created date.  This happened to us when a user created a
+	ticket with the current date as the due date.  This give a due date
+	with the clock part set to 0:0:0, and thus a due timestamp before the
+	created timestamp.
+	
+	This patch fixed the problem by making sure such due date is ignored
+	when calculating priorities.  It also fixes a potential problem
+	(divison by zero) if the due and created date ended up as the same
+	value.
+	
+	I also added some logging, to make sure it is possible to figure it
+	out in the log when tickets was silently escalated.
+	    -- Petter Reinholdtsen <pere@hungry.com>
+	

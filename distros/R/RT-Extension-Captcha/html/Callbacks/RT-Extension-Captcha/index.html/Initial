@@ -1,0 +1,32 @@
+<%ARGS>
+$ARGSRef => {}
+$results => []
+</%ARGS>
+<%INIT>
+return unless $ARGSRef->{'QuickCreate'};
+
+my $queue = RT::Queue->new( $session{'CurrentUser'} );
+$queue->Load( $ARGSRef->{'Queue'} );
+return unless $queue->id;
+
+return if $queue->CurrentUserHasRight('NoCaptchaOnCreate');
+
+delete $session{'Captcha'};
+my $key = Digest::MD5::md5_hex( rand(1024) );
+push @{ $session{"Actions"}->{ $key } ||= [] }, @$results;
+$session{'i'}++;
+RT::Interface::Web::Redirect(
+    RT->Config->Get('WebURL')
+    ."Ticket/Create.html?". $m->comp('/Elements/QueryString',
+        id         => 'new',
+        Status     => 'new',
+        Requestors => $session{'CurrentUser'}->EmailAddress,
+        Queue      => $ARGSRef->{'Queue'},
+        Owner      => $ARGSRef->{'Owner'},
+        Subject    => $ARGSRef->{'Subject'},
+        Content    => $ARGSRef->{'Content'},
+        results    => $key,
+    )
+);
+return $m->abort;
+</%INIT>

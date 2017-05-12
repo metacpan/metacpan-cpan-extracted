@@ -1,0 +1,18 @@
+Revision history for Perl extension Regexp::Bind.
+
+0.01 Sun, 14 Mar 2004 21:29:52 +0800
+	- version 0.01 released
+
+0.02 Mon, 15 Mar 2004 14:28:36 +0800
+	- embedded syntax supported
+	- s!global_arraybind!global_bind!g;
+	- original global_bind() deprecated
+
+0.03 Tue, 16 Mar 2004 00:13:18 +0800
+	- bind_array() and global_bind_array added.
+
+0.04 Mon, 22 Mar 2004 02:37:26 +0800
+	- basic inline filtering added.
+
+0.05 Mon, 04 Oct 2004 11:55:19 +0800
+	- Now, string-refs works with Regexp::Bind

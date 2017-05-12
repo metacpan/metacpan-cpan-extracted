@@ -1,0 +1,13 @@
+100% symbol docs coverage.
+328 symbols documented.
+5 symbols incomplete.
+0 not documented.
+
+
+raptor_unicode_char_to_utf8 (Param1)
+raptor_unicode_is_xml10_namechar (Param1)
+raptor_unicode_is_xml10_namestartchar (Param1)
+raptor_unicode_is_xml11_namechar (Param1)
+raptor_unicode_is_xml11_namestartchar (Param1)
+
+

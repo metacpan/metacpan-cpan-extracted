@@ -1,0 +1,10 @@
+Revision history for Report-Controller
+
+0.002	2010-07-30
+	- Fix invalid sub-dir for template includes
+	- fix YAML incompatible configuration files
+	- bump version to 0.002
+
+0.001   2010-07-27
+        First version, released on an unsuspecting world.
+

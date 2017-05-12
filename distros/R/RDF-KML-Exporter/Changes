@@ -1,0 +1,25 @@
+RDF-KML-Exporter
+================
+
+Created:      2011-01-14
+Home page:    <https://metacpan.org/release/RDF-KML-Exporter>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-KML-Exporter>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.003  2012-05-30
+
+ - Drop dependency on RDF::TrineShortcuts; use RDF::TrineX::Functions.
+ - Drop dependency on common::sense; use strict.
+ - General clean-up; use PerlX::Maybe.
+
+0.002  2011-10-11
+
+ - (Documentation) Remove some nonsense that I accidentally copied from the
+   POD of another module.
+ - (Packaging) Declare dependency on namespace::clean.
+ - (Packaging) Switch to Module::Package::RDF build system.
+ - use 5.010
+
+0.001  2011-01-15  # Initial release
+
+

@@ -1,0 +1,61 @@
+<%ARGS>
+</%ARGS>
+
+<%INIT>
+$RT::EmailCompletionNonPrivileged ||= '';
+$RT::EmailCompletionSearchFields  ||= [qw(EmailAddress)];
+$RT::EmailCompletionSearch        ||= 'LIKE';
+
+if (defined $RT::LdapServer) {
+    $RT::EmailCompletionLdapServer     ||= $RT::LdapServer;
+
+    if ($RT::EmailCompletionLdapServer eq $RT::LdapServer) {
+	$RT::EmailCompletionLdapUser       ||= $RT::LdapUser;
+	$RT::EmailCompletionLdapPass       ||= $RT::LdapPass;
+    }
+}
+
+$RT::EmailCompletionLdapBase       ||= $RT::LdapBase;
+$RT::EmailCompletionLdapFilter     ||= $RT::LdapFilter;
+$RT::EmailCompletionLdapAttrShow   ||= "mail";
+$RT::EmailCompletionLdapAttrSearch ||= [qw/mail/];
+
+$RT::EmailCompletionLdapMinLength     ||= 4;
+
+# for the moment we can only show one attribute
+# but later perhaps we could add some other fields (address, ...)
+$RT::EmailCompletionLdapAttrShow = $RT::EmailCompletionLdapAttrShow->[0] if ref($RT::EmailCompletionLdapAttrShow) eq "ARRAY";
+
+my $CurrentUser = $session{CurrentUser};
+
+# by default SelfService users aren't allowed to use EmailCompletion
+$m->abort
+    unless $CurrentUser->Privileged() or $RT::EmailCompletionUnprivileged;
+
+my $Email;
+
+# whatever the argument, we want to find by email
+for (keys %ARGS) {
+  $Email = $ARGS{$_}, last
+     if defined $ARGS{$_};
+}
+
+my ($emails, $ldaps) = RTx::EmailCompletion::search($Email, $CurrentUser);
+
+my $users = qq{<ul class="contacts">};
+for my $email (@$emails) {
+    $users .= qq{<li class="contact"><div class="email">$email</div></li>};
+}
+for my $email (@$ldaps) {
+    $users .= qq{<li class="contact ldap"><div class="email">$email</div></li>};
+}
+$users .= '</ul>';
+
+$m->out($users);
+$m->abort;
+
+</%INIT>
+
+<%ONCE>
+use RTx::EmailCompletion;
+</%ONCE>

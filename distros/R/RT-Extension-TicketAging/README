@@ -1,0 +1,4 @@
+Installation instructions are in the INSTALL file.
+
+Documentation is in the RT::Extension::TicketAging module itself.  You
+can read it by typing "perldoc RT::Extension::TicketAging".

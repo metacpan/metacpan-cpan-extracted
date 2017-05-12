@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel::Document;
+
+my $res = Ravenel::Document->render( {
+	'data'    => qq(
+Dear {name},
+
+We have received your request for a quote for {product}, and have calculated that it can be delivered to you by {date} at a cost of approximately {cost}.
+
+Thank you for your interest,
+
+Acme Integrated foocorp
+),
+	'arguments'    => { 'name' => 'dextius', 'product' => 'ipad', 'date' => '3 April, 2010', 'cost' => 699.99 },
+	'replace_wrap' => 1,
+} );
+
+print $res . "\n";

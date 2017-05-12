@@ -1,0 +1,22 @@
+bin/prrd
+bin/rrdm
+Build.PL
+Changes
+data/sda.rrd
+lib/RRD/Daemon.pm
+lib/RRD/Daemon/Plugin.pm
+lib/RRD/Daemon/Plugin/HDDTemp.pm
+lib/RRD/Daemon/Plugin/LMSensors.pm
+lib/RRD/Daemon/Plugin/VMStat.pm
+lib/RRD/Daemon/RRDB.pm
+lib/RRD/Daemon/RRDB/DS.pm
+lib/RRD/Daemon/RRDB/Graph.pm
+lib/RRD/Daemon/RRDB/RRA.pm
+lib/RRD/Daemon/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/prrd-fetch.t
+t/prrd-info.t
+t/prrd-rawinfo.t
+t/test.pm

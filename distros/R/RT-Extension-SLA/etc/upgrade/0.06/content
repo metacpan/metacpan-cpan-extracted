@@ -1,0 +1,16 @@
+our @Final = (
+    sub {
+        my $condition = RT::ScripCondition->new( RT->SystemUser );
+        $condition->LoadByCols( ExecModule => 'SLA_RequireDueSet' );
+        unless ( $condition->id ) {
+            $RT::Logger->error("Couldn't find condition based on SLA_RequireDueSet module. New installation?");
+            return 0;
+        }
+
+        my ($status, $msg) = $condition->SetApplicableTransTypes('Create,CustomField,Correspond,Set,Status');
+        unless ($status) {
+            $RT::Logger->error("Couldn't set ApplicableTransTypes for condition: $msg");
+        }
+        return 1;
+    },
+);

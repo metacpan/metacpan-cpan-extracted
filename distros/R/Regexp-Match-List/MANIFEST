@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Regexp-Match-List.t
+lib/Regexp/Match/List.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+TYPEMAP
+dbms_xsmode_t					T_INT
+unsigned int *					T_PTROBJ
+RDFStore					T_PTROBJ
+RDFStore_Iterator				T_PTROBJ
+RDFStore_RDFNode				T_PTROBJ
+RDFStore_Statement				T_PTROBJ
+RDFStore_Triple_Pattern				T_PTROBJ
+
+DBT                     			T_DATUM
+DBMS                    			T_PTROBJ
+
+INPUT
+T_DATUM
+        $var.data = SvPV($arg, PL_na);
+        $var.size = (int)PL_na;
+
+OUTPUT
+T_DATUM
+        sv_setpvn($arg, $var.data, $var.size);
+        if ($var.data && $var.size) safefree($var.data);

@@ -1,0 +1,65 @@
+%# RT::Extension::MandatoryFields
+%#
+%# Copyright 2011 synetics GmbH, http://i-doit.org/
+%#
+%# This program is free software; you can redistribute it and/or modify it under
+%# the same terms as Perl itself.
+%#
+%# Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+<%INIT>
+my $ARGSRef = $ARGS{'ARGSRef'};
+
+if ((!exists $$ARGSRef{'AddMoreAttach'}) &&
+    (defined($$ARGSRef{'id'}) && $$ARGSRef{'id'} eq 'new')) {
+    my %mandatoryFields = RT->Config->Get('MandatoryFields');
+
+    my @supportedFields = (
+        ## Message details
+        'Requestors',
+        'Cc',
+        'AdminCc',
+        'Subject',
+        'Content',
+        'Attach',
+        ## Meta data
+        'Status',
+        'Owner',
+        ## Basics
+        'Priority',
+        'InitialPriority',
+        'FinalPriority',
+        'TimeEstimated',
+        'TimeWorked',
+        'TimeLeft',
+        ## Dates
+        'Starts',
+        'Due',
+        ## Links
+        'new-DependsOn',
+        'DependsOn-new',
+        'new-MemberOf',
+        'MemberOf-new',
+        'new-RefersTo',
+        'RefersTo-new'
+    );
+
+    for my $field (@supportedFields) {
+        if ((exists $mandatoryFields{$field}) &&
+            ( ( !(ref $mandatoryFields{$field} eq 'ARRAY') &&
+                   (($mandatoryFields{$field} eq 'true') ||
+                   ($mandatoryFields{$field} eq 'all')) ) ||
+              (  (ref $mandatoryFields{$field} eq 'ARRAY') &&
+                   (grep {$_ eq $$ARGSRef{Queue}} @{$mandatoryFields{$field}})) ) &&
+            ((!$$ARGSRef{$field}) || ($$ARGSRef{$field} =~ /^[ \t]*$/))) {
+            $$skip_create = 1;
+            push @{$results}, loc('[_1]: mandatory field', loc($field));
+        }
+    }
+}
+</%INIT>
+
+<%ARGS>
+$skip_create => undef
+$results => undef
+</%ARGS>

@@ -1,0 +1,15 @@
+Changes
+const-c.inc
+const-xs.inc
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Regexp/MinLength.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+MinLength.xs
+t/01use_ok.t
+t/02minlength.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

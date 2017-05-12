@@ -1,0 +1,17 @@
+<%args>
+$id => undef
+$Filename => undef
+</%args>
+<%init>
+my $Ticket = RT::Ticket->new($session{'CurrentUser'});
+$Ticket->Load($id);
+my $title =loc("[_1] for ticket [_2]: [_3]", $Filename, $Ticket->id, $Ticket->Subject);
+
+my $QueryString = join(';', map { "$_=".$ARGS{$_}} keys %ARGS );
+
+</%init>
+
+<& /Elements/Header, Title => $title &>
+<& /Elements/Tabs, Title => $title &>
+<a href="<%$RT::WebPath%>/View-Directory/Ticket/<%$Ticket->id%>?<%$QueryString%>">Show all attachments</a>
+<& ../Elements/ListAttachments, %ARGS, Ticket => $Ticket, Filename => $Filename &>

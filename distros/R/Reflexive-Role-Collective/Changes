@@ -1,0 +1,13 @@
+Revision history for Reflexive-Role-Collective: 1.113340
+
+1.113340  2011-11-30 20:59:02 Europe/Amsterdam
+        Rework re-emitting and track changes to current Reflex version
+
+1.110100  2011-01-10 13:59:05 America/Chicago
+        Update tests to use the new Reflex::Sender API
+
+1.103480  2010-12-13 18:41:41 America/Chicago
+        Implement watched events that merely re-emit another event
+
+1.103460  2010-12-11 18:51:56 America/Chicago
+        Initial Release

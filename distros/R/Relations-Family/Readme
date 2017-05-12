@@ -1,0 +1,64 @@
+NAME
+
+  Relations::Family v0.94
+
+DESCRIPTION
+
+  This perl module uses perl5 objects to simplify searching through
+  an reporting on large, complex MySQL databases, especially those 
+  with foreign keys.
+
+COPYRIGHT
+
+  Copyright 2001 GAF-3 Industries, Inc. All rights reserved.
+  Written by George A. Fitch III (aka Gaffer), gaf3@gaf3.com
+
+  This program is free software, you can redistribute it and/or modify it under
+  the same terms as Perl istelf
+
+INSTALlATION
+
+  REQUIRED
+ 
+    perl 5.004
+    DBI >= 1.13
+    DBD::mysql >= 1.18
+    Relations >= 0.94
+    Relations::Query >= 0.93
+    Relations::Abstract >= 0.94
+
+  WIN32 (Relations-Family-0.94.zip)
+
+    Extract zip file into a directory and type
+
+    ppm install Relations-Family.ppd
+
+  UN*X (Relations-Family-0.94.tar.gz)
+
+    Extract bundle into a directory and type
+
+    perl Makefile.PL
+    make
+    make install
+
+TESTING
+
+  After installing, run test.pl by typing 
+
+    perl test.pl
+
+  while in the installation directory.
+  
+DEMONSTRATION
+
+  Included with this distribution is demo.pl, which demonstrates all the listed
+  functionality of Relations::Family. You must have MySQL, Perl, DBI, DBD-MySQL, 
+  Relations, Relations::Query, Relations::Abstract, and Relations::Family 
+  installed. 
+
+  After installing everything, run demo.pl by typing 
+
+    perl demo.pl
+
+  while in the installation directory.
+  

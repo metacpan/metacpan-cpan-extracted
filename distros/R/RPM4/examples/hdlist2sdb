@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+##- Nanar <nanardon@zarb.org>
+##-
+##- This program is free software; you can redistribute it and/or modify
+##- it under the terms of the GNU General Public License as published by
+##- the Free Software Foundation; either version 2, or (at your option)
+##- any later version.
+##-
+##- This program is distributed in the hope that it will be useful,
+##- but WITHOUT ANY WARRANTY; without even the implied warranty of
+##- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##- GNU General Public License for more details.
+##-
+##- You should have received a copy of the GNU General Public License
+##- along with this program; if not, write to the Free Software
+##- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+
+use strict;
+use RPM4;
+use Getopt::Long;
+
+GetOptions (
+    'dbpath=s' => \my $dbpath,
+    'v' => \my $verbose,
+) && @ARGV or die "
+Usage $0 [--dbpath path] hdlist.cz [hdlist2.cz [...]]
+Synch rpm found into given hdlist into a database.
+Usefull to create a solve rpm database.
+";
+
+$dbpath ||= RPM4::expand("%_solve_dbpath");
+
+RPM4::add_macro("_dbpath $dbpath");
+
+my $db = RPM4::newdb(1) or die "Can't open DB";
+
+my %rpmlist;
+my %indb;
+
+$db->traverse_headers( sub {
+        my ($hdr, $id) = @_;
+        $indb{$hdr->queryformat("%{PKGID}")} = 1;
+    });
+
+foreach my $arg (@ARGV) {
+    print "Reading $arg\n";
+    open(my $hdfh, "zcat '$arg' |") or die "Can't open $_";
+    while (my $hdr = stream2header($hdfh)) {
+        $rpmlist{$hdr->queryformat("%{PKGID}")} = 1;
+        defined($indb{$hdr->queryformat("%{PKGID}")}) and next;
+        print "Adding " . $hdr->queryformat("%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}") . "\n";
+        $db->injectheader($hdr);
+    }
+}
+
+my @id2remove;
+
+$db->traverse_headers( sub {
+        my ($hdr, $id) = @_;
+        defined($rpmlist{$hdr->queryformat("%{PKGID}")}) or push(@id2remove, $id);
+    });
+
+foreach (@id2remove) {
+    $db->deleteheader($_);
+}

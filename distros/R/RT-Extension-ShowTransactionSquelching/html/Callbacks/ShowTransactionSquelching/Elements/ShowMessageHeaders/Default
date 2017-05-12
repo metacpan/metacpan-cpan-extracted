@@ -1,0 +1,20 @@
+<%args>
+$message
+$headers
+$display_headers
+</%args>
+<%init>
+
+my $txn = $message->TransactionObj;
+my @squelched = map {$_->Content} $txn->SquelchMailTo;
+
+return unless @squelched;
+
+my $title = "Squelched";
+push @{ $headers }, {
+    Tag => $title,
+    Value => join(", ", @squelched ),
+};
+$display_headers->{lc $title} = 1;
+
+</%init>

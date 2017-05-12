@@ -1,0 +1,79 @@
+<%INIT>
+  # if we aren't processing a bc request, there's nothing to do here,
+  # so bail quickly
+  return unless exists $ARGS{bc_id};
+
+  # flush the current session if user tries to login using bitcard
+  %session = (_session_id => $session{'_session_id'});
+
+  use RT::Authen::Bitcard;
+  my $bc = RT::Authen::Bitcard->handler;
+
+  # We have to use octets as Authen::Bitcard doesn't support perl strings
+  # to avoid converting back from perl string to octets we use request_args
+  my $user = $bc->verify( scalar $m->request_args );
+
+  # bitcard user verify error.  abort abort abort!
+  unless ( $user ) {
+      $RT::Logger->warning( "Bitcard verify() returned undef: ". $bc->errstr );
+      my $qs = $m->comp('/Elements/QueryString',
+                      Error => $bc->errstr );
+      $m->redirect( $RT::WebPath . '/?' . $qs);
+      $m->abort();
+  }
+
+  # upgrade octets returned by An::BC into perl strings
+  use Encode ();
+  $user->{ $_ } = Encode::decode_utf8( $user->{ $_ } )
+      foreach grep defined $user->{$_}, keys %$user;
+
+  ### changing the 'defined $user->{'email}' line back to '$user' enables the
+  ### fsck.com #7277 exploit, if you've saved the 'Manage your Bitcard account'
+  ### URL from a previous successful Bitcard login.
+
+  # if the user isn't logged in and we got credentials from Bitcard, load the user
+  unless ( defined $user->{'email'} && defined $user->{'username'} ) {
+      $RT::Logger->error("Bitcard server didn't provided email and user name, but signature is correct");
+      my $qs = $m->comp('/Elements/QueryString',
+          Error => loc("Couldn't login using Bitcard. Contact system administrator") );
+      $m->redirect( $RT::WebPath . '/?' . $qs);
+      $m->abort();
+  }
+
+  # set a global user so we know elsewhere we're using Bitcard for auth
+  $session{'BitcardUser'} = $user;
+
+  # Bitcard has verified that the user has control of this e-mail address,
+  # so it's okay to use it to get a valid RT user
+
+  # we've got a valid user, so try to load
+  $session{'CurrentUser'} = RT::CurrentUser->new();
+  $session{'CurrentUser'}->LoadByEmail( $user->{'email'} );
+  if ( not $session{'CurrentUser'}->id ) {
+      my $UserObj = RT::User->new( $RT::SystemUser );
+      my ($id, $msg) = $UserObj->Create(
+          Name => $user->{'username'},
+          RealName => $user->{'name'},
+          EmailAddress => $user->{'email'},
+          Privileged => 1,
+      );
+      if ( $UserObj->id ) {
+          # created the user, now load them as the current user
+          $session{'CurrentUser'}->Load($UserObj->id);
+          $m->comp('/Elements/Callback', %ARGS, _CallbackName => 'NewUser');
+
+          # redirect the user to their preference page to add more info
+          $m->redirect($RT::WebPath . '/User/Prefs.html');
+          $m->abort();
+      }
+      else {
+          # we couldn't create the user.  abort abort abort!
+          delete $session{'CurrentUser'};
+          delete $session{'BitcardUser'};
+          my $qs = $m->comp('/Elements/QueryString',
+                             Error => loc("Cannot create user: [_1]", $msg));
+          $m->redirect($RT::WebPath . '/?' . $qs);
+          $m->abort();
+      }
+  }
+</%INIT>

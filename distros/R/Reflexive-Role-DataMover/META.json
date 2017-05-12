@@ -1,0 +1,58 @@
+{
+   "abstract" : "Provides a composable behavior for moving data between Reflex::Streams",
+   "author" : [
+      "Nicholas R. Perez <nperez@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Reflexive-Role-DataMover",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::Params::Validate" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Structured" : "0",
+            "Reflex" : "0.098",
+            "Reflex::Callbacks" : "0",
+            "Reflex::Role" : "0",
+            "Reflex::Role::Collectible" : "0",
+            "Test::More" : "0.92",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IO::All" : "0",
+            "Moose" : "0",
+            "Reflex::Base" : "0",
+            "Reflex::Stream" : "0",
+            "Test::More" : "0",
+            "Text::Lorem" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://nickandperla.net/reflexive-role-datamover.git"
+      }
+   },
+   "version" : "1.122130"
+}
+

@@ -1,0 +1,125 @@
+%# One way to stop a runaway horse is to bet on him.
+
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr> 
+		<td><& /Edit/Elements/Tabs, Map => $Map, URL => $url &></td>
+              </tr>
+              <tr> 
+                <td class="tableEmboss">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="4">
+                    <tr> 
+                      <td bgcolor="#82D1EC" class="poptable" valign="bottom" > 
+                          <&|/l&>Project Name</&>: <% $QueueObj->Name %></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#A3DEF1"> 
+                        <table border="0" cellspacing="0" cellpadding="0" align="center" width="100%">
+			  <tr> 
+			    <td><& /Edit/Elements/Tabs, Name => 'Map2', Map => $Map, URL => '../Basic/' &></td>
+			  </tr>
+			  <tr> 
+			    <td class="poptable" bgcolor="#C4E1F0">
+</form>
+% $m->call_next;
+			    </td>
+			  </tr>
+			</table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+<%INIT>
+my $prefix = '/Foundry/Project/Source/';
+my $Map = [
+    ''			    => 'Queue=' . $QueueObj->Id,
+    $prefix		    => 'Files',		# loc
+    $prefix . "Revisions/"  => 'Revisions',	# loc
+];
+my $url = $r->uri;
+$url =~ s!\w+\.html$!!;
+if ($url =~ m{\bRevisions/}) {
+    $url = "$prefix/Revisions/";
+}
+else {
+    $url = $prefix;
+}
+</%INIT>
+<%ATTR>
+Tab2	=> 'Version Control'
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>
+<%SHARED>
+use MIME::Base64;
+use WWW::Mechanize;
+
+my $u = $session{'CurrentUser'}->UserObj;
+$RT::BaseURL = "/Foundry/Project/Source/List.html/";
+
+our $ua = WWW::Mechanize->new;
+our $wws = "$ENV{SVN_URL}/viewcvs";
+
+our ($Get, $Post) = map {
+    my $method = $_;
+    sub {
+	my $url = shift;
+	$url = $wws . $url unless $url =~ /^\w+:\//;
+	# $url .= "?root=sympa";
+	my $rv;
+	$url =~ s{(?:viewcvs/)+viewcvs}{viewcvs};
+	if ($method eq 'get') {
+	    # $m->print("Getting $url");
+	    $ua->get($url, @_);
+	    Encode::_utf8_on($rv = $ua->content);
+	}
+	else {
+	    Encode::_utf8_on($rv = $ua->post($url, @_)->as_string);
+	}
+	$rv =~ s/<hr noshade>\s*<table width="100%" border=0 cellpadding=0 cellspacing=0><tr>.*$//s;
+	if ($rv =~ s/^(.*?)<\/table>//s) {
+	    $m->notes('revision', $1) if $1 =~ /<h2>\(revision (\d+)\)/;
+	}
+	$rv =~ s!<select name=root onchange="submit\(\)">.*</select>.*?<hr noshade>!!s;
+	if ($r->uri =~ /List\.html/) {
+	    $rv =~ s{(<A[^>]*\bHREF=")/viewcvs/((\w+/)(\3))?([^"]+)}{$1$RT::BaseURL$4$5}gi;
+	}
+	else {
+	    $rv =~ s{(<A[^>]*\bHREF=")([^.][^"]+)}{$1$RT::BaseURL$2}gi
+	}
+	$rv =~ s{action="/viewcvs//"}
+		{action="${RT::BaseURL}"}g;
+	$rv =~ s{action="/viewcvs/(\w+)/\1\b}
+		{action="${RT::BaseURL}/$1}g;
+	$rv =~ s{(\n<tr>\n<td>\n)(.*)(:\n</td>\n<td>\n)}
+		{$1 . loc($2) . $3}eg;
+	$rv =~ s{(<input type=submit value=")([^"]+)}
+		{$1 . loc($2)}eg;
+	$rv =~ s{(#dirlist"?>)([^<]+)(</a></th>)}
+		{$1 . loc($2) . $3}eg;
+	$rv =~ s{(\n>)(File)(</th>)}
+		{$1 . loc($2) . $3}eg;
+	$rv =~ s{(\n<td>&nbsp;)(\d+) (year|month|week|day)s?(</td>)}
+		{$1 . loc("[quant,_1,$3]", $2) . $4}eg;
+	$rv =~ s{(\n<b>)(Up to )(<a href=)}
+		{$1 . loc($2) . $3}eg;
+	$rv =~ s{(<a href="#diff">)(Request diff between arbitrary revisions)(</a>)}
+		{$1 . loc($2) . $3}eg;
+	$rv =~ s{(<hr noshade>\s*)(No default branch)(\s*<br>)}
+		{$1 . loc($2) . $3}eg;
+	$rv =~ s{(Revision <b>)(\d+)(</b> -)}
+		{loc("$1\[_1]$3", $2)}eg;
+	$rv =~ s{<a href=[^>]+>\(text\)</a>}{}g;
+	$rv =~ s{(<a href=[^>]+>)\(markup\)(</a>)}
+		{$1 . loc("(view)"). $2}eg;
+	$rv =~ s{(<a href=[^>]+>\n?\[)(select for diffs)(\]</a>)}
+		{$1 . loc($2) . $3}eg;
+	$rv =~ s{(<a href=[^>]+>\n?)(\(\w+\))(</a>)}
+		{$1 . loc($2) . $3}eg;
+	$rv =~ s{</a>, (view)}{}g;
+	$rv;
+    };
+} qw(get post);
+</%SHARED>

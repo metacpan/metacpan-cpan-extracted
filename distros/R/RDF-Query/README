@@ -1,0 +1,1333 @@
+RDF::Query - A SPARQL 1.1 Query implementation for use with RDF::Trine.
+
+   RDF::Query allows SPARQL 1.1 and RDQL queries to be run against an RDF model, returning rows of matching results.
+
+REQUIREMENTS
+
+	To install RDF::Query you'll need the following perl modules installed:
+
+     * DateTime
+     * DateTime::Format::W3CDTF
+     * Digest::SHA
+     * Error
+     * I18N::LangTags
+     * JSON
+     * List::Util
+     * LWP
+     * Parse::RecDescent
+     * RDF::Trine
+     * Scalar::Util
+     * Set::Scalar
+     * Storable
+     * URI
+
+	The following additional modules are recommended for some functionality:
+
+     * Geo::Distance
+
+INSTALLATION
+
+   To install, run:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+VERSION HISTORY
+
+  Version 2.918 (2017-01-04)
+
+     * SECURITY FIX
+         Do not search modules in relative paths (#141 from @ppisar).
+
+  Version 2.917 (2016-05-22)
+
+     * ENHANCEMENTS
+         Change hashbang to use env (#137 from KjetilK).
+         Replaced Text::CSV by Text::CSV_XS (#127, #136; patch from jordivador).
+     * BUG FIXES
+         Fixed bug that didn't properly anchor the regex match in serializing prefixnames (#135).
+         Fixed SPARQL parsing bug causing filters to improperly appear inside of service blocks (github issue #134).
+         Fix SPARQL serialization of functions that have a prefix that is also a valid function name (#133).
+
+  Version 2.916 (2015-10-16)
+
+     * ENHANCEMENTS
+         Updated RDF::Query::Node::Resource->as_sparql to allow SPARQL 1.0 PN_LOCAL prefix names (GitHub issue #132).
+
+  Version 2.915 (2015-08-18)
+
+     * NEW FEATURES
+         Add RDF::Query::Node->from_attean method (PR #128 from Kjetil Kjernsmo).
+     * OTHER
+         Add default indentation to RDF::Query::Algebra::Limit->sse.
+
+  Version 2.914 (2015-05-17)
+
+     * BUG FIXES
+         Fixed bug in evaluation of SPARQL CONCAT function.
+
+  Version 2.913 (2015-02-14)
+
+     * BUG FIXES
+         Fix SPARQL 1.1 parsing bug that disallowed whitespace between an aggregate name and the following open-parenthesis.
+         Fix bug in RDF::Query::Algebra::NamedGraph->definite_variables.
+         Fix rqsh to use a pure memory model when requested (instead of a temporary model).
+         Fixed whitespace handling bug during parsing of VALUES clauses (github issue #120).
+     * ENHANCEMENTS
+         Merge adjacent service blocks if their endpoints and silent flags match (github issue #124).
+         Allow RDF::Query->new to accept an algebra object instead of a query string.
+         Updated node classes to allow overloaded comparisions with RDF::Trine::Node::Nil objects.
+         Improve coverage of as_hash function for variable bindings and expressions (github issue #121).
+     * OTHER
+         Documentation fixes (from Kjetil Kjernsmo).
+
+  Version 2.912 (2014-10-24)
+
+     * BUG FIXES
+         Fix bug in handling of SUM aggregates with non-literal data.
+     * ENHANCEMENTS
+         Improved performance of regular expression use in SPARQL parser (from Dorian Taylor; github pull request #111).
+     * OTHER
+         Added IRC resource to Makefile.PL.
+
+  Version 2.911 (2014-07-24)
+
+     * BUG FIXES
+         Fixed bug in RDF::Query::Plan::Join::PushDownNestedLoop that didn't allow 'aggregate' to appear in the RHS serialized text (github issue 101).
+         Fixed SPARQL 1.1 GGP parsing bug (github issue 100).
+         Fixed RDF::Query::Algebra->subpatterns_of_type to support descent into sub-queries.
+         Disabled pushing full updates down into the store object (only meant to be full queries at this point).
+         Fixed as_hash method in RDF::Query::Algebra::Aggregate, RDF::Query::Algebra::Sort, and RDF::Query::Expression::Alias.
+         Updated RDF::Query::Compiler::SQL to respect node class encapsulation.
+     * ENHANCEMENTS
+         Modularized implementation of explain method in algebra and plan classes.
+         Updated rqsh script to use env perl instead of hardcoded bin path.
+         Added JSON output to bin/parse.pl script.
+         Added RDF::Query::ExecutionContext->bind_variable method.
+     * OTHER
+         Added :all export tag to RDF::Trine::Node.
+         Remove Crypt::GPG and Bloom::Filter from list of recommended modules (no longer used in code).
+
+  Version 2.910 (2013-07-22)
+
+     * BUG FIXES
+         Updated RDQL parser to work with recent RDF::Trine releases.
+
+  Version 2.909 (2012-11-24)
+
+     * BUG FIXES
+         Fixed bad sparql serialization of filters with equality tests; was using '==' instead of '=' (github issue 53).
+         Fixed bug in RDF::Query::Algebra::Service->referenced_variables.
+         Fixed bug that wasn't passing the active graph to EXISTS filter evaluation.
+         Fixed RDF::Query prepare and execute methods to properly localize the model object.
+         Fixed bug in RDQL parser that mistakenly required a USING clause (github issue 70).
+         Fixed handling of aggregates over empty groups.
+     * NEW FEATURES
+         Added support for VALUES graph pattern (in-place BINDINGS).
+         Added support for UUID() and STRUUID() functions.
+         Added is_update() and specifies_update_dataset() methods to RDF::Query.
+         Accept common typo of SEPARATOR in SPARQL 1.1 parser ("SEPERATOR") with constructor arg 'allow_typos' in RDF::Query::Parser::SPARQL11.
+     * ENHANCEMENTS
+         Fixed SPARQL 1.1 parsing to enforce not using shared bnode labels between update data operations.
+         Improved SPARQL 1.1 parser detection of invalid use of BIND() (when binding already in-scope variables).
+         Fixed bug in SPARQL 1.1 parser to recognize legal Update operations.
+         Updated SPARQL 1.1 parser to allow colon in local part of a prefixname.
+         Updated STRBEFORE() and STRAFTER() implementations to track SPARQL 1.1 standard.
+         Updated property path implementation to track W3C standard (changed counting semantics and dropped {m,n} form).
+         Added support to passthrough query eval to the model if supported and the 'allow_passthrough' option is set on the query object.
+         Added 'canonicalize' option to RDF::Query constructor to canonicalize literal values.
+     * OTHER
+         Updated handling of BIND() in the SPARQL 1.1 parser to match the latest spec semantics.
+         Added ability to run tests of type mf:CSVResultFormatTest.
+         Fixed config handling in rqsh to allow the use of hexastore backends.
+         Merged Log4perl initialization cleanup patches (from github/kba).
+         Use $plan->explain instead of $plan->sse for "explain" rqsh command.
+         Updated EARL IRIs in bin/failing_earl_tests.sh and bin/passing_earl_tests.sh.
+         Removed RDF::Redland recommendation in Makefile.PL.
+         Added doap:implements statements, and updated release data to doap.rdf.
+         Updated RDF::Query::Util::cli_parse_args to allow no-argument setup.
+         Updated xt/dawg/earl.pl to use new EARL IRIs earl:passed and earl:failed.
+         Added POD to bin/rqsh.
+         Updated DAWG test harnesses to support expected query bindings results in RDF/XML format.
+         Fixed xt/dawg-eval11.t to emit TAP failures when query parsing fails.
+         Require RDF::Endpoint 0.05 in xt/dawg-eval11.t.
+         Removed values from test directory list in xt/dawg-eval11.t.
+         Added values to list of test directories in xt/dawg-eval11.t.
+         Added exists test directory to xt/dawg-eval11.t.
+         Added test case confirming bad sparql serialization of equality testing filters (github issue 53).
+         Removed tests for {m,n} property path forms.
+         Fixed RDF::Query::Algebra::Project to throw exception on bad constructor arguments.
+         Added bugtracker info to Makefile.PL.
+         Added POD marking modules as unstable: RDF::Query::BGPOptimizer, RDF::Query::Compiler::SQL, RDF::Query::Federate, RDF::Query::Federate::Plan
+         Improved expected/actual results output when encountering failing tests.
+         Removed old bloom-filter federation code.
+         Removed RDF::Query::ExecutionContext->base method.
+         Fix POD in RDF::Query::Algebra::Table.
+
+  Version 2.908 (2012-01-31)
+
+     * BUG FIXES
+         Fixed SPARQL serialization of expressions using && and ||.
+         Fixed SPARQL 1.1 parser to support "GRAPH<iri>" without whitespace.
+         Fixed bug resulting in false positive error when projecting expressions with aggregates.
+         Fixed aggregate evaluation to result in unbound variables on error (instead of dropping the result).
+         Fixed numeric divide operation to return xsd:decimal when operands are xsd:integers.
+         Fixed RDF::Query::Expression::Binary->evaluate to properly throw on div-by-zero.
+         Fixed RDF::Query::Expression::Function->evaluate to propogate type errors in IF().
+         Fixed bin/rqsh to handle queries that use BASE.
+         Fixed bug in RDF::Query::Plan::Join::PushDownNestedLoop that produced invalid results when the RHS was a subselect.
+         Fixed RDF::Query::Algebra::Filter->as_sparql to handle variation of serialization of the child pattern.
+         Fixed bug in SPARQL 1.1 parser that mistakenly introduced aggregate operations in non-aggregate queries.
+     * NEW FEATURES
+         Added support for Service as a binary op (allowing variable-endpoint SERVICE blocks).
+         Added implementations for functions STRBEFORE, STRAFTER, and REPLACE.
+         Added RDF::Query->prepare_with_named_graphs method.
+         Added support for COPY and MOVE operations.
+         Allow percent encoding and backslash escaping in prefix names.
+     * ENHANCEMENTS
+         Fixed RDF::Query::Expression::Binary to canonicalize numeric literal results.
+         Added syntax support for SILENT form of LOAD.
+         Added support for SILENT and variable endpoint handling for SERVICE patterns.
+         Added syntax support for optional GRAPH keyword on SPARQL 1.1 update shortcuts.
+         Updated RDF::Query::Plan::Extend to copy variable bindings instead of using the existing reference.
+         Added RDF::Query::Plan::Extend->explain.
+         Changed explain() syntax of plan quads.
+         Updated plan classes to optionally register intermediate results with a execution delegate object.
+         Made RDF::Query::Plan::Construct uniq the returned triples.
+         Added custom RDF::Query::Plan::Construct->explain method.
+         Normalize language tags used in SPARQL query syntax to lowercase.
+         Modularize RDF::Query::Plan::Service to allow mock testing.
+         Added exception handling in RDF::Query->set_error.
+         Added subplans_of_type method to Plan classes.
+         Fixed use of '__DEFAULT__' sentinel value in RDF::Query::Plan, RDF::Query::Plan::Service, RDF::Query::Node::Resource->as_sparql, and RDF::Query->as_sparql.
+         Force the planner to avoid using a bind-join when the RHS contains a Service subplan (to avoid a DOS attack on the remote endpoint).
+         Updated DATATYPE() to return rdf:langString on language-tagged literals (per RDF 1.1 change).
+         Fixed sse serialization in RDF::Query::Algebra::Service to handle binary op (variable endpoint) form.
+         Croak rather than die in some places, confess and use logdie in one place
+         Allow aggregates in ORDER BY clause.
+     * OTHER
+         Added examples/query_url.pl.
+         Added RDF::Trine::Error::UnimplementedError exception class.
+         Updated required version of RDF::Trine to 0.138.
+
+  Version 2.907 (2011-06-04)
+
+     * BUG FIXES
+         Fixed bug in SPARQL 1.1 parser for DESCRIBE queries without a WHERE clause.
+         Fixed join ordering bug for queries with a BINDINGS clause and several joins.
+         Fixed RDF::Query->as_sparql for DESCRIBE queries which project URI terms, not variables.
+     * OTHER
+         Fixed expected test results for DESCRIBE queries without a WHERE clause.
+         examples/query.pl now emits a warning if the query object cannot be constructed.
+
+  Version 2.906 (2011-05-14)
+
+     * API CHANGES
+         Globally changed 'base' to 'base_uri' in code and API.
+     * BUG FIXES
+         Fixed SPARQL serialization in RDF::Query::Plan generation of SERVICE blocks to always include braces around the query body.
+         Fixed SPARQL 1.1 parsing bug in property paths using alternatives ('|').
+         Fixed SPARQL 1.1 bug in parsing prefixnames where a graph term is expected.
+         Fixed bug in ZeroOrMore reverse path handling (patterns matching { var path* term }).
+         Fixed bug in RDF::Query::Node::Literal::_cmp that was causing wrong node comparison results.
+         Fixed bug in parsing solution modifiers in CONSTRUCT and DESCRIBE queries.
+         Fixed bug in handling of unbound variables in delete templates in RDF::Query::Plan::Update.
+         Fixed bug in calls to RDF::Query->var_or_expr_value that was preventing use of EXISTS filters in project expressions.
+     * NEW FEATURES
+         Updated RDF::Query::Plan::Iterator->new to allow passing in a callback that will return an iterator, instead of an iterator directly.
+         Updated RDF::Query->query_plan to delegate entire queries to the RDF::Trine::Model when possible.
+         Updated bin/deparse.pl to allow specifying an endpoint url for SPARQL-backed models (which can affect the query plan).
+         Added support for empty SPARQL 1.1 Update sequence operations (allowing no-op updates).
+         Added options to RDF::Query->new to allow forcing RDF::Query to disable query delegation to the underlying store.
+         Added option to RDF::Query::Util::cli_parse_args to specify arbitrary options to be supplied to the RDF::Query->new constructor.
+         Added new, cleaner line-based "explain" format for serializing query Plan and Algebra objects.
+         Added bindings accessor and is_unit method to RDF::Query::Plan::Constant.
+         Added ability to forcibly remove a particular join algorithm from consideration in plan generation.
+         Added 'execute' command in rqsh to allow loading a query from a file or URL.
+     * ENHANCEMENTS
+         Updated SPARQL 1.1 parser to prevent bnode use in DELETE blocks.
+         Updated rqsh to associate common filename extensions with media types (helps in loading local files).
+         Updated RDF::Query::Plan::Path to align with new ALP algorithm from the spec text.
+         Added some simple statistics generation code in RDF::Query::Plan::Join subclasses.
+         Added missing implementation for property paths using {n,} modifier syntax.
+         Added code to guard against mishandling unbound/blank/variable nodes in DELETE templates in RDF::Query::Plan::Update.
+     * OTHER
+         Updated tests to use new RDF::Trine::Iterator->seen_count method instead of deprecated count method.
+         Updated serialization text for zero-length paths in RDF::Query::Plan::Path->plan_node_data.
+         Removed warning of unknown options passed to RDF::Query->new.
+         Removed unused projection code in RDF::Query->execute_plan.
+         Removed Digest::SHA1 from prereq modules, and updated code to use Digest::SHA instead.
+         Remove the meaningless "All rights reserved" copyright text.
+         Fixed test count in t/sparql11-propery_paths.t.
+         Commented out noisy debugging output in RDF::Query::Plan::Path.
+         Added trace debugging in RDF::Query::Plan::Sort.
+         Added options instance variable to RDF::Query::ExecutionContext.
+         Added Module::Pluggable to list of required modules in Makefile.PL.
+         Added mappings from file extensions to media types in dawg test scripts.
+         Various updates to SPARQL 1.1 dawg test harness scripts.
+
+  Version 2.905 (2011-02-18)
+
+     * BUG FIXES
+       Fixed mistaken case sensitivity of COALESCE, BNODE, CONCAT, and SUBSTR keywords in SPARQL 1.1 parser.
+       Fixed parsing ambiguity between MIN aggregate and MINUTES function.
+       Fixed Xpath fn:timezone-from-dateTime function return for UTC timezones.
+       Fixed RDF::Query::Algebra::Project->as_sparql handling of binary select expressions.
+       Fixed RDF::Query::Algebra::Construct->sse serialization to include construct triples.
+       Updated handling of BIND() to not close group scope (which was applying filters in the wrong place).
+       Fixed RDF::Query::Parser::SPARQL11 to handle whitespace between tokens in 'INSERT DATA' and 'DELETE DATA'.
+       Fixed RDF::Query::Parser::SPARQL11 to handle empty ModifyTemplates.
+       Fixed SPARQL 1.1 parser to properly set relevant datasets for update operations.
+       Fixed plan code for zero-length paths to return RDF::Query::Node-based results (not Trine-based).
+       Fixed bug in RDF::Query::Plan::Clear when attempting to clear the default graph.
+       Fixed exception throwing on numeric binary expression eval without numeric literal arguments.
+       Updated RDF::Query::Plan to handle update operations with different datasets for matching (USING clause).
+     * NEW FEATURES
+       Added SPARQL 1.1 numeric functions: ABS, CEIL, FLOOR, ROUND, RAND
+       Added SPARQL 1.1 string functions: CONCAT, SUBSTR, STRLEN, UCASE, LCASE, ENCODE_FOR_URI, CONTAINS, STRSTARTS, STRENDS
+       Added SPARQL 1.1 date functions: NOW, TIMEZONE, TZ, YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS
+       Added SPARQL 1.1 hashing functions: MD5, SHA1, SHA224, SHA256, SHA384, and SHA512
+       Added RDF::Query::Functions->install_function method, and implementations for fn:compare, fn:concat, and fn:substring.
+       Updated RDF::Query->execute_with_named_graphs to accept optional arguments to be passed to C<< execute >>.
+       Added support for CONSTRUCT WHERE syntax shortcut.
+       Added support for SILENT modifier to SERVICE patterns.
+       Added SILENT flag in RDF::Query::Algebra::Service.
+       Added initial code to create SPIN serializations of queries.
+       Added RDF::Query::Node::Literal->type_list method.
+     * ENHANCEMENTS
+       Updated xt/dawg-syntax11.t to find more syntax queries in the dawg test data.
+       SPARQL 1.1 parser now throws errors for more classes of syntactically invalid queries (repeated expression aliases, wrong number of BINDINGS values, SELECT * with use of grouping).
+       Added support for non-strict comparisons of xsd:strings in RDF::Query::Node::Literal (based on $LAZY_COMPARISONS variable).
+     * OTHER
+       Major refactor of xt/dawg-eval11.t test harness.
+       Updated required version of Test::More to 0.88 (0.86 doesn't have done_testing() used in t/store-config.t).
+       Updated RDF::Query::Expression::Function->evaluate to throw an error if no function coderef is found.
+
+  Version 2.904 (2010-11-23)
+
+     * Added SPARQL 1.1 Update shortcut syntax support for COPY, MOVE, and ADD graph operations.
+     * Added 'set prefix' and 'time' commands to rqsh.
+     * Added string concatenation overloading of binary +.
+     * Added xpath function implementations.
+     * Fixed bug in property path evaluation on encountering blank path nodes.
+     * Fixed use of binary '*' in FILTER without numeric data in t/resultforms.t.
+     * Fixed bin/dawg11-status.pl to only load SPARQL 1.1 earl result files.
+     * Fixed RDF::Query::Plan::Update to ignore non-ground triples (unbound variables don't act as wildcards).
+     * Fixed handling of named graph data in insert/delete patterns of update operations.
+     * Updated RDF::Query::Util to use RDF::Trine::Model->temporary_model and guess an appropriate parser based on filenames.
+     * Fixed bug in RDF::Query::Plan::Construct that wasn't giving each result a new set of blank nodes (RT 63155).
+     * Updated SYNOPSIS and execute() and execute_plan() methods POD (RT 63153 comment from Ivan Shmakov).
+     * Updated documentation to explicitly discuss inherited methods due to subclassing.
+     * Fixed RDF::Query::Algebra::Sequence->sse to serialize operations in proper order.
+     * Added $silent argument to RDF::Query::Algebra::Clear constructor.
+     * Updated namespace URI in RDF::Query::Functions::Jena to <http://jena.hpl.hp.com/ARQ/function#>.
+     * Updated namespace URI in RDF::Query::Functions::Xpath to <http://www.w3.org/2005/xpath-functions#>.
+     * Updated xt/dawg-eval11.t to align with updated test case manifest schemas.
+     * Updated xt/dawg-eval11.t to prevent test cases with missing files from emitting failures (now skipped).
+
+  Version 2.903 (2010-11-03)
+
+     * SPARQL 1.1
+     	* New features
+     		* Added support for BIND(expr AS ?var) operator.
+     		* Added isNumeric built-in function, checking for proper datatype and valid lexical forms for numerics.
+     	* Updates
+     		* Updated SPARQL 1.1 parser to handle WITH clauses with PrefixedNames.
+     		* SPARQL 1.1 parser now sets error and returns if no query string is supplied.
+     		* Added more exception handling in RDF::Query::Parser::SPARQL11.
+     		* Updated CLEAR and DROP handling in SPARQL 1.1 parser and engine to handle 'NAMED' and 'ALL' variants.
+     		* Renamed 'binding_variables' methods to 'potentially_bound' to align with current SPARQL 1.1 terminology.
+     		* Results returned by property path plans are now RDF::Query::VariableBindings objects and are properly projected.
+     		* The query planner now interprets simple paths as basic graph patterns.
+     		* Removed Algebra and Plan classes for Not and Exists operations (now handled in other classes).
+     		* Updated RDF::Query::Plan::Extend to drop the extended variable binding if evaluating the extension yields an error.
+     		* Updated RDF::Query::Plan::Update to accept delete patterns with variables.
+     		* Updated subquery plan objects to use a sub-plan, not a full query object.
+     	* Bug fixes
+     		* Fixed SPARQL 1.1 parser bug that was returning partial data from a failed parse call.
+     		* Fixed SPARQL 1.1 parser bug for queries with multiple FILTERs in a GGP including an EXISTS filter.
+     		* Fixed SPARQL 1.1 parser bug for DROP/CLEAR queries.
+     		* Fixed SPARQL 1.1 parser typo of 'SEPARATOR' argument to GROUP_CONCAT aggregate.
+     		* Fixed SPARQL 1.1 parser to handle FITLERS to the left of MINUS/OPTIONAL and allow projecting '*' with other vars/epressions.
+     		* Fixed SPARQL 1.1 parser case sensitivity of project expression 'AS' token.
+     		* Fixed SPARQL 1.1 parser handling of of subqueries within GRAPH blocks.
+     		* Fixed miscellaneous bugs and improved performance of parsing SPARQL 1.1 queries.
+     		* Made parsing of very large triple blocks non-recursive in SPARQL 1.1 parser.
+     		* Fixed COALESCE function to handle errors properly.
+     		* Fixed RDF::Query::Plan::Aggregate to extend results using AliasExpressions from HAVING clauses.
+     		* Fixed bug that was ignoring GROUP BY clauses when no aggregate operations were present.
+     		* Fixed bad looping on start node of unbounded property paths.
+     		* Fixed bug in query planning of '^' property paths.
+     		* Fixed zero-length property path evaluation within GRAPH blocks.
+     		* Removed plan duplication of zero-length case in '*' property paths.
+     		* Fixed handling of named graphs within subqueries (changes to active graph handling in the query planner).
+     		* Fixed type-promotion and handling of numeric types in aggregate handling.
+     		* Fixed RDF::Query::Algebra::Update->as_sparql to handle INSERT/DELETE updates properly.
+     		* Fixed RDF::Query::Plan::Aggregate->sse to allow handling of (non-blessed, scalar) '*' columns.
+	
+     * Query Engine
+     	* Added ability to pass through arguments to the query planner in RDF::Query->prepare.
+     	* Updated RDF::Query::Node::Literal::_cmp to handle literals that fail to parse as DateTime objects.
+     	* Updated RDF::Query::Plan::Limit to use the limit accessor internally.
+     	* RDF::Query::Plan::NamedGraph now uses lazy iterator for graph names.
+     	* Updated RDF::Query::VariableBindings to subclass the new RDF::Trine::VariableBindings.
+     	* RDF::Query::Algebra::Project now implements bind_variables().
+     	* Updated RDF::Query->describe to use $model->bounded_description instead of simply outgoing arcs.
+     	* Fixed bug in evaluation of function expressions in which the execution context object was lost (causing EXISTS filters to fail).
+     	* Fixed optimization of COUNT(*) over 1-triple BGPs to keep the variable binding for the pseudo-variable ?COUNT(*).
+     	* Fixed sse serialization in RDF::Query::Algebra::Distinct.
+     	* Fixed RDF::Query::Plan::Join::PushDownNestedLoop to close sub-plans in close() method.
+	
+     * rqsh - RDF::Query Shell
+     	* Added ability to show the parsed algebra with 'parse' command.
+     	* Added abiility to show the query execution plan with the 'explain' command.
+     	* Added ability to change the RDF serializer with the 'serializer' command.
+     	* Added ability to initialize new stores with the 'init' command.
+     	* Added ability to change underlying store with the 'use' command.
+     	* Added 'help' command.
+     	* Updated packaging to install rqsh script (renamed from old bin/rqsh.pl).
+     	* Updated to catch errors thrown while trying to create new storage backends (e.g. DBI->connect failing).
+     	* rqsh now defaults to read-write models.
+     	* rqsh now sets a base URI for the current working directory.
+     	* Password input now doesn't echo to the terminal.
+     	* Filename input now autocompletes via Term::ReadLine.
+	
+     * Warning and Error Handling
+     	* Replaced calls to die with throwing exceptions.
+     	* RDF::Query->new now warns about unrecognized options.
+     	* DATATYPE() now throws an exception unless passed a valid node object.
+     	* RDF::Query::Expresion::Binary now throws exceptions on numeric comparisions with non-numeric operands.
+     	* Fixed error message in RDF::Query::Plan::NamedGraph.
+     	* Added trace debugging to RDF::Query::Plan::Union.
+     	* Added trace debugging to RDF::Query::Plan::Project.
+     	* Added trace debugging to RDF::Query::Plan::Path.
+	
+     * Tests and Miscellany
+     	* Added SPARQL 1.1 syntax and eval test harnesses.
+     	* Fixed bug in xt/dawg-eval11.t parsing of srx files containing literal values that evaluate to false in perl (e.g. '0').
+     	* Fixed turtle output for rdfs:comments in xt/dawg/earl.pl.
+     	* Moved developer tests from t/ to xt/.
+     	* Refactored RDF::Query::Functions into several auto-loaded sub-packages via Module::Pluggable (patch from tobyink).
+     	* Removed references to the now-deprecated mac.com in network-based tests.
+     	* Updated expected values in t/queryform-describe.t for results using bounded descriptions.
+     	* Updated RDF::Query::Util to look for .prefix-cmd cache of common namespace names.
+     	* Updated RDF::Query::Util::cli_parse_args to accept '-r' as a read-only flag.
+     	* Updated required version of RDF::Trine to 0.126.
+     	* Updated to use URI 1.52 to allow direct usage of IRIs without unicode workarounds.
+     	* Made code updates to improve performance based on profiling.
+
+  Version 2.902 (2010-07-02)
+
+     * Fixed bug in requiring prerequisite modules.
+
+  Version 2.901 (2010-06-29)
+
+     * Added support for SPARQL 1.1 CREATE/DROP GRAPH update operations.
+     * Fixed named graph handling.
+     * Fixed bug in handling of * aggregates.
+     * Simplified code to create new temporary models when FROM clauses dereference graph data.
+     * Fixed infinite loop bug on parsing certain invalid SPARQL 1.1 update queries.
+     * Fixed handling of BGPs within named graphs in RDF::Query::Plan::BasicGraphPattern.
+     * Updated syntax error exception messages in SPARQL parsers.
+     * Fixed property path evaluation within named graphs.
+     * Converted Makefile.PL to properly use Module::Install.
+
+  Version 2.900 (2010-06-23)
+
+     * Major Changes
+     
+     	* SPARQL 1.1 is now the default query parser.
+     	* RDF::Core is no longer supported as a backend triplestore.
+     	* Redland is still supported as a backend store, but updated handling of default and named graphs means that existing triples stored in Redland without a context (named graph) will not be accessible from RDF::Query.
+     
+     * SPARQL Language Updates
+     
+     	* Added support for SPARQL 1.1 Query features:
+     		* Basic Query Federation with BINDINGS and UNDEF support.
+     		* Functions: IF, STRDT, STRLANG, IRI, URI, BNODE.
+     		* Infix operators IN and NOT IN.
+     		* Aggregates COUNT, SUM, MIN, MAX, AVG, GROUP_CONCAT, and SAMPLE.
+     		* Property paths.
+     		* Negation with MINUS graph patterns and NOT EXISTS filters.
+     	* Added support for SPARQL 1.1 Update features:
+     		* INSERT/DELETE DATA, INSERT/DELETE WHERE, LOAD, and CLEAR
+     		* Added support for multi-statement updates.
+     
+     * API Updates
+     
+     	* Removed all bridge classes (RDF::Query::Model::*).
+     	* Removed RDF::Query::Logger class.
+     	* Removed net filter function code from RDF::Query.
+     	* Added as_hash method to Query, Algebra, and Node classes.
+     	* Removed SPARUL and SPARQLP parsers.
+     	* RDF::Query no longer loads URIs in FROM and FROM NAMED clauses with SPARQL 1.1 by default.
+     	* Added ability for RDF::Query::Plan::Iterator to fire a callback when execute() is called.
+     	* Added new RDF::Query::Plan::ComputedStatement class.
+     	* Added new RDF::Query::Plan::Iterator class.
+     
+     * Bugfixes
+     
+     	* Fixed whitespace unescaping bug in SPARQL (1.0 and 1.1) parsers.
+     
+     * Scripts
+     
+     	* Added bin/json.pl to print a JSON-formatted representation of the query algebra.
+     	* Added bin/rqsh.pl CLI interface to executing updates and queries.
+     	* Added ability to serialize algebra and plan in bin/deparse.pl.
+     	* bin/deparse.pl now catches parsing errors and prints stacktrace.
+     
+     * Optimizations
+     
+     	* Implemented optimization for COUNT(*) over a single triplepattern.
+
+  Version 2.202 (2010-05-22)
+
+     * Added initial SPARQL 1.1 syntax and eval support for select expressions, subqueries, negation, aggregates, subqueries, and basic federation.
+     * Added RDF::Query::VariableBindings.pm->set method.
+     * Added RDF::Query::_new constructor without any sanity or setup code (used for subquery construction).
+     * Added RDF::Query::Node::Blank::new constructor to avoid RDF::Trine's N-Triples syntax requirements.
+     * Added SAMPLE and GROUP_CONCAT aggregate support.
+     * Added shortcut functions for constructing RDF::Query::Node objects and Algebra Triples, BGPs and GGPs.
+     * Added warning to RDF::Query::Algebra::Project constructor for improper variable lists.
+     * Updated DAWG tests to use SPARQL 1.1 parser.
+     * Removed SPARQLP aggregate tests that don't align with new SPARQL 1.1 semantics.
+     * Updated DAWG eval tests to skip non-approved tests.
+     * Fixed handling of unicode decoding in DAWG eval tests.
+     * Bumped required version of RDF::Trine to 0.123.
+     * Updated t/models.pl to use RDF::Trine::Parser->parse_url_into_model method and redland's 'guess' parser.
+     * Fixed logging key name in RDF::Query::Plan::Exists.
+     * Fixed sse and as_sparql methods in RDF::Query::Algebra::Exists.
+     * Implemented RDF::Query::Algebra::Exists::binding_variables.
+     * Updated BGPOptimizer to estimate selectivity directly instead of using costmodel code.
+     * Removed costmodel code.
+     * Removed unused fixup and execute methods in Algebra classes.
+     * Updated RDF::Query to only instantiate DateTime parser and LWP::UserAgent if needed.
+     * Changed DBPedia network test to align with recent DBPedia update in t/dev-service-description.
+     * Updated SPARQLP parser tests to align with internal changes in RDF::Query::Algebra::Aggregate.
+     * Updated RDF::Query::Algebra::Aggregate and RDF::Query::Plan::Aggregate to syntactically handle HAVING clauses.
+     * Fixed bin/graph-bgp.pl (had bitrotted).
+     * Changed bnodes to named variables in examples/queries/sparql-bgp-people-knows.rq.
+     * RDF::Query::Util::cli_make_query now defaults the 'class' parameter to 'RDF::Query'.
+     * Removed dependency list and added perlrdf link to POD in RDF::Trine and RDF::Query.
+
+  Version 2.201 (2010-01-30)
+
+     * Added benchmark/lubm.pl.
+     * Added examples/queries/sparql-ask-people.rq.
+     * Added RDFa tests.
+     * Added Data::UUID prerequisite to META.yml and Makefile.PL.
+     * Updated ::Model::RDFTrine::add_uri and ::add_string to use new RDF::Trine::Parser methods.
+     * Updated as_sparql and sse code to work with more recent RDF::Trine versions.
+     * Removed as_sparql caching in RDF::Query::Algebra::Triple.
+     * Renamed RDF::Query test files to remove old-style numbering.
+     * Updated parser tests to track new RDF::Trine::Node::Literal internal structure.
+     * Updated prereq version of RDF::Trine to 0.114.
+     * Fixed NAME POD section in RDF::Query::ServiceDescription (RT52264 from KjetilK).
+
+  Version 2.200 (2009-08-06)
+
+     * Federation / Service Descriptions:
+
+         * Rewrote the optimistic plan generator in RDF::Query::Federate::Plan.
+         * Added threshold timeout argument to RDF::Query::Plan::ThresholdUnion and support for it in RDF::Query::Federate::Plan.
+         * Simplified logging in RDF::Query::Federate::Plan (now only logs to category 'rdf.query.federate.plan').
+         * RDF::Query::ServiceDescription now adds an 'origin' label annotations to RDF::Query::Algebra::Triple objects.
+         * Removed check of the sd:definitive property in RDF::Query::ServiceDescription (was based on wrong assumptions).
+         * Updated RDF::Query::ServiceDescription::answers_triple_pattern() to recognize wildcard capabilities, constructor now adds wildcard by default.
+         * Added new RDF::Query::ServiceDescription::new_with_model constructor.
+         * RDF::Query::ServiceDescription::computed_statement_generator now returns empty iterators when passed triple patterns with bound blank nodes.
+         * Added test data in data/federation_data/.
+         * RDF::Query::Plan::Service now adds an 'origin' label annotation to the RDF::Query::VariableBindings object.
+         * Added 'optimistic_threshold_time' query flag to RDF::Query::ExecutionContext and RDF::Query constructor.
+         * RDF::Query::Federate::add_service() now adds the appropriate computed statement generators to the query object.
+         * Removed optimistic query rewriting test from t/34-servicedescription.t (now covered by t/federate.t).
+         * Added t/federate.t with tests for optimistic federated query optimization using ::Plan::ThresholdUnion and RDF::Endpoint::Server.
+
+     * Aggregates:
+
+         * Fixed serialization quoting issue in RDF::Query::Algebra::Aggregate::sse().
+         * RDF::Query::Plan::Aggregate now attempts plain string comparisons for MIN,MAX when strict_errors is not set.
+         * Added support for average aggregates, and fixed datatype support in aggregates.
+
+     * Command Line Inferface:
+
+         * Added bin/query.pl, a fork of examples/query.pl, to support simple query execution.
+         * Added RDF::Query::Util as home to helper functions (added CLI args parsing functions to create queries and models).
+         * Simplified CLI argument parsing in bin/ and examples/ programs.
+
+     * Refactoring, Code Cleanup, and Documentation:
+
+         * Added and updated POD to RDF::Query::Util, RDF::Query::Node and RDF::Query::Plan and RDF::Query::Federate::Plan.
+         * Added check for RDFQUERY_THROW_ON_SERVICE environment variable in RDF::Query::Plan::Service.
+         * Cleaned up code in RDF::Query::Model::get_computed_statements().
+         * Updated SSE formatting and uninitialized warning in RDF::Query::Plan, RDF::Query::Algebra::Filter, RDF::Query::Algebra::Distinct and RDF::Query::Algebra::Sort.
+         * Moved shared RDF::Trine-related model methods into RDF::Query::Model from subclasses.
+         * Raised required RDF::Trine version to 0.111 which brings RDF::Trine::Graph support.
+         * RDF::Query::Model::RDFTrine::BasicGraphPattern::execute now returns $self.
+         * Removed dependency on Test::JSON, List::MoreUtils, and XML::Parser.
+         * Removed TODO on test in t/29-serialize.t.
+         * Removed unnecessary code in RDF::Query::Plan subclasses, bin/query.pl, bin/graph-bgp.pl and bin/graph-query.pl.
+
+     * Logging:
+
+         * Added logging in RDF::Query::Plan::ThresholdUnion, and RDF::Query::Model.
+         * Changed logging level from debug to trace in RDF::Query::Plan::Triple, RDF::Query::Plan::Project, RDF::Query::Plan::Filter, RDF::Query::Plan::Join::NestedLoop, RDF::Query::Plan::PushDownNestedLoop, and RDF::Query::Model::RDFTrine.
+         * Added calls to Log::Log4perl::is_debug to eliminate unnecessary serialization of logging when not in use.
+         * Made error message more useful when SERVICE calls fail in RDF::Query::Plan::Service.
+
+     * Bugfixes:
+
+         * Fixed bug in RDF::Query::Plan::Offset in cases where the offset was beyond the end of the result set.
+         * Fixed testing for Bloom::Filter in t/31-service.t.
+         * Fixed test expectations when making remote DBPedia query in t/34-servicedescription.t.
+         * Fixed check of $ENV{RDFQUERY_NETWORK_TESTS} to test boolean value, not just existence.
+         * Fixed (bad) expected serializations in t/29-serialize.t.
+         * Fixed bug in RDF::Query::Plan::ThresholdUnion attempting to close an iterator twice.
+         * Fixed sse serialization issues in RDF::Query::Algebra::BasicGraphPattern and RDF::Query::Algebra::Project.
+         * Fixed bug in RDF::Query::Node::from_trine() that up-cast blank nodes to variables.
+         * Fixed quoting issue in RDF::Query::Algebra::Service::sse().
+         * Fixed parameter handling in bin/graph-qeps.pl:prune_plans().
+         * Fixed handling of 'GRAPH ?g {}' (empty GraphGraphPatterns) to return all graph names.
+         * Added check for ref($node) in RDF::Query::VariableBindings::new (broke code after previous removal of blessed() check).
+         * Added use of defined() in code that had been testing boolean value of objects (and causing expensive string overloading).
+
+     * Miscellaneous Changes:
+
+         * Added examples of queries and service descriptions in examples/.
+         * Updated dawg-eval.t to actually test graph equivalence.
+         * Clarified graph labels in RDF::Query::Model::RDFTrine::BasicGraphPattern::graph().
+         * Added the ability to add label annotations to RDF::Query::VariableBindings, RDF::Query::Algebra::Triple and RDF::Query::Algebra::Quad objects.
+         * RDF::Query::Plan::Quad and RDF::Query::Plan::Triple now add an 'origin' label annotation to the RDF::Query::VariableBindings object if the underlying statement has one.
+         * RDF::Query::Plan::prune_plans now uses a stable sort when comparing plan costs.
+         * RDF::Query::Algebra::Triple::new now up-casts to RDF::Query node objects, if necessary.
+         * RDF::Query::Model::RDFTrine::generate_plans now respects the force_no_optimization query flag.
+         * RDF::Query::Algebra::BasicGraphPattern::sse() now sorts triples for output.
+         * Added distinguish_bnode_variables method to RDF::Query::Algebra::Quad and RDF::Query::Algebra::Triple.
+         * Added RDF::Query::Node::Blank::make_distinguished_variable method.
+         * Added caching of sparql serializations to RDF::Query::Algebra::BasicGraphPattern and RDF::Query::Algebra::Triple.
+         * Added code to RDF::Query::VariableBindings::new to up-cast any RDF::Trine::Node objects to their RDF::Query equivalents.
+         * RDF::Query::new() now looks for $args{ defines }, and adds them to the internal %options HASH.
+         * Added hook in RDF::Query::execute_plan() to print the query plan to STDERR if $options{plan} is set (can be set if defines).
+         * Updated RDF::Query::Plan to only consider model-specific plans (if there are any).
+
+  Version 2.100 (2009-03-18)
+
+     * API:
+     
+         * Added ::Algebra::BasicGraphPattern::connected method.
+         * Added 'node_counts' as a recognized key to ::Model::RDFTrine::suports().
+         * Added ::Model::node_count method.
+         * Added ::Model::RDFTrine::count_statements() and ::Model::RDFTrine::node_count() methods.
+         * Added 'store' field to the data returned by the meta() method in the ::Model::* classes.
+         * Added a peek method to ::Iterator to support execution deferment like in ::Algebra::Service.
+         * Added ability to force SERVICE calls to abort using $ENV{RDFQUERY_THROW_ON_SERVICE} and RequestedInterruptError.
+         * Added bf methods to ::Triple and ::BasicGraphPattern to describe the BGP in terms of bound/free.
+         * Added bind_variables method to RDF::Query::Algebra.
+         * Added caching to ::Algebra::Service::_names_for_node.
+         * Added code to count (and warn) the rate of false positives from a bloomjoin.
+         * Added cost model hooks in RDF::Query and ::Algebra::BasicGraphPattern.
+         * Added FeDeRate BINDINGS to the list of supported extensions.
+         * Added get_basic_graph_pattern to ::Model::RDFTrine (not used yet).
+         * Added is_solution_modifier() methods to ::Algebra classes.
+         * Added labels and common patterns to service description template.
+         * Added more logic and debugging to aggregating triples into BGPs for SERVICE calls.
+         * Added optional restriction argument to ::Algebra::subpatterns_of_type.
+         * Added RDF::Query::Model::RDFTrine::BasicGraphPattner::graph() method.
+         * Added RDF::Query::Node::compare for sorting (either Trine or Query) node objects.
+         * Added RDF::Query::plan_class so that ::Federate can overload calls to ::Plan methods.
+         * Added support for computed statement generators (like ARQ's computed property support [e.g. list:member]).
+         * Added trial subsumes() methods to ::Algebra::BasicGraphPattern and ::Algebra::Triple.
+         * Algebra classes now call RDF::Query::algebra_fixup for optimization before falling back on normal fixup code.
+         * Allow equality test and disjunction filters in patterns that can be compiled to SQL.
+         * Fixed ::Algebra::GroupGraphPattern to use join_bnode_streams in cases where the bloom filter wasn't automatically created but instead provided by the user.
+         * Fixed ::Model::RDFTrine::as_string use with Quads.
+         * Fixed argument list for RDF::Query::Algebra::Service::_names_for_node called from bloom function.
+         * Fixed bug so ::Model::RDFTrine::meta may be called as a class method.
+         * Fixed RDF::Query::algebra_fixup to ignore service capabilities that would result in empty BGPs.
+         * Modified code for aggregate queries (though they are currently broken).
+         * Moved construction of bloom-filter-optimized patterns to RDF::Query::Algebra::GroupGraphPattern::_bloom_optimized_pattern().
+         * Moved initial federated service code into RDF::Query::fixup and ::algebra_fixup.
+         * Moved QEP generation code to RDF::Query::query_plan so it can be overloaded.
+         * Moved RDF::Query::add_service() to RDF::Query::Federate::add_service().
+         * Parsing service descriptions now more forgiving in the face of missing values.
+         * RDF::Query::Algebra::Triple::new now adds RDF::Query::Node::Variable objects for undefined nodes.
+         * RDF::Query::fixup() now only returns a construct pattern (the query pattern now being returned by RDF::Query::query_plan()).
+         * RDF::Query::Model::get_computed_statements now doesn't die if there's no query object present.
+         * RDF::Query::new() now accepts two-argument form with just $query and \%options.
+         * RDF::Query::Node::Literal objects now can compare as equal when they're of numeric type but the lexical values aren't numeric.
+         * RDF::Query::prune_plans now takes ExecutionContext as an argument, and in turn calls ::Plan::prune_plans.
+         * RDF::Query::query_plan() now returns all possible query plans when called in list context.
+         * RDF::Query::query_plans now calls RDF::Query::prune_plans to select from the list of possible QEPs.
+         * RDF::Trine::Node::Resource now escapes unicode in base URIs (now just relative URI part) before calling URI->new_abs.
+         * Removed now unused RDF::Query::construct() and RDF::Query::fixup().
+         * Removed old execute() code from ::Algebra classes.
+         * Removed unused redland fallback code from RDF::Query::Model::RDFTrine.
+         * Split RDF::Query::execute into prepare() and execute_plan() methods.
+         * Converted RDF::Query::execute() to use ::Plan classes.
+         * Updated ::Compiler::SQL to recognize ::Algebra::Project objects.
+         * Updates to RDF::Query::execute() to support explicit pre-binding lists (instead of just scalar values).
+         * ::Algebra::GroupGraphPattern now throws an exception if passed unblessed values as patterns.
+         * ::Federate now labels nodes in the QEP tree with applicable services.
+         * ::Model::debug() now shows data from the named graph model.
+         * ::Model::RDFTrine::add_uri now decodes resulting content as utf8 before proceeding.
+         * ::Model::RDFTrine::meta() probes the underlying store object to declare the proper 'store' class.
+         * ::Service::_names_for_node updated to use ::Plan classes for query execution (fixes use of the k:bloom filter).
+
+     * CLASSES:
+     
+         * Added algebra classes for solution modifiers and query forms (construct, project).
+         * Added code and tests for Query Execution Plan classes RDF::Query::Plan::*.
+         * Added RDF::Query::Federate::Plan for federation-specific code.
+         * Added RDF::Query::BGPOptimizer implementing a basic optimizer for basic selectivity-based join ordering.
+         * Added RDF::Query::CostModel classes for computing/estimating the cost of executing a specific pattern.
+         * Added RDF::Query::ExecutionContext to hold all necessary information for query execution (query, model, bound variables).
+         * Added RDF::Query::ServiceDescription for parsing DARQ-style service descriptions.
+         * Added RDF::Query::VariableBindings to wrap existing HASH-based variable binding structure.
+         * Added stub ::Plan::ThresholdUnion class for running optimistic queries.
+         * Added workaround to RDFCore bridge so that RDF::Core doesn't die if getStmts is called with a Literal in the subj or pred position.
+         * Added a RequestedInterruptError exception class.
+         * Added code for RDF-Trine specific BGP query plans.
+         * Changed debugging in RDF::Query modules to use Log::Log4perl.
+         * Made SERVICE work again by rolling back streaming socket work (now commented out).
+         * Moved federation code to new RDF::Query::Federate class.
+         * Plan generation now includes any plans the model object can provide.
+         * RDF::Query now always uses a cost model (defaulting to ::Naive).
+         * RDF::Query::Federate now defaults to SPARQLP parser.
+         * Removed logging/warn calls from forked process in ::Service (was screwing up the parent-child IO pipe).
+         * Removed use of "DISTINCT" queries in SERVICE calls (for pipelining).
+         * ServiceDescription now only runs sofilter if ?subject/?object are bound.
+         * Started work on a more holistic approach to supporting service descriptions (instead of using add_computed_statement_generator()).
+         * Updated ::Algebra::Service to fork and use LWP's callback mechanism for concurrency.
+         * ::Algebra::Service now defers loading of content until the first result is requested.
+         * ::Model::RDFTrine now only produces BGP plans if there is no get_computed_statement_generators in the query object.
+         * Code now materializes all node identities before creating the Bloom filter (so capacity arg is accurate).
+         * Bloom filter use is now only attempted on SERVICE blocks that don't immediately contain a FILTER.
+         * Re-ordered conditionals so that the service-bloom-filter try block is called less frequently.
+         * SERVICE execution now uses non-identity reasoning Bloom filter function.
+
+     * SYNTAX and SERIALIZATION:
+     
+         * Added from_sse method to ::Statement, ::Node.
+         * Added initial code for ARQ-style property paths.
+         * Added initial parser code for SPARQL Update (SPARUL) extension.
+         * Added new 'UNSAID' syntax for SPARQLP, implementing negation.
+         * Added parse_expr method to RDF::Query::Parser::SPARQL.
+         * Added RDF::Query::Algebra::Quad::bf() method.
+         * Fixed RDQL parser to qualify URIs before returning from parse().
+         * Fixed SSE serialization of Aggregates using '*' instead of a variable as the column.
+         * Removed (now unused) parser generator script.
+         * SPARQL parser now always adds a ::Algebra::Project (even when the query selects '*').
+         * SPARQL parser now creates ::Algebra::Construct objects for CONSTRUCT queries.
+         * SPARQL parser now puts ::Distinct above ::Sort algebras in the parse tree.
+         * SPARQLP parser now creates ::Project object as parent of any ::Aggregate.
+         * Turtle parser now doesn't modify the lexical value of numeric typed literals.
+         * Turtle parser now makes universal IDs for all blank node (even those with given IDs like _:xyz).
+         * Updated ::Algebra SSE serializations to conform to Jena's serialization syntax.
+         * Updated ::Algebra::Limit::sse to emit 'slice' serialization if its child is a ::Algebra::Offset.
+         * Updated as_sparql() methods to support the new ::Construct classes.
+         * Updated RDF::Query::sse to emit base and prefix serializations.
+         * Updated SPARQL parser and serializer tests to always assume an ::Algebra::Project on SELECT queries.
+         * Updated SSE serialization of ::Join::PushDownNestedLoop to use 'bind-join' terminology.
+         * Updates to SPARQLP parser to support FeDeRate BINDINGS keyword.
+         * ::Algebra::Distinct now does proper serialization in as_sparql().
+         * ::GroupGraphPattern::sse() updated to output the '(join ...)' only if the GGP has more than one pattern.
+
+     * OPTIMIZER:
+     
+         * Added benchmark/plans.pl to show the runtimes of the available QEPs for a query.
+         * Added benchmark/costmodel.pl for testing the RDF::Query::CostModel.
+         * Added logging for execution time (time to construct iterator) of Triples, BGPs, GGPs and sorting.
+         * Added logging of cardinalities in ::Algebra::Triple, ::Algebra::BasicGraphPattern and ::Algebra::Service.
+         * Added logging to plan classes ::NestedLoop, ::Service, ::Triple.
+         * Naive plan is used in ::Federate::Plan::generate_plans only if no optimistic plans are available.
+         * Updated cost model code to work with ::Plan classes instead of ::Algebra classes.
+         * Logging code now uses sse serialization as log keys (because of expressions that can't be serialized as SPARQL).
+         * Logging object can now be passed to RDF::Query constructor.
+         * Updated logging of algebra execution to use SPARQL serialization as logging key.
+
+     * MISC:
+     
+         * SPARQL parser now constructs ::Algebra::Project objects (had been in RDF::Query::execute).
+         * Updated RDF::Query to require version 0.108 of RDF::Trine.
+         * Added new bloom:filter function variant that doesn't use identity reasoning.
+         * Added debugging information when RDFQUERY_THROW_ON_SERVICE is in effect.
+         * Fixed test plan for t/optimizer.t in cases where no appropriate model is available.
+         * Updated plan generation code to use ::BGPOptimizer when the model supports node_counts.
+         * Fixed SSE serialization bug in ::Algebra::Sort.
+         * Fixed bugs in RDF::Query and RDF::Query::Expression classes that insisted variables be RDF::Query objects (and not simply RDF::Trine objects).
+         * Fixed propogation of iterator binding_names when pre-bound values are used in ::Algebra execution.
+         * Fixed RDF::Query::Algebra::Triple to correctly set binding_names when pre-binding is used.
+         * Fixed use of pre-binding in execution of RDF::Trine optimized BasicGraphPatterns.
+         * Fixed bug in SQL compilation when restricting left-joins to specific node types (based on functions like isIRI).
+         * Fixed node identity computation based on owl:sameAs.
+         * Fixed bitrotted livejournal example script to work with new 2.000 API.
+
+     * TESTS:
+     
+         * Added expected result count test in t/34-servicedescription.t.
+         * Added initial tests for algebra subsumes method.
+         * Added logging and costmodel tests.
+         * Added more example capabilities and patterns to the test service descriptions.
+         * Added RDF::Trine::Store::Hexastore to test model construction list in t/models.pl.
+         * Added sparql:pattern data to test service descriptions.
+         * Added sse re-serialization test to t/29-serialize.t.
+         * Added support for sparql:pattern in service description parsing.
+         * Added t/plan-rdftrine.t to test QEP generation optimized for RDF::Trine BGPs.
+         * Added test data for repeat patterns (e.g. { ?a ?a ?b}).
+         * Added tests to t/plan.t for QEP sse serialization.
+         * Cleaned up federation tests.
+         * Commented out in-progress service description tests.
+         * Fixed bug in t/23-model_bridge.t to allow two models from the same model class to be used in testing.
+         * Fixed error handling in t/plan.t.
+         * Fixed t/costmodel-naive.t to provide a serialized query to ::Plan::Service constructor.
+         * Fixed test count in algebra-bgp.t.
+         * Fixed test in t/31-service.t that relied on identity-reasoning support in bloom filters (which is now off by default).
+         * Fixed use of RDFQUERY_NETWORK_TESTS in 31-service.t.
+         * Improved use of temporary RDF::Trine stores in RDF::Query tests.
+         * Marked tests TODO for federated query serialization.
+         * Removed what looks like an accidentally pasted test in t/plan.t.
+         * SERVICE tests involving bloom filter handling marked as TODO.
+         * ServiceDescription parsing now gets entire sparql:patterns and not just arcs to depth one.
+         * Silenced unfinished test debugging in t/logging.t.
+         * Updated args to roqet call in failing_earl_tests.sh.
+         * Updated costmodel and logging test expected results that changed due to changes to ::Plan::Join code.
+         * Updated dawg-eval.t regex to recognize RDFTrine blank nodes.
+         * Updated DBPedia test query in t/34-servicedescription.t to reflect new source data.
+         * Updated expected cardinalities in t/logging.t for current plan choice.
+         * Updated logging tests to use the new sparql serialization keys.
+         * Updated SERVICE test in t/plan.t (still broken, but only runs when dev env var RDFQUERY_NETWORK_TESTS in effect).
+         * Updated t/plan.t to be less dependent on the specific state of the kasei.us service endpoint.
+         * Updated test service description RDF for new tests.
+         * Updates to improve logging and test coverage.
+
+     * EXAMPLES and DOCS:
+     
+         * Added examples/query.pl to show a simple example of loading data and executing a query.
+         * Added examples/create_query_api.pl for generating queries programatically (based on request from KjetilK).
+         * Added bin/graph-bgp.pl to produce a png of a query's BGP variable connectivity graph.
+         * Added bin/graph-query.pl to graph the (one chosen) QEP tree.
+         * Added bin/graph-qeps.pl to vizualize all QEPs of a query with GraphViz.
+         * Updated bin/parse.pl to emit the SSE serialization of the query algebra tree.
+         * Updated bin/rdf_parse_turtle.pl to warn on any parser error.
+
+  Version 2.002 (2008-04-25)
+
+     * Updated Bloom::Filter required version in RDF-Query's Makefile.PL.
+     * Fixed bug in get_function() when called as a class method.
+     * Updated sparql:logical-* functions to accept more than two operands.
+     * Added code to make loading of Bloom::Filter optional.
+     * Added Bloom::Filter to list of recommended modules.
+
+  Version 2.001 (2008-04-19)
+
+     * Fixed use of "DESCRIBE <resource>" (instead of "DESCRIBE ?var").
+     * Fixed SPARQL serialization of queries with DISTINCT.
+     * Added ::Algebra::subpatterns_of_type method for retrieving all subpatterns of a particular type.
+     * Moved sort_rows() into new ::Algebra classes Sort, Limit, Offset and Distinct.
+     * Updated SQL compiler to handle new ::Algebra classes.
+     * Bumped required RDF::Trine version to 0.106.
+     * Added methods to RDF::Query for retrieving lists of supported SPARQL extensions and extension functions.
+     * RDF::Trine pattern optimization now holds onto the original BGP object for forwarding of calls to as_sparql().
+     * Removed use of Storable module. Query execution no longer clones parse tree before running.
+     * Simplified project operation on query stream in RDF::Query::execute().
+     * fixup() method in ::Algebra and ::Expression now passed the query object as an argument.
+     * Replaced ::RDFTrine::unify_bgp with more general fixup() implementation.
+     * ::Algebra classes now defer to the bridge during fixup() to allow model-specific optimizations.
+     * RDF::Trine::Iterator::smap now allows overriding default construct_args (e.g. binding names).
+     * sparql:str now throws a TypeError if argument isn't bound.
+     * Fixed referenced_variables in RDF::Query::Expression.
+     * Fixed COUNT function to only count bound variables.
+     * Fixed aggregation to work with expressions.
+     * Added support for GROUP BY clauses to aggregation queries.
+     * Removed now unused ::Algebra::OldFilter class.
+     * Added serialization tests for aggregate and union patterns.
+     * Moved as_sparql methods from RDF::Trine:: to RDF::Query:: classes.
+     * Removed context- (quad-) specific code from RDF::Query::Algebra::Triple.
+     * Fixed serialization of BOUND filter functions.
+     * Fixed serialization of unary expressions.
+     * Fixed call to join_streams to use ::Iterator::Bindings instead of ::Iterator.
+     * var_or_expr_value now takes bridge object as an argument.
+     * var_or_expr_value will now accept any RDF::Query::Expression object as an argument.
+     * Added test for using AS syntax for variable renaming: "(?var AS ?newvar)".
+     * Added support for MIN, MAX, COUNT and COUNT-DISTINCT aggregate operators to the SPARQLP parser.
+     * Added COUNT DISTINCT variant aggregate operator.
+     * Aggregates (MIN, MAX, COUNT, COUNT-DISTINCT) now return xsd:decimal values (this shouldn't really happen for non-numeric operands to MIN and MAX...)
+     * Added as_sparql submethod to RDF::Query::Node::Literal to serialize numeric types unquoted.
+     * Added var_or_expr_value method in RDF::Query.
+     * Removed unused _true and _false methods in RDF::Query.
+     * Fixed existing aggregates code and tests.
+     * Removed unused (and bitrotted) t/05-stress.t test.
+     * Made all tests that access the network opt-in with the RDFQUERY_NETWORK_TESTS environment variable.
+     * Updated POD for ::Expression::Alias.
+     * Added tests for select expressions.
+     * Added initial support for selecting expression values.
+
+  Version 2.000 (2008-03-19)
+
+     * RDF::Query now uses RDF::Trine package for common classes (nodes, statements, iterators).
+     * Moved RDF::Query::Stream into RDF::Trine::Iterator namespace.
+     * Reshuffled SPARQL parsers tests.
+     * Added support for RDF::Trine::Model.
+     * RDF::Trine::Iterator can serialize to XML and JSON natively; Updated tests accordingly.
+     * rdf namespace is only added by default for RDQL.
+     * Fixed bug where the wrong bridge object would be returned for queries with FROM clauses.
+     * Moved query_more code to Algebra classes.
+     * Added RDF::Query::pattern method to return the GGP algebra pattern for the query.
+     * Added RDF::Query::as_sparql method to serialize query as SPARQL string.
+     * Removed unused RDF::Query::set_named_graph_query method.
+     * Fixed bug where triples from a FROM clause were loaded into the underlying persistent store.
+     * Added POD to RDF::Query::Node classes.
+     * Added equal method to RDF::Query::Node classes.
+     * RDF::Query::Node::Blank constructor now optionally produces identifiers.
+     * Merged tSPARQL parsing code into new SPARQLP parser.
+     * Added definite_variables method to RDF::Query::Algebra classes.
+     * Triple class now serializes rdf:type shortcut 'a' appropriately.
+     * Removed 'VAR' type from ::Node::Variable object structure.
+     * Updated code to always expect a HASH reference from ::Bindings iterator.
+     * Added more (sparql and see) serialization tests.
+     * Removed old fixup code, replaced by ::Algebra fixup methods.
+     * Moved FROM clause data loading to its own method.
+     * Started removing old code (RDF::Base, direct DBI use, AUTOLOAD, profiling).
+     * Moved general count_statements() method into bridge superclass.
+     * Fixed SQL compiler to work with ::Algebra and ::Node classes.
+     * Added as_native method to bridge superclass for converting ::Node objects to bridge-native objects.
+     * Updated document namespace declaration for SPARQL XML Results.
+     * Added support for SERVICE queries (ala ARQ) with Bloom filter semijoins.
+     * Moved Expression classes out of the Algebra hierarchy and into their own space (RDF::Query::Expression).
+
+  Version 1.501 (2007-11-15)
+
+     * Fixed CONSTRUCT+OPTIONAL bug.
+     * Added as_sparql methods to Algebra and Node classes to serialize patterns in SPARQL syntax.
+     * Added deparse script.
+     * Fixed jena:sha1sum tests when Digest::SHA1 isn't available.
+
+  Version 1.500 (2007-11-13)
+
+     * Query Engine:
+       * URIs are now properly qualified with a BASE when present.
+       * Base URI passed to constructor is now used if no BASE clause exists in the query.
+       * Fixed BASE qualification when an IRI contains Unicode characters (Emulating IRI support with the URI module).
+       * NAMED graph data is now seperated from the default model into new (temporary) models.
+       * NAMED graphs now work with RDF::Core.
+       * Added new RDF::Query::Algebra:: classes that are used to represent query ASTs.
+       * Added new RDF::Query::Node:: classes that are used to represent RDF Nodes and Variables.
+       * Major refactoring to RDF::Query::query_more() to enhance extensibility.
+       * Added RDF::Query::query_more_triple() and RDF::Query::query_more_bgp() for triple and bgp matching.
+       * Improved support of GGP pattern matching.
+       * Added sgrep, smap, swatch and concat methods to RDF::Query::Stream class.
+       * Refactored query_more() variants and sort_rows() to use new stream methods sgrep, smap, and concat.
+       * Continued to fix bugs to more closely align with DAWG tests.
+       * Updated DAWG tests to run with the RDF::Core backend.
+       * Any DAWG tests with mf:requires are now automatically marked TODO.
+       * DAWG tests graph equality is now punted to user verification.
+       * Fixed bNode merging code in DAWG tests.
+       * query_more() variants and sort_rows() now all return RDF::Query::Stream objects.
+       * query_more() (and everything it calls) now expects bridge object as a method argument (to ensure NAMED graph querying works).
+       * Added join_streams() to perform netsted-loop natural joins on two Stream objects.
+     * Filters:
+       * Added call_function() method to abstract the generation of ['FUNCTION',...] blocks.
+       * FILTER operator != is now negative for unknown datatypes.
+       * Fixed exception handling in check_constraints().
+       * Fixed type-promotion in arithmetic operations and added recognized xsd numeric types.
+       * API Chnage: extension functions now take a bridge object as their second argument (after the query object).
+       * Fixed equals() method in RDF::Core bridge to properly use the RDF::Core API.
+       * Javascript function makeTerm now accepts language and datatype parameters.
+       * toString() javascript funtion now returns just the literal value (not including language or datatype).
+       * sop:str now will stringify blank nodes properly.
+       * sparql:langmatches now properly differentiates between no language tag and an empty language tag.
+     * Parsers:
+       * Parsers now generate ASTs using the Algebra and Node classes.
+       * Fixed bugs in SPARQL tokenizer for some Unicode strings (with combining accents).
+       * RDF::Query::Parser::new_literal() now canonicalizes language tags (to lowercase).
+       * Fixed GGP verification in RDF::Query::Parser::SPARQL::fixup().
+       * Merged GGPAtom changes from tSPARQL to SPARQL grammar.
+     * Backends:
+       * Fixed bug in RDF::Query::Model::RDFCore::equals() when comparing two blank nodes.
+       * Changed RDF::Query::Model::RDFCore::as_string to return strings where node type is identifiable (like Redland, URIs as [...], literal \"...\", bnodes (...)).
+       * Model methods literal_value, literal_datatype and literal_value_langauge now return undef if argument isn't a literal.
+       * Model methods uri_value and blank_identifier now return undef unless argument is of correct type.
+       * Model add_string methods now normalize Unicode input.
+       * Blank node prefix is now scoped to bridge, not lexically in RDF::Query::Model::RDFCore.
+       * RDF::Query::Model::Redland::new_literal now forces argument to a string (XS code breaks on non-PVOK scalars).
+       * RDF::Query::Model::Redland::add_uri now uses LWP instead of relying on Redland to fetch content.
+       * Redland model class now recognizes DateTime objects as literals.
+       * Updated add_uri() method in RDF::Core bridge to support named graphs (only one name per model for now).
+     * Miscellaneous:
+       * Added rudimentary profiling code (Devel::DProf seems to crash on RDF::Query)
+       * Added initial code for supporting property functions (using time:inside as an example).
+       * Removed multi_get code.
+       * Removed code for MULTI patterns. Will replace with algebra-based optimization in the future.
+       * RDF::Query::Stream constructor now accepts an ARRAY reference.
+       * Stopped using the peephole optimizers. Will replace with an algebra-based optimizer in the future.
+
+  Version 1.044 (2007-09-13)
+
+     * DAWG tests now emit EARL reports.
+     * Added test harness and temporal data importing scripts to new bin/ directory.
+     * Added support for temporal queries in RDF::Query and optimizers.
+     * Added support for CONSTRUCT queries in new YAPP-based SPARQL parsers.
+     * Added TIMED graph tests for new SPARQL temporal extensions.
+     * Added tests to SPARQL parser for bugs that were discovered with temporal extensions.
+     * Added POD to new SPARQL parsers.
+     * Added new Parse::Yapp-based SPARQL parser in preparation for temporal SPARQL extensions.
+     * Added stub functions for temporal extension support.
+     * Added model_as_stream() method to Redland bridge class.
+     * Addded debug() method to RDF::Query::Model.
+     * Added UNION tests.
+     * Added a javascript debugging flag to RDF::Query.
+     * Added RDF::Query::groupgraphpattern() for handling GGPs.
+     * Added xsd:integer casting function.
+     * Added <http://kasei.us/2007/09/functions/warn> as a FILTER tee that warns to STDERR.
+     * Added Eyapp SPARQL grammer file and replaced parser with auto-generated code from eyapp.
+     * Marked some SPARQL parser tests as TODO (due to incompatability with new YAPP-based parser).
+     * Network tests are now run against all available models.
+     * Stream tests are now run against all available models.
+     * Query parser initialization code cleaned up (and now supports beta tSPARQL parser).
+     * net_filter_function() now properly accesses nodes with bridge methods.
+     * RDF::Query::Parser::new_blank now assigns default names if none is supplied.
+     * Updated error messages in SPARQL parser to align with new YAPP-based parser.
+     * SPARQL parse_predicate_object() fixed to support tripleNodes.
+     * SPARQL parse_object() and parse_predicate() fixed for whitespace insensitivity.
+     * Moved old hand-written SPARQL parser to now unused SPARQL-RD.pm.
+     * Moved new YAPP-based SPARQL parser to SPARQL.pm.
+     * Copied YAPP-based SPARQL parser for new temporal extension tSPARQL.pm.
+     * Moved existing tests for hand-written SPARQL parser to 01-sparql_parser.t.rd-old.
+     * Moved new YAPP-based SPARQL tests to t/01-sparql_parser.t.
+     * Removed bad-syntax queries from optimizer and SQL compiler tests.
+     * Fixed bad-syntax queries in stream and hook tests.
+     * Made output of coverage tests easier to read by adding test names.
+     * Fixed SPARQL parsers to allow keywords as variable names.
+     * Fixed SPARQL parsers to allow dashes and underscores in variable names.
+     * Fixed bad parser constructor call in SQL compiler tests.
+     * Suppressed RDF::Base loading (again) during RDF::Query startup.
+     * RDF::Query::Model::Redland::debug now shows contexts during iterator debugging.
+     * Moved the old (hand written) SPARQL parser out of the way to make test harnesses happy.
+     * SPARQL parser now respects spec regarding the reuse of blank node labels across BGPs.
+     * SPARQL parser now does the right thing with NIL (the empty list).
+     * SPARQL parser now handles embedded GGPs correctly.
+     * Updated SPARQL parser and tests to pass (almost all) DAWG tests.
+     * Fixed bug where results couldn't be sorted by a non-selected variable.
+     * Removed the unused RDF::Query::timed_graph() method.
+     * RDF::Query::qualify_uri is now more liberal in what it accepts.
+     * Fixed xsd:boolean casting of integer values.
+     * RDF::Query::Parser::new_variable can now generate private variable names.
+     * Fixed test suite to work properly on systems without Redland.
+     * Disabled loading of tSPARQL parser for release.
+     * Removed function prototype definitions in Model base class (was causing loading problems when models are missing).
+
+  Version 1.043 (2007-06-14)
+
+     * Fixed broken MANIFEST causing MakeMaker code to break.
+
+  Version 1.042 (2007-06-13)
+
+     * Added support for Javascript URL-based extension functions.
+     * Added GPG signing support for Javascript functions.
+     * Added meta methods to model classes.
+     * Added count_statements methods to model classes.
+     * Added default format for stringifying query result streams.
+     * Added SPARQL syntax coverage tests.
+     * Added stream tests.
+     * ISIRI() now returns a sop:isIRI function IRI.
+     * Redland bridge add_uri strips off URI fragment from parser base URI.
+     * Underlying models aren't loaded if turned off by environment variables.
+     * Stopped using the (currently broken) multi-get code.
+     * Model classes aren't used if turned off by environment variable.
+     * Standardized node testing to is_node (replacing older isa_node).
+     * GPG verification failure now throws exceptions.
+     * GPG fingerprint handling is now whitespace insensitive.
+     * Removed (currently) unused multiget tests.
+     * Redland bridge uri_value returns undef if not called with a node.
+
+  Version 1.041 (2006-11-26)
+
+     * Removed unwanted '+' signs on stringified bigints when running under perl 5.6.x.
+     * Fixed unicode errors when running under perl 5.6.x.
+     * Added tests for model bridge classes.
+     * Fixed bugs in SQL bridge class.
+     * RDFCore and Redland bridge classes now throw error when passed a bad model object.
+     * Bridge class support() method now responds to feature requests for 'temp_model'.
+     * Fixed bug in RDF::Query::Model::RDFCore::isa_resource returning true for blank nodes.
+     * Fixed code in RDF::Query::Model::::SQL::equals().
+     * Added partial support for new RDF::Storage::DBI storage class.
+     * Added support for RDF::Query:::Model::SQL models in RDF::Query bridge code.
+     * Removed RDF::Query::Model::SQL::* code that's now in RDF::Storage::DBI.
+     * Added tests for backend bridge classes (RDF::Query::Model::*).
+     * Added checks for which backends support XML serialization.
+     * Fixed naive peephole tests in cases where model supports cost-based analysis.
+     * Fixed bugs in tests that were relying on C<as_string> to act like C<literal_value>.
+     * Added RDF::Base support.
+     * Fixed bug in C<fixup> that prevented running queries against multiple models.
+     * Added SimpleQueryPatternError exception class for future work on multi-get optimizations.
+     * Removed forced dependence on Digest::SHA1.
+     * Makefile.PL now recommends Digest::SHA1 (for jena function) and Geo::Distance (for 07-filters.t).
+
+  Version 1.040 (2006-07-21)
+
+     * Added support for BOUND() fiters in SQL compilation.
+     * SQL compiler now produces valid SQL when query variable names are SQL reserved keywords.
+     * Moved SPARQL parser test data into YAML.
+     * Added YAML as a build-time prerequisite.
+     * Fixed SPARQL parsing bug for blank nodes as statement objects.
+     * Added peephole optimizer code with naive and cost-analysis strategies.
+     * Added add_string method to RDF::Query::Model::Redland.
+     * Added node_count method to RDF::Query::Model::Redland (only used for testing at this point).
+     * RDF::Query::execute() now uses the peephole optimizer.
+     * Removed punting code in RDF::Query::execute that tried to do JIT optimization.
+     * Removed calls to getLabel() on model objects in test files.
+     * Fixed dawg tests (was dying because of multiple plans being printed).
+     * Fixed cost-based peephole optimizer tests (by forcing Redland to do node counting).
+
+  Version 1.039 (2006-07-14)
+
+     * Removed dawg tests from distribution. Only used as developer tests now.
+     * Updated package to use Module::Install instead of ExtUtils::MakeMaker.
+     * Fixed a spurious uninitialized warning in RDF::Query::get_bridge.
+
+  Version 1.038 (2006-07-09)
+
+     * Fixed DBI case-sensitivity for PostgreSQL support.
+     * Cleaned up SQL syntax for easier debugging.
+     * Removed extra parens in SQL that were causing postgresql to break.
+     * Reference test foaf file using File::Spec->catfile() instead of directly.
+     * Fixed SPARQL parsing bug for anonymous nodes in FILTER expressions.
+     * Fixed major SQL compilation bugs for testing equality in FILTER expressions.
+     * Fixed bug in hashing code for blank nodes in SQL compiler.
+
+  Version 1.037 (2006-07-06)
+
+     * execute() method now takes optional 'bind' parameter for pre-binding query variables.
+     * Updated code to support basic FILTERs in SQL compilation.
+     * Fixed bug in SQL compilation where no WHERE clause was needed.
+     * Fixed bug in SQL compilation when using model-specific Statements tables.
+     * Added Storable to the list of required modules (was missing in the list).
+     * Fixed typos in metadata about past versions in DOAP Changes.ttl.
+
+  Version 1.036 (2006-06-26)
+
+     * Fixed memory leak in RDF::Query::Stream that resulted in too many database handles.
+     * Initial support for OPTIONALs in SQL compiler.
+     * Removed LWP requirement for systems without libwww.
+     * Added support for class variable to hold parsing errors. (Beware under threads.)
+     * RDF::Query now sets error variable upon parsing error. (Access with C<error()>.)
+     * Fixed POD errors, and added tests for POD coverage.
+     * Added model API methods to SQL model class.
+     * Added C<close> method to RDF::Query::Stream.
+
+  Version 1.035 (2006-06-04)
+
+     * Added DAWG tests and harness.
+     * Rewrote core logic in OPTIONAL handling code.
+     * Comparisons on literals now respect numeric datatypes.
+     * Fixed outdated calling conventions in casting functions.
+     * Added custom functions:
+        + jena:sha1sum
+        + jena:now
+        + jena:langeq
+        + jena:listMember
+        + ldodds:Distance
+     * Added new model methods: equals, subject, predicate, object.
+     * Relocated external http-based test data to .Mac URLs.
+
+  Version 1.034 (2006-05-01)
+
+     * Added JSON serialization for bindings and boolean queries.
+     * Initial support for compiling RDF queries to SQL queries using the Redland schema.
+     * Added to_string method to query results Stream class.
+     * Model objects now store the query parse tree for access to data needed in serialization.
+     * Unquoted number and boolean literals in SPARQL are now datatyped appropriately.
+     * Fixed crashing bug when RDF::Query::Model::Redland::as_string was called with an undefined value.
+     * Fixed bug parsing queries with predicate starting with 'a' (confused with { ?subj a ?type}).
+     * Fixed bug parsing queries whose triple pattern ended with the optional dot.
+
+  Version 1.033 (2006-03-08)
+
+     * Updated test suite to work if one of the model classes is missing.
+     * Data-typed literals are now cast appropriately when used in a FILTER.
+     * Added support for xsd:dateTime datatypes using the DateTime module.
+     * Added support for LANG(), LANGMATCHES() and DATATYPE() built-in functions.
+     * Updated TODO list.
+     * Added more exception types to RDF::Query::Error.
+     * Added POD coverage.
+     * Fixed SPARQL parsing bug for logical operators <= and >=.
+
+  Version 1.032 (2006-03-03)
+
+     * Replaced the Parse::RecDescent SPARQL parser with a much faster hand-written one.
+     * Updated SPARQL parsing rules to be better about URI and QName character sets.
+     * FILTER equality operator now '=', not '==' (to match SPARQL spec).
+     * Initial support for FILTER constraints as part of the triple pattern structure (Will allow for nested FILTERs).
+     * Implemented support for ordering query results by an expression.
+     * Fixed bug in expresion handling of unary minus.
+     * Fixed bug in Redland NAMED GRAPH parsing.
+     * Fixed bug in RDF::Core parsing code where blank nodes would be accidentally smushed.
+
+  Version 1.031 (2006-02-08)
+
+     * Added support for NAMED graphs.
+
+  Version 1.030 (2006-01-13)
+
+     * Added support for SELECT * in SPARQL queries.
+     * Added support for default namespaces in SPARQL queries.
+     * Added tests for querying RDF collections in SPARQL (1 ?x 3)
+     * Added tests for triple patterns of the form { ?a ?a ?b . }
+     * Added tests for default namespaces in SPARQL.
+     * Added tests for SELECT * SPARQL queries.
+     * Bugfix where one of two identical triple variables would be ignored ({ ?a ?a ?b }).
+
+  Version 1.028 (2005-11-18)
+
+     * Added SPARQL functions: BOUND, isURI, isBLANK, isLITERAL.
+     * Updated SPARQL REGEX syntax.
+     * Updated SPARQL FILTER syntax.
+     * Added SPARQL RDF Collections syntactic forms.
+     * Fixed FILTER support in OPTIONAL queries.
+     * Added binding_value_by_name method to Query results stream class.
+     * Added isa_blank methods to RDF::Redland and RDF::Core model classes.
+     * Fixed RDF literal datatyping when using Redland versions >= 1.00_02.
+     * Updated SPARQL grammar to make 'WHERE' token optional.
+     * Added <commit> directives to SPARQL grammar.
+     * Updated SPARQL 'ORDER BY' syntax to use parenthesis.
+     * Fixed SPARQL FILTER logical-and support for more than two operands.
+     * Fixed SPARQL FILTER equality operator syntax to use '=' instead of '=='.
+     * Now requires Test::More 0.52 because of changes to is_deeply().
+
+  Version 1.027 (2005-07-28)
+
+     * Updated to follow SPARQL Draft 2005.07.21:
+        + ORDER BY arguments now use parenthesis.
+        + SPARQL parser now supports ORDER BY operands:
+          variable, expression, or function call.
+     * Added binding_value_by_name() method to query result streams.
+
+  Version 1.026 (2005-06-05)
+
+     * Added new DBI model bridge (accesses Redland's mysql storage directly).
+     * Added built-in SPARQL functions and operators (not connected to grammar yet).
+     * Added bridge methods for accessing typed literal information.
+
+  Version 1.024 (2005-06-02)
+
+     * Added missing SPARQL OFFSET grammar rules.
+     * Added XML Results support for graph and boolean queries (DESCRIBE, CONSTRUCT, ASK).
+     * Fixed major bugs in RDF::Core bridge:
+          + Bridge wasn't using passed model.
+          + Literal construction was broken.
+          + Blank node construction was broken when no identifier was specified.
+     * Stream::bindings_count now returns the right number even if there is no data.
+     * XML Result format now works with RDF::Core models.
+     * The Model bridge object is now passed to the Stream constructor.
+     * Internal code now uses the variables method.
+     * Removed redundant code from ORDER BY/LIMIT/OFFSET handling.
+     * Removed unused count method.
+     * Removed unused delegating AUTOLOAD.
+     * Removed unused parse_files method.
+     * Removed usused add_file method.
+     * Removed duplicate net test file.
+     * Added test file for local file-based SPARQL 'FROM' queries.
+     * Added test file for SPARQL Result Forms (LIMIT, ORDER BY, OFFSET, DISTINCT).
+     * Added test file for SPARQL Protocol for RDF (XML Results).
+     * Added new tests based on Devel::Cover results.
+     * Some test files now run against both Redland and RDF::Core:
+          + 00-simple.t
+          + 03-coverage.t
+          + 10-sparql_protocol.t
+     * All debugging is now centrally located in the _debug method.
+     * Moved Stream class to lib/RDF/Query/Stream.pm.
+     * Fixed tests that broke with previous fix to CONSTRUCT queries.
+     * Fixed tests that broke with previous change to ASK query results.
+
+  Version 1.021 (2005-06-01)
+
+     * Added SPARQL UNION support.
+     * Broke OPTIONAL handling code off into a seperate method.
+     * Added new debugging code to trace errors in the twisty web of closures.
+
+  Version 1.020 (2005-05-18)
+
+     * Added support for SPARQL OPTIONAL graph patterns.
+     * Calling bindings_count on a stream now returns 0 with no data.
+     * Added Stream methods:
+          + is_bindings
+          + binding_name
+          + binding_values
+          + binding_names
+     * Added as_xml method to Stream class for XML Binding Results format.
+
+  Version 1.016 (2005-05-08)
+
+     * Added initial support for SPARQL ASK, DESCRIBE and CONSTRUCT queries.
+          + Added new test files for new query types.
+     * Added methods to bridge classes for creating statements and blank nodes.
+     * Added as_string method to bridge classes for getting string versions of nodes.
+     * Broke out triple fixup code into fixup_triple_bridge_variables().
+     * Updated FILTER test to use new Geo::Distance API.
+
+  Version 1.015 (2005-05-03)
+
+     * Fixes to the arguments passed to FILTERs.
+     * Filter tests now show example of two custom filters:
+          + Transitive subClassOf testing.
+          + Logical comparison operators (range testing lat/lon values).
+     * Added literal_value, uri_value, and blank_identifier methods to bridges.
+     * Redland bridge now calls sources/arcs/targets when only one field is missing.
+     * Fixes to stream code. Iterators are now destroyed in a timely manner.
+          + Complex queries no longer max out mysql connections under Redland.
+     * Cleaned up node sorting code.
+          + Removed dependency on Sort::Naturally.
+          + Added new node sorting function ncmp().
+     * check_constraints now calls ncmp() for logical comparisons.
+     * Added get_value method to make bridge calls and return a scalar value.
+     * Fixed node creation in Redland bridge.
+     * Moved DISTINCT handling code to occur before LIMITing.
+     * Added variables method to retrieve bound variable names.
+     * Added binding_count and get_all methods to streams.
+     * get_statments bridge methods now return RDF::Query::Stream objects.
+
+  Version 1.014 (2005-04-26)
+
+     * Made FILTERs work in SPARQL.
+     * Added initial SPARQL support for custom function constraints.
+     * SPARQL variables may now begin with the '$' sigil.
+     * Added direction support for ORDER BY (ascending/descending).
+     * Added 'next', 'current', and 'end' to Stream API.
+
+  Version 1.012 (2005-04-24)
+
+     * Stream objects now handle being constructed with an undef coderef.
+     * Streams are now objects usinig the Redland QueryResult API.
+     * RDF namespace is now always available in queries.
+     * row() now uses a stream when calling execute().
+     * Added ORDER BY support to RDQL parser.
+     * SPARQL constraints now properly use the 'FILTER' keyword.
+     * SPARQL constraints can now use '&&' as an operator.
+     * SPARQL namespace declaration is now optional.
+     * Updated tests.
+
+  Version 1.010 (2005-04-21)
+
+     * execute now returns an iterator.
+     * Added core support for DISTINCT, LIMIT, OFFSET.
+     * Added initial core support for ORDER BY (only works on one column right now).
+     * Broke out the query parser into it's own RDQL class.
+     * Added initial support for a SPARQL parser.
+          + Added support for blank nodes.
+          + Added lots of syntactic sugar (with blank nodes, multiple predicates and objects).
+          + Added SPARQL support for DISTINCT and ORDER BY.
+     * Moved model-specific code into RDF::Query::Model::*.
+     * Moving over to redland's query API (pass in the model when query is executed).
+
+COPYRIGHT
+
+   Copyright (C) 2005-2015 Gregory Williams. All rights reserved.
+   This program is free software; you can redistribute it and/or
+   modify it under the same terms as Perl itself.
+
+AUTHOR
+
+	Gregory Todd Williams <gwilliams@cpan.org>
+

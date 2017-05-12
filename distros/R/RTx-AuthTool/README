@@ -1,0 +1,5 @@
+This RT extension provides a web interface for granting, revoking, and querying
+against the RT ACL system.
+
+After installation, log in as superuser, and click on the "Auth Tools" menu
+on the bottom of the navigation pane.

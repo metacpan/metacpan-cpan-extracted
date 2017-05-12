@@ -1,0 +1,58 @@
+%# Never underestimate the bandwidth of a station wagon full of tapes.
+%# 		-- Dr. Warren Jackson, Director, UTCS
+<%PERL>
+my $basepath = $m->fetch_comp("/Foundry/Project/Source/index.html")->source_dir;
+
+require SVN::Web;
+require File::Spec;
+
+my $tmpdir = File::Spec->tmpdir . '/svn';
+mkdir $tmpdir unless -d $tmpdir;
+
+SVN::Web::set_config({
+    reposparent	    => "$RT::VarPath/Foundry/svn",
+    tmpdir	    => $tmpdir,
+    templatedir	    => "$basepath/template",
+    map ( "\L$_\E_class" => "SVN::Web::$_" ),
+	qw(Branch Branch Checkout Diff Log Revision RSS Template)
+});
+
+my (undef, $repos, $action, $path) = split ('/', ($r->path_info), 4);
+$repos  ||= eval { $QueueObj->OriginObj->CustomFieldValue('UnixName') } || 'local';
+$action ||= 'browse';
+$path   ||= '';
+
+for (1 .. 3) {
+    eval {
+	SVN::Web::run({
+	    repos => $repos,
+	    action => $action,
+	    path => '/'.$path,
+	    lang => $session{CurrentUser}->LanguageHandle->language_tag,
+	    cgi => CGI->new(\%ARGS),
+	    request => $r,
+($action eq 'checkout') ? ( 
+	    output_sub	=> sub {
+		$m->clear_buffer;
+		SVN::Web::mod_perl_output(@_);
+	    },
+) : (
+	    output_sub	=> \&SVN::Web::mod_perl_output,
+),
+	    tmpdir => $tmpdir,
+	    params => \%ARGS,
+	    script => "${RT::WebURL}Foundry/Project/Source/index.html",
+	});
+    };
+    print "$@";
+    last unless $@;
+    sleep 1;
+}
+$m->abort if $action eq 'checkout';
+</%PERL>
+<%ATTR>
+AutoFlush => 0
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>

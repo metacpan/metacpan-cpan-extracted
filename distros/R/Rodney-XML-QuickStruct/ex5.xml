@@ -1,0 +1,17 @@
+    <person casthash>
+        <name>Jack</name>
+        <age value="25"/>
+
+        <hobby value="Climbing trees"/>
+        <hobby>
+            <lit>Climbing rocks</lit>
+            <lit>Flying kites</lit>
+        </hobby>
+    </person>
+
+    <person name="Jill" casthash>
+        <age value="Are you kidding?"/>
+        <hobby value="Scrap booking"/>
+        <hobby value="Plantting"/>
+    </person>
+

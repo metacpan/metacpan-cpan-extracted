@@ -1,0 +1,32 @@
+Remind-Client
+=============
+
+This distribution contains the Remind::Client class, which makes
+building clients to run on top of Remind's "Server Mode" easier.
+
+It also provides a sample implementation of a subclass which sends all
+timed reminders to libnotify, and a script which executes it.
+
+This module has different goals from Remind::Parser. Remind::Parser is
+meant to parse all of the available reminders once, into a list.
+Remind::Client, on the other hand, lets remind take care of all the
+heavy lifting. It is a relatively thin layer on top of remind, which
+responds to reminder events.
+
+For more information about remind, see its homepage at
+<http://www.roaringpenguin.com/products/remind>
+
+Remind-Client is Copyright (C) 2009, Mike Kelly.
+
+License Information
+-------------------
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses at <http://www.perlfoundation.org/artistic_license_1_0>,
+and <http://www.gnu.org/licenses/gpl-2.0.html>.
+
+This program is distributed in the hope that it will be
+useful, but without any warranty; without even the implied
+warranty of merchantability or fitness for a particular purpose.
+

@@ -1,0 +1,10 @@
+<%ARGS>
+$tabs => {}
+</%ARGS>
+<%INIT>
+$tabs->{'Shredder'} = {
+	title => loc('Shredder'),
+	path  => 'Admin/Tools/Shredder',
+};
+
+</%INIT>

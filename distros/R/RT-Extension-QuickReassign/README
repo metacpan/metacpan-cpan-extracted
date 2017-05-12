@@ -1,0 +1,36 @@
+NAME
+    RT-Extension-QuickReassign - Allow members of a specified group to
+    reassign ticket owners without stealing the ticket first
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Set(@Plugins, qw(RT::Extension::QuickReassign));
+
+        or add "RT::Extension::QuickReassign" to your existing @Plugins
+        line.
+
+        Configure the group you wish to let quickly reassign tickets:
+
+            Set($QuickReassignGroup, 'My Group Name');
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Thomas Sibley <trs@bestpractical.com>
+
+LICENCE AND COPYRIGHT
+    This software is copyright (c) 2011 by Best Practical Solutions.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

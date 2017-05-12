@@ -1,0 +1,43 @@
+---
+abstract: 'utilities for handling transactions of Redis'
+author:
+  - '@gmail.com>'
+build_requires:
+  Redis: '0'
+  Sub::Retry: '0'
+  Test::More: '0.98'
+  Test::RedisServer: '0'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-Transaction
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Redis::Transaction:
+    file: lib/Redis/Transaction.pm
+    version: '0.01'
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/shogo82148/p5-Redis-Transaction/issues
+  homepage: https://github.com/shogo82148/p5-Redis-Transaction
+  repository: git://github.com/shogo82148/p5-Redis-Transaction.git
+version: '0.01'
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

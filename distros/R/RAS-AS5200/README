@@ -1,0 +1,32 @@
+RAS::AS5200.pm
+Version 1.00, December 15, 1999
+Gregor Mosheh (stigmata@blackangel.net)
+
+
+DESCRIPTION
+
+RAS::AS5200 is a PERL 5 module for interfacing with a 
+Cisco AS5200 access router. Using this module, one 
+can very easily construct programs to find a particular 
+user in a bank of AS5200s, disconnect users, get usage 
+statistics, or execute arbitrary commands on a AS5200.
+
+
+PREREQUISITES AND INSTALLATION
+
+This module uses Jay Rogers' Net::Telnet module. If you don't have 
+Net::Telnet, get it from CPAN or this module won't do much for you.
+
+Installation is easy:
+   perl Makefile.PL && make && make install
+
+Check out the in the documentation for ideas on how you'd 
+want to use this module.
+
+
+DOCUMENTATION
+
+For more information and for examples, see the POD documentation 
+in the module itself. Try "pod2text AS5200.pm | more" or see 
+the installed manpage.
+

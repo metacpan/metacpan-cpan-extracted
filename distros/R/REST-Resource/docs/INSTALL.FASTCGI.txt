@@ -1,0 +1,56 @@
+OVERVIEW:
+
+   This document describes how to get a REST::Resource FCGI script
+   running.
+
+PREREQUISITES:
+
+    It is assumed that you have a webserver in mind.  If not, you may
+    want to look at INSTALL.WWW-Resource-FRAMEWORK, by Ira Woodhead.
+
+PRESUMED PATH:
+
+    For the purposes of sample configuration, the following path is
+    used.  You will need to use an appropriate path for your
+    configuration.
+
+        /var/www/html/REST-Resource/eg/fcgi_server/parts.fcgi
+
+BUILDING APACHE2:
+
+    I have a CentOS Apache 2.0.52 already installed, so I grabbed the
+    2.0.52 source tree so that I could build the mod_fastcgi.so.  I
+    actually needed to install it (arrgh) to /usr/local/apache2 so
+    that I could extract the module after installing that.
+
+BUILDING FASTCGI:
+
+    Once you point the Makefile.AP2 at the Apache2 sources, things go
+    reasonably well.
+
+    Once you get the module installed into your Apache environment and
+    test the restart, you should be good to go after adding the
+    configuration pieces below.
+
+APACHE FASTCGI CONFIGURATION:
+
+    In httpd.conf (sometimes found in /etc/httpd/conf/httpd.conf),
+    make sure this section is enabled.
+
+        LoadModule fastcgi_module modules/mod_fastcgi.so
+	AddHandler fastcgi-script fcg fcgi fpl
+	FastCgiConfig -pass-header Authorization -autoUpdate
+	FastCgiServer /var/www/html/REST-Resource/eg/fcgi_server/parts.fcgi
+
+    Additionally, I've put a symlink in my environment so that
+    /REST-Resource/ under my document root (/var/www/html/) maps to
+    /export/src/perl/REST-Resource/.
+
+SAMPLE URLS:
+
+    http://localhost/REST-Resource/eg/fcgi_server/parts.fcgi
+
+DATA SETS:
+
+    Once you have generated some parts and descriptions in a browser,
+    you can start trying to retrieve these parts / data simply.

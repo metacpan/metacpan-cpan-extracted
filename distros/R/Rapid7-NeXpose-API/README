@@ -1,0 +1,68 @@
+Rapid7-NeXpose-API
+
+This is Perl interface for communication with NeXpose scanner over API v1.1.
+You can start, stop, pause and resume scan. Watch progress and status of
+scan, download report, etc.
+
+Currently you can only start scan, list sites and delete site.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+EXAMPLE
+
+	use Rapid7::NeXpose::API;
+
+	my $n = Rapid7::NeXpose::API->new(
+			url=>'https://localhost:3780',password=>'test');
+	my $sl = $n->sitelist();
+	print "Starting scan for first site found: ";
+	printf "%s with ID: %s\n", $sl->[0]->{'name'}, $sl->[0]->{'id'};
+	$n->sitescan($sl->[0]->{'id'});
+
+NOTICE
+
+This CPAN module uses LWP for communicating with NeXpose over its API via https.
+Therefore, make sure that you have Net::SSL (provided by Crypt::SSLeay):
+http://search.cpan.org/perldoc?Crypt::SSLeay
+or IO::Socket::SSL:
+http://search.cpan.org/perldoc?IO::Socket::SSL
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Rapid7::NeXpose::API
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Rapid7-NeXpose-API
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Rapid7-NeXpose-API
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Rapid7-NeXpose-API
+
+    Search CPAN
+        http://search.cpan.org/dist/Rapid7-NeXpose-API/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Vlatko Kosturjak
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

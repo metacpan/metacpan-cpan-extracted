@@ -1,0 +1,39 @@
+% if(! param("nolayout")) {
+%    layout 'default';
+% }
+
+
+<h1><%= $name %></h1>
+
+<div id="rexfile_info">
+   Rexfile Loaded: <%= $rexfile %>
+</div>
+
+<div id="task_info">
+   <h2>Tasks Available</h2>
+
+   <table>
+   % for my $task (@$tasks) {
+      <tr>
+         <td width="100px;"><a href="/project/<%= param("id") %>/task/view/<%= $task->{name} %>"><img src="/images/task_32.png" style="padding: 0px 16px;" /></a></td>
+         <td width="30%"><a href="/project/<%= param("id") %>/task/view/<%= $task->{name} %>"><%= $task->{name} %></a></td>
+         <td><%= $task->{desc} %></td>
+      </tr>
+   % }
+   </table>
+</div>
+
+<div id="server_info">
+   <h2>Servers</h2>
+
+   <table>
+   % for my $server (@$servers) {
+      <tr>
+         <td width="100px;"><a href="/server/view/<%= $server->{name} %>"><img src="/images/server_64.png" /></a></td>
+         <td><a href="/server/view/<%= $server->{name} %>"><%= $server->{name} %></a></td>
+         <td><%= $server->{desc} %></td>
+      </tr>
+   % }
+   </table>
+</div>
+

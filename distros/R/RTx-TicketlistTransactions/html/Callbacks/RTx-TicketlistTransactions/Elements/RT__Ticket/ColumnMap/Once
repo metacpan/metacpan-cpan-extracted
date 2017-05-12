@@ -1,0 +1,22 @@
+<%args>
+$COLUMN_MAP => undef
+</%args>
+<%init>
+$COLUMN_MAP->{LastTransactionContent} = { 
+    title => sub { return pop @_},
+    value => sub { my $ticket = shift;
+    my $txns = $ticket->Transactions;
+    $txns->Limit( FIELD => 'Type', VALUE => 'Comment' );
+    $txns->Limit( FIELD => 'Type', VALUE => 'Create' );
+    $txns->Limit( FIELD => 'Type', VALUE => 'Correspond' );
+    $txns->OrderBy(FIELD => 'id', ORDER => 'DESC');
+    $txns->RowsPerPage(1);
+    my $last = $txns->First;
+    return '' unless $last;
+    return $last->Content;
+    }
+
+};
+return;
+</%init>
+

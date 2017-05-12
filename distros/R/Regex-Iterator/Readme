@@ -1,0 +1,10 @@
+Regex::Iterator - an iterator object for regexps
+
+
+Install using 
+
+	% perl Build.PL
+	% ./Build test
+	% sudo ./Build install
+
+

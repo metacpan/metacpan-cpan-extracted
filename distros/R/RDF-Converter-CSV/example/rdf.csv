@@ -1,0 +1,5 @@
+"PDB ID","PUBMED ID","No: of residues per subunit","Chain_ID","PDB/PQS","OLD"," Biological unit","Extent of swapping(%)","Residues in Hinge loop","Residues in swapped domain (PDB numbering)","Sequence of Hinge loop","BOUNDARY: 3 HINGE REGION","Sequence of swapped domain","Structure of swapped region"
+"1HT9",11316872,76,"A, B","PDB","Homodimer","Homodimer",67.1,"SER38-SER44 (7)","THR45-GLN75 (31)","SLLKGMS","EFPSLLKGMSTLD","TLDELFEELDKNGDGEVSFEEFQVLVKKISQ","C-terminal &-alpha helix"
+"1I1D",11278591,159,"A, B, C, D","PQS","Homodimer","Homodimer",20.2,"GLY147-PHE148 (2)","SER149-LYS159 (11)","GF","EKCGFSNA","SNAGVEMQIRK","C-terminal &-beta strand"
+"1I21",11278591,159,"A, B, F, E","PDB","Homohexamer","Homodimer",18.5,"GLY147-PHE148 (2)","SER149-ARG158 (10)","GF","EKCGFSNA","SNAGVEMQIR","C-terminal &-beta sheet"
+"1I4M",11524679,"108 (fragment 119-226)","A","PQS","Homodimer","Homodimer",38.49,"VAL189-PHE198 (10)","THR199-TYR226 (28)","VTTTTKGENF (last few residues of helix 2 in monomer=switch region in dimer)","QHTVTTTTKGENFTET","TETDVKMMERVVEQMCITQYERESQAYY","C-terminal &-alpha helix"

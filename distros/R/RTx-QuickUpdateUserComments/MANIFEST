@@ -1,0 +1,21 @@
+Changes
+html/Callbacks/RTx-QuickUpdateUserComments/Ticket/Elements/ShowRequestor/AfterComments
+html/Callbacks/RTx-QuickUpdateUserComments/User/Summary.html/BeforePortlets
+html/User/Elements/Portlets/EditComments
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RTx/QuickUpdateUserComments.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE                                Public-key signature (added by MakeMaker)

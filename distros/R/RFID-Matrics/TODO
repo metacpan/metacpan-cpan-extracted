@@ -1,0 +1,7 @@
+* Turn matrics.pl into a simple command-line tool that can be used as
+  a demo application and to quickly test out the library.
+* New interface doesn't yet support:
+  + Constant Reads
+  + Dealing with node address
+  + Dealing with serial number
+  

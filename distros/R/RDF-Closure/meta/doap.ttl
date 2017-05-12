@@ -1,0 +1,46 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/RDF-Closure/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project
+	a               :Project ;
+	:name           "RDF-Closure" ;
+	:shortdesc      "pure Perl RDF inferencing"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/RDF-Closure> ;
+	:download-page  <https://metacpan.org/release/RDF-Closure> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Closure> ;
+	rdfs:seeAlso    <http://www.ivan-herman.net/Misc/2008/owlrl/> ;
+	:repository     [ a :HgRepository ; :browse <https://bitbucket.org/tobyink/p5-rdf-closure> ] ;
+	:maintainer     toby:i ;
+	:developer      toby:i , <http://www.ivan-herman.net/foaf#me> ;
+	:documenter     toby:i ;
+	:tester         toby:i ;
+	:created        "2011-02-23"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> ;
+	:category       [ rdfs:label "RDF" ];
+	:category       [ rdfs:label "Reasoning"@en ];
+	:category       [ rdfs:label "Inference"@en ];
+	:category       [ rdfs:label "OWL" ];
+	:category       [ rdfs:label "RDFS" ];
+	:category       [ rdfs:label "Rules"@en ];
+	:category       [ rdfs:label "RL" ].
+
+toby:i
+	a               foaf:Person ;
+	foaf:name       "Toby Inkster" ;
+	foaf:homepage   <http://tobyinkster.co.uk/> ;
+	foaf:page       <https://metacpan.org/author/TOBYINK> ;
+	foaf:mbox       <mailto:tobyink@cpan.org> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://purl.org/NET/cpan-uri/person/tobyink> .
+
+<http://www.ivan-herman.net/foaf#me>
+	a               foaf:Person ;
+	foaf:name       "Ivan Herman" ;
+	foaf:homepage    <http://www.ivan-herman.net/> ;
+	foaf:workplaceHomepage <http://www.w3.org/> .

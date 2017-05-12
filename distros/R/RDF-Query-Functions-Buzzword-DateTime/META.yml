@@ -1,0 +1,40 @@
+---
+abstract: 'plugin for buzzword.org.uk datetime functions'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: RDF::Query::Functions::Buzzword::DateTime
+name: RDF-Query-Functions-Buzzword-DateTime
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+recommends:
+  RDF::Query::Functions::Buzzword::Util: 0.003
+requires:
+  DateTime: 0
+  DateTime::Format::Duration: 0
+  DateTime::Format::ISO8601: 0
+  DateTime::Format::Natural: 0
+  RDF::Query: 2.903
+  perl: 5.005
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-Query-Functions-Buzzword-DateTime
+  homepage: https://metacpan.org/release/RDF-Query-Functions-Buzzword-DateTime
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-rdf-query-functions-buzzword-datetime
+version: 0.002

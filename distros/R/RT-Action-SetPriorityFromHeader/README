@@ -1,0 +1,42 @@
+NAME
+    RT::Action::SetPriorityFromHeader - Set ticket priority from an email
+    header of your choosing
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        Only run the first time you install this action.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Set(@Plugins, qw(RT::Action::SetPriorityFromHeader));
+
+        or add "RT::Extension::SetPriorityFromHeader" to your existing
+        @Plugins line.
+
+        You also need to configure the email header to use and a mapping
+        from the email header values to RT priority values.
+
+            Set($PriorityHeader, 'X-Priority');
+            Set(%PriorityMap, highest => 1, high => 2, normal => 3, low => 4, lowest => 5);
+            # With the above, a header like "X-Priority: high" would set the RT ticket priority to 2
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Thomas Sibley <trs@bestpractical.com>
+
+LICENCE AND COPYRIGHT
+    This software is copyright (c) 2011 by Best Practical Solutions.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

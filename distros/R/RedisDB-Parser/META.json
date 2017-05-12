@@ -1,0 +1,70 @@
+{
+   "abstract" : "Redis protocol parser",
+   "author" : [
+      "Pavel Shaydo <zwon@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "redis",
+      "protocol",
+      "parser"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RedisDB-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0.94",
+            "Test::Most" : "0.22"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.27",
+            "ExtUtils::MakeMaker" : "6.3002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.1",
+            "Try::Tiny" : "0",
+            "perl" : "5.008004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trinitum/perl-RedisDB-Parser/issues"
+      },
+      "homepage" : "https://github.com/trinitum/perl-RedisDB-Parser",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/trinitum/perl-RedisDB-Parser"
+      }
+   },
+   "version" : "2.22",
+   "x_contributors" : [
+      "Pavel Shaydo <zwon@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

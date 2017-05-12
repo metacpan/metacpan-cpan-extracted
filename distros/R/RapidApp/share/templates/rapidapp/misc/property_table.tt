@@ -1,0 +1,123 @@
+﻿
+<style>
+
+table.property-table {
+  padding: 3px;
+}
+
+table.property-table table.column {
+  font-size: 12px;
+  padding-left: 25px;
+}
+
+table.property-table td.first table.column {
+  padding-left: 3px;
+}
+
+table.property-table table.column td.name {
+  text-align: left;
+  font-weight: bold;
+  white-space: nowrap;
+  padding-right: 15px;
+}
+
+table.property-table table.column td.value {
+  min-width: 70px;
+}
+
+table.property-table tr {
+  vertical-align: top;
+}
+
+table.property-table td div.cell {
+  padding: 2px;
+  vertical-align: baseline;
+}
+
+
+[% self.tt_css_styles_str %]
+
+</style>
+
+  
+<tpl for=".">
+  
+<div class="row">
+  
+<table class="property-table">
+  <tbody>
+  <tr>
+  
+    [% FOREACH col_set IN self.tt_table_data %]
+    
+       <td [%- 'class="first"' IF loop.first %]>
+        <table class="column column-[% loop.count %]">
+          <tbody>
+          
+            [% FOREACH col IN col_set %]
+            
+              <tr>
+              
+                [% SET value_attrs = 
+                  "class='cell" _ 
+                  (col.value_cls ? " " _ col.value_cls : "") _ 
+                  "'" _ 
+                  (col.value_style ? " style='" _ col.value_style _ "'" : "")
+                %]
+                
+                [% SET name_attrs = 
+                  "class='cell" _ 
+                  (col.name_cls ? " " _ col.name_cls : "") _ 
+                  "'" _ 
+                  (col.name_style ? " style='" _ col.name_style _ "'" : "")
+                %]
+              
+              
+                [% IF col.whole_col %]
+                
+                  <td class="value" colspan="2">
+                    <div [% value_attrs %]>[% col.value %]</div>
+                  </td>
+
+                [% ELSIF col.label_top %]
+               
+                  <td class="name" colspan="2">
+                    <div [% name_attrs %]>[% col.name %]</div>
+                  </td>
+                  
+                  </tr><tr>
+                  
+                  <td class="value" colspan="2">
+                    <div style="padding-left:3px;">
+                      <div [% value_attrs %]>[% col.value %]</div>
+                    </div>
+                  </td>
+                
+                [% ELSE %]
+              
+                  <td class="name">
+                    <div [% name_attrs %]>[% col.name %]</div>
+                  </td>
+                  <td class="value">
+                    <div [% value_attrs %]>[% col.value %]</div>
+                  </td>
+                
+                [% END %]
+                
+              </tr>
+            
+            [% END %]
+
+          </tbody>
+        </table>
+      </td>
+      
+    [% END %]
+  
+  </tr>
+  </tbody>
+</table>
+  
+</div>
+
+</tpl>

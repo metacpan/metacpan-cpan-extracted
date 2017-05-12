@@ -1,0 +1,11 @@
+# perl -I lib bin/ldf-client.pl  http://fragments.dbpedia.org/2014/en sparql07.txt
+PREFIX ontology: <http://dbpedia.org/ontology/>
+PREFIX property: <http://dbpedia.org/property/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT * { 
+  ?craft a ontology:Spacecraft .
+  ?craft property:launch ?date .
+  FILTER (
+    ?date > "1999-01-01"^^xsd:date
+  )
+}

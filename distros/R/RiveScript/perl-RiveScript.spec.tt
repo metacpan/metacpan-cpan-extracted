@@ -1,0 +1,32 @@
+Name:    perl-RiveScript
+Version: [% version %]
+Release: [% build %]
+Summary: Chatterbot Brain Development Toolkit
+Group:   Development/Libraries
+License: MIT
+URL:     http://search.cpan.org/dist/RiveScript/
+
+Provides: perl(RiveScript) = %{version}
+Provides: perl(RiveScript::WD) = [% wd_version %]
+Requires: perl(JSON)
+
+%description
+RiveScript is a simple trigger/response language primarily used for the
+creation of chatting robots. It's designed to have an easy-to-learn syntax
+but provide a lot of power and flexibility. For more information,
+visit http://www.rivescript.com/
+
+%pre
+
+%post
+
+%preun
+
+%postun
+
+%files
+%defattr(-, root, root, -)
+[% FOREACH file IN files %][% file %]
+[% END %]
+
+# vim:ft=spec

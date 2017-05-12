@@ -1,0 +1,810 @@
+---
+match_binary:
+  -
+    - a0_0.tar.gz
+    - '-'
+  -
+    - a0_0.orig.tar.gz
+    - '-'
+  -
+    - a0_0-1.diff.gz
+    - '-'
+  -
+    - a0_0.debian.tar.gz
+    - '-'
+  -
+    - a0_0.orig-abc.tar.gz
+    - '-'
+  -
+    - a0_0.dsc
+    - '-'
+  -
+    - a0_0_all.changes
+    - '-'
+  -
+    - a0_1_all.deb
+    - +
+    - a0_1_all.deb
+    - a0
+    - 1
+    - all
+  -
+    - a0_a_all.deb
+    - +
+    - a0_a_all.deb
+    - a0
+    - a
+    - all
+  -
+    - a0_amd64_s390x.deb
+    - +
+    - a0_amd64_s390x.deb
+    - a0
+    - amd64
+    - s390x
+  -
+    - abcdefghijklmnopqrstuvwxyz_1_all.deb
+    - +
+    - abcdefghijklmnopqrstuvwxyz_1_all.deb
+    - abcdefghijklmnopqrstuvwxyz
+    - 1
+    - all
+  -
+    - 0123456789_1_all.deb
+    - +
+    - 0123456789_1_all.deb
+    - 0123456789
+    - 1
+    - all
+  -
+    - a-0_1_all.deb
+    - +
+    - a-0_1_all.deb
+    - a-0
+    - 1
+    - all
+  -
+    - a+0_1_all.deb
+    - +
+    - a+0_1_all.deb
+    - a+0
+    - 1
+    - all
+  -
+    - a.0_1_all.deb
+    - +
+    - a.0_1_all.deb
+    - a.0
+    - 1
+    - all
+  -
+    - a0_0123456789_all.deb
+    - +
+    - a0_0123456789_all.deb
+    - a0
+    - 0123456789
+    - all
+  -
+    - a0_0abcdefghijklmnopqrstuvwxyz_all.deb
+    - +
+    - a0_0abcdefghijklmnopqrstuvwxyz_all.deb
+    - a0
+    - 0abcdefghijklmnopqrstuvwxyz
+    - all
+  -
+    - a0_0%3a0a_all.deb
+    - +
+    - a0_0%3a0a_all.deb
+    - a0
+    - 0%3a0a
+    - all
+  -
+    - a0_0~a_all.deb
+    - +
+    - a0_0~a_all.deb
+    - a0
+    - 0~a
+    - all
+  -
+    - a0_0-a_all.deb
+    - +
+    - a0_0-a_all.deb
+    - a0
+    - 0-a
+    - all
+  -
+    - deb_0_all.deb
+    - +
+    - deb_0_all.deb
+    - deb
+    - 0
+    - all
+  -
+    - a.deb_0_all.deb
+    - +
+    - a.deb_0_all.deb
+    - a.deb
+    - 0
+    - all
+  -
+    - alpha_0_all.deb
+    - +
+    - alpha_0_all.deb
+    - alpha
+    - 0
+    - all
+  -
+    - darwin-alpha_0_all.deb
+    - +
+    - darwin-alpha_0_all.deb
+    - darwin-alpha
+    - 0
+    - all
+  -
+    - a0_0.deb_all.deb
+    - +
+    - a0_0.deb_all.deb
+    - a0
+    - 0.deb
+    - all
+  -
+    - a0_0.amd64_all.deb
+    - +
+    - a0_0.amd64_all.deb
+    - a0
+    - 0.amd64
+    - all
+  -
+    - a0_0.freebsd-amd64_all.deb
+    - +
+    - a0_0.freebsd-amd64_all.deb
+    - a0
+    - 0.freebsd-amd64
+    - all
+  -
+    - a0_0_all.deb
+    - +
+    - a0_0_all.deb
+    - a0
+    - 0
+    - all
+  -
+    - a0_0_any.deb
+    - +
+    - a0_0_any.deb
+    - a0
+    - 0
+    - any
+  -
+    - a0_0_source.deb
+    - +
+    - a0_0_source.deb
+    - a0
+    - 0
+    - source
+  -
+    - a0_0_armeb.deb
+    - +
+    - a0_0_armeb.deb
+    - a0
+    - 0
+    - armeb
+  -
+    - a0_0_hurd-armeb.deb
+    - +
+    - a0_0_hurd-armeb.deb
+    - a0
+    - 0
+    - hurd-armeb
+  -
+    - a0_0_lpia.deb
+    - +
+    - a0_0_lpia.deb
+    - a0
+    - 0
+    - lpia
+  -
+    - a0_0_kfreebsd-lpia.deb
+    - +
+    - a0_0_kfreebsd-lpia.deb
+    - a0
+    - 0
+    - kfreebsd-lpia
+  -
+    - ''
+    - '-'
+  -
+    - a0
+    - '-'
+  -
+    - a0_1
+    - '-'
+  -
+    - a0_1_all
+    - '-'
+  -
+    - a0_1_all.
+    - '-'
+  -
+    - a0_1_allxdeb
+    - '-'
+  -
+    - '!@#$a0_0_all.deb'
+    - '-'
+    - a0_0_all.deb
+    - a0
+    - 0
+    - all
+  -
+    - a0_0_all.debabcd
+    - '-'
+  -
+    - a0_1_all.deb.deb
+    - '-'
+  -
+    - a_1_all.deb
+    - '-'
+  -
+    - _1_all.deb
+    - '-'
+  -
+    - __all.deb
+    - '-'
+  -
+    - __.deb
+    - '-'
+  -
+    - a0__all.deb
+    - '-'
+  -
+    - a0_1_.deb
+    - '-'
+  -
+    - a1__.deb
+    - '-'
+  -
+    - a:0_0_all.deb
+    - '-'
+  -
+    - a0_:0a_all.deb
+    - '-'
+  -
+    - a0_0:a_all.deb
+    - '-'
+  -
+    - a0_0:0a_all.deb
+    - '-'
+  -
+    - a0_0a:_all.deb
+    - '-'
+  -
+    - '%3Da_1_all.deb'
+    - '-'
+  -
+    - a0_%3D_all.deb
+    - '-'
+  -
+    - a0_1_3141.deb
+    - '-'
+  -
+    - cnews_cr.g7-40.4_i386.deb
+    - +
+    - cnews_cr.g7-40.4_i386.deb
+    - cnews
+    - cr.g7-40.4
+    - i386
+match_dsc:
+  -
+    - a0_0_all.deb
+    - '-'
+  -
+    - a0_0.tar.gz
+    - '-'
+  -
+    - a0_0.orig.tar.gz
+    - '-'
+  -
+    - a0_0-1.diff.gz
+    - '-'
+  -
+    - a0_0.debian.tar.gz
+    - '-'
+  -
+    - a0_0.orig-abc.tar.gz
+    - '-'
+  -
+    - a0_0_all.changes
+    - '-'
+  -
+    - ''
+    - '-'
+  -
+    - dsc
+    - '-'
+  -
+    - 0.dsc
+    - '-'
+  -
+    - 0-1.dsc
+    - '-'
+  -
+    - _0.dsc
+    - '-'
+  -
+    - _0-1.dsc
+    - '-'
+  -
+    - a0_0-1.dsc
+    - +
+    - a0_0-1.dsc
+    - a0
+    - 0-1
+  -
+    - a0_a-1.dsc
+    - +
+    - a0_a-1.dsc
+    - a0
+    - a-1
+  -
+    - a0_dsc-1.dsc
+    - +
+    - a0_dsc-1.dsc
+    - a0
+    - dsc-1
+  -
+    - a0_0.dsc
+    - +
+    - a0_0.dsc
+    - a0
+    - 0
+  -
+    - a0_a.dsc
+    - +
+    - a0_a.dsc
+    - a0
+    - a
+  -
+    - a0_dsc.dsc
+    - +
+    - a0_dsc.dsc
+    - a0
+    - dsc
+  -
+    - a0_a.dsc.dsc
+    - +
+    - a0_a.dsc.dsc
+    - a0
+    - a.dsc
+  -
+    - a0_0.dscfoo.bar
+    - '-'
+  -
+    - _a0_0.dsc
+    - '-'
+    - a0_0.dsc
+    - a0
+    - 0
+  -
+    - a0_0-dsc
+    - '-'
+  -
+    - a0_0_dsc
+    - '-'
+  -
+    - a0_0-1_dsc
+    - '-'
+  -
+    - a0_0-1.dsc.dsc
+    - +
+    - a0_0-1.dsc.dsc
+    - a0
+    - 0-1.dsc
+  -
+    - a0_0.dsc.dsc
+    - +
+    - a0_0.dsc.dsc
+    - a0
+    - 0.dsc
+  -
+    - a0_0-1.dsc.dsc.dsc
+    - +
+    - a0_0-1.dsc.dsc.dsc
+    - a0
+    - 0-1.dsc.dsc
+  -
+    - a0_0.dsc.dsc.dsc
+    - +
+    - a0_0.dsc.dsc.dsc
+    - a0
+    - 0.dsc.dsc
+  -
+    - a0_0:1.dsc
+    - '-'
+  -
+    - a0_0%1.dsc
+    - '-'
+  -
+    - a0_0%3a1.dsc
+    - '-'
+  -
+    - a0_0123456789-1.dsc
+    - +
+    - a0_0123456789-1.dsc
+    - a0
+    - 0123456789-1
+  -
+    - a0_0123456789.dsc
+    - +
+    - a0_0123456789.dsc
+    - a0
+    - 0123456789
+  -
+    - a0_0abcdefghijklmnopqrstuvwxyz-1.dsc
+    - +
+    - a0_0abcdefghijklmnopqrstuvwxyz-1.dsc
+    - a0
+    - 0abcdefghijklmnopqrstuvwxyz-1
+  -
+    - a0_0abcdefghijklmnopqrstuvwxyz.dsc
+    - +
+    - a0_0abcdefghijklmnopqrstuvwxyz.dsc
+    - a0
+    - 0abcdefghijklmnopqrstuvwxyz
+  -
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ-1.dsc
+    - +
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ-1.dsc
+    - a0
+    - 0ABCDEFGHIJKLMNOPQRSTUVWXYZ-1
+  -
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ.dsc
+    - +
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ.dsc
+    - a0
+    - 0ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  -
+    - a0_0~1-2.dsc
+    - +
+    - a0_0~1-2.dsc
+    - a0
+    - 0~1-2
+  -
+    - a0_0~1.dsc
+    - +
+    - a0_0~1.dsc
+    - a0
+    - 0~1
+  -
+    - a0_0.1-2.dsc
+    - +
+    - a0_0.1-2.dsc
+    - a0
+    - 0.1-2
+  -
+    - a0_0.1.dsc
+    - +
+    - a0_0.1.dsc
+    - a0
+    - 0.1
+  -
+    - a0_0+1-2.dsc
+    - +
+    - a0_0+1-2.dsc
+    - a0
+    - 0+1-2
+  -
+    - a0_0+1.dsc
+    - +
+    - a0_0+1.dsc
+    - a0
+    - 0+1
+  -
+    - a_0-1.dsc
+    - '-'
+  -
+    - a_0.dsc
+    - '-'
+  -
+    - abcdefghijklmnopqrstuvwxyz_0-1.dsc
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0-1.dsc
+    - abcdefghijklmnopqrstuvwxyz
+    - 0-1
+  -
+    - abcdefghijklmnopqrstuvwxyz_0.dsc
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0.dsc
+    - abcdefghijklmnopqrstuvwxyz
+    - 0
+  -
+    - 0123456789_0-1.dsc
+    - +
+    - 0123456789_0-1.dsc
+    - 0123456789
+    - 0-1
+  -
+    - 0123456789_0.dsc
+    - +
+    - 0123456789_0.dsc
+    - 0123456789
+    - 0
+  -
+    - a-0_0-1.dsc
+    - +
+    - a-0_0-1.dsc
+    - a-0
+    - 0-1
+  -
+    - a-0_0.dsc
+    - +
+    - a-0_0.dsc
+    - a-0
+    - 0
+  -
+    - a-_0-1.dsc
+    - +
+    - a-_0-1.dsc
+    - a-
+    - 0-1
+  -
+    - a-_0.dsc
+    - +
+    - a-_0.dsc
+    - a-
+    - 0
+  -
+    - a+0_0-1.dsc
+    - +
+    - a+0_0-1.dsc
+    - a+0
+    - 0-1
+  -
+    - a+0_0.dsc
+    - +
+    - a+0_0.dsc
+    - a+0
+    - 0
+  -
+    - a+_0-1.dsc
+    - +
+    - a+_0-1.dsc
+    - a+
+    - 0-1
+  -
+    - a+_0.dsc
+    - +
+    - a+_0.dsc
+    - a+
+    - 0
+  -
+    - a.0_1-2.dsc
+    - +
+    - a.0_1-2.dsc
+    - a.0
+    - 1-2
+  -
+    - a.0_1.dsc
+    - +
+    - a.0_1.dsc
+    - a.0
+    - 1
+  -
+    - a._0-1.dsc
+    - +
+    - a._0-1.dsc
+    - a.
+    - 0-1
+  -
+    - a._0.dsc
+    - +
+    - a._0.dsc
+    - a.
+    - 0
+match_changes:
+  -
+    - a0_0_all.deb
+    - '-'
+  -
+    - a0_0.tar.gz
+    - '-'
+  -
+    - a0_0.orig.tar.gz
+    - '-'
+  -
+    - a0_0-1.diff.gz
+    - '-'
+  -
+    - a0_0.debian.tar.gz
+    - '-'
+  -
+    - a0_0.orig-abc.tar.gz
+    - '-'
+  -
+    - a0_0.dsc
+    - '-'
+  -
+    - ''
+    - '-'
+  -
+    - changes
+    - '-'
+  -
+    - all.changes
+    - '-'
+  -
+    - 0_all.changes
+    - '-'
+  -
+    - _0_all.changes
+    - '-'
+  -
+    - a0_0_notanarch.changes
+    - '-'
+  -
+    - a0_0_all.changes
+    - +
+    - a0_0_all.changes
+    - a0
+    - 0
+    - all
+  -
+    - a0_0_all.changesfoo.bar
+    - '-'
+  -
+    - _a0_0_all.changes
+    - '-'
+    - a0_0_all.changes
+    - a0
+    - 0
+    - all
+  -
+    - a0_0_all-changes
+    - '-'
+  -
+    - a0_0_all_changes
+    - '-'
+  -
+    - a0_0:1_all.changes
+    - '-'
+  -
+    - a0_0%1_all.changes
+    - '-'
+  -
+    - a0_0%3a1_all.changes
+    - '-'
+  -
+    - a0_0123456789_all.changes
+    - +
+    - a0_0123456789_all.changes
+    - a0
+    - 0123456789
+    - all
+  -
+    - a0_0abcdefghijklmnopqrstuvwxyz_all.changes
+    - +
+    - a0_0abcdefghijklmnopqrstuvwxyz_all.changes
+    - a0
+    - 0abcdefghijklmnopqrstuvwxyz
+    - all
+  -
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ_all.changes
+    - +
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ_all.changes
+    - a0
+    - 0ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    - all
+  -
+    - a0_0-1_all.changes
+    - +
+    - a0_0-1_all.changes
+    - a0
+    - 0-1
+    - all
+  -
+    - a0_0~1_all.changes
+    - +
+    - a0_0~1_all.changes
+    - a0
+    - 0~1
+    - all
+  -
+    - a0_0.1_all.changes
+    - +
+    - a0_0.1_all.changes
+    - a0
+    - 0.1
+    - all
+  -
+    - a0_0+1_all.changes
+    - +
+    - a0_0+1_all.changes
+    - a0
+    - 0+1
+    - all
+  -
+    - a_0_all.changes
+    - '-'
+  -
+    - abcdefghijklmnopqrstuvwxyz_0_all.changes
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0_all.changes
+    - abcdefghijklmnopqrstuvwxyz
+    - 0
+    - all
+  -
+    - 0123456789_0_all.changes
+    - +
+    - 0123456789_0_all.changes
+    - 0123456789
+    - 0
+    - all
+  -
+    - a-0_0_all.changes
+    - +
+    - a-0_0_all.changes
+    - a-0
+    - 0
+    - all
+  -
+    - a-_0_all.changes
+    - +
+    - a-_0_all.changes
+    - a-
+    - 0
+    - all
+  -
+    - a+0_0_all.changes
+    - +
+    - a+0_0_all.changes
+    - a+0
+    - 0
+    - all
+  -
+    - a+_0_all.changes
+    - +
+    - a+_0_all.changes
+    - a+
+    - 0
+    - all
+  -
+    - a.0_1_all.changes
+    - +
+    - a.0_1_all.changes
+    - a.0
+    - 1
+    - all
+  -
+    - a._0_all.changes
+    - +
+    - a._0_all.changes
+    - a.
+    - 0
+    - all
+  -
+    - a0_0_source.changes
+    - +
+    - a0_0_source.changes
+    - a0
+    - 0
+    - source
+  -
+    - a0_0_any.changes
+    - +
+    - a0_0_any.changes
+    - a0
+    - 0
+    - any
+  -
+    - a0_0_s390x.changes
+    - +
+    - a0_0_s390x.changes
+    - a0
+    - 0
+    - s390x
+  -
+    - a0_0_solaris-powerpc.changes
+    - +
+    - a0_0_solaris-powerpc.changes
+    - a0
+    - 0
+    - solaris-powerpc

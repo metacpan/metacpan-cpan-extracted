@@ -1,0 +1,5 @@
+Revision history for Perl extension Redirx::Client.
+
+0.01  Fri Mar 14 15:24:55 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Redirx::Client

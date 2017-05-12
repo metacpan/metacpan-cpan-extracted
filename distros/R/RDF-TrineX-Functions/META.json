@@ -1,0 +1,74 @@
+{
+   "abstract" : "some shortcut functions for RDF::Trine's object-oriented interface",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::9 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-TrineX-Functions",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "IO::Detect" : "0",
+            "PerlX::Maybe" : "0",
+            "RDF::NS" : "0",
+            "RDF::Trine" : "0.135",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0",
+            "URI::file" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "RDF::TrineX::Functions" : {
+         "file" : "lib/RDF/TrineX/Functions.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Functions/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=RDF-TrineX-Functions"
+      },
+      "homepage" : "https://metacpan.org/release/RDF-TrineX-Functions",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-rdf-trinex-functions.git",
+         "web" : "https://github.com/tobyink/p5-rdf-trinex-functions"
+      }
+   },
+   "version" : "0.005"
+}

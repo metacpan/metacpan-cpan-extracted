@@ -1,0 +1,8 @@
+<%init>
+$m->call_next();
+</%init>
+</body>
+</html>
+<%cleanup>
+$m->abort;
+</%cleanup>

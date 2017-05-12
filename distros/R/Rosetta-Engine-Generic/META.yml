@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Rosetta-Engine-Generic
+version:      v0.22.0
+version_from: lib/Rosetta/Engine/Generic.pm
+installdirs:  site
+requires:
+    DBD::SQLite:                   1.09
+    DBI:                           1.48
+    List::Util:                    0
+    only:                          0
+    Rosetta:                       0.71.0
+    Rosetta::Utility::SQLBuilder:  0.22.0
+    Rosetta::Utility::SQLParser:   0.3.0
+    Rosetta::Validator:            0.71.0
+    Test::More:                    0
+    version:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

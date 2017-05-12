@@ -1,0 +1,295 @@
+=head1 NAME
+
+ResourcePool - A connection caching and pooling class.
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool;
+ use ResourcePool::Factory;
+ 
+ my $factory = ResourcePool::Factory->new("arg1");
+ my $pool    = ResourcePool->new($factory, MaxTry => 3);
+ 
+ my $resource = $pool->get();  # get a resource out of the pool
+ #[...]                        # do something with $resource
+ $pool->free($resource);       # give it back to the pool
+ 
+ $pool->fail($resource);       # give back a failed resource
+
+=head1 DESCRIPTION
+
+
+The ResourcePool is a generic connection caching and pooling management facility. It might be used in an Apache/mod_perl environment to support connection caching like L<Apache::DBI|Apache::DBI> for non-DBI resources (e.g. L<Net::LDAP|Net::LDAP>). It's also useful in a stand alone perl application to handle connection pools.
+
+The key benefit of ResourcePool is the generic design which makes it easily extensible to new resource types.
+
+The ResourcePool has a simple check mechanism to detect and close broken connections (e.g. if the database server was restarted) and opens new connections if possible.
+
+If you are new to ResourcePool you should go to the L<ResourcePool::BigPicture|ResourcePool::BigPicture> documentation which provides the best entry point to this module.
+
+The ResourcePool itself handles always exactly equivalent connections (e.g. connections to the same server with the same user-name and password) and is therefore not able to do a load balancing. The L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> is able to do a advanced load balancing across different servers and increases the overall availability by applying a failover policy if there is a server breakdown.
+
+=head2 S<ResourcePool-E<gt>new($factory, @Options)>
+
+Creates a new ResourcePool. It uses a previously created ResourcePool if possible. So if you call the new method with the same arguments twice, the second call returns the same object as the first did. This is even true if you call the new method while handling different Apache/mod_perl requests (as long as they are in the same Apache process). (This is implemented using the L<ResourcePool::Singleton|ResourcePool::Singleton> class included in this distribution)
+
+=over 4
+
+=item $factory
+
+A L<ResourcePool::Factory|ResourcePool::Factory> is required to create new resources on demand. The L<ResourcePool::Factory|ResourcePool::Factory> is the place where you configure the resources you plan to use (e.g. Database server, user-name and password). Since the L<ResourcePool::Factory|ResourcePool::Factory> is specific to the actual resource you want to use, there are different factories for the different resource types (see L<ResourcePool::Factory|ResourcePool::Factory>)
+
+=item @Options
+
+=over 4
+
+=item B<Max>
+
+Specifies the maximum concurrent resources managed by this pool. If the limit is reached the L<get()|/get> method will return undef.
+
+Default: 5
+
+=item B<MaxTry>
+
+Specifies how many dead resources the L<get()|/get> method checks before it returns undef. Normally the L<get()|/get> method doesn't return dead resources (e.g. broken connections). In the case there is a broken connection in the pool, the L<get()|/get> method throws it away and takes the next resource out of the pool. The L<get()|/get> method tries not more then MaxTry resources before it returns undef.
+
+Default: 2
+
+=item B<MaxExecTry>
+
+Specifies how often the L<execute()|/execute> method will repeat the command before it gives up. Please have a look at the L<ResourcePool::Command|ResourcePool::Command> documentation to learn more about the Command patten and how to use it with ResourcePool.
+
+Default: 2
+
+=item B<PreCreate>
+
+Normally the ResourcePool creates new resources only on demand, with this option you can specify how many resources are created in advance when the ResourcePool gets constructed.
+
+Default: 0
+
+=item B<SleepOnFail>
+
+You can tell the ResourcePool to sleep a while when a dead resource was found. Normally the L<get()|/get> method tries up to > times to get an valid resource for you without any delay between the attempts. This is usually not what you want if you database is not available for a short time. Using this option you can specify a list of timeouts which should be slept between two attempts to get an valid resource.
+
+If you have specified 
+
+ MaxTry => 5 
+ SleepOnFail => [0, 1, 2, 4] 
+
+ResourcePool would do the following if it isn't able to get an valid resource: 
+
+=over 4
+
+=item * 
+try to get a resource: fails 
+
+=item * 
+sleep 0 seconds 
+
+=item * 
+try to get a resource: fails 
+
+=item * 
+sleep 1 second 
+
+=item * 
+try to get a resource: fails 
+
+=item * 
+sleep 2 seconds 
+
+=item * 
+try to get a resource: fails 
+
+=item * 
+sleep 4 seconds 
+
+=item * 
+try to get a resource: fails 
+
+=item * 
+give up and return undef
+
+=back
+So this call to L<get()|/get> would have taken about 7 seconds.
+
+Using an exponential time scheme like this one, is usually the most efficient. However it is highly recommended to leave the first value always "0" since this is required to allow the ResourcePool to try to establish a new connection without delay.
+
+The number of sleeps can not be more than > - 1, if you specify more values the list is truncated. If you specify less values the list is extended using the last value for the extended elements. e.g. [0, 1] in the above example would have been extended to [0, 1, 1, 1]
+
+If you have L<Time::HiRes|Time::HiRes> installed on your system, you can specify a fractal number of seconds.
+
+If you are doing load balancing you should use L<ResourcePool::LoadBalancer's SleepOnFail option|ResourcePool::LoadBalancer> instead of this one.
+
+Please see also the L<TIMEOUTS|/TIMEOUTS> section for more information about timeouts.
+
+Default: [0]
+
+=back
+
+=back
+
+=head2 S<$pool-E<gt>get>
+
+Returns a resource. This resource has to be given back via the L<free()|/free> or L<fail()|/fail> method. The L<get()|/get> method calls the L<precheck() method of the according resource|ResourcePool::Resource/precheck> to determine if a resource is valid. The L<get()|/get> method may return undef if there is no valid resource available. (e.g. because the > or the > values are reached)
+
+
+=head2 S<$pool-E<gt>free($resource)>
+
+Marks a resource as free. This resource will be re-used by L<get()|/get> calls. The free() method calls the L<postcheck() method of the resource|ResourcePool::Resource/postcheck> to determine if the resource is valid.
+
+B<Returns:> true on success or false if the resource doesn't belong to that pool
+
+=head2 S<$pool-E<gt>fail($resource)>
+
+Marks a resource as bad. The ResourcePool will throw this resource away and NOT return it to the pool of available connections.
+
+B<Returns:> true on success or false if the resource doesn't belong to that pool
+
+=head2 S<$pool-E<gt>execute($Command)>
+
+Executes a L<ResourcePool::Command|ResourcePool::Command> with a resource from this pool. The execute() method implements the Command design pattern from the GoF book "Design Patterns". This enables you to use the ResourcePool without using the get(), free() and fail() methods manually. Basically the execute() method obtains a resource from this pool by calling its get() method, then calling the execute() method of the supplied Command and releasing the resource afterwards.
+
+The execute method will call die() if an error happened, therefore it's best practice to wrap it in an eval{} block.
+
+The L<ResourcePool::Command::Execute|ResourcePool::Command::Execute> documentation covers this in all the details and facets which are introduced by this pattern.
+
+B<Returns:> 
+
+=head1 EXAMPLES
+
+
+This section includes a typical configuration for a persistent L<Net::LDAP|Net::LDAP> pool.
+
+ 
+ use ResourcePool;
+ use ResourcePool::Factory::Net::LDAP;
+ 
+ my $factory =  ResourcePool::Factory::Net::LDAP->new("ldaphost",
+                  version => 2 );
+ $factory->bind('cn=Manager,dc=fatalmind,dc=com', password => 'secret');
+ 
+ 
+ my $pool = ResourcePool->new($factory, 
+                 MaxTry      => 5, 
+                 SleepOnFail => [0,1,2,4]
+ );
+ 
+ if ($something) {
+    my $ldaph = $pool->get();
+ 
+    # do something useful with $ldaph
+ 
+    $pool->free($ldaph);
+ }
+ 
+ # some code nothing to do with ldap
+ 
+ if ($somethingdifferent) {
+    my $ldaph = $pool->get();
+ 
+    # do something different with $ldaph
+ 
+    $pool->free($ldaph);
+ }
+
+So, lets sum up some characteristics of this example: 
+
+=over 4
+
+=item There is only one connection
+
+Even if $something AND $somethingdifferent are true, there is only one connection to the ldaphost opened if you run this script.
+
+=item Connections are created on demand
+
+If neither $something nor $somethingdifferent are true, there is NO connection to ldaphost opened for this script. This is very nice for script (or sub routines) which MIGHT need a connection, and MIGHT need this connection on some different places. You can save a lot of
+
+ 
+ if (! defined $ldaph) {
+    # your connection code goes here
+ }
+
+stuff.
+
+It much more convenient to pass a single argument (e.g. $pool) to a function than passing all the credentials.
+
+If you want to make sure that there is always a connection opened, you can use  PreCreate => 1 (see >)
+
+=item Covers server outages
+
+As long as the ldaphost doesn't crash while you are actually using it (between L<get()|/get> and L<free()|/free>) the ResourcePool would transparently cover any ldaphost outages which take less then 7 seconds.
+
+You can easily change the time how long ResourcePool tries to create a connection with the > and > options. If you would have used  MaxTry => 1000000 in the example above, the L<get()|/get> method could have blocked for about 46 days until giving up (after the first 3 tries it would have tried every 4 seconds to establish a connection).
+
+If you have a connection problem with the resource while using it, it's the best practice to give it back to the pool using the L<fail()|/fail> method. In that case the ResourcePool just throws it away. After that you can try again to L<get()|/get> a new resource.
+
+=item No magic
+
+The resources you obtain from the L<get()|/get> method are in no way magic. They are just plain L<Net::LDAP|Net::LDAP> handles as you would create them yourself. You still MUST apply all the error handling when using this resource.
+
+=back
+
+Examples for the L<execute()|/execute> method can be found in the L<ResourcePool::Command|ResourcePool::Command> documentation.
+
+=head1 TIMEOUTS
+
+
+Time to say some more words about timeouts which take place in the L<get()|/get> method. As you have seen above you can configure this timeouts with the > option, but thats only the half truth. As the name of the option says, thats only the time which is actually slept if an attempt to obtain a valid resource fails. But there is also the time which is needed to try to obtain a valid resource. And this time might vary in a very wide range.
+
+Imagine a situation where you have a newly created ResourcePool for a database (without >) and call the L<get()|/get> method for the first time. Obviously the ResourcePool has to establish a new connection to the database. But what happens if the database is down? Then the time which is needed to recognize that the database is down does also block the L<get()|/get> call. Thats usually not a problem if the operating system of the database server is up and only the database application is down. In that case the operating system rejects the connection actively and the connection establishment will fail very fast. But it's very different if the operating system is also not available (hardware down, network down,...), in this case it might take several seconds (or even minutes!!) before the connection establishment fails, because it has to wait for internal timeouts (which are not affected by ResourcePool). Another example is if your DNS server is down, it might also take a long time before the establishment fails. The usual DNS resolver tries more then one minute before it gives up.
+
+Therefore you have to keep in mind that the timeouts configured via > are only minimum values. If you configure a > value of one second between the attempts, than you have a guarantee the there is at least a sleep of one second before the next attempt is done.
+
+If you want to limit the overall timeouts you have two choices. 1. Use the timeout functionality of the underlaying modules. This is not always safe since the modules might use some functions which do not implement a configurable timeout or does just not use it. 2. Implement your own timeout using alarm(). Thats also not safe, since there is no guarantee that a blocking system call gets interrupted when a signal is received. But to my knowledge thats still the more reliable variant.
+
+The best way of handling this timeouts is to avoid them. For a High Availability configuration it is important fail very fast to be effective. But thats easy to say...
+
+=head1 LIMITATIONS
+
+
+
+=over 4
+
+=item Not transparent
+
+Since the main goal of the ResourcePool implementation is to be generic for any resource types you can think of, it is not possible to implement features which need knowledge of the used resource types.
+
+For this reason ResourcePool leaves you alone as soon as you have obtained a resource until you give it back to the pool (between L<get()|/get> and L<free()|/free> or L<fail()|/fail>).
+
+ResourcePool does not magically modify L<DBI|DBI> or L<Net::LDAP|Net::LDAP> to do a transparent reconnect if one connection fails while you are using it. The smartness of ResourcePool lies in the L<get()|/get> method, therefore you must keep the resources as short as possible outside of the pool and obtain a resource via L<get()|/get> if you need one.
+
+But you have also to be careful to do too many L<get()|/get>/ L<free()|/free> calls since this might also cause a overhead because of the L<precheck()|ResourcePool::Resource/precheck> and L<postcheck()|ResourcePool::Resource/postcheck> methods.
+
+=item Pools are not shared across different processes
+
+The use of fork() and ResourcePool is only safe if there are no open resources (connections) when you are doing the fork.
+
+Even if it sounds very invitingly to create a ResourcePool with some > connections and afterwards doing the fork, its just not save. Thats for several reasons: 1. There is no locking between the different processes (the same resource could be used more then once simultaneously). 2. There is no guarantee the the underlaying implementations do not keep some state-information locally (this could cause protocol errors). 3. It's impossible to share newly opened connection with the other processes.
+
+If you try to pass some open resources through fork() you are alone! You will have some funny effects which will cost you a lot of time tracking down until you finally give up. And please, do not even think of asking for help as long as you do pass open resources through fork.
+
+=item iThreads
+
+Since perl 5.8 interpreter threads (iThreads) have become more popular. Even mod_perl 2.0 does massively use iThreads. So it would be great to share a ResourcePool across different iThreads. But this is not so simple: it would be possible to share the ResourcePool itself across iThreads, but to do the trick we also need to share the managed resources. So each resource you plan to use has to support shared handles. Non of the included resource types ( L<Net::LDAP|Net::LDAP> and L<DBI|DBI>) do this yet. Therefore ResourcePool does currently not take any effort to share across iThreads. But thats for sure a major part on the TODO list.
+
+=back
+
+=head1 SEE ALSO
+
+L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer>,
+L<ResourcePool::Resource|ResourcePool::Resource>,
+L<ResourcePool::Factory|ResourcePool::Factory>,
+L<ResourcePool::Factory::DBI|ResourcePool::Factory::DBI>,
+L<ResourcePool::Factory::Net::LDAP|ResourcePool::Factory::Net::LDAP>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

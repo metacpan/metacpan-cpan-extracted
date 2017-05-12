@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ...................................................................... -->
+<!-- XFrames DTD .......................................................... -->
+<!-- URI: http://www.w3.org/MarkUp/DTD/xframes-1.dtd
+
+     This is XFrames - an XML application for composing documents together.
+
+     Copyright ©2002-2005 W3C (MIT, ERCIM, Keio), All Rights Reserved.
+
+       Editor:   Masayasu Ishikawa <mimasa@w3.org>
+       Revision: $Id: xframes-1.dtd,v 1.8 2005/10/04 12:50:58 mimasa Exp $
+
+     Permission to use, copy, modify and distribute the XFrames DTD and its 
+     accompanying documentation for any purpose and without fee is hereby 
+     granted in perpetuity, provided that the above copyright notice and 
+     this paragraph appear in all copies.  The copyright holders make no 
+     representation about the suitability of the DTD for any purpose.
+
+     It is provided "as is" without expressed or implied warranty.
+
+     This DTD module is identified by the PUBLIC and SYSTEM identifiers:
+
+       PUBLIC "-//W3C//DTD XFrames 1.0//EN"
+       SYSTEM "http://www.w3.org/MarkUp/DTD/xframes-1.dtd"
+
+     Revisions:
+     (none)
+     ....................................................................... -->
+
+<!-- XFrames
+
+     frames, head, title, style, group, frame
+
+     This XFrames DTD declares elements and attributes defining
+     XFrames, an XML application for composing documents together.
+-->
+
+<!-- Datatypes
+
+     defines containers for the following datatypes, many of
+     these imported from other specifications and standards.
+-->
+
+<!-- media type, as per [RFC2045] -->
+<!ENTITY % ContentType.datatype "CDATA" >
+
+<!-- A comma-separated list of media descriptors as described by [CSS2].
+     The default is all.
+-->
+<!ENTITY % MediaDesc.datatype "CDATA" >
+
+<!-- An Internationalized Resource Identifier Reference, as defined by [IRI].
+-->
+<!ENTITY % URI.datatype "CDATA" >
+
+<!-- XFrames Qname (Qualified Name) Module -->
+<!ENTITY % xframes-qname.mod
+    PUBLIC "-//W3C//ENTITIES XFrames Qualified Names 1.0//EN"
+           "xframes-qname-1.mod" >
+%xframes-qname.mod;
+
+<!-- Common Attributes
+
+     This module declares many of the common attributes for the XFrames DTD.
+     %XFRAMES.xmlns.attrib; is declared in the XFrames Qname module.
+-->
+
+<!ENTITY % XFRAMES.Common.extra.attrib "" >
+
+<!ENTITY % XFRAMES.Common.attrib
+  "class   NMTOKENS  #IMPLIED
+   xml:id  ID        #IMPLIED
+   title   CDATA     #IMPLIED
+   %XFRAMES.xmlns.attrib;
+   %XFRAMES.Common.extra.attrib;"
+>
+
+<!-- frames element .................................... -->
+<!ENTITY % XFRAMES.frames.content
+  "( %XFRAMES.head.qname;?, 
+   ( %XFRAMES.group.qname; | %XFRAMES.frame.qname;+ ) )"
+>
+<!ELEMENT %XFRAMES.frames.qname; %XFRAMES.frames.content; >
+<!ATTLIST %XFRAMES.frames.qname;
+    %XFRAMES.Common.attrib;
+    xml:base  %URI.datatype;  #IMPLIED
+>
+
+<!-- head element ...................................... -->
+<!ENTITY % XFRAMES.head.content
+  "( %XFRAMES.title.qname;, %XFRAMES.style.qname;* )"
+>
+<!ELEMENT %XFRAMES.head.qname; %XFRAMES.head.content; >
+<!ATTLIST %XFRAMES.head.qname;
+    %XFRAMES.Common.attrib;
+>
+
+<!-- title element ..................................... -->
+<!ENTITY % XFRAMES.title.content "( #PCDATA )" >
+<!ELEMENT %XFRAMES.title.qname; %XFRAMES.title.content; >
+<!ATTLIST %XFRAMES.title.qname;
+    %XFRAMES.Common.attrib;
+>
+
+<!-- style element ..................................... -->
+<!ENTITY % XFRAMES.style.content "( #PCDATA )" >
+<!ELEMENT %XFRAMES.style.qname; %XFRAMES.style.content; >
+<!ATTLIST %XFRAMES.style.qname;
+    %XFRAMES.Common.attrib;
+    type    %ContentType.datatype;  #REQUIRED
+    media   %MediaDesc.datatype;    #IMPLIED
+    source  %URI.datatype;          #IMPLIED
+>
+
+<!-- group element ..................................... -->
+<!ENTITY % XFRAMES.group.content
+  "( ( %XFRAMES.group.qname; | %XFRAMES.frame.qname; )+ )"
+>
+<!ELEMENT %XFRAMES.group.qname; %XFRAMES.group.content; >
+<!-- possible values for the compose attribute are:
+     "vertical", "horizontal", "single", "free", or a QName
+-->
+<!ATTLIST %XFRAMES.group.qname;
+    %XFRAMES.Common.attrib;
+    compose   CDATA           'vertical'
+    xml:base  %URI.datatype;  #IMPLIED
+>
+
+<!-- frame element ..................................... -->
+<!ENTITY % XFRAMES.frame.content "EMPTY" >
+<!ELEMENT %XFRAMES.frame.qname; %XFRAMES.frame.content; >
+<!ATTLIST %XFRAMES.frame.qname;
+    %XFRAMES.Common.attrib;
+    source  %URI.datatype;  #IMPLIED
+>
+
+<!-- end of xframes-1.dtd -->

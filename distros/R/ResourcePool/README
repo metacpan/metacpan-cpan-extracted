@@ -1,0 +1,63 @@
+ResourcePool - A connection caching and pooling framework
+
+Copyright (c) 2001-2013 by Markus Winand <markus@winand.at>
+
+See COPYRIGHT section in the ResourcePool(3pm) manpage.
+
+Recent Changes
+--------------
+  *  ResourcePool did use a stringified object as key in a hash 
+     reference. This has been replaced by using Tie::RefHash. 
+
+Installation
+------------
+    ResourcePool is a pure perl implemented module and should 
+    therefore run everywhere where perl is already installed.
+
+    The well known procedure is:
+        perl Makefile.PL
+        make
+        make test
+        make install 
+
+Examples
+--------
+    Are included in the manpages which come with this distribution.
+    The ResourcePool::BigPicture(3pm) manpage is the right point 
+    to start to get the overview, after that feel free to visit
+    the ResourcePool(3pm) and ResourcePool::LoadBalancer(3pm)
+    manpages.
+
+Resource bindings
+-----------------
+    To do something usefull with ResourcePool you will need 
+    resource bindings. There are some bindings available for
+    download from CPAN. Those bindings live in the
+    ResourcePool::Resource namespace, for example the Net::LDAP 
+    binding has the name ResourcePool::Resource::Net::LDAP, if you 
+    can not find the required bindings, please consult the 
+    ResourcePool::ExtensionGuide(3pm) manpage for details how to 
+    create one.
+
+    Available bindings on CPAN (as of 2009-11-25):
+       Net::LDAP
+       DBI
+       Alzabo
+       SOAP::Lite
+
+    The Net::LDAP and DBI bindings where included in the ResourcePool
+    core package in all 0.99xx versions of ResourcePool. Since
+    release 1.0000 they are no longer included in this package
+    and have to be installed seperately.
+
+How to contribute?
+------------------
+    Submit patches for bugs you discovered (or report the at least), 
+    upload your own resource bindings to CPAN. 
+
+Authors contact
+---------------
+       e-mail: mws@fatalmind.com
+     homepage: http://www.fatalmind.com/
+    whishlist: http://www.amazon.de/exec/obidos/wishlist/1JW6LC92SAK62/
+               http://amazon.com/gp/registry/3BXRJP9W3WMDX

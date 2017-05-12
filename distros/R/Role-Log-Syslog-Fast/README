@@ -1,0 +1,64 @@
+NAME
+    Role::Log::Syslog::Fast - A Logging role for Moose on Log::Syslog::Fast
+
+VERSION
+    version 0.14
+
+SYNOPSIS
+        {
+            package ExampleLog;
+
+            use Moose;
+            with 'Role::Log::Syslog::Fast';
+
+            sub BUILD {
+                my $self = shift;
+                $self->_hostname('/var/run/syslog');
+                $self->_name('Example');
+            }
+
+            sub test {
+                my $self = shift;
+                $self->log('foo');
+            }
+
+        }
+
+        my $obj = new ExampleLog;
+
+        $obj->test;
+
+DESCRIPTION
+    A logging role building a very lightweight wrapper to Log::Syslog::Fast
+    for use with Moose classes.
+
+METHOD
+  log
+    (message, [time])
+
+SEE ALSO
+    Log::Syslog::Fast, Log::Syslog, Moose
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    bug-moosex-log-syslog-fast@rt.cpan.org, or through the web interface at
+    http://rt.cpan.org.
+
+    Or come bother us in #moose on irc.perl.org.
+
+AUTHOR
+    Thiago Rondon <thiago@aware.com.br>
+
+LICENSE AND COPYRIGHT
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Thiago Rondon <thiago@nsms.com.br>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Thiago Rondon.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,21 @@
+RT-Extension-LinkSelfLoops version 0.1
+--------------------------------------
+
+How to install:
+
+1. Run "perl Makefile.PL"
+
+2. Run "make"
+
+3. Run "make install" (you may need root permissions)
+
+4. Add "RT::Extension::LinkSelfLoops" to @Plugins in etc/RT_SiteConfig.pm
+   For example:
+   Set(@Plugins, qw(RT::Extension::QuickDelete RT::Extension::LinkSelfLoops));
+
+5. Also in your etc/RT_SiteConfig.pm, set the $LinkSelfLoops variable
+   to a true value:
+   Set( $LinkSelfLoops, 1 );
+
+6. Clear RT's mason cache and restart the web server to make sure the
+   extension is incorporated.

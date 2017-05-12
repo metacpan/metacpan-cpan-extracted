@@ -1,0 +1,9 @@
+Revision history for RT-View-ConciseSpreadsheet
+
+0.002  Mon Sep  4 14:51:40 EDT 2006
+
+* Todd Chapman provided a patch to switch us to more correct TSV generation
+
+0.0.1  Mon Nov 21 13:54:51 2005
+       Initial release.
+

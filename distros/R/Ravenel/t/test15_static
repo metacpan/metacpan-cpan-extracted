@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel;
+use Ravenel::Document;
+
+my $obj = new Ravenel( { 
+	'docroot' => $FindBin::Bin,
+	'dynamic' => 0,
+} );
+
+# XXX if depth on the first "ret" is supplied, this works fine.. I suspect somethign with the depth system is borked in build_document
+my Ravenel::Document $doc = $obj->add_document( {
+	'data'         => qq(
+<r:Moo:blah>
+	1. Hello
+	<block id="moo"/>
+	2. Goodbye
+</r:Moo:blah>), 
+
+	'prefix'       => 'r:',
+	'content_type' => 'html',
+	'name'         => 'test',
+} );
+
+my $res = $doc->parse();
+
+#print $res . "\n";
+
+eval $res;
+print $@ if ( $@ );
+print test->get_html_content() . "\n";

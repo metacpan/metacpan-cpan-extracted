@@ -1,0 +1,14 @@
+<%ARGS>
+$COLUMN_MAP => {}
+</%ARGS>
+<%INIT>
+return $COLUMN_MAP->{'ReportSpam'} = {
+    title     => 'Spam',
+    attribute => '',
+    value     => sub {
+        my $res = $m->scomp('/Ticket/Elements/ReportSpam', id => $_[0]->id);
+        $res =~ s/\n/ /g;
+        return \$res;
+    },
+};
+</%INIT>

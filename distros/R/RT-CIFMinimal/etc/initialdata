@@ -1,0 +1,196 @@
+@CustomFields = (
+    {
+        Name        => 'CIFGroupPriority',
+        Type        => 'FreeformSingle',
+        LookupType  => 'RT::Group',
+        Disabled    => 0,
+        Description => 'Apply Priority to the Constituency/Group (0-100, 0 is the highest priority)',
+    },
+    {
+        Name        => 'Address',
+        Type        => 'FreeformSingle',
+        Queue       => [ 'Incident Reports' ],
+        Disabled    => 0,
+        Description => '_IODEF_IncidentEventDataFlowSystemNodeAddress',
+    },
+    {
+        Name        => 'BGP Prefix',
+        Type        => 'FreeformSingle',
+        Queue       => [ 'Incident Reports' ],
+        Disabled    => 0,
+        Description => '',
+    },
+    {
+        Name        => 'ASN',
+        Type        => 'FreeformSingle',
+        Queue       => [ 'Incident Reports' ],
+        Disabled    => 0,
+        Description => '',
+    },
+    {
+        Name        => 'Purpose',
+        Type        => 'SelectSingle',
+        Queue       => ['Incident Reports'],
+        Disabled    => 0,
+        Description => '_IODEF_Incidentpurpose',
+        Values      => [
+            { Name  => 'traceback',    SortOrder   => 0 },
+            { Name  => 'mitigation',   SortOrder   => 1 },
+            { Name  => 'reporting',    SortOrder   => 2 },
+            { Name  => 'other',        SortOrder   => 3 },
+            { Name  => 'ext-value',    SortOrder   => 4 },
+        ],
+    },
+    {
+        Name        => 'Restriction',
+        Type        => 'SelectSingle',
+        Queue       => [ 'Incident Reports' ],
+        Disabled    => 0,
+        Description => '_IODEF_Incidentrestriction',
+        Values      => [
+            { Name  => 'private',       SortOrder   => 0 },
+            { Name  => 'need-to-know',  SortOrder   => 1 },
+            { Name  => 'public',        SortOrder   => 2 },
+            { Name  => 'default',       SortOrder   => 3 },
+        ],
+    },
+    {
+        Name        => 'Confidence',
+        Type        => 'FreeformSingle',
+        Queue       => ['Incident Reports'],
+        Disabled    => 0,
+        Description => '_IODEF_IncidentAssessmentConfidence',
+    },
+    {
+        Name        => 'Severity',
+        Type        => 'SelectSingle',
+        Queue       => ['Incident Reports'],
+        Disabled    => 0,
+        Description => '_IODEF_IncidentAssessmentImpactseverity',
+        Values      => [
+            { Name  => 'low',       SortOrder   => 0 },
+            { Name  => 'medium',    SortOrder   => 1 },
+            { Name  => 'high',      SortOrder   => 2 },
+        ],
+    }, 
+    {
+        Name        => 'Assessment Impact',
+        Type        => 'FreeformSingle',
+        Queue       => ['Incident Reports'],
+        Disabled    => 0,
+        Description => '_IODEF_IncidentAssessmentImpact',
+    },
+    {
+        Name        => 'ReportDescription',
+        Type        => 'FreeformSingle',
+        Queue       => ['Incident Reports'],
+        Disabled    => 0,
+        Description => '_IODEF_IncidentDescription',
+        Values      => [
+            { Name      => 'mebroot', },
+            { Name      => 'tdl', },
+            { Name      => 'spyeye', },
+            { Name      => 'zeus', },
+            { Name      => 'tdss', },
+            { Name      => 'rbn', },
+        ],
+    },
+    {
+        Name        => 'Service Portlist',
+        Type        => 'FreeformSingle',
+        Queue       => [ 'Incident Reports' ],
+        Disabled    => 0,
+        Description => '_IODEF_IncidentEventDataFlowSystemServicePortlist',
+    },
+    {
+        Name        => 'Service Protocol',
+        Type        => 'FreeformSingle',
+        Queue       => [ 'Incident Reports' ],
+        Disabled    => 0,
+        Description => '_IODEF_IncidentEventDataFlowSystemServiceip_protocol',
+    },
+    {
+        Name        => 'Share With',
+        Type        => 'FreeformMultiple',
+        Queue       => ['Incident Reports'],
+        Disabled    => 0,
+        Description => '_IODEF_IncidentAdditionalDatasharewith',
+    },
+);
+
+for my $cf (@CustomFields) {
+    push @ACL, (
+        { 
+            GroupType   => 'Everyone',
+            GroupDomain => 'SystemInternal',
+            CF          => $cf->{Name},
+            Right       => 'SeeCustomField', 
+        },
+        { 
+            GroupType     => 'Everyone',
+            GroupDomain => 'SystemInternal',
+            CF          => $cf->{Name},
+            Right       => 'ModifyCustomField', 
+        },
+    );
+}
+
+@ScripConditions = (
+    {
+        Name                    => 'On IODEF Change',
+        Description             => 'When an IODEF field changes',
+        ApplicableTransTypes    => 'CustomField',
+        ExecModule              => 'CIFMinimal_IODEFFieldChange',
+    },
+);
+
+@ScripActions = (
+	{
+		Name		=> 'CIFMinimal ProcessReport',
+		Description	=> 'CIFMinimal ProcessReport',
+		ExecModule	=> 'CIFMinimal_ProcessReport',
+	},
+    {
+        Name        => 'CIFMinimal RejectReport',
+        Description => 'CIFMinimal RejectReport',
+        ExecModule  => 'CIFMinimal_RejectReport',
+    },
+    {
+        Name        => 'CIFMinimal ReopenReport',
+        Description => 'CIFMinimal ReopenReport',
+        ExecModule  => 'CIFMinimal_ReopenReport',
+    },
+);
+
+@Scrips = (
+    {
+        Description 	=> 'zzzCIFMinimal_OnCreateProcessReport',
+        Queue       	=> ['Incident Reports'],
+        ScripCondition  => 'On Create',
+        ScripAction 	=> 'CIFMinimal ProcessReport',
+        Template    	=> 'Blank',
+    },
+    {
+        Description     => 'OnReopen CIFMinimal ReopenReport',
+        Queue           => ['Incident Reports'],
+        ScripCondition  => 'On Reopen',
+        ScripAction     => 'CIFMinimal ReopenReport',
+        Template        => 'Blank',
+    },
+    {
+        Description     => 'OnReject CIFMinimal RejectReport',
+        Queue           => ['Incident Reports'],
+        ScripCondition  => 'On Reject',
+        ScripAction     => 'CIFMinimal RejectReport',
+        Template        => 'Blank',
+    },
+    {
+        Description     => 'On IODEF Field Change Update CIF',
+        Queue           => ['Incident Reports'],
+        ScripCondition  => 'On IODEF Change',
+        ScripAction     => 'CIFMinimal ReopenReport',
+        Template        => 'Blank',
+    },
+);
+
+1;

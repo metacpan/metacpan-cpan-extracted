@@ -1,0 +1,32 @@
+DOC: qald-4_biomedical_train-1
+language: EN
+
+sentence: 
+# sentence form (ended by _END_SENT_)
+Which diseases is Cetuximab used for?
+_END_SENT_
+
+word information:
+# Inflected form<tab>POSTAG<tab>Lemma<tab>offset (ended by _END_POSTAG_)
+Which	WDT	which	10	
+diseases	NNS	disease	16	
+is	VBZ	be	25	
+Cetuximab	VBN	Cetuximab	28	
+used	VBN	use	38	
+for	IN	for	43	
+?	SENT	?	46	
+
+_END_POSTAG_
+
+semantic units:
+# term form<tab>term canonical form<tab>semantic features<tab>offset start<tab>offset end (ended by _END_SEM_UNIT_)
+diseases	diseas	disease:disease	16	23
+Cetuximab	Cetuximab	drug/drugbank/gen/DB00002:drug/drugbank/gen/DB00002	28	36
+used for	used for	possibleDrug:possibleDrug	38	45
+Cetuximab	Cetuximab	drug/drugbank/gen/DB00002:drug/drugbank/gen/DB00002	28	36
+diseases	diseas	disease:disease	16	23
+used for	used for	possibleDrug:possibleDrug	38	45
+_END_SEM_UNIT_
+
+_END_DOC_
+

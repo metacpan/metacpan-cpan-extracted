@@ -1,0 +1,16 @@
+Revision history for Retry
+
+1.01    Jul 16 13:15:00 2014
+  * Add missing dependency
+
+1.00    Jul 14 18:30:00 2014
+  * Change license to Artistic 2.0
+  * Switch from Moose to Moo
+  * Improve example
+
+0.11    Feb 22 13:14:24 2011
+    Add missing build dependency upon Test::Exception.
+
+0.10    May 17 12:55:22 2010
+    Initial version for CPAN.
+

@@ -1,0 +1,79 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f667a874b4e5a2a11b9507de0f0f3ecf2133f7ec Changes
+SHA1 cc087c3dd6e1b519c680e68cd0231735a68300a0 LICENSE
+SHA1 0d6b696dff7ad332513a5fb357318dfe24a31969 MANIFEST
+SHA1 9c6cee61acdc6011cacfba523e169f803ba7645e META.yml
+SHA1 952dced47930b5a904a20c6530e3e686ea5c67b1 Makefile.PL
+SHA1 3833cecd6c5889b9f3cbc2f9f06566583bb70a71 README
+SHA1 767cc2dd782926f1c578b228be529d3c02937855 TODO
+SHA1 0c7f86da6c7320c14d9b3b3fd0b45b5efb44a68a examples/manifests.pl
+SHA1 6a080dc3dc27f1025e6129beb9728439609544aa examples/signing.pl
+SHA1 efc3b0db935dd84a35da460d2011f5f333daeee3 examples/web-id.pl
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 b86d0385e10881db680d28bde94f275e49e34a27 inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 6b807287940754cc31a3db59f2b22e363d5525be inc/Module/Package/Dist/RDF.pm
+SHA1 e31c281782183601e1e057c5914f63269e043932 inc/Scalar/Util.pm
+SHA1 5eae2f71c45a996a296d2445b18d0589307111f0 inc/Scalar/Util/PP.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 8105c0510a773b56840995fb4dd2dc64fe9ddaee inc/unicore/Name.pm
+SHA1 739ea45b9bad1b115c7d58ce7611d853c7436515 lib/RDF/Crypt.pm
+SHA1 03ab4c22cd218856a10b759de9bdf9b0fe6faef7 lib/RDF/Crypt/Decrypter.pm
+SHA1 cbc9bd1fdf6f3d2f564b791f043f6daccebe7734 lib/RDF/Crypt/Encrypter.pm
+SHA1 45e4a6aae6dd7f6ad261fa9f7b7e8f7e70542d4c lib/RDF/Crypt/ManifestItem.pm
+SHA1 a5f945c377367c66b6593b3f144252f1339897a2 lib/RDF/Crypt/Role/DoesDecrypt.pm
+SHA1 f02ca331894787556303dded82a65fe168b179c2 lib/RDF/Crypt/Role/DoesEncrypt.pm
+SHA1 25247c9ba167a9249fcbbf8079b06f75c3ce39fe lib/RDF/Crypt/Role/DoesSign.pm
+SHA1 e36b1947f2a36e23a5029b607caf4204e767990e lib/RDF/Crypt/Role/DoesVerify.pm
+SHA1 32dbb4788b25476eded78a3c03af9e305994b7af lib/RDF/Crypt/Role/StandardSignatureMarkers.pm
+SHA1 8f5246ae507a91d52615c4316602b16503540b37 lib/RDF/Crypt/Role/ToString.pm
+SHA1 e93413a95574a0677a8a920445e6d6d68212875d lib/RDF/Crypt/Role/WithPrivateKey.pm
+SHA1 1defd0b69209397570b2b8816116f1860b7d64da lib/RDF/Crypt/Role/WithPublicKeys.pm
+SHA1 336139d4dc66152b7e9b451ac9ee91517a36410d lib/RDF/Crypt/Signer.pm
+SHA1 30f285d9d114723e03eed2a33dff445d90e0bfd6 lib/RDF/Crypt/Verifier.pm
+SHA1 82d7a5d79d6bbc6b0d6546816ecf39163f8d0514 meta/changes.ttl
+SHA1 856d98da858e6ac76f985208f5e8b657a62deb63 meta/doap.ttl
+SHA1 9857f1da222ef527ec549266375153cf84ad06eb meta/makefile.ttl
+SHA1 0e03a0a0d131a8ec6be80b554e752facccaf8c99 t/01basic.t
+SHA1 6de4588fc327d466312c87213ee42a81a3d17eb2 t/02encryption.t
+SHA1 2463d26431cb8ed424a2d48fca424edfa221caf6 t/03signing.t
+SHA1 8606d677d05ee3ba93491165d6667d1652c980bb t/04encryption-rdf.t
+SHA1 d215122ad7de49bf9c5d99b02f3656b414f4f510 t/05signing-rdf.t
+SHA1 305beb38da420b78da7dc6042661f202ab332311 t/06manifests.t
+SHA1 744e0c05c5af95922be139a0882cbcca8c992be7 t/key-for-testing/test-key-private.pem
+SHA1 321ec12b859d348afde5a5f14181c24394021d80 t/key-for-testing/test-key-public.pem
+SHA1 c145c4023e4f8a015b0110476aedd8deccac81e2 t/lib/Test/HTTP/Server.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk/ocO4ACgkQzr+BKGoqfTmdzQCfVHEZdS4bl6Hvnc2gmnkr48iV
+rkMAn02Hzcvyu/8HadaWUJ/ZMXvDwvlX
+=QsKp
+-----END PGP SIGNATURE-----

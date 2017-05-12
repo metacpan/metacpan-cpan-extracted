@@ -1,0 +1,22 @@
+Revision history for Perl extension Redis::AOF::Tail::File.
+
+0.01  Sun Aug 31 23:41:59 2014
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Redis::AOF::Tail::File -b 5.8.8
+
+0.02  Mon Oct 20 11:24:15 2014
+	- finish the extension
+
+0.03  Mon Oct 20 17:48:55 2014
+	- format the code
+
+0.04  Mon Dec  1 11:41:31 2014
+  - add seekpos feature
+  - add unit test
+	- change File::Tail to File::Tail::Lite
+
+0.05  Mon Dec  8 18:01:30 2014
+  - bug fix
+
+0.06  Tue Dec  9 16:32:30 2014
+  - pod fix

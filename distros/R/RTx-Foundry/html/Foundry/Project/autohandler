@@ -1,0 +1,85 @@
+%# One way to stop a runaway horse is to bet on him.
+<& /Foundry/Elements/Header,
+    Title => $QueueObj->Name,
+    ($action ? (Action => $action) : ()),
+    ($method ? (Method => $method) : ()),
+&>
+<input type="hidden" name="Queue" value="<% $ARGS{Queue} %>">
+
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td><& /Foundry/Elements/Tabs, Text => $m->base_comp->attr('Tab2'), Queue => $ARGS{Queue}, Skips => \%Skips &></td>
+  </tr>
+  <tr> 
+    <td valign="top"> 
+      <table border="0" cellspacing="0" cellpadding="4" class="poptable" width="100%">
+        <tr> 
+          <td valign="top"> 
+% $m->call_next(%ARGS, QueueObj => $QueueObj) unless $r->uri =~ /Admin/ and !$IsMember;
+	  </td>
+	</tr>
+      </table>
+<br>
+
+<& /Foundry/Elements/Footer &>
+<%INIT>
+my $QueueObj = RT::Queue->new($session{'CurrentUser'}); 
+$QueueObj->Load($ARGS{Queue}||=$session{LastQueue}||=1);
+$ARGS{Queue} = $session{LastQueue} = $QueueObj->Id || $session{LastQueue};
+my $s = "?Queue=$ARGS{Queue}";
+
+@RT::Tabs = (
+    'Summary'		=> '/Foundry/Project/' . $s,
+#   'News'		=> '/Foundry/Project/News/' . $s,
+    'Tracker'		=> '/Foundry/Project/Tracker/' . $s,
+    'Forums'		=> '/Foundry/Project/Forum/' . $s,
+    'Wiki'		=> '/Foundry/Project/Wiki/' . $s,
+    'Version Control'	=> '/Foundry/Project/Source/' . $s,
+    'Downloads'		=> '/Foundry/Project/Download/' . $s,
+);
+
+my $IsMember = $QueueObj->HasWatcher($session{CurrentUser}->UserObj)
+    || $session{CurrentUser}->UserObj->HasRight( Right => 'SuperUser', Object => $QueueObj );
+
+my %Skips;
+if ($IsMember) {
+    push @RT::Tabs, ( 'Project Admin' => '/Foundry/Project/Admin/' . $s );
+}
+elsif ( $RT::SkipEmptyTabs ) {
+    my $UnixName = $QueueObj->OriginObj->CustomFieldValue('UnixName') or return;
+    # XXX - refactor this to somewhere else
+    if (-e "$RT::VarPath/Foundry/sympa") {
+	$Skips{'Forums'}++ unless glob("$RT::VarPath/Foundry/sympa/expl/$UnixName-*");
+    }
+    if (-e "$RT::VarPath/Foundry/kwiki") {
+	require File::Compare;
+	$Skips{'Wiki'}++ unless File::Compare::compare(
+	    "$RT::VarPath/Foundry/kwiki/.default/database/HomePage",
+	    "$RT::VarPath/Foundry/kwiki/$UnixName/database/HomePage",
+	);
+    }
+    if (-e "$RT::VarPath/Foundry/svn") {
+	if (open my $fh, "/usr/depot/rt3/var/Foundry/svn/$UnixName/db/revisions") {
+	    local $/ = \32768;
+	    my $rev = <$fh>;
+	    close $fh;
+	    $Skips{'Version Control'}++ unless index($rev, '(revision 1 2)') > -1;
+	}
+    }
+    my $file = RT::Ticket->new($session{'CurrentUser'});
+    $file->LoadByCols(
+	Queue	=> $QueueObj->Id,
+	Type	=> 'release',
+	Status	=> 'resolved',
+    );
+    $Skips{'Downloads'}++ unless $file->Id;
+}
+
+my $action = $m->base_comp->attr('Action');
+my $method = $m->base_comp->attr('Method');
+</%INIT>
+<%ATTR>
+Action	=> undef
+Method	=> undef
+</%ATTR>

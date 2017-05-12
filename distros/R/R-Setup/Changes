@@ -1,0 +1,6 @@
+Revision history for Perl extension R::Setup.
+
+0.01  Mon Apr 13 15:06:28 2015
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n R::Setup -v0.01
+

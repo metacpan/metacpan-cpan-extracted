@@ -1,0 +1,16 @@
+,v$
+~$
+\#
+^\.
+\/\.
+\.old$
+\.bak$
+\.tmp$
+\.tar\.gz$
+^blib\/
+^RFID-EPC-[\d\.]+\/
+^Makefile$
+^pm_to_blib$
+CVS
+_test.pl
+RFID-base*

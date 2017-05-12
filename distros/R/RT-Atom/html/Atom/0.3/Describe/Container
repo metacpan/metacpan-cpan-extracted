@@ -1,0 +1,27 @@
+%# [OPTIONS FeedURI]
+%# On a container, returns the schema of objects acceptable by this container.
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="<% $BaseURI %>/NoAuth/feed.css"?>
+<feed version="0.3" xmlns="http://purl.org/atom/ns#" xmlns:html="http://www.w3.org/1999/xhtml">
+  <& $ShowLink, Relation => "service.post", URI => "$BaseURI/$Path", Id => '!add', Title => $Type &>
+  <& $ShowLink, Relation => "service.feed", URI => "$BaseURI/$Path", Id => '!search', Title => $Type &>
+  <entry>
+    <content type="text/xml" mode="xml">
+% $Map->{action} = 'add';
+      <% $X->XMLout($Map) |n %>
+      <% $X->XMLout({ action => 'search', 'rows' => '' }) |n %>
+    </content>
+  </entry>
+</feed>
+<%ARGS>
+$Path
+$BaseURI
+$Now
+$ShowLink
+$ShowEntry
+$X
+
+$Type
+$FeedURI
+$Map
+</%ARGS>

@@ -1,0 +1,12 @@
+--- #YAML:1.0
+'':
+  '': http://www.cpan.org/
+  dc: http://purl.org/dc/elements/1.1/
+http://search.cpan.org/dist/DBI-1.38/:
+  dc:date: "2003-08-25T20:36:26"
+  dc:format: application/x-gzip
+  dc:identifier: http://search.cpan.org/dist/DBI-1.38/
+  dc:publisher: http://www.cpan.org/
+  dc:type: http://purl.org/dc/dcmitype/Software
+  distversion: DBI-1.38
+  version: 1.38

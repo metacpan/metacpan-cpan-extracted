@@ -1,0 +1,9 @@
+@CustomFields = (
+    {
+        Name => 'Original Ticket',
+        Type   => 'FreeformSingle',
+        Queue  => '0',
+        LinkValueTo => RT->Config->Get('WebPath') . '/Ticket/Display.html?id=__CustomField__',
+    }
+);
+

@@ -1,0 +1,21 @@
+=pod
+
+=head2 Rex::IO::Client
+
+
+=head2 EXAMPLE
+
+ use strict;
+ use warnings;
+ 
+ use Data::Dumper;
+ use Rex::IO::Client;
+ 
+ my $cl = Rex::IO::Client->create(protocol => 1);
+ $cl->endpoint = "http://127.0.0.1:5000";
+ 
+ my $res = $cl->search_server("fo");
+  
+ my $res = $cl->get_server(5);
+  
+ print Dumper($res);

@@ -1,0 +1,25 @@
+0.06 2013-09-06
+
+    * fixed typo in shebang string rt-check-user-right-on-ticket
+
+0.05 2011-04-03
+
+    * fix manifest
+
+0.04 2011-04-03
+
+    * sbin/rt-create-admin-user
+    * sbin/rt-sql-trace-summary
+
+0.03 2011-02-15
+
+    * sbin/rt-custom-fields-initialdata
+    * sbin/rt-enable-disabled-users
+
+0.02 2010-07-15
+
+    * delete attributes when we delete objects
+
+0.01 2010-01-29
+
+    * initial release

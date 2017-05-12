@@ -1,0 +1,12 @@
+Version 0.07 
+
+Thu Aug 16 11:28:35 EST 2007
+ - YAML use removed, aiesh!
+ - Test showing weird but explainable result for
+   [rt.cpan.org #23762] Wrong strings() output for long (?) regexpes
+
+Version 0.06 
+ - String::Escape use removed
+
+Sat May 29 21:38:03 EST 2004
+ - version 0.05 released as Regexp::Genex

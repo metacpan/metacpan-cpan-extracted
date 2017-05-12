@@ -1,0 +1,183 @@
+package Rinci::FAQ; # just to make PodWeaver happy
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Metadata for your functions/methods
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Rinci::FAQ - Metadata for your functions/methods
+
+=head1 VERSION
+
+This document describes version 1.1.84 of Rinci::FAQ (from Perl distribution Rinci), released on 2016-12-28.
+
+=head1 FAQ
+
+=head2 Rinci::function
+
+=over
+
+=item * Why do you make enveloped result an arary instead of hash?
+
+For example, a hash-based enveloped result can be something like:
+
+ {status=>200, message=>"OK", result=>42, meta1=>..., meta2=>...}
+
+This has the benefit of a single container, but I picked array because of the
+brevity for simple cases (which are the majority), e.g.:
+
+ [200]        # versus {status=>200}
+ [200, "OK"]  # versus {status=>200, message=>"OK"}
+
+When handling enveloped result, the array version is also shorter:
+
+ if ($res->[0] == 200) { ... }
+ # versus: if ($res->{status} == 200) { ... }
+
+ print "Error $res->[0] - $res->[1]";
+ # versus: print "Error $res->{status} - $res->{message}";
+
+The hash version is more obvious for first-time reader, but after just some
+amount of time, C<< $res->[0] >>, C<< $res->[1] >> will become obvious if you
+use it consistently.
+
+As a bonus, arrays are faster and more space-efficient than hashes.
+
+=item * How do you indicate transient/temporary vs permanent errors?
+
+Some protocols, like SMTP or POP, defines 4xx codes as temporary errors and 5xx
+as permanent ones. This gives clue to clients whether to retry or not. HTTP,
+which Rinci is modelled after, does not provide such distinction to its status
+codes. However, Rinci defines a C<perm_err> result metadata that can be used for
+such purpose, e.g.:
+
+ [500, "Can't submit mail, we are being blocked by RBL", undef,
+  {perm_err=>0}]
+
+ [500, "Can't submit mail, destination address does not exist", undef,
+  {perm_err=>1}]
+
+=item * How to handle binary data?
+
+To accept binary data, you can set one or more arguments as having the schema
+type C<buf> (instead of C<str>):
+
+ args => {
+     data => { schema => 'buf*', req=>1 },
+ }
+
+To return binary data, you can set result's schema type to C<buf>, e.g.:
+
+ result => { schema => 'buf*' }
+
+For handling binary data when writing Perl-based command-line applications, see
+L<Perinci::CmdLine::Manual::Examples>.
+
+=item * How to accept partial data?
+
+First, set an argument property C<partial> to true to signify that this argument
+accept partial value. You can then call with special arguments C<-arg_len>,
+C<-arg_part_start>, C<-arg_part_len>. See L<Rinci::function> for more details.
+L<Riap::HTTP> can also do this via HTTP Content-Range.
+
+=item * How to accept streaming input?
+
+Many program environments (like in Unix) have the concept of standard input.
+Rinci provides a thin abstraction over this. You can set the argument property
+C<stream> to true. This way, in most implementation like in Perl, your function
+will receive the argument value as filehandle which it can then read from. See
+C<partial> property in C<args> function metadata property in L<Rinci::function>
+for an example.
+
+Your function can also read from standard input directly, but this means you
+cannot use conveniences like the C<cmdline_src>, where the command-line
+framework can supply an argument value for you from various sources including
+standard input and/or files.
+
+=item * How to produce streaming output?
+
+Many program environments (like in Unix) have the concept of standard output. To
+produce output stream, you can set result metadata property C<stream> to true.
+And then in the result you can put a filehandle or an object that responds to
+getline/getitem methods.
+
+=item * What is the difference between accepting partial data and streaming input?
+
+If a function accepts partial data, to send a large data without taking up too
+much memory, a caller needs to break the data into several parts and call the
+function several times, each with a different part.
+
+If a function accepts a stream input, to send a large data a caller can send a
+filehandle/iterator object from which the function can read the data
+iteratively.
+
+Stream input is easier and simpler for the function writer to write. A caller
+also only needs to call the function once instead of multiple times. However,
+there is no resume capability.
+
+On the other hand, partial input data is easier to implement with Riap::HTTP, as
+it maps rather closely to HTTP Content-Range.
+
+If you are uploading a large data over a network to a function, partial input
+data is preferred because of its ease to work with HTTP and its resume ability.
+
+However, if input is really a stream (i.e. unknown/infinite length), then
+streaming input is the option to use.
+
+=item * What is the difference between returning partial result and streaming output?
+
+If a function can return partial result, to retrieve a large result from a
+function a caller can calls several times and each time request to retrieve
+parts of result.
+
+If a function returns output stream, a caller can then retrieve data from the
+stream iteratively.
+
+Output stream is easier to handle by the caller. The caller also only needs to
+call once instead of multiple times. However, there is no resume capability.
+
+On the other hand, partial result is easier to implement with Riap::HTTP, as it
+maps rather closely to HTTP Content-Range.
+
+If you are retrieving a large data over a network from a function, partial
+result is preferred because of its ease to work with HTTP
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Rinci>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Rinci>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Rinci>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

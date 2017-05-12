@@ -1,0 +1,20 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Crypt/project>
+	:perl_version_from _:main ;
+	:version_from _:main ;
+	:readme_from _:main ;
+	:requires "Any::Moose 0.16" ;
+	:requires "Crypt::OpenSSL::Bignum 0.04" ;
+	:requires "Crypt::OpenSSL::RSA 0.24" ;
+	:requires "File::Slurp 9999" ;
+	:requires "Mail::Message 2.100" ;
+	:requires "RDF::RDFa::Parser 1.097" ;
+	:requires "RDF::TrineX::Functions 0.001" ;
+	:requires "RDF::Query 2.900" ;
+	:requires "Web::ID 1.900" ;
+	:test_requires "Test::More 0.61" .
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/RDF/Crypt.pm" .

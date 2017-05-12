@@ -1,0 +1,21 @@
+Changes
+lib/Range/Object/Date.pm
+lib/Range/Object/DigitString.pm
+lib/Range/Object/Extension.pm
+lib/Range/Object/Interval.pm
+lib/Range/Object.pm
+lib/Range/Object/Serial.pm
+lib/Range/Object/String.pm
+Makefile.PL
+MANIFEST
+README
+t/00_object.t
+t/01_serial.t
+t/02_strings.t
+t/03_extension.t
+t/04_date.t
+t/05_interval.t
+t/06_digitstring.t
+t/pod.t
+t/tests.pl
+META.yml                                 Module meta-data (added by MakeMaker)

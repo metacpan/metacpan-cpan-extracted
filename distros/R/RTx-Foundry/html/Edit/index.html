@@ -1,0 +1,42 @@
+%# Zounds!  I was never so bethumped with words
+%# since I first called my brother's father dad.
+%# 		-- William Shakespeare, "King John"
+
+<& /Edit/Elements/104Header,
+    Buttons => [
+	Add => '',
+	Save => '',
+	Delete => '',
+	Copy => '',
+	Search => '',
+	Help => '/NoAuth/docs/',
+    ],
+    Method => 'Post',
+&>
+
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td><& /Edit/Elements/Tab, Text => 'Site Admin' &></td>
+  </tr>
+  <tr> 
+    <td valign="top"> 
+      <table border="0" cellspacing="4" cellpadding="4" class="poptable" width="100%">
+        <tr> 
+          <td valign="top" align="left" class="tableEmboss" width="100%"> 
+<&
+    /Foundry/Elements/Kwiki,
+    Repository	=> '.global',
+    IsAdmin	=> 1,
+    Script	=> 'index.html',
+    PageId	=> ($page_id || ($keywords ||= 'SiteAdmin')),
+&>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<%ARGS>
+$keywords => undef
+$page_id => undef
+</%ARGS>

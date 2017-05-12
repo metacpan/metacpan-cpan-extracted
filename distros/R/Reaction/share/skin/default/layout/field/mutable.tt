@@ -1,0 +1,11 @@
+=extends NEXT
+
+=for layout widget
+
+<div class="[% field_class %]">[% call_next %]</div>
+
+=for layout message
+
+[% call_next %]<br />
+
+=cut

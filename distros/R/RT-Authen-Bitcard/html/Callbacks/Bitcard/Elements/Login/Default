@@ -1,0 +1,13 @@
+<%INIT>
+  use RT::Authen::Bitcard;
+  my $bc = RT::Authen::Bitcard->handler;
+  my $return_to = $RT::WebURL . 'index.html';
+</%INIT>
+<div class="input-row">
+  Have a <a href="<% $bc->bitcard_url %>">Bitcard</a> account?
+  <a href="<% $bc->login_url( r => $return_to ) %>">Log in with it now</a>.
+</div>
+<div class="input-row">
+  <a href="<% $bc->register_url( r => $return_to ) %>">
+  Get a Bitcard account.</a>
+</div>

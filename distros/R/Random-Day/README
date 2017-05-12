@@ -1,0 +1,147 @@
+NAME
+    Random::Day - Class for random day generation.
+
+SYNOPSIS
+     use Random::Day;
+     my $obj = Random::Day->new(%params);
+     my $dt = $obj->get;
+     my $dt = $obj->random;
+     my $dt = $obj->random_day($day);
+     my $dt = $obj->random_day_month($day, $month);
+     my $dt = $obj->random_day_month_year($day, $month, $year);
+     my $dt = $obj->random_month($month);
+     my $dt = $obj->random_month_year($month, $year);
+     my $dt = $obj->random_year($year);
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+            *       "day"
+
+                     Day.
+                     Default value is undef.
+
+            *       "dt_from"
+
+                     DateTime object from.
+                     Default value is DateTime object for 1900 year.
+
+            *       "dt_to"
+
+                     DateTime object to.
+                     Default value is DateTime object for 2050 year.
+
+            *       "month"
+
+                     Month.
+                     Default value is undef.
+
+            *       "year"
+
+                     Year.
+                     Default value is undef.
+
+    "get()"
+             Get random date defined by constructor parameters.
+             Returns DateTime object for date.
+
+    "random()"
+             Get random date.
+             Returns DateTime object for date.
+
+    "random_day($day)"
+             Get random date defined by day.
+             Returns DateTime object for date.
+
+    "random_day_month($day, $month)"
+             Get random date defined by day and month.
+             Returns DateTime object for date.
+
+    "random_day_month_year($day, $month, $year)"
+             Get date defined by day, month and year
+             Returns DateTime object for date.
+
+    "random_month($month)"
+             Get random date defined by month.
+             Returns DateTime object for date.
+
+    "random_month_year($month, $year)"
+             Get random date defined by month and year.
+             Returns DateTime object for date.
+
+    "random_year($year)"
+             Get random date defined by year.
+             Returns DateTime object for date.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     random_day():
+             Day cannot be a zero.
+             Day isn't number.
+
+     random_day_month():
+             Cannot create DateTime object.
+             Day cannot be a zero.
+             Day isn't number.
+
+     random_day_month_year():
+             Cannot create DateTime object.
+                     Error: %s
+             Day cannot be a zero.
+             Day isn't number.
+
+     random_month():
+             Cannot create DateTime object.
+                     Error: %s
+
+     random_month_year():
+             Cannot create DateTime object.
+                     Error: %s
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Random::Day;
+
+     # Object.
+     my $obj = Random::Day->new;
+
+     # Get date.
+     my $dt = $obj->get;
+
+     # Print out.
+     print $dt->ymd."\n";
+
+     # Output like:
+     # \d\d\d\d-\d\d-\d\d
+
+DEPENDENCIES
+    Class::Utils, DateTime, DateTime::Event::Random,
+    DateTime::Event::Recurrence, English, Error::Pure.
+
+SEE ALSO
+    Data::Random
+        Perl module to generate random data
+
+REPOSITORY
+    <https://github.com/tupinek/Random-Day>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2013-2015
+     BSD 2-Clause License
+
+VERSION
+    0.05
+

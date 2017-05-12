@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Regexp/Debugger.pm
+bin/rxrx
+t/00.load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

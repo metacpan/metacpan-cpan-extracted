@@ -1,0 +1,24 @@
+{
+    "base_uri"  : "http://localhost:8000/",
+    "store" : {
+	"storetype"	: "Memory",
+	"sources" : [ { 
+	    "file" : "/tmp/kommune-navn.ttl",
+	    "syntax" : "turtle"
+	} ]
+	
+    },
+
+    "namespaces" : { "rdfs" : "http://www.w3.org/2000/01/rdf-schema#", 
+	             "dc" : "http://purl.org/dc/terms/" },
+    "cors" : {
+              "origins" : "*"
+            },
+   "endpoint" : { "foo" : "1" },
+   "void": {
+        "pagetitle": "VoID Description for my dataset",
+     "add_void": { "file": "t/data/add.ttl", "syntax": "turtle" }
+
+   }
+
+}

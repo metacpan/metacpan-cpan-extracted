@@ -1,0 +1,10 @@
+Changes
+lib/Rinchi/Outlook.pm
+Makefile.PL
+MANIFEST
+README
+Rinchi-Outlook.ppd
+t/Rinchi-Outlook.t
+test.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

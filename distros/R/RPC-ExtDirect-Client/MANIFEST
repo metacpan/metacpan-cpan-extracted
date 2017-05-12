@@ -1,0 +1,26 @@
+Changes
+lib/RPC/ExtDirect/Client.pm
+lib/RPC/ExtDirect/Client.pod
+lib/RPC/ExtDirect/Client/API.pm
+lib/RPC/ExtDirect/Client/API/Method.pm
+Makefile.PL
+MANIFEST
+README
+t/010_params.t
+t/011_api_remote.t
+t/012_api_local.t
+t/02_exception.t
+t/03_post.t
+t/04_form.t
+t/05_upload.t
+t/061_poll.t
+t/062_poll.t
+t/063_poll.t
+t/07_cookie_jar.t
+t/08_cookies.t
+t/lib/RPC/ExtDirect/Client/Test/Util.pm
+t/lib/test/class.pm
+t/pod.t
+t/server.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

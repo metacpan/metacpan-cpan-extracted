@@ -1,0 +1,44 @@
+ResourcePool::Resource::Net::LDAPapi - Net::LDAPapi bindings for ResourcePool
+
+Original ResourcePool::Resource::Net::LDAP:
+
+Copyright (c) 2001-2003 by Markus Winand <mws@fatalmind.com>
+
+ResourcePool::Resource::Net::LDAPapi:
+
+Copyright (c) 2015 by Phillip O'Donnell <podonnell@cpan.org>
+
+See COPYRIGHT section in the ResourcePool::Resource::Net::LDAPapi(3pm) manpage.
+
+Installation
+------------
+    This modules requires ResourcePool to be pre installed.
+
+    The well known procedure is:
+        perl Makefile.PL
+        make
+        make test
+        make install 
+
+Examples
+--------
+    Are included in the manpages which come with this distribution.
+    To start with ResourcePool read the ResourcePool::BigPicture(3pm)
+    manpage, to learn something about the Net::LDAPapi bindings included
+    in this package visit the ResourcePool::Factory::Net::LDAPapi(3pm) 
+    manpage.
+
+Obtaining the most recent version
+---------------------------------
+    This package and subsequent updates is available on CPAN. Please
+    use a mirror close to you when downloading from CPAN.
+
+        http://www.cpan.org/SITES.html
+
+How to contribute?
+------------------
+    Submit patches for bugs you discovered (or report them at least)
+
+Authors contact
+---------------
+       e-mail: podonnell@cpan.org

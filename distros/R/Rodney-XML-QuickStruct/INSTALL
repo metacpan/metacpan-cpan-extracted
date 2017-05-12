@@ -1,0 +1,16 @@
+This is the installation instructions for Rodney::XML::QuickStruct.
+
+This package installs as just the module file. While there is an example script,
+there are no tests. This file is mostly here just as a place holder.
+
+
+===> To install
+
+    perl Makefile.PL
+    make
+    make install
+
+
+If you want to check it out before use, run make and then use the example.pl
+script in this directory. If you're happy, then run 'make install'.
+

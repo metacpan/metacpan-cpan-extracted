@@ -1,0 +1,47 @@
+快纪允许网站的管理者为每一页都设定一个隐私权层级。一共有三个隐私权层级：
+
+* 公开 ─ 任何人都可以阅读及编辑该页面。
+* 保护 ─ 任何人都可以阅读该页面，但是祇有管理者才能够加以编辑。
+* 私人 ─ 祇有管理者才能够阅读或编辑该页面。
+
+在预设的情况下，所有的页面都是公开的。
+----
+=== 安装
+你得另外开启这个隐私权功能。这个功能预设并不会安装；要开启这个功能就祇需要在你安装快纪的目录中，下这一个指令就行了：
+
+    kwiki-install --privacy
+----
+=== 服务器组态设定
+
+同时你也需要修改你的网页服务器组态设定，来让 [=admin.cgi] 程序受到鉴定架构的保护。以下这个范例就是你搭配 Apache 时，你可能会用到的设定：
+
+    Alias /kwiki/ /home/ingy/kwiki/
+    <Directory /home/ingy/kwiki/>
+        Order allow,deny
+        Allow from all
+        AllowOverride None
+        Options ExecCGI
+        AddHandler cgi-script .cgi
+        <Files admin.cgi>
+            Require user admin
+            AuthType Basic
+            AuthName Restricted
+            AuthUserFile /home/ingy/kwiki/passwd
+        </Files>
+    </Directory>
+
+同时你还得设定管理者口令。如果你在用的是 Apache 的话，就祇需要键入：
+
+    htpasswd -bc passwd admin foo
+
+这个指令会把 [=admin] 的口令设定成 [=foo] 。
+
+----
+
+=== 管理
+
+如果你打算登入成站台管理者的话，请不要连到 [index.cgi http:index.cgi] ，请连到 [admin.cgi http:admin.cgi] 。如果一切都设定妥当的话，此时你应该会被询问口令。
+
+请在使用者名称输入 [=admin] ，然后在口令输入 [=foo] （或任何你所设定的口令）。
+
+一旦你登入之后，就应该能够在编辑页面的时候，一并设定它们的隐私权层级了。

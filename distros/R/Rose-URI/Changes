@@ -1,0 +1,41 @@
+1.00 (03.17.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Updated tests to accomodate new default escaping rules in
+      URI::Escape 3.30 (and, presumably, later versions).
+    * Bumped version number to reflect API stability.
+
+0.50 (10.21.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused empty query parameters to be omitted 
+      from the query string.
+    * Added the omit_empty_query_params object attribute (with class-
+      wide default override) to preserve the old behavior.
+
+0.022 (02.06.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Improved handling or "keyword"-style query string (e.g., "/bar?foo")
+
+0.021 (10.06.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Simplified cloning.
+    * Corrected POD errors.
+
+0.02 (10.05.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fix cloning bugs.
+    * Added configurable default query param separator.
+    * Added POD links.
+
+0.012 (12.09.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed rel() to do explicit string comparison instead of relying on
+      overload(), which seems to fail in perl 5.6.0 in that particular
+      case.
+
+0.011 (11.14.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Added copyright info.
+
+0.01 (11.13.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Initial release.

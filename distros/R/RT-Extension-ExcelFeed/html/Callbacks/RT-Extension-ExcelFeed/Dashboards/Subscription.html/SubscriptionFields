@@ -1,0 +1,11 @@
+<%INIT>
+# Add MSExcel to the hash of fields for the subscription form
+# Subscription.html will then handle loading from the subscription
+# object and user input.
+$FieldsRef->{'MSExcel'} = '';
+</%INIT>
+<%ARGS>
+$FieldsRef
+$SubscriptionObj
+$DashboardObj
+</%ARGS>

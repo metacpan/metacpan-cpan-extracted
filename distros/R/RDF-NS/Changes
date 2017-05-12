@@ -1,0 +1,267 @@
+20170111  2017-01-11 17:02:03 CET
+ - 1922 prefixes
+ - added:   apf art asawoo bb bblfish biml bioc cdt clinic cpack crime
+            crowd dash datex dbfo dcap dcatapit dcodata dpn driver duv eame
+            eccpubsub ecoll efrbroo ensembl eol esproc fno fo frgeo html
+            iana ifc ioto ipsv isidore ispra jpost kees latitude ldq ldqm
+            leak leaks literal llr lsq lyon markus mdi meat merge meshv mls
+            mmm mmoon mod ncbigene ndnp neotec neotecbib obeu ondc ontolex
+            ontology ontop or organ pcdm pdf planet pm pmd pmo pmofn pmonb
+            pmopb pmovn ppr prohow rdaad rdaar rdabs rdacarx rdacdt rdacpc
+            rdaft rdagen rdaill rdalay rdapf rdapm rdaspc rdaterm rdavf
+            rdfp rdfsharp ruian sdm sdmxc sdmxcode sdmxm semiot sg sgfn sgg
+            sgiter soch solid sorg spv studiop sx system tarql tgm tissue
+            undata vam vogd voidex vplan wab wdv webac ws year yso
+ - changed: cdm content dbpediaowl dul fn gen ic jolux ludo media mm nuts
+            ogc res role san seas units verb wikipedia wp
+
+
+20170111  2017-01-11 17:02:03 CET
+
+20160409  2016-04-09 14:03:22 CEST
+ - 1793 prefixes
+ - added:   dwciri sdterms
+
+ - move bin directory to script (#18)
+
+20160408  2016-04-08 20:54:28 CEST
+ - 1791 prefixes
+ - added:   ali aozora auto b3kat csdbp csvw ctxdesc cue data datacite
+            dataid dcodt dcosample dio door dpla dqc dqv dsfv dsv eccauth
+            eccdi ecowlim edac eem efd eli elod esair estatgph ethc
+            eurostat fe fire fnabox fntbox foo frame frappe gci gist glycan
+            gns gont goog gs1 hello hto ianarel ideotalex iiif incident
+            input ipo isbdu iso37120 jolux juso kbv km4c lcsh lgdm lgdt
+            lheo lslife lsmap lsweb lswmo lswpm lu maeco maet master1 moo
+            mv ncicp nlon ns1 odw ogc oml open311 opllog oplweb orges
+            orgesv2 orth ost ou output owl2xml pbody pcit pid pmhb pp proms
+            provoc psv puml pv qms regorg rfd rgml rimmf rm rofsf rofsm
+            rpath rut samfl saref scco scholl scor sct sdshare sdt si smxm
+            snac sor srx step teamwork text theme tix tp type uby uom
+            valueflows vf voc vocnet volt vort vsearch wail wde wdt
+            wikibase wimpo wsdl xapi yd
+ - changed: bd bgcat bif bsb cordis dbpediaowl dpc ex fn go hasneto ic lgd
+            media mm mu pay rdacct sem vstoi xkos
+
+ - Take version number from lib/RDF/NS.pm
+ - Require Perl >= 5.12
+
+20150725 2015-0725 (1643 prefixes)
+ - added:   affymetrix airs aktivesa amsl as bag beth bfo bgcat bgdbp bgdbr
+            bgn bibrm bmo bn bner bnf bridge bsym bv c9d caplibacl cart cbo
+            ccrel cff changeset chembl cl clirio company condition cpant
+            cpsv crmdig cwl cwork d0 d2d dannet daq date dbcat dcs decision
+            demlab deps dgfr dicera dm2e doas dpc ecc eccrev ecgl ecglview
+            eclap edgarcik emtr esaloj esapar esco escom esdir esequip
+            espresup essglobal estrf ev faldo faq fdbp figigii fluidops
+            galaksiya geojson gl glview gov gpml gtfs guo ha hasneto
+            holding hp ic imind insdc isocat itcat jerm kegg lawd lc lcdr
+            lden ldvm lemonuby lindt ljkl ll llm llo llont lmx lpeu ls lsd
+            lso lsqv luc lw mbgd mexalgo mexcore mexperf mexv mico minim
+            mmd mmf mtlo ncit nerd newsevents nex npdv oae oboinowl odbc
+            odo ofrd omnfed omnlife onc onto opengov oplcb oplcert oplecrm
+            oplmkt ops oss owsom oxi phdd piero pim pod quantity r4r ramon
+            rdabf rdabm rdacc rdacct rdaco rdact rdaemm rdafmn rdafnm
+            rdafnv rdafr rdafs rdaftn rdagd rdagrp rdagw rdami rdamt rdapmt
+            rdapo rdarm rdarr rdasco rdasoi rdatc rdatr rdaz religion
+            remetca rml rmo rofch rofem rofer rofet rofhf rofid rofim rofin
+            rofit rofrm rofrr rofrt rs rvdata sakthi san saws seas sh shoah
+            soc st sw swcomp tadirah td5 traffic ubiq um uneskos vacseen1
+            vag verb vidont vstoi wb webservice wn31 wno wro xcql xlime xrd
+            yo
+ - changed: biopax blt cex cv dblp factbook gml gnd lemon lgd nfo omn phil
+            rda ro scot sdo vgo xfn
+ - list available dates with rdfns --dates (close #15)
+
+20140910 2014-0910 (1415 prefixes)
+
+ - fixed deterministic short names
+
+20140909 2014-099  (1415 prefixes)
+ - added:   opllic
+
+ - improved test coverage (close #5)
+ - support reverse lookup in rdfns (close #9)
+ - test Perl 5.20
+
+20140908 2014-098  (1414 prefixes)
+ - added:   abs article cdc opencyc smg
+ - new module RDF::SN to abbreviate URIs
+
+20140901 2014-091  (1409 prefixes)
+ - added:   aat accom acrt agrd agro app asgv aws babelnet basic bbccms
+            bbccore bbcprov bco bevon bihap bis bk bwb call citof cjr cmd
+            cmdi cmdm contsem csv dbpedia2 dbug dcoid defns delta diag
+            dicom dn dogont dpd dq dsn ebucore ec ecrm employee erce esadm
+            escjr estatwrap estrn eurlex evident ext fam fao fbgeo fcs fma
+            form fp3 frb friends ftcontent gaf gcis geop geos geosparql
+            geovoid gf gm gts gvp h2o hdo hlygt hr hydra ignf ilap imf
+            irstea irsteaont iso isothes itm jp1 kai keys kml koly l2sp
+            language lda ldr lexcz lexicon lexinfo lfov li lime limo ling
+            lio lmf locah location locn lofv loted mammal maso mb metadata
+            mm mmt msm mt my naval navm ndl nxs oad oan od odapps odrl odrs
+            of oh oils olac olac11 olca om omdoc onisep ont ontosec onyx op
+            openskos oplacl oplprod oplres origins oslo parl pattern pco
+            physo pic pkm plo pnc pni pnt pproc provone psys purl pvcs qu
+            rdaa rdac rdae rdag2 rdai rdam rdarel2 rdau rdaw rdl reegle
+            roadmap rso ru ruto rvl sad sam sao sbench scip scoro security
+            ses sf shex shw siocserv skos08 spcm spdx spfood sql sro sru
+            stanford static stories swpm swrcfe tac tavprov taxon tddo tgn
+            thors tm topo travel trig tw uis ulan un unspsc uri4uri va vext
+            vgo videogame vin viso vmm voidext voidwh vra wfn whisky wi
+            wiki wikim wikimedia wn30 xml xsi xslopm zr
+ - changed: dblp dco dcq ecb fabio govwild http lemon marl mf muni nyt sdo
+            sparql ssn
+
+
+20131205 2013-125  (1170 prefixes)
+ - added:   bbc bibframe bm emoca emotion limoo mged mocanal muldicat nidm
+            paia pubmed service tr
+ - changed: ro sdo
+
+
+20131115 2013-1115 (1156 prefixes)
+ - added:   amalgame camelot conf crv csm curr dbrc dbyago frad gq hxl mp
+            ogbd olad ox pat pext qb4o refe swperson ub
+ - changed: dso frsad gnd
+
+ - documentation
+ - add return value of method SET
+
+20131002 2013-102  (1135 prefixes)
+ - added:   cdtype fincaselaw finlaw
+
+ - new method SET to add/modify mappings
+
+20130930 2013-0930 (1132 prefixes)
+
+ - new rdfns command line argument --version
+ - fix Changes creation via update.pl
+ - fix Changes to comply w/CPAN::Changes::Spec
+
+20130926 2013-09-26 (1132 prefixes)
+
+ - fixed documentation
+ - new format 'json' for JSON-LD
+
+20130924 2013-09-24 (1132 prefixes)
+ - added:   alchemy archdesc cosmo cro dbpo dt frbrer frsad gndo icane ludo oj 
+            oliasystem orca saif sdmxa sdmxd stream tsioc twaapi wd who 
+            wikidata
+ - changed: agrelon cnt co sdo yago
+
+ - made REVERSE reproducible
+ - improved command line client
+
+20130816 2013-08-16 (1109 prefixes)
+ - added:   fea penis scms sdo wapp
+
+ - improved update process
+ - remove .bak files
+
+20130812 2013-08-12 (1104 prefixes)
+ - added:   lldr up
+ - changed: copyright
+
+20130802 2013-08-02 (1102 prefixes)
+ - added:   algo bsb centrifuge cex cf cidoc crtv dbc dbnary dbpr dbt dctypes 
+            dis dvia ebu ecb ecpo exterms frapo geof geofla gfo hifm httpm 
+            iot itsrdf kbp l4lod laabs locwd mods namespaces nif nsl odcs oecd 
+            omn opmw oslc pam penn pkgsrc ple poste premis prolog qrl qvoc 
+            radion rdarole rdf123 reve rlno rlnr rlog roevo roterms sci sem 
+            site stac stats wf4ever wfm wfs wikterms wl won worldbank
+ - changed: b2bo biocore cito dita dso lgd lv oa osr pr req ro voaf
+
+ - fixed bug in test of RDF::NS::Trine (https://github.com/nichtich/RDF-NS/issues/4)
+ - rdfns now emits plain URLs without format
+
+20130402 2013-04-02 (1033 prefixes)
+ - added:   dcm gnvc occult pizza role
+ - changed: w3po
+
+ - fixed bug in PREFIXES  caused by returning from an each-loop
+
+20130327 2013-03-27 (1028 prefixes)
+ - added:   agls agrelon aigp aos api being bf bif biotop biro cb cgov city 
+            cold coll comm coun cpa crsw csp ctorg dbtont dcite dcndl deo dl 
+            doco dqm dr drm ds dso ecos edgar elec emp ep fcp fowl gadm 
+            gastro geod geosp gnm graffle graves gso infor inno iol itsmo lcy 
+            lh lingvo lmm1 lmm2 lsc mads mds meb mil mime moac mrel msr mvco 
+            ntag nyt obsm odapp odpart odv oecc ontopic opl opmo oprovo ordf 
+            osadm osgeom osp osr osspr ostop part passim prvt pso ptop pwo 
+            quty raul rdafrbr rdag1 rdag3 rdarel semio seq situ snarm spt swpo 
+            tao te tis trait turismo tvc vocab vrank wlo wsl xmp zoomaterms
+ - changed: acm br crm disco dita food idemo lib ps s2s sc sec
+
+20130208 2013-02-08 (914 prefixes)
+ - added:   adms aersv agg apivc arpfo asn atomrdf b2bo bd bing biopax bne bp 
+            bte cidoccrm daisy dce dco dcr disco dita dnb dsp dssn ekaw ens 
+            eseduc fd food fos gawd genea geocontext gsp gxa health hgnc 
+            icaltzd idemo igeo jjd kdo l4a laposte ldp lex lyou marshall md 
+            nxp oa oarj oax osn owltime particip person photoshop pingback 
+            prefix pronom qa qud rad rov ssso strdf tisc uco viaf visit w3po 
+            wn20 xmls
+ - changed: cv geoes media metalex nfo prv xro
+
+20120917 2012-09-17 (840 prefixes)
+ - added:   category ero interval
+
+20120905 2012-09-05 (837 prefixes)
+ - added:   flow osmsemnet wfprov
+
+ - new subclass RDF::NS::URIS to get URI objects
+
+20120829 2012-08-29 (834 prefixes)
+ - added:   mpeg7 myprefix ngeoi okg
+
+20120827 2012-08-27 (830 prefixes)
+ - added:   acco admssw aers arg br cao cogs dive dpl eprints eumida germplasm 
+            intervals lctr lemon library life marl muni ncbitaxon no npgd npgg 
+            npgx open pav pkmn pml poder pol r4ta rda rdagr1 rssynd sdgp set 
+            sgv spif tcga
+ - changed: acm crm prism prv s4ac
+
+ - new methods PREFIX PREFIXES and REVERSE
+
+20120521 2012-05-21 (791 prefixes)
+ - added:   d2r efo enhancer fcm fise fl fls oboe pccz rdrel rec54
+
+20120426 2012-04-26 (780 prefixes)
+ - added:   aerols carfo cerif cheminf cts2 example func geom gldp goef hg ipad
+            isbd kupkb lexvo lr lv marcrel metalex mohammad npg nsogi oac ogorg
+            omv onssprel ospost pay pf pne prism21 pro prviv ql r2rml rating
+            recipe scufl2 ssn vapour vsws wbc wbp wkd wp wscaim xkos
+ - changed: linkedct nfo pc prov xhtml
+
+20120124 2012-01-24 (733 prefixes)
+ - added:   arecipe calli cis datafaqs db dwc ends eunis georss identity italy 
+            jita moby np ocd places pna protegedc swpatho transit voidp vsr 
+            wfdesc wikipedia
+ - changed: daiaserv media nfo
+
+20111208 2011-12-08 (716 prefixes)
+ - added:   calli dwc eunis georss pna swpatho voidp
+
+ - introduced blank nodes in RDF::NS::Trine
+ - extended command line tool to expand QNames
+
+20111124 2011-11-24 (709 prefixes)
+ - added:   gnd grs htir infosys muto omapi prf webbox
+ - changed: commerce
+ - removed: uri
+
+ - modified command line tool option syntax
+
+20111102 2011-10-31 (702 prefixes)
+ - added:   vsw
+
+ - new command line tool 'rdfns'
+
+20111031 2011-10-31 (701 prefixes)
+ - added:   daiaserv vvo
+
+ - first release at CPAN
+
+20111028 2011-10-28
+
+ - first full-featured version

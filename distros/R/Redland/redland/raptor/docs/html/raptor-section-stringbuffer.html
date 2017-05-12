@@ -1,0 +1,520 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>String buffer</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Raptor RDF Syntax Parsing and Serializing Library Manual">
+<link rel="up" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="prev" href="raptor-section-serializer.html" title="Serializer">
+<link rel="next" href="raptor-section-triples.html" title="Triples">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="introduction.html" title="Raptor Overview">
+<link rel="part" href="tutorial.html" title="Part&#160;I.&#160;Raptor Tutorial">
+<link rel="chapter" href="tutorial-initialising-finishing.html" title="Initialising and Finishing using the Library">
+<link rel="chapter" href="tutorial-querying-functionality.html" title="Listing built-in functionality">
+<link rel="chapter" href="tutorial-parsing.html" title="Parsing syntaxes to RDF Triples">
+<link rel="chapter" href="tutorial-serializing.html" title="Serializing RDF triples to a syntax">
+<link rel="part" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="chapter" href="raptor-parsers.html" title="Parsers in Raptor (syntax to triples)">
+<link rel="chapter" href="raptor-serializers.html" title="Serializers in Raptor (triples to syntax)">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="raptor-section-serializer.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference-manual.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Raptor RDF Syntax Parsing and Serializing Library Manual</th>
+<td><a accesskey="n" href="raptor-section-triples.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2584890" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2616612" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="raptor-section-stringbuffer"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2584890"></a><span class="refentrytitle">String buffer</span>
+</h2>
+<p>String buffer &#8212; Append-only strings.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a>;
+<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a>* <a href="raptor-section-stringbuffer.html#raptor-new-stringbuffer">raptor_new_stringbuffer</a>
+                                            (void);
+void        <a href="raptor-section-stringbuffer.html#raptor-free-stringbuffer">raptor_free_stringbuffer</a>        (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer);
+int         <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-append-counted-string">raptor_stringbuffer_append_counted_string</a>
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             size_t length,
+                                             int do_copy);
+int         <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-append-string">raptor_stringbuffer_append_string</a>
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             int do_copy);
+int         <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-append-decimal">raptor_stringbuffer_append_decimal</a>
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             int integer);
+int         <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-append-stringbuffer">raptor_stringbuffer_append_stringbuffer</a>
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             <a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *append);
+int         <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-prepend-counted-string">raptor_stringbuffer_prepend_counted_string</a>
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             size_t length,
+                                             int do_copy);
+int         <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-prepend-string">raptor_stringbuffer_prepend_string</a>
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             int do_copy);
+unsigned char* <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-as-string">raptor_stringbuffer_as_string</a>
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer);
+size_t      <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-length">raptor_stringbuffer_length</a>      (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer);
+int         <a href="raptor-section-stringbuffer.html#raptor-stringbuffer-copy-to-string">raptor_stringbuffer_copy_to_string</a>
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             size_t length);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2616612"></a><h2>Description</h2>
+<p>
+A utility class that allows easy construction of strings that
+grow at the end by appending new strings.  Primarily used for
+constructing/serializing syntaxes into strings by the <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a>
+and <a href="raptor-section-serializer.html#raptor-serializer"><span class="type">raptor_serializer</span></a> classes.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2616645"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2612520"></a><h3>
+<a name="raptor-stringbuffer"></a>raptor_stringbuffer</h3>
+<a class="indexterm" name="id2612532"></a><pre class="programlisting">raptor_stringbuffer* raptor_stringbuffer;
+</pre>
+<p>
+Raptor string buffer class</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612552"></a><h3>
+<a name="raptor-new-stringbuffer"></a>raptor_new_stringbuffer ()</h3>
+<a class="indexterm" name="id2612563"></a><pre class="programlisting"><a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a>* raptor_new_stringbuffer
+                                            (void);</pre>
+<p>
+Create a new stringbuffer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612604"></a><h3>
+<a name="raptor-free-stringbuffer"></a>raptor_free_stringbuffer ()</h3>
+<a class="indexterm" name="id2612615"></a><pre class="programlisting">void        raptor_free_stringbuffer        (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer);</pre>
+<p>
+Destroy a stringbuffer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> stringbuffer object to destroy.
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612664"></a><h3>
+<a name="raptor-stringbuffer-append-counted-string"></a>raptor_stringbuffer_append_counted_string ()</h3>
+<a class="indexterm" name="id2612679"></a><pre class="programlisting">int         raptor_stringbuffer_append_counted_string
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             size_t length,
+                                             int do_copy);</pre>
+<p>
+If <em class="parameter"><code>string</code></em> is NULL or <em class="parameter"><code>length</code></em> is 0, no work is performed.
+</p>
+<p>
+If <em class="parameter"><code>do_copy</code></em> is non-0, the passed-in string is copied into new memory
+otherwise the stringbuffer becomes the owner of the string pointer
+and will free it when the stringbuffer is destroyed.
+</p>
+<p>
+Add a string to the stringbuffer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> raptor stringbuffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>length</code></em>&#160;:</span></td>
+<td> length of string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>do_copy</code></em>&#160;:</span></td>
+<td> non-0 to copy the string
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619001"></a><h3>
+<a name="raptor-stringbuffer-append-string"></a>raptor_stringbuffer_append_string ()</h3>
+<a class="indexterm" name="id2619013"></a><pre class="programlisting">int         raptor_stringbuffer_append_string
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             int do_copy);</pre>
+<p>
+Add a string to the stringbuffer.
+</p>
+<p>
+If <em class="parameter"><code>string</code></em> is NULL, no work is performed.
+</p>
+<p>
+If <em class="parameter"><code>do_copy</code></em> is non-0, the passed-in string is copied into new memory
+otherwise the stringbuffer becomes the owner of the string pointer
+and will free it when the stringbuffer is destroyed.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> raptor stringbuffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>do_copy</code></em>&#160;:</span></td>
+<td> non-0 to copy the string
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619138"></a><h3>
+<a name="raptor-stringbuffer-append-decimal"></a>raptor_stringbuffer_append_decimal ()</h3>
+<a class="indexterm" name="id2619150"></a><pre class="programlisting">int         raptor_stringbuffer_append_decimal
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             int integer);</pre>
+<p>
+Add an integer in decimal to the stringbuffer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> raptor stringbuffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>integer</code></em>&#160;:</span></td>
+<td> integer to format as decimal and add
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2618304"></a><h3>
+<a name="raptor-stringbuffer-append-stringbuffer"></a>raptor_stringbuffer_append_stringbuffer ()</h3>
+<a class="indexterm" name="id2618318"></a><pre class="programlisting">int         raptor_stringbuffer_append_stringbuffer
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             <a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *append);</pre>
+<p>
+Add a stringbuffer to the stringbuffer.
+</p>
+<p>
+This function removes the content from the appending stringbuffer,
+making it empty and appends it to the supplied stringbuffer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-stringbuffer.html#raptor-stringbuffer"><span class="type">raptor_stringbuffer</span></a>
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>append</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-stringbuffer.html#raptor-stringbuffer"><span class="type">raptor_stringbuffer</span></a> to append
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2618422"></a><h3>
+<a name="raptor-stringbuffer-prepend-counted-string"></a>raptor_stringbuffer_prepend_counted_string ()</h3>
+<a class="indexterm" name="id2618437"></a><pre class="programlisting">int         raptor_stringbuffer_prepend_counted_string
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             size_t length,
+                                             int do_copy);</pre>
+<p>
+If do_copy is non-0, the passed-in string is copied into new memory
+otherwise the stringbuffer becomes the owner of the string pointer
+and will free it when the stringbuffer is destroyed.
+</p>
+<p>
+Add a string to the start of the stringbuffer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> raptor stringbuffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>length</code></em>&#160;:</span></td>
+<td> length of string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>do_copy</code></em>&#160;:</span></td>
+<td> non-0 to copy the string
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2618569"></a><h3>
+<a name="raptor-stringbuffer-prepend-string"></a>raptor_stringbuffer_prepend_string ()</h3>
+<a class="indexterm" name="id2618581"></a><pre class="programlisting">int         raptor_stringbuffer_prepend_string
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             int do_copy);</pre>
+<p>
+Add a string to the start of the stringbuffer.
+</p>
+<p>
+If do_copy is non-0, the passed-in string is copied into new memory
+otherwise the stringbuffer becomes the owner of the string pointer
+and will free it when the stringbuffer is destroyed.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> raptor stringbuffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>do_copy</code></em>&#160;:</span></td>
+<td> non-0 to copy the string
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2626738"></a><h3>
+<a name="raptor-stringbuffer-as-string"></a>raptor_stringbuffer_as_string ()</h3>
+<a class="indexterm" name="id2626749"></a><pre class="programlisting">unsigned char* raptor_stringbuffer_as_string
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer);</pre>
+<p>
+Return the stringbuffer as a C string.
+</p>
+<p>
+Note: the return value is a to a shared string that the stringbuffer
+allocates and manages.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> raptor stringbuffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> NULL on failure or stringbuffer is empty, otherwise
+  a pointer to a shared copy of the string.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2626813"></a><h3>
+<a name="raptor-stringbuffer-length"></a>raptor_stringbuffer_length ()</h3>
+<a class="indexterm" name="id2626825"></a><pre class="programlisting">size_t      raptor_stringbuffer_length      (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer);</pre>
+<p>
+Return the stringbuffer length.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> raptor stringbuffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> size of stringbuffer
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2626885"></a><h3>
+<a name="raptor-stringbuffer-copy-to-string"></a>raptor_stringbuffer_copy_to_string ()</h3>
+<a class="indexterm" name="id2626899"></a><pre class="programlisting">int         raptor_stringbuffer_copy_to_string
+                                            (<a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *stringbuffer,
+                                             unsigned char *string,
+                                             size_t length);</pre>
+<p>
+Copy the stringbuffer into a string.
+</p>
+<p>
+Copies the underlying string to a pre-allocated buffer.  The
+output string is always '\0' terminated.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stringbuffer</code></em>&#160;:</span></td>
+<td> raptor stringbuffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> output string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>length</code></em>&#160;:</span></td>
+<td> size of output string
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure such as stringbuffer is empty, buffer is too small
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,5 @@
+Revision history for RT-Extension-PushoverNotify
+
+0.01    Date/time
+        Extract RT::Extension::PushoverNotify from private RT extension
+

@@ -1,0 +1,19 @@
+<%init>
+my %variables = ( Ticket => $Ticket );
+
+if (RT->Config->Get('ArticleTemplatesWithRequestArgs')) {
+    $variables{'request_args'} = { $m->request_args };
+}
+
+my ($new, $msg) = $Article->ParseTemplate( $$content, %variables );
+unless ( defined $new && length $new ) {
+    $RT::Logger->error("Couldn't parse article's content: $msg");
+} else {
+    $$content = $new;
+}
+</%init>
+<%args>
+$Article
+$Ticket => undef
+$content
+</%args>

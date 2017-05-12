@@ -1,0 +1,32 @@
+=head1 NAME
+
+RocksDB::LRUCache - rocksdb::Cache object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $capacity = 1024 * 1024;
+  my $cache = RocksDB::LRUCache->new($capacity);
+  my $db = RocksDB->new('/path/to/db', { block_cache => $cache });
+
+=head1 DESCRIPTION
+
+B<RocksDB::LRUCache> is a rocksdb::Cache object.
+
+=head1 CONSTRUCTOR
+
+=head2 C<< RocksDB::LRUCache->new($capacity :Int) :RocksDB::LRUCache >>
+
+Create a new cache with a fixed size capacity.  This implementation
+of Cache uses a least-recently-used eviction policy.
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::Cache>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

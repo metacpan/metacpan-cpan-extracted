@@ -1,0 +1,50 @@
+Regexp-Common-microsyntax
+
+This module provides regular expressions for matching microblogging-style
+text (tweets, dents, microposts, etc.). It is based on the ruby
+B<twitter-text> Regex class, with extensions to support features that
+Twitter doesn't support (like status.net !group tags, microsyntax.org
+slashtags, etc.).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Regexp::Common::microsyntax
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Regexp-Common-microsyntax
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Regexp-Common-microsyntax
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Regexp-Common-microsyntax
+
+    Search CPAN
+        http://search.cpan.org/dist/Regexp-Common-microsyntax/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Gavin Carr <gavin@openfusion.com.au>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcq="http://dublincore.org/2000/03/13/dcq#"
+         xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#">
+
+  <rdf:Description rdf:about="http://testers.mkdoc.com:80/">
+
+    <dc:title>MKDoc testers</dc:title>
+
+    <dcq:abstract>
+      This particular mkdoc site is for
+mkdoc testers to play with and to explore the mkdoc admin
+system. Nothing here is permanent and there is no useful
+information anywhere.
+    </dcq:abstract>
+
+    <dc:creator>
+      <rdf:Description>
+      <rdfs:label>Postle, Bruno</rdfs:label>
+      <vCard:FN>Bruno Postle</vCard:FN>
+      <vCard:EMAIL>bruno@mkdoc.com</vCard:EMAIL>
+      <vCard:N rdf:parseType="Resource">
+        <vCard:Family>Postle</vCard:Family>
+        <vCard:Given>Bruno</vCard:Given>
+      </vCard:N>
+      </rdf:Description> 
+   </dc:creator>
+  
+
+    <dc:contributor>
+      <rdf:Bag>
+
+        <rdf:li>
+          <rdf:Description>
+          <rdfs:label>Croome, Chris</rdfs:label>
+          <vCard:FN>Chris Croome</vCard:FN>
+          <vCard:EMAIL>chris@mkdoc.com</vCard:EMAIL>
+          <vCard:N rdf:parseType="Resource">
+            <vCard:Family>Croome</vCard:Family>
+            <vCard:Given>Chris</vCard:Given>
+          </vCard:N>
+          </rdf:Description>
+        </rdf:li>
+
+        <rdf:li>
+          <rdf:Description>
+          <rdfs:label>Moran, Adam</rdfs:label>
+          <vCard:FN>Adam Moran</vCard:FN>
+          <vCard:EMAIL>adam@webarchitects.co.uk</vCard:EMAIL>
+          <vCard:N rdf:parseType="Resource">
+            <vCard:Family>Moran</vCard:Family>
+            <vCard:Given>Adam</vCard:Given>
+          </vCard:N>
+          </rdf:Description>
+        </rdf:li>
+
+      </rdf:Bag>
+    </dc:contributor>
+
+
+
+    <dc:publisher>
+      MKDoc Ltd.
+    </dc:publisher>
+
+
+    <dc:subject>
+      <rdf:Bag>
+
+        <rdf:li>MKDoc</rdf:li>
+
+        <rdf:li>information architecture</rdf:li>
+
+        <rdf:li>content management system</rdf:li>
+
+        <rdf:li>useability</rdf:li>
+
+        <rdf:li>metadata</rdf:li>
+
+        <rdf:li>editor</rdf:li>
+
+      </rdf:Bag>
+    </dc:subject>
+
+    <dc:identifier>
+      <dcq:URI>
+        <rdf:value>http://testers.mkdoc.com:80/</rdf:value>
+      </dcq:URI>
+    </dc:identifier>
+
+
+  
+      <dcq:references>
+        <dcq:URI>
+          <rdf:value>http://mkdoc.com/</rdf:value>
+        </dcq:URI>
+      </dcq:references>
+  
+
+
+
+    <dc:rights>
+      Copyright &#38;#169; 2001 MKDoc Ltd.
+    </dc:rights>
+
+
+    <dc:format>
+      <dcq:IMT>
+        <rdf:value>text/html</rdf:value>
+        <rdfs:label>HTML</rdfs:label>
+      </dcq:IMT>
+    </dc:format>
+
+    <dc:type>
+      <dcq:Text>
+        <rdfs:label>Text</rdfs:label>
+      </dcq:Text>
+    </dc:type>
+
+      <dcq:created>
+        <dcq:W3CDTF>
+          <rdf:value>2001-03-23T18:50:09Z</rdf:value>
+          <rdfs:label>Created</rdfs:label>
+        </dcq:W3CDTF>
+      </dcq:created>
+
+      <dcq:modified>
+        <dcq:W3CDTF>
+          <rdf:value>2001-06-19T17:45:20Z</rdf:value>
+          <rdfs:label>Modified</rdfs:label>
+        </dcq:W3CDTF>
+      </dcq:modified>
+
+    <dc:language>
+      <dcq:RFC1766>
+        <rdf:value>en-gb</rdf:value>
+        <rdfs:label>English (United Kingdom)</rdfs:label>
+      </dcq:RFC1766>
+    </dc:language>
+
+  </rdf:Description>
+</rdf:RDF>

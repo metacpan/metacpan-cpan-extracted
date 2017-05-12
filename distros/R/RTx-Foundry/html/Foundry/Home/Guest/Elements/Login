@@ -1,0 +1,49 @@
+%# Sauron is alive in Argentina!
+
+% if ($m->request_args->{'Do-Login'} and !$m->notes('error')) {
+%     $m->notes( error => loc('Invalid login.') );
+% }
+
+<& SELF:Draw, %ARGS &>
+
+<%METHOD Draw>
+% my ($f1, $f2, $submit) = map $m->base_comp->attr($_), qw(Field1 Field2 Submit);
+% if ($MD5Auth) {
+<SCRIPT Language="JavaScript" Src="/NoAuth/auth.js"></SCRIPT>
+% }
+<TABLE BORDER="0">
+% foreach ($f1, $f2) {
+    <TR>
+	<TD ALIGN=RIGHT><% loc($_->{label}) %>:</TD>
+	<TD ALIGN=LEFT><input
+	    name="<% $_->{name} %>"
+%     if ($_->{type}) {
+	    type="<% $_->{type} %>"
+%     } else {
+	    value="<% $ARGS{$_->{name}} %>"
+%     }
+	></TD>
+    </TR>
+% }
+    <TR>
+	<TD colspan=2 align="center">
+	    <input type=hidden name="auth_digest" value="">
+	    <input type=hidden name="auth_nonce" value="">
+	    <input type=hidden name="auth_created" value="">
+	    <input type=submit value="<% loc($submit) %>" name="Do-Login"
+% if ($MD5Auth) {
+            onclick="this.disabled = true; auth_populate(this.form); this.form.submit();"
+% }
+	    >
+	</TD>
+    </TR>
+</TABLE>
+<%ARGS>
+$MD5Auth => 1
+</%ARGS>
+</%METHOD>
+<%ATTR>
+Field1 => { label => 'Username', name => 'user' }
+Field2 => { label => 'Password', name => 'pass', type => 'password' }
+Submit => 'Login'
+</%ATTR>

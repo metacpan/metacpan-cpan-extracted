@@ -1,0 +1,477 @@
+NAME
+        REST::Resource      -- Provide base class functionality for RESTful servers.
+
+SYNOPSIS
+        package My::Rest::Resource;
+        use base "REST::Resource";
+
+        sub new
+        {
+            my( $class )    = shift;
+            my( $this )     = $this->SUPER::new( @_ );
+            $this->method( "PUT",   \&Create, "This method handles the creation of My::Rest::Resource." );
+            $this->method( "GET",   \&Read,   "This method handles the reading of My::Rest::Resource." );
+            $this->method( "POST",  \&Update, "This method handles the updating of My::Rest::Resource." );
+            $this->method( "DELETE",\&Delete, "This method handles the deletion of My::Rest::Resource." );
+        }
+
+        sub Create  { my( $this ) = shift;  my( $request_interface_instance ) = shift; ... }
+        sub Read    { my( $this ) = shift;  my( $request_interface_instance ) = shift; ... }
+        sub Update  { my( $this ) = shift;  my( $request_interface_instance ) = shift; ... }
+        sub Delete  { my( $this ) = shift;  my( $request_interface_instance ) = shift; ... }
+
+        package main;
+        use My::Rest::Resource;
+
+        my( $restful )      = new My::Rest::Resource();
+        $restful->handle_request();                         ## One-shot CGI Context
+
+DESCRIPTION
+        This is a fork of WWW::Resource 0.01.  The major changes are:
+
+        [] Full OO implementation
+        [] Overt abstract base class design
+        [] Support of Perl 5.6
+        [] Support for use with CGI interface.
+        [] Support for HEAD and TRACE.
+        [] Method / handler registration to better support
+           application-semantics over REST-semantics.
+
+METHOD REGISTRATION
+        HTTP method handlers should be members of your derived class and
+        expect $this (or $self) as the first parameter.
+
+        sub Create  { my( $this ) = shift;  my( $request_interface_instance ) = shift; ... }
+        sub Read    { my( $this ) = shift;  my( $request_interface_instance ) = shift; ... }
+        sub Update  { my( $this ) = shift;  my( $request_interface_instance ) = shift; ... }
+        sub Delete  { my( $this ) = shift;  my( $request_interface_instance ) = shift; ... }
+
+REQUEST INTERFACE INSTANCE
+        $request_interface_instance is a wrapper for your favorite Common
+        Gateway Interface implementation.  Mine is CGI.pm for server-side
+        request interrogation and server-side response.
+
+        If you don't like this, create a class modeled after REST::Request
+        and register it with:
+
+        my( $restful ) = new REST::Resource( request_interface => new My::REST::Request() );
+
+        The REST::Resource constructor will validate that
+        My::REST::Request implements the requisite methods new(), http(),
+        param() and header() and then only use these methods to interace
+        with the Common Gateway Interface variables.
+
+REQUESTED RETURNED CONTENT-TYPE:
+        The requesting client is responsible for specifying the
+        returned Content-Type: header in one of two ways.
+
+        [] Via the "Accept: application/xml" HTTP header.
+        [] Via the CGI query parameter ?format=xml
+
+        The Accept: header is preferred as it is semantically
+        cleaner, but the CGI query parameter is also supported in
+        recognition of the fact that sometimes it is easier to affect the
+        request URL than it is to get at and specify the HTTP headers.
+
+DEFAULT SUPPORTED CONTENT TYPES
+        The supported content types provided by the base class are:
+
+        []  ?format=xml     or      Accept: application/xml
+        []  ?format=json    or      Accept: text/javascript
+        []  ?format=html    or      Accept: text/html
+
+        HTML will be returned if the requestor appears to be a browser and
+        no format is specified.
+
+        XML will be returned if the requestor does NOT appear to be a
+        browser and no format is specified.
+
+AUTHOR
+        frotz@acm.org                               Fork of WWW::Resource into REST::Resource.
+
+CREDITS
+        Ira Woodhead <ira at sweetpota dot to>      For his WWW::Resource implementation.
+
+METHODS
+  new()
+    USAGE:
+
+        my( $restful ) = new REST::Resource();
+        $restful->method( "GET", \&get_handler );
+        $restful->handle_request();
+
+        my( $restful ) = new REST::Resource( request_interface => new REST::Request() );
+
+    DESCRIPTION:
+
+        Create an instance of a REST::Resource, or one of its
+        derived classes.
+
+        If you need a specific implementation of the REST::Request
+        interface, pass it in as shown in the second constructor call.
+
+  run()		CAUTION
+    USAGE:
+
+        my( $restful )      = new REST::Resource( new CGI::Fast() );
+        $restful->run();
+
+        my( $restful )      = new Your::WWW::Resource::Implementation( new CGI::Fast() );
+        $restful->run();
+
+    DESCRIPTION:
+
+        This method will run a CGI::Fast instance.  It delegates request
+        interpolation to the registered request instance via the
+        constructor.  The default is a shim derived class of CGI.pm.
+
+    WWW::RESOURCE COMPATIBILITY:
+
+        If your derived class provides the WWW::Resource suggested
+        callbacks browserprint() and ttl(), this method will honor those
+        and fold in the new code hook mechanism.
+
+    WARNING:
+
+        If your derived class contains the method "browserprint()",
+        the calling semantics for _all_ methods will be \%query.
+
+            $instance->$method( \%query_hash );
+
+        If your derived class does NOT contain the method "browserprint()",
+        it is assumed that you are using the new calling semantics where
+        you method handler is passed the request instance.
+
+            $instance->$method( $request_instance );
+
+        Thus ref( $arg ) will be "HASH" for the old style and an object
+        reference for the new style.
+
+  handle_request()
+    USAGE:
+
+        my( $restful ) = new REST::Resource( request_instance => new REST::Request() );
+        $restful->handle_request();                         ## Implicit
+        $restful->handle_request( new REST::Request() );    ## Explicit
+        $restful->handle_request( new CGI() );              ## Explicit
+
+    DESCRIPTION:
+
+        This method runs a single action handler.  Optionally pass in the
+        CGI request to be handled.
+
+  method()
+    USAGE:
+
+        my( $coderef ) = $restful->method( "GET" );         ## OR
+        my( $method )  = $restful->method( "GET", \&get_handler, $description );
+
+        $restful->$method( $request_interface_instance );
+
+    DESCRIPTION:
+
+        This accessor/mutator allows the caller to register or change the
+        implementation behavior for a given HTTP method handler.  The standard
+        event handlers that are pre-registered are:
+
+            GET
+            PUT
+            POST
+            DELETE
+            TRACE
+            HEAD
+
+        Additionally, the following pseudo-methods provide over-ride control
+        to derived class implementors.
+
+            authenticate
+
+        Unless otherwise overridden, the default implementation for each
+        of these methods is REST::Resource->unimplemented().
+
+  format()
+    USAGE:
+
+        my( $format ) = $restful->format( "xml" );          ## OR
+        $description   = $restful->format( "xml", \&format_xml, $description );
+
+        $restful->$format( $request_interface_instance, $status, $data );
+
+    DESCRIPTION:
+
+        This accessor/mutator allows the caller to register or change the
+        implementation behavior for a given output format.
+
+  description()
+    USAGE:
+
+        my( $restful )      = new REST::Resource();
+        my( $description )  = $restful->description( $name );
+
+    DESCRIPTION:
+
+        This accessor/mutator allows the caller to register or change the
+        description for a given HTTP method handler or output format.
+
+        This is used by REST::Resource->api() to provide a description
+        of the API.
+
+    PARAMETERS:
+
+        $type       -- "methods" or "formats"
+        $name       -- See the names appropriate for the given $type.
+        $description-- The description to be set (or returned).
+
+  api()
+    USAGE:
+
+        my( $status, $data ) = $this->api( $request_interface_instance );
+
+    DESCRIPTION:
+
+        This method generates a resultset that can be returned through
+        $this->_return_result( $status, $data );
+
+  authenticate()
+    USAGE:
+
+        my( $status, $data ) = $this->authenticate( $request_interface_instance );
+
+    DESCRIPTION:
+
+        This method may be overridden by a derived class that requires
+        HTTP request authentication.
+
+    STATUS VALUES:
+
+        RC_OK               (200)   -- Accept provided credentials, if any.
+        RC_UNAUTHORIZED     (401)   -- Prompt user for credentials via dialog box.
+        RC_FORBIDDEN        (403)   -- Reject provided credentials.
+
+    DERIVED IMPLEMENTATIONS:
+
+        This method may be overridden in the derived class in order to
+        require a specific set of credentials.
+
+  format_xml()
+    USAGE:
+
+        print $this->format_xml( $request_interface_instance, $status, $data );
+
+    DESCRIPTION:
+
+        This method will format $data as XML via XML::Dumper with an
+        included in-document DTD.
+
+  format_text()
+    USAGE:
+
+        print $this->format_text( $request_interface_instance, $status, $data );
+
+    DESCRIPTION:
+
+        Use Data::Dumper to emit $data in text/plain format.
+
+  format_html()
+    USAGE:
+
+        print $this->format_html( $request_interface_instance, $status, $data );
+
+    DESCRIPTION:
+
+        Use Data::Dumper to emit $data, then translate it via simple <pre>
+        tags with limited CSS to control the font-size.
+
+  format_json()
+    USAGE:
+
+        print $this->format_json( $request_interface_instance, $status, $data );
+
+    DESCRIPTION:
+
+        This method will format $data in JSON (JavaScript Object
+        Notation).
+
+  unimplemented()
+    USAGE:
+
+        N/A
+
+    DESCRIPTION:
+
+        This method is invoked if an unregistered HTTP REQUEST_METHOD is
+        invoked.
+
+  default_format()
+    USAGE:
+
+        my( $format )       = $this->default_format( $request_interface_instance );
+        print $this->$format( $status, $data );
+
+    DESCRIPTION:
+
+        This method will return the requested format.  We look in two
+        places.  The first is in the query parameter list for the
+        parameter "format".  If that is defined, we return that value.
+
+        Otherwise, we scan through the list of q=1.0 Accept: headers and
+        return the first matching MIME-type.
+
+    SAMPLE OPERA Accept: / User-Agent: HEADERS: Accept: text/html,
+    application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg,
+    image/gif, image/x-xbitmap, */*;q=0.1 User-Agent: Opera/9.10 (X11; Linux
+    i686; U; en)
+
+    SAMPLE FIREFOX Accept: / User-Agent: HEADERS: Accept: text/xml,
+    application/xml, application/xhtml+xml, text/html; q=0.9, text/plain;
+    q=0.8, image/png, */*; q=0.5 User-Agent: Mozilla/5.0 (Windows; U;
+    Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3
+
+    SAMPLE MSIE Accept: / User-Agent: HEADERS: Accept: image/gif,
+    image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash,
+    application/vnd.ms-powerpoint, application/vnd.ms-excel,
+    application/msword, */* User-Agent: Mozilla/4.0 (compatible; MSIE 6.0;
+    Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
+
+    SUGGESTIONS FOR JSON DEVELOPERS: Use "Accept: text/javascript" or
+    "?format=json" to get JSON output. The default algorithm will presume
+    that the client is a human behind a browser and try to encourage html.
+
+    SUGGESTIONS FOR AJAX DEVELOPERS: Use "Accept: application/xml" or
+    "?format=xml" to get XML output. The default algorithm will presume that
+    the client is a human behind a browser and try to encourage html.
+
+  get_request()
+    USAGE:
+
+        my( $request )      = $restful->get_request();
+
+    DESCRIPTION:
+
+        Return a new request_interface instance.  This instance must
+        support the methods: new(), http(), param() and header().
+
+    SEE ALSO:
+
+        REST::Request
+
+  _return_result()	PRIVATE
+    USAGE:
+
+        $this->_return_result( $request_interface_instance, $http_status, $data );
+
+    DESCRIPTION:
+
+        This method is handed output of a given REQUEST_METHOD handler and
+        is responsible for appropriate status code emission and $data
+        formatting.
+
+  SEE ALSO
+        WWW::Resource
+        http://www.peej.co.uk/articles/restfully-delicious.html
+        http://www.xfront.com/REST-Web-Services.html
+        http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm
+
+NAME
+        REST::Request
+
+SYNOPSIS
+        use REST::Resource;
+
+        sub main
+        {
+            my( $restul )   = new REST::Resource( request_interface => new REST::Request() );
+            ...
+        }
+
+DESCRIPTION
+        This class provides a standardized interface shim that users can
+        implement in order to wrap around their favorite CGI interface
+        module so that it can be registered and used by REST::Resource.
+
+        If you prefer some module other than CGI.pm to access server-side
+        CGI behavior, then create a module that mimics this interface and
+        register it with REST::Resource as shown in the synopsis.
+
+INTERFACE v. ABSTRACT BASE CLASS
+        In this case, I prefer Java's interface-style to an abstract base
+        class that someone must override.  Since this class derives from
+        CGI.pm for its implementation, you may not want that baggage in
+        your interface implementation.  Therefore, all you need to do is
+        register a class that provides the functionality specified by this
+        module.
+
+        Since there isn't really a great Perl-based interface specification,
+        REST::Resource will interrogate your registered request_interface
+        to ensure that the class provides the minimum / required methods:
+
+            new()
+            http()
+            param()
+            header()
+
+        If you chose to provide an alternate interface implementation,
+        these are the methods that must exist before REST::Resource will
+        accept your interface.
+
+AUTHOR
+        John "Frotz" Fa'atuai
+        frotz@acm.org
+
+INTERFACE METHODS
+  new()
+    USAGE:
+
+        my( $restful )      = new REST::Resource( request_interface => new REST::Request() );
+        my( $request )      = new REST::Request();
+
+    DESCRIPTION:
+
+        This method constructs a new instance of the request object.  The
+        first usage shows how users should pass this into REST::Resource.
+        The second usage shows how you might use this in your unit tests.
+
+    WARNING:
+
+        This constructor plays REST games with CGI.pm by detecting PUT or
+        DELETE and transforming the request (temporarily) to POST, then
+        reverting back to the original value before returning an instance.
+        This allows us to use all of the nice POST processing provided by
+        CGI.pm, but for PUT, and DELETE, not just POST.
+
+  http()
+    USAGE:
+
+        my( $value )        = $request->http( $variable );
+
+    DESCRIPTION:
+
+        This method extracts the given CGI $variable from the underlying
+        $request and returns its $value.
+
+  header()
+    USAGE:
+
+        $request->header( %args );
+
+    DESCRIPTION:
+
+        This interface method provides access to the CGI-response header
+        functionality.  This method will be called when you have the
+        collection of response headers that you want to pass down to your
+        base class.
+
+  param()
+    USAGE:
+
+        my( $value ) = $request->param( $variable );
+
+    DESCRIPTION:
+
+        This method returns the $value of the CGI request parameter
+        $variable.
+
+SEE ALSO
+        CGI
+        REST::Resource
+

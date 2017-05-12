@@ -1,0 +1,75 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 45644e620fb14062f615d8a8a737bf4f5df1ec3f Changes
+SHA1 e12684b3dc5c5967d9db6c17ca2e2742cf4b3cb1 Changes.ttl
+SHA1 79ed23cfdcbb392941fd3a2d6ba9e08aedb529a6 MANIFEST
+SHA1 4e0de98f09004807c96c229987ec186cef48b6bd MANIFEST.SKIP
+SHA1 49bf932cdb66c0a5be28d14ac67aaf30f95a8347 META.yml
+SHA1 6661222afa3b6e4141b1df01be100d2d44ffe24f Makefile.PL
+SHA1 7bc4cc75c26c53fc333e3d5019a855751df80c4e README
+SHA1 249fcc6249c9130509f262ac297008f9207e4780 examples/dbpedia-mustang-range.input.xhtml
+SHA1 72608bfd43f89b5b21a61fb2084003b754ef6438 examples/demoserver.pl
+SHA1 fd5f3c4f0418efee3b9b16cf8c3902e8374909df inc/Module/Install.pm
+SHA1 7cd7c349afdf3f012e475507b1017bdfa796bfbd inc/Module/Install/Base.pm
+SHA1 7dc35fbe1e7a4ce02ce00b02470cbf1d4eddce19 inc/Module/Install/Bugtracker.pm
+SHA1 ba186541bbf6439111f01fc70769cf24d22869bf inc/Module/Install/Can.pm
+SHA1 73a28c770d5e9324eaa586f03252c5a8a6f3c941 inc/Module/Install/DOAPChangeSets.pm
+SHA1 aaa50eca0d7751db7a4d953fac9bc72c6294e238 inc/Module/Install/Fetch.pm
+SHA1 219da5a95c290312a81477b226f005997d97dcfd inc/Module/Install/Include.pm
+SHA1 3e83972921d54198d1246f7278f08664006cd65d inc/Module/Install/Makefile.pm
+SHA1 12bf1867955480d47d5171a9e9c6a96fabe0b58f inc/Module/Install/Metadata.pm
+SHA1 fd81bc0e85a1193f278760edb82928d8b4dff2c1 inc/Module/Install/Repository.pm
+SHA1 f7ee667e878bd2faf22ee9358a7b5a2cc8e91ba4 inc/Module/Install/Win32.pm
+SHA1 8ed29d6cf217e0977469575d788599cbfb53a5ca inc/Module/Install/WriteAll.pm
+SHA1 1e6399a0585817abef500c34fce676fb9b0545f0 inc/Test/Signature.pm
+SHA1 6f1d212daac04884c19c0f6706b62d93eac1e748 lib/RDF/RDFa/Template.pm
+SHA1 5aca837fddcad0d36003f332a8b9a20ef5a535df lib/RDF/RDFa/Template/Document.pm
+SHA1 4c6aebb16ce2214ceda936871638c346dd0b6027 lib/RDF/RDFa/Template/SAXFilter.pm
+SHA1 ceca199976315eac3b25175ce866f2849b0b1361 lib/RDF/RDFa/Template/SimpleQuery.pm
+SHA1 fd898c74e30ee03e2e528463bec45c8e1ec291e7 lib/RDF/RDFa/Template/Unit.pm
+SHA1 5201c6d9390d1daba899ddbd85b314ba98695542 t/00-load.t
+SHA1 8d802304c1cec8a3e61d2e338256e47d96bced91 t/data/dbpedia-mustang-range.expected.xhtml
+SHA1 249fcc6249c9130509f262ac297008f9207e4780 t/data/dbpedia-mustang-range.input.xhtml
+SHA1 f87e3e27efa00c1b612e341faac701a111fd0465 t/data/dbpedia-produced.expected.rq
+SHA1 1747e6425fae3a132ec9ba0ae028dc5cca64339d t/data/dbpedia-produced.expected.xhtml
+SHA1 2d3da87724ae9596415c975cd019d877b0f642ab t/data/dbpedia-produced.input.xhtml
+SHA1 76a37c6d3169f07bf6de75d5524be5616ac69c8f t/data/localqueries/dbpedia-comment-other-variables/expected-0.rq
+SHA1 d55509bac751695d04bf07743b2ae3482fb1ab93 t/data/localqueries/dbpedia-comment-other-variables/expected.xhtml
+SHA1 9ac0eb118eace8a08181eecf0b01192cddd01de8 t/data/localqueries/dbpedia-comment-other-variables/input.ttl
+SHA1 fadb9d2672c8ab40ba47eb59577c6f1d0e26b0c0 t/data/localqueries/dbpedia-comment-other-variables/input.xhtml
+SHA1 49fddf5fbe73663b7a974f6444e768a1c644fcba t/data/localqueries/dbpedia-comment/expected-0.rq
+SHA1 d55509bac751695d04bf07743b2ae3482fb1ab93 t/data/localqueries/dbpedia-comment/expected.xhtml
+SHA1 9ac0eb118eace8a08181eecf0b01192cddd01de8 t/data/localqueries/dbpedia-comment/input.ttl
+SHA1 6f2500b5ff62f64fb94fddc388867c3f84dfb96f t/data/localqueries/dbpedia-comment/input.xhtml
+SHA1 0bf089c94b7a5fb4c20ba163c644a53c3f7bbd6e t/data/publisher.expected.rq
+SHA1 eb84270dbb5655b4dad377b625fbc528fa0d82d2 t/data/publisher.expected.xhtml
+SHA1 a5fbf9d246ffb88ea4b117e400c21187d92bace3 t/data/publisher.input.xhtml
+SHA1 bfe7defaa04e7964dcd3e292fd86e7861b11e6e1 t/external.t
+SHA1 c98e5674d382a2eafa00e9e9818dcffe668ed129 t/extract.t
+SHA1 3c49cbff11ce71c55c9b10c39a7c745b595168a2 t/localqueries.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 94aa08844f9e76ca1215807ce87e2dc25252cb2d t/simplequery.t
+SHA1 6027ca8dcc9ba30201cef5639abdab726a7ff2e5 xt/0-signature.t
+SHA1 152611e32e58da36f6201075c426b6d4668ae885 xt/01-critic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iD8DBQFLz31XlE/Gp2pqC7wRAmxyAKCfnXmnwsXj8eHh3SxHUym0/kXYhACfY9ZC
+JrHhuUKEi24+Gafva8XfsQg=
+=WJym
+-----END PGP SIGNATURE-----

@@ -1,0 +1,76 @@
+R3::rfcapi - Perl extension for SAP rfcsdk
+
+COPYRIGHT
+=========
+
+Copyright (c) 1999, Johan Schoen. All rights reserved.
+
+R3::rfcapi is free software; you may use, modify and redistribute it
+under the same terms as Perl itself.
+
+To use the R3::rfcapi you also need the RFCSDK which is proprietary
+software owned by SAP AG. The RFCSDK is not delivered with R3::rfcapi. 
+
+
+INTRODUCTION
+============
+
+R3::rfcapi is not intended to be used directly. Use R3.pm, which includes
+R3::conn, R3::func and R3::itab, to get an object oriented interface to
+SAP R/3 remote function calls. 
+
+The R3::* modules are still under construction; the interface may change
+in future versions.
+
+REQUIREMENTS
+============
+
+The R3::rfcapi requires Perl 5, a C compiler and SAP's RFCSDK.
+
+The RFCSDK is available on the R/3 Frontend CD and/or (depending on
+operating system) via ftp from any of SAP's sapserv. If you have legal
+access to an R/3 system you should be able to obtain it - if not, 
+you should not use the R3::* modules anyway.
+
+INSTALLATION
+============
+
+The RFCSDK must be installed on your system. If it is installed in
+a different directory than /usr/sap/rfcsdk on Linux/UNIX or
+C:\usr\sap\rfcsdk on Windows NT you have to change $rfcsdk_dir
+(Linux/UNIX) or $rfcsdk_nt (Windows NT) in Makefile.PL.
+
+On Linux and HP-UX with gcc (and probably other UNIX like systems):
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make install
+	$ make -f Makefile.aperl inst_perl
+Unfortunatly static linking is needed.
+You probably have to be root to run the last two commands.
+If you want an other name on the perl executable do:
+	$ perl Makefile.PL MAP_TARGET=r3perl
+	$ make
+	$ make test
+	$ make install
+	$ make -f Makefile.aperl inst_perl MAP_TARGET=r3perl
+
+On NT with VC++:
+	D:\R3>perl Makefile.PL
+	D:\R3>nmake
+	D:\R3>nmake test
+	D:\R3>nmake install
+
+On other platforms:
+Sorry, I do not know. Please tell me if you do!
+
+AUTHOR
+======
+
+R3::rfcapi is written by Johan Schoen, johan.schon@capgemini.se.
+Feedback welcome!
+
+TRADEMARK INFORMATION
+=====================
+
+SAP and R/3 are trademarks of SAP AG.

@@ -1,0 +1,74 @@
+Revision history for Reindeer
+
+0.018     2015-03-28 21:11:48 PDT-0700
+	* Add MooseX::CascadeClearing as an optional trait
+	* Add Shortcuts trait alias
+	* Use an appropriate feature bundle, vs :5.10 everywhere
+
+0.017     2014-03-03 00:52:19 PST-0800
+	* handle Try::Tiny and Exporter's breakup (gh #6; thanks @amiri and
+	  @ether)!
+
+0.016     2012-09-17 19:07:37 America/Los_Angeles
+	* drop the ~~ operator from Builder.
+
+0.015     2012-09-06 09:03:22 America/Los_Angeles
+	* doc that v5.10 features are enabled if available
+
+0.014     2012-08-31 00:57:56 America/Los_Angeles
+	* enable v5.10 features (say, switch, state) if we're on v5.10 or greater
+
+0.013     2012-08-27 00:03:08 America/Los_Angeles
+	* bump MX::AS dep to 0.015
+
+0.012     2012-06-12 16:50:57 America/North_Dakota/New_Salem
+	* add class_type() and role_type() from Moose::Util::TypeConstraints
+
+0.011     2012-04-26 23:26:57 America/Los_Angeles
+	* add ENV as an optional attribute trait
+
+0.010     2012-04-25 10:34:11 America/Los_Angeles
+	* bump IxHash req to 0.003; this is the first version that omits coercion from
+	  hashrefs.
+
+0.009     2012-04-07 23:30:51 America/Los_Angeles
+	* TRIAL release
+	* add: MooseX::Traits
+
+0.008     2012-02-28 14:31:07 America/Los_Angeles
+	* pod/documentation update only
+
+0.007     2012-02-14 20:47:12 America/Los_Angeles
+	* add: MooseX::CurriedDelegation
+	* add: MooseX::Types::LoadableClass
+	* initial combined types library (Reindeer::Types)
+	* Reinder::Util can now export functions on request
+
+0.006     2012-02-06 07:42:58 America/Los_Angeles
+	* Add explicit version dependencies to most deps.  This should help avoid some
+	  install/test failures
+
+0.005     2012-02-05 09:51:30 America/Los_Angeles
+	* Use Test::Requires to check for the presence of optional traits
+	* Additional "spot-check" tests
+
+0.004     2011-11-15 16:39:50 America/Los_Angeles
+	* add weaver.ini to invoke (the possibly poorly named)
+	  Pod::Weaver::Section::Collect::FromOther, so that we can document without
+	  redocumenting
+	* Add Path::Class to our exports
+	* Add MooseX::Types::Path::Class, ::Tied::IxHash, etc.
+	* Add a number of "optional" traits, by ensuring aliases are exported for them
+	* Add trait_aliases where any of our attribute extensions don't provide them
+	  on their own; this allows for a more consistent interface, especially when
+	  the traits may need to be applied manually (e.g. to extended attributes from
+	  a superclass)
+
+0.003     2011-11-06 20:17:59 America/Los_Angeles
+
+0.002     2011-11-03 21:28:26 America/Los_Angeles
+	* Require recent MooseX::MarkAsMethods and ::AttributeShortcuts
+	* Take advantage of "into" support in MX::MAM 0.14
+
+0.001     2011-10-27 10:49:02 America/Los_Angeles
+	* First release

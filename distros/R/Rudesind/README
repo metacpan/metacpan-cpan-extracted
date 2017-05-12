@@ -1,0 +1,9 @@
+Rudesind is a Mason-base image gallery application.
+
+INSTALLATION
+
+To install this application type the following in the distribution
+directory:
+
+   perl Build.PL
+   ./Build install

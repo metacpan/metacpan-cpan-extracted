@@ -1,0 +1,22 @@
+---
+abstract: 'provides an iterator interface to regexps'
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+  - 'Matt Lawrence <mattlaw@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Regex-Iterator
+provides:
+  Regex::Iterator:
+    file: lib/Regex/Iterator.pm
+    version: 0.4
+requires:
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.4

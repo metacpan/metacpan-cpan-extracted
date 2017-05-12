@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 6b63ebc43661ce43ac3dbe353474769f843d3daf COPYRIGHT
+SHA1 e3e0e39296ce1cb035cb7c372a53ac507bbbda5f CREDITS
+SHA1 4d4af81edf4b386f00a0860ad987e17f3ad50caf Changes
+SHA1 3b9005d79d4d95b4682956c65a21e62cad45f907 INSTALL
+SHA1 bab09840c4a5314fa843ed1dc253c826b0931fb8 LICENSE
+SHA1 50dc2f55e5f31031c1b9b0b29e2a633896db63ac MANIFEST
+SHA1 e271df8164022f514aad665f5769a90f27598a7e META.json
+SHA1 17945493fd5c1dd22329df217be04da7e808caf3 META.yml
+SHA1 6d6e28d56d396b27b76f00460a63e8783a669b13 Makefile.PL
+SHA1 3ab8a5ab027cc8552985bf8682b85964d9554634 README
+SHA1 23e2cb7a7749afb3769b3997dff72c9273041b46 README.pod
+SHA1 e630e871b145a960f6b79498eb21f9eb9252b4fb dist.ini
+SHA1 49a31b98af6bdf1908969abde66f815a77f80211 doap.ttl
+SHA1 23e2cb7a7749afb3769b3997dff72c9273041b46 lib/RDF/Generator/HTTP.pm
+SHA1 0ae2b7d7b5a696e4b07b0cd7b1306be8c9578875 t/01basic.t
+SHA1 ee64e05410d17736abed81911f3fada0f69173fc t/message.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIVAwUBVI9kQH++6N86nkqlAQilSA//Rh7Sc6ped1eaeJFTTEoCKoEfaHJlJ6aX
+BJqxjyXkBkOeS667h+wAs2ozGZaxurA0MDOJdHzL9nik+rS0KYPPn7jZw6/iIieQ
+qU4mdQtyykDXqPYcqrT+niWJEt6wkedFA8vtaU+MVLduBjFDpLh2SThqWhKjkNNw
+hqO+bNlAZLdM0/1S69zaGr7FnPjZXCnHnighfqauguUwj5xQxYmZ4Bc7pXptkPhF
+FCKUU8l0GhNg4/1vjefA6njasqMG2W5oFq9zA9HOOF9E2uPaSn39Tec8RU/KG5o2
+8goSuDIUu7u2ZWWgtdbn1CqaKTQN4k8GYJN9puQG2OFcUjVJv/eIDLAc0tnTJKmJ
+vmIEArywsP72aUKlDqh/A6RdSfEcfvWPvQVnPp7av3wQYjdWM5rquU1NoTMbBAjD
+Gb8GsH5rL7i750Y5mv/jeCUu3iLCG1dFyy1dtwHT0bF+5dQIwttutBGhNExJqlwb
+ct1FupUwPr2/bkDHntFw8Ey/1D7rLvK84yV79lcKgxuiFV0WQXKmFyfcqR4/Rcsz
+osvRns9kQwH+fBbQxcD2JNmnuq33RTejDIkd8mmzbOHA0wmg85DlsDcg1oczM+FS
+yKnwq6A/ohSdH19CO0gAtzgbDJf8+ghVKjy7D7PlgMAdOK1USTAMLtn8MrUd+0Hq
+qZWgtOEtZ/M=
+=kSUB
+-----END PGP SIGNATURE-----

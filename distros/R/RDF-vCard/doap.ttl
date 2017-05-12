@@ -1,0 +1,241 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/project>
+	a                    doap:Project;
+	cpan-uri:x_IRC       <irc://irc.perl.org/#perlrdf>;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "XML::LibXML 1.70"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine 0.135"^^doap-deps:CpanId ], [
+		doap-deps:on "RDF::TrineX::Functions"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Text::vFile::asData 0.07"^^doap-deps:CpanId;
+	], [ doap-deps:on "URI"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-vCard>;
+	doap:category        [ rdfs:label "RDF"@en ], [ rdfs:label "Semantic Web"@en ], [ rdfs:label "SemWeb"@en ], [ rdfs:label "vCard"@en ], [ rdfs:label "Directory"@en ], [ rdfs:label "Contacts"@en ], [ rdfs:label "hCard"@en ], [ rdfs:label "XML"@en ];
+	doap:created         "2011-01-05"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:documenter      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/RDF-vCard>;
+	doap:homepage        <https://metacpan.org/release/RDF-vCard>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "RDF-vCard";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-006>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-007>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-008>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-009>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-010>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-011>, <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-012>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rdf-vcard>;
+	];
+	doap:shortdesc       "convert between RDF and vCard"@en;
+	doap:tester          <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release. RDF to vCard only."@en;
+	dc:issued            "2011-01-06"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2011-01-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Proper support for vCard CATEGORIES property."@en;
+		], [
+			rdfs:label "Support for RDF vCard 2006 v:homeTel property and its ilk."@en;
+		], [
+			rdfs:label "Improved support for 'data:' URIs in binary vCard properties."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Include vCard VERSION property in output."@en;
+		], [ rdfs:label "Tidied up export_card method."@en ], [
+			rdfs:label "More consistent support for comma-escaping."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Two-way conversions."@en;
+	dc:issued            "2011-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "RDF::vCard::Line now has an add_to_model() method."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add RDF::vCard::Importer module."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "RDF::vCard::Entity now has add_to_model() and node() methods."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2011-01-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "More flexibility for other classes wanting to subclass this - particularly around different datatypes."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-005>
+	a                    doap:Version;
+	dc:issued            "2011-01-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "nvalue method on RDF::vCard::Line."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Experimental vCard XML support."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Partial vCard 4.0 support."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-004>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-006>
+	a                    doap:Version;
+	dc:issued            "2011-02-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix WithXmlSupport's string overloading."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-005>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-007>
+	a                    doap:Version;
+	dc:issued            "2011-02-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Setting vcard_version to 3 outputted version 4 vcards."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "jCard output."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-006>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-008>
+	a                    doap:Version;
+	dc:issued            "2011-07-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "vcard2rdf script."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add support for 'lang' option when converting vCards to RDF."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Include language tags on plain literals, if provided."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Use Content-Language HTTP header of downloaded vCards."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-007>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-009>
+	a                    doap:Version;
+	dc:issued            "2012-06-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Reduce dependencies - no longer need common::sense, RDF::TrineShortcuts (thus RDF::Query) or parent.pm, but do need RDF::TrineX::Functions."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Module::Package::RDF."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-008>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-010>
+	a                    doap:Version;
+	dc:issued            "2012-06-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix various small issues around RDF::TrineShortcuts -> RDF::TrineX::Functions switch."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-009>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "RDF-vCard-0.011"^^xsd:string;
+	dc:issued            "2014-09-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "use warnings";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add IRC link.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-vCard/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "RDF-vCard-0.012"^^xsd:string;
+	dc:issued            "2014-09-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "no warnings 'uninitialized'";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-vCard-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://tobyinkster.co.uk/#i>.
+

@@ -1,0 +1,24 @@
+Version 1.05 (Sun Dec 30 2007)
+ * Add Build.PL requirement for Privileges::Drop module
+
+Version 1.04 (Sun Dec 30 2007)
+ * Added function treewalk() from unreleased module
+
+Version 1.03 (Sun Dec 30 2007)
+ * Use new syntax for perl.*// protocol, so replacing the header is now a
+   special case.
+ * Remove deprecated checker framework.
+ * Add new def_* sub type to describe rpc_* sub input and output data. This
+   can be used as a reflection API for the RPC server.
+ * Add new function url_absolute to get absolute path from a URL.
+ * Fix all perl-critic warnings.
+ * Update and add POD documentation to reflect new changes.
+ * Bumped version on all modules to match new release.
+
+Version 1.02 (Sun Oct 7 2007)
+ * Use exec($^X, '...') to invoke a new perl, as the environment perl might not
+   be the same as the one we where invoked with. Suggested by David Cantrell.
+ * Bumped version on all modules to match new release.
+
+Version 1.01 (Tue Sep 4 2007)
+ * Add missing file to manifest

@@ -1,0 +1,13 @@
+<div id="footer">
+<hr />
+<a id="tracpowered" href="http://www.bestpractical.com/"><img src=""
+alt="Trac Powered"/></a>
+<p class="left">
+Powered by <a href="about_trac"><strong><%$RT::VERSION%></strong></a><br />
+By <a href="http://www.bestpractical.com/">Best Practical Solutions, LLC</a>.
+</p>
+<p class="right">
+Visit the RT open source project at<br /><a href="http://www.bestpractical.com/">http://www.bestpractical.com/</a>
+</p>
+</div>
+

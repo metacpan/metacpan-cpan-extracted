@@ -1,0 +1,15 @@
+Rose-Planter
+
+This is a little wrapper around Rose::DB::Object::Loader
+to create a bunch of in-memory rose classes, and manage
+them.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+

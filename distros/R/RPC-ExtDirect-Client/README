@@ -1,0 +1,31 @@
+RPC::ExtDirect::Client
+======================
+
+    This module implements Ext.Direct client in pure Perl. Its main purpose
+    is to be used for testing server side Ext.Direct classes, complementing
+    RPC::ExtDirect::Server. It can also be used for testing Ext.Direct
+    Actions developed in languages other than Perl, or for something else
+    altogether.
+
+    This client is synchronous, i.e. all method calls are blocking. If you
+    need a non-blocking way of calling an Ext.Direct server, take a look at
+    RPC::ExtDirect::Client::Async instead.
+
+    Unless configured otherwise, RPC::ExtDirect::Client will use HTTP::Tiny
+    for the transport layer.
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make && make test
+        make install
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2012-2016 Alex Tokarev <tokarev@cpan.org>.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

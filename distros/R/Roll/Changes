@@ -1,0 +1,6 @@
+Revision history for Perl extension Roll.
+
+0.01  Fri Sep 23 15:52:37 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Roll
+

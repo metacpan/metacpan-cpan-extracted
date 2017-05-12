@@ -1,0 +1,8 @@
+---
+name: foobar
+version: 1.0
+os: el6
+dependencies:
+  - perl-YAML
+files:
+  bin: /usr/local/bin

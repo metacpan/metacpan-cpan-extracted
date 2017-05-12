@@ -1,0 +1,81 @@
+<& /Elements/Header, Title => 'Simple Saved Search Invoker' &>
+<& /Ticket/Elements/Tabs, Title => 'Simple Saved Search Invoker' &>
+<& /Elements/ListActions, actions => \@results &>
+
+<ul>
+% printf qq(<li><a href="%s">%s</a></li>\n), @{$_} foreach( @ambiguous);
+</ul>
+
+<%INIT>
+use RT::SavedSearches;
+return unless $session{'CurrentUser'}->HasRight(
+    Right  => 'LoadSavedSearch',
+    Object => $RT::System,
+);
+
+my(@results, @ambiguous);
+my $count = 0;
+
+#We could do the same as Search/Elements/SelectSearchesForObjects but we want
+#the globals too, so we need to know who we are and what we're a member of.
+#Otherwise, we get a list of all saved searches, and while we can load some we
+#"ought" not be able to, we'd die on others.
+#We previously used user->OwnGroups, but it requires the SeeGroup right
+my @groups;
+foreach my $o ( RT::SavedSearches->new($session{'CurrentUser'})->_PrivacyObjects ){
+  push(@groups, $o->Id) if ref($o) eq 'RT::Group';
+}
+
+#Alas, binding is pointless due to variable group membership, so we interpolate
+my $WHERE = sprintf("WHERE Description LIKE '%s' AND ( (Name='SavedSearch' AND ( (ObjectType='RT::User' AND ObjectId=%i) %s ) ) OR ( ObjectType='RT::System' AND (Name LIKE 'Search - %' OR Name='SavedSearch') ) )",
+		    "%\Q${do}\E%",
+		    $session{'CurrentUser'}->Id,
+		    scalar @groups ? "OR ( ObjectType='RT::Group' AND ObjectId IN (". join(',', @groups) .') )' : ''
+		   );
+
+my $r = $RT::Handle->SimpleQuery("SELECT COUNT(*) FROM Attributes $WHERE;");
+unless ( $r ){
+  push(@results,
+       sprintf("Internal error, could not count: <%s>. Please send bug report.", $r->error_message)) unless $r;
+}
+elsif( ($count = $r->fetchrow) == 0 ){
+  push(@results, "No saved searches match: $do");
+}
+else{
+  my $r = $RT::Handle->SimpleQuery("SELECT ObjectType, ObjectId, id, Description FROM Attributes $WHERE GROUP BY Description, ObjectType, ObjectId, id ORDER BY Description;");
+  push(@results,
+       sprintf("Internal error, could not select: <%s>.Please send bug report.", $r->error_message)) unless $r;
+  
+  if( $count == 1 ){
+    RT::Interface::Web::Redirect(RT->Config->Get('WebURL').
+				 SS2U($r->fetchrow_array));
+  }
+  else{
+    push @results, "Ambiguous search: $do";    
+    while( my @F = $r->fetchrow_array ) {
+      push @ambiguous, [SS2U(@F), $F[3]]; }
+  }
+}
+
+sub SS2U{
+  my $SS = sprintf "%s-%i-SavedSearch-%i", @_;
+  my @URI;
+
+  my ($container, $id) = _parse_saved_search ($SS);
+  my $search = $container->Attributes->WithId( $id );
+  my $C = $search->Content;
+
+  foreach my $k ( keys %{$C} ){
+    my $v = $C->{$k};
+    HTML::Mason::Escapes::url_escape(\$v); #or RT::Interface::Web::EscapeURI
+    push(@URI, "$k=$v");
+  }
+  push @URI, "SaveSearchId=$SS";
+
+  return '/Search/Results.html?' . join('&', @URI);
+}
+</%INIT>
+
+<%ARGS>
+$do => ''
+</%ARGS>

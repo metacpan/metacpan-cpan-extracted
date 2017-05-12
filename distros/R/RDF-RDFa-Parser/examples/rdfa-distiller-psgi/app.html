@@ -1,0 +1,138 @@
+<!doctype html>
+
+<style type="text/css">
+	@import url(http://fonts.googleapis.com/css?family=Judson:400,400italic);
+	body {
+		font-family: "Judson", serif;
+		text-align: center;
+		color: #666;
+		margin: 1em 3em;
+	}
+	h1 {
+		font-weight: normal;
+		font-size: 300%;
+	}
+	h1, address, fieldset {
+		border: 0;
+		margin: 0.67em;
+	}
+	fieldset.main {
+		font-size: 200%;
+	}
+	fieldset table {
+		margin: 0 30%;
+		text-align: left;
+	}
+	address a {
+		text-decoration: none;
+	}
+</style>
+
+<title>RDF::RDFa::Parser Distiller</title>
+<h1>RDF::RDFa::Parser Distiller</h1>
+
+<form action="" method="get">
+
+	<fieldset class="main">
+		<label for="url">url</label>:
+		<input id="url" name="url" size="40">
+		<input type="submit" value="distill &rArr;">
+	</fieldset>
+	
+	<fieldset>
+		<table summary="">
+			<tr>
+				<td><label for="host">host language</label>:</td>
+				<td>
+					<select id="host" name="host" style="width:18em">
+						<option value="">guess</option>
+						<optgroup label="HTML">
+							<option value="xhtml">XHTML 1.x</option>
+							<option value="html5">HTML 5</option>
+							<option value="xhtml5">XHTML 5</option>
+							<option value="html4">HTML 4.x</option>
+							<option value="html32">HTML 3.2</option>
+						</optgroup>
+						<optgroup label="Atom">
+							<option value="atom">Atom 1.0</option>
+							<option value="datarss">DataRSS</option>
+						</optgroup>
+						<option value="svg">SVG 1.2 Tiny</option>
+						<optgroup label="OpenDocument">
+							<option value="opendocument-zip">OpenDocument</option>
+							<option value="opendocument-xml">OpenDocument flat XML</option>
+						</optgroup>
+						<option value="xml">Generic XML</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td><label for="version">rdfa level</label>:</td>
+				<td>
+					<select id="version" name="version" style="width:18em">
+						<option value="guess">guess</option>
+						<option value="1.0">RDFa 1.0</option>
+						<option value="1.1">RDFa 1.1</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					<input type="checkbox" name="option_cite_attr" id="option_cite_attr">
+					<label for="option_cite_attr">support <code>@cite</code></label>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					<input type="checkbox" name="option_longdesc_attr" id="option_longdesc_attr">
+					<label for="option_longdesc_attr">support <code>@longdesc</code></label>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					<input type="checkbox" name="option_role_attr" id="option_role_attr">
+					<label for="option_role_attr">support <code>@role</code></label>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	
+	<fieldset>
+		<table summary="">
+			<tr>
+				<td><label for="rdfagraph">output graph</label>:</td>
+				<td>
+					<select id="rdfagraph" name="rdfagraph" style="width:18em">
+						<option value="output">data</option>
+						<option value="processor">errors &amp; warnings</option>
+						<option value="output,processor">everything</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td><label for="format">output format</label>:</td>
+				<td>
+					<select id="format" name="format" style="width:18em">
+						<option value="">guess</option>
+						<option value="rdfa">XHTML+RDFa 1.0</option>
+						<option value="rdfxml">RDF/XML</option>
+						<option value="turtle">Turtle</option>
+						<option value="ntriples">N-Triples</option>
+						<option value="rdfjson">RDF/JSON</option>
+					</select>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	
+</form>
+
+<address>
+	Powered by
+	<a href="https://metacpan.org/release/RDF-RDFa-Parser"
+	>RDF::RDFa::Parser $VERSION ($AUTHORITY)</a>
+</address>
+

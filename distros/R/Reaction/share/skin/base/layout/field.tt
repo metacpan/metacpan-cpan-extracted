@@ -1,0 +1,14 @@
+=for layout widget
+
+[% label_fragment %]
+[% value_layout %]
+
+=for layout label
+
+<span class="field_label"> [% label %]: </span>
+
+=for layout value_layout
+
+<span class="field_value">[% field_value %]</span>
+
+=cut

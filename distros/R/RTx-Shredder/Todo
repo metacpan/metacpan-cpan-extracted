@@ -1,0 +1,68 @@
+MAJOR things that should be done in 0.05:
+    * sql dumps checker in tests, at list simple test that
+      counts INSERTs in file
+	* Move delete handler to hook DBIx::SB::Record hook to be sure if some RT
+	  core code delete record behind our back we could catch it. NOTE: if plan
+	  integration into WebUI this hook would be global so we should check if it
+	  is shredder or not.
+
+TODO list for RT Shredder extension
+
+    * delete object as bundle, for example user and all tickets where he is requestor.
+      this should be done in one transaction.
+	* User is linked from Tickets.Owner, but also this user is member
+	  of the ticket owners role group. We don't build right dependencies here, and
+	  also my be our resolver functionality doesn't allow good coverity here
+	** 0.02_01 has workaround for this
+	** RT has this "BUG" too, we need patch RT
+	** but we duplicate code here, deleting members of the groups is very
+	   complicated task we MUST use RT's methods, but RT deletes records and
+	   doesn't ask us, so we need database transactions enabled and hooks.
+	* approvals clean ups, if someone would write tests for this.
+	* RT data exporter
+	** design export API
+	** discover rt2-to-rt3 migration tools and its file format
+	** Oh, idea, if I implement database transactions then I can delete all
+	   requested objects and ROLLBACK everything, but DumpSQL(or other exporter)
+	   will collect all data for export! So we will get RT exporter :)
+	* investigate how to play with queue CFs, mainly when ticket was moved
+	  to another queue, such tickets have CFs values, we should delete it
+	  *if we delete queue*.
+	* !!! WebUI should also write SQL dumps!
+	* Now all code that works with plugins push all objects into shredder cache,
+	  this is very bad, memory is not endless(implemented limit argument for all
+	  plugins is workaround, I think in 0.05 we can change this).
+	* Generalize Plugin arguments handler functions, like: search masks, queues...
+	  may be in 0.06.
+	* Now plugins work only for search, but we can implement different types,
+	  may be in 0.06.
+	* DumpSQL should be implemented as plugin with type "exporter", then
+	  it would be possible to export into XML or whatever format we want.
+	* Generalize next code in validator code paths:
+        $obj = $self->Object;
+        if( defined $obj->id ) {
+                push( @$list, $obj );
+        } else {
+                my $rec = $args{'Shredder'}->GetRecord( Object => $self );
+                $self = $rec->{'Object'};
+                $rec->{'State'} |= INVALID;
+                $rec->{'Description'} = "Have no related Object #". $self->id ." object";
+        }
+    ** really validator is broken by design and doesn't work at all :(
+       have no time to work on it
+
+	
+Complete:
+in 0.04
+	* database transactions support
+
+in >= 0.03
+	* cover all RT objects(only approvals are unsupported well)
+	* Search plugins, implement framework for writing search plugins. For example
+	  we can implement search for bad users(spammers) with plugin interface.
+	* adopt for 3.4 changes(basic things done in 0.01_02, 0.02 works good,
+	  0.03 should do its job much better)
+	* write docs(I think this distribution has enough docs to use it smooth,
+	  but if you have problems feel free to ask me directly)
+	* write full command line interface(CLI is in almost final state with
+	  plugins framework, you can add own plugins)

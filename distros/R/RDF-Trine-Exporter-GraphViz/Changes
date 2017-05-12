@@ -1,0 +1,25 @@
+# Change file for RDF::Trine::Exporter::GraphViz
+
+0.141 2012-08-20
+	Fixed config parameter 'edge'
+
+0.14 2012-07-21
+    New method to_string
+    New configuration parameters: edge and alias (extended)
+
+0.13 2012-01-23
+    Moved list of namespace prefixes to RDF::NS
+
+0.12 2011-12-01
+    Abbreviate resources also if subject or object in a triple
+
+0.103 2011-10-21
+    Support RDF variables, more configuration, and ->to_file
+
+0.003 2011-09-06
+    Renamed to RDF::Trine::Exporter::GraphViz
+    Improved command line client 'rdfdot'
+
+0.002 2011-09-02
+    First public release as RDF::Trine::Serializer::GraphViz
+

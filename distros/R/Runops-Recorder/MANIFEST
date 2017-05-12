@@ -1,0 +1,23 @@
+bin/rr-diff
+bin/rr-viewer
+bin/rr-exceptions
+Changes
+lib/Runops/Recorder.pm
+lib/Runops/Recorder/Reader.pm
+lib/Runops/Recorder/Viewer.pm
+lib/Runops/Recorder/Viewer/Diff.pm
+lib/Runops/Recorder/Viewer/Exceptions.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Recorder.xs
+t/01-runops.t
+t/02-reader.t
+t/03-reader-handler-object.t
+t/04-reader-handler-callbacks.t
+t/05-runops-nostore.t
+t/06-runops-die.t
+t/07-dump.t
+t/data/example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

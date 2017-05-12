@@ -1,0 +1,67 @@
+Perl-RPM-Perlonly - Native bindings to the RPM package format, without needing rpm.
+
+Version: 1.0.1
+
+WHAT IS IT:
+
+  Perl-RPM-Perlonly is a clone of RPM::Header written in only perl, so it provides
+  a way to read a rpm package on systems where rpm is installed. Perl-RPM-Perlonly
+  can used as a drop in replacement for RPM::Header, if needed also the other way 
+  around.
+
+  The interface is a tied-hash, there are some tags not provided by RPM::Header but
+  avalible in Perl-RPM-Perlonly:
+    
+    DESCRIPTIONLANGS:
+      An array of languages not exported by RPM::Header, this is need to know 
+      what language a ie. description, summary, etc. is. "C" is the normal value
+      of the default. RPM::Perlonly also provides description, summary.
+  
+    LEAD_*:
+      Information for the package LEAD, this information is also in the RPM tags
+      and is provided for internal use to validate a RPM package.
+      
+    PACKAGE_OFFSET:
+      Offset of cpio.gz file in bytes, can be used to extract the cpio.gz archive.
+  
+    UNKNOWN[0-9]:
+      Unknown tags for internal use not exported by the std RPM::Header interface.
+
+BUILDING/INSTALLING:
+
+  This package is set up to configure and build like a typical Perl extension.
+  To build:
+    
+    perl Makefile.PL
+    make && make test
+
+  If the RPM package passes all tests, then:
+  
+    make install
+
+You may need super-user access to install.
+
+CHANGES:
+  2006.12.08 - Version 1.0.2
+   + Renamed to RPM::Header::PurePerl
+   + Added more tags for newer RPM4 packages.
+   + Cleanup of documentaion and changed License to same as Perl.
+
+  2002.11.28 - Version 1.0.1
+   + Renamed UNKNOWN3 to SHA1HEADER and change som groups.
+   + Added missing = in the pod section(Thanks Laurent Caprani).
+   + Added more documentation about tags only provided by RPM::Perlonly.
+   
+  2002.07.28 - Version 1.0.1
+   + Added some new tags to the Tagtable:
+    PLATFORM, RHNPLATFORM
+    (Credits should go to Marco Fioretti for the information).
+ 
+  2001.11.29 - Version 1.0
+   + First release.
+
+LICENSE:
+  
+  This package is Copyright (C) 2001,2002,2006 by Troels Liebe Bentsen. 
+  You may redistribute this and/or modify under the terms of same 
+  terms as Perl itself. 

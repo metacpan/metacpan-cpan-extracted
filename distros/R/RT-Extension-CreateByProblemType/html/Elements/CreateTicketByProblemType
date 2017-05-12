@@ -1,0 +1,26 @@
+<form action="<% RT->Config->Get('WebPath') %>/Ticket/Create.html" name="CreateTicketInQueue" id="CreateTicketInQueue"
+% $m->callback(CallbackName => 'InFormElement');
+>
+<input type="submit" class="button" value="New problem" />&nbsp;
+<select name="Problem" onchange="document.CreateTicketInQueue.submit()">
+<%perl>
+my @problemtypes;
+my $queues = RT::Queues->new($session{'CurrentUser'});
+$queues->UnLimit;
+while (my $q = $queues->Next) {
+    next unless $q->CurrentUserHasRight("CreateTicket");
+    my $cf = $q->CustomField("Problem Type");
+    if (not $cf->Id or not $cf->Values->Count) {
+        $m->out('<option value="'.$q->Id.'-">'.$q->Name.'</option>');
+    } else {
+        $m->out('<optgroup label="'.$q->Name.'">');
+        my $values = $cf->Values;
+        while (my $v = $values->Next) {
+            $m->out('<option value="'. $q->Id."-".$v->Name.'">'.$v->Name.'</option>');
+        }
+        $m->out('</optgroup>');
+    }
+}
+</%perl>
+</select>
+</form>

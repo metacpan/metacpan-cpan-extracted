@@ -1,0 +1,86 @@
+{
+   "abstract" : "Fast routing engine for web applications",
+   "author" : [
+      "tokuhirom <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Router-Boom",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0.05",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Router::Boom" : {
+         "file" : "lib/Router/Boom.pm",
+         "version" : "1.03"
+      },
+      "Router::Boom::Method" : {
+         "file" : "lib/Router/Boom/Method.pm",
+         "version" : "1.03"
+      },
+      "Router::Boom::Node" : {
+         "file" : "lib/Router/Boom/Node.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Router-Boom/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Router-Boom",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Router-Boom.git",
+         "web" : "https://github.com/tokuhirom/Router-Boom"
+      }
+   },
+   "version" : "1.03",
+   "x_contributors" : [
+      "Fuji, Goro <goro-fuji@cookpad.com>",
+      "Hiroyoshi Houchi <git@hixi-hyi.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ]
+}

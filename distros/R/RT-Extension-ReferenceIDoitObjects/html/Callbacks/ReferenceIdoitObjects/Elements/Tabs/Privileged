@@ -1,0 +1,39 @@
+%# RT::Extension::ReferenceIDoitObjects
+%#
+%# Copyright (C) 2011-17 synetics GmbH, <https://i-doit.com/>
+%#
+%# This program is free software: you can redistribute it and/or modify
+%# it under the terms of the GNU Affero General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# This program is distributed in the hope that it will be useful,
+%# but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%# GNU Affero General Public License for more details.
+%#
+%# You should have received a copy of the GNU Affero General Public License
+%# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%#
+%# Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+<%INIT>
+
+my $request_path = $HTML::Mason::Commands::r->path_info;
+
+if ( $request_path =~ m{^/Ticket/} ) {
+    if ( ( $m->request_args->{'id'} || '' ) =~ /^(\d+)$/ ) {
+        my $id = $1;
+
+        my $tabs = PageMenu();
+        $tabs->child(
+            'refidoitobj' => title => loc('Referenced i-doit objects'),
+            path => "/Ticket/ModifyIDoitObjects.html?id=" . $id
+        );
+    }
+}
+
+</%INIT>
+
+<%ARGS>
+</%ARGS>

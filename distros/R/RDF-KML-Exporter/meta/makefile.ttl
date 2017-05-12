@@ -1,0 +1,16 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-KML-Exporter/project>
+	:perl_version_from _:main ;
+	:version_from _:main ;
+	:readme_from _:main ;
+	:test_requires "Test::More 0.61" ;
+	:requires "Geo::GoogleEarth::Pluggable" ;
+	:requires "RDF::TrineX::Functions" ;
+	:requires "Scalar::Util" ;
+	:requires "namespace::clean" ;
+	:requires "PerlX::Maybe" .
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/RDF/KML/Exporter.pm" .

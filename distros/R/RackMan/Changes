@@ -1,0 +1,225 @@
+Release history for RackMan
+
+1.19 / 2016.05.06 / SAPER
+
+  [Internal changes]
+  - CPAN RT #90914: use Module::Runtime::require_module instead of
+  Class::MOP::load_class
+
+  [Documentation]
+  - Added SUPPORT and LICENSE sections.
+
+  [Tests]
+  - Make sure author tests are only executed when AUTHOR_TESTING=1
+  - Adapt t/98-kwalitee.t to the new Test::Kwalitee API.
+
+  [Distribution]
+  - Added LICENSE file
+
+
+1.18 / 2013.01.07 / SAPER
+  - Added missing prereqs.
+  - Modified t/00-load.t to compile check the commands.
+  - Modified t/01-programs.t so it only execute the tests in environments where
+    Test::Cmd can find and load the required modules.
+  - Fixed t/50-rackman-scm.t so it (hopefully) passes on Win32.
+  - Prevent errors in Test::Kwalitee from making the tests fail.
+
+1.17 / 2012.12.14 / SAPER
+  - racktables-check: Allow to process on specific named devices.
+  - RackMan::Device: Added method physical_interfaces() to make the
+    network interfaces check in racktables-check more natural.
+    Rewrote regular_mac_addrs(), regular_ipv4addrs(), regular_ipv6addrs()
+    so the names to filter out can be configured using the parameters
+    [general]/management_interfaces and [general]/virtual_interfaces.
+  - Trying to fix some test failures that show up in CPAN Testers.
+  - Added a few more tests to t/50-rackman-scm.t
+
+1.16 / 2012.12.13 / SAPER
+  - racktables-check: The short version of the --format option now is -t.
+  - racktables-check: Added the same --filter option than cfengine-tags.
+  - cfengine-tags: Restructured the documentation a bit.
+
+1.15 / 2012.12.11 / SAPER
+  - cfengine-tags: Added option --class-names.
+  - Added bin/racktables-check to Build.PL and Makefile.PL so it is actually
+    installed, and to make tests pass.
+  - Adjusted t/50-rackman-scm.t to handle some variants of Moose diagnostics.
+  - Improved the documentation a bit.
+
+1.14 / 2012.12.02 / SAPER
+  - cfengine-tags: Added option --output-path.
+  - RackMan::Device's regular_mac_addrs() now only returns ports with
+    a defined MAC address.
+  - Fixed a stupid bug in the RackMan::Format::Bacula.
+  - Adapted t/01-programs.t and fixed a few dist related things.
+
+1.13 / 2012.11.23 / SAPER
+  - cfengine-tags: Now create the files with fully qualified tag names.
+  - Added a new RackMan::Device attribute, tag_tree.
+  - RackMan::Device's implicit_tags attribute now returns all the parent tags.
+  - Added bin/racktables-check.
+  - A small change in RackMan::File allows for a simpler use in some cases.
+  - Added RackMan::Device::VM to improve support for VMs.
+  - cfengine-tags: Small optimisation.
+
+1.12 / 2012.11.16 / SAPER
+  - Added a default has_ilo value for Server objects.
+  - The Server role now provides a has_ilo template parameter.
+  - The HP_ProLiant role now provides an ilo_fqdn template parameter.
+  - Better support for VMs.
+  - cfengine-tags: Avoid a warning when an attribute is missing.
+
+1.11 / 2012.11.14 / SAPER
+  - Added the Generic format.
+  - Added the --formats, --no-write-device-config, --only-formats, --output
+    and --template options.
+  - Better support for VMs.
+
+1.10 / 2012.11.08 / SAPER
+  - cfengine-tags: Support for device filtering on tags and attributes.
+  - The HP_ProLiant role now provides an ilo_name template parameter, an
+    ilo_fqdn attribute, and requires the IP address to have a valid reverse.
+  - Modified some formats to make them more parametrized.
+  - Anonymized what needed to be, for publication as a free software.
+
+1.09 / 2012.10.24 / SAPER
+  - cfengine-tags: Actually avoid duplicate names in tag files.
+  - Enforce some assertions about the network interfaces.
+
+1.08 / 2012.10.16 / SAPER
+  - cfengine-tags: Allow the use of attribute values as tag names.
+  - cfengine-tags: Avoid duplicate names in tag files.
+  - Added support for checking iLO subsystems in Nagios.
+  - Replaced Rackman::Device::*'s constant CONFIG_FORMATS with the method
+    formats(), thus allowing to specify the associated formats from the
+    configuration file. Tests and documentation were modified accordingly.
+  - Factored the RackTables types in a dedicated module.
+  - Moved all the attributes and methods related to iLO in the 
+    HP_Proliant role.
+  - Fixed the default templates.
+  - Fixed t/93-eol.t
+
+1.07 / 2012.02.03 / LPN
+  - Added attributes and methods related to iLO
+  - Shortened the templates variable names
+
+1.06 / 2012.01.27 / SAPER
+  - Added bin/cfengine-tags to generate tags files for Cfengine.
+  - Added t/01-programs.t to test the commands.
+  - RackMan::Tasks::task_list() can now return the list of devices instead
+    of just printing it.
+  - Added RackMan::Types to handle types translation between RackTables
+    and RackMan, with provision for future types.
+  - Added mocked Cacti commands, for test purpose.
+
+1.05 / 2012.01.20 / SAPER
+  - Formats now throw an error when a mandatory attribute is missing.
+  - Template parameters have all been factored into RackMan::Template.
+  - Some template parameters have changed: host_ipaddr now is host_if0_ip,
+    host_macaddr now is host_if0_mac, host_name now is host_fqdn.
+  - New template parameters: host_name, host_if0_name.
+  - RackMan::Device::Server::HP_ProLiant now mandates the iLO subsystem
+    to have a FQDN.
+
+1.04 / 2012.01.18 / SAPER
+  - Verbose mode now prints the SCM commands being executed.
+
+1.03 / 2012.01.16 / SAPER
+  - Added RackMan::Format::PXE.
+  - The host_name parameter in Device::Format::DHCP and ::Kickstart now
+    contains the FQDN whenever possible.
+  - Added t/93-eol.t, t/98-kwalitee.t, t/99-distchk.t
+
+1.02 / 2012.01.13 / SAPER
+  - Added new template parameters in Device::Format::DHCP and ::Kickstart.
+  - Several internal fixes and adjustements.
+
+1.01 / 2012.01.11 / SAPER
+  - RackMan::Format::DHCP and ::Kickstart now support more template
+    parameters, which are now documented.
+  - bin/cisco-status no longer try to resolve VRRP addresses, and check that
+    the switch is actually a Cisco device.
+  - Added a workaround for a small bug in old versions of Term::ANSIcolor.
+  - Added cgi/rackapi to provide a small web service access.
+
+1.00 / 2012.01.03 / SAPER
+  - Improved the info task output by sorting the ports by their names.
+  - Fixed a cosmetic issue with the diff output.
+  - Handle some corner case with Cisco devices.
+  - Now install config file as rack.sample.conf to avoid overwriting
+    existing configuration.
+  - Fixed some incompatibilities between Perl before 5.12 and IPv6 support.
+  - Improved the documentation, which can now be easily converted to HTML
+    with the tools/make_doc script.
+
+0.99 / 2011.12.21 / SAPER
+  - Configuration file is now installed within the PREFIX hierarchy.
+  - Added bin/cisco-status to display the status of a Cisco network switch.
+
+0.98 / 2011.12.19 / SAPER
+  - Add support for DNS settings in the APC_RackPDU role.
+
+0.97 / 2011.12.16 / SAPER
+  - Support the --device_password option within the Cisco_Catalyst role.
+  - Handle Rackman::Device objects lacking an expected role.
+  - Adjusted installation process.
+
+0.96 / 2011.12.14 / SAPER
+  - Fixed a small bug that prevented to fetch implicit tags.
+
+0.95 / 2011.12.07 / SAPER
+  - Implemented RackMan::Format::Cacti.
+
+0.90 / 2011.12.02 / SAPER
+  - Tested and debugged the RackMan::Device::* roles PDU::APC_RackPDU,
+    Server::HP_ProLiant and Switch::Cisco_Catalyst.
+  - Now use Term::ANSIColor for outputing colors.
+
+0.80 / 2011.12.01 / SAPER
+  - Implemented RackMan::Device::Switch::Cisco_Catalyst.
+  - Factored out the diff code in Rackman::Utils.
+
+0.70 / 2011.11.30 / SAPER
+  - Implemented RackMan::Device::Server::HP_ProLiant
+
+0.60 / 2011.11.24 / SAPER
+  - Improved RackMan::Config to allow per-device configuration.
+  - Added a "list" action.
+  - Fixed and improved t/50-rackman-scm.t
+
+0.55 / 2011.11.17 / SAPER
+  - Completely finalised RackMan::Device::PDU::APC_RackPDU, with a new
+    implementation of its "diff" task, and the completion of the "push" task.
+  - Added RackTables::Schema::Result::viewRack
+
+0.50 / 2011.11.16 / SAPER
+  - Finalised most of RackMan::Device::PDU::APC_RackPDU, including a tentative
+    implementation of its "diff" task.
+  - Added RackMan::Config.
+
+0.45 / 2011.11.15 / SAPER
+  - Implemented a good chunk of RackMan::Device::PDU::APC_RackPDU, including
+    the config generation part.
+
+0.40 / 2011.11.10 / SAPER
+  - Finalised formats generation for DHCP, Kickstart, LDAP, Bacula, Nagios.
+    Prepared Cacti format.
+  - Added RackMan::SCM, RackMan::Template.
+
+0.30 / 2011.11.04 / SAPER
+  - Added Rackman::File.
+  - Working prototypes for some formats: Nagios, Kickstart, DHCP, LDAP.
+
+0.20 / 2011.11.01 / SAPER
+  - Finalised RackMan::Device.
+  - Finalised "info" task. Prepared "diff" and "write" tasks.
+
+0.10 / 2011.10.26 / SAPER
+  - Designed rack architecture.
+  - Added tools/schema to properly update the schema from the RackTables
+    database.
+
+0.01 / 2011.10.19 / SAPER
+  - First prototype to extract information from RackTables using DBIx::Class.
+

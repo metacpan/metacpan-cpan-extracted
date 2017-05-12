@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e1bc52e9ebde3205d6344cf50fd8763527d04df6 Changes
+SHA1 f144c9765ec184915d1529925fcec3917e428252 MANIFEST
+SHA1 30732a5045c730baf75d689f6ffbce7669da7da6 MANIFEST.SKIP
+SHA1 aeef277327347c467821b41af979fc1f22c5a914 META.yml
+SHA1 258b7af4aafba460ac45120bc923cf3ccd523a89 Makefile.PL
+SHA1 b0b64d77bedb7085b05e42781c9129d39e003e55 README
+SHA1 271d50bb9ff43331b8d839a52398971de120952c etc/initialdata
+SHA1 59e69e8b99149999c0c74e6031def042569410aa inc/Module/AutoInstall.pm
+SHA1 eba6465ce5287959acc940e75b080205960b7ac6 inc/Module/Install.pm
+SHA1 9dc7102b5e2c3a791205ecc4f9d84a56632253ef inc/Module/Install/AutoInstall.pm
+SHA1 b1cf7431800187990981684e7f67e572e8f7a631 inc/Module/Install/Base.pm
+SHA1 8550a7c7d2ed0632f8bdb3b741dfccaa013a1403 inc/Module/Install/Can.pm
+SHA1 73b01297ba83de8dbe4a87f70bbad0460f973ae2 inc/Module/Install/Fetch.pm
+SHA1 cb6547200d5494081535f3d91d76dc4364ad1029 inc/Module/Install/Include.pm
+SHA1 318ae9c85a1e1c4b7be1586e7e93713714ba93f8 inc/Module/Install/Makefile.pm
+SHA1 27edaaee2dc9d9b0be98e09ae82e5fe81cd58ba6 inc/Module/Install/Metadata.pm
+SHA1 e51d256f3c61dc968e1f3226d04c6fd06c3586d8 inc/Module/Install/RTx.pm
+SHA1 5c589819986050dd79faf8572992a9790ae89f2e inc/Module/Install/RTx/Factory.pm
+SHA1 dc972927565015ffbbaae806ff44634cae6fa1d2 inc/Module/Install/ReadmeFromPod.pm
+SHA1 0ae795f0a9b6783872d393f92f9dc7173f7632e9 inc/Module/Install/Win32.pm
+SHA1 2ad05d85780f32385e90fc76da59f635d453e29a inc/Module/Install/WriteAll.pm
+SHA1 f5a8af292880396d8fe93d4dcb9a6859ddb8f46c lib/RT/Condition/NotStartedInBusinessHours.pm
+SHA1 66f793ab7d8898c0fd2e813019413f47218c579c t/00-load.t
+SHA1 7762823967a857cee33a596519c8f092955056e7 t/boilerplate.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlBQXmAACgkQWFkxZRfLwXKTDwCgxj/DaUpFjVTaQXIZdEOEKCQQ
+yN8AoJZW2+LKAKzp0KFeuWj9qBQjITL0
+=6uKj
+-----END PGP SIGNATURE-----

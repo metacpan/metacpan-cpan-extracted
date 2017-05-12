@@ -1,0 +1,11 @@
+Revision history for Resource-Pack
+
+0.03  2011-03-07
+      - fix attribute initialization order issue
+      - switch to Test::Fatal
+
+0.02  2010-04-18
+      - complete rewrite, using Bread::Board
+
+0.01  2010-04-12
+      - first release of this module

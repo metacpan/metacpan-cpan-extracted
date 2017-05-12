@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 c277d63b48b7a67e6ab94c560590567a56ab18ad COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 7f0baf77542d0b631549c1c26da77baaad16a7ad Changes
+SHA1 79af6bf3dd69bafed0e98e8e71549ab84fd18df1 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 b993344ea20d6a244512680f43c8bedb560c7dcf MANIFEST
+SHA1 c115b9bcce91fe61d947e9a206c87f820de7b85f META.json
+SHA1 b26b3d443474ec06eebe26837d7ad79abf843832 META.yml
+SHA1 a94a4008ff4b43a7b30a9701e1550e12cb511990 Makefile.PL
+SHA1 a65e427c26dcf35a6dd9fa52da564f043d929318 README
+SHA1 2c73701575eea819b4ce599c67436e446731d180 TODO
+SHA1 0926bce06bccb7c038d7a2af4b3572b957789a75 bin/vcard2rdf
+SHA1 4c78b0f3419a570c8519340f7f93bb4ab10ada33 bin/vcard2xml
+SHA1 578c212da16c2f8a36db089f3901102dd81d7b4f dist.ini
+SHA1 f957b4fdf6d18844069dd6934550fdc5961e585a doap.ttl
+SHA1 05603de07e9235f261a7b890a6382f578d9272e0 examples/example.vcard
+SHA1 ca1ed448298bbafe26b36bb492b00685a7988bd8 examples/example1.pl
+SHA1 52fa14b4b07dc76ed895a6ef4521c22754ae9f80 examples/example2.pl
+SHA1 8a1eff5ffb39e50ad73cb12dbebcc4f1a682b7a0 examples/example3.pl
+SHA1 cc90aa9769a7d7dd73589677c423dc7c45f05089 lib/RDF/vCard.pm
+SHA1 6fbe152f5e35997b2cb6e90c331d9d3e187d5e43 lib/RDF/vCard/Entity.pm
+SHA1 94c0b0c3cc07a00b67705a0815f1e8ab85430994 lib/RDF/vCard/Entity/WithXmlSupport.pm
+SHA1 a2030bec7c586b02e2feae9ff33032ec9729a97a lib/RDF/vCard/Exporter.pm
+SHA1 f0fca94644c1acb3314f2b196b53a1747d8f03eb lib/RDF/vCard/Importer.pm
+SHA1 43260c3bc142cca7cc97f2c661cfc6ea37ec95d1 lib/RDF/vCard/Line.pm
+SHA1 87aa60dd374d9627ee83f929d987483a5503a7e4 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQZ9xQACgkQzr+BKGoqfTk4zgCdHMTToTXnArDZo+KZYqVZY+EF
+YukAnibFzANqncYg+jGVxdd6fC0h4XAQ
+=PJku
+-----END PGP SIGNATURE-----

@@ -1,0 +1,96 @@
+NAME
+    Geo::Coder::Google - Geocoder that utilizes the public Google Geocoder
+    API
+
+SYNOPSIS
+        use Geo::Coder::Google;
+        use Data::Dumper;
+
+        my $geocoder = Geo::Coder::Google->new({ key => "$API_KEY" });
+
+        my $address  = '1600 Pennsylvania Ave Washington DC';
+    
+        # Returns an array of matching records.  Geocoding is often not precise
+        # enough to guarantee one record, so this is always an array
+        my @response = $geocoder->geocode($address);
+
+        foreach my $addr ( @response ) {
+            print $addr->address, "\n"; # Formatted address (looks pretty)
+            print "This address is at: ",
+                $addr->latitude, " x ", $addr->longitude, "\n";
+            # Now for the other fields.  Because Geocoding isn't *just* in the
+            # US, the format is loosely based upon xAL.  You can readup on it
+            # here: http://www.oasis-open.org/committees/ciq/ciq.html#6
+            print $addr->administrativearea, "\n";    # State/Province (e.g., "CA")
+            print $addr->subadministrativearea, "\n"; # County (e.g., "Santa Clara")
+            print $addr->locality, "\n";     # The City
+            print $addr->postalcode, "\n";   # Postal Code
+            print $addr->thoroughfare, "\n"; # Just the number and street info
+        }
+
+DESCRIPTION
+    This module utilizes LWP::UserAgent to request geocode results from the
+    Google Geocode Service. This requires that you register for an API key
+    at:
+
+    http://www.google.com/apis/maps/signup.html
+
+    Once you have your key, you can begin using this module for geocoding.
+    If your key is invalid, or misentered, you will receive an "Error 610".
+
+  ERROR CASES
+    G_GEO_SUCCESS (200)
+        Successful geocode
+
+    G_GEO_MISSING_ADDRESS (601)
+        You have to supply at least some form of an address.
+
+    G_GEO_UNKNOWN_ADDRESS (602)
+        You probably supplied gibberish, didn't you? Didn't you!?
+
+    G_GEO_UNAVAILABLE_ADDRESS (603)
+        Google knows your address. But it is a secret. Sshh.
+
+    G_GEO_BAD_KEY (610)
+        Your key is not valid. Check it again.
+
+    G_GEO_TOO_MANY_QUERIES (620)
+        You have used up too many queries. There is a 50,000 limit that is
+        likely to change (who knows which direction).
+
+    G_GEO_SERVER_ERROR (500)
+        Server Error. Oops!
+
+METHODS
+  new
+    This simple constructor gets you started.
+
+        my $geocoder = Geo::Coder::Google->new({ key => $YOURKEY });
+
+    Parameters:
+
+    key Required. Set this to your Google API Key
+
+    timeout
+        Optional timeout to use before giving up and reporting failure.
+
+    agent
+        Optional parameter to set the User Agent. Defaults to
+        Geo::Coder::Google/$VERSION
+
+  geocode
+    This method returns an array of the results for the address specified.
+
+AUTHORS
+    Copyright 2006 J. Shirley <jshirley@gmail.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. That means either (a) the GNU
+    General Public License or (b) the Artistic License.
+
+  THANKS
+    Google! You can do no evil, except in China. We still love you, though.
+
+SEE ALSO
+    Geo::Coder::Google::Address - The Google address object
+

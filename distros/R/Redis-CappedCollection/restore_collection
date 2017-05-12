@@ -1,0 +1,134 @@
+#!/usr/bin/perl -w
+
+use 5.010;
+use strict;
+use warnings;
+
+use lib qw(
+    lib
+);
+
+# NAME: Restore Redis::CappedCollection collection dump.
+
+use bytes;
+use Getopt::Long qw(
+    GetOptions
+);
+use JSON::XS ();
+use Try::Tiny;
+
+use Redis::CappedCollection qw(
+    $DEFAULT_SERVER
+    $DEFAULT_PORT
+);
+
+my ( $collection, $dump_fh, $json ) = setup();
+
+my @data_fields = qw(
+    list_id
+    data_id
+    data
+    data_time
+);
+my $number_data_fields = scalar @data_fields;
+
+while ( my $encoded = <$dump_fh> ) {
+    chomp $encoded;
+
+    my $error;
+
+    my $decoded = try {
+        $json->decode( $encoded );
+    } catch {
+        $error = $_;
+        warn "failed to decode JSON ($error): $encoded";
+    };
+    next if $error;
+
+    my @data_info;
+    foreach my $key ( @data_fields ) {
+        my $value = delete $decoded->{ $key };
+        push( @data_info, $value ) if defined $value;
+    }
+
+    my $no_complete_information = scalar( @data_info ) != $number_data_fields;
+    if ( $no_complete_information || %$decoded ) {
+        warn "Invalid record: $encoded";
+        next if $no_complete_information;
+    }
+
+    $collection->insert( @data_info );
+}
+
+close $dump_fh;
+
+exit 0;
+
+sub setup {
+    my ( $help, $host, $port, $collection_name, $dump_file );
+
+    $host = $DEFAULT_SERVER;
+    $port = $DEFAULT_PORT;
+
+    my $ret = GetOptions(
+        'host=s'        => \$host,
+        'port=i'        => \$port,
+        'collection=s'  => \$collection_name,
+        'dump-file=s'   => \$dump_file,
+        "help|?"        => \$help,
+    );
+
+    if ( !$ret || $help )
+    {
+        say <<"HELP";
+Usage: $0 [--host="..."] [--port=...] --collection="..." [--dump-file="..."] [--help]
+
+Connect to redis server, creates the specified Redis::CappedCollection collection from specified file or STDIN instead.
+Use default settings and 'older_allowed => 1'.
+
+Options:
+    --help
+        Display this help and exit.
+
+    --host="..."
+        The server should contain an IP address of Redis server.
+        If the server is not provided, '${DEFAULT_SERVER}' is used as the default for the Redis server.
+    --port=N
+        The server port.
+        Default ${DEFAULT_PORT} (the default for the Redis server).
+    --collection="..."
+        The collection name.
+    --dump-file="..."
+        Path to previously created dump file.
+        If not specified, the STDIN used.
+HELP
+        exit 1;
+    }
+
+    die "Error: Redis::CappedCollection collection name required, use --collection to specify\n"
+        unless $collection_name;
+
+    my $redis_server = "$host:$port";
+
+    my $collection = try {
+        Redis::CappedCollection->create(
+            redis           => $redis_server,
+            name            => $collection_name,
+            older_allowed   => 1,
+        );
+    } catch {
+        my $error = $_;
+        die "Error: Redis::CappedCollection collection '$collection_name' not created on '$redis_server'.\n$error\n";
+    };
+
+    my $dump_fh;
+    if ( $dump_file ) {
+        open( $dump_fh, '<', $dump_file ) or die "cannot open < $dump_file: $!";
+    } else {
+        $dump_fh = *STDIN;
+    }
+
+    my $json = JSON::XS->new;
+
+    return( $collection, $dump_fh, $json );
+}

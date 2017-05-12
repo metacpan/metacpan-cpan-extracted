@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 020c5e1a03e29d5e233976e70a123aa36fe55a12 Changes
+SHA1 ccee2d33d830e2dabe61e50e27da259cd43b29a5 LICENSE
+SHA1 824407863245a311aa957416c315b894f499fe4c MANIFEST
+SHA1 85347742c23f68152d1c58b0e2b060fe52120a80 META.yml
+SHA1 100957aba7937eb7aadeb081cc90ab62ed599e6c Makefile.PL
+SHA1 d6fd2b62eda8f8b0e974f630b14be205f7bacd2e README.mkdn
+SHA1 9a252e25abe1f7ac8e04072eaf6a96895284fb45 dist.ini
+SHA1 fd579c17ed76d845e595af37d428ed0fdc743687 doc/TESTING.with.server.mkdn
+SHA1 364440ab60496abc4768aae6574b9bdb7d10772b lib/REST/Cypher.pm
+SHA1 53900611ec8bc4088019f7f5d26bcca2d284d594 lib/REST/Cypher/Agent.pm
+SHA1 7ea6fc971ecece1fc87620513fed11231f97326d lib/REST/Cypher/Exception.pm
+SHA1 eb55f22511d730fcbd0002933ebb0d4e9642000f lib/REST/Cypher/Exception/Response.pm
+SHA1 d4426c3a7150a7a522cb0617b5e0b6c806995b5e script/buildkite/dzil-authordeps
+SHA1 7872b53eabda8b053bc1e540724da4dd721a3751 script/buildkite/dzil-distrodeps
+SHA1 a8182b6da9f37f221e5ab11588ea85370e7039d8 script/buildkite/dzil-install
+SHA1 176466926452610b5b7b808082e3603ed77215ad script/buildkite/dzil-tests-basic
+SHA1 ef72d3dd2bdde3b4eabeedb9ff49c0c3678d45ff script/buildkite/dzil-tests-full
+SHA1 a4f5908aecac978a87d3d4d1b68948ab4b420224 script/buildkite/perlbrew-install
+SHA1 0f841effbeb886bcbe1d88f8a7e2c29974c2a8e0 script/buildkite/perlbrew-setup
+SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
+SHA1 a1c7fe58022c01e4568e8caf9b0e999eb284763f t/00.agent.t
+SHA1 e9a2ae6d5e0b404e7dbe9add4dc9279d55d53b48 t/00.cypher.t
+SHA1 5fddfd66c9a18436f91fecf6c0106d9fe71f058c t/author-no-breakpoints.t
+SHA1 f8732b98094b55528b15922299ff60663bfc94bf t/author-no-tabs.t
+SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 2a17eb5700f98afcee54d074ded68d514c94e9f0 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iEYEARECAAYFAlYyczkACgkQh4j7xTiFuxGFZQCeOhPDh7lsS9lV8Fqy93UBzeJt
+QxcAn19nqFWLaYBwU6yAI0252Ax6cpBU
+=DrkH
+-----END PGP SIGNATURE-----

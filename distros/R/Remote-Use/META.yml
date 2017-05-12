@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Remote-Use
+version:            0.04
+abstract:           Using modules from a remote server
+author:
+    - Casiano Rodriguez Leon 2 <casiano@ull.es>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    File::Basename:  0
+    File::Find:      0
+    File::Path:      0
+    File::Spec:      0
+    Getopt::Long:    0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.46
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

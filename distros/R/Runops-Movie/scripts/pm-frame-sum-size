@@ -1,0 +1,188 @@
+#!perl
+use strict;
+use warnings;
+use 5.010_000;
+use feature ':5.10';
+use Getopt::Long qw( GetOptions );
+use Runops::Movie::Util qw( pretty_size );
+use File::Spec::Functions qw( catfile );
+use Carp::Always;
+use Alien::Judy;
+use Judy::L;
+use Inline
+    C => 'DATA',
+    ( # Config:
+        OPTIMIZE => '-g',
+        CLEAN_AFTER_BUILD => 1,
+        INC => join( ' ',
+            map { "-I$_" }
+            Alien::Judy::inc_dirs()
+        ),
+        LIBS => join( ' ',
+            (
+                map { "-L$_" }
+                Alien::Judy::lib_dirs()
+            ),
+            '-lJudy'
+        )
+    );
+
+
+
+GetOptions(
+    help            => sub { die 'pod2usage( -verbose => 2 )' },
+    'dir=s'         => \my($dir),
+    'edge=s'        => \my($in_edge),
+    'vertex-size=s' => \my($in_vertex_size),
+    'size=s'        => \my($out_size),
+)
+  or die 'pod2usage( -verbose => 2 )';
+
+
+# --dir automagic
+#
+if ( $dir ) {
+    $in_edge        //= catfile( $dir, 'frame.edge' );
+    $in_vertex_size //= catfile( $dir, 'frame.size' );
+    $out_size       //= catfile( $dir, 'frame.sum-size' );
+}
+
+my $vertex_size;
+{
+    say "Read $in_vertex_size (@{[ pretty_size( -s $in_vertex_size ) ]})";
+    open my($fh), '<', $in_vertex_size
+        or die "Can't open $in_vertex_size: $!";
+    $vertex_size = read_size( $fh );
+}
+
+my $edge;
+{
+    say "Read $in_edge (@{[ pretty_size( -s $in_edge ) ]})";
+    open my($fh), '<', $in_edge
+        or die "Can't open $in_edge: $!";
+    $edge = read_edge( $fh );
+}
+
+say 'Summing vertices';
+my $sums = calc_sum( $vertex_size, $edge, 0 );
+
+open my($fh), '>', $out_size
+    or die "Can't open $out_size for writing: $!";
+
+my ( undef, $size, $x ) = Judy::L::First( $sums, 0 );
+while ( defined $x ) {
+    printf {$fh} "size(%x,%d).\n", $x, $size
+        or die "Can't write to $out_size: $!";
+    ( undef, $size, $x ) = Judy::L::Next( $sums, $x );
+}
+close $fh
+    or die "Can't flush $out_size: $!";
+say "Wrote $out_size (@{[ pretty_size( -s $out_size ) ]})";
+
+__DATA__
+__C__
+#include <Judy.h>
+
+void*
+read_size(PerlIO *fh) {
+    SV *line_sv;
+    char *line;
+    Pvoid_t size = 0;
+    STRLEN line_len;
+    int x;
+    PWord_t pxsize;
+    Word_t xsize;
+
+    line_sv = newSVpv("",0);
+    while (sv_gets(line_sv,fh,0)) {
+        line = SvPV(line_sv,line_len);
+        if ( 2 != sscanf(line,"size(%x,%d).",&x,&xsize) ) {
+            croak(line);
+        }
+
+        JLI(pxsize,size,x);
+        *pxsize = xsize;
+    }
+    SvREFCNT_dec(line_sv);
+
+    return size;
+}
+
+#include <Judy.h>
+void*
+read_edge(PerlIO *fh) {
+    SV *line_sv;
+    char *line;
+    STRLEN line_len;
+    Pvoid_t edge = 0;
+    PWord_t pyedge;
+    Word_t x, y;
+    int Rc_int;
+
+    line_sv = newSVpv("",0);
+    while (sv_gets(line_sv,fh,0)) {
+        line = SvPV(line_sv,line_len);
+        if ( 2 != sscanf(line,"edge(%x,%x).",&x,&y) ) {
+            croak(line);
+        }
+
+        JLI(pyedge,edge,x);
+        J1S(Rc_int,*pyedge,y);
+    }
+    SvREFCNT_dec(line_sv);
+
+    return edge;
+}
+
+int
+_sum(Pvoid_t const vertex_size, Pvoid_t const edge, Word_t const x, Pvoid_t *sums) {
+    PWord_t pyedge;
+    PWord_t psum, psize;
+    Word_t y, sum;
+    int found_y;
+
+    /* Already computed? */
+    psum = 0;
+    JLI( psum, *sums, x );
+    if ( ! psum ) {
+        croak("Can't allocate");
+    }
+
+    if ( *psum ) {
+        return *psum;
+    }
+    else {
+        /* size(X) + sum(size(children)) */
+        psize = 0;
+        JLG( psize, vertex_size, x );
+        sum = psize ? *psize : 128;
+
+        /* Fetch children */
+        pyedge = 0;
+        JLG( pyedge, edge, x );
+        if ( ! pyedge ) {
+            return *psum = sum;
+        }
+
+        /* Sum children */
+        y = 0;
+        J1F( found_y, (Pvoid_t)*pyedge, y );
+        while ( found_y ) {
+            sum += _sum( vertex_size, edge, y, sums );
+
+            J1N( found_y, (Pvoid_t)*pyedge, y );
+        }
+
+        /* Refetch sum because *sums likely has changed */
+        JLG(psum,*sums,x);
+        return *psum = sum;
+    }
+}
+
+void*
+calc_sum( void* vertex_size, void* edge, int x ) {
+    Pvoid_t *sums = malloc(sizeof(Pvoid_t));
+    *sums = 0;
+    _sum( vertex_size, edge, x, sums );
+    return *sums;
+}

@@ -1,0 +1,48 @@
+#!perl
+use strict;
+use warnings;
+use feature ':5.10';
+use Storable qw( store );
+use File::Basename qw( dirname );
+use lib dirname( __FILE__ );
+use TM qw( size );
+
+my $in_pro     = "$ARGV[0].pro";
+my $out_type = "$ARGV[0].type";
+
+open my($fh,), '<', $in_pro
+  or die "Can't read $in_pro: $!";
+
+my %type;
+say STDERR "Typing w/ $in_pro (@{[ size( -s $in_pro ) ]})";
+while (defined( my $_ = <$fh>)) {
+    next if !( my ( $type, $vertex ) = /^(null|pv|iv|rv|pvgv|pvcv|pvav|pviv|pvnv|pvhv|pvmg|pvbm|nv|pvio|pvlv|pvfm)\(([[:xdigit:]]+)/ );
+
+#    2 pvfm
+#   27 pvlv
+#   31 pvio
+#   83 nv
+# 1262 pvbm
+# 2202 pvmg
+# 5860 function
+# 6164 file
+# 6178 pvcv
+# 8771 pvhv
+# 11791 pvnv
+# 16437 pviv
+# 18910 pvav
+# 20189 name
+# 20189 pvgv
+# 20189 stash
+# 27069 rv
+# 42996 iv
+# 44325 pv
+# 59285 null
+
+    $type{$vertex} = $type;
+}
+$type{'root'} = '';
+
+store( \ %type, $out_type );
+say STDERR "Wrote $out_type (@{[ size( -s $out_type ) ]})";
+

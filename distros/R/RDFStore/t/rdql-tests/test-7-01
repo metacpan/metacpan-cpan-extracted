@@ -1,0 +1,10 @@
+SELECT ?x, ?t, ?c, ?o
+
+WHERE   ( ?x, <dc:title>, ?t),
+	( ?x, <dc:creator>, ?c),
+        ( ?c, <eg:homePage>, <http://purl.org/net/eric/>),
+        ( ?c, <eg:worksFor>, ?o)
+
+USING	dc FOR <http://purl.org/dc/1.1/>,
+	eg FOR <http://example.com/vocab/foaf/>
+

@@ -1,0 +1,204 @@
+---
+abstract: 'A Reflex(ive) HTTP Client'
+author:
+  - 'Torsten Raudssus <torsten@raudss.us>'
+build_requires:
+  Test::HTTP::Server: 0.03
+  Test::LoadAllModules: 0.021
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300024, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Reflexive-Client-HTTP
+requires:
+  HTTP::Message: 6.03
+  Moose: 2.0604
+  POE::Component::Client::HTTP: 0.947
+  Reflex: 0.098
+resources:
+  homepage: https://github.com/Getty/p5-reflexive-client-http
+  repository: https://github.com/Getty/p5-reflexive-client-http.git
+version: 0.007
+x_Dist_Zilla:
+  perl:
+    version: 5.014002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Author::GETTY/@Basic/GatherDir'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::GETTY/@Basic/PruneCruft'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::GETTY/@Basic/ManifestSkip'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::GETTY/@Basic/MetaYAML'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::GETTY/@Basic/License'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Author::GETTY/@Basic/Readme'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Author::GETTY/@Basic/ExtraTests'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::GETTY/@Basic/ExecDir'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::GETTY/@Basic/ShareDir'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Author::GETTY/@Basic/MakeMaker'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::GETTY/@Basic/Manifest'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::GETTY/@Basic/TestRelease'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::GETTY/@Basic/ConfirmRelease'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::GETTY/@Basic/UploadToCPAN'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@Author::GETTY/Git::NextVersion'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Author::GETTY/PkgVersion'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::GETTY/MetaConfig'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::GETTY/MetaJSON'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::GETTY/PodSyntaxTests'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: '@Author::GETTY/Repository'
+      version: 0.18
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@Author::GETTY/GithubMeta'
+      version: 0.28
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@Author::GETTY/InstallRelease'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Author::GETTY/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
+      name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
+      version: 0.004
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@Author::GETTY/TestMoreWithSubtests'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::ChangelogFromGit
+      name: '@Author::GETTY/ChangelogFromGit'
+      version: 0.005
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@Author::GETTY/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Author::GETTY/@Git/Check'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Author::GETTY/@Git/Commit'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Author::GETTY/@Git/Tag'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Author::GETTY/@Git/Push'
+      version: 1.122530
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300024
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300024
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300024
+x_authority: cpan:GETTY

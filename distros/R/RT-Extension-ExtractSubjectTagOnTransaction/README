@@ -1,0 +1,105 @@
+
+=head1 COPYRIGHT
+
+This extension is Copyright (C) 2005 Best Practical Solutions, LLC.
+
+It is freely redistributable under the terms of version 2 of the GNU GPL.
+
+=cut
+
+
+SUMMARY ---
+
+RT-Extension-ExtractSubjectTag is an extension for use when you have
+multiple RT systems (or other automated systems) talking to each
+other.  All the systems need to use some sort of subject based tag to
+track things.
+
+RT figures out which ticket a message is associated with by looking
+for a [rtname #1234] or similar tag in the Subject line.  If multiple
+RT instances are sharing a ticket, it needs to contain a tag for each
+RT system.
+
+This extension looks at incoming messages and modifies the subject of
+the ticket to include any appropriate rtnames (or other tags) from other systems.
+
+INSTALLATION ---
+
+To install the extension:
+
+$ perl Makefile.PL
+
+(it may prompt you for the path to your RT.pm, if it can't
+automatically detect it.)
+
+$ make
+$ make install
+
+Before the Scrip will actually work, you must run:
+
+$ make initdb
+
+which will create a new global scrip:
+
+  Description: On transaction, add any tags in the transaction's subject 
+               to the ticket's subject
+  Condition: On Transaction
+  Action: ExtractSubjectTag
+  Template: Blank
+  Stage: TransactionCreate
+
+In order to prevent the other RT instance's auto-response to your RT's resolve
+message from re-opening your resolved ticket, any RT instance you will be 
+interacting with needs to have the header
+
+  RT-Control: no-autoopen
+
+included in its default resolve template.  Note that this will only work in
+RT 3.4.2 and later.  To make the RT-Control: header work in earlier versions of
+RT, you need to apply the following patch to lib/RT/Action/AutoOpen.pm (the
+patch file is also included as etc/no-autoopen.patch in this distribution).  
+Note that the second line which the patch adds wraps to include 
+'=~ /\bno-autoopen\b/i )'. 
+
+Modified: rt/branches/3.4-RELEASE/lib/RT/Action/AutoOpen.pm                     
+==============================================================================  
+--- rt/branches/3.4-RELEASE/lib/RT/Action/AutoOpen.pm   (original)              
++++ rt/branches/3.4-RELEASE/lib/RT/Action/AutoOpen.pm   Thu Jun  2 00:15:13 2005
+@@ -74,6 +74,8 @@                                                               
+     if ( ( $self->TicketObj->Status eq 'open' )                                
+          || ( ( $self->TicketObj->Status eq 'new' )
+               && $self->TransactionObj->IsInbound )
++         || ( defined $self->TransactionObj->Message->First                    
++              && $self->TransactionObj->Message->First->GetHeader('RT-Control') =~ /\bno-autoopen\b/i )
+       ) {
+
+         return undef;
+
+
+
+CONFIGURATION ---
+
+ExtractSubjectTag supports two configuration directives.
+
+$ExtractSubjectTagMatch - a regular expression that describes what
+tags shouuld be extracted from the subject line.  
+
+Defaults to: /\[.+? #\d+\]/ which will match any RT system.
+
+Other examples:
+
+  Set($ExtractSubjectTagMatch, qr/\#\d+/ );
+  Match a # followed by a number.
+
+  Set($ExtractSubjectTagMatch, qr/\[(?:pizza|fred|noodle) #\d+\]/  
+  Match tickets from systems with rtnames pizza, fred, or noodle.
+
+$ExtractSubjectTagNoMatch - a regular expression that describes tags
+that might match $ExtractSubjectTagMatch, but shouldn't be included.
+The rtname of the current system is an example of this.  Defaults to:
+qr/\[(?:${RT::EmailSubjectTagRegex}) #\d+\]/;  You only want to change
+this if you add something to your ExtractSubjectTagMatch that you
+don't want to get added to your subject.
+
+
+

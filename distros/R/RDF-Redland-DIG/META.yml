@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                RDF-Redland-DIG
+version:             0.04
+abstract:            DIG extension for Redland RDF (Reasoner)
+license:             ~
+author:              
+    - Lara Spendier <lara@apple.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    LWP:                           5.805
+    RDF::Redland:                  1.000401
+    Test::More:                    0.47
+    Test::Pod:                     1
+    Test::Pod::Coverage:           1.08
+    XML::LibXML:                   1.59
+    XML::LibXML::XPathContext:     1.66
+    XML::LibXSLT:                  1.59
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

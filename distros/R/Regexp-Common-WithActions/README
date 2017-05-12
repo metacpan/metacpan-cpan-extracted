@@ -1,0 +1,44 @@
+NAME
+    Regexp::Common::WithActions - adds actions to Regexp::Common
+
+SYNOPSIS
+        use Regexp::Common::WithActions;
+        my $quoted = $RE{quoted}->action('quote')->(q{a string with ' or "});
+        my $dequoted = $RE{quoted}->action('dequote')->(q{'a string with \' or "'});
+
+DESCRIPTION
+    Some regular expressions from Regexp::Common may be much better with
+    actions to manipulate matched data, for example for all variants
+    delimited provides it's good to have quoter and de-quoter actions.
+
+    This module extends %RE with action method. It can be used in the same
+    way as subs or match methods. For example:
+
+        $RE{some}{re}{-with => 'arguments'}->action('action')->('do something');
+
+    As you can see action method returns a reference to a function
+    implementing particular action.
+
+CAVEAT
+    Regexp::Common 2.122 has a problem that makes this module less useable.
+    You must load Regexp::Common::WithActions as the last thing (after all
+    other modules that can load R::C) in you programm.
+
+    Patch for this issue exists and waiting for abigail to release a new
+    version.
+
+ACTIONS
+  delimited and quoted
+    'quote' and 'dequote' are two actions provided for these regexps. Both
+    work in place in void context and return new value in other cases.
+
+  more
+    It's very easy to add a new action for other regexps in the module.
+    Patches are welcome.
+
+AUTHOR
+    Ruslan.Zakirov@gmail.com
+
+LICENSE
+    Under the same terms as perl itself.
+

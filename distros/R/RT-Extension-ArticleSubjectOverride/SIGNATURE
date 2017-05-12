@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c6471ef3fdc60f9ac61be15a551e2f293fd30fbf MANIFEST
+SHA1 c8d5962f70960d051f2eb334441649cc90257b54 META.yml
+SHA1 2281726d2eee8428c00ce791053c6eb4c952b115 Makefile.PL
+SHA1 a5cc0b0b687cf71c7d4bbf8e2c9deff036159f91 README
+SHA1 d4cba5d316aba04d707949e662c9addbe51ffc59 html/Callbacks/RT-Extension-ArticleSubjectOverride/Admin/Articles/Classes/Modify.html/AttributeList
+SHA1 17996a872ffee63e29b4644d4515548332fef2e0 html/Callbacks/RT-Extension-ArticleSubjectOverride/Admin/Articles/Classes/Modify.html/BeforeSubmit
+SHA1 8e1909e1a8e031d67940ae777df7e19425afad37 html/Callbacks/RT-Extension-ArticleSubjectOverride/Ticket/Create.html/Default
+SHA1 8e1909e1a8e031d67940ae777df7e19425afad37 html/Callbacks/RT-Extension-ArticleSubjectOverride/Ticket/Update.html/Initial
+SHA1 2134613d6e2da97d570e4137a7114d99bd17a812 html/Elements/SubjectOverride
+SHA1 7ba8556ded0e1b8465b2ebe703e073b416d454d7 inc/Module/Install.pm
+SHA1 69a3a256888658cbbe0164171744838e53dc06e3 inc/Module/Install/Base.pm
+SHA1 17be8c56d695ed14cf77e37542438a5eebf1c9e1 inc/Module/Install/Can.pm
+SHA1 b842371af51441beb020ce37349f96123841f684 inc/Module/Install/Fetch.pm
+SHA1 474ff5d11d1dd3327487f13d44d3c7b3945050a8 inc/Module/Install/Makefile.pm
+SHA1 fdf68f7c27a463011640b0739299834a65268056 inc/Module/Install/Metadata.pm
+SHA1 086821cf681da29d7a7e94e8a6fe6cce7e14f00f inc/Module/Install/RTx.pm
+SHA1 d3a33569b41077d6a836f95bb63484c51e9d0a52 inc/Module/Install/ReadmeFromPod.pm
+SHA1 fe19e1641d3642424ba4088909e0f2e05747c76f inc/Module/Install/Win32.pm
+SHA1 b71a7355e7c74219f0d24aedf057121981ff0f95 inc/Module/Install/WriteAll.pm
+SHA1 8ee77e5c8323c71bff488733d5cd8e41a9a93b11 lib/RT/Extension/ArticleSubjectOverride.pm
+SHA1 6d5407814ce2bf24747532ee43f93037029c2501 patches/0001-Add-two-new-callbacks.patch
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFPS6n3Hdv9ZfNcOAcRAuzoAJ9zOhyGRaaE0mrnaVIoi/9iTob7oACgiGKZ
+W6mNGQZ5xV3vFzethgjvfe0=
+=/4to
+-----END PGP SIGNATURE-----

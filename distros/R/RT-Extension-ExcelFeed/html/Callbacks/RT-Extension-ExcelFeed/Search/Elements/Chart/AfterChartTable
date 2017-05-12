@@ -1,0 +1,12 @@
+<a href="<% $href %>" class="button">Download as Microsoft Excel Spreadsheet</a>
+<%INIT>
+my $query_string = '?' . $m->comp('/Elements/QueryString',
+    Query            => $ARGSRef->{Query},
+    GroupBy          => $ARGSRef->{GroupBy},
+    ChartFunction    => $ARGSRef->{ChartFunction},
+);
+my $href = RT->Config->Get('WebPath') . '/Search/Chart.xlsx' . $query_string;
+</%INIT>
+<%ARGS>
+$ARGSRef => {}
+</%ARGS>

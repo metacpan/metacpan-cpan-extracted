@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<record>
+	<car type="hash">
+		<make/>
+		<year type="integer"/>
+	</car>
+	<person typeref="person2.xml#personname" />
+</record>

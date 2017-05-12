@@ -1,0 +1,48 @@
+NAME
+    RDF::Service - The Wraf core library
+
+
+DESCRIPTION
+    Wraf implements a RDF API that hopes to realize the Semantic
+    Web. The framework uses RDF for data, user interface, modules and
+    object methods. It uses interfaces to other sources in order to
+    integrate all data in one enviroment, regardless of storage form.
+
+
+DOCUMENTATION
+    The documentation is far from complete and not up to date.  Send
+    any question to the mailinglist rdf@uxn.nu.  Look for comments in
+    the source and notes in the ./doc directory.
+
+
+PREREQUISITIES
+    Perl v5.6 with modules Template v2, Time::Hires, CGI, FreezeThaw, DBI,
+    DBD::Pg and URI.  PostgreSQL.  Apache v1.3 with mode_usertrack.
+
+
+INSTALL
+    The test program bin/serv1.pl will look for the libraries in
+    ../lib (relative to the current directory).  Create the databases
+    wraf_v01a in PostgreSQL and initiate it with the tables in
+    doc/rdf.sql  Do not 'make install'.
+
+
+TEST EXAMPLE
+    Make the CGI program cgi-bin/client.cgi executable from a webserver.
+    Start ./serv1.pl in bin and be amazed at the amount of work needed
+    for a simple stupid list of names.  Use cgi-bin/demo.html as a
+    starting point.
+
+
+DEVELOPMENT
+    The homepage for Wraf is http://www.uxn.nu/wraf/ there you can
+    find the developers mailinglist and more background information.
+    Please send any comments to the developer mailinglist.
+
+
+COPYRIGHT
+    Copyright (C) 2000 Jonas Liljegren. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

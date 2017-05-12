@@ -1,0 +1,20 @@
+Revision history for Perl extension RangeQuery.
+
+0.04 Sun Jul 13 14:45:00 2009
+	- Changed ranges from 1-based to 0-based (suggestion from Lars Dieckow).
+	- Optimized a little bit the code.
+
+0.03 Sun Jul 13 10:15:00 2009
+	- Changed required perl's version from 5.10 to 5.6
+	- Fixed a typo in my email address.
+
+0.02 Sun Jul 12 21:25:00 2009
+	- Corrected an error in the documentation.
+
+0.01  Sun Jul 12 22:00:00 2009
+	- module is ready to be released
+
+0.01  Sun Jul 12 20:44:50 2009
+	- original version; created by h2xs 1.23 with options
+		-Xan RangeQuery
+

@@ -1,0 +1,12 @@
+1.05 2016-07-19
+ - Packaging updates
+ - Whitelist all query endpoints from CSRF protection
+
+1.00 2014-12-15
+ - Packaging and documentation updates
+
+0.05 2014-12-12
+ - RT 4.0 compaitibility
+
+0.02 2008-03-05
+ - initial release to the CPAN

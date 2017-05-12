@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 b6c86935d4ce30a70ba9e48d2dc374b56209f715 COPYRIGHT
+SHA1 5abeac54ef4164f5931983fe14f0c5fc2ed3ec6b CREDITS
+SHA1 22446c11790ed8f18fe938e95a86b2587d342a8b Changes
+SHA1 73e2c1eeb1effd40d60a170ae45ecee185ba68de INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 5bfd55191e33a33a9f9ba14eec6363d9784639df MANIFEST
+SHA1 832431c2f9148b854089e021783cef66383e9d1e META.json
+SHA1 a3baf83293a34885a8479d24aec872fd32e3586f META.yml
+SHA1 1f7dc3dc99342062a9d57972703622f50c5f304c Makefile.PL
+SHA1 5664226eee8b48eadc856f0e07d45cc8823bde49 README
+SHA1 7d21eb9d82cc0da834f6f8fb3a8688f81d95ce5b TODO
+SHA1 e7d06ae1517321f1deff880f2db505c296fcc494 dist.ini
+SHA1 0f993b4453e0ad8fae6fb8a345d725ca588263c5 doap.ttl
+SHA1 d32e9803f67a72cb912c0e6b735d784db2fb3662 examples/example1.pl
+SHA1 67bfe4cb50df503aa9d308054cd2d0ebcf4fb36a lib/RDF/iCalendar.pm
+SHA1 fb58f2ce5332e08310620685bc4a2bb940f34efe lib/RDF/iCalendar/Entity.pm
+SHA1 bcdc7d0e9bf9cdaf03d7970bd3ae2992d49239b3 lib/RDF/iCalendar/Exporter.pm
+SHA1 68ff6f014004dfda58e66605ec903199a63c2487 lib/RDF/iCalendar/Line.pm
+SHA1 c356758da772331ac071f66161248e87968db8b8 t/01basic.t
+SHA1 7a7256658dad791fca6c9fd2d72aa51765ec37e6 t/02rdf2ical.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQZ+E8ACgkQzr+BKGoqfTl6qACguE+zxmJagHlrQ9CKt/PAxkmB
+1HoAnAsqgdb7GWQaUFeQ3Wn32G01UNIq
+=sQBt
+-----END PGP SIGNATURE-----

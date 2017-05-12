@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use RT -init;
+
+my $attributes = RT::Attributes->new( RT->SystemUser );
+$attributes->Limit( FIELD => 'Name',       VALUE => 'SpamReports' );
+$attributes->Limit( FIELD => 'ObjectType', VALUE => 'RT::Ticket' );
+
+my $tickets = 0;
+my $reports = 0;
+
+my $tickets_deleted = 0;
+my $deleted = 0;
+
+my %users;
+
+while (my $attr = $attributes->Next) {
+    $tickets++;
+
+    my $users = $attr->Content || [];
+    $reports += @$users;
+
+    $users{$_}++ for @$users;
+
+    if ($attr->Object->Status eq 'deleted') {
+        $tickets_deleted++;
+        $deleted += @$users;
+    }
+}
+
+my $u = RT::User->new( RT->SystemUser );
+
+printf "Average %4.1f reports per ticket\n", $reports/$tickets;
+printf "Average %4.1f reports per deleted ticket\n", $deleted/$tickets_deleted;
+printf "Top users:\n";
+printf "   %4d %s\n", @$_
+    for map { $u->Load($_); [$users{$_}, $u->Name]; } (sort { $users{$b} <=> $users{$a} } keys %users)[0..9];

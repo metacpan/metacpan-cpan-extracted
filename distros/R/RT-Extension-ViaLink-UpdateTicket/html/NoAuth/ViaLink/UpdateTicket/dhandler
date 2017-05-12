@@ -1,0 +1,43 @@
+<& /Elements/Header, ShowBar => 0 &>
+<& /Elements/ListActions, actions => \@results &>
+</body></html>
+<%INIT>
+use Encode ();
+
+my $notfound = sub {
+    $r->headers_out->{'Status'} = '404 Not Found';
+    $m->clear_and_abort;
+};
+
+my $path = $m->dhandler_arg;
+$notfound->() unless $path =~ m{^([0-9]+)/([^/]+)};
+
+my ($uid, $token) = ($1, $2);
+
+my $user = RT::User->new( $RT::SystemUser );
+$user->Load( $uid );
+$notfound->() unless $user->id;
+
+require RT::Extension::ViaLink::UpdateTicket;
+
+$notfound->() unless RT::Extension::ViaLink::UpdateTicket->Check(
+    $user, $token, %ARGS
+);
+
+my $tid = $ARGS{'id'};
+my $ticket = RT::Ticket->new( $user );
+$ticket->Load( $tid );
+$notfound->() unless $ticket->id;
+
+my $title = loc('Update ticket #[_1]', $ticket->id);
+
+my @results;
+push @results, ProcessTicketWatchers(           ARGSRef => \%ARGS, TicketObj => $ticket );
+push @results, ProcessTicketBasics(             ARGSRef => \%ARGS, TicketObj => $ticket );
+push @results, ProcessTicketLinks(              ARGSRef => \%ARGS, TicketObj => $ticket );
+push @results, ProcessTicketDates(              ARGSRef => \%ARGS, TicketObj => $ticket );
+push @results, ProcessObjectCustomFieldUpdates( ARGSRef => \%ARGS, TicketObj => $ticket );
+
+$RT::Logger->error( "bla bla" );
+
+</%INIT>

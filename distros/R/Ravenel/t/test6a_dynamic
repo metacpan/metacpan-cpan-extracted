@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin );
+use Ravenel;
+use Ravenel::Document;
+
+my $obj = new Ravenel( { 
+	'dynamic' => 1,
+} );
+
+my Ravenel::Document $doc = $obj->add_document( {
+	'data'         => qq(
+	<html>
+		<r:Foo:test abc="def" depth="1">
+			<div>"Hello" 
+				<r:replace name="moo" depth="0">
+					{c} {b} {a} {b}
+				</r:replace> 
+			</div>
+		</r:Foo:test>
+	</html>
+	), 
+	'prefix'       => 'r:',
+	'content_type' => 'html',
+	'arguments'    => {
+		'moo' => [ 
+			{ 'a' => 'bar', 'b' => 'cow', 'c' => 'jar' },
+			{ 'a' => 'zoo', 'b' => 'zaz', 'c' => 'zar' },
+		],
+	},
+	'name' => 'test',
+	#'path' => '/foo.html',
+} );
+
+my $res = $doc->parse();
+
+print $res . "\n";
+

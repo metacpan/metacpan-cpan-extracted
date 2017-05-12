@@ -1,0 +1,34 @@
+Regexp-Log-Progress
+
+This module provides regex's to parse various log files for Progress
+Softwares OpenEdge database product.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Installation files for RPM and APT have been included if you perfer the 
+local package manager.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Regexp::Log::Progress
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 Kevin L. Esteb
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

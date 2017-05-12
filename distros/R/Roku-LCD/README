@@ -1,0 +1,68 @@
+Roku-LCD
+
+This module supplies a small set of routines to display text on a Roku
+Soundbridge whilst it is not being used for radio.
+
+This was originally based on Tools4Roku's RokuUI module, but since it
+is not available on CPAN, I have revised the RokuLCD module to use the
+Roku::RCP module for inherited methods.  For more information on RokuLCD,
+the documentation is encapsulated within the module and can be accessed
+via a tool such as pod2html.
+
+The M400 & M500 can't display pictures and have small screens.  If you
+have a more advanced Soundbridge, I'd recommend heading over to 
+http://billiatjapan.netfirms.com/Tools4Roku/ and downloading Juergen's
+script.
+
+
+INSTALLATION
+
+If you have a Roku Soundbridge and wish to run all tests, set the ROKUIP
+variable to the hostname or IP address of your Soundbridge prior to
+installation - eg in bash:
+export ROKUIP=192.168.1.86
+or
+export ROKUIP=roku
+
+If using Windows, this should work from the command prompt:
+set ROKUIP=roku
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	Build
+	Build test
+	Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Roku::LCD
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Roku-LCD
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Roku-LCD
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Roku-LCD
+
+    Search CPAN
+        http://search.cpan.org/dist/Roku-LCD/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 Outhwaite, Ed
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

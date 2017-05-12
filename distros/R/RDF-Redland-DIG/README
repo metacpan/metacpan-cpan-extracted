@@ -1,0 +1,34 @@
+RDF::Redland::DIG
+=================
+
+This package provides functionality to
+
+  - transport RDF models to a remote reasoner
+  - to transport OWL information to that reasoner
+  - and to extract DL reasoned information from that reasoner
+
+Hereby it is using the DIG protocol:
+
+   http://dl-web.man.ac.uk/dig/
+
+The package has been tested with
+
+   pellet isa owl-reasoner,
+       which supports-interface dig,
+   homepage: http://pellet.owldl.com/
+
+
+   fact isa owl-reasoner,
+       which supports-interface dig,
+   homepage: http://www.cs.man.ac.uk/~horrocks/FaCT/   
+
+--
+
+Copyright (C) 2008 by Lara Spendier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+Work supported by the Austrian Research Centers Seibersdorf (Smart
+Systems).

@@ -1,0 +1,3 @@
+<form action="<% RT->Config->Get('WebPath') %>/Minimal/Search.html" method="get">
+<input type="submit" class="button" value="<&|/l&>Search</&>" />&nbsp;<input size="4" name="q" />
+</form>

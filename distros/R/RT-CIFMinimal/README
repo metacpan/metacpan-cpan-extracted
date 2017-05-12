@@ -1,0 +1,21 @@
+Collective Intelligence Framework
+=================================
+
+see: https://github.com/collectiveintel/RT-CIFMinimal
+
+PREREQS
+
+1. RT and the CIF Server need to be on the same box (RT-CIFMinimal needs access to the apikeys libraries and table)
+
+INSTALLATION
+
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ sudo make initdb
+$ sudo vi /opt/rt3/etc/RT_SiteConfig.pm
+
+Set(@Plugins,(qw(RT::FM RT::IR RT::IODEF RT::CIFMinimal)));
+
+$ sudo patch /opt/rt3/lib/RT/Interface/Web.pm etc/web.pm.patch
+$ sudo /etc/init.d/apache2 restart

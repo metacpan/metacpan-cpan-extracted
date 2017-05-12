@@ -1,0 +1,501 @@
+<HTML>
+<HEAD>
+<TITLE>Relations::Query - Object for building queries with DBI/DBD::mysql</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+  <!-- beginning of leaf header-->
+
+  <TABLE border=0  cellpadding=0 cellspacing=0 width=100%>
+  <TR>
+    <TD valign=middle width='100%'
+    bgcolor='#cc0066'> <font face='sans-serif' size='+1'
+    color='#ff99cc'>&nbsp;&nbsp;&nbsp;Relations::Query - Object for creating SQL queries</font>
+    </TD>
+  </TR>
+  </TABLE>
+  <p>&nbsp</p>
+  <!-- end of leaf content-->
+  
+
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#abstract">ABSTRACT</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#what it does">WHAT IT DOES</A></LI>
+		<LI><A HREF="#calling relations::query routines">CALLING RELATIONS::QUERY ROUTINES</A></LI>
+		<LI><A HREF="#query arguments">QUERY ARGUMENTS</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::query functions">LIST OF RELATIONS::QUERY FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#clone">clone</A></LI>
+		<LI><A HREF="#get">get</A></LI>
+		<LI><A HREF="#add">add</A></LI>
+		<LI><A HREF="#set">set</A></LI>
+		<LI><A HREF="#get_add">get_add</A></LI>
+		<LI><A HREF="#get_set">get_set</A></LI>
+		<LI><A HREF="#to_string">to_string</A></LI>
+		<LI><A HREF="#to_text">to_text</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::query properties">LIST OF RELATIONS::QUERY PROPERTIES</A></LI>
+	<UL>
+
+		<LI><A HREF="#select">select</A></LI>
+		<LI><A HREF="#from">from</A></LI>
+		<LI><A HREF="#where">where</A></LI>
+		<LI><A HREF="#group_by">group_by</A></LI>
+		<LI><A HREF="#having">having</A></LI>
+		<LI><A HREF="#order_by">order_by</A></LI>
+		<LI><A HREF="#limit">limit</A></LI>
+	</UL>
+
+	<LI><A HREF="#other related work">OTHER RELATED WORK</A></LI>
+	<UL>
+
+		<LI><A HREF="#relations (perl)">Relations (Perl)</A></LI>
+		<LI><A HREF="#relationsquery (perl)">Relations-Query (Perl)</A></LI>
+		<LI><A HREF="#relationsabstract (perl)">Relations-Abstract (Perl)</A></LI>
+		<LI><A HREF="#relationsadmin (php)">Relations-Admin (PHP)</A></LI>
+		<LI><A HREF="#relationsfamily (perl)">Relations-Family (Perl)</A></LI>
+		<LI><A HREF="#relationsdisplay (perl)">Relations-Display (Perl)</A></LI>
+		<LI><A HREF="#relationsreport (perl)">Relations-Report (Perl)</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Relations::Query - Object for building queries with DBI/DBD::mysql</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  # Relations::Query Script that creates some queries.</PRE>
+<PRE>
+  use Relations::Query;</PRE>
+<PRE>
+  $query = new Relations::Query(-select   =&gt; {'fife' =&gt; 'barney'},
+                                -from     =&gt; {'green_teeth' =&gt; 'moogoo'},
+                                -where    =&gt; &quot;flotsam&gt;jetsam&quot;,
+                                -group_by =&gt; &quot;denali&quot;,
+                                -having   =&gt; {'fortune' =&gt; 'cookie'},
+                                -order_by =&gt; ['was','is','will'],
+                                -limit    =&gt; '1');</PRE>
+<PRE>
+  $get_query = $query-&gt;get();</PRE>
+<PRE>
+  $query-&gt;set(-select   =&gt; {'clean' =&gt; 'sparkle'},
+              -from     =&gt; {'lean' =&gt; 'book'},
+              -where    =&gt; &quot;fighting is between courage and chaos&quot;,
+              -limit    =&gt; '123');</PRE>
+<PRE>
+  $set_query = $query-&gt;get();</PRE>
+<PRE>
+  $get_add_query = $query-&gt;get_add(-select   =&gt; {'mean' =&gt; 'dog'},
+                                   -where    =&gt; &quot;running is null&quot;,
+                                   -having   =&gt; {'kitties'=&gt; 'on_tv'},
+                                   -limit    =&gt; ['9678']);</PRE>
+<PRE>
+  $query = to_string({'select' =&gt; 'this',
+                      'from'   =&gt; 'that'});</PRE>
+<P>
+<HR>
+<H1><A NAME="abstract">ABSTRACT</A></H1>
+<P>This perl library uses perl5 objects and functions to simplify the 
+query creation and manipulation process. It uses an object orientated 
+interface, with the exception of the <CODE>to_string()</CODE> function, complete 
+with functions to manipulate the query and return the query as a string.</P>
+<P>The current version of Relations::Query is available at</P>
+<PRE>
+  <A HREF="http://www.gaf3.com">http://www.gaf3.com</A></PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="what it does">WHAT IT DOES</A></H2>
+<P>With Relations::Query you can create a 'select' query by creating a new
+query object, and passing hashes, arrays, or strings of info to the 
+constructor, such as what's within the variables clause, what to order 
+by, etc.  You can also add and override clause info in the query as well, 
+on both a permanent and temporary basis. With the <CODE>to_string()</CODE> function,
+you can create a query string from a hash, query object or string.</P>
+<P>
+<H2><A NAME="calling relations::query routines">CALLING RELATIONS::QUERY ROUTINES</A></H2>
+<P>All Relations::Query routines use an ordered, named and hashed argument 
+calling style, with the exception of the <CODE>to_string()</CODE> function which uses
+only an ordered argument calling style. This is because some routines have 
+as many as seven arguments, and the code is easier to understand given a 
+named or hashed argument style, but since some people, however, prefer the 
+ordered argument style because its smaller, I'm glad to do that too.</P>
+<P>If you use the ordered argument calling style, such as</P>
+<PRE>
+  $query = new Relations::Query(['id','label'],'parts');</PRE>
+<P>the order matters, and you should consult the function defintions 
+later in this document to determine the order to use.</P>
+<P>If you use the named argument calling style, such as</P>
+<PRE>
+  $query = new Relations::Query(-select =&gt; ['id','label'],
+                                -from   =&gt; 'parts');</PRE>
+<P>the order does not matter, but the names, and minus signs preceeding them, do.
+You should consult the function defintions later in this document to determine 
+the names to use.</P>
+<P>In the named arugment style, each argument name is preceded by a dash.  
+Neither case nor order matters in the argument list.  -from, -From, and 
+-FROM are all acceptable.  In fact, only the first argument needs to begin with 
+a dash.  If a dash is present in the first argument, Relations::Query assumes
+dashes for the subsequent ones.</P>
+<P>If you use the hashed argument calling style, such as</P>
+<PRE>
+  $query = new Relations::Query({select =&gt; ['id','label'],
+                                 from   =&gt; 'parts'});</PRE>
+<P>or</P>
+<PRE>
+  $query = new Relations::Query({-select =&gt; ['id','label'],
+                                 -from   =&gt; 'parts'});</PRE>
+<P>the order does not matter, but the names, and curly braces do, (minus signs are
+optional). You should consult the function defintions later in this document to 
+determine the names to use.</P>
+<P>In the hashed arugment style, no dashes are needed, but they won't cause problems
+if you put them in. Neither case nor order matters in the argument list. from, 
+From, and FROM are all acceptable. If a hash is the first argument, 
+Relations::Query assumes that is the only argument that matters, and ignores any 
+other arguments after the {}'s.</P>
+<P>
+<H2><A NAME="query arguments">QUERY ARGUMENTS</A></H2>
+<P>All of the Relations::Query object functions require arguments to be used 
+as different clauses of a ``select * from blah'' statements. To be as easy and
+flexible as possible (In my opinion anyway! :D ), you can specify these 
+arguments as a hash, an array or a string.</P>
+<P>SELECT AND FROM FUNCTIONALITY</P>
+<P>If sent as a hash, a select or from argument will become a string of 
+'field as name' pairs, concatented with a ','.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-select =&gt; {'id'     =&gt; 'parts.part_id',
+                                            'label'  =&gt; &quot;concat(parts.name,' - $ ',prices.price)&quot;},
+                                -from   =&gt; {'parts'  =&gt; 'sales.cheap_parts',
+                                            'prices' =&gt; 'stock.all_prices'});</PRE>
+<P>creates the SQL statment:</P>
+<PRE>
+  select parts.part_id as id,concat(parts.name,' - $ ',prices.price) as label 
+  from sales.cheap_parts as parts,stock.all_prices as prices</PRE>
+<P>If sent as an array, a select or from argument will become a string of array 
+members, concatented with a ','.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-select =&gt; ['cheap_parts.part_id',
+                                            &quot;concat(cheap_parts.name,' - $ ',all_prices.price) as price&quot;],
+                                -from   =&gt; ['sales.cheap_parts',
+                                            'stock.all_prices']);</PRE>
+<P>creates the SQL statment:</P>
+<PRE>
+  select cheap_parts.part_id,concat(cheap_parts.name,' - $ ',all_prices.price) as price 
+  from sales.cheap_parts,stock.all_prices</PRE>
+<P>If sent as string, a select or from argument will stay a string.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-select =&gt; &quot;name&quot;,
+                                -from   =&gt; 'sales.cheap_parts');</PRE>
+<P>creates the SQL statment:</P>
+<PRE>
+  select name from sales.cheap_parts</PRE>
+<P>WHERE AND HAVING FUNCTIONALITY</P>
+<P>If sent as a hash, a where or having argument will become a string of 
+'field=value' pairs, concatented with an ' and '.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-where  =&gt; {'price' =&gt; &quot;4.99&quot;,
+                                            'type'  =&gt; &quot;'cap'&quot;},
+                                -having =&gt; {'total' =&gt; '100',
+                                            'cost'  =&gt; &quot;19.96&quot;});</PRE>
+<P>creates the SQL statment:</P>
+<PRE>
+  where price=4.99 and type='cap'
+  having total=100 and cost=19.96</PRE>
+<P>If sent as an array, a where or having argument will become a string of array 
+members, concatented with an ' and '.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-where  =&gt; ['price &gt; 4.99',
+                                            &quot;type in ('cap','res','ind')&quot;],
+                                -having =&gt; ['total between 90 and 100',
+                                            'cost=19.96']);</PRE>
+<P>creates the SQL statment:</P>
+<PRE>
+  where price &gt; 4.99 and type in ('cap','res','ind')
+  having total between 90 and 100 and cost=19.96</PRE>
+<P>If sent as string, a where or having argument will stay a string.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-where  =&gt; &quot;price &gt; 4.99 or type in ('cap','res','ind')&quot;,
+                                -having =&gt; &quot;total between 90 and 100 or (cost=19.96 and not total=70)&quot;);</PRE>
+<P>creates the SQL statment:</P>
+<PRE>
+  where price &gt; 4.99 or type in ('cap','res','ind')
+  having total between 90 and 100 or (cost=19.96 and not total=70)</PRE>
+<P>GROUP BY, ORDER BY, AND LIMIT FUNCTIONALITY</P>
+<P>If sent as a hash, a group by, order by or limit argument will become 
+a string of 'field_1,field_2' pairs, concatented with a ','. Why did I 
+do this? The clause delimitter is the same for all clauses. So, this 
+behavior is more by default than by design. Keep in mind that since 
+a hash has no order, the order of your arguments is not guaranteed. 
+So, it's really not advisable to pass the ``order by'' arguments this 
+way. You can if you want, but I will you taunt you for doing so.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-group_by =&gt; {'name'     =&gt; 'color',
+                                              'category' =&gt; 'size'},
+                                -order_by =&gt; {'color'    =&gt; 'size',
+                                              'name'     =&gt; 'category'},
+                                -limit    =&gt; {'30'  =&gt; '5'});</PRE>
+<P>creates the SQL statment:</P>
+<PRE>
+  group by name,color,category,size 
+  order by color,size,name,category
+  limit 30,5</PRE>
+<P>or possibly:</P>
+<PRE>
+  group by category,size,name,color 
+  order by name,category,color,size
+  limit 30,5</PRE>
+<P>If sent as an array, a group by, order by or limit argument will 
+become a string of array members, concatented with a ','.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-group_by =&gt; ['name','color','category','size'],
+                                -order_by =&gt; ['color','size','name','category'],
+                                -limit    =&gt; ['30','5']);</PRE>
+<P>creates the SQL statment (without a doubt):</P>
+<PRE>
+  group by name,color,category,size 
+  order by color,size,name,category
+  limit 30,5</PRE>
+<P>If sent as string, a group by, order by or limit argument will stay a 
+string.</P>
+<P>For example,</P>
+<PRE>
+  $query = new Relations::Query(-group_by =&gt; 'name,color,category,size',
+                                -order_by =&gt; 'color,size desc,name,category',
+                                -limit    =&gt; '30');</PRE>
+<P>creates the SQL statment (without a doubt):</P>
+<PRE>
+  group by name,color,category,size 
+  order by color,size desc,name,category
+  limit 30</PRE>
+<P>
+<HR>
+<H1><A NAME="list of relations::query functions">LIST OF RELATIONS::QUERY FUNCTIONS</A></H1>
+<P>An example of each function is provided in 'test.pl'.</P>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+  $query = Relations::Query-&gt;new($select,$from,$where,$group_by,$having,$order_by,$limit);</PRE>
+<PRE>
+  $query = new Relations::Query(-select   =&gt; $select,
+                                -from     =&gt; $from,
+                                -where    =&gt; $where,
+                                -group_by =&gt; $group_by,
+                                -having   =&gt; $having,
+                                -order_by =&gt; $order_by,
+                                -limit    =&gt; $limit);</PRE>
+<P>Creates creates a new Relations::Query object with each clause stored as
+a string.</P>
+<P>
+<H2><A NAME="clone">clone</A></H2>
+<PRE>
+  $clone = $query-&gt;clone();</PRE>
+<P>Returns creates a copy of a Relations::Query object.</P>
+<P>
+<H2><A NAME="get">get</A></H2>
+<PRE>
+  $query_string = $query-&gt;get();</PRE>
+<P>Returns the query in string form.</P>
+<P>
+<H2><A NAME="add">add</A></H2>
+<PRE>
+  $query-&gt;add($select,$from,$where,$group_by,$having,$order_by,$limit);</PRE>
+<PRE>
+  $query-&gt;add(-select   =&gt; $select,
+              -from     =&gt; $from,
+              -where    =&gt; $where,
+              -group_by =&gt; $group_by,
+              -having   =&gt; $having,
+              -order_by =&gt; $order_by,
+              -limit    =&gt; $limit);</PRE>
+<P>Adds more info to the query object. If the clause to be added to is already 
+set, <CODE>add()</CODE> concatenates the new clause onto to current one with the appropriate 
+delimitter. If the clause to be added to is not already set, <CODE>add()</CODE> sets that 
+clause to the new one.</P>
+<P>
+<H2><A NAME="set">set</A></H2>
+<PRE>
+  $query-&gt;set($select,$from,$where,$group_by,$having,$order_by,$limit);</PRE>
+<PRE>
+  $query-&gt;set(-select   =&gt; $select,
+              -from     =&gt; $from,
+              -where    =&gt; $where,
+              -group_by =&gt; $group_by,
+              -having   =&gt; $having,
+              -order_by =&gt; $order_by,
+              -limit    =&gt; $limit);</PRE>
+<P>Sets (overwrites) info to the query object. Only the clauses specified will
+be over written.</P>
+<P>
+<H2><A NAME="get_add">get_add</A></H2>
+<PRE>
+  $query-&gt;get_add($select,$from,$where,$group_by,$having,$order_by,$limit);</PRE>
+<PRE>
+  $query-&gt;get_add(-select   =&gt; $select,
+                  -from     =&gt; $from,
+                  -where    =&gt; $where,
+                  -group_by =&gt; $group_by,
+                  -having   =&gt; $having,
+                  -order_by =&gt; $order_by,
+                  -limit    =&gt; $limit);</PRE>
+<P>Returns the query, plus whatever's to be added, in string form. The query
+object is not added to, but the string is returned with the info added to the
+specified clauses.</P>
+<P>
+<H2><A NAME="get_set">get_set</A></H2>
+<PRE>
+  $query-&gt;get_set($select,$from,$where,$group_by,$having,$order_by,$limit);</PRE>
+<PRE>
+  $query-&gt;get_set(-select   =&gt; $select,
+                  -from     =&gt; $from,
+                  -where    =&gt; $where,
+                  -group_by =&gt; $group_by,
+                  -having   =&gt; $having,
+                  -order_by =&gt; $order_by,
+                  -limit    =&gt; $limit);</PRE>
+<P>Returns the query, plus whatever's to be set, in string form. The query
+object is not over written, but the string is returned with the info 
+over written in the specified clauses.</P>
+<P>
+<H2><A NAME="to_string">to_string</A></H2>
+<PRE>
+  $string = to_string('select this from that');</PRE>
+<PRE>
+  $string = to_string({'select' =&gt; 'this',
+                       'from'   =&gt; 'that'});</PRE>
+<PRE>
+  $string = to_string({-select =&gt; 'this',
+                       -from   =&gt; 'that'});</PRE>
+<PRE>
+  $string = to_string(Relations::Query-&gt;new(-select =&gt; 'this',
+                                            -from   =&gt; 'that'));</PRE>
+<P>Returns a query in string form from the arguments sent. It may seem a little
+silly, but Relations::Abstract relies heavily on this function. All the 
+examples above set string equal to 'select this from that'.</P>
+<P>
+<H2><A NAME="to_text">to_text</A></H2>
+<PRE>
+  $text = $query-&gt;to_text($string,$current);</PRE>
+<P>Returns a text representation of a query. Useful for debugging purposes. It
+takes a a string to use for indenting, $string, and the current number of 
+indents, $current.</P>
+<P>
+<HR>
+<H1><A NAME="list of relations::query properties">LIST OF RELATIONS::QUERY PROPERTIES</A></H1>
+<P>
+<H2><A NAME="select">select</A></H2>
+<P>The select part of the query in string form (without the word 'select').</P>
+<P>
+<H2><A NAME="from">from</A></H2>
+<P>The from part of the query in string form (without the word 'from').</P>
+<P>
+<H2><A NAME="where">where</A></H2>
+<P>The where part of the query in string form (without the word 'where').</P>
+<P>
+<H2><A NAME="group_by">group_by</A></H2>
+<P>The group by part of the query in string form (without the words 'group by').</P>
+<P>
+<H2><A NAME="having">having</A></H2>
+<P>The having part of the query in string form (without the word 'having').</P>
+<P>
+<H2><A NAME="order_by">order_by</A></H2>
+<P>The order by part of the query in string form (without the words 'order by').</P>
+<P>
+<H2><A NAME="limit">limit</A></H2>
+<P>The limit part of the query in string form (without the word 'limit').</P>
+<P>
+<HR>
+<H1><A NAME="other related work">OTHER RELATED WORK</A></H1>
+<P>
+<H2><A NAME="relations (perl)">Relations (Perl)</A></H2>
+<P>Contains functions for dealing with databases. It's mainly used as 
+the foundation for the other Relations modules. It may be useful for 
+people that deal with databases as well.</P>
+<P>
+<H2><A NAME="relationsquery (perl)">Relations-Query (Perl)</A></H2>
+<P>An object oriented form of a SQL select query. Takes hashes.
+arrays, or strings for different clauses (select,where,limit)
+and creates a string for each clause. Also allows users to add to
+existing clauses. Returns a string which can then be sent to a 
+database.</P>
+<P>
+<H2><A NAME="relationsabstract (perl)">Relations-Abstract (Perl)</A></H2>
+<P>Meant to save development time and code space. It takes the most common 
+(in my experience) collection of calls to a MySQL database, and changes 
+them to one liner calls to an object.</P>
+<P>
+<H2><A NAME="relationsadmin (php)">Relations-Admin (PHP)</A></H2>
+<P>Some generalized objects for creating Web interfaces to relational 
+databases. Allows users to insert, select, update, and delete records from 
+different tables. It has functionality to use tables as lookup values 
+for records in other tables.</P>
+<P>
+<H2><A NAME="relationsfamily (perl)">Relations-Family (Perl)</A></H2>
+<P>Query engine for relational databases.  It queries members from 
+any table in a relational database using members selected from any 
+other tables in the relational database. This is especially useful with 
+complex databases: databases with many tables and many connections 
+between tables.</P>
+<P>
+<H2><A NAME="relationsdisplay (perl)">Relations-Display (Perl)</A></H2>
+<P>Module creating graphs from database queries. It takes in a query through a 
+Relations-Query object, along with information pertaining to which field 
+values from the query results are to be used in creating the graph title, 
+x axis label and titles, legend label (not used on the graph) and titles, 
+and y axis data. Returns a graph and/or table built from from the query.</P>
+<P>
+<H2><A NAME="relationsreport (perl)">Relations-Report (Perl)</A></H2>
+<P>An Web interface for Relations-Family, Reations-Query, and Relations-Display. 
+It creates complex (too complex?) web pages for selecting from the different 
+tables in a Relations-Family object. It also has controls for specifying the 
+grouping and ordering of data with a Relations-Query object, which is also 
+based on selections in the Relations-Family object. That Relations-Query can 
+then be passed to a Relations-Display object, and a graph and/or table will 
+be displayed.</P>
+
+
+    <!-- beginning of leaf footer-->
+    <p>&nbsp;</p>
+    <TABLE border=0  cellpadding=0 cellspacing=0 width=100%>
+    <TR>
+      <TD valign=middle
+        bgcolor='#cc0066'> <font face='sans-serif' size='+1'
+        color='#ff99cc'>&nbsp;&nbsp;&nbsp;Relations::Query - Object for creating SQL queries</font>
+      </TD>
+    </TR>
+    </TABLE>
+    <!-- end of leaf footer-->
+  
+</BODY>
+
+</HTML>

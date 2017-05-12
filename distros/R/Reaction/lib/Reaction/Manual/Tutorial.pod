@@ -1,0 +1,522 @@
+=head1 NAME
+
+Reaction::Manual::Tutorial - Step by Step Tutorial
+
+=head1 DESCRIPTION
+
+This document aims at giving simple step-by-step leading to an example application
+using the common functionality provided by L<Reaction>.
+
+=head1 CREATING A NEW APPLICATION
+
+At first we have to create a new application. For this we use the C<catalyst.pl>
+script as we would for any other Catalyst application:
+
+  $ catalyst.pl MyApp
+  [lots "created ..." messages]
+
+There is nothing to change in the application class file.
+
+As you work through this tutorial you'll be creating several new files in
+various directories. You can save some time by creating the directories now,
+like this:
+
+  mkdir -p share/skin/myapp/layout lib/MyApp/View/Site/Widget lib/MyApp/Schema lib/MyApp/InterfaceModel
+
+=head1 THE VIEW
+
+Since we are not just rendering templates with Reaction, but layouts and widgets,
+a simple TT view won't suffice. We need to create our own C<lib/MyApp/View/Site.pm>:
+
+  package MyApp::View::Site;
+  use Reaction::Class;
+  
+  use namespace::autoclean;
+  
+  extends 'Reaction::UI::View::TT';
+  
+  __PACKAGE__->meta->make_immutable;
+  
+  1;
+
+The C<use Reaction::Class> line will import L<Moose>, L<strict> and L<warnings> into
+our file and might perform some Reaction specific setups.
+
+We make sure that we don't provide imported functions as methods at runtime by using
+L<namespace::autoclean>.
+
+In its simplest version, our view just needs to do a C<extends 'Reaction::UI::View::TT'>
+to make a new subclass of it.
+
+We chose to call C<make_immutable> on the class' meta class instance to have it inline
+methods for runtime speed improvements.
+
+=head1 THE ROOT CONTROLLER
+
+As usual in Catalyst, our root controller (at C<lib/MyApp/Controller/Root.pm> represents
+the root namespace for our application. For this purpose, it should look like this:
+
+  package MyApp::Controller::Root;
+  use strict;
+  use warnings;
+  use parent 'Reaction::UI::Controller::Root';
+  
+  use aliased 'Reaction::UI::ViewPort';
+  use aliased 'Reaction::UI::ViewPort::SiteLayout';
+  
+  use namespace::autoclean;
+  
+  __PACKAGE__->config(
+      view_name       => 'Site',
+      window_title    => 'MyApp Window',
+      namespace       => '',
+  );
+  
+  sub base: Chained('/') PathPart('') CaptureArgs(0) {
+      my ($self, $ctx) = @_;
+      $self->push_viewport(SiteLayout,
+          title           => 'MyApp Test Title',
+          static_base_uri => join('', $ctx->uri_for('/static')),
+          meta_info       => {
+              http_header   => {
+                  'Content-Type' => 'text/html;charset=utf-8',
+              },
+          },
+      );
+  }
+  
+  sub root: Chained('base') PathPart('') Args(0) {
+      my ($self, $ctx) = @_;
+      $self->push_viewport(ViewPort, layout => 'root');
+  }
+  
+  1;
+
+The effects of L<strict>, L<warnings>, L<parent>, L<aliased> and L<namespace::autoclean>
+should be clear by now. Let's take a look at the configuration.
+
+The C<view_name> determines which view to use. We set it to C<Site>, which is our only view
+by now. Be careful to set C<view_name> and not C<view>, which would fail telling you it 
+expected an object.
+
+The C<window_title> is the title given to the L<Reaction::UI::Window> instance that will be
+stored in C<$ctx-E<gt>stash-E<gt>{window}> by the C<begin> action provided by
+L<Reaction::UI::Controller::Root>.
+
+The C<namespace> setting anchors the root controller at C</>.
+
+The C<base> action here acts as a general point all other actions can chain off of. It
+pushes the L<Reaction::UI::ViewPort::SiteLayout> viewport onto the 
+L<focus stack|Reaction::UI::FocusStack>. As arguments we see a C<title> that will be used
+as page title later. The C<static_base_uri> is used for static links like CSS and JavaScript
+files. Since we didn't specify a layout C<site_layout> will be used.
+
+We also defined a C<root> action serving as application index. It chains off the C<base>
+action. It is only pushing the root viewport L<Reaction::UI::ViewPort> on the focus stack,
+but this time we specified a layout named C<root>.
+
+Reaction will try to find our layout files in C<share/skin/$skin_name/layout/*>, so the next
+thing to do is to create a new skin and the layout files.
+
+=head1 A NEW SKIN
+
+If your version of Catalyst still creates a C<root> instead of a C<share> directory, you
+might want to rename it. This is regarded as a best practice and follows the conventions
+of this tutorial and other Reaction documentation.
+
+First we need to create a directory for our new skin:
+
+  $ mkdir -p share/skin/myapp/layout
+
+Next we need to configure our new skin. This is done in the C<share/skin/myapp/skin.conf>
+file. At the moment, all it should contain is
+
+  extends /Reaction/default
+
+Note that this C<extends> specification contains the distribution name of the
+library or application of which to use the templates as base. You can also give it
+a relative name like
+
+  extends foo
+
+and it would try to extend a skin named C<foo> in your own application's C<share/skin>
+directory.
+
+In general, the Reaction distribution provides two skin choices to build upon:
+C</Reaction/default> and C</Reaction/base>.  C<base> is Reaction's most basic skin
+while the C<default> skin extends the base by embellishing the layouts with more XHTML.  
+The default skin is designed to be a working skin.
+
+In other words, if you want to write most of the low-level XHTML yourself
+then put the following in your skin.conf:
+
+  extends /Reaction/base
+  
+If you want to use more XHTML out of the box, then configure your application to extend 
+the default skin.  
+
+It's worth noting that you are not bound to the XHTML of the default or base skin layouts,
+because you are able to override layout fragments in your own skin.
+
+Next we create C<share/skin/defaults.conf> to allow settings that concern all skins of
+the application. It should contain only this:
+
+  widget_search_path MyApp::View::Site::Widget
+  widget_search_path Reaction::UI::Widget
+
+This will tell Reaction to look in C<Reaction::UI::Widget::*> and 
+C<MyApp::View::Site::Widget::*> for widget classes. That means that our layout named
+C<root> will check for C<MyApp::View::Site::Widget::Root> first and then look if
+C<Reaction::UI::Widget> exists.
+
+We want the first line to be able to create our own widgets and the second line to
+have Reaction find its own widgets.
+
+Now we need to tell Reaction what skin it should use. We do this by adding this section
+to our C<myapp.conf>:
+
+  <View Site>
+      skin_name myapp
+  </View>
+
+The value should be the name of the target directory under C<share/skin/>.
+
+=head1 LAYOUTS
+
+We will need two layout files to begin with. One controlling the site layout and one
+for the root action.
+
+The first will be created as C<share/skin/myapp/layout/site_layout.tt>:
+
+  =extends NEXT
+
+  =for layout body
+
+      <h1>Welcome to MyApp</h1>
+
+      <div id="content">
+          [% inner %]
+      </div>
+
+  =cut
+
+The C<=extends> directive specifies that this layout file is an extension of another
+layout file. The C<NEXT> value here tells Reaction that this extends the C<site_layout>
+layout in the base skin, which we have defined as C</Reaction/default>. That means, you
+can take a look at the layout we are extending at C<share/skin/default/layout/site_layout.tt>
+in the L<Reaction> distribution.
+
+The C<=for layout> directives allows us to set a layout fragment. We define a C<body> fragment
+containing the common C<body> for all pages using this site layout. The C<[% inner %]> is
+where the deeper parts of the stack will be included, in the case of our C<root> action that
+would be the C<Reaction::UI::ViewPort> with the C<root> layout.
+
+If we want to override a specific fragment, we can do just that. There are two choices
+when overriding a specific fragment.  One can disregard the parent fragment all together
+and start from scratch or they could reuse the parent fragment and add to it.  The key to 
+re-using a parent (extended) layout fragment is the keyword C<call_next>.  Specifically, 
+we insert C<[% call_next %]> to include the layout fragment of the parent.  
+
+The parent layout fragment is found either in another layout template named in the 
+C<=extends> directive or it's in a subclass of Reaction::UI::Widget.
+In the latter case, the Widget subclass name matches the name of the template or
+the widget name posed at the top of the layout file via the C<=widget> directive.
+
+Once you know the hierarchy C<call_next> follows, then you know where to examine
+the details of the parent layouts or widgets.
+
+The layout representing the root action is called C<share/skin/myapp/layout/root.tt>:
+
+  =for layout widget
+
+      <p>Hello, World!</p>
+
+  =cut
+
+This one is rather simple. The C<=for layout widget> directive is special in that the
+C<widget> fragment will always be where the rendering starts. In fact, our C<site_layout>
+layout too contains a C<widget> fragment, you just don't see it because you inherited it from
+your base skin (or your base skin's base skin, for that matter) instead of defining it yourself.
+
+=head1 A SIMPLE WIDGET
+
+If we wanted to use a different kind of widget than that assumed automatically by Reaction, we 
+could add a
+
+  =widget ClassName
+
+directive at the top of the layout file. But for now, we will instead create our own
+widget at C<lib/MyApp/View/Site/Widget/Root.pm>:
+
+  package MyApp::View::Site::Widget::Root;
+  use Reaction::UI::WidgetClass;
+  
+  use namespace::autoclean;
+  
+  __PACKAGE__->meta->make_immutable;
+  
+  1;
+
+This adds no new functionality at the moment. It just uses C<Reaction::UI::WidgetClass> to ease
+and automate the setup of a new widget class. The widget can provide functionality and fragments
+to the layout. In a way, it can be seen as the Perl code backend to the layout file.
+
+You can now start your C<script/myapp_server.pl> and visit
+
+  http://localhost:3000/
+
+to view your "Hello, World" page.
+
+=head1 ADDING A SCHEMA
+
+The next part of the tutorial will be about adding data storage to our application. While most
+L<Catalyst> web applications today (or at least they should) abstract their database schema
+with L<DBIx::Class::Schema> into a separate module separated from the webapplication, Reaction
+takes this one step further by introducing so called interface models. The interface model
+defines the layer between your application and your domain model (in this case, the L<DBIx::Class>
+schema).
+
+The first thing we will need is a schema class in C<lib/MyApp/Schema.pm>:
+
+  package MyApp::Schema;
+  use strict;
+  use warnings;
+  
+  use parent 'DBIx::Class::Schema';
+  
+  __PACKAGE__->load_classes;
+  
+  1;
+
+The schema class itself is built like a typical L<DBIx::Class::Schema>. The difference in class
+definition starts at the result classes. For the example's sake, let's make a SQLite database
+called C<example.sqlite>:
+
+  $ cat > example.sqlite.sql
+  CREATE TABLE foo (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name  VARCHAR NOT NULL,
+    last_name   VARCHAR NOT NULL
+  );
+  <Ctrl-D>
+
+  $ sqlite3 example.sqlite < example.sqlite.sql
+  $
+
+The result class for this table combines the usual style of L<DBIx::Class> with L<Moose> meta
+data additions in C<lib/MyApp/Schema/Foo.pm>:
+
+  package MyApp::Schema::Foo;
+  use Moose;
+  use MooseX::Types::Moose  qw( Int );
+  use Reaction::Types::Core qw( NonEmptySimpleStr );
+  
+  use namespace::autoclean;
+  
+  extends 'DBIx::Class';
+  
+  has id => 
+      (is => 'ro', isa => Int, required => 1);
+  
+  has first_name => 
+      (is => 'rw', isa => NonEmptySimpleStr, required => 1);
+  
+  has last_name => 
+      (is => 'rw', isa => NonEmptySimpleStr, required => 1);
+  
+  __PACKAGE__->load_components(qw( IntrospectableM2M Core ));
+  __PACKAGE__->table('foo');
+  
+  __PACKAGE__->add_columns(
+      id => { 
+          data_type         => 'integer', 
+          is_auto_increment => 1,
+      },
+      first_name => { data_type => 'varchar' },
+      last_name  => { data_type => 'varchar' },
+  );
+  
+  __PACKAGE__->set_primary_key('id');
+  
+  1;
+
+The L<MooseX::Types::Moose> and L<Reaction::Types::Core> modules export L<Moose> type
+constraints (See also L<MooseX::Types> and L<Moose::Util::TypeConstraints>). Note that
+we are using L<Moose/extends> here instead of L<base> or L<parent> to extend 
+L<DBIx::Class>.
+
+Next we see our columns in form of Moose attribute definitions. The C<is>, C<isa> and
+C<required> attribute parameters will all be used for introspection and interface
+building later. The C<required> is rather straight-forward. The C<is> will decide whether
+this attribute (or column) can be edited (C<ro> means that it can't, C<rw> means it can).
+The C<isa> attribute will be used for validation and rendering of input fields.
+
+The imported C<NonEmptySimpleStr> for example gives us a simple single-line input box,
+while a C<Str> from L<MooseX::Types::Moose> would give us a textbox.
+
+Following that, we have the usual L<DBIx::Class> result class definitions. The only thing
+different might be the new L<DBIx::Class::IntrospectableM2M> which will allow us to
+inspect many-to-many relations later on.
+
+=head1 CREATING AN INTERFACE MODEL
+
+The interface model should be separated from the application and the schema, since it
+will tie both together. In this case, we will use a reflector to set up the usual interface
+model actions for our schema (C<Create>, C<Update>, C<Delete>, C<DeleteAll>) in
+C<lib/MyApp/InterfaceModel/DBIC.pm>:
+
+  package MyApp::InterfaceModel::DBIC;
+  
+  # keep this on top
+  use parent 'Reaction::InterfaceModel::Object';
+  
+  use Reaction::Class;
+  use Reaction::InterfaceModel::Reflector::DBIC;
+  
+  use namespace::autoclean;
+  
+  my $reflector = Reaction::InterfaceModel::Reflector::DBIC->new;
+  
+  $reflector->reflect_schema(
+      model_class     => __PACKAGE__,
+      schema_class    => 'MyApp::Schema',
+  );
+  
+  __PACKAGE__->meta->make_immutable;
+  
+  1;
+
+The L<parent> import must happen before the L<Reaction::Class> one in this case. Other
+than that, the only thing we do here is create a new L<Reaction::InterfaceModel::Reflector::DBIC>
+and call C<reflect_schema> to build our C<MyApp::InterfaceModel::DBIC::*> namespace out of our
+C<MyApp::Schema>.
+
+=head1 TIEING THE INTERFACE MODEL TO THE APPLICATION
+
+Next on the list is the integration of our new interface model into our application. For
+this we create a simple catalyst model in C<lib/MyApp/Model/DBIC.pm>:
+
+  package MyApp::Model::DBIC;
+  use Reaction::Class;
+  
+  use namespace::autoclean;
+  
+  extends 'Catalyst::Model::Reaction::InterfaceModel::DBIC';
+  
+  __PACKAGE__->meta->make_immutable;
+  
+  __PACKAGE__->config(
+      im_class    => 'MyApp::InterfaceModel::DBIC',
+      db_dsn      => 'dbi:SQLite:example.sqlite',
+  );
+  
+  1;
+
+This model L<extends|Moose> the L<Catalyst::Model::Reaction::InterfaceModel::DBIC> base class
+shipped with Reaction. It's configuration must contain the C<im_class> naming our interface
+model and the C<db_dsn>. If you're using a different kind of database then you
+may neeb to add config for C<db_user>, C<db_password>, and C<db_params>.
+All these get passed to the schema's connect() method.
+
+Of course, since this is Catalyst, all this can also easily be specified 
+via your application config file under the C<Model::DBIC> key.
+
+=head1 BUILDING A SIMPLE CRUD CONTROLLER
+
+Now, since we have defined our interface model as well as our domain model including meta
+data, it isn't very hard (at least not for us) to build a basic (but extendable)
+CRUD controller in C<lib/MyApp/Controller/Foo.pm>:
+
+  package MyApp::Controller::Foo;
+  use strict;
+  use warnings;
+  
+  use parent 'Reaction::UI::Controller::Collection::CRUD';
+  use Reaction::Class;
+  
+  use namespace::autoclean;
+  
+  __PACKAGE__->config(
+      model_name      => 'DBIC',
+      collection_name => 'Foo',
+      actions => {
+          base => { Chained => '/base', PathPart => 'foo' },
+      },
+  );
+  
+  1;
+
+This controller subclasses L<Reaction::UI::Controller::Collection::CRUD>, which is itself a
+subclass of L<Reaction::UI::Controller::Collection>, a class to ease the creation of controllers
+who act on collections of things.
+
+As you can see, for the simplest case we don't need any code; we simply configure our controller.
+
+The C<model_name> is the name of our interface model sans the C<MyApp::Model::> prefix. This means
+this entry points to C<MyApp::Model::DBIC> in this case. The C<collection_name> is the name of
+the collection in the specified interface model. For us, this would be C<Foo>, to match the result
+class we created above and want to manage.
+
+The C<actions> part of the configuration is not Reaction, but rather Catalyst specific. This
+configures the actions inherited from L<Reaction::UI::Controller::Collection::CRUD>. For it to
+work, we only need to tell the C<base> action where to chain off from, and what C<PathPart>
+to use. We chain it to the C<base> action in our root controller. The C<foo> path part is rather
+obvious.
+
+Now you can restart your application and visit
+
+  http://localhost:3000/foo
+
+and you have a complete CRUD interface for C<Foo> with listing, viewing, creating, updating
+and deleting capabilities.
+
+=head1 WHERE TO GO NEXT
+
+=over
+
+=item L<Reaction::Manual::Templates>
+
+When a viewport tries to render a layout, it will involve the view to figure out the corresponding
+template (or any other kind of GUI description) and render it. The template documentation is concerned
+mostly with the C<Reaction::UI::View::TT> implementation allowing the developer to use the L<Template>
+engine to render the layouts.
+
+=item L<Reaction::Manual::Widgets>
+
+A widget is the backend Perl object providing the Perl view logic to a layout. What the rendered
+output actually looks like is determined by the layout. The widget is concerned with storing, providing
+and managing data used and rendered by the layout.
+
+=back
+
+=head1 SEE ALSO
+
+=over 
+
+=item * L<Reaction::Manual>
+
+=item * L<Reaction::Manual::Intro>
+
+=item * L<Reaction::Manual::Overview>
+
+=item * L<Reaction::Manual::Templates>
+
+=item * L<Reaction::Manual::RenderPage>
+
+=item * L<Reaction::UI::View::TT>
+
+=item * L<Reaction::UI::Controller::Root>
+
+=item * L<Reaction::UI::WidgetClass>
+
+=back
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

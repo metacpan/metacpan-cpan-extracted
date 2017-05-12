@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4a43296b0eb1a5b6a402a946d2f17cf02808b813 Changes
+SHA1 9563439c665969cbc24d7cac91744f1777a99923 MANIFEST
+SHA1 7afc5f26b6b6c4bfcc453ba60be285801df2e6d3 META.yml
+SHA1 9a10f2b533cc32db738e688b2b426b68a5b12963 Makefile.PL
+SHA1 c04eca50ec0a6bfe68356d130df7b3a557906d2d README
+SHA1 fc8a47835b942abcbd40b48c1a5a38bde30e5d11 html/Admin/Tools/AutoCreatedUsers.html
+SHA1 5ad5275713807f0d75ff6642f077c3d0d4b7c59b html/Callbacks/RT-Extension-ManageAutoCreatedUsers/Elements/RT__User/ColumnMap/ColumnMap
+SHA1 cabe5c8c509fe072bf8dbe2667cc493cbde9375e html/Callbacks/RT-Extension-ManageAutoCreatedUsers/Elements/Tabs/Privileged
+SHA1 10f1ba97180b54e94ab30d9efe4aaa0a70aa1e26 inc/Module/AutoInstall.pm
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 b084961275ae4b66a9a0766372b0a08803aa63d1 inc/Module/Install/AutoInstall.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 9892f830ea9b5fb1005ff17e38f9309a94f6ea0d inc/Module/Install/GithubMeta.pm
+SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 7173d20065379a781d0218b7e747ca7a9b11f7a0 inc/YAML/Tiny.pm
+SHA1 09407f382c9ab8abc54aa1e1441df635cb512afd lib/RT/Extension/ManageAutoCreatedUsers.pm
+SHA1 b203393260c06bef777dc3620ee0ff584cdc3d43 static/js/manage-autocreated-users.js
+SHA1 6856d095d5dc6b4e554dd0b2b87fabf23f2ee835 xt/basic.t
+SHA1 13a1c64dc30b79cf3c756fec4036aad6944407c7 xt/data/rt4.sql
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlT40ckACgkQMflWJZZAbqABUACfVzHNT3MvdryzLTBmcr18hhBP
+K6IAn3gnQpCxr6b+/mRfF06JD1jbWgoq
+=sWGf
+-----END PGP SIGNATURE-----

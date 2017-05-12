@@ -1,0 +1,22 @@
+---
+abstract: 'REST easier, lay on a cot'
+author:
+  - 'Jason Mills <jmmills@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: REST-Cot
+requires:
+  Email::MIME::ContentType: '0'
+  Hash::Merge::Simple: '0'
+  JSON: '0'
+  REST::Client: '0'
+  URI: '0'
+  namespace::autoclean: '0'
+version: '0.006'

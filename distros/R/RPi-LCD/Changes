@@ -1,0 +1,4 @@
+Revision history for RPi-LCD
+
+2.3601  2017-04-11
+        - extracted from RPi::WiringPi::LCD and made standalone

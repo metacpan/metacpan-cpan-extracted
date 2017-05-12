@@ -1,0 +1,96 @@
+RDF-RDB2RDF
+===========
+
+Created:      2011-09-13
+Home page:    <https://metacpan.org/release/RDF-RDB2RDF>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDB2RDF>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.008	2013-09-20
+
+ [ Bug Fixes ]
+ - Author test cases cope better with newer RDF::Trine versions which are
+   less tolerant of ill-formed IRIs.
+ - Avoid IRI-encoding things that are already fully-formed IRIs.
+   Fixes RT#88816.
+   Vladimir Alexiev++
+   <https://rt.cpan.org/Ticket/Display.html?id=88816>
+ - Correctly skip generating triples when fields are null.
+   Fixes RT#88815.
+   Vladimir Alexiev++
+   <https://rt.cpan.org/Ticket/Display.html?id=88815>
+
+ [ Packaging ]
+ - Use Dist::Inkt.
+
+ [ Other ]
+ - Added: Support rrx:languageColumn.
+   Vladimir Alexiev++
+ - Misc refactoring and tidying.
+ - Updated: Stop using smart match operator and given/when (which each
+   provoke warnings in Perl 5.18.x) in favour of match::simple and for/if
+   respectively.
+
+0.007	2012-06-15	The name's Bond... James Bond
+
+ [ Bug Fixes ]
+ - Properly dereference hashref for Perl < 5.14.
+
+0.006	2012-06-12
+
+ [ Packaging ]
+ - RDB2RDF Working Group tests are now 'xt'.
+ - Reduce dependencies (parent.pm, common::sense, DBIx::Admin::TableInfo,
+   etc).
+
+ [ Other ]
+ - A number of small changes to fix compliance issues with R2RML and Direct
+   Mapping test suites.
+ - Added: RDF::RDB2RDF::DirectMapping::Store supports new_with_config.
+ - Added: RDF::TrineX::Store::DirectMapping is now an alias for
+   RDF::RDB2RDF::DirectMapping::Store.
+
+0.005	2011-11-10
+
+ - Added: Provide ignore_tables option for DirectMapping.
+ - Handle SQL datatypes better.
+ - Template substitutions that will result in URIs now correctly uri_encode
+   substituted values.
+
+0.004	2011-10-20
+
+ [ Documentation ]
+ - Document handle_table and handle_table_rdfs methods for
+   RDF::RDB2RDF::DirectMapping.
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Further optimise RDF::RDB2RDF::DirectMapping::Store::get_statements
+   allowing it to narrow down the list of columns to select from the
+   database when fewer than '*' are needed.
+ - Optimise RDF::RDB2RDF::DirectMapping::Store::get_pattern in cases when
+   all statements with the pattern share a common subject.
+ - Provide warn_sql option for RDF::RDB2RDF::DirectMapping.
+ - Updated: use 5.010
+
+0.003	2011-09-27
+
+ [ Bug Fixes ]
+ - Fix blank node scoping in R2RML mapping.
+ - Various fixes.
+
+ [ Test Suite ]
+ - Include more test cases, inspired by RDB2RDF Working Group's tests.
+
+ [ Other ]
+ - Added: Include RDF::RDB2RDF::DirectMapping class.
+ - Added: Include RDF::RDB2RDF::DirectMapping::Store class.
+
+0.002	2011-09-23
+
+ - Added: Allow 'process' method to take a callback.
+ - Updated: Support 20 Sept 2011 Working Draft of R2RML
+
+0.001	2011-09-15	Initial release

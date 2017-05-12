@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+BEGIN {
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4-assets/local/lib /opt/rt4-assets/lib);
+use RT;
+RT::LoadConfig();
+RT::Init();
+}
+
+use Getopt::Long;
+my %opt;
+GetOptions( \%opt, 'help|h', );
+if ( $opt{help} ) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ verbose => 2 });
+    exit;
+}
+
+# Sanity check that the extension is configured
+die "Apple GSX authentication not configured; please read the documentation for " .
+    "RT::Extension::Assets::AppleGSX for more on configuring this extension."
+    unless RT->System->FirstAttribute('AppleGSXOptions');
+
+my $gsx  = RT::Extension::Assets::AppleGSX->Client;
+die "Apple GSX credentials are incorrect or out-of-date; update them in " .
+    "Tools -> Configuration -> Assets -> Apple GSX"
+    unless $gsx->Authenticate;
+
+my $serial_name = RT::Extension::Assets::AppleGSX->SerialCF;
+my $FIELDS_MAP  = RT::Extension::Assets::AppleGSX->Fields;
+my $CHECKS      = RT::Extension::Assets::AppleGSX->Checks;
+
+# Check that all of the CFs we reference exist
+for my $cfname ($serial_name, keys(%$FIELDS_MAP), keys(%$CHECKS)) {
+    my $cf = RT::CustomField->new(RT->SystemUser);
+    $cf->Load($cfname);
+    die "Custom Field '$cfname' not found" unless $cf->id;
+}
+
+my $assets = RT::Assets->new( RT->SystemUser );
+$assets->UnLimit;
+while (my $asset = $assets->Next) {
+    $asset->UpdateGSX;
+}
+
+__END__
+
+=head1 NAME
+
+rt-apple-gsx-set-warranty - set warranty info for apple assets
+
+=head1 SYNOPSIS
+
+    rt-apple-gsx-set-warranty
+
+=head1 DESCRIPTION
+
+This script will incrementally set warranty info for apple assets;
+running it as a cron job is recommended.
+
+See L<RT::Extension::Assets::AppleGSX> for the necessary RT
+configuration.

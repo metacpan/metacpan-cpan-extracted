@@ -1,0 +1,13 @@
+Revision history for Reflexive-Role-TCPServer: 1.140030
+
+1.140030  2014-01-03 18:26:26 Europe/Amsterdam
+        Make the stream class customizable at role consumption
+        Fix docs/comments and excise all reference to Reflex::Sender
+
+1.121580  2012-06-06 17:15:07 Europe/Amsterdam
+        Support new Reflex::Event interface.
+        Update the example code and tests.
+        Ultimately, stave off the bitrot.
+
+1.110100  2011-01-10 14:10:52 America/Chicago
+        Initial Release

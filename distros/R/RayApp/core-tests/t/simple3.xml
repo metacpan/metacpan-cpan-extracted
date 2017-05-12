@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<application>
+	<found if="list">
+		<dept/>
+		<date/>
+		<list multiple="listelement">
+			<person typeref="#person"/>
+		</list>
+	</found>
+
+	<auth_user id="person" type="struct">
+		<id type="int" />
+		<first_name mandatory="yes"/>
+		<middle_name />
+		<last_name mandatory="yes"/>
+	</auth_user>
+</application>
+

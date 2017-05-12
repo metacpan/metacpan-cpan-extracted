@@ -1,0 +1,70 @@
+{
+   "abstract" : "Translate SQL LIKE pattern to a regular expression",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Regexp-SQL-LIKE",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Sub::Exporter" : 0,
+            "autodie" : "2.00",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : "0.92",
+            "re" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Regexp::SQL::LIKE" : {
+         "file" : "lib/Regexp/SQL/LIKE.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-regexp-sql-like at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-SQL-LIKE"
+      },
+      "homepage" : "http://github.com/dagolden/regexp-sql-like",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/dagolden/regexp-sql-like",
+         "web" : "http://github.com/dagolden/regexp-sql-like"
+      }
+   },
+   "version" : "0.001"
+}
+

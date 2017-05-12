@@ -1,0 +1,166 @@
+Constant(3)           User Contributed Perl Documentation          Constant(3)
+
+
+
+SSYYNNOOPPSSIISS
+         The following example shows how a complicated string, such as the date / time string from the unix "date" command, can be matched against a regular expression defined as a constant. The original regular expression is 5 lines long.
+
+         use Regexp::Constant;
+
+         my $date = "Mon Oct 25 11:59:13 EDT 2004";
+         print $1 if $date =~ /@{[REGEX_SHELL_DATE]}/;
+         exit();
+
+AABBSSTTRRAACCTT
+         WARNING - BETA SOFTWARE - NOT ALL REGEX’S HAVE BEEN TESTED
+
+         A module for defining commonly used regular expressions as constants.
+
+DDEESSCCRRIIPPTTIIOONN
+       NNuummeerriicc rreegguullaarr eexxpprreessssiioonnss
+
+        REGEX_SIGNED
+        REGEX_BINARY
+        REGEX_DECIMAL
+        REGEX_FLOAT
+        REGEX_HEX
+        REGEX_OCTAL
+        REGEX_OCTET
+
+        REGEX_COMMA_DELIMITED_NUMBER
+
+       MMYYSSQQLL ddaattaa ttyyppeess
+
+        REGEX_TINYINT
+        REGEX_TINYINT_SIGNED
+        REGEX_SMALLINT
+        REGEX_SMALLINT_SIGNED
+        REGEX_MEDIUMINT
+        REGEX_MEDIUMINT_SIGNED
+        REGEX_INT
+        REGEX_INT_SIGNED
+        REGEX_BIGINT
+        REGEX_BIGINT_SIGNED
+
+       IIPP && hhoosstt mmaattcchhiinngg
+
+        REGEX_MAC_ADDRESS
+        REGEX_IP_CLASS_A
+        REGEX_IP_CLASS_B
+        REGEX_IP_CLASS_C
+        REGEX_IP_ADDRESS
+        REGEX_DOMAIN_NAME
+        REGEX_EMAIL_ADDRESS
+
+       TTiimmee
+
+        REGEX_HOUR
+        REGEX_MINUTE
+        REGEX_SECOND
+        REGEX_TIME
+        REGEX_GMT_OFFSET
+        REGEX_TIMEZONE
+
+       DDaattee
+
+        REGEX_DAY
+        REGEX_WEEKDAY_ABBREVIATED
+        REGEX_WEEKDAY_NAME
+        REGEX_WEEKDAY
+        REGEX_MONTH_NUMERIC
+        REGEX_MONTH_NAME_ABBREVIATED
+        REGEX_MONTH_NAME
+        REGEX_MONTH
+        REGEX_YEAR
+        REGEX_ROMAN_NUMERAL
+
+       DDaatteeTTiimmee
+
+        REGEX_CLF_DATE
+        REGEX_MYSQL_DATE
+        REGEX_CLF_DATETIME
+        REGEX_MYSQL_DATETIME
+        REGEX_SHELL_DATE
+
+       TTeelleepphhoonnee ((UUSS))
+
+        REGEX_AREA_CODE
+        REGEX_PHONE_EXCHANGE
+        REGEX_PHONE_EXTENSION
+        REGEX_PHONE
+
+       HHTTMMLL
+
+        REGEX_HTML_SIMPLE
+
+       UURRII && wweebb sseerrvveerr lloogg
+
+        REGEX_REQUEST_METHOD
+        REGEX_REQUEST_OBJECT
+        REGEX_URI
+        REGEX_PROTOCOL
+        REGEX_RESPONSE_CODE
+        REGEX_CONTENT_LENGTH
+        REGEX_HTTP_REFERER
+        REGEX_HTTP_USER_AGENT
+        REGEX_COOKIE
+
+       RReeggiioonn ((UUSS))
+
+        REGEX_STATE
+        REGEX_STATE_ABBREVIATION
+        REGEX_ZIP_CODE
+        REGEX_ZIP_CODE_PLUS_FOUR
+
+       MMiisscceellllaanneeoouuss
+
+        REGEX_REPEATED_WORD
+        REGEX_WINDOWS_FILENAME
+        REGEX_NUMBER
+        REGEX_WORD_UNCAPITALIZED
+        REGEX_WORD_CAPITALIZED
+
+       IIDD
+
+        REGEX_MD5
+        REGEX_GUID
+        REGEX_ISBN
+        REGEX_SSN
+
+       CCrreeddiitt CCaarrdd
+
+        REGEX_VISA
+        REGEX_MASTERCARD
+        REGEX_DISCOVER
+        REGEX_DINERS_CLUB
+        REGEX_AMERICAN_EXPRESS
+        REGEX_CREDIT_CARD
+        REGEX_CREDIT_CARD_EXPIRATION
+        REGEX_CREDIT_CARD_VALIDATION
+
+       EEXXPPOORRTT
+
+       None by default.
+
+PPRREERREEQQUUIISSIITTEESS
+       None.
+
+BBUUGGSS
+       Some values are not defined, or use basic matching (HTML, Cookie, etc).
+
+       Telephone does not properly match paranthesis around area code.
+
+       Many REGEX untested or partially tested.
+
+AAUUTTHHOORR
+       David Tiberio, <dtiberio5@hotmail.com>
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright 2004 David Tiberio, dtiberio5@hotmail.com
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.8.0                       2004-10-25                       Constant(3)

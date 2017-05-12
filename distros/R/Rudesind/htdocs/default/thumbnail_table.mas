@@ -1,0 +1,56 @@
+<div class="Rudesind-thumbnail-div">
+ <table>
+  <tr valign="top">
+% foreach my $image (@images) {
+   <td>
+    <& .thumbnail_and_caption, image => $image, gallery => $gallery &>
+% if ( $image->has_caption ) {
+     <div class="Rudesind-caption">
+      <% $image->caption_as_html %>
+     </div>
+% }
+   </td>
+%   unless ( $x++ % $width ) {
+  </tr>
+  <tr valign="top">
+%   }
+% }
+% if ($extra_cells) {
+%   for ( 1..$extra_cells ) {
+   <td class="Rudesind-thumbnail-table-empty-cell"></td>
+%   }
+% }
+  </tr>
+ </table>
+</div>
+
+<%args>
+$gallery
+@images
+</%args>
+
+<%init>
+my $width  = $App->config->gallery_columns;
+
+my $extra_cells = $width - ( @images % $width );
+
+my $x = 1;
+</%init>
+
+<%def .thumbnail_and_caption>
+
+<a href="<% $App->config->uri_root %>/<% $image->path %>.html">\
+<img src="<% $image->thumbnail_uri | h %>"
+     <% Image::Size::html_imgsize( $image->thumbnail_image_file ) %>
+     border="0" class="Rudesind-thumbnail"></a>
+
+<%args>
+$gallery
+$image
+</%args>
+
+<%init>
+$m->flush_buffer unless $image->has_thumbnail;
+</%init>
+
+</%def>

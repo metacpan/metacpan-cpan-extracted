@@ -1,0 +1,25 @@
+---
+abstract: 'Perl extension for parsing and handling RINO data'
+author:
+  - 'Wes Young, <wes@ren-isac.net>'
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RINO-Client
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::CSV: 0
+  JSON: 2.07
+  Module::Pluggable: 3.6
+  Text::Table: 1.114
+  XML::IODEF: 0.11
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

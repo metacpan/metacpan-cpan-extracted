@@ -1,0 +1,38 @@
+{
+   "abstract" : "Cached Lua scripts on a Redis server",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Redis-ScriptCache",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::XSAccessor" : "1.12",
+            "Digest::SHA1" : "0",
+            "Redis" : "1.955",
+            "Test::Deep" : "0",
+            "Test::More" : "0.095",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

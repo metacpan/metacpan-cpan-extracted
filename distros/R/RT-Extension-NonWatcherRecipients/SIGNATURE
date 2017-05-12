@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 40b971b682149236d57ed241ed6997e2d396dcd2 Changes
+SHA1 eaab9b9368207ea6452e02a752458bb272ddfd5b MANIFEST
+SHA1 20ddd3befe95c96808dd3b12c791d887a93234a8 MANIFEST.SKIP
+SHA1 8f767a038aa2b01c6a747c506c6ad6639f87a878 META.yml
+SHA1 4d09e1e8b1b0d82ef2c8a57429ac380635c5dff2 Makefile.PL
+SHA1 1d41251b4aee3f1237dcbbe7517a53b2503a397a README
+SHA1 238cc44648cedfdf4a1ad2c66a839c72db4e3d7b etc/initialdata
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 780e868167858840d454ef6ad6bc2a2206f845e7 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 01fb64dd2387c0b7a843d21feab83b7d033bd3a4 inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 50f38f0587bdac2d88cf83fa3b01558009556cd4 lib/RT/Extension/NonWatcherRecipients.pm
+SHA1 d1069044cdcfa867b09706bdb303be8d21c161d6 lib/RT/Extension/NonWatcherRecipients/Test.pm.in
+SHA1 b358746095ca3629f54aa286d7385e32a7154823 xt/basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXVnTRAAoJEJHs6NvKxcMFWBIQAJbjj/SykSmTnA+TOT4TYqdy
+RZl7B6ozREfScqRZxWXEKlVau/PK3XWVV3481dsNqxCaB0go13a4pwMniv5V/iTG
+S4g8iterzo8WPixJZvDe5CqXc2TSviOGnzYA2m8bKfqR74fxHQe2BSODbqYPcR9I
+rZReAlydwab6+W4IZv9XxV8yEzZFtJl0+pCXTQgfP4z0BP4yd8W+zXCTnRtT3yCv
+cogNrPd3+QA2yzzJHQquCYeAmzqgZVdngQJfO4OpVp02K9vvlw3L6VUgV26l7u0Z
+vW9FvniiiBWSaASFxIuAiF/QDm3NOtpTUK9IMUDfzyr7Icv8N9iTQio9qkehpRbu
+JQogUeoIdaEbJcxH71hgSHeghtDuXGDh8JjcuYorCFZ1RzUsK9PfoaUajVMxUNr0
+3jNUTo4A/3Uft4I7gb8qP3LLDFZ0e94/X6CdK6ytLijotHtcVcoiEcWMizGsQ3Tq
+A0N46drzql5t7zz2yFgNS69NicGYDdeGESDhljH2j03mSy20EVcVxpo7AWk3em50
+aVUbnZoLZORYwtAaGk+pwEEcVJz914quUGCAmbLXwCzpbE1Up00WLsdqA0Pp79+l
+RgL2+Sf+XeApx7H4UqOmthOdizNI6TYF7yo6FB/n3GZyr/Dfd9EhQdlglgqvCYkU
+ijLnWRGKtM+vS6G1Rc28
+=6h5U
+-----END PGP SIGNATURE-----

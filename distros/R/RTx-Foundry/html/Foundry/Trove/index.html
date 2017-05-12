@@ -1,0 +1,88 @@
+%# Never call a man a fool; borrow from him.
+
+% if (@$Map2) {
+	<tr> 
+	    <td><& /Edit/Elements/Tabs, Name => 'Map2', Map => $Map2, URL => "?Type=$Type&Value=" . CGI::Util::escape($Value) &></td>
+	</tr>
+% } else {
+%     $Queues->LimitToEnabled
+% }
+	<tr> 
+	    <td class="tableEmboss">
+	    <table width="100%" border="0" cellspacing="0" cellpadding="4">
+		<tr> 
+		    <td bgcolor="#A3DEF1"> 
+% if ($Type eq 'Overview' or ($Type and $Value)) {
+    <& List, List => $Queues, Begin => $Begin, ARGS => \%ARGS &>
+% } else {
+<&|/l&>Please select one of the category types above.</&>
+% }
+		    </td>
+		</tr>
+	    </table>
+	    </td>
+	</tr>
+<%INIT>
+my $Map2 = [];
+my $QueueObj = RT::Queue->new($session{'CurrentUser'});
+$QueueObj->Load('NewProject');
+my $CF = $QueueObj->CustomField($Type);
+my $CFValues = $CF->Values;
+my $Queues = RT::Queues->new($session{'CurrentUser'});
+
+while (my $V = $CFValues->Next) {
+    $Value ||= $V->Name;
+
+    my $Values = RT::TicketCustomFieldValues->new($session{'CurrentUser'});
+    $Values->LimitToCustomField( $CF->Id );
+    $Values->Limit( FIELD => 'Content', VALUE => $V->Name );
+
+    my $alias = $Values->Join(
+	TYPE   => 'left',
+	ALIAS1 => 'main',
+	FIELD1 => 'Ticket',
+	TABLE2 => 'Tickets',
+	FIELD2 => 'id'
+    );
+    $Values->Limit(
+	ALIAS	   => $alias,
+	FIELD      => 'Status',
+	OPERATOR   => '=',
+	VALUE      => 'resolved',
+    );
+    my $alias2 = $Values->Join(
+	TYPE   => 'left',
+	ALIAS1 => $alias,
+	FIELD1 => 'id',
+	TABLE2 => 'Queues',
+	FIELD2 => 'DefaultDueIn'
+    );
+    $Values->Limit(
+	ALIAS	   => $alias2,
+	FIELD      => 'Id',
+	OPERATOR   => '>',
+	VALUE      => '0',
+    );
+    $Values->Limit(
+	ALIAS	   => $alias2,
+	FIELD      => 'Disabled',
+	OPERATOR   => '=',
+	VALUE      => '0',
+    );
+
+    require CGI::Util;
+    push @$Map2, "?Type=$Type&Value=" . CGI::Util::escape($V->Name), loc($V->Description) . '(' . $Values->Count . ')';
+    next unless ($Value and $V->Name eq $Value);
+    while (my $Value = $Values->Next) {
+	my $Queue = RT::Queue->new($RT::SystemUser);
+	$Queue->LoadByCols( DefaultDueIn => $Value->Ticket);
+	$Queues->Limit( ENTRYAGGREGATOR => 'OR',  FIELD => 'DefaultDueIn', VALUE => $Value->Ticket );
+    }
+}
+
+</%INIT>
+<%ARGS>
+$Type
+$Value	=> undef
+$Begin	=> 0
+</%ARGS>

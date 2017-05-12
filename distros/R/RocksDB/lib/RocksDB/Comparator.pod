@@ -1,0 +1,47 @@
+=head1 NAME
+
+RocksDB::Comparator - rocksdb::Comparator object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $handler = MyComparator->new;
+  my $db = RocksDB->new('/path/to/db', {
+      create_if_missing => 1,
+      comparator        => RocksDB::Comparator->new($handler),
+  });
+
+=head1 DESCRIPTION
+
+B<RocksDB::Comparator> is a utility class to make rocksdb::Comparator object.
+
+=head1 CONSTRUCTOR
+
+=head2 C<< RocksDB::Comparator->new($handler :Object) :RocksDB::Comparator  >>
+
+Create and return a new RocksDB::Comparator object.
+
+$handler must respond to "compare".
+
+See 'HANDLER METHODS' section for more details.
+
+=head1 HANDLER METHODS
+
+=head2 C<< $handler->compare($a :Str, $b :Str) :Int >>
+
+Three-way comparison. Returns value:
+
+  < 0 iff $a < $b,
+  == 0 iff $a == $b,
+  > 0 iff $a > $b
+
+=head1 SEE ALSO
+
+L<RocksDB>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

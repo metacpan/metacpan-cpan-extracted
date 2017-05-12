@@ -1,0 +1,34 @@
+Regexp::Grammars version 1.045
+
+This module adds a small number of new regex constructs that can be used
+within Perl 5.10 patterns to implement complete recursive-descent parsing.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Perl 5.10.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

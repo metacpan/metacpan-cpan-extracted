@@ -1,0 +1,8 @@
+<html>
+<body>
+<%$Message%>
+</body>
+</html>
+<%args>
+$Message => undef
+</%args>

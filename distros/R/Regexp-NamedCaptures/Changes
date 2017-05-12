@@ -1,0 +1,12 @@
+Revision history for Regexp-NamedCaptures
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    Mon Sep 19 2005, 9:34 pm
+        Added t/15no_warn.t
+        Removed debugging output.
+0.03    Mon Oct  3 2005, late
+        Fixed a bug in Makefile.PL and Build.PL.
+        Tested til I had 100%-ish code coverage.
+0.04    Tue Oct  4 2005, early
+        Added tests for 100% interpolated regexes, (?{}), and (??{})

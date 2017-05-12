@@ -1,0 +1,35 @@
+<table>
+  <tr>
+    <td class="label"><&|/l&>Owner</&>:</td>
+% my $owner = $Ticket->OwnerObj;
+    <td class="value"><& /Elements/ShowUser, User => $owner, Ticket => $Ticket &>
+    <& /Elements/ShowUserEmailFrequency, User => $owner, Ticket => $Ticket &>
+% $m->callback( User => $owner, Ticket => $Ticket, %ARGS, CallbackName => 'AboutThisUser' );
+    </td>
+  </tr>
+  <tr>
+    <td class="label status"><&|/l&>Status</&>:</td>
+    <td class="value status"><% loc($Ticket->Status) %></td>
+  </tr>
+  <tr>
+    <td class="label date created"><&|/l&>Created</&>:</td>
+    <td class="value date created"><% $Ticket->CreatedObj->AsString %></td>
+  </tr>
+  <tr>
+    <td class="label date resolved"><&|/l&>Closed</&>:</td>
+    <td class="value date resolved"><% $Ticket->ResolvedObj->AsString  %></td>
+  </tr>
+  <tr>
+    <td class="label date updated"><&|/l&>Updated</&>:</td>
+% my $UpdatedString = $Ticket->LastUpdated ? loc("[_1] by [_2]", $Ticket->LastUpdatedAsString, $Ticket->LastUpdatedByObj->Name) : loc("Never");
+% if ($UpdatedLink) {
+    <td class="value date updated"><a href="#lasttrans"><% $UpdatedString | h %></a></td>
+% } else {
+    <td class="value date updated"><% $UpdatedString | h %></td>
+% }
+  </tr>
+</table>
+<%ARGS>
+$Ticket => undef
+$UpdatedLink => 1
+</%ARGS>

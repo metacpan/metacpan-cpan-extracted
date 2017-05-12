@@ -1,0 +1,44 @@
+=head1 NAME
+
+ResourcePool::Resource::Alzabo - A L<ResourcePool|ResourcePool> wrapper for L<Alzabo|Alzabo>
+
+=head1 SYNOPSIS
+
+ use ResourcePool::Resource::Alzabo;
+
+ my $resource =  ResourcePool::Resource::Alzabo->new(
+                        $schema_name,
+                        $data_source,
+                        $username,
+                        $auth,
+                        \%attr);
+
+=head1 DESCRIPTION
+
+This class is used by the L<ResourcePool|ResourcePool> internally to 
+load the L<Alzabo::Runtime::Schema|Alzabo::Runtime::Schema> object and 
+associate it with L<DBI|DBI> connections. Its called by the corresponding
+L<ResourcePool::Factory::Alzabo|ResourcePool::Factory::Alzabo> object 
+which passes the parameters needed to load the schema and establish 
+the L<DBI|DBI> connection.
+
+The connection management is inherited from L<ResourcePool::Resource::DBI|ResourcePool::Resource::DBI>.
+
+=head1 SEE ALSO
+
+L<DBI|DBI>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Resource|ResourcePool::Resource>,
+L<ResourcePool::Resource::DBI|ResourcePool::Resource::DBI>
+L<ResourcePool::Factory::Alzabo|ResourcePool::Factory::Alzabo>
+
+=head1 AUTHOR
+
+Copyright (C) 2004 by Texas A&M University <jsmith@cpan.org>
+
+Based on ResourcePool::Resource::DBI
+
+Copyright (C) 2001-2003 by Markus Winand <mws@fatalmind.com>
+
+This program is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.

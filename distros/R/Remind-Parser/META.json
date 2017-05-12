@@ -1,0 +1,50 @@
+{
+   "abstract" : "parse `remind -lp' output",
+   "author" : [
+      "Paul Hoffman (nkuitse AT cpan DOT org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Remind-Parser",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "YAML" : "0"
+         },
+         "requires" : {
+            "Date::DayOfWeek" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Remind::Parser" : {
+         "file" : "lib/Remind/Parser.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.08"
+}

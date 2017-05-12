@@ -1,0 +1,379 @@
+<& /Elements/ListActions, actions => \@results &>
+
+% if (! $PickUser or $Principal) {
+<FORM METHOD=POST ACTION="<%$m->request_comp->name%>" ENCTYPE="multipart/form-data">
+<INPUT TYPE=HIDDEN NAME=Principal VALUE="<%$principal->Id%>">
+<INPUT TYPE=HIDDEN NAME=Save VALUE="1">
+<INPUT TYPE=HIDDEN NAME=Edit VALUE="1">
+<INPUT TYPE=HIDDEN NAME=EditApplies VALUE="1">
+
+<table border="1" cellspacing="0">
+<tr>
+<th colspan="3" >Custom Field</th>
+<th colspan="<% $cfs->Count %>" ><%$ObjectString%></th>
+</tr>
+<tr>
+<td>Name</td>
+%#<td>Description</td>
+<td>All Rights</td>
+<td>Direct Rights</td>
+% foreach my $object ( @objects ) {
+<td><b>
+% if ( $session{CurrentUser}->HasRight(Right => 'Admin'.$ObjectString, Object => $object, EquivObjects => $EquivObjects) ) {
+      <a href="<%$RT::WebPath%>/Admin/<%$ObjectString%>s/Modify.html?id=<%$object->id%>"><% $object->Name %></a>
+% }
+% else {
+    <% $object->Name %>
+% }
+    </b>
+<br>
+% foreach my $right (keys %$ObjectRights) {
+  <% $Super || $principal->HasRight(Object => $object, Right => $ObjectRights->{$right}{RIGHT}, EquivObjects => $EquivObjects)     ? $right : '&nbsp;' |n %>
+% }
+</td>
+% }
+<td><b>
+% if ( $session{CurrentUser}->HasRight(Right => 'Admin'.$ObjectString, Object => $RT::System, EquivObjects => $EquivObjects) ) {
+      <a href="<%$RT::WebPath%>/Admin/Global/index.html"><i>Global</i></a>
+% }
+% else {
+    <i>Global</i>
+% }
+    </b>
+<br>
+% foreach my $right (keys %$ObjectRights) {
+  <% $Super || $principal->HasRight(Object => $ObjectSystem, Right => $ObjectRights->{$right}{RIGHT}, EquivObjects => $EquivObjects)     ? $right : '&nbsp;' |n %>
+% }
+     </td>
+</tr>
+
+% my $i;
+% while (my $cf = $cfs->Next) {
+% $i++;
+<tr class="<% $i%2 ? 'oddline' : 'evenline'%>" >
+  <td><b>
+% if ( $session{CurrentUser}->HasRight(Right => 'AdminCustomField', Object => $cf) ) {
+      <a href="<%$RT::WebPath%>/Admin/CustomFields/Modify.html?id=<%$cf->id%>"><% $cf->Name %></a>
+% }
+% else {
+      <% $cf->Name %>
+% }
+      </b>
+      <INPUT TYPE="HIDDEN" NAME="cf-<%$cf->Id%>-magic" VALUE="1" >
+  </td>
+%#  <td><% $cf->Description %> </td>
+%# All Rights
+  <td align="center">
+%  foreach (qw(r w a)) {
+%    my $has_right = $Super || $GlobalRight{$cf_rights{$_}{RIGHT}} || $principal->HasRight(Object => $cf, Right => $cf_rights{$_}{RIGHT});
+% $RT::Logger->debug("Principal " . $principal->Object->Name . " Object ". ref($cf) . " " . $cf->id . " Right " . $cf_rights{$_}{RIGHT} . " has right: $has_right");
+%    my $url = $WhereFrom->(Principal => $principal, Object => $cf, Right => $cf_rights{$_}{RIGHT});
+          <a href="<% $url %>"><% $has_right ? $_ : '' %></a><br>
+%  }
+  </td>
+%# Direct Rights
+  <td align="center">
+%  if ($ARGS{Principal} !~ /Role/) {
+%  foreach (qw(r w a)) {
+%    my $has_right = $principal->_HasDirectRight(Object => $cf, Right => $cf_rights{$_}{RIGHT});
+%# $RT::Logger->debug("principal: " . $principal->id . " current user: " . $principal->CurrentUser->Id);
+%# $RT::Logger->debug("$has_right direct right cf: " . $cf->id . " right: " . $cf_rights{$_}{RIGHT});
+%    if ( $ARGS{Edit}
+%          and $cf->CurrentUserHasRight("AdminCustomField")
+%          and ( ($principal->IsUser and $session{CurrentUser}->HasRight(Right => 'AdminUsers', Object => $RT::System ))
+%                or
+%                ($principal->IsGroup and $session{CurrentUser}->HasRight(Right => 'SeeGroup', Object => $principal))
+%              )
+%       )
+%    {
+      <%$_%> <input type="checkbox" name="cf-<%$cf->Id%>" <%$has_right ? 'checked=1' : '' %> value = "<%$cf_rights{$_}{RIGHT}%>" ><br>
+%    }
+%    else {
+          <% $has_right ? $_ : '' %><br>
+%    }
+%  }
+% }
+% else {
+         &nbsp;
+% }
+  </td>
+%  foreach my $object ( @objects ) {
+%      my $ocfs = RT::ObjectCustomFields->new($RT::SystemUser);
+%      $ocfs->Limit( FIELD => 'CustomField', VALUE => $cf->Id );
+%#      $ocfs->Limit( FIELD => 'ObjectId', VALUE => 0 );
+%      $ocfs->Limit( FIELD => 'ObjectId', VALUE => $object->Id );
+%      if ($ocfs->Count) {
+        <td align="center">
+%         if ($ARGS{EditApplies} and $object->CurrentUserHasRight('AssignCustomFields')) {
+            <input type="checkbox" name="cf-<%$cf->Id%>-object-<%$object->Id%>" value="1" checked=1">
+            <input type="hidden" name="cf-<%$cf->Id%>-object-<%$object->Id%>-magic" value="1">
+%         }
+%         else {
+           A 
+%         }
+        </td>
+%      }
+%      else {
+         <td align="center">
+%         if ($ARGS{EditApplies} and $object->CurrentUserHasRight('AssignCustomFields')) {
+            <input type="checkbox" name="cf-<%$cf->Id%>-object-<%$object->Id%>" value="1">
+            <input type="hidden" name="cf-<%$cf->Id%>-object-<%$object->Id%>-magic" value="1">
+%         }
+%         else {
+            &nbsp;
+%         }
+        </td>
+         </td>
+%      }
+%  }
+%# Global applies
+%      my $ocfs = RT::ObjectCustomFields->new($RT::SystemUser);
+%      $ocfs->Limit( FIELD => 'CustomField', VALUE => $cf->Id );
+%      $ocfs->Limit( FIELD => 'ObjectId', VALUE => 0 );
+%      if ($ocfs->Count) {
+        <td align="center">
+%         if ($ARGS{EditApplies} and $session{CurrentUser}->HasRight(Right => 'AssignCustomFields', Object => $RT::System)) {
+            <input type="checkbox" name="cf-<%$cf->Id%>-object-0" value="1" checked=1>
+            <input type="hidden" name="cf-<%$cf->Id%>-object-0-magic" value="1">
+%         }
+%         else {
+           A 
+%         }
+        </td>
+%      }
+%      else {
+         <td align="center">
+%         if ($ARGS{EditApplies} and $session{CurrentUser}->HasRight(Right => 'AssignCustomFields', Object => $RT::System)) {
+            <input type="checkbox" name="cf-<%$cf->Id%>-object-0" value="1">
+            <input type="hidden" name="cf-<%$cf->Id%>-object-0-magic" value="1">
+%         }
+%         else {
+            &nbsp;
+%         }
+        </td>
+         </td>
+%      }
+</tr>
+% }
+</table>
+
+<p>
+<b>Note:</b> click on any of the bold rights keys under 'All Rights' to see exactly how that user/group/role has received that right.
+</p>
+
+%#<& /Elements/TitleBoxEnd &>
+
+%if ($ARGS{Edit} or $ARGS{EditApplies}) {
+<& /Elements/Submit, Label => loc("Save Changes"), Caption => "For user/group being viewed", Reset => 1 &>
+%}
+</FORM>
+% } # end PickUser
+
+<FORM METHOD=POST ACTION="<%$m->request_comp->name%>" ENCTYPE="multipart/form-data">
+<& /Elements/TitleBoxStart, title => loc('View rights for'),   color=> "#993333", width => "100%" &>
+Select User or Group: <& /Admin/Tools/RightsMatrix/Elements/SelectPrincipalForRightsMatrix, Principal => $ARGS{Principal}, IncludeRoles => 0 &>
+% if ($session{CurrentUser}->HasRight(Right => 'AdminUsers', Object => $RT::System)) {
+- or -
+Enter username: <INPUT NAME="User" VALUE="<%$ARGS{User}%>">
+Edit rights: <input type="checkbox" name="Edit"  <%$ARGS{Edit} ? 'CHECKED=1' : ''%> value='1' >
+Edit custom field assignments: <input type="checkbox" name="EditApplies"  <%$ARGS{EditApplies} ? 'CHECKED=1' : ''%> value='1' >
+%# <br><input type="checkbox" name="Intersect"  <%$ARGS{Intersect} ? 'CHECKED=1' : ''%> value='1' > Show intersection of object and custom field rights.
+% }
+<& /Elements/TitleBoxEnd &>
+
+<& /Elements/Submit &>
+
+<h3>Custom Field Key:</h3>
+For a custom field the possible permissions are:
+<table border="1">
+% foreach (qw(r w a)) {
+<tr>
+<td><%$_%></td><td><%$cf_rights{$_}{RIGHT}%></td><td><%$cf_rights{$_}{DESC}%></td>
+</tr>
+% }
+</table>
+<p>
+
+An <b>A</b> in the table means that custom field applies for that object.
+
+</FORM>
+
+<%INIT>
+my @results;
+
+my ($ObjectString) = $ObjectType =~ /RTx?.*::(.*)/;
+
+if ( $ARGS{WhereFrom} ) {
+        $m->comp("../WhereRightComesFrom.html", %ARGS);
+        $m->abort;
+}
+
+if ( $ARGS{Principal} and $ARGS{User} ) {
+        $m->comp("/Elements/Error", Why => loc("You can't select a user and enter one manually."));
+        $m->abort;
+}
+
+my $principal = $PrincipalObj;
+
+my $EquivObjects = ref($ObjectSystem) eq 'RT::System' ? [] : [ $ObjectSystem ];
+my $Super = $principal->HasRight(Right => 'SuperUser', Object => $RT::System, EquivObjects => $EquivObjects);
+
+# process custom field edits
+if ($ARGS{Save}) {
+    # CF Rights
+    CFs:
+    foreach my $arg (keys %ARGS) {
+        next CFs unless $arg =~ /^cf-(\d+)-magic$/;
+        my $cfid = $1;
+        my $cf = RT::CustomField->new($session{CurrentUser});
+        my ($rv, $msg) = $cf->Load($cfid);
+        if (! $rv) {
+            push @results, "Could not load custom field $cfid";
+            next CFs;
+        }
+
+        my %all_cf_rights = map { $cf_rights{$_}{RIGHT} => 1 } keys %cf_rights;
+        my @rights = ref($ARGS{"cf-$cfid"}) ? @{$ARGS{"cf-$cfid"}} : defined $ARGS{"cf-$cfid"} ? $ARGS{"cf-$cfid"} : ();
+
+        # process each right that was checked in the form
+        RIGHTS:
+        foreach my $right (@rights) {
+            delete $all_cf_rights{$right};
+            next RIGHTS if $principal->_HasDirectRight(Right => $right, Object => $cf);
+            ($rv, $msg) = $principal->GrantRight(Right => $right, Object => $cf);
+            if (! $rv) {
+                push @results, "Could not grant right '$right' to custom field '" . $cf->Name . "': $msg";
+            }
+            else {
+                push @results, "Right '$right' granted for custom field: " . $cf->Name;
+            }
+        }
+
+        # process each right that was _not_ checked in the form
+        REMAIN:
+        foreach my $right (keys %all_cf_rights) {
+            next REMAIN if ! $principal->_HasDirectRight(Right => $right, Object => $cf);
+            ($rv, $msg) = $principal->RevokeRight(Right => $right, Object => $cf);
+            if (! $rv) {
+                push @results, "Could not revoke right '$right' from custom field '" . $cf->Name . "': $msg";
+            }
+            else {
+                push @results, "Right '$right' revoked for custom field: " . $cf->Name;
+            }
+        }
+    }
+    # CF Applies to
+    CFApplies:
+    foreach my $arg (keys %ARGS) {
+        next CFApplies unless $arg =~ /^cf-(\d+)-object-(\d+)-magic$/;
+        my ($cfid, $oid) = ($1, $2);
+        my $cf = RT::CustomField->new($session{CurrentUser});
+        my ($rv, $msg) = $cf->Load($cfid);
+        if (! $rv) {
+            push @results, "Could not load custom field $cfid";
+            next CFAppliess;
+        }
+
+        my $object = $ObjectType->new($session{CurrentUser});
+        if ($oid > 0) {
+            ($rv, $msg) = $object->Load($oid);
+            if (! $rv) {
+                push @results, "Could not load object $ObjectType $oid";
+                next CFAppliess;
+            }
+        }
+
+        my $applies = $ARGS{"cf-$cfid-object-$oid"};
+        if ($applies) {
+            if (! $_AppliesToObject->(CustomField => $cf, Object => $object) ) {
+                ($rv, $msg) = $cf->AddToObject($object);
+                if ($rv) {
+                    push @results, ("Custom Field '" . $cf->Name . "' applied to $ObjectString '" . ($object->Name ? $object->Name : 'Global') . "'");
+                }
+                else {
+                    push @results, ("Custom Field '" . $cf->Name . "' NOT applied to $ObjectString '" . ($object->Name ? $object->Name : 'Global') . "': $msg");
+                }
+            }
+        }
+        else {
+            if ($_AppliesToObject->(CustomField => $cf, Object => $object) ) {
+                ($rv, $msg) = $cf->RemoveFromObject($object);
+                if ($rv) {
+                    push @results, ("Custom Field '" . $cf->Name . "' removed from $ObjectString '" . ($object->Name ? $object->Name : 'Global') . "'");
+                }
+                else {
+                    push @results, ("Custom Field '" . $cf->Name . "' NOT removed from $ObjectString '" . ($object->Name ? $object->Name : 'Global') . "': $msg");
+                }
+            }
+        }
+
+    }
+}
+
+my %GlobalRight;
+foreach my $right (keys %cf_rights) {
+    $GlobalRight{$cf_rights{$right}{RIGHT}} = $principal->HasRight(Right => $cf_rights{$right}{RIGHT}, Object => $RT::System);
+}
+
+my $object = $ObjectType->new($RT::System);
+my $cfs = RT::CustomFields->new($session{CurrentUser});
+$cfs->LimitToLookupType($LookupType);
+$cfs->OrderBy(FIELD => 'Name');
+
+my $objects = "${ObjectType}s"->new($session{CurrentUser});
+$objects->UnLimit;
+my @objects = @{ $objects->ItemsArrayRef };
+$m->comp('/Elements/Callback', _CallbackName => $ObjectString.'Sort', objects => \@objects);
+
+my $WhereFrom = sub {
+
+    my %args = @_;
+
+    my @callers = $m->callers();
+    my $user_context = ( grep { $_->dir_path() =~ /User/ } @callers ) ? 'User/' : '';
+
+    return    "?"
+            . "WhereFrom=1"
+            . "&PrincipalId=" . $args{Principal}->id
+            . "&ObjectId="    . $args{Object}->id
+            . "&ObjectType="  . ref($args{Object})
+            . "&Right="       . $args{Right}
+            ;
+};
+
+
+</%INIT>
+<%ARGS>
+$User => undef
+$Edit => 0
+$Principal => 0
+$PrincipalObj
+$Intersect => 0
+$ObjectType
+$LookupType
+$ObjectRights
+$ObjectSystem => $RT::System
+$PickUser => 0
+</%ARGS>
+<%ONCE>
+use RTx::RightsMatrix;
+use RTx::RightsMatrix::RolePrincipal;
+
+my $_AppliesToObject = sub {
+
+    my %args = @_;
+    my $ocfs = RT::ObjectCustomFields->new($session{CurrentUser});
+    $ocfs->LimitToCustomField($args{CustomField}->id);
+    $ocfs->LimitToObjectId($args{Object}->id);
+
+    return $ocfs->Count;
+};
+
+my %cf_rights = (
+                  'r' => { RIGHT => 'SeeCustomField',    DESC =>'Can see that custom field' },
+                  'w' => { RIGHT => 'ModifyCustomField', DESC =>'Can edit/moidfy that custom field' },
+                  'a' => { RIGHT => 'AdminCustomField',  DESC =>'Can administer that custom field' },
+                  'm' => { RIGHT => 'ModifyACL',         DESC =>'Can modify the access control list for that custom field' },
+                 );
+
+</%ONCE>

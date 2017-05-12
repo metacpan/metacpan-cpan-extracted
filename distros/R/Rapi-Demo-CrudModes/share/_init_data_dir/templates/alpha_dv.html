@@ -1,0 +1,79 @@
+<title>Alpha DataView</title>
+
+<div class="alpha-dv">
+
+<div class="rows-wrap">
+
+  <tpl for=".">
+
+  <div class="alpha-row shadow">
+
+  <table style="width:100%;">
+    <tr>
+      <td class="row-id" style="width:6%;">
+        {id}
+      </td>
+      <td style="width:48%;">
+        <div class="col" style="font-size:1.1em;padding-top:10px;">
+          <i class="name">string1</i><br>
+          <span class="value">[% r.autofield.string1 %]</span><br>
+        </div>
+        <div class="col">
+          <i class="name">string2</i><br>
+          <span class="value">[% r.autofield.string2 %]</span><br>
+        </div>
+      </td>
+      <td style="width:46%;">
+        <div class="col">
+          <i class="name">bool:</i>&nbsp;&nbsp;[% r.autofield.bool %]<br>
+          <i class="name">number</i><br>
+          <span class="value">[% r.autofield.number %]</span><br>
+        </div>
+        
+        <div class="col">
+          <i class="name">date</i><br>
+          <span class="value">[% r.autofield.date %]</span><br>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3>
+        <div class="edit-wrap">[% r.toggle.edit %]</div>
+        <div class="del-wrap" >[% r.delete_record %]</div>
+      </td>
+    </tr>
+  </table>
+  </div>
+
+  </tpl>
+
+</div>
+
+<div class="foot-wrap">
+  <div class="store-btn-wrap">
+  
+    <a style="float:left;padding-left:8px;"
+       class="ra-icon-refresh-tiny ra-autopanel-reloader"
+    >Reload Panel</a>
+  
+    [% r.store_button.add    %] |
+    [% r.store_button.edit   %] |  
+    [% r.store_button.delete %] | 
+    [% r.store_button.reload %] | 
+    [% r.store_button.save   %] | 
+    [% r.store_button.undo   %]
+    
+    <div style="float:right;">
+      <a class="crud-opts with-inline-icon ra-icon-collapse-all"
+         title="Show crud options" 
+         onclick="RA.ux.CM.showCrudEl('Configured CRUD Options',this);"
+      ><i>CRUD Options</i></a>
+      <div style="display:none;">
+        <pre>[% r.AppDV.dump_crud_options() %]</pre>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+</div>

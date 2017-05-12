@@ -1,0 +1,77 @@
+NAME
+    RTx::Calendar - Calendar for RT due dates
+
+DESCRIPTION
+    This RT extension provides a calendar view for your tickets and your
+    reminders so you see when is your next due ticket. You can find it in
+    the menu Search->Calendar.
+
+    There's a portlet to put on your home page (see Prefs/MyRT.html)
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RTx::Calendar');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RTx::Calendar));
+
+        or add RTx::Calendar to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+  Base configuration
+    To use the MyCalendar portlet, you must add MyCalendar to
+    $HomepageComponents in etc/RT_SiteConfig.pm:
+
+      Set($HomepageComponents, [qw(QuickCreate Quicksearch MyCalendar
+         MyAdminQueues MySupportQueues MyReminders RefreshHomepage)]);
+
+  Display configuration
+    You can show the owner in each day box by adding this line to your
+    etc/RT_SiteConfig.pm:
+
+        Set($CalendarDisplayOwner, 1);
+
+    You can change which fields show up in the popup display when you mouse
+    over a date in etc/RT_SiteConfig.pm:
+
+        Set(@CalendarPopupFields, ('Status', 'OwnerObj->Name', 'DueObj->ISO'));
+
+USAGE
+    A small help section is available in /Prefs/Calendar.html
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+    Originally written by Nicolas Chuche <nchuche@barna.be>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RTx-Calendar@rt.cpan.org|mailto:bug-RTx-Calendar@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RTx-Calendar>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2010-2014 by Best Practical Solutions
+
+    Copyright 2007-2009 by Nicolas Chuche
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

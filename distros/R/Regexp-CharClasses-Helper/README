@@ -1,0 +1,60 @@
+NAME
+
+    Regexp::CharClasses::Helper - User defined character class strings by
+    unicode name or literals
+
+SYNOPSIS
+
+        use Regexp::CharClasses::Helper;
+    
+        sub IsAorPlus {
+            return Regexp::CharClasses::Helper::fmt(
+                'A',
+                'LATIN SMALL LETTER A'
+                '+',
+            );
+        }
+        say 'matches' if 'A+' =~ /^\p{IsAorPlus}+$/;
+    
+        sub InCapitalsButNot42 {
+            return Regexp::CharClasses::Helper::fmt(
+                "+A\tZ", # from A till Z
+                "-\x42"  # except \x42
+            );
+        }
+        say "doesn't" if 'ABC' =~ /\p{InCapitalsButNot42}+/;
+            
+
+METHODS AND ARGUMENTS
+
+    fmt()
+
+      Takes in a list and turns it into the format specified by
+      User-Defined Character Properties
+      <http://perldoc.perl.org/perlunicode.html#User-Defined-Character-Properties>
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Regexp-CharClasses-Helper
+
+SEE ALSO
+
+    Regexp::CharClasses for a collection of user supplied character
+    classes. Sub::CharacterProperties generates the subs themselves, but
+    isn't usable at compile time.
+
+    User-Defined Character Properties
+    <http://perldoc.perl.org/perlunicode.html#User-Defined-Character-Properties>
+    perldoc.
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

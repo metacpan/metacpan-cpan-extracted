@@ -1,0 +1,56 @@
+Regexp::Fields version 0.46
+===========================
+
+Regexp::Fields adds the "(?<name> ...)" extended pattern to Perl's
+regular expression language.  This works like an ordinary pair of
+capturing parens, but after a match you can use $&{name} instead of
+$1 (or whichever $N) to access the captured value.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENSE
+
+This distribution includes several versions of Perl's regexec.c and
+regcomp.c, released under these terms:
+
+    ---------------------------------------------------------------------
+    Copyright (c) 1986 by University of Toronto.
+    Written by Henry Spencer.  Not derived from licensed software.
+  
+    Permission is granted to anyone to use this software for any
+    purpose on any computer system, and to redistribute it freely,
+    subject to the following restrictions:
+  
+    1. The author is not responsible for the consequences of use of
+       this software, no matter how awful, even if they arise
+       from defects in it.
+  
+    2. The origin of this software must not be misrepresented, either
+       by explicit claim or by omission.
+  
+    3. Altered versions must be plainly marked as such, and must not
+       be misrepresented as being the original software.
+  
+    Alterations to Henry's code are...
+  
+    Copyright (c) 1991-2002, Larry Wall
+ 
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the README file.
+    ---------------------------------------------------------------------
+
+My (trivial) alterations and the rest of this package are released 
+under these:
+
+    Copyright (c) 2003, Steve Grazzini
+
+    This library is free software.  You can copy, modify and/or 
+    redistribute it under the same terms as Perl itself.
+

@@ -1,0 +1,13 @@
+<%INIT>
+# If unchecked, the MSExcel ARG won't exist and Subscription.html
+# won't update the subscription attribute. Manually add it with
+# an empty string to remove a possible previous selected value.
+if ( $ARGS{'Save'} ){
+    $FieldsRef->{'MSExcel'} = '' if not exists $ARGS{'MSExcel'};
+}
+</%INIT>
+<%ARGS>
+$FieldsRef
+$SubscriptionObj
+$DashboardObj
+</%ARGS>

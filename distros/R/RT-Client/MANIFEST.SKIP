@@ -1,0 +1,16 @@
+#defaults
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+^MANIFEST\.bak
+^Makefile$
+^blib/
+^bin/
+^MakeMaker-\d
+^blibdirs
+^pm_to_blib
+~$
+\.old$
+^#.*#$
+^\.#

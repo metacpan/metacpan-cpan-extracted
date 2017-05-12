@@ -1,0 +1,8 @@
+[% META title = 'Add person' %]
+
+<table>
+  <tr><td>First name <td><input name="r_fn">
+  <tr><td>Last name  <td><input name="r_ln">
+</table>
+
+<input type="button" OnClick="javascript:go('person_list','person_add')" value=" Create  ">

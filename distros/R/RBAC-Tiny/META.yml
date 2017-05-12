@@ -1,0 +1,30 @@
+---
+abstract: 'Tiny Role-Based Access Control (RBAC) implementation'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Andre Walker <andre@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Fatal: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RBAC-Tiny
+no_index:
+  file:
+    - README.pod
+requires:
+  List::Util: 0
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/xsawyerx/rbac-tiny.git
+  repository: git://github.com/xsawyerx/rbac-tiny.git
+version: 0.003

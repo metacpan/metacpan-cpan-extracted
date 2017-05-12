@@ -1,0 +1,57 @@
+=head1 NAME
+
+RocksDB::Statistics - rocksdb::Statistics object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $db = RocksDB->new('/path/to/rocks.db', {
+      enable_statistics => 1,
+  })
+  my $stats = $db->get_statistics;
+  print $stats->get_ticker_count('rocksdb.block.cache.miss');
+  my $data = $stats->histogram_data('rocksdb.write.raw.block.micros');
+  print $data->{average};
+  my $hashref = $db->to_hashref;
+  print $stats->to_string;
+
+=head1 DESCRIPTION
+
+B<RocksDB::Statistics> is a rocksdb::Statistics object.
+
+=head1 METHODS
+
+=head2 C<< $stats->get_ticker_count($key) :Int >>
+
+Returns the count.
+
+=head2 C<< $stats->histogram_data($key) :HashRef >>
+
+Returns the HistogramData as HashRef.
+
+  {
+    median => 0,
+    percentile95 => 0,
+    percentile99 => 0,
+    average => 0,
+    standard_deviation => 0,
+  }
+
+=head2 C<< $stats->to_hashref :HashRef >>
+
+Returns a HashRef includes all tickers and histograms.
+
+=head2 C<< $stats->to_string :HashRef >>
+
+String representation of the statistic object.
+
+=head1 SEE ALSO
+
+L<RocksDB>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,64 @@
+###############################################################################
+#
+#   Sub Name:       introspection
+#
+#   Description:    Collates the data from listMethods, methodHelp and
+#                   methodSignature into a single array
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $srv      in      ref       Server object instance
+#                   $list     in      listref   If passed, limit methods listed
+#                                     or scalar   to these.
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    string or listref
+#                   Failure:    fault object
+#
+###############################################################################
+sub introspection
+{
+    use strict;
+
+    my $srv = shift;
+    my $list = shift;
+
+    my (@methods, @all_methods, %all_methods, @bad, @results, $scalar, $meth);
+
+    my $name = $srv->{method_name};
+    $scalar = ($list and (! ref($list))) ? 1 : 0;
+    @all_methods = sort $srv->list_methods;
+
+    if ($list)
+    {
+        # This is an expensive-enough operation that I don't want to do it
+        # if I don't have to
+        @methods = ($scalar) ? ($list) : @$list;
+        @all_methods{@all_methods} = (1) x scalar(@all_methods);
+        if (@bad = grep(! $all_methods{$_}, @methods))
+        {
+            local $" = ', ';
+            return RPC::XML::fault->new(302, "$name: Method(s) @bad unknown");
+        }
+    }
+    else
+    {
+        @methods = @all_methods;
+    }
+
+    # Convert in-place to their objects
+    for (@methods) { $_ = $srv->get_method($_); }
+    # Since that list came from the server object, we know alls calls were OK
+
+    for (@methods)
+    {
+        push(@results, { name      => $_->name,
+                         help      => $_->help,
+                         signature => $_->signature,
+                         version   => RPC::XML::string->new($_->version) });
+    }
+
+    return $scalar ? $results[0] : \@results;
+}

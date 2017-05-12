@@ -1,0 +1,10 @@
+<%init>
+$tabs->{this}->{subtabs}->{Tickets} = {
+				       title => loc('Tickets'),
+				       path => 'Search/Results.html?Query=Requestor.id%3D'.$id
+				      } if defined($id);
+</%init>
+<%args>
+$tabs
+$id=>undef
+</%args>

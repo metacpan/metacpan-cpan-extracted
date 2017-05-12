@@ -1,0 +1,127 @@
+Revision history for RDFStore tcp/ip backend storage
+
+version 1.7 (version taken from dbms/veersion.c)
+-------------------------------------------------------------------------------------------
+
+	utils/
+		- added dbms_mirror.pl to copy/mirror DBMS tables either locally or remotely
+
+	dbmsproxy/
+		- added dbmsproxy to use cheap local unix socket for reads if possible.
+
+	client/t/*
+		- updated to receive bt_compare_fcn_type paramter after mode
+
+	include/dbms.h
+		- added bt_compare_fcn_type to dbms struct
+
+	include/dbms_comms.h
+		- added TOKEN_FROM
+
+	deamon/hanlder.c
+		- added TOKEN_FROM handler for from() operation
+		- added bt_compare_fcn_type paramter management to receive from client
+                - fixed bug in frist(), next() methods to use the right macros depending on BDB version
+
+        libdbms/libdbms.c
+                - updated to use debug malloc/free
+		- added TOKEN_FROM
+		- added bt_compare_fcn_type paramter management to send to server
+
+version 1.2.
+-------------------------------------------------------------------------------------------
+
+	Abstracted out a libdbms(.a) which contains all
+	the communciation code and does better error handling.
+	the perl side is now just a wrapper.
+
+	Abstracted/moved all specific things into a compat header 
+	file (see include/*compat*).
+
+	Renamed directory DBMS to client and added client/stub.[ch]
+
+	include/dbms.h
+		- added TOKEN_DEC for atomic decrement
+		- added TOKEN_PACKINC for atomic packed increment
+		- added TOKEN_PACKDEC for atomic packed decrement
+
+	deamon/deamon.h
+		- added definitions for BDB > 1.8x support
+
+	deamon/hanlder.c
+		- added basic BDB > 1.8x support
+		- added atomic decrement support via do_dec()
+		- added atomic packed increment support via do_packinc()
+		- added atomic packed decrement support via do_packdec()
+
+	client/DBMS.xs
+		- updated perl/XS glue code
+		- added atomic decrement - see DEC()
+		- moved client related definitions in client/stub.h
+		- moved code to main RDFStore.xs to avoid dynamic linking problems of libdbms.so
+
+	client/DBMS.pm
+		- added atomic decrement - see dec()
+		- moved one level up to main rdfstore dist dir (see ../lib)
+
+version 1.1.1.1 - 2001/01/18 09:53:20
+-------------------------------------------------------------------------------------------
+
+	A a new version of dbmsd has been made. Most of this code come from one of the
+	leatest version authored by Dirk Willem-van Gulik early 1999. Since version 0.1
+	I simpy posted his code almost untouched, but due the fact dirk left since a year
+	ago I will take over the dbmsd project. I am not a C guru and volunteers are
+	welcome. What is new:
+
+		- dirk started with multi-thread supported but it was never finished that
+		  I know of
+		- some bug fixing to get it compiled on Irix and Solaris has been made
+		- dbmsd still use BerkeleyDB 1.x style interface
+
+	Now DBMS runs fine on Linux platforms (tested on SuSE Linux Linux 2.2.16) by using the
+	Sleepycat BDB 1.85 compatibility API (namely libdb1 and db_185.h). The user needs to edit
+	the deamon/Makefile to link with the right library.
+
+	DBMS/typemap
+		- Fixed bug to make it compile on old and recent Perl5 versions
+
+	Makefile
+		- general update. Added make depend for deamon
+
+	deamon/children.c
+		- added platform check to include compatibility code db_185.h
+
+	deamon/deamon.c
+		- added platform check to include compatibility code db_185.h
+
+	deamon/deamon.h
+		- added platform check to include compatibility code db_185.h
+
+	deamon/handler.c
+		- added platform check to include compatibility code db_185.h
+
+	deamon/loop.c
+		- added platform check to include compatibility code db_185.h
+
+	deamon/main.c
+		- added platform check to include compatibility code db_185.h
+
+	deamon/Makefile
+		- commented out a few options and cleaned up a few things
+		- added (optional) libdb1 to get DBMS compile on Linux
+
+	deamon/README
+		- included README file originally written by dirk
+	
+	utils
+		- moved original utils/dbcat_raw utils to dbsm dirs
+
+	doc
+		- added documentation section
+		- added dbms.html contribution by dirkx@webweaving.org
+	
+	INSTALL
+		- added installation instructions
+
+	deamon/handler.c
+		- commented out sys/syslimits.h (already included by sys/param.h)

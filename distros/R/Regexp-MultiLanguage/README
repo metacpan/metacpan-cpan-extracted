@@ -1,0 +1,41 @@
+Regexp-MultiLanguage
+
+Regexp::MultiLanguage takes common regular expressions and their combinations
+and produces Perl, PHP, and JavaScript code that executes them.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Regexp::MultiLanguage
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Regexp-MultiLanguage
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Regexp-MultiLanguage
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Regexp-MultiLanguage
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Regexp-MultiLanguage
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Robby Walker
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

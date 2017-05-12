@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Redis-Term.t
+lib/Redis/Term.pm
+tools/http_parse_redis_manual.pl
+tools/README
+redist
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

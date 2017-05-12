@@ -1,0 +1,48 @@
+{
+   "abstract" : "Redis Client Terminal",
+   "author" : [
+      "Chen Gang <yikuyiku.com@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-Term",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Std" : "0",
+            "List::MoreUtils" : "0",
+            "Redis" : "1.972",
+            "Storable" : "0",
+            "Term::ReadKey" : "2.3",
+            "Term::ReadLine" : "1.14",
+            "Term::ReadLine::Perl" : "1.0303",
+            "Text::TabularDisplay" : "1.35"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.12"
+}

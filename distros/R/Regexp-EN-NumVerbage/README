@@ -1,0 +1,32 @@
+NAME
+    Regexp::EN::NumVerbage - Regex pattern to match English number verbage
+    in text
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+     use Regexp::EN::NumVerbage ($RE);
+
+     say $1 if "this year's revenue reaches 2.5 million dolars" =~ /\b($RE)\b/; # "2.5 million"
+
+EXPORTS
+    None are exported by default, but they are exportable.
+
+  $RE (REGEX)
+    A regex for quickly matching/extracting verbage from text; it looks for
+    a string of words. It's not perfect (the extracted verbage might not be
+    valid, e.g. "thousand three"), but it's convenient.
+
+SEE ALSO
+    Regexp::ID::NumVerbage.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

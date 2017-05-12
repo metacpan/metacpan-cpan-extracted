@@ -1,0 +1,47 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Getopt::Std;
+require RINO::Client;
+
+my %opts;
+getopt('p:f:', \%opts);
+
+my $plugin  = $opts{'p'} || 'table';
+my $plugs   = join(',',RINO::Client::_plugins());
+my $f       = $opts{'f'};
+
+die(usage()) if($opts{'h'});
+
+sub usage {
+    return <<EOF;
+Usage: perl $0 -f /tmp/rino.xml
+    -h  --help:     this message
+    -f  --file:     open file
+    -p  --plugin:   output plugin ($plugs), default: $plugin
+
+    \$> perl $0 -f /tmp/rino.xml
+    \$> cat /tmp/rino.xml | perl rino -p table
+
+EOF
+}
+
+my @input;
+if($f){
+    open(F,$f) || die('unable to open file: '.$f.' '.$!);
+    while(<F>){
+        push(@input,$_);
+    }
+    close(F);
+} else {
+    while(<STDIN>){
+        push(@input,$_);
+    }
+}
+die 'no input' unless($#input);    
+my $string = join("",@input);
+
+my $rino = RINO::Client->new(iodef => $string);
+print $rino->write_out($plugin);
+

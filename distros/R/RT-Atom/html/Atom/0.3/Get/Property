@@ -1,0 +1,39 @@
+%# [GET EditURI]
+%# Retrieve a representation of an property.
+<%INIT>
+my $is_obj = ($Property =~ s/Obj$//);
+
+$Object->_ClassAccessible->{$Property}{read}
+    or $Property eq 'Id'
+    or return $m->comp($ShowError, Status => 404)
+    if $Object->can('_ClassAccessible');
+
+if ($is_obj) {
+    my $code = $Object->can($Property.'Obj')
+	or return $m->comp($ShowError, Status => 404);
+
+    my $obj = $code->($Object);
+    return $m->comp($ShowError, Status => 404)
+	unless ($obj and $obj->Id);
+
+    my $path = $obj->Table;
+    $r->headers_out->{Location} = "$BaseURI/$path/".$obj->Id;
+    return $m->comp($ShowError, Status => 303);
+}
+
+$r->content_type('text/plain');
+
+if ($Object->can('_gen_primary_cache_key')) {
+    $Object->Load($Object->Id);
+    $Object->_expire( $Object->_gen_primary_cache_key());
+}
+
+print $Object->$Property, "\n";
+</%INIT>
+<%ARGS>
+$BaseURI
+$ShowError
+
+$Object
+$Property
+</%ARGS>

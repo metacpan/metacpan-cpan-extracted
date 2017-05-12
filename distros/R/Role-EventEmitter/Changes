@@ -1,0 +1,5 @@
+0.002     2015-10-27 21:22:12 EDT
+  - Switch to Role::Tiny based role as attribute is not needed
+
+0.001     2015-08-10 15:44:08 EDT
+  - First release

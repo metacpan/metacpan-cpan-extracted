@@ -1,0 +1,289 @@
+#!perl
+#
+# $Id$
+
+use 5.010;
+use strict;
+use warnings;
+
+package CHOP::RDB::CannedQuery::SimpleQueryCache;
+
+our ($VERSION) = '0.03';
+our ($REVISION) = '$Revision$' =~ /: (\d+)/ ? $1 : 0;
+
+use Data::Dumper;
+use Digest::MD5 qw(md5_hex);
+
+use Any::Moose;
+use namespace::autoclean;
+
+has backend => (
+    isa      => 'Object',
+    is       => 'ro',
+    required => 1,
+    lazy     => 1,
+    builder  => 'build_backend'
+);
+
+has args_to_key => (
+    isa      => 'CodeRef',
+    is       => 'ro',
+    required => 1,
+    lazy     => 1,
+    builder  => 'build_args_to_key'
+);
+
+sub build_backend {
+    CHOP::RDB::CannedQuery::SimpleQueryCache::_PlainOldHash->new();
+}
+
+sub _make_digest_key {
+    my (%args) = ref $_[0] ? %{ $_[0] } : @_;
+    state $dumper = Data::Dumper->new( [] )->Sortkeys(1);
+    my $key =
+      $dumper->Reset->Values( [ map { $_ => $args{$_} } sort keys %args ] )
+      ->Dump;
+    $key =~ s/\s+/ /g;
+    $key = lc $key;
+    $key = md5_hex($key) if length($key) > 512;
+    return $key;
+}
+
+sub build_args_to_key {
+    return \&_make_digest_key;
+}
+
+sub get_query_from_cache {
+    my $self = shift;
+    my $key  = $self->args_to_key->(shift);
+    my $qry  = $self->backend->get($key);
+
+    if ($qry) {
+        my $sth = $qry->sth;
+
+        # We take this roundabout path to check on connectedness because
+        # $sth's own Active attribute may be false if prepared but not yet
+        # executed, and we don't want to go through Rose::DB->dbh to get
+        # DBI's database handle, since it'll reconnect under the hood if
+        # it's been disconnected, which doesn't help $sth
+        return $qry if $sth->{Active} or $sth->{Database}->{Active};
+        $self->backend->remove($key);
+    }
+    return;
+}
+
+sub add_query_to_cache {
+    my $self  = shift;
+    my $query = shift;
+    my $key   = $self->args_to_key->(shift);
+    my $ret   = $self->backend->set( $key, $query );
+    return $ret ? $query : $ret;
+}
+
+sub remove_query_from_cache {
+    my $self = shift;
+    my $key  = $self->args_to_key->(shift);
+    return $self->backend->remove($key);
+}
+
+sub clear_query_cache {
+    shift->backend->clear();
+}
+
+{
+
+    package CHOP::RDB::CannedQuery::SimpleQueryCache::_PlainOldHash;
+
+    sub new {
+        bless {}, shift;
+    }
+
+    sub get {
+        my ( $self, $key ) = @_;
+        return $self->{$key} if exists $self->{$key};
+        return;
+    }
+
+    sub set {
+        my ( $self, $key, $query ) = @_;
+        $self->{$key} = $query;
+        return $query;
+    }
+
+    sub remove {
+        my ( $self, $key ) = @_;
+        delete $self->{$key};
+    }
+
+    sub clear {
+        my $self = shift;
+        undef %$self;
+        return 1;
+    }
+}
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+
+=head1 NAME
+
+CHOP::RDB::CannedQuery::SimpleQueryCache - simple canned query cache
+
+=head1 SYNOPSIS
+
+  use CHOP::RDB::CannedQuery::SimpleQueryCache;
+  my $cache =
+     CHOP::RDB::CannedQuery::SimpleQueryCache->new(
+       backend => CHI->new(...),
+       args_to_key => \&my_converter
+     );
+  my $canned = $cache->get_query_from_cache(%desc);
+  my $canned = $cache->add_query_to_cache($canned_query, %desc);
+  $cache->remove_query_from_cache(%desc); # Drop one query
+  $cache->clear_query_cache(); # Drop them all
+
+=head1 DESCRIPTION
+
+This class provides a simple API and default implementation for the
+query cache available through L<CHOP::RDB::CannedQuery>.  The goal of
+the query cache is to simplify the structure of programs that use
+L<CHOP::RDB::CannedQuery>: code elsewhere can reuse a canned query
+with some frequency without being required to keep track of the query
+object across function calls oor the like.  Because query objects
+involve live database connections, the duration of caching, and the
+number of queries that can be cached, is generally limited.  In
+particular, this class does not contemplatefreezing and thawing of
+query objects.
+
+The behavior of the query cache is determined by two attributes:
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item backend
+
+This is the object that provides the cache.  It must implement C<get>,
+C<set>, C<remove>, and C<clear> methods; their behavior is fairly
+obvious from their names.
+
+You may provide any cache object that is compatible with the above
+API; in particular, this is intended to accommodate cache modules that
+conform to the L<CHI> API.  If you do not, a default backend is used
+that provides a simple in-memory cache with no expiration or other
+active management.
+
+=item args_to_key(I<$args>)
+
+This is a code reference to a function that uses the contents of the
+hash reference I<$args> to construct a key compatible with the query
+backend.  L<CHOP::RDB::CannedQuery> passes the arguments given to its
+constructor in I<args>.
+
+The default implementation uses the stringified form of all the
+arguments passed to it to generate the key. The order of arguments,
+whitespace within arguments, and alphabetic case of strings are not
+significant.
+
+=back
+
+=head1 CLASS METHODS
+
+Since L<CHOP::RDB::CannedQuery::SimpleQueryCache> is built using
+L<Any::Moose>, you have the option of changing its default behavior by
+creating a subclass that replaces its attribute defaults via the
+standard builder methods:
+
+=over 4
+
+=item build_backend
+
+Creates the default object for the L</backend>.  Currently returns an object
+implementing the simple hash-based cache described above.  For more
+details about the required behavior of the cache backend, see
+the L</backend> documentation above.
+
+=item build_args_to_key
+
+Creates the default for the L</args_to_key> function.  Returns a code
+reference whose calling sequence is described under L<?args_to_key> above.
+
+=back
+
+=head1 OBJECT METHODS
+
+L<CHOP::RDB::CannedQuery::SimpleQueryCache> objects provide the
+following methods to manage the query cache:
+
+=over 4
+
+=item B<add_query_to_cache>(I<$query>,I<$args>)
+
+Adds I<query> to the cache, using the key generated from I<args>,
+which must be a hash reference.
+
+Returns I<$query> if the backend's C<set> method returns a true value,
+and whatever C<set> returned otherwise. 
+
+=item B<get_query_from_cache>(I<$args>)
+
+Retrieves from the cache the query whose key is specified by I<$args>.
+If a query object is retrived, but neither its L<DBI/sth> nor the associated
+L<DBI/dbh> has a true C<Active> attribute, the object is deleted from
+the cache and discarded.
+
+Returns the query object on success, and C<undef> on failure.
+
+=item B<remove_query_from_cache>(I<$args>)
+
+Deletes the query object whose key is specified by I<$args> from the cache.
+
+Returns whatever the backend's C<remove> method returns (the default
+backend returns the query object).
+
+=item B<clear_query_cache>()
+
+Clears the query cache entirely.
+
+Returns whatever the backend's C<clear> method returns (the default
+backend returns a true value).
+
+=back
+
+=head2 EXPORT
+
+None.
+
+=head1 SEE ALSO
+
+L<CHOP::RDB::CannedQuery>, L<CHI>
+
+=head1 DIAGNOSTICS
+
+Any message produced by an included package.
+
+=head1 BUGS AND CAVEATS
+
+Are there, for certain, but have yet to be cataloged.
+
+=head1 REVISION
+
+$Revision$ $Date$
+
+=head1 AUTHOR
+
+Charles Bailey <baileyc@email.chop.edu>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Charles Bailey and the Children's Hospital of
+Philadelphia
+
+All rights reserved.
+
+=cut

@@ -1,0 +1,79 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 72f937756f1c81559e59d75b3f559244377c7100 Changes
+SHA1 312faf783b79d16d29a70e4b02c7b5275ba626f9 FAQ
+SHA1 4f8f74883c875ac16791b355c07f58294743ab76 LICENSE
+SHA1 3a66056457bda30b3fca2b8bd4aa00ff60fa382c MANIFEST
+SHA1 9efc1ea5f6a65be2d9527d5bf7b8372c6ccba20f META.yml
+SHA1 84366cd3811e570bb1c9e29f2990e5a0dc8601eb Makefile.PL
+SHA1 35f82ffaf7c63a7d429fe0548ee11236dda95674 README
+SHA1 9817bf2199af0d0dcc9fb2de82a275169308afd2 TODO
+SHA1 c1273d93f06ab4f7d0849153a8295758ec21198c examples/example1.pl
+SHA1 d5bc1451f8119bc2eba477cc805ec0fce58c7d00 examples/example2.pl
+SHA1 bc34fd41b265edf3dbe503d4aaa1985bac677a33 examples/example3.pl
+SHA1 f046d946a6c2644133c534c3437b123ebed0379e examples/example4.pl
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 b86d0385e10881db680d28bde94f275e49e34a27 inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 6b807287940754cc31a3db59f2b22e363d5525be inc/Module/Package/Dist/RDF.pm
+SHA1 e31c281782183601e1e057c5914f63269e043932 inc/Scalar/Util.pm
+SHA1 5eae2f71c45a996a296d2445b18d0589307111f0 inc/Scalar/Util/PP.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 8105c0510a773b56840995fb4dd2dc64fe9ddaee inc/unicore/Name.pm
+SHA1 e4b486823884918f33e61a7c435c9c9c88684d48 lib/RDF/Closure.pm
+SHA1 36c56cd4123944b6b788a54d4710392a3836a232 lib/RDF/Closure/AxiomaticTriples.pm
+SHA1 7758889f87006e0b675bd7432e480d1eb5b5d1e1 lib/RDF/Closure/DatatypeHandling.pm
+SHA1 02e766a4a9795481bf5e26a22e0e0fa296f715bb lib/RDF/Closure/DatatypeTuple.pm
+SHA1 577722e6971029bdbf2dfb688d1c1255788014ae lib/RDF/Closure/Engine.pm
+SHA1 f7f8a7f07c0d99a6fcd2649d40e4c17f80d83265 lib/RDF/Closure/Engine/Core.pm
+SHA1 1fc0bacd85496ec183ac4e602b4b78fc75be6a46 lib/RDF/Closure/Engine/OWL2Plus.pm
+SHA1 6481f32949a32446b2c8f52a9727a1ab947e05fc lib/RDF/Closure/Engine/OWL2RL.pm
+SHA1 6eba267368ffe4c3f985af144a011e55354bb042 lib/RDF/Closure/Engine/RDFS.pm
+SHA1 8324f970ec8097fe668a486d533a2eb6c658f8e1 lib/RDF/Closure/Model.pm
+SHA1 8b927d6b999717c2aedfc353519110aa5f91ed77 lib/RDF/Closure/RestrictedDatatype.pm
+SHA1 ffb098753cdcbb4ba6fa8df96cefbc1470ae6ac2 lib/RDF/Closure/Rule/Core.pm
+SHA1 195780ab603c049f82c651f919e14df44c25f66b lib/RDF/Closure/Rule/PatternMatcher.pm
+SHA1 02f0b651b70fc4e43b553a67e9fd176ebd9ded05 lib/RDF/Closure/Rule/Programmatic.pm
+SHA1 ded6b2ff5e3ea6496089d2ff28c3b3574f2472cc lib/RDF/Closure/Rule/StatementMatcher.pm
+SHA1 bce1116548e24359943815db6fcc878801d07707 lib/RDF/Closure/XsdDatatypes.pm
+SHA1 1024f87c138b97a787f4a9a4b230b0a5ff24cb2a lib/RDF/Trine/Parser/OwlFn.pm
+SHA1 ff69d76eadb6cb619e7c6114e978b2dfb9fd49df lib/RDF/Trine/Parser/OwlFn/Compiled.pm
+SHA1 ec5236ffa0cd330a0cb0dcfe8b9ad45fafd0f798 lib/RDF/Trine/Parser/OwlFn/Grammar.pm
+SHA1 dafd2bf54541341e5d48fd277c83cdd860c713fe meta/changes.ttl
+SHA1 12a1aa6e02d5d999e7c1bde69ce263770e382fae meta/doap.ttl
+SHA1 d53bd5257ccec809ddf3ffc848aba6e04ae7533d meta/makefile.ttl
+SHA1 6e7a7677f8d4e6bd2bb1765ffc81aa3fbebe2da4 t/01basic.t
+SHA1 bcde620e09301de175de2f5cbe9507d5c19a8cbf t/02reasoning.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk/satkACgkQzr+BKGoqfTn01wCfV+b2bbp43aX2DnrE7OAi1E/S
+KvAAn0OwdXd0X3NNNZY10Nn0WFBvZhQJ
+=W2WS
+-----END PGP SIGNATURE-----

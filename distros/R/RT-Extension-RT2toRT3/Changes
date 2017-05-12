@@ -1,0 +1,6 @@
+1.25 
+    * add ability to merge an older RT2 instance into an existing RT3
+      installation by specifying a new option
+    * add custom hooks for massaging data during the RT3 import
+    * fix bugs importing Custom Fields with non-ascii characters
+    * remove dependancy on DBIx::SearchBuilder internals

@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Locator</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Raptor RDF Syntax Parsing and Serializing Library Manual">
+<link rel="up" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="prev" href="raptor-section-iostream.html" title="I/O Stream">
+<link rel="next" href="raptor-section-parser.html" title="Parser">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="introduction.html" title="Raptor Overview">
+<link rel="part" href="tutorial.html" title="Part&#160;I.&#160;Raptor Tutorial">
+<link rel="chapter" href="tutorial-initialising-finishing.html" title="Initialising and Finishing using the Library">
+<link rel="chapter" href="tutorial-querying-functionality.html" title="Listing built-in functionality">
+<link rel="chapter" href="tutorial-parsing.html" title="Parsing syntaxes to RDF Triples">
+<link rel="chapter" href="tutorial-serializing.html" title="Serializing RDF triples to a syntax">
+<link rel="part" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="chapter" href="raptor-parsers.html" title="Parsers in Raptor (syntax to triples)">
+<link rel="chapter" href="raptor-serializers.html" title="Serializers in Raptor (triples to syntax)">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="raptor-section-iostream.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference-manual.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Raptor RDF Syntax Parsing and Serializing Library Manual</th>
+<td><a accesskey="n" href="raptor-section-parser.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2591722" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2602456" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="raptor-section-locator"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2591722"></a><span class="refentrytitle">Locator</span>
+</h2>
+<p>Locator &#8212; Location information for errors, warnings and messages.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+            <a href="raptor-section-locator.html#raptor-locator">raptor_locator</a>;
+void        <a href="raptor-section-locator.html#raptor-print-locator">raptor_print_locator</a>            (FILE *stream,
+                                             <a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);
+int         <a href="raptor-section-locator.html#raptor-format-locator">raptor_format_locator</a>           (char *buffer,
+                                             size_t length,
+                                             <a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);
+int         <a href="raptor-section-locator.html#raptor-locator-line">raptor_locator_line</a>             (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);
+int         <a href="raptor-section-locator.html#raptor-locator-column">raptor_locator_column</a>           (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);
+int         <a href="raptor-section-locator.html#raptor-locator-byte">raptor_locator_byte</a>             (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);
+const char* <a href="raptor-section-locator.html#raptor-locator-file">raptor_locator_file</a>             (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);
+const char* <a href="raptor-section-locator.html#raptor-locator-uri">raptor_locator_uri</a>              (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2602456"></a><h2>Description</h2>
+<p>
+A small structure that can be optionally filled in when
+errors, warnings or other messages are generated and returned
+to user code.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2602474"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2602484"></a><h3>
+<a name="raptor-locator"></a>raptor_locator</h3>
+<a class="indexterm" name="id2602497"></a><pre class="programlisting">typedef struct {
+  raptor_uri *uri;
+  const char *file;
+  int line;
+  int column;
+  int byte;  
+} raptor_locator;
+</pre>
+<p>
+Location information for an error, warning or information message.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a href="raptor-section-uri.html#raptor-uri">raptor_uri</a>&#160;*<em class="structfield"><code>uri</code></em>;</span></td>
+<td> URI of location (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term">const&#160;char&#160;*<em class="structfield"><code>file</code></em>;</span></td>
+<td> Filename of location (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term">int&#160;<em class="structfield"><code>line</code></em>;</span></td>
+<td> Line number of location (or &lt;0 for no line)
+</td>
+</tr>
+<tr>
+<td><span class="term">int&#160;<em class="structfield"><code>column</code></em>;</span></td>
+<td> Column number of location (or &lt;0 for no column)
+</td>
+</tr>
+<tr>
+<td><span class="term">int&#160;<em class="structfield"><code>byte</code></em>;</span></td>
+<td> Byte number of location (or &lt;0 for no byte)
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2597233"></a><h3>
+<a name="raptor-print-locator"></a>raptor_print_locator ()</h3>
+<a class="indexterm" name="id2597244"></a><pre class="programlisting">void        raptor_print_locator            (FILE *stream,
+                                             <a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);</pre>
+<p>
+Print a raptor locator to a stream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stream</code></em>&#160;:</span></td>
+<td> stream to print to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>locator</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-locator.html#raptor-locator"><span class="type">raptor_locator</span></a> to print
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614124"></a><h3>
+<a name="raptor-format-locator"></a>raptor_format_locator ()</h3>
+<a class="indexterm" name="id2614135"></a><pre class="programlisting">int         raptor_format_locator           (char *buffer,
+                                             size_t length,
+                                             <a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);</pre>
+<p>
+Format a raptor locator as a string.
+</p>
+<p>
+If buffer is NULL or length is insufficient for the size of
+the locator, returns the number of additional bytes required
+in the buffer to write the locator.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>buffer</code></em>&#160;:</span></td>
+<td> buffer to store format
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>length</code></em>&#160;:</span></td>
+<td> size of buffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>locator</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-locator.html#raptor-locator"><span class="type">raptor_locator</span></a> to format
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> 0 on success, &gt;0 if additional bytes required in buffer, &lt;0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614251"></a><h3>
+<a name="raptor-locator-line"></a>raptor_locator_line ()</h3>
+<a class="indexterm" name="id2614263"></a><pre class="programlisting">int         raptor_locator_line             (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);</pre>
+<p>
+Get line number from locator.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>locator</code></em>&#160;:</span></td>
+<td> locator
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> integer line number, or -1 if there is no line number available
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614323"></a><h3>
+<a name="raptor-locator-column"></a>raptor_locator_column ()</h3>
+<a class="indexterm" name="id2614334"></a><pre class="programlisting">int         raptor_locator_column           (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);</pre>
+<p>
+Get column number from locator.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>locator</code></em>&#160;:</span></td>
+<td> locator
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> integer column number, or -1 if there is no column number available
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2613837"></a><h3>
+<a name="raptor-locator-byte"></a>raptor_locator_byte ()</h3>
+<a class="indexterm" name="id2613850"></a><pre class="programlisting">int         raptor_locator_byte             (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);</pre>
+<p>
+Get the locator byte offset from locator.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>locator</code></em>&#160;:</span></td>
+<td> locator
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> integer byte number, or -1 if there is no byte offset available
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2613910"></a><h3>
+<a name="raptor-locator-file"></a>raptor_locator_file ()</h3>
+<a class="indexterm" name="id2613922"></a><pre class="programlisting">const char* raptor_locator_file             (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);</pre>
+<p>
+Get file name from locator.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>locator</code></em>&#160;:</span></td>
+<td> locator
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> string file name, or NULL if there is no filename available
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2613983"></a><h3>
+<a name="raptor-locator-uri"></a>raptor_locator_uri ()</h3>
+<a class="indexterm" name="id2613996"></a><pre class="programlisting">const char* raptor_locator_uri              (<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator);</pre>
+<p>
+Get URI from locator.
+</p>
+<p>
+Returns a pointer to a shared string version of the URI in
+the locator.  This must be copied if it is needed.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>locator</code></em>&#160;:</span></td>
+<td> locator
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> string URI, or NULL if there is no URI available
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

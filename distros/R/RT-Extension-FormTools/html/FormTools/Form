@@ -1,0 +1,128 @@
+<%args>
+$next
+$next_for_validation => undef
+$include_header      => 1
+$include_page_layout => 1
+$include_tabs        => 0
+$ShowBar             => 1
+$validation          => 0
+$forbid_persisting   => {}
+$form_id             => undef
+$form_name           => undef
+$self_service        => 0
+</%args>
+<%init>
+use RT::Extension::FormTools;
+my $content = $m->content;
+
+$form_id   = $m->interp->apply_escapes( $form_id,   'h')
+    if defined $form_id;
+$form_name = $m->interp->apply_escapes( $form_name, 'h')
+    if defined $form_name;
+
+my $header_component = $self_service ? '/SelfService/Elements/Header' : '/Elements/Header';
+
+my %cfs = map { $_ => 1} @{ $m->notes('cfs_on_page') || [] };
+my %core_fields = map { $_ => 1} @{ $m->notes('core_fields_on_page') || [] };
+
+my %request_args = $m->request_args;
+
+my @results;
+my $real_next = delete $request_args{_form_tools_next};
+if ($validation && $real_next) {
+    my $queue = $m->notes('queue');
+    # registered validation
+    if (my $validation = $m->notes('validation')) {
+        while (my ($key, $validator) = each (%$validation)) {
+            if (ref($validator) eq 'CODE') {
+                # no op
+            }
+            elsif (!ref($validator)) {
+                 my $method_name = $validator;
+                 $validator = RT::Extension::FormTools->can($method_name);
+            }
+            else {
+                warn "unknown validator for $key, ignoring.";
+                next;
+            }
+
+            my ($ok, $res) = $validator->($request_args{$key}, \%request_args);
+            push @results, "$key: $res" unless $ok;
+        }
+    }
+
+    # cf validation based on record pattern
+    foreach my $key (keys %request_args) {
+        next if $key =~ /Values-Magic$/;
+        next unless ($key =~ /CustomField-(\d+)/ );
+        my $id = $1;
+        my $cf = RT::CustomField->new($session{'CurrentUser'});
+        $cf->Load($id);
+        next unless exists $request_args{"Object-RT::Ticket--CustomField-@{[ $cf->Id ]}-Values-Magic"};
+        my ($ok, @res) = RT::Extension::FormTools::validate_cf($cf, \%request_args);
+        push @results, @res unless $ok;
+
+    }
+    unless (@results) {
+        my $next_comp = $real_next;
+        $real_next = $m->caller(1)->dir_path . '/' . $real_next
+            unless $real_next =~ m'^/';
+        $m->subexec("$real_next", %ARGS, %request_args);
+        $m->abort;
+    }
+}
+
+foreach my $key (keys %request_args) {
+   next unless ($key =~ /CustomField-(\d+)/ );
+   my $cf = $1;
+   delete $request_args{$key} if ($cfs{$cf});
+}
+
+foreach my $key (keys %request_args) {
+   next unless RT::Extension::FormTools::is_core_field($key);
+   delete $request_args{$key} if ($core_fields{$key});
+}
+
+$next_for_validation ||= $m->caller(1)->path;
+
+</%init>
+% if ($include_header) {
+      <& $header_component, Title => $m->notes('page_title'), ShowBar => $ShowBar &>
+%     # SelfService Header already calls /Elements/Tabs (which calls /Elements/PageLayout)
+%     # Thus it only makes sense to display either the Tabs or the PageLayout if we
+%     # are not rendering the SelfService environment.
+%     if (! $self_service) {
+%         if ($include_tabs) {
+              <& /Elements/Tabs &>
+%         } elsif ($include_page_layout) {
+%             # /Elements/Tabs already unconditionally calls the PageLayout component.
+%             # Thus it only makes sense to call it if we aren't "including" the tabs.
+              <& /Elements/PageLayout &>
+%         }
+%     }
+% }
+
+<& /Elements/ListActions, actions => \@results &>
+
+<form
+    method="POST"
+    action="<% $validation ? $next_for_validation : $next %>"
+    enctype="multipart/form-data"
+    <% defined $form_id ? ' id="'.$form_id.'"' : '' |n %>
+    <% defined $form_name ? ' name="'.$form_name.'"' : '' |n %>
+>
+% if ($validation) {
+<input type="hidden" name="_form_tools_next" value="<%$next%>" />
+% }
+<%$content|n%>
+
+% foreach my $key (keys %request_args) {
+% next if (ref $request_args{$key} && ref $request_args{$key} ne 'ARRAY');
+% foreach my $val ( ref ($request_args{$key}) ? @{$request_args{$key}} : ($request_args{$key})) {
+% next if $forbid_persisting->{$key};
+% next if ($key eq 'user' or $key eq 'pass');
+<input type="hidden" name="<%$key%>" value="<%$val%>" />
+% }
+% }
+
+</form>

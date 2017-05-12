@@ -1,0 +1,32 @@
+%# "Don't go around saying the world owes you a living.  The world owes
+%# you nothing.  It was here first."
+%# 		-- Mark Twain
+
+<table border=0 cellpadding=0 cellspacing=0 bgcolor="#C4E1F0"><tr> 
+% my $postfix;
+% while (my $k = shift(@$Map)) {
+<td><input type="button" value="<% loc($k) %>"></td>
+% }
+<td><select>
+<option><&|/l&>defect</&></option>
+<option><&|/l&>patch</&></option>
+<option><&|/l&>enhancement</&></option>
+</select></td>
+</tr></table>
+<%INIT>
+my $url = $r->uri;
+$Map = [
+    'Overview',
+    'List',
+    'Add',
+    'Search',
+];
+$url =~ s!//+!/!g;
+</%INIT>
+<%ARGS>
+$Map	=> []
+$Name	=> 'Map'
+$Show	=> ''
+$URL	=> ''
+$Skip	=> ''
+</%ARGS>

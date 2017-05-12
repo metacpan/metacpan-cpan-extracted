@@ -1,0 +1,1249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Parser</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Raptor RDF Syntax Parsing and Serializing Library Manual">
+<link rel="up" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="prev" href="raptor-section-locator.html" title="Locator">
+<link rel="next" href="raptor-section-sequence.html" title="Sequence">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="introduction.html" title="Raptor Overview">
+<link rel="part" href="tutorial.html" title="Part&#160;I.&#160;Raptor Tutorial">
+<link rel="chapter" href="tutorial-initialising-finishing.html" title="Initialising and Finishing using the Library">
+<link rel="chapter" href="tutorial-querying-functionality.html" title="Listing built-in functionality">
+<link rel="chapter" href="tutorial-parsing.html" title="Parsing syntaxes to RDF Triples">
+<link rel="chapter" href="tutorial-serializing.html" title="Serializing RDF triples to a syntax">
+<link rel="part" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="chapter" href="raptor-parsers.html" title="Parsers in Raptor (syntax to triples)">
+<link rel="chapter" href="raptor-serializers.html" title="Serializers in Raptor (triples to syntax)">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="raptor-section-locator.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference-manual.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Raptor RDF Syntax Parsing and Serializing Library Manual</th>
+<td><a accesskey="n" href="raptor-section-sequence.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2565165" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2610523" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="raptor-section-parser"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2565165"></a><span class="refentrytitle">Parser</span>
+</h2>
+<p>Parser &#8212; RDF parsers - from a syntax to RDF triples</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="raptor-section-parser.html#raptor-parser">raptor_parser</a>;
+<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a>* <a href="raptor-section-parser.html#raptor-new-parser">raptor_new_parser</a>            (const char *name);
+<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a>* <a href="raptor-section-parser.html#raptor-new-parser-for-content">raptor_new_parser_for_content</a>
+                                            (<a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             const char *mime_type,
+                                             unsigned char *buffer,
+                                             size_t len,
+                                             unsigned char *identifier);
+int         <a href="raptor-section-parser.html#raptor-start-parse">raptor_start_parse</a>              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri);
+void        <a href="raptor-section-parser.html#raptor-free-parser">raptor_free_parser</a>              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser);
+void        <a href="raptor-section-parser.html#raptor-set-fatal-error-handler">raptor_set_fatal_error_handler</a>  (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-general.html#raptor-message-handler">raptor_message_handler</a> handler);
+void        <a href="raptor-section-parser.html#raptor-set-error-handler">raptor_set_error_handler</a>        (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-general.html#raptor-message-handler">raptor_message_handler</a> handler);
+void        <a href="raptor-section-parser.html#raptor-set-warning-handler">raptor_set_warning_handler</a>      (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-general.html#raptor-message-handler">raptor_message_handler</a> handler);
+void        <a href="raptor-section-parser.html#raptor-set-statement-handler">raptor_set_statement_handler</a>    (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-general.html#raptor-statement-handler">raptor_statement_handler</a> handler);
+void        <a href="raptor-section-parser.html#raptor-set-generate-id-handler">raptor_set_generate_id_handler</a>  (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             raptor_generate_id_handler handler);
+void        (<a href="raptor-section-parser.html#raptor-namespace-handler">*raptor_namespace_handler</a>)     (void *user_data,
+                                             <a href="raptor-section-xml-namespace.html#raptor-namespace">raptor_namespace</a> *nspace);
+void        <a href="raptor-section-parser.html#raptor-set-namespace-handler">raptor_set_namespace_handler</a>    (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-parser.html#raptor-namespace-handler">raptor_namespace_handler</a> handler);
+<a href="raptor-section-locator.html#raptor-locator">raptor_locator</a>* <a href="raptor-section-parser.html#raptor-get-locator">raptor_get_locator</a>          (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);
+void        <a href="raptor-section-parser.html#raptor-set-default-generate-id-parameters">raptor_set_default_generate_id_parameters</a>
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             char *prefix,
+                                             int base);
+int         <a href="raptor-section-parser.html#raptor-parse-chunk">raptor_parse_chunk</a>              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             unsigned char *buffer,
+                                             size_t len,
+                                             int is_end);
+int         <a href="raptor-section-parser.html#raptor-parse-file-stream">raptor_parse_file_stream</a>        (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             FILE *stream,
+                                             const char *filename,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *base_uri);
+int         <a href="raptor-section-parser.html#raptor-parse-file">raptor_parse_file</a>               (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *base_uri);
+int         <a href="raptor-section-parser.html#raptor-parse-uri">raptor_parse_uri</a>                (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *base_uri);
+int         <a href="raptor-section-parser.html#raptor-parse-uri-with-connection">raptor_parse_uri_with_connection</a>
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *base_uri,
+                                             void *connection);
+void        <a href="raptor-section-parser.html#raptor-parse-abort">raptor_parse_abort</a>              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);
+const char* <a href="raptor-section-parser.html#raptor-get-name">raptor_get_name</a>                 (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);
+const char* <a href="raptor-section-parser.html#raptor-get-label">raptor_get_label</a>                (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);
+const char* <a href="raptor-section-parser.html#raptor-get-mime-type">raptor_get_mime_type</a>            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);
+int         <a href="raptor-section-parser.html#raptor-get-need-base-uri">raptor_get_need_base_uri</a>        (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);
+int         <a href="raptor-section-parser.html#raptor-set-feature">raptor_set_feature</a>              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature,
+                                             int value);
+int         <a href="raptor-section-parser.html#raptor-parser-set-feature-string">raptor_parser_set_feature_string</a>
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature,
+                                             unsigned char *value);
+int         <a href="raptor-section-parser.html#raptor-get-feature">raptor_get_feature</a>              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature);
+const unsigned char* <a href="raptor-section-parser.html#raptor-parser-get-feature-string">raptor_parser_get_feature_string</a>
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature);
+void        <a href="raptor-section-parser.html#raptor-set-parser-strict">raptor_set_parser_strict</a>        (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             int is_strict);
+const char* <a href="raptor-section-parser.html#raptor-parser-get-accept-header">raptor_parser_get_accept_header</a> (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);
+void        <a href="raptor-section-parser.html#raptor-parser-set-uri-filter">raptor_parser_set_uri_filter</a>    (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-www.html#raptor-uri-filter-func">raptor_uri_filter_func</a> filter,
+                                             void *user_data);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2610523"></a><h2>Description</h2>
+<p>
+The parsing class that allows creating a parser for reading from a
+particular syntax (or can guess and use contextual information) that
+will on demand generate RDF triples to a handler function, as chunks
+of syntax data are passed into the parser.  Parsing can be done from
+strings in memory, files or from URIs on the web.
+</p>
+<p>
+There are also methods to deal with handling errors, warnings and
+returned triples as well as setting options (features) that can
+adjust how parsing is performed.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2610550"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2610561"></a><h3>
+<a name="raptor-parser"></a>raptor_parser</h3>
+<a class="indexterm" name="id2610574"></a><pre class="programlisting">raptor_parser* raptor_parser;
+</pre>
+<p>
+Raptor Parser class</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2610593"></a><h3>
+<a name="raptor-new-parser"></a>raptor_new_parser ()</h3>
+<a class="indexterm" name="id2610606"></a><pre class="programlisting"><a href="raptor-section-parser.html#raptor-parser">raptor_parser</a>* raptor_new_parser            (const char *name);</pre>
+<p>
+Constructor - create a new raptor_parser object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> the parser name
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2610673"></a><h3>
+<a name="raptor-new-parser-for-content"></a>raptor_new_parser_for_content ()</h3>
+<a class="indexterm" name="id2610686"></a><pre class="programlisting"><a href="raptor-section-parser.html#raptor-parser">raptor_parser</a>* raptor_new_parser_for_content
+                                            (<a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             const char *mime_type,
+                                             unsigned char *buffer,
+                                             size_t len,
+                                             unsigned char *identifier);</pre>
+<p>
+Constructor - create a new raptor_parser.
+</p>
+<p>
+Uses <a href="raptor-section-general.html#raptor-guess-parser-name"><code class="function">raptor_guess_parser_name()</code></a> to find a parser by scoring
+recognition of the syntax by a block of characters, the content
+identifier or a mime type.  The content identifier is typically a
+filename or URI or some other identifier.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> URI identifying the syntax (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>mime_type</code></em>&#160;:</span></td>
+<td> mime type identifying the content (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>buffer</code></em>&#160;:</span></td>
+<td> buffer of content to guess (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len</code></em>&#160;:</span></td>
+<td> length of buffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>identifier</code></em>&#160;:</span></td>
+<td> identifier of content (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2610855"></a><h3>
+<a name="raptor-start-parse"></a>raptor_start_parse ()</h3>
+<a class="indexterm" name="id2610868"></a><pre class="programlisting">int         raptor_start_parse              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri);</pre>
+<p>
+Start a parse of content with base URI.
+</p>
+<p>
+Parsers that need a base URI can be tested with <a href="raptor-section-parser.html#raptor-get-need-base-uri"><code class="function">raptor_get_need_base_uri()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> RDF parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> base URI or may be NULL if no base URI is required
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure, &lt;0 if a required base URI was missing
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620055"></a><h3>
+<a name="raptor-free-parser"></a>raptor_free_parser ()</h3>
+<a class="indexterm" name="id2620065"></a><pre class="programlisting">void        raptor_free_parser              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser);</pre>
+<p>
+Destructor - destroy a raptor_parser object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620118"></a><h3>
+<a name="raptor-set-fatal-error-handler"></a>raptor_set_fatal_error_handler ()</h3>
+<a class="indexterm" name="id2620131"></a><pre class="programlisting">void        raptor_set_fatal_error_handler  (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-general.html#raptor-message-handler">raptor_message_handler</a> handler);</pre>
+<p>
+Set the parser error handling function.
+</p>
+<p>
+The function will receive callbacks when the parser fails.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> the parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data to pass to function
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>handler</code></em>&#160;:</span></td>
+<td> pointer to the function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620228"></a><h3>
+<a name="raptor-set-error-handler"></a>raptor_set_error_handler ()</h3>
+<a class="indexterm" name="id2620240"></a><pre class="programlisting">void        raptor_set_error_handler        (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-general.html#raptor-message-handler">raptor_message_handler</a> handler);</pre>
+<p>
+Set the parser error handling function.
+</p>
+<p>
+The function will receive callbacks when the parser fails.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> the parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data to pass to function
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>handler</code></em>&#160;:</span></td>
+<td> pointer to the function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620336"></a><h3>
+<a name="raptor-set-warning-handler"></a>raptor_set_warning_handler ()</h3>
+<a class="indexterm" name="id2620348"></a><pre class="programlisting">void        raptor_set_warning_handler      (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-general.html#raptor-message-handler">raptor_message_handler</a> handler);</pre>
+<p>
+Set the parser warning handling function.
+</p>
+<p>
+The function will receive callbacks when the parser gives a warning.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> the parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data to pass to function
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>handler</code></em>&#160;:</span></td>
+<td> pointer to the function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620444"></a><h3>
+<a name="raptor-set-statement-handler"></a>raptor_set_statement_handler ()</h3>
+<a class="indexterm" name="id2620458"></a><pre class="programlisting">void        raptor_set_statement_handler    (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-general.html#raptor-statement-handler">raptor_statement_handler</a> handler);</pre>
+<p>
+Set the statement handler function for the parser.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data pointer for callback
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>handler</code></em>&#160;:</span></td>
+<td> new statement callback function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620558"></a><h3>
+<a name="raptor-set-generate-id-handler"></a>raptor_set_generate_id_handler ()</h3>
+<a class="indexterm" name="id2620572"></a><pre class="programlisting">void        raptor_set_generate_id_handler  (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             raptor_generate_id_handler handler);</pre>
+<p>
+Set the generate ID handler function for the parser.
+</p>
+<p>
+Sets the function to generate IDs for the parser.  The handler is
+called with the <em class="parameter"><code>user_data</code></em> parameter and an ID type of either
+RAPTOR_GENID_TYPE_BNODEID or RAPTOR_GENID_TYPE_BAGID (latter is deprecated).
+</p>
+<p>
+The final argument of the callback method is user_bnodeid, the value of
+the rdf:nodeID attribute that the user provided if any (or NULL).
+It can either be returned directly as the generated value when present or
+modified.  The passed in value must be <code class="function">free()</code>d if it is not used.
+</p>
+<p>
+If handler is NULL, the default method is used</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data pointer for callback
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>handler</code></em>&#160;:</span></td>
+<td> generate ID callback function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620671"></a><h3>
+<a name="raptor-namespace-handler"></a>raptor_namespace_handler ()</h3>
+<a class="indexterm" name="id2620681"></a><pre class="programlisting">void        (*raptor_namespace_handler)     (void *user_data,
+                                             <a href="raptor-section-xml-namespace.html#raptor-namespace">raptor_namespace</a> *nspace);</pre>
+<p>
+XML Namespace declaration reporting handler set by 
+<a href="raptor-section-parser.html#raptor-set-namespace-handler"><code class="function">raptor_set_namespace_handler()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>nspace</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-xml-namespace.html#raptor-namespace"><span class="type">raptor_namespace</span></a> declared
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620761"></a><h3>
+<a name="raptor-set-namespace-handler"></a>raptor_set_namespace_handler ()</h3>
+<a class="indexterm" name="id2620773"></a><pre class="programlisting">void        raptor_set_namespace_handler    (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             void *user_data,
+                                             <a href="raptor-section-parser.html#raptor-namespace-handler">raptor_namespace_handler</a> handler);</pre>
+<p>
+Set the namespace handler function for the parser.
+</p>
+<p>
+When a prefix/namespace is seen in a parser, call the given
+<em class="parameter"><code>handler</code></em> with the prefix string and the <a href="raptor-section-uri.html#raptor-uri"><span class="type">raptor_uri</span></a> namespace URI.
+Either can be NULL for the default prefix or default namespace.
+</p>
+<p>
+The handler function does not deal with duplicates so any
+namespace may be declared multiple times.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data pointer for callback
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>handler</code></em>&#160;:</span></td>
+<td> new namespace callback function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620887"></a><h3>
+<a name="raptor-get-locator"></a>raptor_get_locator ()</h3>
+<a class="indexterm" name="id2620898"></a><pre class="programlisting"><a href="raptor-section-locator.html#raptor-locator">raptor_locator</a>* raptor_get_locator          (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);</pre>
+<p>
+Get the current raptor locator object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> raptor parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> raptor locator
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620952"></a><h3>
+<a name="raptor-set-default-generate-id-parameters"></a>raptor_set_default_generate_id_parameters ()</h3>
+<a class="indexterm" name="id2620965"></a><pre class="programlisting">void        raptor_set_default_generate_id_parameters
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             char *prefix,
+                                             int base);</pre>
+<p>
+Set default ID generation parameters.
+</p>
+<p>
+Sets the parameters for the default algorithm used to generate IDs.
+The default algorithm uses both <em class="parameter"><code>prefix</code></em> and <em class="parameter"><code>base</code></em> to generate a new
+identifier.   The exact identifier generated is not guaranteed to
+be a strict concatenation of <em class="parameter"><code>prefix</code></em> and <em class="parameter"><code>base</code></em> but will use both
+parts. The <em class="parameter"><code>prefix</code></em> parameter is copied to generate an ID.
+</p>
+<p>
+For finer control of the generated identifiers, use
+<code class="function">raptor_set_default_generate_id_handler()</code>.
+</p>
+<p>
+If <em class="parameter"><code>prefix</code></em> is NULL, the default prefix is used (currently "genid")
+If <em class="parameter"><code>base</code></em> is less than 1, it is initialised to 1.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>prefix</code></em>&#160;:</span></td>
+<td> prefix string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base</code></em>&#160;:</span></td>
+<td> integer base identifier
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621119"></a><h3>
+<a name="raptor-parse-chunk"></a>raptor_parse_chunk ()</h3>
+<a class="indexterm" name="id2621130"></a><pre class="programlisting">int         raptor_parse_chunk              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             unsigned char *buffer,
+                                             size_t len,
+                                             int is_end);</pre>
+<p>
+Parse a block of content into triples.
+</p>
+<p>
+This method can only be called after raptor_start_parse has
+initialised the parser.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> RDF parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>buffer</code></em>&#160;:</span></td>
+<td> content to parse
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len</code></em>&#160;:</span></td>
+<td> length of buffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>is_end</code></em>&#160;:</span></td>
+<td> non-0 if this is the end of the content (such as EOF)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621246"></a><h3>
+<a name="raptor-parse-file-stream"></a>raptor_parse_file_stream ()</h3>
+<a class="indexterm" name="id2621257"></a><pre class="programlisting">int         raptor_parse_file_stream        (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             FILE *stream,
+                                             const char *filename,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *base_uri);</pre>
+<p>
+Parse RDF content from a FILE*.
+</p>
+<p>
+After draining the stream, fclose is not called on it internally.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>stream</code></em>&#160;:</span></td>
+<td> FILE* of RDF content
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>filename</code></em>&#160;:</span></td>
+<td> filename of content or NULL if it has no name
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> the base URI to use
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621373"></a><h3>
+<a name="raptor-parse-file"></a>raptor_parse_file ()</h3>
+<a class="indexterm" name="id2621384"></a><pre class="programlisting">int         raptor_parse_file               (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *base_uri);</pre>
+<p>
+Parse RDF content at a file URI.
+</p>
+<p>
+If uri is NULL (source is stdin), then the base_uri is required.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> URI of RDF content or NULL to read from standard input
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> the base URI to use (or NULL if the same)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621482"></a><h3>
+<a name="raptor-parse-uri"></a>raptor_parse_uri ()</h3>
+<a class="indexterm" name="id2621492"></a><pre class="programlisting">int         raptor_parse_uri                (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *base_uri);</pre>
+<p>
+Parse the RDF content at URI.
+</p>
+<p>
+Sends an HTTP Accept: header whent the URI is of the HTTP protocol,
+see raptor_parse_uri_with_connection for details.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> URI of RDF content
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> the base URI to use (or NULL if the same)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621590"></a><h3>
+<a name="raptor-parse-uri-with-connection"></a>raptor_parse_uri_with_connection ()</h3>
+<a class="indexterm" name="id2621602"></a><pre class="programlisting">int         raptor_parse_uri_with_connection
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *base_uri,
+                                             void *connection);</pre>
+<p>
+Parse RDF content at URI using existing WWW connection.
+</p>
+<p>
+When <em class="parameter"><code>connection</code></em> is NULL and a MIME Type exists for the parser
+type - such as returned by raptor_get_mime_type(parser) - this
+type is sent in an HTTP Accept: header in the form
+Accept: MIME-TYPE along with a wildcard of 0.1 quality, so MIME-TYPE is
+prefered rather than the sole answer.  The latter part may not be
+necessary but should ensure an HTTP 200 response.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> URI of RDF content
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> the base URI to use (or NULL if the same)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>connection</code></em>&#160;:</span></td>
+<td> connection object pointer or NULL to create a new one
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621731"></a><h3>
+<a name="raptor-parse-abort"></a>raptor_parse_abort ()</h3>
+<a class="indexterm" name="id2621742"></a><pre class="programlisting">void        raptor_parse_abort              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);</pre>
+<p>
+Abort an ongoing parse.
+</p>
+<p>
+Causes any ongoing generation of statements by a parser to be
+terminated and the parser to return controlto the application
+as soon as draining any existing buffers.
+</p>
+<p>
+Most useful inside raptor_parse_file or raptor_parse_uri when
+the Raptor library is directing the parsing and when one of the
+callback handlers such as as set by raptor_set_statement_handler
+requires to return to the main application code.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621805"></a><h3>
+<a name="raptor-get-name"></a>raptor_get_name ()</h3>
+<a class="indexterm" name="id2621816"></a><pre class="programlisting">const char* raptor_get_name                 (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);</pre>
+<p>
+Get the name of a parser.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the short name for the parser.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621877"></a><h3>
+<a name="raptor-get-label"></a>raptor_get_label ()</h3>
+<a class="indexterm" name="id2621887"></a><pre class="programlisting">const char* raptor_get_label                (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);</pre>
+<p>
+Get a descriptive label of a parser.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a readable label for the parser.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621949"></a><h3>
+<a name="raptor-get-mime-type"></a>raptor_get_mime_type ()</h3>
+<a class="indexterm" name="id2621960"></a><pre class="programlisting">const char* raptor_get_mime_type            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);</pre>
+<p>
+Return MIME type for the parser.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> MIME type or NULL if none available
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622022"></a><h3>
+<a name="raptor-get-need-base-uri"></a>raptor_get_need_base_uri ()</h3>
+<a class="indexterm" name="id2622032"></a><pre class="programlisting">int         raptor_get_need_base_uri        (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);</pre>
+<p>
+Get a boolean whether this parser needs a base URI to start parsing.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if this parser needs a base URI
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622094"></a><h3>
+<a name="raptor-set-feature"></a>raptor_set_feature ()</h3>
+<a class="indexterm" name="id2622104"></a><pre class="programlisting">int         raptor_set_feature              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature,
+                                             int value);</pre>
+<p>
+Set various parser features.
+</p>
+<p>
+The allowed features are available via <a href="raptor-section-feature.html#raptor-features-enumerate"><code class="function">raptor_features_enumerate()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>feature</code></em>&#160;:</span></td>
+<td> feature to set from enumerated <a href="raptor-section-feature.html#raptor-feature"><span class="type">raptor_feature</span></a> values
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>value</code></em>&#160;:</span></td>
+<td> integer feature value (0 or larger)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure or if the feature is unknown
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622223"></a><h3>
+<a name="raptor-parser-set-feature-string"></a>raptor_parser_set_feature_string ()</h3>
+<a class="indexterm" name="id2622236"></a><pre class="programlisting">int         raptor_parser_set_feature_string
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature,
+                                             unsigned char *value);</pre>
+<p>
+Set parser features with string values.
+</p>
+<p>
+The allowed features are available via <a href="raptor-section-feature.html#raptor-features-enumerate"><code class="function">raptor_features_enumerate()</code></a>.
+If the feature type is integer, the value is interpreted as an integer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>feature</code></em>&#160;:</span></td>
+<td> feature to set from enumerated <a href="raptor-section-feature.html#raptor-feature"><span class="type">raptor_feature</span></a> values
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>value</code></em>&#160;:</span></td>
+<td> feature value
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure or if the feature is unknown
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622357"></a><h3>
+<a name="raptor-get-feature"></a>raptor_get_feature ()</h3>
+<a class="indexterm" name="id2622367"></a><pre class="programlisting">int         raptor_get_feature              (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature);</pre>
+<p>
+Get various parser features.
+</p>
+<p>
+The allowed features are available via <a href="raptor-section-feature.html#raptor-features-enumerate"><code class="function">raptor_features_enumerate()</code></a>.
+</p>
+<p>
+Note: no feature value is negative</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>feature</code></em>&#160;:</span></td>
+<td> feature to get value
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> feature value or &lt; 0 for an illegal feature
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622464"></a><h3>
+<a name="raptor-parser-get-feature-string"></a>raptor_parser_get_feature_string ()</h3>
+<a class="indexterm" name="id2622476"></a><pre class="programlisting">const unsigned char* raptor_parser_get_feature_string
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature);</pre>
+<p>
+Get parser features with string values.
+</p>
+<p>
+The allowed features are available via <a href="raptor-section-feature.html#raptor-features-enumerate"><code class="function">raptor_features_enumerate()</code></a>.
+If a string is returned, it must be freed by the caller.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>feature</code></em>&#160;:</span></td>
+<td> feature to get value
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> feature value or NULL for an illegal feature or no value
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622572"></a><h3>
+<a name="raptor-set-parser-strict"></a>raptor_set_parser_strict ()</h3>
+<a class="indexterm" name="id2622583"></a><pre class="programlisting">void        raptor_set_parser_strict        (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             int is_strict);</pre>
+<p>
+Set parser to strict / lax mode.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>is_strict</code></em>&#160;:</span></td>
+<td> Non 0 for strict parsing
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622652"></a><h3>
+<a name="raptor-parser-get-accept-header"></a>raptor_parser_get_accept_header ()</h3>
+<a class="indexterm" name="id2622665"></a><pre class="programlisting">const char* raptor_parser_get_accept_header (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser);</pre>
+<p>
+Get an HTTP Accept value for the parser.
+</p>
+<p>
+The returned string must be freed by the caller such as with
+<a href="raptor-section-memory.html#raptor-free-memory"><code class="function">raptor_free_memory()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> parser
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new Accept: header string or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622734"></a><h3>
+<a name="raptor-parser-set-uri-filter"></a>raptor_parser_set_uri_filter ()</h3>
+<a class="indexterm" name="id2622746"></a><pre class="programlisting">void        raptor_parser_set_uri_filter    (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *parser,
+                                             <a href="raptor-section-www.html#raptor-uri-filter-func">raptor_uri_filter_func</a> filter,
+                                             void *user_data);</pre>
+<p>
+Set URI filter function for WWW retrieval.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>parser</code></em>&#160;:</span></td>
+<td> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>filter</code></em>&#160;:</span></td>
+<td> URI filter function
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> User data to pass to filter function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

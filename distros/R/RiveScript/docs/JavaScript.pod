@@ -1,0 +1,168 @@
+=head1 NAME
+
+RiveScript::Docs::JavaScript
+
+=head1 DESCRIPTION
+
+To clean up the primary manpage for L<RiveScript>, the JavaScript example was
+moved here.
+
+With C<$rs-E<gt>setHandler()>, you can specify your own custom code to handle
+RiveScript object macros using programming languages other than Perl.
+
+For example, if you're implementing a RiveScript bot that runs on the web, you
+might like to support JavaScript objects in your code, because your user's
+browser would be able to execute it.
+
+=head1 JAVASCRIPT HANDLER
+
+Here's an example of defining a handler for JavaScript objects:
+
+  my $scripts = {}; # Place to store JS code.
+
+  $rs->setHandler (javascript => sub {
+    my ($self,$action,$name,$data) = @_;
+
+    # Loading the object.
+    if ($action eq "load") {
+      # Just store the code.
+      $scripts->{$name} = $data;
+    }
+    else {
+      # Turn the args into a JavaScript array.
+      my $code = "var fields = new Array();\n";
+      for (my $i = 0; $i < scalar @{$data}; $i++) {
+        $code .= "fields[$i] = \"$data->[$i]\";\n";
+      }
+
+      # Come up with code for the web browser.
+      $code .= "function rsobject (args) {\n"
+             . "$scripts->{$name}\n"
+             . "}"
+             . "document.writeln( rsobject(fields) );\n";
+      return "<script type=\"text/javascript\">\n"
+        . $code
+        . "</script>";
+    }
+  });
+
+So, the above example just loads the JavaScript source code into a hash reference
+named $scripts, and then when called it creates some JavaScript code to put the
+call's arguments into an array, creates a function that accepts the args, then
+calls this function in a C<document.writeln>. Here's an example of how this would
+be used in the RiveScript code:
+
+  // Define an object to encode text into rot13 to be executed by the web browser
+  > object rot13 javascript
+    var txt = args.join(" "); // Turn the args array into a string
+    var result = "";
+
+    for (var i = 0; i < txt.length; i++) {
+      var b = txt.charCodeAt(i);
+
+      // 65 = A    97 = a
+      // 77 = M   109 = m
+      // 78 = N   110 = n
+      // 90 = Z   122 = z
+
+      var isLetter = 0;
+
+      if (b >= 65 && b <= 77) {
+        isLetter = 1;
+        b += 13;
+      }
+      else if (b >= 97 && b <= 109) {
+        isLetter = 1;
+        b += 13;
+      }
+      else if (b >= 78 && b <= 90) {
+        isLetter = 1;
+        b -= 13;
+      }
+      else if (b >= 110 && b <= 122) {
+        isLetter = 1;
+        b -= 13;
+      }
+
+      if (isLetter) {
+        result += String.fromCharCode(b);
+      }
+      else {
+        result += String.fromCharCode(b);
+      }
+    }
+
+    return result;
+  < object
+
+  // Use the object
+  + say * in rot13
+  - "<star>" in rot13 is: <call>rot13 <star></call>.
+
+Now, when the user at the web browser provokes this reply, it will get back a
+bunch of JavaScript code as part of the response. It might be like this:
+
+  <b>User:</b> say hello world in rot13<br>
+  <b>Bot:</b> "hello world" in rot13 is: <script type="text/javascript">
+  var fields = new Array();
+  fields[0] = "hello";
+  fields[1] = "world";
+  function rsobject (args) {
+    var txt = args.join(" "); // Turn the args array into a string
+    var result = "";
+
+    for (var i = 0; i < txt.length; i++) {
+      var b = txt.charCodeAt(i);
+
+      // 65 = A    97 = a
+      // 77 = M   109 = m
+      // 78 = N   110 = n
+      // 90 = Z   122 = z
+
+      var isLetter = 0;
+
+      if (b >= 65 && b <= 77) {
+        isLetter = 1;
+        b += 13;
+      }
+      else if (b >= 97 && b <= 109) {
+        isLetter = 1;
+        b += 13;
+      }
+      else if (b >= 78 && b <= 90) {
+        isLetter = 1;
+        b -= 13;
+      }
+      else if (b >= 110 && b <= 122) {
+        isLetter = 1;
+        b -= 13;
+      }
+
+      if (isLetter) {
+        result += String.fromCharCode(b);
+      }
+      else {
+        result += String.fromCharCode(b);
+      }
+    }
+
+    return result;
+  }
+  document.writeln(rsobject(fields));
+  </script>.
+
+And so, the JavaScript gets executed inside the bot's response by the web
+browser.
+
+In this case, Perl itself can't handle JavaScript code, but considering the
+environment the bot is running in (CGI served to a web browser), the web browser
+is capable of executing JavaScript. So, we set up a custom object handler so that
+JavaScript objects are given directly to the browser to be executed there.
+
+=head1 SEE ALSO
+
+L<RiveScript>.
+
+=head1 AUTHOR
+
+Noah Petherbridge

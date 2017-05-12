@@ -1,0 +1,59 @@
+=head1 NAME
+
+VCP::Newlines - Newline, ^Z, and NULL handling in VCP
+
+=head1 DESCRIPTION
+
+Newlines can be a bear to debug, since most display programs hide the
+difference between C<\r\n>, C<\r>, and C<\n> from you.
+
+VCP copes with newlines thusly:
+
+=over
+
+=item 1.
+
+When reading/writing repositories (Cvs, Perforce, etc), it lets them sweat
+the details.
+
+=item 2.
+
+RevML text (non-binary) files always use single newline "\n" endings internally
+for both content and patches.  Due to XML handling, any "\r\n" or "\r"
+sequences that sneak in to an XML file get converted to "\n" anyway.
+
+=item 3.
+
+RevML binary files use an escape like <char code="0x0d"/> to encode carriage
+returns and other character codes illegal in XML texts.
+
+=item 4.
+
+L<VCP::Source::revml|VCP::Source::revml> can be asked to convert "\n" to "\r\n"
+on the fly in text files.  It never does this by default because most
+modern-day editors do the right thing (C<notepad.exe> is *not* modern day :).
+
+=item 5.
+
+L<VCP::Dest::revml|VCP::Dest::revml> always converts "\r\n" and "\r" in to "\n"
+for consistancy's sake, so the RevML file extracted on a Windows machine should
+be identical (or at least more nearly so) to one extracted on a Unix machine.
+The metadata might differ a bit, of course, but at least the content won't.
+
+=back
+
+Embedded Control-Z characters C<^Z> (ASCII 26) are passed through, as are
+embedded NULLs.  Both the diff and patch code are ^Z and NULL clean as well
+(unlike many).
+
+C<vcp> treats all files as binary files and uses it's own C<\r\n> conversion
+routines specifically to be able to pass C<^Z> through unmolested, since not
+passing things through can mess up both end users with loitering C<^Z>
+characters and C<vcp>'s checksums.
+
+If you think you have issues like these, see the document
+L<VCP::Maintenance|VCP::Maintenance> for some options and tools that can help
+when debugging.
+
+=cut
+

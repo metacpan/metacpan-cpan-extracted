@@ -1,0 +1,27 @@
+<%init>
+my @queues;
+
+my $unwanted = {};
+if ( $session{'CurrentUser'}->UserObj->can('Preferences') ) {
+    $unwanted
+        = $session{'CurrentUser'}->UserObj->Preferences( 'QuickSearch', {} );
+}
+my $queues = RT::Queues->new( $session{'CurrentUser'} );
+$queues->UnLimit();
+
+while ( my $queue = $queues->Next ) {
+    next
+        unless ( $queue->CurrentUserHasRight('ShowTicket')
+        && !exists $unwanted->{ $queue->Name } );
+    push @queues, $queue->Name;
+
+}
+</%init>
+<form method="post" action="/Search/Results.html" name="goto_queue" id="goto_queue" style="position: absolute; right: 35em;">
+<select onchange="document.goto_queue.submit()" name="Query" class="select-queue">
+<option value=""><&|/l&>Show queue</&></option>
+% foreach (@queues) {
+<option value="Queue = '<%$_%>' AND (Status = 'new' OR Status = 'open' OR Status = 'stalled')"><%$_%></option>
+%}
+</select>&nbsp;<input type="submit" class="button" value="<&|/l&>Go</&>" style="display: none;">
+</form>

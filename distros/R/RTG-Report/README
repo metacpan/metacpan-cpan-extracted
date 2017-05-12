@@ -1,0 +1,21 @@
+
+RTG is "a flexible, scalable, high-performance SNMP statistics monitoring system" available at http://rtg.sourceforge.net/  For measuring bandwidth based on router/switch port traffic, RTG is an excellent tool. It polls network devices via SNMP and stores the traffic data in a SQL RDBMS. 
+
+Layered Technologies uses RTG to monitor tens of thousands of network ports, feeding bandwidth data from each network into a MySQL database. Each script included in RTG::Report is a substantial rewrite that significantly improves upon the original scripts provided with RTG. We appreciate the generosity of RTGs authors and it is our hope that the RTG community finds this software useful as well.
+
+Many new features have been added. These are documented primarily in the man pages for each script and can be viewed via perldoc or man (ex: perldoc billing_report.pl). A major focus of the rewrite was adding the ability to control the report output based on command line options and config settings. The code has also been thoroughly modernized (ex: using DBIx::Class instead of DBI::) and the RTG::Report class is object oriented. The package mostly conforms with Perl Best Practices. 
+
+billing_report.pl - Generate a bandwidth billing report. The script includes a slew of options for customizing the report to provide as much or as little data as is needed. The report exports a CSV file and emails it (as an attachment) to a list of email addresses specified in the config file. The report includes the following fields: network name, router, Interface ID, Interface Name, Port Speed, Description, and In/Out bytes. It can optionally include the Avg In/Out (bit/s), Peak In/Out (bit/s), and 95th In/Out (bits/s). For each network defined, a set of 4 summary records are included in the CSV data (uplink, downlink, isp_uplink, and total). An example CSV is included in examples/billing_report.csv.
+
+uplink_report.pl - Generates an uplink report that shows how much traffic each ISP uplink port is utilizing. We run this report weekly and it gives our operations team and executives a high level overview of our network traffic. It also gives us handy reference points to compare and validate the usage our ISPs bill us for. An example is included.
+ 
+record_consolidator.pl - Consolidates RTG data into summary records. We monitor tens of thousands of network ports and have hundreds of gigabytes of RTG data. When disk space or performance becomes an issue, the RTG supplied tool is a pruning script that simply deletes old data. Rather than deleting that data, I wanted to condense it, preserving the essence of the data. I borrowed a concept from Tobias Otiker and his RRD databases--rather than discard old data, reduce its granularity.
+
+rtg_target_maker.pl - not released yet...
+
+A re-write of rtgtargetmkr.pl. Fixes a few notable problems with the existing script. Notably, it corrects errors in the RTG database. For example, you see that a customer is utilizing 250% of his port speed in the billing report. Being gifted in math, you deduce that is not possible and figure out it is because the port was upgraded from 100Mbit to Gigabit. This target maker script will automatically update port speeds and port descriptions so that the data in the database accurately reflects the configuration of the network device. It also sends a HUP signal to the rtgpoll process so it will re-read the routers file.
+
+
+RTG::Report is written by Matt Simerson @ Layered Technologies, Inc. 
+
+Layered Technologies is a world class dedicated hosting provider that you should consider: http://www.layeredtech.com/

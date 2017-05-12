@@ -1,0 +1,22 @@
+---
+abstract: 'RT AttachmentZip Extension'
+author:
+  - 'Richard G Harman Jr <rtx-attachmentszip+richard@richardharman.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.93'
+license: 'GPL Version 2'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RTx-AttachmentZip
+no_index:
+  directory:
+    - html
+    - inc
+requires:
+  Archive::Zip: 0
+version: 1.0

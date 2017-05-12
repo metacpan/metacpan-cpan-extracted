@@ -1,0 +1,68 @@
+NAME
+    RDF::Helper::Properties - Module that provides shortcuts to retrieve
+    certain information
+
+VERSION
+    Version 0.22
+
+SYNOPSIS
+     my $helper = RDF::Helper::Properties->new($model);
+     print $helper->title($node);
+
+DESCRIPTION
+  Constructor
+    "new(model => $model, %attributes)"
+        Moose-style constructor.
+
+  Attributes
+    "model"
+        The RDF::Trine::Model which data will be extracted from. The only
+        attribute which the constructor requires.
+
+    "page_properties"
+        An arrayref of RDF::Trine::Node::Resource objects, each of which are
+        taken to mean "something a bit like foaf:homepage". There is a
+        sensible default.
+
+    "title_properties"
+        An arrayref of RDF::Trine::Node::Resource objects, each of which are
+        taken to mean "something a bit like foaf:name". There is a sensible
+        default.
+
+    "cache"
+        A hashref for caching data into, or a blessed object which supports
+        "get" and "set" methods compatible with CHI and Cache::Cache. If you
+        do not supply a cache, then a hashref will be used by default.
+
+  Methods
+    "page($node)"
+        A suitable page to redirect to, based on foaf:page or foaf:homepage.
+
+    "title($node)"
+        A suitable title for the document will be returned, based on
+        document contents.
+
+        Called in list context, returns a ($value, $lang, $datatype) tuple.
+
+    "description($node)"
+        A suitable description for the document will be returned, based on
+        document contents
+
+    "html_node_value($node)"
+        Formats the nodes for HTML output.
+
+AUTHOR
+    Most of the code was written by Gregory Todd Williams
+    "<gwilliams@cpan.org>" for RDF::LinkedData::Apache, but refactored into
+    this class for use by other modules by Kjetil Kjernsmo, "<kjetilk at
+    cpan.org>", then refactored again by Toby Inkster, "<tobyink at
+    cpan.org>".
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Gregory Todd Williams and ABC Startsiden AS.
+
+    Copyright 2012 Toby Inkster.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,25 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RSH/Logging.pm
+lib/RSH/Logging/TextTable.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/000.load.t
+t/010.RSH-Logging.t
+t/011.RSH-Logging-chunking.t
+t/999.perlcritic.t
+t/999.pod-coverage.t
+t/999.pod.t

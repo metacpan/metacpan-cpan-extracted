@@ -1,0 +1,458 @@
+=pod
+
+=head1 NAME
+
+RPC::ExtDirect::API::Method - Ext.Direct Method object
+
+=head1 DESCRIPTION
+
+This package implements an Ext.Direct L<Method|RPC::ExtDirect::Intro/Method>
+object that holds Method's properties and can be subclassed to change
+its behavior.
+
+This document does not provide an overview of a Method. For that information,
+see L<RPC::ExtDirect::API/"ACTIONS AND METHODS">.
+
+=head1 METHOD OBJECT INTERFACE
+
+L<RPC::ExtDirect::API::Method> provides several public methods:
+
+=over 4
+
+=item C<HOOK_TYPES>
+
+Class/instance method. Returns the list of supported hook types. See
+L<RPC::ExtDirect/HOOKS> for more information.
+
+=item C<new>
+
+Constructor. Returns a new L<RPC::ExtDirect::API::Method> object. Accepts
+named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<config>
+
+A L<RPC::ExtDirect::Config> instance to be used with this Method.
+
+This parameter is mandatory.
+
+=item C<action>
+
+An L<Action|RPC::ExtDirect::Intro/Action> name this Method belongs to.
+
+This parameter is mandatory.
+
+=item C<name>
+
+This Method's name. Should be unique among the methods in an Action.
+
+This parameter is mandatory.
+
+=item C<len>
+
+Number of parameters accepted by an
+L<ordered Method|RPC::ExtDirect::Intro/"Ordered Method">.
+
+This parameter is mandatory for ordered Methods, and should not
+be defined for Methods of other calling conventions.
+
+=item C<params>
+
+An arrayref with names of parameters accepted by a
+L<named Method|RPC::ExtDirect::Intro/"Named Method">.
+
+This parameter is mandatory for named Methods, and should not
+be defined for Methods of other calling conventions.
+
+=item C<formHandler>
+
+A boolean flag indicating that this Method is a
+L<Form Handler|RPC::ExtDirect::Intro/"Form Handler Method">.
+
+This parameter is mandatory for Form handler Methods, and should
+not be defined for Methods of other calling conventions.
+
+=item C<pollHandler>
+
+A boolean flag indicating that this Method is a
+L<Poll Handler|RPC::ExtDirect::Intro/"Poll Handler Method">.
+
+This parameter is mandatory for Poll handler Methods, and should
+not be defined for Methods of other calling conventions.
+
+=item C<package>
+
+Name of the package this Method's code belongs to.
+
+This parameter is mandatory.
+
+=item C<strict>
+
+A boolean flag that enables or disables
+L<lazy parameter checking|RPC::ExtDirect::API/"Lazy parameter checking">
+for a named Method.
+
+This parameter is optional and should only be used with named Methods.
+
+=item C<before|instead|after>
+
+A L<Hook|RPC::ExtDirect/HOOKS> definition of the specified type for
+this Method. See L<RPC::ExtDirect::API::Hook/code> for the list of
+supported options.
+
+All three of these parameters are optional.
+
+=item C<env_arg>
+
+Use this parameter to indicate that this Method needs an
+L<environment object|RPC::ExtDirect/"ENVIRONMENT OBJECTS"> passed to it.
+Before RPC::ExtDirect 3.0, a Method was passed an environment object on
+every invocation; this behavior caused problems in certain cases.
+
+For ordered Methods and Poll handler Methods, C<env_arg> parameter
+should be a number for the C<@_> position that the env object should be
+spliced in. To receive the env object as the first argument, use C<0>;
+to receive it as the last argument, use some number greater than
+the number of parameters accepted by the Method (e.g. C<99>).
+
+For named Methods and Form handler Methods, C<env_arg> parameter
+should be a name of the hash key in which the environment object is
+passed.
+
+=item C<upload_arg>
+
+Use this parameter to change the hash key name in which the
+L<file upload array|RPC::ExtDirect/"FILE UPLOADS"> is passed to a
+Form handler Method. Default is C<'file_uploads'>.
+
+=item C<decode_params>
+
+This optional parameter may contain the list of fields that should be
+decoded from JSON for a formHandler Method. Does nothing for Methods
+with other calling conventions.
+
+=item C<metadata>
+
+Use this parameter to declare that this Method supports call
+L<metadata|RPC::ExtDirect::Intro/Metadata>. The value of this key
+should be a hashref with the following properties:
+
+=over 8
+
+=item C<len>
+
+Declares that this Method accepts ordered (by position) metadata
+with this number of mandatory values, with the number > 0.
+The metadata values will be passed to the Method in arrayref.
+
+This parameter is mutually exclusive with "params" below.
+
+=item C<params>
+
+Declares that this Method accepts named metadata values in a hashref.
+The value of C<params> is also arrayref with the names of mandatory
+metadata values. The declaration arrayref may be empty to indicate
+that all metadata values are optional and should not be checked
+for existence.
+
+This parameter is mutually exclusive with "len" above.
+
+=item C<strict>
+
+Set this option to falsy value to have all metadata key-value pairs
+passed to the Method. The default behavior is similar to named main
+arguments, where all undeclared parameters will be discarded and only
+the declared ones will be passed to the Method.
+
+=item C<arg>
+
+Defines the position of the metadata argument for Ordered methods,
+or the name of the metadata argument for Named methods. Note that
+this is about the calling convention of the main arguments, not
+metadata itself!
+
+For Named methods, C<arg> defaults to C<metadata>; for Ordered
+methods there is no default and an error will be raised if C<arg>
+is omitted.
+
+=back
+
+=item other
+
+Any other hash key with the corresponding value will be stored in the
+Method object.
+
+=back
+
+=item C<get_api_definition>
+
+Instance method. Returns a hashref with the Method's definition for the
+L<API declaration|RPC::ExtDirect::Intro/"API declaration">, or an empty
+list if the Method should not be included in the remoting API published
+to the client side.
+
+If you need to affect Ext.Direct API generation, this method is the place
+to do it. One example option is running a check on the user's credentials,
+and deciding to include or exclude this particular Method from the API
+generated for this user.
+
+Parameters (by position):
+
+=over 8
+
+=item *
+
+An L<environment object|RPC::ExtDirect/"ENVIRONMENT OBJECTS"> for this
+invocation.
+
+The stock C<get_api_definition> method does not use this environment
+object; it is provided to be potentially utilized in subclasses.
+
+=back
+
+=item C<get_api_definition_compat>
+
+Instance method. Returns a hashref with the Method's definition that
+is backwards compatible with versions 1.x and 2.x of RPC::ExtDirect.
+
+This method should not be used under normal circumstances.
+
+=item C<run>
+
+Instance method. Runs the Method's subroutine code and returns the
+L<Result|RPC::ExtDirect::Intro/Result> of the invocation. Accepts named
+arguments in a hash.
+
+The Method subroutine code is always called as a class method.
+For L<Poll handlers|RPC::ExtDirect::Intro/"Poll Handler Methods">, the
+code is called in a list context; for Methods of other calling
+conventions, the code is called in scalar context.
+
+Parameters:
+
+=over 8
+
+=item C<arg>
+
+The actual arguments that should be passed to the Method's code. This
+should be an arrayref for
+L<ordered Methods|RPC::ExtDirect::Intro/"Ordered Method"> and
+L<Poll handlers|RPC::ExtDirect::Intro/"Poll Handler Method">, or a
+hashref the other calling convention.
+
+Note that the value of this parameter is the same as returned by
+L</prepare_method_arguments> method.
+
+=back
+
+=item C<check_method_arguments>
+
+Instance method. Accepts one positional argument, which is incoming
+data that should be validated as Method's arguments. A specific
+I<checker method> (see below) will be executed to run the actual
+checks on this data; that method is expected to C<die> with an error,
+or return C<1> if the arguments are valid.
+
+=item C<check_ordered_arguments>
+
+Instance method. Takes input data and checks that it's an arrayref,
+and it has enough elements to satisfy the L</len> requirement of
+the Method.
+
+=item C<check_ordered_metadata>
+
+Instance method. Takes input metadata and checks that it's an arrayref,
+and it has enough values to satisfy the metadata C<len> requirement
+of the Method.
+
+Metadata will only be checked for Methods that accept it.
+
+=item C<check_named_arguments>
+
+Instance method. Takes input data and checks that it's a hashref,
+and that keys for all mandatory L</params> exist in that hashref.
+If the Method declares empty L</params>, the check will pass and
+effectively all arguments will be passed on to the Method call.
+
+=item C<check_named_metadata>
+
+Instance method. Takes input metadata and performs the checks similar
+to those made for named arguments.
+
+Metadata will only be checked for Methods that accept it.
+
+=item C<check_formHandler_arguments>
+
+Instance method. Takes input data and checks that it's a hashref.
+Since a Form Handler arguments are not known before invocation,
+no other checks are performed.
+
+=item C<check_pollHandler_arguments>
+
+Instance method. Does not in fact run any checks, since Poll Handler
+Methods are not supposed to be called directly and do not receive
+any arguments.
+
+=item C<prepare_method_arguments>
+
+Instance method. Accepts named arguments in a hash, and runs a
+specific I<preparer method> (see below) on these arguments,
+depending on the Method's calling convention.
+
+The return value of this method is the L<arguments|/arg> fed to
+the Method's code invoked in the L</run> method.
+
+Parameters:
+
+=over 8
+
+=item C<env>
+
+An L<environment object|RPC::ExtDirect/"ENVIRONMENT OBJECTS"> that is
+to be passed to the Method's code if Method has requested it.
+
+=item C<input>
+
+Method arguments passed from the client side. The type of the input
+depends on the Method's calling convention.
+
+=item C<upload>
+
+Arrayref of file upload hashrefs. See L<RPC::ExtDirect/"FILE UPLOADS">
+for more information.
+
+This parameter is only defined for
+L<Form handler methods|RPC::ExtDirect::Intro/"Form Handler Method">
+when uploaded files are present.
+
+=back
+
+=item C<prepare_ordered_arguments>
+
+Instance method. Takes C<input> arguments for the Method and returns
+an arrayref conformant to the 
+L<ordered Method's|RPC::ExtDirect::Intro/"Ordered Method"> definition.
+This arrayref will optionally contain env object if requested,
+and/or metadata.
+
+=item C<prepare_ordered_metadata>
+
+Instance method. Takes input metadata and returns an arrayref conformant
+to the Method's metadata definition.
+
+=item C<prepare_named_arguments>
+
+Instance method. Takes C<input> arguments for the Method and returns
+a hashref conformant to the 
+L<named Method's|RPC::ExtDirect::Intro/"Named Method"> definition.
+This hashref will optionally contain env object if requested,
+and/or metadata.
+
+=item C<prepare_formHandler_arguments>
+
+Instance method. Takes C<input> arguments for the Method and returns
+a hashref conformant to the
+L<Form Handler Method's|RPC::ExtDirect::Intro/"Form Handler Method">
+definition. This hashref will optionally contain env object if requested,
+and/or metadata.
+
+=item C<prepare_pollHandler_arguments>
+
+Instance method. Returns an arrayref conformant to
+L<Poll handler method's|RPC::ExtDirect::Intro/"Poll Handler Method">
+definition. This arrayref will optionally contain env object
+if requested.
+
+=back
+
+=head1 ACCESSOR METHODS
+
+For L<RPC::ExtDirect::API::Method>, the following
+L<accessor methods|RPC::ExtDirect::Config/"ACCESSOR METHODS"> are
+provided:
+
+=over 4
+
+=item C<config>
+
+Return the L<RPC::ExtDirect::Config> instance assigned to this
+Method object.
+
+=item C<action>
+
+Return the Action name for this Method object.
+
+=item C<name>
+
+Return the Method name for this Method object.
+
+=item C<len>
+
+Return the number of the parameters accepted by this
+L<ordered Method|RPC::ExtDirect::Intro/"Ordered Method">.
+
+For any other calling convention, C<len> should be C<undef>.
+
+=item C<params>
+
+Return the names of the mandatory parameters accepted by this
+L<named Method|RPC::ExtDirect::Intro/"Named Method">.
+
+For any other calling convention, C<params> should be C<undef>.
+
+=item C<formHandler>
+
+Return true if this Method is a
+L<Form Handler|RPC::ExtDirect::Intro/"Form Handler Method">.
+
+For any other calling convention, C<formHandler> should be C<undef>.
+
+=item C<pollHandler>
+
+Return true if this Method is a
+L<Poll Handler|RPC::ExtDirect::Intro/"Poll Handler Method">.
+
+For any other calling convention, C<pollHandler> should be C<undef>.
+
+=item C<is_ordered>
+
+Return true if this is an ordered Method.
+
+=item C<is_named>
+
+Return true if this is a named Method.
+
+=item C<strict>
+
+Return false for Named methods with
+L<lazy parameter checking|RPC::ExtDirect::API/"Lazy parameter checking">.
+
+Defaults to true.
+
+=item C<package>
+
+Return the name of the package this Method's code belongs to.
+
+=item C<env_arg>
+
+Return the name or position for the environment object parameter.
+
+See L</new>.
+
+=item C<upload_arg>
+
+Return the name of the file upload parameter for a Form handler.
+
+See L</new>.
+
+=item C<before|instead|after>
+
+Return the L<Hook|RPC::ExtDirect::API::Hook> object for the corresponding
+hook slot assigned to this Method.
+
+=back
+
+=cut

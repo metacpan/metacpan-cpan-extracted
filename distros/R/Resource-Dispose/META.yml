@@ -1,0 +1,26 @@
+---
+abstract: 'Syntax sugar for dispose pattern'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Resource-Dispose
+provides:
+  Resource::Dispose:
+    file: lib/Resource/Dispose.pm
+    version: 0.01
+requires:
+  Devel::Declare: 0
+  Guard: 0
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/dex4er/perl-Resource-Dispose/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-Resource-Dispose
+version: 0.01

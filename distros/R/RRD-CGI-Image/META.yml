@@ -1,0 +1,23 @@
+---
+name: RRD-CGI-Image
+version: 0.01
+author:
+  - 'Joshua Keroes <joshua@cpan.org>'
+abstract: accept CGI-style rrdgraph args to build and print image
+license: perl
+build_requires:
+  HTML::Entities: 0
+  RRDs: 0
+  Spiffy: 0
+  Test::More: 0
+  URI::Escape: 0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  RRD::CGI::Image:
+    file: lib/RRD/CGI/Image.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/

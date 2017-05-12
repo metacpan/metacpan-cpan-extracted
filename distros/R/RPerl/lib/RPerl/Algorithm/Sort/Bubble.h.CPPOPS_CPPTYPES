@@ -1,0 +1,104 @@
+// [[[ HEADER ]]]
+using std::cout;  using std::cerr;  using std::endl;
+
+#ifndef __CPP__INCLUDED__RPerl__Algorithm__Sort__Bubble_h
+#define __CPP__INCLUDED__RPerl__Algorithm__Sort__Bubble_h 0.010_000
+
+// [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]
+#include <RPerl.cpp>  // -> RPerl.h -> (rperltypes_mode.h; rperloperations.h; rperltypes.h; HelperFunctions.cpp)
+#include <RPerl/Algorithm/Sort.cpp>
+
+# ifdef __PERL__TYPES
+
+Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# elif defined __CPP__TYPES
+
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+
+// [[[ CONSTANTS ]]]
+const string RPerl__Algorithm__Sort__Bubble__TIME_BEST = (const string) "O($n)";
+const string RPerl__Algorithm__Sort__Bubble__TIME_AVERAGE = (const string) "O($n ** 2)";
+const string RPerl__Algorithm__Sort__Bubble__TIME_WORST = (const string) "O($n ** 2)";
+const string RPerl__Algorithm__Sort__Bubble__SPACE_WORST = (const string) "O(1)";
+
+// [[[ OO INHERITANCE ]]]
+class RPerl__Algorithm__Sort__Bubble : public RPerl__Algorithm__Sort {
+public:
+    // [[[ OO PROPERTIES ]]]
+    integer_arrayref integer_data;
+    number_arrayref number_data;
+
+    // [[[ OO METHODS ]]]
+
+    // <<< OO PROPERTIES, ACCESSORS & MUTATORS >>>
+    integer_arrayref get_integer_data() { return this->integer_data; }
+    void set_integer_data(integer_arrayref integer_data_new) { this->integer_data = integer_data_new; }
+    number_arrayref get_number_data() { return this->number_data; }
+    void set_number_data(number_arrayref number_data_new) { this->number_data = number_data_new; }
+    string get_foo() { return this->foo; }
+    void set_foo(string foo_new) { this->foo = foo_new; }
+
+    // <<< CONSTRUCTOR & DESTRUCTOR >>>
+    RPerl__Algorithm__Sort__Bubble() {}
+    ~RPerl__Algorithm__Sort__Bubble() {}
+
+    // <<< CLASS NAME REPORTER >>>
+    virtual string myclassname() { return (const string) "RPerl::Algorithm::Sort::Bubble"; }
+
+    // <<< CONSTANTS, SHIMS >>>
+    const string TIME_BEST() { return RPerl__Algorithm__Sort__Bubble__TIME_BEST; }
+    const string TIME_AVERAGE() { return RPerl__Algorithm__Sort__Bubble__TIME_AVERAGE; }
+    const string TIME_WORST() { return RPerl__Algorithm__Sort__Bubble__TIME_WORST; }
+    const string SPACE_WORST() { return RPerl__Algorithm__Sort__Bubble__SPACE_WORST; }
+
+    // <<< USER-DEFINED METHODS >>>
+    void integer_sort();
+    void number_sort();
+    void inherited__Bubble(string person);
+    string inherited__Bubble_foo_get();
+    void inherited__Bubble_foo_set(string foo_new);
+    void inherited(string person);
+};  // end of class
+
+// [[[ OO SUBCLASSES ]]]
+#define RPerl__Algorithm__Sort__Bubble_rawptr RPerl__Algorithm__Sort__Bubble*
+typedef std::unique_ptr<RPerl__Algorithm__Sort__Bubble> RPerl__Algorithm__Sort__Bubble_ptr;
+typedef std::vector<RPerl__Algorithm__Sort__Bubble_ptr> RPerl__Algorithm__Sort__Bubble_arrayref;
+typedef std::unordered_map<string, RPerl__Algorithm__Sort__Bubble_ptr> RPerl__Algorithm__Sort__Bubble_hashref;
+typedef std::unordered_map<string, RPerl__Algorithm__Sort__Bubble_ptr>::iterator RPerl__Algorithm__Sort__Bubble_hashref_iterator;
+
+// [[[ SUBROUTINES ]]]
+integer_arrayref RPerl__Algorithm__Sort__Bubble__integer_bubblesort(integer_arrayref integer_data);
+number_arrayref RPerl__Algorithm__Sort__Bubble__number_bubblesort(number_arrayref number_data);
+string RPerl__Algorithm__Sort__Bubble__uninherited__Bubble(string person);
+string RPerl__Algorithm__Sort__Bubble__uninherited(string person);
+string RPerl__Algorithm__Sort__Bubble__integer_bubblesort__typetest0(integer_arrayref lucky_integers);
+string RPerl__Algorithm__Sort__Bubble__number_bubblesort__typetest0(number_arrayref lucky_numbers);
+
+// <<< SHIM MACROS >>>
+#define integer_bubblesort(integer_data) RPerl__Algorithm__Sort__Bubble__integer_bubblesort(integer_data)
+#define number_bubblesort(number_data) RPerl__Algorithm__Sort__Bubble__number_bubblesort(number_data)
+#define uninherited__Bubble(person) RPerl__Algorithm__Sort__Bubble__uninherited__Bubble(person)
+#define uninherited(person) RPerl__Algorithm__Sort__Bubble__uninherited(person)
+#define integer_bubblesort__typetest0(lucky_integers) RPerl__Algorithm__Sort__Bubble__integer_bubblesort__typetest0(lucky_integers)
+#define number_bubblesort__typetest0(lucky_numbers) RPerl__Algorithm__Sort__Bubble__number_bubblesort__typetest0(lucky_numbers)
+
+// <<< OPERATIONS & DATA TYPES REPORTER >>>
+integer RPerl__Algorithm__Sort__Bubble__MODE_ID() { return 2; }  // CPPOPS_CPPTYPES is 2
+
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+
+# else
+
+Purposefully_die_from_a_compile-time_error,_due_to_neither___PERL__TYPES_nor___CPP__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# endif
+
+#endif
+
+// end of class

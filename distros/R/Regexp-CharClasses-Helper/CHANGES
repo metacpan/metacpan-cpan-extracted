@@ -1,0 +1,76 @@
+==================================================
+Changes from 2015-12-01 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2016-11-30 13:55:52 +0000
+------------------------------------------
+
+  Change: e0eb4c51ab61efb11d6023d1300e77f6012d7fb6
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-11-30 14:53:42 +0000
+
+    Added explicit version requirement
+
+    Fix for Github issue #1 
+
+------------------------------------------
+version 0.004 at 2016-10-04 08:04:56 +0000
+------------------------------------------
+
+  Change: 4658222f800307342407f4693c848b0a175890f3
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-04 10:04:56 +0000
+
+    Removed unneeded s///r modifier.Now Perl<5.12 works too 
+
+------------------------------------------
+version 0.003 at 2016-10-01 03:06:38 +0000
+------------------------------------------
+
+  Change: 0ee598e8cfa54bb2230edb2534102fbb5a2cc031
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-01 05:06:38 +0000
+
+    Added AutoPrereqs 
+
+------------------------------------------
+version 0.002 at 2016-09-29 22:20:40 +0000
+------------------------------------------
+
+  Change: acf3c2ad5b9842d7c6d7f1c2bd9b9330187bbaee
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-30 00:20:40 +0000
+
+    Fixed Bug where subroutines weren't detected 
+
+  Change: bee76594e349640767a05d3e73af02122a61bc34
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-29 22:10:28 +0000
+
+    Removed empty sections from pod 
+
+------------------------------------------
+version 0.001 at 2016-09-29 19:39:46 +0000
+------------------------------------------
+
+  Change: a56e847355873c879c515dc6b63f218edd220e6f
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-29 21:39:46 +0000
+
+    Added trailing newline
+
+    Documentation doesn't note it, but format isn't new line separated
+    but new line terminated.
+
+    Documentation ticket needs to be created. 
+
+  Change: 1678a6e897cef3af89a0c46c60905ce69dbd54a3
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-29 19:06:45 +0000
+
+    Initial commit. 
+
+================
+End of releases.
+================

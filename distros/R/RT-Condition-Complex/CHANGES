@@ -1,0 +1,14 @@
+0.03 2009-11-21
+
+    * ParseCode now takes text of the condition as argument
+    * moved more things into Solve method and made code
+      more abstract for re-use not only in conditions
+    * new Describe method with localization
+
+0.02 2009-11-05
+
+    * switch over RT::Extension::ColumnMap
+
+0.01 2009-09-06
+
+    * initial release

@@ -1,0 +1,14 @@
+Revision history for RNA-HairpinFigure
+
+0.11        2011-11-16
+            Finished at 2011 in FOMMiR project.
+
+0.13        2013-12-13
+            I make it a module for distribution.
+        
+0.140101    2013-12-13
+            Fix a bug, bases error in bulge.
+            
+0.141212    2014-12-12
+            Fix a bug, bases error in 5' ssRNA part.
+

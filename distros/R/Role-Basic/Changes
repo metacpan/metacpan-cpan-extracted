@@ -1,0 +1,76 @@
+Revision history for Role-Basic
+
+The token "[!Moose]" documents features which diverge from Moose.
+
+0.13    Apr 3, 2012
+        - Add SEE ALSO to the docs to let people know what the main
+          alternatives are.
+
+0.12    Apr 17, 2011
+        - Fixed a bug where constants could confuse _get_valid_method. Thanks
+          to Marcel Grünauer.
+
+0.11    Feb 11, 2011
+        - Allow constants in roles. Thanks to Marcel Grünauer.
+
+0.10    Jan 29, 2011
+        - Bump up version number for "beta" release. No functional changes.
+
+0.0804  Jan 25, 2011
+        - Finally ran ./Build manifest like a good boy.
+
+0.0803  Jan 24, 2011
+        - Add MyTests to the Manifest (oops)
+
+0.0802  Jan 23, 2011
+        - Ensure that all tests which use MyTests have the correct lib.
+
+0.0801  Jan 23, 2011
+        - Make sure people can run all of the tests, not just the top-level
+        - Bugfix: -rename => { x => y, y => x } now works
+        - Add a "philosophy" document.
+        - Aliasing $old to $new should fulfill requirements for $new, if any
+
+0.08    Jan 22, 2011
+        - Methods which point to the same reference do not conflict (because
+          they're the same method).
+        - [!Moose] Excluded methods are now required. See
+          [https://rt.cpan.org/Public/Bug/Display.html?id=45591] in Moose.
+        - [!Moose] Added -rename, a combination of -alias and -excludes.
+        - Add -version for roles
+        - Bug fix: make sure that -alias doesn't also -exclude
+        - Bug fix: Can't alias over an existing method
+        - Removed a number of Moose tests which don't apply
+
+0.0701  Jan 9, 2011
+        - Bug fix: add t/lib to t/composition.t (Marcel Grünauer)
+
+0.07    Jan 8, 2011
+        - Fix problem where 'allowed' methods in one role weren't carried over
+          into another. Reported by Marcel Grünauer. I really need to grab the
+          Moose tests.
+        - Documented the ALPHA nature of the code.
+
+0.06    Jan 6, 2011
+        - Allow roles to have getter/setter generators (Marcel Grünauer
+          pointed this out).
+        - Work around 5.6.x bug where ->can('can') was always returning true.
+          Thanks to Ben Morrow for spotting the bug.
+
+0.05    Jan 4, 2011
+        - Remove Test::Most dependency. All deps are now core.
+
+0.04    Jan 3, 2011
+        - Ensure that multiple roles flattening in identical methods from same
+          role don't cause conflicts (report by Marcel Grünauer)
+        - List repository in Build.PL so that people people on CPAN can find
+          the github version.
+
+0.03    Jan 1, 2011
+        - Bugfix: rename '-aliases' to '-alias' for Moose compatability.
+
+0.02    Dec 29, 2010
+        - Remove Carp::Always. Oops :)
+
+0.01    Dec 28, 2010    
+        - Minimal role support with a Moose-like syntax

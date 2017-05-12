@@ -1,0 +1,35 @@
+==================================================
+Changes from 2013-02-11 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.1.1 at 2014-02-11 10:43:08 +0000
+------------------------------------------
+
+  Change: 5c7fada4cbefa98f4a0d40673e0d0deb3867718c
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-11 11:42:46 +0000
+
+    documentation 
+
+  Change: eba8c66e08993f72effae2a0676d84460129d411
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-11 11:07:05 +0000
+
+    version 0.1.0 
+
+  Change: 85a17960ccac1e54956f70a9444ad33cf2a43a94
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-10 21:53:10 +0000
+
+    release at CPAN 
+
+  Change: 5fad4114217f3e51c3f887b87477178cc9a13ab6
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-09 22:12:59 +0000
+
+    initial version 
+
+================
+End of releases.
+================

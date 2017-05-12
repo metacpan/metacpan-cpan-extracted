@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8">
+   <title>Rex - WebUI</title>
+   <link rel="stylesheet" href="/css/layout.css" type="text/css" media="screen" charset="utf-8" />
+   <link rel="stylesheet" href="/css/jquery-layout-default.css" type="text/css" media="screen" charset="utf-8" />
+
+   <script type="text/javascript" charset="utf-8" src="/js/jquery-1.8.2.min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="/js/jquery.layout.min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="/js/ajax_links.js"></script>
+   <script type="text/javascript" charset="utf-8" src="/js/notification_message.js"></script>
+</head>
+<body>
+   <div id="content_area" class="ui-layout-center">
+<%= content %>
+   </div>
+
+   <div id="project_list" class="ui-layout-west">
+      <h1>Links</h1>
+      <p><a href="/">Dashboard</a></p>
+      <br />
+      <ul class="project_list">
+% my $id = 0;
+% for my $project (@{ config->{"projects"} }) {
+         <li>
+            <h2><a href="/project/<%= $id %>"><%= $project->{name} %></a></h2>
+            <p><%= $project->{description} %></p>
+         </li>
+% $id++;
+% }
+     </ul>
+  </div>
+
+  <div id="notification_area" class="ui-layout-south">
+<%= $notification_message %>
+  </div>
+
+</body>
+
+<script type="text/javascript" charset="utf-8">
+
+var notification = new notification_message('#notification_area');
+
+$(document).ready(function() {
+   $("body").layout();
+   ajax_links();
+   notification.init();
+});
+
+</script>
+
+</html>

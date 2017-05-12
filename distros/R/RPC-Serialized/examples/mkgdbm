@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+#
+# mkgdbm - Create GNU dbm file from key:value data.
+#
+# $HeadURL: https://svn.oucs.ox.ac.uk/people/oliver/pub/librpc-serialized-perl/trunk/examples/mkgdbm $
+# $LastChangedRevision: 1327 $
+# $LastChangedDate: 2008-10-01 16:16:56 +0100 (Wed, 01 Oct 2008) $
+# $LastChangedBy: oliver $
+#
+
+use strict;
+use warnings FATAL => 'all';
+
+use GDBM_File;
+use Getopt::Long;
+use IO::File;
+
+my $unlink;
+
+END {
+    defined $unlink and -f $unlink and unlink($unlink);
+}
+
+sub usage {
+    ( my $prog = $0 ) =~ s/^.*//;
+    print STDERR <<"EOT";
+Usage: $prog --help
+       $prog --create GDBM-FILE [INPUT-FILE ...]
+       $prog --dump GDBM-FILE
+EOT
+    exit shift;
+}
+
+sub cmd_create {
+    my $dbmfile = shift;
+    my $newfile = $dbmfile . '.NEW';
+
+    my $fh = IO::File->new( $newfile, O_CREAT | O_EXCL )
+        or die "Error opening $newfile: $!\n";
+    $unlink = $newfile;
+    $fh->close();
+
+    my %h;
+    tie( %h, 'GDBM_File', $newfile, GDBM_NEWDB, 0644 )
+        or die "Error opening $newfile: $!\n";
+
+    while (<>) {
+        next if /^#/;
+        chomp;
+        my ( $k, $v ) = split( /:/, $_, 2 ) or next;
+        $v = 1 unless defined $v;
+        die "Already seen $k\n" if $h{$k};
+        $h{$k} = $v;
+    }
+
+    untie(%h) or die "Error untying $newfile: $!";
+
+    rename( $newfile, $dbmfile )
+        or die "Error renaming $newfile to $dbmfile";
+}
+
+sub cmd_dump {
+    my $dbmfile = shift;
+
+    my %h;
+    tie( %h, 'GDBM_File', $dbmfile, GDBM_READER, 0 )
+        or die "Error opening $dbmfile: $!\n";
+
+    print map( "$_:$h{$_}\n", keys %h );
+
+}
+
+#
+# Main processing
+#
+my ( $help, $create, $dump );
+GetOptions(
+    'help'     => \$help,
+    'create=s' => \$create,
+    'dump=s'   => \$dump
+) or usage(1);
+
+if ($help) {
+    usage(0);
+}
+elsif ( $create and not $dump ) {
+    cmd_create($create);
+}
+elsif ( $dump and not $create ) {
+    cmd_dump($dump);
+}
+elsif ( $dump and $create ) {
+    die "Only one of --dump or --create may be specified\n";
+}
+else {
+    die "One of --dump or --create must be specified\n";
+}

@@ -1,0 +1,11 @@
+TODO
+^Makefile$
+blib
+pm_to_blib
+.swp$
+~$
+.tmp$
+.bak$
+.git/
+.gitignore$
+.shipit$

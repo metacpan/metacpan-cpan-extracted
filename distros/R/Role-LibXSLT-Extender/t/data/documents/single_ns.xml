@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<test_cases>
+    <test_case name="foo">TESTFOO</test_case>
+    <test_case name="bar">TESTBAR</test_case>
+    <test_case name="quux">TESTQUUX</test_case>
+</test_cases>
+

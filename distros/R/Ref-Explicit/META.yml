@@ -1,0 +1,25 @@
+---
+abstract: 'Keywords to create arrayrefs and hashrefs'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Ref-Explicit
+requires:
+  Exporter: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Ref-Explicit
+  homepage: http://github.com/pshangov/ref-explicit/tree
+  repository: git://github.com/pshangov/ref-explicit.git
+version: 0.001

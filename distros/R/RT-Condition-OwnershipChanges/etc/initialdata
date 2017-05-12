@@ -1,0 +1,14 @@
+@ScripConditions = (
+    { Name                 => 'On Owned',
+      Description          => "When a ticket's owner is changed from Nobody",
+      ApplicableTransTypes => 'Any',
+      ExecModule           => 'OnOwned', 
+    },
+    { Name                 => 'On Abandoned',
+      Description          => "When a ticket's owner is changed to Nobody",
+      ApplicableTransTypes => 'Any',
+      ExecModule           => 'OnAbandoned',
+    },
+);
+
+1;

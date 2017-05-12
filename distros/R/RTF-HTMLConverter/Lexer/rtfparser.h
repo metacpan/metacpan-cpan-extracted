@@ -1,0 +1,15 @@
+#define CWORD 256
+#define CSYMB 257
+#define CUNDF 258
+#define CPARM 259
+#define CNOPR 260
+#define PTEXT 261
+#define ENTER 262
+#define LEAVE 263
+#define DESTN 264
+#define ENHEX 265
+#define ENBIN 266
+#define WRHEX 268
+#define OKEOF 300
+#define UNEOF 301
+#define UNBRC 302

@@ -1,0 +1,42 @@
+---
+abstract: '(beta) Highly configurable recycling of syndication (RSS/Atom) feeds into tailored, guaranteed XHTML fragments.'
+author:
+  - 'Ashley Pond V, C<< <ashley@cpan.org> >>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RSSycklr
+no_index:
+  directory:
+    - dtd
+    - inc
+    - t
+    - xt
+requires:
+  Capture::Tiny: 0
+  DateTime: 0
+  Encode: 0
+  File::ShareDir: 0
+  Getopt::Long: 0
+  HTML::Entities: 0
+  HTML::TokeParser::Simple: 0
+  HTML::Truncate: 0
+  Hash::Merge::Simple: 0
+  Mouse: 0
+  Pod::Usage: 0
+  Template: 0
+  URI: 0
+  XML::Feed: 0
+  XML::LibXML: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git@github.com:pangyre/p5-rssycklr.git
+version: 0.15

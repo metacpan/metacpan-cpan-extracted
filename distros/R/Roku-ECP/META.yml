@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Roku-ECP
+version:            1.0.0
+abstract:           External Control Protocol for Roku
+author:
+    - Andrew Arensburger <arensb+pause@ooblick.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Encode:          0
+    FindBin:         0
+    LWP::UserAgent:  0
+    URI:             0
+    URI::Escape:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

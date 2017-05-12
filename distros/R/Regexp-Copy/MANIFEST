@@ -1,0 +1,8 @@
+CHANGES
+Copy.xs
+README
+MANIFEST			This list of files
+Makefile.PL
+lib/Regexp/Copy.pm
+lib/Regexp/Storable.pm
+test.pl

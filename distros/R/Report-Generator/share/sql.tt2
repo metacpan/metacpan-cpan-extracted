@@ -1,0 +1,25 @@
+[%- MACRO sqltable(d)
+    BLOCK;
+	IF ADD_TIMESTAMP;
+	    d.cols.push(TIMESTAMP_COLNAME);
+	END;
+	FOREACH line IN d.data;
+	    NEXT UNLESS line.size() > 0;
+	    IF ADD_TIMESTAMP;
+		line.push(TIMESTAMP_COLVALUE);
+	    END;
+	    sqlline = [];
+	    FOREACH col IN line;
+		IF col.defined;
+		    IF col.match('^\d+$');
+			sqlline.push(col);
+		    ELSE;
+			sqlline.push("'$col'");
+		    END;
+		ELSE;
+		    sqlline.push("NULL");
+		END;
+	    END; -%]
+INSERT INTO [% d.tablename %] ( [% d.cols.join(',') %] ) VALUES ( [% sqlline.join( ',' ) %] )
+[%	END;
+    END -%]

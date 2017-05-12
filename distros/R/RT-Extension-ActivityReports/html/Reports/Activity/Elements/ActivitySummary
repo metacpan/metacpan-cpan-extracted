@@ -1,0 +1,59 @@
+
+<& MiniPlot, data => \%queues &>
+
+<table style="width: 100%">
+<tr class="titlerow">
+<th>Queue</th>
+% for my $status (sort keys %status) {
+<th><% $status %></th>
+% }
+<th>Total</th>
+</tr>
+% for my $queue (sort keys %queues) {
+<th class="label"><% $queue %></th>
+% for my $status (sort keys %status) {
+<td><% $queues{$queue}{$status} || 0 %>
+% }
+<td><% $total{$queue} %></td>
+</tr>
+% }
+<tr class="grandtotal">
+<th class="label" >Grand Total</th>
+% for my $status (sort keys %status) {
+<td><% $status{$status} %></td>
+% }
+<td><% $total %></td>
+</table>
+
+<%args>
+$query => ''
+$start => "2005/01/01"
+$end   => "2006/01/01"
+$actor => ''
+</%args>
+<%init>
+use RT::Extension::ActivityReports qw( RelevantTxns );
+
+my $tickets = RT::Tickets->new($session{'CurrentUser'});
+$tickets->FromSQL(join " AND ", map {"($_)"} grep {/\S/} ($query, "Updated >= '$start' AND Updated <= '$end'"));
+
+my %queues;
+my %status;
+my %total;
+my $total;
+while (my $ticket = $tickets->Next) {
+    my $txns = RelevantTxns( $ticket, start => $start, end => $end, query => $query );
+    while (my $txn = $txns->Next) {	
+	# We have to filter for actor here, not in the query.  Alas.
+	if( $actor ) {
+	    next unless $txn->CreatorObj->Name ne $actor;
+	}
+        $queues{$txn->TicketObj->QueueObj->Name}{$txn->NewValue || 'new'}++;   
+        $status{$txn->NewValue || 'new'}++;
+        $total{$txn->TicketObj->QueueObj->Name}++;
+        $total++;
+    }
+}
+
+
+</%init>

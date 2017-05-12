@@ -1,0 +1,23 @@
+%# [OPTIONS EditURI]
+%# On an object, returns the schema acceptable by the specified update types.
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="<% $BaseURI %>/NoAuth/feed.css"?>
+<entry xmlns="http://purl.org/atom/ns#" xmlns:html="http://www.w3.org/1999/xhtml">
+  <& $ShowLink, Relation => "service.post", URI => "$BaseURI/$Path", Id => '!update', Title => $Type, Class => 'Update' &>
+  <& $ShowLink, Relation => "service.edit", URI => "$BaseURI/$Path", Id => '!put', Title => $Type &>
+  <content type="text/xml" mode="xml">
+      <% $X->XMLout($Map) |n %>
+  </content>
+</entry>
+<%ARGS>
+$Path
+$BaseURI
+$Now
+$ShowLink
+$ShowEntry
+$X
+
+$Type
+$FeedURI
+$Map
+</%ARGS>

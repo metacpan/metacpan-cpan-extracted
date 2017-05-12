@@ -1,0 +1,67 @@
+Libnfc version 0.01
+===================
+
+perl bindings for libnfc.
+This module aims to provide an high-level OO api to access mifare rfid tags
+(and in general all readers and tags supported by libnfc).
+
+You can obviously access the procedural api exposed by the C library 
+which has been fully mapped within the perl context
+
+NOTE : 
+    This module has been updated to work with last libnfc stable
+    (1.3.3 when I'm writing this)
+    Hopefully libnfc API is now stable and won't drastically change
+    in the next realeases. Support for older versions of libnfc
+    have been dropped with version 0.6 of this perl module
+
+FURTHER NOTE: 
+    Actually only support for mifare classics and ultralights have been
+    implemented. The design of this package should anyway simplify 
+    writing implementations for all other tags supported by libnfc
+    (perhaps there could be need to map some more structures in Libnfc.xx,
+     but that's quite a straightforward task)
+
+INSTALLATION
+
+First ensure installing libnfc >= 1.3.3 on the system and make it available
+in system-wide library/include dirs. If you are installing it on a different
+location you could need to apply some changes to Makefile.PL to skip autodetection
+of libnfc location and to correctly point your custom location)
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libnfc
+
+COPYRIGHT AND LICENCE
+
+*  (c) Copyright 2009-2010 xant <xant@dyne.org>
+*
+* This source code is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Public License as published 
+* by the Free Software Foundation; either version 3 of the License,
+* or (at your option) any later version.
+* 
+* This source code is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+* Please refer to the GNU Public License for more details.
+* 
+* You should have received a copy of the GNU Public License along with
+* this source code; if not, write to:
+* Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

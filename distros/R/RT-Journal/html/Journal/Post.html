@@ -1,0 +1,40 @@
+<& Elements/Tabs, Title => loc("Post Journal") &>
+<br><br>
+<&|/l&>Add this to the bookmarks bar to blog urls you find interesting:</&>
+<A href="javascript:void(window.open('<%$RT::WebURL%>Journal/Post.html?new-RefersTo='+escape(window.location)+'&Content='+escape(document.selection)+'&Subject='+escape(document.title),'webloglet','scrollbars=yes,status=yes,location=yes,toolbar=yes'));"><&|/l&>RT Journal Bookmarklet</&></a><BR>
+
+<FORM ACTION="Article.html" METHOD="POST" ENCTYPE="multipart/form-data">
+<INPUT TYPE=HIDDEN Name="id" VALUE="new">
+<A NAME="top"></a>
+
+<BR>
+<&|/l&>Subject</&>:
+<INPUT Name="Subject" SIZE=60 MAXSIZE=100 value="<%$ARGS{Subject} || ''%>"><br>
+<&|/l&>Category</&>:<& Elements/SelectCategory &><br>
+%# <&|/l&>Attach</&>: <INPUT TYPE=FILE NAME="Attach"><br>
+<&|/l&>Content</&>:<br>
+
+<& /Elements/MessageBox, Default => $ARGS{Content} &>
+
+<BR>
+
+<&|/l&>Refers to</&><input size=100 name="new-RefersTo" VALUE="<%$ARGS{'new-RefersTo'} %>">
+<BR><&|/l&>Referred to by</&><input size=100 name="RefersTo-new"<% $ARGS{'RefersTo-new'} && " VALUE=\"$ARGS{'RefersTo-new'}\"" %>>
+
+<BR>
+
+<& /Elements/Submit, Label => loc("Create") &>
+</FORM>
+
+<%INIT>
+
+my $q = RT::Queue->new($session{'CurrentUser'});
+$q->Load('Journal');
+$ARGS{'Queue'} = $q->Name;
+$ARGS{'Owner'} = $session{'CurrentUser'}->id;
+$ARGS{'Status'}  = 'new';
+
+my $cat = RT::CustomField->new($session{'CurrentUser'});
+$cat->LoadByNameAndQueue(Queue => $q->Id, Name => 'RT::Journal-Category');
+
+</%INIT>

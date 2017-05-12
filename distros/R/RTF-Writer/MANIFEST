@@ -1,0 +1,20 @@
+ChangeLog
+examples/demo_writer.pl
+examples/la_dame.rtf
+lib/RTF/Cookbook.pod
+lib/RTF/Writer.pm
+lib/RTF/Writer.pod
+lib/RTF/Writer/TableRowDecl.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00about.t
+t/align_test1.t
+t/border_test.t
+t/hypnocat.jpg
+t/hypnocat.png
+t/image1.t
+t/image2.t
+t/rtf_test.t
+META.yml                                 Module meta-data (added by MakeMaker)

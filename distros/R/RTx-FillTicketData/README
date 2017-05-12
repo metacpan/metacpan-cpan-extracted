@@ -1,0 +1,3 @@
+An extension which lets automatically fill ticket data (including body, subject
+and custom fields) from the preconfigured data sources (databases or external
+commands output).

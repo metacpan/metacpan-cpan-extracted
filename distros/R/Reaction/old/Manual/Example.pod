@@ -1,0 +1,304 @@
+=head1 NAME
+
+Reaction::Manual::Example - Simple Reaction example
+
+=head1 DESCRIPTION
+
+This tutorial will guide you through the process of setting up and testing a
+very basic CRUD application based on the database from
+L<DBIx::Class::Manual::Example>.
+
+You need at least a fairly basic understanding of L<DBIx::Class::Schema> for
+this example to have value for you.
+
+=head2 Installation
+
+Install L<DBIx::Class> via CPAN.
+
+Install Reaction from http://code2.0beta.co.uk/reaction/svn via SVN or SVK.
+
+Set up the database as mentioned in L<DBIx::Class::Manual::Example>. Don't do
+any of the DBIx::Class related stuff, only the SQLite database.
+
+=head2 Create the application
+
+  catalyst.pl Test::Reaction 
+  cd Test-Reaction
+  script/test_reaction_create.pl Model Test::Reaction DBIC::Schema Test::Reaction::DB
+
+Also, remember to include Catalyst::Plugin::I18N in your plugin list, like
+this:
+
+  use Catalyst qw/-Debug ConfigLoader Static::Simple I18N/;
+
+=head2 Set up DBIx::Class::Schema
+
+In addition to the normal DBIC stuff, you need to moosify your DBIC classes.
+
+Change directory back from db to the directory app:
+
+  cd lib/Test/Reaction
+  mkdir DB
+
+Then, create the following DBIx::Class::Schema classes:
+
+DB.pm:
+    
+  package Test::Reaction::DB;
+
+  use base 'DBIx::Class::Schema';
+  
+  __PACKAGE__->load_classes;
+  
+  1;
+
+DB/Artist.pm:
+
+  package Test::Reaction::DB::Artist;
+  
+  use base 'DBIx::Class';
+  use Reaction::Class;
+  
+  has 'artistid' => ( isa => 'Int', is => 'ro', required => 1 );
+  has 'name' => ( isa => 'NonEmptySimpleStr', is => 'rw', required => 1 );
+  
+  sub display_name {
+      my $self = shift;
+      return $self->name;
+  }
+  
+  __PACKAGE__->load_components(qw/PK::Auto Core/);
+  __PACKAGE__->table('artist');
+  __PACKAGE__->add_columns(qw/ artistid name /);
+  __PACKAGE__->set_primary_key('artistid');
+  __PACKAGE__->has_many( 'cds' => 'Test::Reaction::DB::Cd' );
+  
+  1;
+
+DB/Cd.pm:
+
+  package Test::Reaction::DB::Cd;
+
+  use base 'DBIx::Class';
+  use Reaction::Class;
+  
+  has 'cdid' => ( isa => 'Int', is => 'ro', required => 1 );
+  has 'artist' =>
+      ( isa => 'Test::Reaction::DB::Artist', is => 'rw', required => 1 );
+  has 'title' => ( isa => 'NonEmptySimpleStr', is => 'rw', required => 1 );
+  
+  sub display_name {
+      my $self = shift;
+      return $self->title;
+  }
+  
+  __PACKAGE__->load_components(qw/PK::Auto Core/);
+  __PACKAGE__->table('cd');
+  __PACKAGE__->add_columns(qw/ cdid artist title/);
+  __PACKAGE__->set_primary_key('cdid');
+  __PACKAGE__->belongs_to( 'artist' => 'Test::Reaction::DB::Artist' );
+  __PACKAGE__->has_many( 'tracks' => 'Test::Reaction::DB::Track' );
+  
+  1;
+
+DB/Track.pm:
+
+  package Test::Reaction::DB::Track;
+  
+  use base 'DBIx::Class';
+  use Reaction::Class;
+  
+  has 'trackid' => ( isa => 'Int', is => 'ro', required => 1 );
+  has 'cd'    => ( isa => 'Test::Reaction::DB::Cd', is => 'rw', required => 1 );
+  has 'title' => ( isa => 'NonEmptySimpleStr',      is => 'rw', required => 1 );
+  
+  __PACKAGE__->load_components(qw/PK::Auto Core/);
+  __PACKAGE__->table('track');
+  __PACKAGE__->add_columns(qw/ trackid cd title/);
+  __PACKAGE__->set_primary_key('trackid');
+  __PACKAGE__->belongs_to( 'cd' => 'Test::Reaction::DB::Cd' );
+  
+  1;
+
+=head3 Reaction attributes
+
+See L<Reaction::Types::Core>
+
+=head3 The rest
+
+Reaction will use I<sub display_name> for displaying when there is a 1:Many or
+Many:Many relation. It will return a suitable text representation.
+
+=head2 Models
+
+=head3 Create Test::Reaction::Model::Action
+
+Still in lib/Test/Reaction, create 
+
+Model/Action.pm:
+
+  package Test::Reaction::Model::Action;
+  
+  use Reaction::Class;
+  
+  use Test::Reaction::DB;
+  
+  use aliased 'Reaction::InterfaceModel::Action::DBIC::ActionReflector';
+  
+  my $r = ActionReflector->new;
+  
+  $r->reflect_actions_for( 'Test::Reaction::DB::Artist' => __PACKAGE__ );
+  $r->reflect_actions_for( 'Test::Reaction::DB::Cd'     => __PACKAGE__ );
+  $r->reflect_actions_for( 'Test::Reaction::DB::Track'  => __PACKAGE__ );
+  
+  1;
+
+=head2 Controllers
+
+Reaction controllers inherit from Reaction::UI::CRUDController, like this:
+
+Controller/Artist.pm
+
+  package Test::Reaction::Controller::Artist;
+  
+  use strict;
+  use warnings;
+  use base 'Reaction::UI::CRUDController';
+  use Reaction::Class;
+  
+  __PACKAGE__->config(
+    model_base => 'Test::Reaction',
+    model_name => 'Artist',
+    action => { base => { Chained => '/base', PathPart => 'artist' } }
+  );
+  
+  1;
+
+Controller/Cd.pm
+
+  package Test::Reaction::Controller::Cd;
+  
+  use strict;
+  use warnings;
+  use base 'Reaction::UI::CRUDController';
+  use Reaction::Class;
+  
+  __PACKAGE__->config(
+    model_base => 'Test::Reaction',
+    model_name => 'Cd',
+    action => { base => { Chained => '/base', PathPart => 'cd' } }
+  );
+  
+  1;
+
+Controller/Track.pm
+
+  package Test::Reaction::Controller::Track;
+  
+  use strict;
+  use warnings;
+  use base 'Reaction::UI::CRUDController';
+  use Reaction::Class;
+  
+  __PACKAGE__->config(
+    model_base => 'Test::Reaction',
+    model_name => 'Track',
+    action => { base => { Chained => '/base', PathPart => 'track' } }
+  );
+  
+  1;
+
+Finally, change Controller/Root.pm to
+
+  package Test::Reaction::Controller::Root;
+  
+  use strict;
+  use warnings;
+  use base 'Reaction::UI::RootController';
+  use Reaction::Class;
+  
+  use aliased 'Reaction::UI::ViewPort';
+  use aliased 'Reaction::UI::ViewPort::ListView';
+  use aliased 'Reaction::UI::ViewPort::ActionForm';
+  
+  __PACKAGE__->config->{namespace} = '';
+  
+  sub base :Chained('/') :PathPart('') :CaptureArgs(0) {
+    my ($self, $c) = @_;
+  
+    $self->push_viewport(ViewPort, layout => 'xhtml');
+  }
+  
+  sub root :Chained('base') :PathPart('') :Args(0) {
+    my ($self, $c) = @_;
+  
+    $self->push_viewport(ViewPort, layout => 'index');
+  }
+  
+  1;
+
+=head2 View
+
+View/XHTML.pm looks like this
+
+  package Test::Reaction::View::XHTML;
+  
+  use Reaction::Class;
+  
+  extends 'Reaction::UI::Renderer::XHTML';
+  
+  1;
+
+This is all the perly stuff. Now return to the base Test-Reaction directory and
+create root/index:
+
+  [%
+  
+  main_block = 'index';
+  
+  BLOCK index;
+  
+  %]<p><a href="[% ctx.uri_for('/artist') %]">artist</a></p>
+  <p><a href="[% ctx.uri_for('/cd') %]">cd</a></p>
+  <p><a href="[% ctx.uri_for('/track') %]">track</a></p>[%
+  
+  END;
+  
+  %]
+
+=head2 Running
+
+Now all that remains is to tell Catalyst about the root and the model. Let
+test_reaction.yml look like this:
+
+ ---
+ name: Test::Reaction
+ Controller::Root:
+     view_name:  'XHTML'
+     window_title: 'Reaction Test App'
+ Model::Test::Reaction:
+     schema_class: 'Test::Reaction::DB'
+     connect_info:
+         - 'dbi:SQLite:dbname=database/example.db'
+
+The finals step for this example is to link to Reaction's templates:
+
+ ln -s <path to reaction install directory>/root/base/ root/base
+
+At last you're now ready to run the server
+
+  script/test_reaction_server.pl
+
+=head1 Notes
+
+=head1 TODO
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

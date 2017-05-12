@@ -1,0 +1,9 @@
+      PROGRAM  TestComment1
+!        ..........
+         READ(*,*)  Year   ! read in the value of Year
+!        ..........
+         Year = Year + 1   ! add 1 to Year
+!        ..........
+      END PROGRAM  TestComment1
+
+

@@ -1,0 +1,15 @@
+This is a PSGI application that provides an RDFa "distiller". That is,
+a web service that consumes RDFa and emits some serialisation of RDF.
+
+PSGI applications can be run via CGI (a CGI wrapper is provided), via
+dedicated PSGI web servers (such as Starman and Gepok), via the
+"plackup" command-line tool, via Apache mod_perl, and many other ways.
+
+This distiller supports RDFa 1.0 and 1.1 embedded in all the host
+languages supported by RDF::RDFa::Parser, and is able to produce
+output in RDF/XML, Turtle, N-Triples and RDF/JSON serialisations. If
+RDF::RDFa::Generator is installed, then it can even produce XHTML+RDFa
+output.
+
+If you plan on using this application in a production environment,
+please change the e-mail address on line 16 of app.psgi.

@@ -1,0 +1,17 @@
+%# Real programmers don't write in BASIC.  Actually, no programmers write
+%# in BASIC after reaching puberty.
+<& /Edit/Elements/List,
+    Data  => [
+	[ '', loc('Name'),       sub { $_[0]->Name } ],
+	[ '', loc('Real Name'),   sub { $_[0]->IsPublic('RealName') ? $_[0]->RealName : '' } ],
+    ],
+    Link    => sub {
+	"/Foundry/User/?User=" . $_[0]->Id
+    },
+    Size    => 14,
+    %ARGS,
+&>
+<%ARGS>
+$Begin	=> 0
+$ARGS	=> {}
+</%ARGS>

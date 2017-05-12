@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title><% $n || 'RT' %> - RT Pod Online</title>
+<style type="text/css"><!--
+a { text-decoration: none }
+a:hover { text-decoration: underline }
+a:focus { background: #99ff99; border: 1px black dotted }
+
+#apidoc-content: { float: left; }
+#apidoc-toc { float: right; width: 250px; border-left: 1px solid black; padding-left: 3px;  }
+--></style>
+</head>
+<body>
+<div id="apidoc-container">
+
+<div id="apidoc-toc">
+<h1><a id="toc">Table of Contents</a></h1>
+<h3><a href="<% RT->Config->Get('WebURL') %>">Return to RT</a></h3>
+<& Elements/TOC &>
+</div>
+
+<div id="apidoc-content">
+<& Elements/Body, package => $n &>
+</div>
+
+</div>
+</body>
+</html>
+% # Skip footer
+% $m->abort;
+<%args>
+$n => ''
+</%args>

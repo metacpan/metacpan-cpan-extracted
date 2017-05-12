@@ -1,0 +1,176 @@
+#!/usr/bin/perl
+use strict;
+use CGI;
+use RackMan;
+use RackMan::Config;
+
+
+use constant {
+    CONFIG_PATH => "/usr/local/etc/rack.conf",
+};
+
+my %handler = (
+    # action handlers
+    list    => \&action_list,
+
+    # serializers
+    to_perl => \&to_dumper,
+    to_json => \&to_json,
+    to_yaml => \&to_yaml,
+);
+
+my %type = (
+    json    => "application/json",
+    perl    => "text/plain",
+    yaml    => "application/yaml",
+);
+
+
+# fetch the requested action
+my $cgi = CGI->new;
+my $action = $cgi->param("action");
+error(404, "No such action '$action'") if not exists $handler{$action};
+
+# load the RackMan objects
+my $config = RackMan::Config->new(-file => CONFIG_PATH);
+my $rackman = RackMan->new({ config => $config });
+my $racktables = $rackman->racktables;
+
+# execute the corresponding handler
+my $result = $handler{$action}->();
+
+# serialize the result
+my $format = $cgi->param("to") || "json";
+$format = "json" unless $handler{"to_$format"};
+my $output = $handler{"to_$format"}->($result);
+
+print $cgi->header($type{$format}), $output;
+
+
+
+#
+# error()
+# -----
+sub error {
+    my ($code, $text) = @_;
+    print $cgi->header(-status => $code, -type => "text/plain"), "$text\n";
+    exit
+}
+
+
+#
+# action_list()
+# -----------
+sub action_list {
+    # fetch the list of entities with the requested tags
+    my $list = $racktables->resultset("TagStorage")->search(
+        { entity_realm => "object", tag => { -in => [ $cgi->param("tag") ] } },
+        { join => "tag" },
+    );
+
+    my @ids = map $_->entity_id, $list->all;
+
+    # find the name of the corresponding IDs
+    my @objects = map { eval {
+        RackMan::Device->new({ racktables => $racktables, id => $_ })
+    } } @ids;
+
+    # if requested to, filter out objects not of the given "Use" attribute
+    my ($use) = lc $cgi->param("use");
+    if ($use) {
+        @objects = grep { lc $_->attributes->{Use} eq $use } @objects
+    }
+
+    # if requested to, filter out objects not of the given type
+    my ($type) = lc $cgi->param("type");
+    if ($type) {
+        @objects = grep { lc $_->object_type eq $type } @objects
+    }
+
+    # return the result as the list of the remaining names
+    my @names = map { $_->object_name || "[anonymous $type]" } @objects;
+
+    return \@names
+}
+
+
+#
+# to_dumper()
+# ---------
+sub to_dumper {
+    require Data::Dumper;
+    my $dumper = Data::Dumper->new([$_[0]]);
+    $dumper->Indent(1)->Sortkeys(1)->Terse(1);
+    return $dumper->Dump
+}
+
+
+#
+# to_json()
+# -------
+sub to_json {
+    require JSON;
+    return JSON::to_json($_[0])
+}
+
+
+#
+# to_yaml()
+# -------
+sub to_yaml {
+    require YAML;
+    return YAML::Dump($_[0])
+}
+
+
+__END__
+
+=head1 NAME
+
+rackapi - Web service access to RackMan
+
+=head1 DESCRIPTION
+
+This program is a small CGI which provides a limited web service access
+to the RackTables database, through the RackMan modules.
+
+
+=head1 ACTIONS
+
+=head2 list
+
+Search and return the list of devices corresponding to the criterion
+defined by the given parameters.
+
+
+=head1 PARAMETERS
+
+=head2 tag
+
+Specify one or more tags to select the devices.
+Currently, at least one tag must be specified.
+
+
+=head2 to
+
+Specify the output format: C<perl>, C<json>, C<yaml>.
+Default is C<json>.
+
+
+=head2 type
+
+Specify the type of device to select: C<pdu>, C<server>, C<switch>.
+
+
+=head2 use
+
+Specify the C<Use> attribute of the device: C<dev>, C<preprod>, C<prod>,
+C<test>, C<dead>.
+
+
+=head1 AUTHOR
+
+Sebastien Aperghis-Tramoni
+
+=cut
+

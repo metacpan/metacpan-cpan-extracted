@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RDF::Core::Model - RDF model</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#interface">Interface</a></li>
+	</ul>
+
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>RDF::Core::Model - RDF model</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  my $storage = new RDF::Core::Storage::Memory;
+  my $model = new RDF::Core::Model (Storage =&gt; $storage);
+  my $subject = new RDF::Core::Resource('<a href="http://www.gingerall.cz/employees/Jim">http://www.gingerall.cz/employees/Jim</a>');
+  my $predicate = $subject-&gt;new('<a href="http://www.gingerall.cz/rdfns#name">http://www.gingerall.cz/rdfns#name</a>');
+  my $object = new RDF::Core::Literal('Jim Brown');
+  my $statement = new RDF::Core::Statement($subject, $predicate, $object);</pre>
+<pre>
+  $model-&gt;addStmt($statement);</pre>
+<pre>
+  print &quot;Model contains &quot;.$model-&gt;countStmts.&quot;statement(s).\n&quot;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Model provides interface to store RDF statements, ask about them and retrieve them back.</p>
+<p>
+</p>
+<h2><a name="interface">Interface</a></h2>
+<ul>
+<li><strong><a name="item_new"><code>new(%options)</code></a></strong><br />
+</li>
+$options is a hash reference, available options are
+<ul>
+<li><strong><a name="item_storage">Storage</a></strong><br />
+</li>
+a reference to a RDF::Core::Storage implementation
+<p></p></ul>
+<li><strong><a name="item_getoptions">getOptions</a></strong><br />
+</li>
+<li><strong><a name="item_setoptions"><code>setOptions(\%options)</code></a></strong><br />
+</li>
+<li><strong><a name="item_addstmt"><code>addStmt($statement)</code></a></strong><br />
+</li>
+Add RDF::Core::Statement instance to Model, unless it already exists there.
+<p></p>
+<li><strong><a name="item_removestmt"><code>removeStmt($statement)</code></a></strong><br />
+</li>
+Remove statement from Model, if it's there.
+<p></p>
+<li><strong><a name="item_existsstmt"><code>existsStmt($subject,$predicate,$object)</code></a></strong><br />
+</li>
+Check if statement exists, that matches given mask. Parameters can be undefined, every value matches undefined parameter.
+<p></p>
+<li><strong><a name="item_countstmts"><code>countStmts($subject,$predicate,$object)</code></a></strong><br />
+</li>
+Count matching statements.
+<p></p>
+<li><strong><a name="item_getstmts"><code>getStmts($subject,$predicate,$object)</code></a></strong><br />
+</li>
+Retrieve matching statements. Returns RDF::Core::Enumerator object.
+<p></p>
+<li><strong><a name="item_getobjects">getObjects($subject, $predicate)</a></strong><br />
+</li>
+Return a reference to an array keeping all objects, that are values of
+specified $predicate for given $subject.
+<p></p>
+<li><strong><a name="item_getcontainerobjects"><code>getContainerObjects($container)</code></a></strong><br />
+</li>
+Return a reference to an array keeping all objects, that are members
+of the $container. Objects are sorted.
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is subject to the MPL (or the GPL alternatively).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ginger Alliance, <a href="mailto:rdf@gingerall.cz">rdf@gingerall.cz</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>RDF::Core::Statement, RDF::Core::Storage, RDF::Core::Serializer, RDF::Core::Parser, RDF::Core::Enumerator</p>
+
+</body>
+
+</html>

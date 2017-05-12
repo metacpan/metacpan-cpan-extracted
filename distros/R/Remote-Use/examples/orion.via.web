@@ -1,0 +1,38 @@
+(
+'Trivial.pm' => { dir => '', files => [
+	'/Trivial.pm' ] },
+'Tintin/Trivial.pm' => { dir => '', files => [
+	'/Tintin/Trivial.pm' ] },
+'Parse/Eyapp.pm' => { dir => '', 
+  files => [ '/Parse/Eyapp.pm' ],
+  bin => [ '/bin/eyapp', '/bin/treereg' ]
+},
+'Parse/Eyapp/Lalr.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Lalr.pm' ] },
+'Parse/Eyapp/YATW.pm' => { dir => '', files => [
+	'/Parse/Eyapp/YATW.pm' ] },
+'Parse/Eyapp/Treeregexp.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Treeregexp.pm' ] },
+'Parse/Eyapp/Parse.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Parse.pm' ] },
+'Parse/Eyapp/Scope.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Scope.pm' ] },
+'Parse/Eyapp/Options.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Options.pm' ] },
+'Parse/Eyapp/Output.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Output.pm' ] },
+'Parse/Eyapp/Node.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Node.pm' ] },
+'Parse/Eyapp/Grammar.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Grammar.pm' ] },
+'Parse/Eyapp/Driver.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Driver.pm' ] },
+'Parse/Eyapp/Base.pm' => { dir => '', files => [
+	'/Parse/Eyapp/Base.pm' ] },
+'Parse/Eyapp/_TreeregexpSupport.pm' => { dir => '', files => [
+	'/Parse/Eyapp/_TreeregexpSupport.pm' ] },
+'Math/Prime/XS.pm' => { dir => '', files => [
+	'/auto/Math/Prime/XS/XS.bs',
+	'/auto/Math/Prime/XS/XS.so',
+	'/Math/Prime/XS.pm' ] },
+);

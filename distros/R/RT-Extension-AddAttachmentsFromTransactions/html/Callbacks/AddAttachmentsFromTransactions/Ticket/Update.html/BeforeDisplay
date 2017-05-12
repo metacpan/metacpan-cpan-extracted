@@ -1,0 +1,15 @@
+<%init>
+if ($ARGSRef->{'AttachExisting'}) {
+    $ARGSRef->{'AttachExisting'} = [$ARGSRef->{'AttachExisting'}]
+        if not ref $ARGSRef->{'AttachExisting'} eq 'ARRAY';
+
+    for my $id (@{$ARGSRef->{'AttachExisting'}}) {
+        next if $id =~ /\D/;
+        push @{ $session{'AttachExisting'} ||= [] }, $id;
+    }
+}
+</%init>
+
+<%args>
+$ARGSRef => undef
+</%args>

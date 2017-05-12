@@ -1,0 +1,12 @@
+# $File: //depot/RT/osf/var/README $ $Author: autrijus $
+# $Revision: #1 $ $Change: 9414 $ $DateTime: 2003/12/25 09:55:18 $
+
+If you have a local subversion installation, please create a symbolic
+link to the subversion base directory here as 'svn', like this:
+
+    ln -shf /home/svn/repos /usr/local/rt3/var/Foundry/svn
+
+Similarily, a 'sympa' link may be created as:
+
+    ln -shf /usr/local/sympa /usr/local/rt3/var/Foundry/sympa
+

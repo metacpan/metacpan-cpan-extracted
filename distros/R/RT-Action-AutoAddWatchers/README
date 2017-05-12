@@ -1,0 +1,90 @@
+NAME
+    RT-Action-AutoAddWatchers - A more powerful $ParseNewMessageForTicketCcs
+
+DESCRIPTION
+    Automatically adds new watchers from the current transaction to the
+    ticket, while trying to do so intelligently. The basic rules:
+
+    *   Addresses are extracted from the To, Cc, and From headers.
+
+    *   Any address matching a configured address for RT is discarded.
+
+    *   Any address which is already a ticket watcher is discarded.
+
+    *   If the address matches a privileged user, the user is added as a
+        ticket AdminCc.
+
+    *   Otherwise, the address is added as a ticket Cc.
+
+    Notably, this does not skip addresses which are already queue watchers.
+    The intent is to ensure that explicitly named people remain explicit on
+    the ticket but don't receive duplicate mail. This is the reason for the
+    distinction between ticket Cc/AdminCc, under the assumption that your
+    queue watchers are AdminCcs. It also pairs nicely with a notification
+    setup using RT::Extension::NotifyBasedOnOwnership and enables queue
+    watchers to be looped into specific tickets via the initial email.
+
+    The default installation does not create a scrip for you. You must do
+    that for yourself using the new *Automatically add ticket watchers from
+    new addresses* action. A suggested scrip is:
+
+        Condition: On Create
+        Action: Automatically add ticket watchers from new addresses
+        Template: Blank
+        Stage: Normal
+
+    I strongly suggest only running this action *On Create* instead of on
+    all correspondences (matching the behaviour of
+    $ParseNewMessageForTicketCcs) so that watchers may not add themselves
+    simply by replying to a ticket.
+
+INSTALLATION
+    "perl Makefile.PL"
+    "make"
+    "make install"
+        May need root permissions
+
+    "make initdb"
+        Only run this the first time you install this module.
+
+        If you run this twice, you may end up with duplicate data in your
+        database.
+
+        If you are upgrading this module, check for upgrading instructions
+        in case changes need to be made to your database.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin("RT::Action::AutoAddWatchers");
+
+        or add "RT::Action::AutoAddWatchers" to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+    Create a scrip (or scrips) as appropriate for your installation using
+    the new action.
+
+AUTHOR
+    Thomas Sibley <trsibley@uw.edu>
+
+BUGS
+    All bugs should be reported via email to
+    bug-RT-Action-AutoAddWatchers@rt.cpan.org
+    <mailto:bug-RT-Action-AutoAddWatchers@rt.cpan.org> or via the web at
+    rt.cpan.org
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Action-AutoAddWatch
+    ers>.
+
+SEE ALSO
+    RT::Extension::NonWatcherRecipients
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2014 by Thomas Sibley
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

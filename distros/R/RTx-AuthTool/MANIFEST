@@ -1,0 +1,23 @@
+Changes
+html/Callbacks/RT-AuthTool/Elements/Tabs/Default
+html/Developer/AuthTool/autohandler
+html/Developer/AuthTool/index.html
+html/NoAuth/AuthTool.html
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RTx/AuthTool.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+po/zh_cn.po
+po/zh_tw.po
+README
+t/0-signature.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

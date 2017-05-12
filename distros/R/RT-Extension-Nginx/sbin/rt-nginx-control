@@ -1,0 +1,187 @@
+#!/usr/bin/env perl
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+use strict;
+use warnings;
+
+=head1 NAME
+
+rt-nginx-control - script to start, stop or restart nginx and/or fcgi running RT
+
+=head1 USAGE
+
+    rt-nginx-control start
+    rt-nginx-control stop
+    rt-nginx-control restart
+
+    rt-nginx-control start fcgi
+    rt-nginx-control stop fcgi
+    rt-nginx-control restart fcgi
+
+    rt-nginx-control start nginx
+    rt-nginx-control stop nginx
+    rt-nginx-control restart nginx
+
+=head1 DESCRIPTION
+
+This script allows you to control nginx and/or fcgi processes that run RT.
+You can control both if you run nothing but RT on the server or control
+only one part of the setup. For example if you run something else on
+nginx server then use the scrip to contol fcgi part only.
+
+The script expects that nginx and plackup commands are in your PATH.
+
+You can take a look at the source code of the script to get idea which
+commands are executed, where files are located. The script is very simple.
+
+B<NOTE>: one important thing this script does is that it runs servers under
+web user, not user you start it under (root).
+
+=cut
+
+use File::Spec;
+use autodie;
+
+use RT;
+RT::LoadConfig();
+
+my %targets = map {$_ => 1} qw(nginx fcgi);
+my %commands = map {$_ => 1} qw(start stop restart);
+
+my $command = pop @ARGV;
+my $target = pop @ARGV;
+if ( !$command || !$commands{ $command } || ($target && !$target) ) {
+    require Pod::Usage;
+    print Pod::Usage::pod2usage( { verbose => 2  }  );
+    exit 1;
+}
+
+my @plugins = RT->Config->Get('Plugins');
+push @plugins, 'RT::Extension::Nginx';
+RT->Config->Set('Plugins' => @plugins);
+RT::InitPluginPaths();
+require RT::Extension::Nginx;
+
+if ( $command eq 'start' ) {
+    main->start_fcgi() if !$target || $target eq 'fcgi';
+    main->start_nginx() if !$target || $target eq 'nginx';
+}
+elsif ( $command eq 'stop' ) {
+    main->stop_fcgi() if !$target || $target eq 'fcgi';
+    main->stop_nginx() if !$target || $target eq 'nginx';
+}
+elsif ( $command eq 'restart' ) {
+    main->restart_fcgi() if !$target || $target eq 'fcgi';
+    main->restart_nginx() if !$target || $target eq 'nginx';
+}
+
+sub start_nginx {
+    my $self = shift;
+
+    $self->run_command_as_web_user(
+        'nginx',
+        '-c', RT::Extension::Nginx->NginxConfigPath,
+    );
+}
+sub stop_nginx {
+    my $self = shift;
+
+    $self->run_command_as_web_user(
+        'nginx',
+        '-c', RT::Extension::Nginx->NginxConfigPath,
+        '-s', 'quit',
+    );
+}
+sub restart_nginx {
+    my $self = shift;
+
+    $self->run_command_as_web_user(
+        'nginx',
+        '-c', RT::Extension::Nginx->NginxConfigPath,
+        '-s', 'reload',
+    );
+}
+sub nginx_pidfile {
+    my $self = shift;
+    return File::Spec->catfile( RT::Extension::Nginx->RootPath, 'nginx.pid' );
+}
+
+sub start_fcgi {
+    my $self = shift;
+    my $root = RT::Extension::Nginx->RootPath;
+
+    $self->run_command_as_web_user(
+        'plackup',
+        '--server', 'FCGI',
+        '--listen', File::Spec->catfile( $root, 'fcgi.sock' ),
+        '--pid',    $self->fcgi_pidfile,
+        '--daemonize', '--nproc', 10,
+        '--keep-stderr', 1,
+        File::Spec->catfile( $RT::SbinPath, 'rt-server' ),
+    );
+}
+
+sub stop_fcgi {
+    my $self = shift;
+
+    my $pid = do {
+        open my $fh, '<', $self->fcgi_pidfile;
+        local $/; my $res = <$fh>; chomp $res if $res;
+        $res;
+    };
+    unless ($pid) {
+        print "No FCGI pid\n";
+        return;
+    }
+    kill 'SIGTERM', $pid or die "couldn't kill process #$pid: $!";
+}
+
+sub restart_fcgi {
+    my $self = shift;
+
+    my $pidfile = $self->fcgi_pidfile;
+    if (-e $pidfile ) {
+        $self->stop_fcgi;
+        sleep 1 while -e $pidfile;
+    }
+    $self->start_fcgi;
+}
+
+sub fcgi_pidfile {
+    my $self = shift;
+    return File::Spec->catfile( RT::Extension::Nginx->RootPath, 'fcgi.pid' );
+}
+
+sub run_command_as_web_user {
+    my $self = shift;
+    my $name = shift;
+    my @cmd = @_;
+
+    my $executable = RT::Extension::Nginx->FindExecutable( $name );
+    die "Couldn't find $name executable under PATH" unless $executable;
+    unshift @cmd, $executable;
+
+    if ( (RT::Extension::Nginx->GetSystemUser)[0] != (RT::Extension::Nginx->GetWebUser)[0] ) {
+        my $exit_code = system @cmd;
+        die "Couldn't run `". join(' ', @cmd) ."`: $!" if $exit_code;
+        return;
+    }
+
+    my ($wuid, $wgid) = (
+        (RT::Extension::Nginx->GetWebUser)[0],
+        (RT::Extension::Nginx->GetWebGroup)[0],
+    );
+
+    if (my $pid = fork) { wait }
+    elsif ( !defined $pid ) { die "Couldn't fork: $!" }
+    else {
+        require POSIX;
+        POSIX::setgid( $wgid ) or die "couldn't set gid: $!";
+        POSIX::setuid( $wuid ) or die "couldn't set uid: $!";
+        exec @cmd; die "couldn't exec foo: $!";
+    }
+    return;
+}
+

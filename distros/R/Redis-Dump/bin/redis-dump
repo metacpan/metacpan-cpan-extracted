@@ -1,0 +1,137 @@
+#!/usr/bin/perl
+
+package App::Redis::Dump;
+
+use strict;
+use Redis::Dump;
+use JSON;
+
+# ABSTRACT: It's a simple way to dump and backup data from redis-server.
+our $VERSION = '0.016'; # VERSION
+
+my $app = Redis::Dump->new_with_options();
+
+print to_json( { $app->run } , { ascii => 1, pretty => 1 } );
+
+#print to_json( { $app->run_config }, { ascii => 1, pretty => 1 } ) if $app->config;
+
+
+1;
+
+
+
+=pod
+
+=head1 NAME
+
+App::Redis::Dump - It's a simple way to dump and backup data from redis-server.
+
+=head1 VERSION
+
+version 0.016
+
+=head1 SYNOPSIS
+
+    redis-dump --server 127.0.0.1:6379 --filter foo
+    {
+        "foo" : "1",
+    }
+
+    redis-dump --type list --filter my --show_type
+    {
+      "mylist (list)" : [
+            "{\"uuid\":\"F3D4BA06-9793-11E0-AAB9-D0A1E5EB3B8E\",\"from_number\":\"0000\",\"customer\":\"21\"\"}",
+            ]
+    }
+
+Run C<redis-dump -h> for more options.
+
+=head1 DESCRIPTION
+
+redis-dump is a script to dump your redis server, requires zero
+configuration, and return a JSON with data.
+
+See L<Redis::Dump> for more information.
+
+=head1 SEE ALSO
+
+L<Redis::Dump>, L<Redis::Dump::Restore>, L<App::Redis::Dump::Restore>
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item *
+
+L<Moose>
+
+=item *
+
+L<MooseX::Getopt>
+
+=item *
+
+L<Redis>
+
+=back
+
+=head1 DEVELOPMENT
+
+Redis::Dump is a open source project for everyone to participate. The code repository
+is located on github. Feel free to send a bug report, a pull request, or a
+beer.
+
+L<http://www.github.com/maluco/Redis-Dump>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+perldoc Redis::Dump
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Redis-Dump>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Redis-Dump>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Redis-Dump>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Redis-Dump>
+
+=back
+
+=head1 NO WARRANTY
+
+This software is provided "as-is," without any express or implied
+warranty. In no event shall the author be held liable for any damages
+arising from the use of the software.
+
+=head1 AUTHOR
+
+Thiago Rondon <thiago@nsms.com.br>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Thiago Rondon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+
+
+

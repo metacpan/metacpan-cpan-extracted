@@ -1,0 +1,32 @@
+Regexp-Log-WMS
+==============
+
+This module enables the computation of regular expressions for
+parsing the log files created by WMS.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  Test::More
+  Regexp::Log
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Salvador Fandino
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, either Perl
+version 5.8.4 or, at your option, any later version of Perl 5 you
+may have available.
+
+

@@ -1,0 +1,23 @@
+RTx-RT34-Bulk-CF-Edit version 0.0.2
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+RT 3.4.x
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

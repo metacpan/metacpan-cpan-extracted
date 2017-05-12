@@ -1,0 +1,30 @@
+% if(@recs){
+<h1>API Keys</h1>
+<table>
+    <tr>
+        <td><b>Key</b></td>
+        <td><b>Type</b></td>
+        <td><b>GUID</b></td>
+        <td><b>Description</b></td>
+        <td><b>Created</b></td>
+        <td></td>
+    </tr>
+% }
+% foreach my $r (@recs){
+    <tr>
+        <form method="post">
+        <td><input type='hidden' name='uuid' value='<%$r->uuid()%>'><%$r->uuid()%></td>
+        <td><%$r->access()%></td>
+        <td>GROUP</td>
+        <td><%$r->description() || ''%></td>
+        <td><%$r->created()%></td>
+        <td><& /Elements/Submit, Name => 'PurgeKey', Label => loc('Purge Key') &></td>
+        </form>
+    </tr>
+% }
+    </form>
+</table>
+
+<%ARGS>
+@recs => undef
+</%ARGS>

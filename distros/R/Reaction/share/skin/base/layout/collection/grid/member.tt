@@ -1,0 +1,14 @@
+=for layout widget
+
+[% field_list %]
+
+=for layout field_list
+
+[% call_next %]
+[% actions %]
+
+=for layout field
+
+[% call_next %]
+
+=cut

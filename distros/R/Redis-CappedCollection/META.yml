@@ -1,0 +1,48 @@
+---
+abstract: 'Redis::CappedCollection module provides the fixed sized collections that have a auto-FIFO age-out feature.'
+author:
+  - 'TrackingSoft LLC <sgladkov@trackingsoft.com>'
+build_requires:
+  Data::UUID: '1.217'
+  ExtUtils::MakeMaker: '0'
+  JSON::XS: '3.01'
+  Net::EmptyPort: '0'
+  Sys::SigAction: '0.21'
+  Test::Exception: '0.31'
+  Test::NoWarnings: '1.04'
+  Test::RedisServer: '0.04'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-CappedCollection
+no_index:
+  directory:
+    - t
+    - inc
+    - xt
+provides:
+  Redis::CappedCollection:
+    file: lib/Redis/CappedCollection.pm
+    version: '1.10'
+  Redis::CappedCollection::Util:
+    file: lib/Redis/CappedCollection/Util.pm
+    version: '1.10'
+requires:
+  Const::Fast: '0.014'
+  Digest::SHA1: '2.13'
+  Mouse: '0'
+  Params::Util: '1.07'
+  Redis: '1.976'
+  Try::Tiny: '0.18'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/TrackingSoft/Redis-CappedCollection/issues
+  homepage: https://github.com/TrackingSoft/Redis-CappedCollection
+  repository: git://github.com/TrackingSoft/Redis-CappedCollection.git
+version: '1.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

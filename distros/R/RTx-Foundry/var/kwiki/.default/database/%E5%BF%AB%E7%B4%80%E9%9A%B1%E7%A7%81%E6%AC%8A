@@ -1,0 +1,47 @@
+快紀允許網站的管理者為每一頁都設定一個隱私權層級。一共有三個隱私權層級：
+
+* 公開 ─ 任何人都可以閱讀及編輯該頁面。
+* 保護 ─ 任何人都可以閱讀該頁面，但是祇有管理者纔能夠加以編輯。
+* 私人 ─ 祇有管理者纔能夠閱讀或編輯該頁面。
+
+在預設的情況下，所有的頁面都是公開的。
+----
+=== 安裝
+妳得另外開啟這個隱私權功能。這個功能預設並不會安裝；要開啟這個功能就祇需要在妳安裝快紀的目錄中，下這一個指令就行了：
+
+    kwiki-install --privacy
+----
+=== 伺服器組態設定
+
+同時妳也需要修改妳的網頁伺服器組態設定，來讓 [=admin.cgi] 程式受到鑑定架構的保護。以下這個範例就是妳搭配 Apache 時，妳可能會用到的設定：
+
+    Alias /kwiki/ /home/ingy/kwiki/
+    <Directory /home/ingy/kwiki/>
+        Order allow,deny
+        Allow from all
+        AllowOverride None
+        Options ExecCGI
+        AddHandler cgi-script .cgi
+        <Files admin.cgi>
+            Require user admin
+            AuthType Basic
+            AuthName Restricted
+            AuthUserFile /home/ingy/kwiki/passwd
+        </Files>
+    </Directory>
+
+同時妳還得設定管理者密碼。如果妳在用的是 Apache 的話，就祇需要鍵入：
+
+    htpasswd -bc passwd admin foo
+
+這個指令會把 [=admin] 的密碼設定成 [=foo] 。
+
+----
+
+=== 管理
+
+如果妳打算登入成站台管理者的話，請不要連到 [index.cgi http:index.cgi] ，請連到 [admin.cgi http:admin.cgi] 。如果一切都設定妥當的話，此時你應該會被詢問密碼。
+
+請在使用者名稱輸入 [=admin] ，然後在密碼輸入 [=foo] （或任何妳所設定的密碼）。
+
+一旦妳登入之後，就應該能夠在編輯頁面的時候，一併設定它們的隱私權層級了。

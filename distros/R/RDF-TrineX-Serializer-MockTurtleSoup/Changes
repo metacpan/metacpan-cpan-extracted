@@ -1,0 +1,41 @@
+RDF-TrineX-Serializer-MockTurtleSoup
+====================================
+
+Created:      2013-03-15
+Home page:    <https://metacpan.org/release/RDF-TrineX-Serializer-MockTurtleSoup>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-TrineX-Serializer-MockTurtleSoup>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.005	2013-07-02
+
+ [ Bug Fixes ]
+ - Fix dependencies.
+   Jonas Smedegaard++
+
+0.004	2013-07-02
+
+ - Updated: Drop usage of smartmatch operator.
+ - Updated: Update test cases for RDF::Prefixes 0.004.
+
+0.003	2013-05-16
+
+ [ Bug Fixes ]
+ - Fix t/02ser.t test case in RDF::Trine 1.004+, where parsers expect chars
+   (not bytes).
+
+0.002	2013-05-14
+
+ [ Documentation ]
+ - Minor fixes/improvements.
+
+ [ Other ]
+ - Added: 'apostrophe' option.
+ - Added: 'encoding' option.
+ - Nicer output of literals.
+
+0.001	2013-03-15	Initial release

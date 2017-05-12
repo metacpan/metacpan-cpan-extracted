@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl
+# $File: //depot/RT/osf/sbin/foundry-svn-start-commit $ $Author: autrijus $
+# $Revision: #3 $ $Change: 10012 $ $DateTime: 2004/02/12 22:12:46 $
+
+use strict;
+use FindBin;
+use LWP::Simple;
+
+eval { require "$FindBin::Bin/../etc/foundry.conf" };
+eval { require "$FindBin::Bin/../etc/Foundry/foundry.conf" };
+
+my ($svn_base) = grep { defined and -d } (
+    $ENV{SVNROOT}, 
+    '/home/svn',
+    '/home/svn-repositories',
+) or die "Cannot find SVNROOT";
+$svn_base .= "/foundry-repos";
+
+my $rt_url = $ENV{RT_URL} or die 'Must specify $ENV{RT_URL}';
+
+my ($repos, $user) = @ARGV;
+
+my $project = $1 if $repos =~ /^\Q$svn_base\E(\w+)/;
+
+exit 1 unless $project;
+
+my $content = get("$rt_url/REST/0.0/NoAuth/has_member?Queue=$project&User=$user");
+
+exit 0 if $content =~ '^OK';
+
+die "permission denied for user $user to commit to project $project";
+

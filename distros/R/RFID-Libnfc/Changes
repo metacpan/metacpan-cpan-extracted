@@ -1,0 +1,47 @@
+Revision history for Perl extension Libnfc.
+
+0.01  Sun Nov  8 19:31:24 2009
+        - original version; created by h2xs 1.23 with options
+            -gx /usr/local/include/libnfc/libnfc.h
+0.02  Sat Dec 19 17:03:01 CET 2009
+        - support newer libnfc api (svn trunk)
+        - renamed from Libnfc to RFID::Libnfc
+        - cleanings prior uploading to CPAN
+0.03  Sat Dec 19 20:37:16 CET 2009
+        - autodetect libnfc install location
+          (and if stable or development version)
+0.04  Thu Dec 31 13:19:42 CET 2009
+        - bugfixes due to package-name changes
+0.05  Sat Feb 20 10:35:33 CET 2010
+        - upgrading to libnfc-1.3.3 API 
+          (some internal structures have been renamed)
+        - lost support for older versions of the library
+          (hopefully their api should be stable now)
+0.06  Sat Feb 20 11:12:55 CET 2010
+        - make it build properly where defines.h is not installed
+0.07  Sat Feb 20 13:03:19 CET 2010
+        - fixed a bug in 4K->write_sector() introduced when switching
+          from unpack("C", $data) to split(//, $data)
+0.08  Sun Feb 21 16:47:36 CET 2010
+        - supporting the nfc_target_info_t union. Mifare specific structure is
+          now accessed through the 'nai' member.
+          ( the nfc_iso14443a_info_t  structure has been mapped in Libnfc.xs)
+        - some minimal cleanings
+0.09  Wed Mar 17 11:26:26 CET 2010
+        - Extended support for mifare-classic tags (now supporting 4K, 1K and MINI)
+0.10  Fri Jan 21 13:54:35 CET 2011
+        - added support for libnfc-1.4 API (the library keeps changing its API)
+0.11  Sat Jan 22 01:00:32 CET 2011
+        - dropped support for libnfc API < 1.4
+          (older versions of this module could be eventually used together with
+          older versions of the libnfc library)
+        - cleaner mapping of internal structures 
+          (on the perl side it's not necessary anymore to care about retaining 
+          the storage while references are being accessed)
+0.12  Sun Jan 23 16:57:44 CET 2011
+        - fixed some leaks (check : 470f526a767817eaf0357e1d067b836a7e0d1d33)
+        - cleaned-up libnfc version checking logic in Makefile.PL
+        - wrapping allocation/release operations with proper perl macros in the XS code
+        - updated documentation
+0.13 Mon Jan 24 01:23:59 CET 2011
+        - fixed support for Mifare classic 1K and 4K (was broken since 0.11)

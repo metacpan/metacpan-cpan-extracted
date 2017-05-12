@@ -1,0 +1,262 @@
+=head1 NAME
+
+Reaction::Manual::Glossary - Terms and Definitions used in Reaction
+
+=head1 GLOSSARY
+
+
+=head3 Controller
+
+Reaction controllers are extended L<Catalyst> controllers. The controllers coordinate
+L</Interface Model> access and actions with the view logic in your L</ViewPort>s.
+
+=over
+
+=item * L<Reaction::UI::Controller>
+
+=item * L<Reaction::UI::Controller::Root>
+
+=back
+
+
+=head3 Domain Model
+
+This is the implementation of your business logic. An example would be a L<DBIx::Class> schema
+providing you with collections, objects and relationships.
+
+Your Domain Model will interface with Reaction through an L</Interface Model>. Therefore your
+domain model itself can and should be decoupled from your Reaction application.
+
+=over
+
+=item * L<Reaction::Manual::Overview>
+
+=back
+
+
+=head3 Focus Stack
+
+Whenever you push a L</ViewPort> in your controller, you are pushing it onto the Focus Stack.
+When the root window (containing the root Focus Stack) is flushed by Reaction at the end
+of the request, the ViewPorts' L</Widget>s will be rendered inside each other.
+
+A typical example would be a L<SiteLayout|Reaction::UI::ViewPort::SiteLayout> ViewPort
+being pushed onto the Focus Stack by your root action. A 
+L<CRUD|Reaction::UI::Controller::Collection::CRUD> controller would then, if its list action
+was requested, push a L<ListView|Reaction::UI::ViewPort::ListView> ViewPort. On flushing, 
+the ListView will be rendered inside the SiteLayout.
+
+=over
+
+=item * L<Reaction::UI::FocusStack>
+
+=back
+
+
+=head3 Interface Model
+
+Provides a standardized way for the application to interact with the 
+L</Domain Model>s. It does this by providing objects, collections and actions.
+
+A CRUD capable interface model can be generated from a L<DBIx::Class> schema on-the-fly via
+L<Reaction::InterfaceModel::Reflector::DBIC>.
+
+=over
+
+=item * L<Reaction::Manual::Overview>
+
+=item * L<Reaction::Manual::Tutorial>
+
+=item * L<Reaction::InterfaceModel::Object>
+
+=item * L<Reaction::InterfaceModel::Collection>
+
+=item * L<Reaction::InterfaceModel::Action>
+
+=back
+
+
+=head3 Layout
+
+Defines how a L</Widget> fragment is rendered. They are organized in L</LayoutSet>s. Its 
+arguments are provided by the Widget the LayoutSet specified.
+
+Layout fragments reference other fragments and can be overridden or wrapped when the
+LayoutSet is an extension of another.
+
+=over
+
+=item * L<Reaction::Manual::Templates>
+
+=item * L<Reaction::Manual::RenderPage>
+
+=back
+
+
+=head3 LayoutSet
+
+Contains L</Layout>s. A LayoutSet is specified (or autodiscovered) for any
+L</ViewPort>. It determines which L</Widget> to use as the functional part used to
+render the ViewPort. A LayoutSet can also extend on another LayoutSet. With this,
+L</Layout>s of the parent can be modified. This allows for very fine-grained control
+when developing different L<Skin>s.
+
+=over
+
+=item * L<Reaction::Manual::RenderPage>
+
+=item * L<Reaction::Manual::Overview>
+
+=item * L<Reaction::UI::LayoutSet>
+
+=back
+
+
+=head3 ListView
+
+The ListView L</Widget>, L</ViewPort> and L</LayoutSet> group
+allows you to render an L</Interface Model> collection as a table.
+
+=over
+
+=item * L<Reaction::UI::ViewPort::ListView>
+
+=item * L<Reaction::UI::Widget::ListView>
+
+=item * L<Reaction::InterfaceModel::Collection>
+
+=back
+
+
+=head3 MVC
+
+Model-View-Controller - a high-level software design pattern, which focuses on separation of 
+concerns.  For details on MVC, try here, here, and here.  Reaction is an extended MVC system; 
+it uses a two-layer Model (the Interface Model, with the Domain Model below it).  Views are 
+implemented by DOCTODO.  Controllers are represented by DOCTODO.
+
+
+=head3 Observer
+
+DOCTODO: A software design pattern in which one 
+
+
+=head3 RenderingContext
+
+The context in which the L</Widget>'s rendering via the L</LayoutSet> will be done. A typical
+example would be a L<Template Toolkit|Template> LayoutSet being used to render a
+L</Widget> in the L<Reaction::UI::RenderingContext::TT> context.
+
+=over
+
+=item * L<Reaction::Manual::RenderPage>
+
+=item * L<Reaction::UI::RenderingContext>
+
+=back
+
+
+=head3 Role
+
+A particular interface that a class implements.  Here, Role is used in the sense of Moose::Role; 
+this same concept is sometimes called a Mix-In Class or a Decorator pattern.
+
+=over
+
+=item * L<Moose>
+
+=item * L<Moose::Role>
+
+=back
+
+
+=head3 Skin
+
+A Skin usually contains L</LayoutSet>s and files for static delivery. Since Skins are extendable
+and can be switched by configuration, they allow easy customization of your application's
+look and feel.
+
+=over
+
+=item * L<Reaction::Manual::RenderPage>
+
+=item * L<Reaction::UI::Skin>
+
+=back
+
+
+=head3 View
+
+In Reaction, the View modules handle rendering the ViewPort. ViewPorts are the V in MVC.
+
+Technically, the View creates the L</RenderingContext> and finds the L</LayoutSet>s via the
+L</ViewPort>s and L</Widget>s from the LayoutSets that are required to render your page.
+
+=over
+
+=item * L<Reaction::Manual::RenderPage>
+
+=item * L<Reaction::UI::View>
+
+=item * L<Reaction::UI::View::TT>
+
+
+=back
+
+=head3 ViewPort
+
+Represents a part of your web pages output. Your application creates a page by stacking
+ViewPorts referencing your L</Interface Model>s inside another. To each ViewPort belongs a 
+L</LayoutSet>, which will determine the layout and type of the L</Widget>s rendering your page.
+
+=over
+
+=item * L<Reaction::Manual::RenderPage>
+
+=item * L<Reaction::UI::ViewPort>
+
+=back
+
+
+=head3 Widget
+
+The functionality needed to render a part of your page. The Widget that is used
+is determined by the L</LayoutSet>, which is in turn determined by the L</ViewPort>.
+
+The Widget organizes the layouts contained in the LayoutSet and provides them with 
+data to render.
+
+=over
+
+=item * L<Reaction::Manual::RenderPage>
+
+=item * L<Reaction::Manual::Widgets>
+
+=item * L<Reaction::UI::Widget>
+
+=back
+
+
+=head1 SEE ALSO
+
+Please refer to these documents for further and more general information:
+
+=over 
+
+=item * L<Reaction::Manual>
+
+=item * L<Reaction::Manual::Overview>
+
+=item * L<Reaction::Manual::Intro>
+
+=back
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

@@ -1,0 +1,42 @@
+<h1 class="Rudesind-title"><% $image ? $image->filename : $gallery->title | h %></h1>
+<h2 class="Rudesind-breadcrumb">
+% if ( @galleries || $last ) {
+<a href="<% $App->config->uri_root %>/">top</a> &middot;
+%   foreach my $x ( 0 .. $#galleries ) {
+%     my $path = join '/', @galleries[0..$x];
+<a href="<% $App->config->uri_root %>/<% $path %>"><% $path eq '' ? 'top' : $galleries[$x] | h %></a>
+%     if ( $x < $#galleries || ! $image ) {
+ &middot;
+%     }
+%   }
+% } elsif ($image) {
+<a href="<% $App->config->uri_root %>/">top</a>
+% }
+% if ($last) {
+<% $last | h %>
+% }
+</h2>
+
+% unless ( $App->basic_auth ) {
+%   if ( $App->is_admin ) {
+<p>
+<a href="<% $App->config->uri_root %>/submit/logout?redirect_to=<% $r->parsed_uri->unparse | u %>">logout</a>
+</p>
+%   } else {
+<p>
+<a href="<% $App->config->uri_root %>/admin/login.html?redirect_to=<% $r->parsed_uri->unparse | u %>">admin login</a>
+</p>
+%   }
+% }
+
+<%args>
+$gallery
+$image => undef
+</%args>
+
+<%init>
+my @galleries = split /\//, $gallery->path;
+
+my $last;
+$last = pop @galleries unless $image;
+</%init>

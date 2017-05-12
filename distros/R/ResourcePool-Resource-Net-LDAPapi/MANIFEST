@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/ResourcePool-Resource-Net-LDAPapi.t
+t/02FactorySingleon.t
+t/03ResourcePoolSingleton.t
+t/ResourcePool-Resource-Net-LDAPapi.t
+lib/ResourcePool/Factory/Net/LDAPapi.pm
+lib/ResourcePool/Resource/Net/LDAPapi.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

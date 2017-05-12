@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use Runops::Recorder::Viewer::Diff;
+
+unless (@ARGV == 2) {
+    print "Usage: rr-diff DIR DIR\n";
+    exit -1;
+}
+
+Runops::Recorder::Viewer::Diff->new(@ARGV)->run();

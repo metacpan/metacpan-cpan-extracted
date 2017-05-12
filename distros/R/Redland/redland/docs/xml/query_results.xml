@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY version SYSTEM "version.xml">
+]>
+<refentry id="redland-query-results">
+<refmeta>
+<refentrytitle role="top_of_page">Query results</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>REDLAND Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Query results</refname>
+<refpurpose>RDF query results.</refpurpose>
+<!--[<xref linkend="desc" endterm="desc.title"/>]-->
+</refnamediv>
+
+<refsynopsisdiv role="synopsis">
+<title role="synopsis.title">Synopsis</title>
+
+<synopsis>
+
+
+
+typedef     <link linkend="librdf-query-results">librdf_query_results</link>;
+<link linkend="librdf-stream">librdf_stream</link>* <link linkend="librdf-query-results-as-stream">librdf_query_results_as_stream</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-get-count">librdf_query_results_get_count</link>  (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-next">librdf_query_results_next</link>       (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-finished">librdf_query_results_finished</link>   (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-get-bindings">librdf_query_results_get_bindings</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             const <link linkend="char">char</link> ***names,
+                                             <link linkend="librdf-node">librdf_node</link> **values);
+<link linkend="librdf-node">librdf_node</link>* <link linkend="librdf-query-results-get-binding-value">librdf_query_results_get_binding_value</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="int">int</link> offset);
+const <link linkend="char">char</link>* <link linkend="librdf-query-results-get-binding-name">librdf_query_results_get_binding_name</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="int">int</link> offset);
+<link linkend="librdf-node">librdf_node</link>* <link linkend="librdf-query-results-get-binding-value-by-name">librdf_query_results_get_binding_value_by_name</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             const <link linkend="char">char</link> *name);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-get-bindings-count">librdf_query_results_get_bindings_count</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+unsigned <link linkend="char">char</link>* <link linkend="librdf-query-results-to-counted-string">librdf_query_results_to_counted_string</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="librdf-uri">librdf_uri</link> *format_uri,
+                                             <link linkend="librdf-uri">librdf_uri</link> *base_uri,
+                                             <link linkend="size-t">size_t</link> *length_p);
+unsigned <link linkend="char">char</link>* <link linkend="librdf-query-results-to-string">librdf_query_results_to_string</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="librdf-uri">librdf_uri</link> *format_uri,
+                                             <link linkend="librdf-uri">librdf_uri</link> *base_uri);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-to-file-handle">librdf_query_results_to_file_handle</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="FILE:CAPS">FILE</link> *handle,
+                                             <link linkend="librdf-uri">librdf_uri</link> *format_uri,
+                                             <link linkend="librdf-uri">librdf_uri</link> *base_uri);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-to-file">librdf_query_results_to_file</link>    (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             const <link linkend="char">char</link> *name,
+                                             <link linkend="librdf-uri">librdf_uri</link> *format_uri,
+                                             <link linkend="librdf-uri">librdf_uri</link> *base_uri);
+<link linkend="void">void</link>        <link linkend="librdf-free-query-results">librdf_free_query_results</link>       (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-is-bindings">librdf_query_results_is_bindings</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-is-boolean">librdf_query_results_is_boolean</link> (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-is-graph">librdf_query_results_is_graph</link>   (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+<link linkend="int">int</link>         <link linkend="librdf-query-results-get-boolean">librdf_query_results_get_boolean</link>
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+
+
+
+
+<refsect1 role="desc">
+<title role="desc.title">Description</title>
+<para>
+The results of an <link linkend="librdf-query"><type>librdf_query</type></link> execution as a sequence of individual
+results, an RDF graph as a sequence of triples or a boolean.  For
+variable binding results, the binding names and values can be read in
+multiple forms and the number of results returned as well as the
+current result moved to the next.  For an RDF graph result, the
+stream of triples can be returned. For a boolean result, the value
+can be returned.  All results can be turned into a string XML format
+based on the SPARQL XML results format which can also be written to a file.
+</para>
+</refsect1>
+
+<refsect1 role="details">
+<title role="details.title">Details</title>
+<refsect2>
+<title><anchor id="librdf-query-results" role="typedef"/>librdf_query_results</title>
+<indexterm><primary>librdf_query_results</primary></indexterm><programlisting>typedef struct librdf_query_results_s librdf_query_results;
+</programlisting>
+<para>
+Redland query results class.</para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-as-stream" role="function"/>librdf_query_results_as_stream ()</title>
+<indexterm><primary>librdf_query_results_as_stream</primary></indexterm><programlisting><link linkend="librdf-stream">librdf_stream</link>* librdf_query_results_as_stream
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+The return value is only meaningful if this is an RDF graph
+query result - see <link linkend="librdf-query-results-is-graph"><type>librdf_query_results_is_graph</type></link></para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query_results
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> RDF graph query result or NULL on error
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-get-count" role="function"/>librdf_query_results_get_count ()</title>
+<indexterm><primary>librdf_query_results_get_count</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_get_count  (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Get number of bindings so far.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query results
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> number of bindings found so far
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-next" role="function"/>librdf_query_results_next ()</title>
+<indexterm><primary>librdf_query_results_next</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_next       (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Move to the next result.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query results
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non-0 if failed or results exhausted
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-finished" role="function"/>librdf_query_results_finished ()</title>
+<indexterm><primary>librdf_query_results_finished</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_finished   (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Find out if binding results are exhausted.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query results
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non-0 if results are finished or query failed
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-get-bindings" role="function"/>librdf_query_results_get_bindings ()</title>
+<indexterm><primary>librdf_query_results_get_bindings</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_get_bindings
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             const <link linkend="char">char</link> ***names,
+                                             <link linkend="librdf-node">librdf_node</link> **values);</programlisting>
+<para>
+Get all binding names, values for current result.
+</para>
+<para>
+If names is not NULL, it is set to the address of a shared array
+of names of the bindings (an output parameter).  These names
+are shared and must not be freed by the caller
+</para>
+<para>
+If values is not NULL, it is used as an array to store pointers
+to the librdf_node* of the results.  These nodes must be freed
+by the caller.  The size of the array is determined by the
+number of names of bindings, returned by
+librdf_query_get_bindings_count dynamically or
+will be known in advanced if hard-coded into the query string.
+</para>
+<para>
+Example
+</para>
+<para>
+const char **names=NULL;
+librdf_node* values[10];
+</para>
+<para>
+if(librdf_query_results_get_bindings(results, &amp;names, values))
+  ...</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query results
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>names</parameter>&nbsp;:</term>
+<listitem><simpara> pointer to an array of binding names (or NULL)
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>values</parameter>&nbsp;:</term>
+<listitem><simpara> pointer to an array of binding value <link linkend="librdf-node"><type>librdf_node</type></link> (or NULL)
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non-0 if the assignment failed
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-get-binding-value" role="function"/>librdf_query_results_get_binding_value ()</title>
+<indexterm><primary>librdf_query_results_get_binding_value</primary></indexterm><programlisting><link linkend="librdf-node">librdf_node</link>* librdf_query_results_get_binding_value
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="int">int</link> offset);</programlisting>
+<para>
+Get one binding value for the current result.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query results
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>offset</parameter>&nbsp;:</term>
+<listitem><simpara> offset of binding name into array of known names
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> a new <link linkend="librdf-node"><type>librdf_node</type></link> binding value or NULL on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-get-binding-name" role="function"/>librdf_query_results_get_binding_name ()</title>
+<indexterm><primary>librdf_query_results_get_binding_name</primary></indexterm><programlisting>const <link linkend="char">char</link>* librdf_query_results_get_binding_name
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="int">int</link> offset);</programlisting>
+<para>
+Get binding name for the current result.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query results
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>offset</parameter>&nbsp;:</term>
+<listitem><simpara> offset of binding name into array of known names
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> a pointer to a shared copy of the binding name or NULL on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-get-binding-value-by-name" role="function"/>librdf_query_results_get_binding_value_by_name ()</title>
+<indexterm><primary>librdf_query_results_get_binding_value_by_name</primary></indexterm><programlisting><link linkend="librdf-node">librdf_node</link>* librdf_query_results_get_binding_value_by_name
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             const <link linkend="char">char</link> *name);</programlisting>
+<para>
+Get one binding value for a given name in the current result.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query results
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>name</parameter>&nbsp;:</term>
+<listitem><simpara> variable name
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> a new <link linkend="librdf-node"><type>librdf_node</type></link> binding value or NULL on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-get-bindings-count" role="function"/>librdf_query_results_get_bindings_count ()</title>
+<indexterm><primary>librdf_query_results_get_bindings_count</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_get_bindings_count
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Get the number of bound variables in the result.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query results
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> &lt;0 if failed or results exhausted
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-to-counted-string" role="function"/>librdf_query_results_to_counted_string ()</title>
+<indexterm><primary>librdf_query_results_to_counted_string</primary></indexterm><programlisting>unsigned <link linkend="char">char</link>* librdf_query_results_to_counted_string
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="librdf-uri">librdf_uri</link> *format_uri,
+                                             <link linkend="librdf-uri">librdf_uri</link> *base_uri,
+                                             <link linkend="size-t">size_t</link> *length_p);</programlisting>
+<para>
+Turn a query results into a string.
+</para>
+<para>
+Values of format_uri currently supported (via Rasqal) are:
+ http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/
+</para>
+<para>
+The base URI may be used for the generated syntax, depending
+on the format.
+</para>
+<para>
+The returned string must be freed by the caller</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>format_uri</parameter>&nbsp;:</term>
+<listitem><simpara> URI of syntax to format to
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>base_uri</parameter>&nbsp;:</term>
+<listitem><simpara> Base URI of output formatted syntax  or NULL
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>length_p</parameter>&nbsp;:</term>
+<listitem><simpara> Pointer to where to store length of string or NULL
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> new string value or NULL on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-to-string" role="function"/>librdf_query_results_to_string ()</title>
+<indexterm><primary>librdf_query_results_to_string</primary></indexterm><programlisting>unsigned <link linkend="char">char</link>* librdf_query_results_to_string
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="librdf-uri">librdf_uri</link> *format_uri,
+                                             <link linkend="librdf-uri">librdf_uri</link> *base_uri);</programlisting>
+<para>
+Turn a query results into a string.
+</para>
+<para>
+See librdf_query_results_to_counted_string for information on the
+format_uri and base_uri parameters.
+</para>
+<para>
+The returned string must be freed by the caller</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>format_uri</parameter>&nbsp;:</term>
+<listitem><simpara> URI of syntax to format to
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>base_uri</parameter>&nbsp;:</term>
+<listitem><simpara> Base URI of output formatted syntax 
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> new string value or NULL on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-to-file-handle" role="function"/>librdf_query_results_to_file_handle ()</title>
+<indexterm><primary>librdf_query_results_to_file_handle</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_to_file_handle
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             <link linkend="FILE:CAPS">FILE</link> *handle,
+                                             <link linkend="librdf-uri">librdf_uri</link> *format_uri,
+                                             <link linkend="librdf-uri">librdf_uri</link> *base_uri);</programlisting>
+<para>
+Write a query results to a FILE*.
+</para>
+<para>
+See librdf_query_results_to_counted_string for information on the
+format_uri and base_uri parameters.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>handle</parameter>&nbsp;:</term>
+<listitem><simpara> file handle to write to
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>format_uri</parameter>&nbsp;:</term>
+<listitem><simpara> URI of syntax to format to
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>base_uri</parameter>&nbsp;:</term>
+<listitem><simpara> Base URI of output formatted syntax 
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non 0 on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-to-file" role="function"/>librdf_query_results_to_file ()</title>
+<indexterm><primary>librdf_query_results_to_file</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_to_file    (<link linkend="librdf-query-results">librdf_query_results</link> *query_results,
+                                             const <link linkend="char">char</link> *name,
+                                             <link linkend="librdf-uri">librdf_uri</link> *format_uri,
+                                             <link linkend="librdf-uri">librdf_uri</link> *base_uri);</programlisting>
+<para>
+Write a query results to a file.
+</para>
+<para>
+See librdf_query_results_to_counted_string for information on the
+format_uri and base_uri parameters.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>name</parameter>&nbsp;:</term>
+<listitem><simpara> filename to write to
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>format_uri</parameter>&nbsp;:</term>
+<listitem><simpara> URI of syntax to format to
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>base_uri</parameter>&nbsp;:</term>
+<listitem><simpara> Base URI of output formatted syntax 
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non 0 on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-free-query-results" role="function"/>librdf_free_query_results ()</title>
+<indexterm><primary>librdf_free_query_results</primary></indexterm><programlisting><link linkend="void">void</link>        librdf_free_query_results       (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Destructor - destroy a <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-is-bindings" role="function"/>librdf_query_results_is_bindings ()</title>
+<indexterm><primary>librdf_query_results_is_bindings</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_is_bindings
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Test if librdf_query_results is variable bindings format.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non-0 if true
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-is-boolean" role="function"/>librdf_query_results_is_boolean ()</title>
+<indexterm><primary>librdf_query_results_is_boolean</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_is_boolean (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Test if librdf_query_results is boolean format.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non-0 if true
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-is-graph" role="function"/>librdf_query_results_is_graph ()</title>
+<indexterm><primary>librdf_query_results_is_graph</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_is_graph   (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Test if librdf_query_results is RDF graph format.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> object
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non-0 if true
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="librdf-query-results-get-boolean" role="function"/>librdf_query_results_get_boolean ()</title>
+<indexterm><primary>librdf_query_results_get_boolean</primary></indexterm><programlisting><link linkend="int">int</link>         librdf_query_results_get_boolean
+                                            (<link linkend="librdf-query-results">librdf_query_results</link> *query_results);</programlisting>
+<para>
+Get boolean query result.
+</para>
+<para>
+The return value is only meaningful if this is a boolean
+query result - see <link linkend="librdf-query-results-is-boolean"><type>librdf_query_results_is_boolean</type></link></para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>query_results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="librdf-query-results"><type>librdf_query_results</type></link> query_results
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> boolean query result - &gt;0 is true, 0 is false, &lt;0 on error or finished
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

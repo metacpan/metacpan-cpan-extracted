@@ -1,0 +1,62 @@
+{
+   "abstract" : "An Application to interface with http://rosettacode.org",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "RosettaCode",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0",
+            "IO::All" : "0",
+            "MediaWiki::Bot" : "0",
+            "Mo" : "0",
+            "Mo::xxx" : "0",
+            "Module::Pluggable" : "0",
+            "YAML::XS" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/rosettacode-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/rosettacode-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/rosettacode-pm.git",
+         "web" : "https://github.com/ingydotnet/rosettacode-pm"
+      }
+   },
+   "version" : "0.0.15"
+}
+

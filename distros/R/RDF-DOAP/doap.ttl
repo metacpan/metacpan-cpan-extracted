@@ -1,0 +1,217 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [
+		doap-deps:on "match::simple 0.001"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.010"^^doap-deps:CpanId ], [
+		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Types::Standard 0.022"^^doap-deps:CpanId;
+	], [ doap-deps:on "JSON 2.00"^^doap-deps:CpanId ], [ doap-deps:on "List::MoreUtils 0"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.0600"^^doap-deps:CpanId ], [
+		doap-deps:on "MooseX::AttributeTags 0.001"^^doap-deps:CpanId;
+	], [ doap-deps:on "RDF::Trine 1.000"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::LongString"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-DOAP>;
+	doap:created         "2013-08-11"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/RDF-DOAP>;
+	doap:homepage        <https://metacpan.org/release/RDF-DOAP>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "RDF-DOAP";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-006>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-007>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-008>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-009>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-010>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-011>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-012>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rdf-doap>;
+	];
+	doap:shortdesc       "an object-oriented interface for DOAP (Description of a Project) data".
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "RDF-DOAP-0.001"^^xsd:string;
+	dc:issued            "2013-08-12"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.002"^^xsd:string;
+	dc:issued            "2013-08-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Various mini fixes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.003"^^xsd:string;
+	dc:issued            "2013-08-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "RDF::DOAP::Resource now has `rdf_get`, `rdf_get_literal` and `rdf_get_uri` methods.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.004"^^xsd:string;
+	dc:issued            "2013-08-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix `rdf_get`, `rdf_get_literal` and `rdf_get_uri` methods.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improved stringification for RDF::DOAP::Person.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add missing dep on Test::LongString.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.005"^^xsd:string;
+	dc:issued            "2013-08-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Further fix for `rdf_get`, `rdf_get_literal` and `rdf_get_uri` methods.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.006"^^xsd:string;
+	dc:issued            "2013-09-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "New roles added for dcs:BackCompat and dcs:Tests.";
+		], "Changed the generated changelogs to include groupings."^^doap-changeset:BackCompat;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.007"^^xsd:string;
+	dc:issued            "2013-09-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Make sure entries within changelog groups are lexicograpically sorted.";
+		], "Changed the generated changelogs yet again, to include 'RT' or 'GH' before issue numbers."^^doap-changeset:BackCompat;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.008"^^xsd:string;
+	dc:issued            "2013-09-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix some 'uninitialized' warnings.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.009"^^xsd:string;
+	dc:issued            "2013-09-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix entries in changelog for changes with no explicit rdf:type.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.010"^^xsd:string;
+	dc:issued            "2013-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Use Exporter::Tiny instead of Exporter::TypeTiny.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.011"^^xsd:string;
+	dc:issued            "2014-08-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Don't import Types::Standard type constraints twice over.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.012"^^xsd:string;
+	dc:issued            "2014-09-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Prevent gather_objects from returning non-references.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

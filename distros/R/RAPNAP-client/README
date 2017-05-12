@@ -1,0 +1,47 @@
+RAPNAP/client version 0.01
+==========================
+
+A client for the pay2send.com RAPNAP database, which is
+a database of valid e-mail senders and the e-mail relays
+that their e-mail originates from.
+
+Pay2send.com  pursues a vision of e-mail that costs money
+to send, except for whitelisted correspondents.  This client
+module connects to http://pay2send.com/cgi/rapnap/check and
+offers the RA ("Return Address") and PNA ("Peer Network Address")
+specified as the first and second arguments to the rapnap_check($$)
+function which is exported by this module.
+
+The rapnap_check($$) function returns the text of the web page.
+
+By default, RAPNAP::client uses a pay2send account key of "ipv4"
+which allows 100 accesses per day from an IP address.
+
+See the http://www.pay2send.com web site for information on 
+getting a pay2send RAPNAP client key which will allow more
+than 100 accesses per day.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires core perl: it handles its own socket calls
+instead of using LWP.
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2003 David Nicol / pay2send.com / Tipjar LLC
+the RAPNAP database has a patent pending for it
+this module is released GPL/AL: the same terms as Perl
+
+

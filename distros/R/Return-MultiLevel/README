@@ -1,0 +1,46 @@
+Return-MultiLevel
+
+Return across multiple call levels
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Return::MultiLevel
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Return-MultiLevel
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Return-MultiLevel
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Return-MultiLevel
+
+    MetaCPAN
+        https://metacpan.org/module/Return::MultiLevel
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2014 Lukas Mai
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

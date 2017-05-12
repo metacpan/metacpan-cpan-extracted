@@ -1,0 +1,4 @@
+<%init>
+$RT::JournalQueue ||= 'RT::Journal';
+return();
+</%init>

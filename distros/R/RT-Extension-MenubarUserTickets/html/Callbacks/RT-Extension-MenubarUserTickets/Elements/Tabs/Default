@@ -1,0 +1,6 @@
+<%args>
+$topactions => undef
+</%args>
+<%init>
+$topactions->{'__A_Searches'}->{html} = $m->scomp('/RT-Extension-MenubarUserTickets/List');
+</%init>

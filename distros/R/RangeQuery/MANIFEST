@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/RangeQuery.t
+lib/RangeQuery.pm
+META.yml                                 Module meta-data (added by MakeMaker)

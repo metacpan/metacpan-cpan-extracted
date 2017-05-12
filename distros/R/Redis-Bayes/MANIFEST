@@ -1,0 +1,7 @@
+Changes
+lib/Redis/Bayes.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t

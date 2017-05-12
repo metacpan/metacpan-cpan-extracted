@@ -1,0 +1,30 @@
+---
+abstract: 'Send ticket updates to Icestack'
+author:
+  - 'Mark Ibell <marki@econz.co.nz>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Action-UpdateIcestack
+no_index:
+  directory:
+    - etc
+    - inc
+requires:
+  Date::Manip: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  XML::LibXML: 0
+  perl: 5.6.0
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 0.01

@@ -1,0 +1,19 @@
+Revision history for Regexp-IPv4
+
+0.003   2016-10-18 (PERLANCAR)
+
+	- No functional changes.
+
+        - Fix typo in Synopsis (MANWAR++).
+
+
+0.002   2016-10-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add note about only supporting quad-dotted notation [GH#1].
+
+
+0.001   2016-10-18 (PERLANCAR)
+
+        - First release.

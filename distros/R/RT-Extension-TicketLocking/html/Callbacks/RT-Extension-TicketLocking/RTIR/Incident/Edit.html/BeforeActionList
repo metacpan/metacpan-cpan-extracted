@@ -1,0 +1,4 @@
+<%INIT>
+$m->comp('/Elements/ShowLock', %ARGS);
+return;
+</%INIT>

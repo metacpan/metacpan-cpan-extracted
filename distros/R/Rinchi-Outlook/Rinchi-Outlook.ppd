@@ -1,0 +1,14 @@
+<SOFTPKG NAME="Rinchi-Outlook" VERSION="0,01,0,0">
+    <TITLE>Rinchi-Outlook</TITLE>
+    <ABSTRACT>Module for representing Microsoft Outlook&#174; 11.0 Object Library objects.</ABSTRACT>
+    <AUTHOR>Brian M. Ames &lt;bmames@apk.net&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Carp" VERSION="1,0,0,0" />
+        <DEPENDENCY NAME="Class-ISA" VERSION="0,30,0,0" />
+        <DEPENDENCY NAME="XML-DOM" VERSION="1,40,0,0" />
+        <DEPENDENCY NAME="XML-Parser" VERSION="2,0,0,0" />
+        <OS NAME="linux" />
+        <ARCHITECTURE NAME="i386-linux-thread-multi" />
+        <CODEBASE HREF="" />
+    </IMPLEMENTATION>
+</SOFTPKG>

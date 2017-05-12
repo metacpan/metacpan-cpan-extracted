@@ -1,0 +1,70 @@
+<%PERL>
+my $path = $package;
+$path =~ s!::!/!g;
+
+my $found;
+for my $ext (qw(pm pod)) {
+    for my $libpath (RT::OnlineDocs->lib_paths) {
+        next unless -r "$libpath/$path.$ext";
+        $found = "$libpath/$path.$ext";
+        last;
+    }
+    last if $found;
+}
+$found ||= $INC{"RT.pm"};
+
+my $fh;
+open $fh, $found or $m->abort(404);
+my $body = do { local $/; <$fh> };
+close $fh;
+
+# Trim empty sections
+$body =~ s/^=head1 .*\s*(?==(head1|cut))//mg;
+
+# Remove AUTHOR, SEE ALSO, and SYNOPSIS sections
+$body =~ s/^=head1 (?:AUTHOR|SEE ALSO|SYNOPSIS).*?^(=head|=cut)/$1/smg;
+
+# Both of the above leave in place the final =cut, which may be an error
+# if we are no longer in a POD section due to the missing =head1.  There
+# are two halves to the fix: first, remove every =cut which has no POD
+# before it.
+1 while $body =~ s/\A((^([^=\n].*|)\n)*)^=cut.*/$1/m;
+
+# Second, remove every =cut which comes after a =cut
+$body =~ s/^=cut.*\n((^([^=\n].*|)\n)*)^=cut.*/$1/mg;
+
+# Fix up POD blocks which may be lacking empty lines before them
+$body =~ s/^=/\n=/mg;
+
+my $html = "";
+my $converter = Pod::Simple::HTML->new();
+$converter->output_string(\$html);
+$converter->html_header_before_title("<h1>");
+$converter->force_title($package);
+$converter->html_header_after_title("</h1>");
+$converter->html_footer("");
+$converter->perldoc_url_prefix("http://metacpan.org/module/");
+
+# When generating the TOC, we kept track of which modules are local.
+# Use the non-exposed (but written for external consumption (!?)) API
+# for mapping packages to URLs.
+$converter->{'podhtml_LOT'} = $m->notes("toc");
+
+$converter->parse_string_document($body);
+
+# Anything in the RT:: namespace should get linked to the appropriate doc
+my $self = RT->Config->Get('WebURL') . "Developer/Perldoc?n=";
+$html =~ s{(?<!\$)(?<!Perldoc\?n=)\b(RT(::[a-zA-Z0-9]+)+)(?!</a>)(?!::)\b}{<a href="$self$1">$1<\/a>}g;
+
+# Other Foo::Bar packages should get linked to metacpan
+$html =~ s{(?<![\$:])(?<!RT::)\b((?!(\w+_)?RT::)\w+::\w+)\b}{<a
+href="http://metacpan.org/module/$1">$1</a>}g;
+
+# Squish adjacent paragraphs together
+$html =~ s!<p></p>!!;
+
+$m->print($html);
+</%PERL>
+<%ARGS>
+$package
+</%ARGS>

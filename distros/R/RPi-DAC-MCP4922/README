@@ -1,0 +1,305 @@
+NAME
+
+    RPi::DAC::MCP4922 - Interface to the MCP49x2 series digital to analog
+    converters (DAC) over the SPI bus
+
+DESCRIPTION
+
+    Interface to the MCP49x2 series Digital to Analog Converters (DAC) over
+    the SPI bus. These units have two onboard DACs, which are modified
+    independently.
+
+    The MCP4902 has 8-bit resolution (max 255 data value), the MCP4912 has
+    10-bit resolution (max val 1023), and the MCP4922 has 12-bit resolution
+    (max val 4095).
+
+SYNOPSIS
+
+        my $dac = RPi::DAC::MCP4922->new(
+    
+            model   => 'MCP4922', # mandatory
+            channel => 0,         # mandatory (SPI channel)
+            cs      => 18,        # mandatory (GPIO pin num)
+            buf     => 0,         # optional, default
+            gain    => 1,         # optional, default
+        );
+    
+        my ($dacA, $dacB) = (0, 1);
+    
+        $dac->set($dacA, 4095); # 100% output
+        $dac->set($dacB, 0);    # 0% output
+    
+        $dac->disable_sw($dacB); # shuts onboard DAC B down
+        $dac->enable_sw($dacB);  # turns it back on
+    
+        # NOTE
+    
+        # the SHDN pin on the IC is normally tied to 3.3v+ or 5v+ which
+        # signifies that the DACs are always available. This SHDN pin
+        # enables you to disable both DACs by pulling this pin LOW
+    
+        # to enable this functionality, connect the ICs SHDN pin to a GPIO
+        # pin, then in the new() call, add the following param:
+    
+        shdn => 19 # GPIO pin num
+    
+        # if you do use this hardware feature, you MUST make a call to
+        # enable_hw() after initialization of the object before you can
+        # use either of the onboard DACs
+    
+        $dac->enable_hw;
+    
+        ...
+
+METHODS
+
+ new
+
+    Instantiates a new RPi::DAC::MCP4922 object, sets up the GPIO and SPI,
+    and returns the object.
+
+    Parameters:
+
+    All parameters are sent in within a single hash.
+
+    There are three mandatory parameters, the rest are optional with very
+    sane defaults that shouldn't be used unless you understand the
+    ramifications.
+
+        model => $str
+
+    Mandatory: String. The model number of the MCP49xx DAC you're
+    controlling.
+
+        channel => $int
+
+    Mandatory: Integer. 0 for SPI channel 0, or 1 for SPI channel 1.
+
+        cs => $int
+
+    Mandatory: Integer. The GPIO pin number connected to the DACs chip
+    select (CS) pin.
+
+        buf => $int
+
+    Optional: Integer. 0 for unbuffered output, and 1 for buffered. This
+    software does not at this time use the LDAC latch pin (and should be
+    tied to Gnd), so although this param won't have any meaning, best to
+    leave it set to the default, 0.
+
+        gain => $int
+
+    Optional: Integer. Sets the gain amplifier. 1 for 1x gain (0v to
+    255/256 * Vref), and 0 for 2x gain (0v to 255/256 * 2 * Vref). Defaults
+    to 1, or 1x gain.
+
+        shdn => $int
+
+    Optional: Integer. This is the GPIO pin number if you decide to use the
+    SHDN (hardware shutdown pin #9) on the chip. Typically, this can simply
+    be tied to 3.3v or 5v which means the DACs will always be active. If
+    you do use this pin, you *MUST* make a specific call to
+    $dac-enable_hw()> before using either of the onboard DACs.
+
+ set
+
+    Writes a new analog output value to one of the onboard DACs.
+
+    Parameters:
+
+        $dac
+
+    Mandatory: Integer. 0 for DAC A, or 1 for DAC B.
+
+        $value
+
+    Mandatory: Integer. The new value to write to the DAC. See
+    "DESCRIPTION" for the respective values for each IC model.
+
+ disable_sw
+
+    Disables a specified onboard DAC's output via software. Both DACs are
+    enabled by default.
+
+    Parameters:
+
+        $dac
+
+    Mandatory: Integer. 0 for DAC A, or 1 for DAC B.
+
+ enable_sw
+
+    Re-enables a specified onboard DAC's output via software.
+
+    Parameters:
+
+        $dac
+
+    Mandatory: Integer. 0 for DAC A, or 1 for DAC B.
+
+ enable_hw
+
+    NOTE: The MCP49xx DAC IC chips have a SHDN pin, which when pulled LOW,
+    disables via hardware the output on both onboard DACs. Normally, this
+    pin is simply tied to 3.3v+ or 5v+ which informs the hardware that both
+    DACs will always be active.
+
+    If you decide you want to tie the SHDN pin to a GPIO pin and control
+    this feature manually, you have to initialize your RPi::DAC::MCP4922
+    object by setting the shdn = $gpio_pin_num> in your call to new().
+    Then, before either of the DACs can be used, this method (enable_hw())
+    MUST be called.
+
+    Takes no parameters.
+
+ disable_hw
+
+    Disables, via the hardware's SHDN pin, the outputs of both onboard
+    DACs.
+
+    See "enable_hw" for more information on this feature.
+
+    Takes no parameters.
+
+ register
+
+    This is a helper function which allows you to view the configuration
+    register at various stages of this software's operation. I tend to use
+    it to ensure I'm getting proper bit strings back from the various inner
+    operations:
+
+        printf("%b\n", $dac->register);
+
+    Takes no parameters, returns the decimal value of the register as it's
+    currently configured.
+
+TECHNICAL INFORMATION
+
+DEVICE SPECIFICS
+
+    The MCP49x2 series chips have two onboard DACs (referred to as DAC A
+    and DAC B).
+
+    The 4902 unit provides 8-bit output resolution (value 0-255), the 4912,
+    10-bit (0-1023), and the 4922, 12-bit (0-4095).
+
+DEVICE OPERATION
+
+    The MCP49x2 series digital to analog converters (DAC) operate as
+    follows:
+
+        - SHDN pin is an override to physically disable the DACs. It can be tied to
+          3.3v+ or 5v+ for always-on, or tied to any GPIO pin so you can control the
+          physical shutdown by putting the GPIO pin LOW
+        - on startup, put the CS pin to HIGH. This indicates that there is no
+          conversation occuring
+        - turn the CS pin to LOW to start a conversation
+        - send 16 bits (the write register) over the SPI bus while CS is LOW
+        - turn the CS pin HIGH to end the conversation
+        - as soon as the last bit is clocked in, the specified DAC will update its
+          output level
+
+ DEVICE REGISTER
+
+    The write register is the same for all devices under the MCP49x2
+    umbrella, with the differing devices having differing sizes for the
+    data portion. Following is a diagram that depicts the register for the
+    different devices, where x shows that the bit is available, with a -
+    signifying that this bit will be ignored. Note that a full 16-bits
+    needs to be sent in regardless of chip type.
+
+                |<---------------- Write Command Register --------------->|
+                |                   |                                     |
+                |<---- control ---->|<------------ data ----------------->|
+                ] 15 | 14 | 13 | 12 | 11 10 09 08 07 06 05 04 03 02 01 00 |
+                -----------------------------------------------------------
+                | ^  |  ^ |  ^ |  ^ |               ^                     |
+                |    |    |    |    |                                     |
+                |A/B | BUF|GAIN|SHDN|              DATA                   |
+                |---------------------------------------------------------|
+        MCP4922 | x  |  x |  x |  x |  x  x  x  x  x  x  x  x  x  x  x  x | 12-bit
+        MCP4912 | x  |  x |  x |  x |  x  x  x  x  x  x  x  x  x  x  -  - | 10-bit
+        MCP4902 | x  |  x |  x |  x |  x  x  x  x  x  x  x  x  -  -  -  - |  8-bit
+                -----------------------------------------------------------
+
+ REGISTER BITS
+
+    The device register is 16-bits wide.
+
+  DAC SELECT BITS
+
+        bit 15
+
+    Specifies which DAC we're writing to with this write.
+
+        Param   Value   DAC
+        -------------------
+    
+        0       0b0     A
+        1       0b1     B
+
+  BUFFERED BITS
+
+        bit 14
+
+    Specifies whether to buffer the data (for use with the LATCH pin, if
+    used) or simply send it straight through to the DAC.
+
+        Param   Value   Result
+        ----------------------
+    
+        0       0b0     Unbuffered (default)
+        1       0b1     Buffered
+
+  GAIN BITS
+
+        bit 13
+
+    Specifies the value of the gain amplifier.
+
+        Param   Value   Gain
+        --------------------
+    
+        0       0b0     2x (Vout = 2 * Vref * D/4096)
+        1       0b1     1x (Vout = Vref * D/4096) (default)
+
+  SHUTDOWN BITS
+
+        bit 12
+
+    Allows you to programmatically shut down both DACs on the chip.
+
+         Param  Value   Result
+         ----------------------
+    
+         0      0b0     DACs active (default)
+         1      0b1     DACs shut down
+
+  DATA BITS
+
+        bits 11-0
+
+    These bits are used to set the output level.
+
+        Model   Value   Bits
+        --------------------
+    
+        MCP4922 0-4095  12
+        MCP4912 0-1023  10
+        MCP4902 0-255   8
+
+    The 10-bit and 8-bit models simply ignore the last 2 and 4 bits
+    respectively. =head1 AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

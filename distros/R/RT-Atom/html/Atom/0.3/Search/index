@@ -1,0 +1,88 @@
+%# [GET FeedURI]
+%# Search for objects within an container.
+%# Possible query parameters: rows, page, query.
+%# 200: Success.  Body is the result, serialized as an AtomFeed.
+%# 400: Request failed.  Body is error message in text/plain.
+%# 404: There is no container matching the specified URI.
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="<% $BaseURI %>/NoAuth/feed.css"?>
+<feed version="0.3" xmlns="http://purl.org/atom/ns#" xmlns:html="http://www.w3.org/1999/xhtml">
+  <title><&|/l&>Query</&>: <% loc($Type) %></title>
+  <author>
+    <name><% $RT::Organization %></name>
+    <url><% $RT::WebURL %></url>
+  </author>
+  <tagline mode="escaped">
+% if ($TotalFound) {
+    <&|/l, $page, int(($TotalFound-1)/$rows)+1&>Page [_1] of [_2]</&>
+    (<&|/l, $TotalFound&>[_1] Total</&>)
+% }
+  </tagline>
+  <& $ShowLink, Relation => "service.feed", URI => $BaseURI, Id => '_up', Title => "Up" &>
+  <& $ShowLink, Relation => "service.post", URI => $FeedURI, Id => '!add', Title => $Type &>
+% # XXX - The URI below is incorrect; should point to collection URL
+  <& $ShowLink, Type => 'text/html', URI => $RT::WebURL, Title => $Type &>
+  <modified><% $Now->W3CDTF %></modified>
+  <generator url="http://www.bestpractical.com/rt/" version="<% $RT::VERSION %>"></generator>
+% foreach my $obj (@$List) {
+  <entry>
+    <& $ShowEntry, %ARGS, Object => $obj, IsChild => 1 &>
+  </entry>
+% }
+  <info></info>
+% if ($page > 1) {
+  <& $ShowLink, URI => $prev->as_string, Text => loc("Previous Page"), Relation => 'prev', &>
+% }
+% if (($page * $rows) < $TotalFound) {
+  <& $ShowLink, URI => $next->as_string, Text => loc("Next Page"), Relation => 'next', &>
+% }
+</feed>
+<%INIT>
+
+my $List = $Collection;
+
+if (defined($rows) and $List->isa('RT::Tickets')) {
+    $List->FromSQL( $query || "Type = 'ticket'" );
+}
+
+my $TotalFound = $List->Count;
+
+$List->RowsPerPage($rows) if $rows > 0;
+$List->GotoPage($page - 1) if $page > 0;
+
+$List = $List->ItemsArrayRef || [];
+
+$rows = $TotalFound if $rows <= 0;
+$page = 1 if $page <= 0;
+
+if ($TotalFound) {
+    $r->headers_out->{'Content-Location'} = "$BaseURI/$Path/".join(',', map $_->Id, @$List);
+}
+
+return if $r->method eq 'HEAD';
+
+my %query;
+while (my ($k, $v) = each %ARGS) {
+    $query{$k} = $v if $k eq lc($k) and $k ne 'page';
+}
+my $prev = URI->new($FeedURI);
+$prev->query_form( %query, page => ($page-1) );
+my $next = URI->new($FeedURI);
+$next->query_form( %query, page => ($page+1) );
+
+</%INIT>
+<%ARGS>
+$Path
+$BaseURI
+$Now
+$ShowLink
+$ShowEntry
+
+$Type
+$Collection
+$FeedURI
+
+$rows => 10
+$page => 1
+$query => undef
+</%ARGS>

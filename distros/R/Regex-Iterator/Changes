@@ -1,0 +1,19 @@
+2011-04-06 0.4 Fix breaking tests
+
+We were using a bad check to see if something's a regex which broke under bleadperl.
+
+2004-09-16 0.3 Integrate changes from Matt Lawrence
+
+Matt Lawrence sent me the version of Regexp::Iterator 
+that he'd been workign on. This integrates all his ideas.
+
+2004-08-22 0.2 Doh!
+
+Didn't put Build.PL and Makefile.PL in the MANIFEST.
+How stupid is that?
+
+2004-08-21 0.1 Initial release
+
+Based on work for URI::Find::Iterator.
+Many thanks to Matt Lawrence
+

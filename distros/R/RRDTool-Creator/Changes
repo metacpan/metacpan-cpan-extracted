@@ -1,0 +1,13 @@
+Revision history for RRDTool-Creator
+Revision history for RRDTool-Creator
+
+0.1    2007-04-13
+       First version, released on an unsuspecting world.
+0.3    2007-05-06
+       Documentation format 
+0.5    2007-05-31
+       Correct a bug about RRA definition
+0.7    Correct a bug about interpretation of the step in the constructor
+0.8
+0.9    Documentation complements
+0.10   Documentation correction (cf Bug #57660 for RRDTool-Creator)

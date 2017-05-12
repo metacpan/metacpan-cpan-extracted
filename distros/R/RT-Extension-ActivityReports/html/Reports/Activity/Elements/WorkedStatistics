@@ -1,0 +1,199 @@
+
+<& MiniPlot, data => \%plot, minor => ["< 24h","24-48h","> 48h"] &>
+
+<br />
+<table class="numberreport">
+<tr class="titlerow">
+<th rowspan="2">Queue</th>
+<th colspan="6">Created in date range</th>
+<th colspan="6">Resolved in date range</th>
+<th rowspan="2">Total tickets still open</th>
+</tr>
+<tr class="titlerow">
+<th>Total tickets</th>
+<th>Total resolutions</th>
+<th>Resolved within 24h</th>
+<th>Resolved within 24-48h</th>
+<th>Resolved in more than 48h</th>
+<th>Tickets currently open</th>
+
+<th>Total tickets</th>
+<th>Total resolutions</th>
+<th>Resolved within 24h</th>
+<th>Resolved within 24-48h</th>
+<th>Resolved in more than 48h</th>
+<th>Tickets currently open</th>
+</tr>
+
+% my @totals; 
+% for my $queue (sort {lc $queue{$a}{name} cmp lc $queue{$b}{name}} keys %queue) {
+% my @row; my $i = 0;
+<tr>
+<th><% $queue{$queue}{name} %></th>
+% for my $bin (qw/created resolved/) {
+<td><% $row[$i++] = $queue{$queue}{$bin}{tickets}  || 0%></td>
+<td><% $row[$i++] = $queue{$queue}{$bin}{resolves} || 0%></td>
+<td><% $row[$i++] = $queue{$queue}{$bin}{24} || 0 %></td>
+<td><% $row[$i++] = $queue{$queue}{$bin}{48} || 0 %></td>
+<td><% $row[$i++] = $queue{$queue}{$bin}{more} || 0 %></td>
+<td><% $row[$i++] = $queue{$queue}{$bin}{open} || 0 %></td>
+% }
+
+<td><% $row[$i++] = $queue{$queue}{total_open} %></td>
+</tr>
+% $totals[$_] += $row[$_] for 0..$#row;
+% }
+<tr class="grandtotal">
+<th>Total</th>
+% for (@totals) {
+<td><% $_ %></td>
+% }
+</tr>
+</table>
+
+<br />
+<table class="numberreport">
+<tr class="titlerow">
+<th>Username</th>
+<th>Queue</th>
+<th>Resolved within 24h</th>
+<th>Resolved within 24-28h</th>
+<th>Resolved in more than 48h</th>
+<th>Time worked</th>
+<th>Average time per ticket</th>
+<th>Average resolutions per hour</th>
+</tr>
+% for my $user (sort keys %user) {
+% for my $queue (sort {lc $queue{$a}{name} cmp lc $queue{$b}{name}} keys %{$user{$user}}) {
+<tr>
+<th><% $user %></th>
+<th><% $queue{$queue}{name} %></th>
+<td><% $user{$user}{$queue}{24}   || 0 %></td>
+<td><% $user{$user}{$queue}{48}   || 0 %></td>
+<td><% $user{$user}{$queue}{more} || 0 %></td>
+<td><% sprintf("%.02f",$user{$user}{$queue}{time}/60 || 0) %></td>
+<td><% sprintf("%.02f",$user{$user}{$queue}{time}/(scalar keys %{$user{$user}{$queue}{tickets}}) || 0) %></td>
+<td><% $user{$user}{$queue}{time} ? sprintf("%.02f",$user{$user}{$queue}{resolves}/($user{$user}{$queue}{time}/60) || 0) : "-" %></td>
+</tr>
+% }
+% }
+</table>
+
+<br />
+<h3>Still open tickets created in date range</h3>
+<& /Elements/CollectionList,
+    Query   => qq{ ( Created >= '$start'  AND Created <= '$end' ) AND ( Status = 'new'  OR Status = 'open' ) },
+    OrderBy => 'Created',
+    Order   => 'ASC',
+    Format  => q{'   <b><a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a></b>/TITLE:#','<a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a>/TITLE:Subject','__QueueName__','__Created__'},
+    Rows    => 0,
+    BaseURL => $RT::WebPath."/Search/Results.html?",
+    AllowSorting => 1,
+    Class => 'RT::Tickets',
+&>
+<br />
+
+<%args>
+$query => ""
+$start => "2005/01/01"
+$end   => "2006/01/01"
+$actor => ""
+</%args>
+<%init>
+my $startDate = RT::Date->new($session{'CurrentUser'});
+$startDate->Set(Format => 'unknown', Value => $start);
+my $endDate   = RT::Date->new($session{'CurrentUser'});
+$endDate->Set(Format => 'unknown', Value => $end);
+
+my(%queue, %user);
+my $Queues = RT::Queues->new($session{'CurrentUser'}); 
+$Queues->UnLimit();
+while (my $queue = $Queues->Next) {
+    my $tix = RT::Tickets->new($session{'CurrentUser'});
+    $tix->FromSQL("Queue = '@{[$queue->Name]}' AND (Status = 'open' OR Status = 'new')");
+    $queue{$queue->Id}{name} = $queue->Name;
+    $queue{$queue->Id}{total_open} = $tix->Count();
+}
+
+my $actor_query = '';
+$actor_query = "(Owner = '$actor')" if $actor;
+
+my $tix = RT::Tickets->new($session{'CurrentUser'});
+$tix->FromSQL(join " AND ", map {"($_)"} grep {/\S/} ($query, $actor_query, "Updated >= '$start' AND Updated <= '$end'"));
+while (my $ticket = $tix->Next) {
+    my $created  = $ticket->CreatedObj;
+    my $resolved = $ticket->ResolvedObj;
+
+    $RT::Logger->debug("Looking at ticket @{[$ticket->id]}");
+    
+    # "bin" is either "created" and/or "resolved"; it could be neither.
+    my %bins;
+    $bins{created} = 1 if $created->Unix > $startDate->Unix and $created->Unix < $endDate->Unix;
+
+    # Find out when we *first* responded to this ticket
+    my $opened = $created;
+    my $txns = $ticket->Transactions;
+    while (my $txn = $txns->Next) {
+        $RT::Logger->debug( "  TXN: @{[$txn->Created]}" );
+        # Abort when we hit transactions after our end date
+        last if $txn->CreatedObj->Unix > $endDate->Unix;
+
+        if (not $opened and $txn->Type eq "Status" and $txn->NewValue =~ /new|open/) {
+            # As each one goes by, notice when tickets pop open
+            $opened = $txn->CreatedObj;
+        } elsif ($opened and $txn->Type eq "Status" and $txn->NewValue eq "resolved") {
+            # Or are resolved
+            if ($txn->CreatedObj->Unix >= $startDate->Unix) {
+                # We only *really* care about it when it was resolved
+                # in the date range.  Now this counts in the "resolved
+                # in range" bin, possibly in addition to "created in
+                # range" bin.
+                $bins{resolved} = 1;
+
+                # Figure out which "time to resolve" bucket it goes
+                # in.  Buckets aren't bins!  Bucket is time to resolve
+                # a ticket.  Bin is if the ticket was created or
+                # resolved at all in the time range.
+                my $time = $txn->CreatedObj->Diff($opened);
+                $time = ($time < 24*60*60 ? "24" : ($time < 48*60*60 ? "48" : "more"));
+
+                # Keep track of resolves,resolves per time bucket, and tickets for each bin
+                $queue{$ticket->Queue}{$_}{$time}++ for keys %bins;
+                $queue{$ticket->Queue}{$_}{resolves}++ for keys %bins;
+                # Tickets per bin is done at the end
+
+                # Also for the creator-queue combo
+                $user{$txn->CreatorObj->Name}{$ticket->Queue}{$time}++;
+                $user{$txn->CreatorObj->Name}{$ticket->Queue}{resolves}++;
+                $user{$txn->CreatorObj->Name}{$ticket->Queue}{tickets}{$ticket->Id}++;
+            }
+            # Forget when we were opened
+            undef $opened;
+        }
+
+        if ($txn->TimeTaken and $txn->CreatedObj->Unix >= $startDate->Unix) {
+            # If this txn has some time taken, and is in the target
+            # range, record it.
+            $queue{$ticket->Queue}{time} += $txn->TimeTaken;
+            $user{$txn->CreatorObj->Name}{$ticket->Queue}{time} += $txn->TimeTaken;
+            $user{$txn->CreatorObj->Name}{$ticket->Queue}{tickets}{$ticket->Id}++;
+        }
+    }
+
+    # If we cared about this ticket in any way..
+    for my $bin (keys %bins) {
+        # Record the number of open and total tickets for each bin.
+        $queue{$ticket->Queue}{$bin}{tickets}++;
+        $queue{$ticket->Queue}{$bin}{open}++ if $ticket->Status =~ /new|open/;
+    }
+}
+
+my %plot;
+for (keys %queue) {
+    $plot{$queue{$_}{name}} = {
+        "< 24h"  => $queue{$_}{resolved}{24},
+        "24-48h" => $queue{$_}{resolved}{48},
+        "> 48h"  => $queue{$_}{resolved}{more},
+    };
+}
+</%init>

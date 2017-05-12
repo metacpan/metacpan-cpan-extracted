@@ -1,0 +1,40 @@
+== Installing a Kwiki Site ==
+
+Kwiki is a snap to install.
+
+First:
+* Download and install the CGI::Kwiki module from [CPAN http://search.cpan.org/search?query=cgi-kwiki&mode=dist]
+* Have an Apache web server.
+
+Second:
+* Make a new directory in your Apache cgi-bin.
+* Go into this directory and run:
+
+  kwiki-install
+
+Third:
+* Point your browser at the new location.
+* Viola! You can set up new Kwikis in seconds.
+----
+
+== Apache Config ==
+
+Here's a sample Apache config section that may help.
+
+  Alias /kwiki/ /home/ingy/kwiki/
+  <Directory /home/ingy/kwiki/>
+      Order allow,deny
+      Allow from all
+      AllowOverride None
+      Options ExecCGI
+      AddHandler cgi-script .cgi
+  </Directory>
+
+Adjust to your needs.
+
+== See Also: ==
+* KwikiUpgrading
+* KwikiModPerl
+* KwikiFastCGI
+* KwikiPrivacy
+* KwikiBackup

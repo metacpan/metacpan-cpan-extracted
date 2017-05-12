@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Readonly/BeginLift.pm
+t/00-load.t
+t/beginlift.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml

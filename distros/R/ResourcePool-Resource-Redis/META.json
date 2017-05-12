@@ -1,0 +1,54 @@
+{
+   "abstract" : "Provides a ResourcePool wrapper for Redis.",
+   "author" : [
+      "Sebastian Nowicki <sebnow@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ResourcePool-Resource-Redis",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MockModule" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Redis" : 0,
+            "ResourcePool::Factory" : 0,
+            "ResourcePool::Resource" : 0,
+            "perl" : 0
+         }
+      }
+   },
+   "provides" : {
+      "ResourcePool::Factory::Redis" : {
+         "file" : "lib/ResourcePool/Factory/Redis.pm",
+         "version" : "1"
+      },
+      "ResourcePool::Resource::Redis" : {
+         "file" : "lib/ResourcePool/Resource/Redis.pm",
+         "version" : "1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "1"
+}

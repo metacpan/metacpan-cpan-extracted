@@ -1,0 +1,24 @@
+<%args>
+$ARGSRef
+$skip_create
+$results => []
+</%args>
+<%init>
+
+my $Queue = $ARGSRef->{Queue};
+my $QueueObj = RT::Queue->new($session{'CurrentUser'});
+$QueueObj->Load($Queue);
+
+my $errors_ref = RT::Extension::MandatoryOnTransition->CheckMandatoryFields(
+    ARGSRef => $ARGSRef,
+    From    => "*",
+    To      => $ARGSRef->{'Status'},
+    Queue   => $QueueObj,
+);
+
+if (@$errors_ref) {
+    RT->Logger->debug("Preventing create because of missing mandatory fields");
+    $$skip_create = 1;
+    push @$results, @$errors_ref;
+}
+</%init>

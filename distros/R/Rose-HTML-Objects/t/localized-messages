@@ -1,0 +1,15 @@
+[% LOCALE en %]
+
+FIELD_REQUIRED_GENERIC = "This is a required field."
+
+[% START FIELD_REQUIRED_LABELLED %]
+[1] is a required field.
+[% END FIELD_REQUIRED_LABELLED %]
+
+[% LOCALE xx %] # for testing only
+
+[% START FIELD_REQUIRED_SUBFIELDS %]
+Missing [@missing( : )].
+[% END FIELD_REQUIRED_SUBFIELDS %]
+
+FIELD_REQUIRED_SUBFIELD  = "Missing [@missing( : )]."

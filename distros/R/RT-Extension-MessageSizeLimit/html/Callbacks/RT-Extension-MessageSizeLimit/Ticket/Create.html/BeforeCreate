@@ -1,0 +1,20 @@
+<%init>
+
+my $result = RT::Extension::MessageSizeLimit::CheckMessageSizeLimit(
+        Subject => $$ARGSRef{'Subject'},
+        Content => $$ARGSRef{'Content'},
+        Attachments => $session{Attachments}{$$ARGSRef{'Token'}},
+        CurrentUser => $session{'CurrentUser'},
+    );
+
+if ( $result ) {
+    push @$results, $result;
+    $$skip_create = 1;
+}
+
+</%init>
+<%args>
+$ARGSRef => undef
+$results => undef
+$skip_create => undef
+</%args>

@@ -1,0 +1,23 @@
+2004-01-14  Matt Luker  <kostya@redstarhackers.com>
+
+	* 1.0.8: Fixed test number in 10-configfile (was generating dubious reports).
+		Fixed all tests to use diag.
+
+2003-12-27  Matt Luker  <kostya@redstarhackers.com>
+
+	* 1.0.7: Fixes for slash-continues and comments and empty elements in hashes--when
+		the last element has a comma after it, but nothing after the comma.
+
+2003-11-13  Matt Luker  <kostya@redstarhackers.com>
+
+	* 1.0.6: Added some new exceptions to RSH::Exception.
+
+2003-10-14  Matt Luker  <kostya@redstarhackers.com>
+
+	* lib/RSH/ConfigFile.pm: bumped rev for getting docs up to date and getting
+	  licenses all synced.  Using Artistic for everything.
+	* 1.0.2
+
+2003-10-10  Matt Luker  <kostya@redstarhackers.com>
+	* 0.01: original version; created by h2xs 1.22 with options -XA RSH::ConfigFile
+

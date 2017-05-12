@@ -1,0 +1,19 @@
+RT-Extension-DateDiscordian version 0.01
+
+How to install:
+
+1. perl Makefile.PL
+2. make
+3. make install (may need root permissions)
+4. Edit your /opt/rt3/etc/RT_SiteConfig.pm 
+    Set(@Plugins, qw(RT::Extension::DateDiscordian));
+5. rm -rf /opt/rt3/var/mason_data/obj
+6. Restart your webserver
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

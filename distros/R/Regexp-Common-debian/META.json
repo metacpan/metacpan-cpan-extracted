@@ -1,0 +1,51 @@
+{
+   "abstract" : "regexps for Debian specific strings",
+   "author" : [
+      "Eric Pozharski <whynot@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Regexp-Common-debian",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : 0,
+            "Test::Differences" : "v0.60.0",
+            "Test::More" : 0,
+            "YAML::Syck" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Regexp::Common" : 0,
+            "perl" : "v5.10.0",
+            "version" : "v0.77.0"
+         }
+      }
+   },
+   "provides" : {
+      "Regexp::Common::debian" : {
+         "file" : "lib/Regexp/Common/debian.pm",
+         "version" : "v0.2.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-3.0.txt"
+      ]
+   },
+   "version" : "v0.2.14"
+}

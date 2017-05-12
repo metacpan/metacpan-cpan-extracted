@@ -1,0 +1,197 @@
+=head1 NAME
+
+VCP::Branches - Introduction to transferring branches with VCP
+
+=head1 DESCRIPTION
+
+VCP can be used to transfer branched files from one repository to
+another.  To do this in a repository-independant fashion, it associates
+a branch_id with each revision of each file.  This branch_id is assigned
+by the VCP source module extracting the files from the source
+repository.
+
+The C<branch_id> is logically independant from the name or the revision
+number of the file.  This is because different repositories encode the
+branching topology in different ways.  CVS encodes it in the C<rev_id>
+and in branch tags, p4 encodes it in metadata that is not a part of
+the file's C<name> or C<rev_id>, and does not associate a name with a
+branch (p4 users are free to do so in several ways however).
+
+So, without knowing the source repository in question, all you can say
+is that a branched file will have a different C<branch_id> than any
+other branch of that file.  Specifically:
+
+=over
+
+=item 1
+
+by default, C<branch_id>s are not guaranteed to be a name from the
+source repository
+
+=item 2
+
+by default C<branch_id>s are not guaranteed to be the same across all files in
+what you or I would call a branch
+
+=back
+
+Both of these facts are rather horrifying, but inescapable.  For
+instance, neither CVS nor p4 mandates that a branch be labelled, tagged,
+or specified with a branch tag, and both allow you to mix files branched
+from different places and times in the repository in to what a user
+would think of as a branch.  There is no reliable way for a tool like
+VCP to accurately label all files with C<branch_id>s in either of these
+types of repository with a meaningful name that matches what a user
+thinks of as a branch.
+
+However, if a source repository has been maintained with good labelling
+(for CVS) or good branch specifications (for p4), VCP will get pretty
+close and, given a source repository where all branched files are
+covered by a named identity like a branch tag or specification, the
+C<branch_id>s will be consistent and meaningful, being the CVS branch
+tag or the name of the (one) p4 branch specification covering a branch.
+
+Currently, there is no way to cause VCP to error out when it silently
+makes up a C<branch_id>.  That's a limitation that will be addressed,
+probably using the L<map filter|VCP::Filter::map>.
+
+For transfers between repositories of like minds, this is not much of an
+issue, VCP's default behavior should be appropriate in most cases
+without using L<a map filter|VCP::Filter::map>.  The source module will
+put as meaningful a value as it can in to the C<branch_id> and the
+destination module will use it appropriately.  Note that the made-up
+C<branch_id> values can leak in to destination repositories when doing
+this with VCP; they will be used as branch tags in lieu of the branch
+tag that was missing from the source repositories.
+
+When transferring between repositories of different types, however, it
+is important to understand the topology of the source repository very
+well and use VCP's L<map filter|VCP::Filter::map> to correctly map
+source branches to destination branches.  In particular, if you want to
+use C<branch_id>s extracted by VCP to mean something in the target
+repository, then you need to be sure that VCP is extracting meaningful
+C<branch_ids> that you can use and not making any up.
+
+For instance, a typical CVS to p4 conversion map might look like:
+
+    Source:       cvs:....source details & options here...
+
+    Destination:  p4:....dest details & options here...
+
+    Map:
+            (...)<>     main/$1
+            (...)<(*)>  $2/$1
+
+See the L<map filter|VCP::Filter::map> for details on undestanding
+that, but it takes all files with an empty branch_id and puts them under
+the C<main> directory and all files on a branch and places them under
+directories named after the C<branch_id>s.  The C<< <> >> and C<< <(*)>
+>> parts of the source patterns match the unbranched and branched
+>> revisions, respectively.
+
+Now, if all of the revisions being transferred have meaningful
+C<branch_id>s associated with them, that map will suffice.
+
+On the other hand, if VCP has had to make up C<branch_id>s, you'll get
+some unexpected directories in your target repository.
+
+Currently, VCP does not help you find branches that aren't well labelled
+in source repositories, unfortunately.  One day it will.
+
+The best way to do this with the current version is either to try it and
+see what happens, or to do a pre-conversion of the source repository to
+a RevML file and look for made up C<branch_id>s:
+
+    $ vcp <source_spec> revml:foo.revml
+    $ grep "<branch_id>" foo.revml
+    # look through grep's output for branch_ids that look like
+    # _branch_... .  These were probably made up by VCP.
+
+To associate a meaningful names with branches you can either tweak the
+source repository or add map rules.
+
+Modifying a CVS source repository means adding the appropriate branch tags
+to the untagged branches.  Modifying a p4 repository means adding or
+modifying a branch specification to cover the branched files.
+
+If you don't want to modify the source repository, you can add an
+additional VCP map to force these revisions to have a meaningful
+C<branch_id>s.  (You can do this using the existing map, but for
+clarity's sake, we recommend using two maps.  There should be no
+noticable overhead).
+
+For instance, let's say that the source repository went through a the
+rush to get release candidate one out the door and, while most files got
+branched on to the RC1 branch with the branch tag of C<RC1>, one file
+got branched by a developer at the last moment and she didn't get a
+branch tag on there.  We'll leave that developer's name out of the
+discussion because she's already suffered enough.  You see, where she
+works, management really understands the importance of a properly
+maintained SCM repository and was rather severe with her.
+
+Anway, here's how to add a map section I<before> the map section we had above
+to rechristen the file in question into the proper branch:
+
+    Source:       cvs:....source details & options here...
+
+    Destination:  p4:....dest details & options here...
+
+    Map:
+            path/to/file<_branch_1.53.0.1> path/to/file<RC1>
+           
+    Map:
+            (...)<>     main/$1
+            (...)<(*)>  $2/$1
+
+The first map section will be evaluated before the second, and will
+rewrite the branch_id on all revisions of the source file on the branch
+indicated.  That branch label may look odd unless you understand CVS's
+magic branch numbers; specifically, that '0' is not an error.
+
+If multiple files need to be dealt with like this, just add multiple
+rules to the first map.  When dealing with this problem on some other
+types of source repository
+wildcards might be useful in that first map specification to relabel
+many files with one rule. But not with CVS: CVS does not supply useful
+branch metadata other than branch tags; magic branch numbers are related
+to the C<rev_id> of the parent version of a file when a branch is made
+and that rarely can be used to determine a child file's branch.
+
+On the other hand, if you're using VCP to reorganize a p4 repository by
+converting to a new repository and your site doesn't happen to use
+branch specifications, or has a few that aren't quite right for the
+purposes of your repository reorganization, you might want to associate
+C<branch_id>s with well known directory names.
+
+Here's a mapping that takes all names like C</branch_name/path/to/file>
+and copies the C<branch_name> portion in to the C<branch_id> without
+altering the file's name (path):
+
+
+
+    Source:       p4:....source details & options here...
+
+    Destination:  p4:....dest details & options here...
+
+    Map:
+            # Extract meaningful branch_ids by copying them
+            # through $1.
+            (*)/...            <$1>
+           
+    Map:
+            # put the rules that reorganizes the tree here
+
+
+
+=head1 AUTHOR
+
+Barrie Slaymaker <barries@slaysys.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000, 2001, 2002 Perforce Software, Inc.
+All rights reserved.
+
+See L<VCP::License|VCP::License> (C<vcp help license>) for the terms of use.
+
+=cut

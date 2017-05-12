@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.69.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 795a5bba87741cc1181aca4bcc72e1bb26c0d3dd Changes
+SHA1 cd51d545b39ec8da5c3a499c45de8076892a8168 MANIFEST
+SHA1 000dd4014326dc987706f3d571ea09362117e119 META.yml
+SHA1 469dea0b6509d8c5017e6256305bc5817e6c40c0 Makefile.PL
+SHA1 e9d1f2bb4435e8a724bc5fd3cc4e1f8a065af32b README
+SHA1 06070b3d587333989149f2b30e00afb4c9d2f89d bin/rt-apple-gsx-set-warranty.in
+SHA1 32fd71a305b20221c8e44079fd697cddecd4fb27 etc/initialdata
+SHA1 4cf25a9c2f974fcc3d17d9b82de926bb38e7d963 html/Admin/Assets/GSX/index.html
+SHA1 a0cbcec3ffd778bd9b0d6f9ac971aeb9f185f480 html/Callbacks/RT-Extension-Assets-AppleGSX/Asset/Display.html/BeforeDisplay
+SHA1 e55e9d083bfeae92e6f9d388e5c90acbd1c5f75e html/Callbacks/RT-Extension-Assets-AppleGSX/Elements/Tabs/Privileged
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 40df6f8d889b52eef379f04af6227f9302b23bf9 inc/Module/Install/RTx.pm
+SHA1 293967c09b20031d14fbe96d51a68b6e003a89c3 inc/Module/Install/RTx/Factory.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 a0c94dbb6b266ddb82f80a0f2f1244d0f4168330 lib/RT/Extension/Assets/AppleGSX.pm
+SHA1 1cc582d8d98bbdfc587bbb7f057f1a6e6d2427cf lib/RT/Extension/Assets/AppleGSX/Client.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlLyrDAACgkQMflWJZZAbqDfXACdEWZJJmgAVIKpPXAXD7QtOlYa
+lQcAnA0DjUVq3OxuoHCd4z+pabi91bGe
+=eyyr
+-----END PGP SIGNATURE-----

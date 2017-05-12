@@ -1,0 +1,41 @@
+--- #YAML:1.0
+name:               RWDE
+version:            573
+abstract:           RWDE - Rapid Web Development Framework
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache::Session:      0
+    Cache::Memcached:     0
+    Crypt::CBC:           0
+    Crypt::Rijndael:      1.05
+    Data::Dumper:         0
+    Data::Validate::Domain:  0
+    DBD::Pg:              2.6
+    Digest::HMAC_SHA1:    0
+    Digest::MD5:          0
+    Error:                0
+    Gearman::Client:      0
+    Gearman::Worker:      0
+    HTTP::Date:           0
+    Mail::RFC822::Address:  0
+    MIME::Base64:         0
+    Net::Server:          0
+    Net::SMTP:            0
+    NEXT:                 0
+    SCGI:                 0
+    Storable:             0
+    Sys::Syslog:          0
+    Template:             0
+    YAML:                 0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

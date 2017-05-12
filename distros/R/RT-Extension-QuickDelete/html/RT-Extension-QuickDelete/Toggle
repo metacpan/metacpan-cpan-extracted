@@ -1,0 +1,24 @@
+<%init>
+my $ticket =LoadTicket($id);
+if ($toggle && $ticket->Status eq 'deleted') {
+$ticket->SetStatus('open');
+} elsif ($toggle) {
+
+$ticket->SetStatus('deleted');
+}
+
+</%init>
+<%args>
+$id
+$toggle => 0
+</%args>
+<span id="quickdelete-toggle-<%$id%>">\
+% my $url = $RT::WebPath."/RT-Extension-QuickDelete/ToggleQuickDelete?id=".$id;
+<a align="right" href="<%$url|n%>" onClick="ahah('<%$url|n%>', 'quickdelete-toggle-<%$id|n%>'); return false;" >\
+% if ($ticket->Status ne 'deleted') {
+Delete\
+% } else { 
+Undelete\
+% }
+</a>\
+</span>\

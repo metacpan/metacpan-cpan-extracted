@@ -1,0 +1,23 @@
+Regexp-Util
+===========
+
+Created:      2014-08-07
+Home page:    <https://metacpan.org/release/Regexp-Util>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Regexp-Util>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-09-17
+
+ [ Packaging ]
+ - Remove with a newer version of Dist::Inkt to fix META.json error.
+
+0.002	2014-08-08
+
+ [ Documentation ]
+ - Add Hash::Util link to SEE ALSO
+
+ [ Other ]
+ - Removed: Remove the regexp_is_anchored function because it required Perl
+   5.20 to compile.
+
+0.001	2014-08-07	Initial release

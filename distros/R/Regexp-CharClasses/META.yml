@@ -1,0 +1,35 @@
+---
+abstract: 'Provide character classes'
+author:
+  - 'Abigail <regexp-charclasses@abigail.be>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+keywords:
+  - 'regular expression'
+  - 'character class'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-CharClasses
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  charnames: '0'
+  perl: '5.01'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/Abigail/regexp--charclasses.git
+version: '2015112801'

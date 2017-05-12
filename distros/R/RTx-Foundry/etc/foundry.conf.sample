@@ -1,0 +1,15 @@
+# This is a sample only.  Please modify it according to your local setup.
+
+$ENV{DB_TYPE}		= 'mysql';
+$ENV{DB_HOST}		= 'localhost';
+$ENV{DB_PORT}		= '';
+$ENV{DB_DBA_USER}	= 'root';
+$ENV{DB_DBA_PASSWORD}	= '';
+$ENV{RT_URL}		= 'http://rt.example.org';
+$ENV{WIKI_URL}		= 'http://wiki.example.org';
+$ENV{SVN_URL}		= 'http://svn.example.org';
+$ENV{SVNROOT}		= '/home/svn';
+$ENV{CVSROOT}		= '/home/cvs';
+$ENV{CVSUSER}		= 'cvs';
+$ENV{CVSGROUP}		= 'cvs';
+

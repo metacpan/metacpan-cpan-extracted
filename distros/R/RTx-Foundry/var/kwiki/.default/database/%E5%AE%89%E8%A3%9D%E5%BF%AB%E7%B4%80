@@ -1,0 +1,40 @@
+== 安裝快紀站台 ==
+
+瞬間就可以把快紀裝起來。
+
+首先：
+* 從 [CPAN http://search.cpan.org/search?query=cgi-kwiki&mode=dist] 下載及安裝 CGI::Kwiki 模組
+* 跑一份 Apache 網頁伺服器。
+
+其次：
+* 在妳的 Apache 的 cgi-bin 目錄裡再新增一個目錄。
+* 進入這個目錄然後執行：
+
+  kwiki-install
+
+第三：
+* 把妳的網頁瀏覽器祇到這個新的路徑去。
+* 賀！現在你在幾秒內就設定好 Kwiki 了！
+----
+
+== Apache 組態 ==
+
+以下是一段 Apache 組態範例，可能可以幫上忙。
+
+  Alias /kwiki/ /home/ingy/kwiki/
+  <Directory /home/ingy/kwiki/>
+      Order allow,deny
+      Allow from all
+      AllowOverride None
+      Options ExecCGI
+      AddHandler cgi-script .cgi
+  </Directory>
+
+請依妳的實際需要加以調整。
+
+== 同時參見： ==
+* [升級快紀]
+* [快紀ModPerl]
+* [快紀FastCGI]
+* [快紀隱私權]
+* [備份快紀]

@@ -1,0 +1,7 @@
+/*
+ * Test 1-08 : bound subject and value : no statements
+ */
+
+SELECT *
+SOURCE <model1.nt>
+WHERE  (<http://rdf.org/r-1>, ?y, "v-2-2")

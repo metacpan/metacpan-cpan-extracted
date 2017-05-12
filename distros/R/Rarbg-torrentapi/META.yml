@@ -1,0 +1,37 @@
+---
+abstract: 'Wrapper around Rarbg torrentapi (L<https://torrentapi.org/apidocs_v2.txt>)'
+author:
+  - 'Paco Esteban <paco@onna.be>'
+build_requires:
+  JSON: '0'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0.96'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Rarbg-torrentapi
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/pacoesteban/Rarbg-torrentapi/issues
+  homepage: https://github.com/pacoesteban/Rarbg-torrentapi
+  repository: https://github.com/pacoesteban/Rarbg-torrentapi.git
+version: v0.1.4

@@ -1,0 +1,11 @@
+---
+test:
+    home_test:
+        username: test_user
+        password: test_pass
+    env_test:
+        username: right_user
+        password: right_pass
+    dist_test:
+        username: wrong_user
+        password: wrong_pass 

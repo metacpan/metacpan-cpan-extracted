@@ -1,0 +1,2 @@
+SELECT * WHERE { ?subject <http://www.w3.org/2000/01/rdf-schema#comment> ?literal .
+?subject <http://www.w3.org/2000/01/rdf-schema#label> "Resource Description Framework"@en . }

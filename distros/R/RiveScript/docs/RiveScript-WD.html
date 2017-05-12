@@ -1,0 +1,1346 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="rivescript.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:nlo@osx004.apple.com" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INTRODUCTION">INTRODUCTION</a></li>
+  <li><a href="#VOCABULARY">VOCABULARY</a></li>
+  <li><a href="#FORMAT">FORMAT</a></li>
+  <li><a href="#WHITESPACE">WHITESPACE</a></li>
+  <li><a href="#COMMANDS">COMMANDS</a>
+    <ul>
+      <li><a href="#DEFINITION">! DEFINITION</a>
+        <ul>
+          <li><a href="#version">version</a></li>
+          <li><a href="#global">global</a></li>
+          <li><a href="#var">var</a></li>
+          <li><a href="#array">array</a></li>
+          <li><a href="#sub">sub</a></li>
+          <li><a href="#person">person</a></li>
+        </ul>
+      </li>
+      <li><a href="#LABEL">&gt; LABEL</a>
+        <ul>
+          <li><a href="#begin">begin</a></li>
+          <li><a href="#topic">topic</a></li>
+          <li><a href="#object">object</a></li>
+        </ul>
+      </li>
+      <li><a href="#TRIGGER">+ TRIGGER</a>
+        <ul>
+          <li><a href="#Atomic-Trigger">Atomic Trigger</a></li>
+          <li><a href="#Trigger-Wildcards">Trigger Wildcards</a></li>
+          <li><a href="#Trigger-Alternations">Trigger Alternations</a></li>
+          <li><a href="#Trigger-Optionals">Trigger Optionals</a></li>
+          <li><a href="#Arrays-in-Triggers">Arrays in Triggers</a></li>
+          <li><a href="#Priority-Triggers">Priority Triggers</a></li>
+        </ul>
+      </li>
+      <li><a href="#RESPONSE">- RESPONSE</a>
+        <ul>
+          <li><a href="#Atomic-Response">Atomic Response</a></li>
+          <li><a href="#Random-Response">Random Response</a></li>
+          <li><a href="#Weighted-Random-Response">Weighted Random Response</a></li>
+        </ul>
+      </li>
+      <li><a href="#PREVIOUS">% PREVIOUS</a></li>
+      <li><a href="#CONTINUE">^ CONTINUE</a></li>
+      <li><a href="#REDIRECT">@ REDIRECT</a></li>
+      <li><a href="#CONDITION">* CONDITION</a></li>
+      <li><a href="#COMMENT">// COMMENT</a></li>
+    </ul>
+  </li>
+  <li><a href="#OBJECT-MACROS">OBJECT MACROS</a></li>
+  <li><a href="#TAGS">TAGS</a>
+    <ul>
+      <li><a href="#star-star1---starN">&lt;star&gt;, &lt;star1&gt; - &lt;starN&gt;</a></li>
+      <li><a href="#botstar-botstar1---botstarN">&lt;botstar&gt;, &lt;botstar1&gt; - &lt;botstarN&gt;</a></li>
+      <li><a href="#input1---input9-reply1---reply9">&lt;input1&gt; - &lt;input9&gt;; &lt;reply1&gt; - &lt;reply9&gt;.</a></li>
+      <li><a href="#id">&lt;id&gt;</a></li>
+      <li><a href="#bot">&lt;bot&gt;</a></li>
+      <li><a href="#env">&lt;env&gt;</a></li>
+      <li><a href="#get-set">&lt;get&gt;, &lt;set&gt;</a></li>
+      <li><a href="#add-sub-mult-div">&lt;add&gt;, &lt;sub&gt;, &lt;mult&gt;, &lt;div&gt;</a></li>
+      <li><a href="#topic1">{topic=...}</a></li>
+      <li><a href="#weight">{weight=...}</a></li>
+      <li><a href="#pod">{@...}, &lt;@&gt;</a></li>
+      <li><a href="#pod1">{!...}</a></li>
+      <li><a href="#random-...-random">{random}...{/random}</a></li>
+      <li><a href="#person-...-person-person">{person}...{/person}, &lt;person&gt;</a></li>
+      <li><a href="#formal-...-formal-formal">{formal}...{/formal}, &lt;formal&gt;</a></li>
+      <li><a href="#sentence-...-sentence-sentence">{sentence}...{/sentence}, &lt;sentence&gt;</a></li>
+      <li><a href="#uppercase-...-uppercase-uppercase">{uppercase}...{/uppercase}, &lt;uppercase&gt;</a></li>
+      <li><a href="#lowercase-...-lowercase-lowercase">{lowercase}...{/lowercase}, &lt;lowercase&gt;</a></li>
+      <li><a href="#ok">{ok}</a></li>
+      <li><a href="#s">\s</a></li>
+      <li><a href="#n">\n</a></li>
+      <li><a href="#pod2">\/</a></li>
+      <li><a href="#pod3">\#</a></li>
+    </ul>
+  </li>
+  <li><a href="#INTERPRETER-IMPLEMENTATION">INTERPRETER IMPLEMENTATION</a>
+    <ul>
+      <li><a href="#STANDARD-GLOBAL-VARIABLES">STANDARD GLOBAL VARIABLES</a></li>
+      <li><a href="#PARSING-GUIDELINES">PARSING GUIDELINES</a>
+        <ul>
+          <li><a href="#Sorting-Triggers">Sorting +Triggers</a></li>
+          <li><a href="#Sorting-Previous">Sorting %Previous</a></li>
+          <li><a href="#Syntax-Checking">Syntax Checking</a></li>
+        </ul>
+      </li>
+      <li><a href="#REPLY-FETCHING">REPLY FETCHING</a></li>
+      <li><a href="#TAG-PRIORITY">TAG PRIORITY</a>
+        <ul>
+          <li><a href="#Within-BEGIN-Request">Within BEGIN/Request</a></li>
+          <li><a href="#Within-Trigger">Within +Trigger</a></li>
+          <li><a href="#Within-Replies">Within Replies</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#REVERSE-COMPATIBILITY">REVERSE COMPATIBILITY</a></li>
+  <li><a href="#REVISIONS">REVISIONS</a></li>
+  <li><a href="#DISCLAIMER">DISCLAIMER</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>RiveScript::WD - RiveScript 2.00 Working Draft (2014/11/30)</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This document details the standards for the RiveScript scripting language. The purpose of this document is that interpreters for RiveScript could be written in various programming languages that would meet the standards for the RiveScript language itself.</p>
+
+<p>The most current version of this document is at http://www.rivescript.com/wd/RiveScript.html</p>
+
+<h1 id="INTRODUCTION">INTRODUCTION</h1>
+
+<p>RiveScript is an interpreted scripting language for giving responses to chatterbots and other intelligent chatting entities in a simple trigger/reply format. The scripting language is intended to be simplistic and easy to learn and manage.</p>
+
+<h1 id="VOCABULARY">VOCABULARY</h1>
+
+<dl>
+
+<dt id="RiveScript">RiveScript</dt>
+<dd>
+
+<p>RiveScript is the name of the scripting language that this document explains.</p>
+
+</dd>
+<dt id="Interpreter">Interpreter</dt>
+<dd>
+
+<p>The RiveScript interpreter is a program or library in another programming language that loads and parses a RiveScript document.</p>
+
+</dd>
+<dt id="RiveScript-Document">RiveScript Document</dt>
+<dd>
+
+<p>A RiveScript Document is a text file containing RiveScript code.</p>
+
+</dd>
+<dt id="Bot">Bot</dt>
+<dd>
+
+<p>A Bot (short for robot) is the artificial entity that is represented by an instance of a RiveScript Interpreter object. That is, when you create a new Interpreter object and load a set of RiveScript Documents, that becomes the &quot;brain&quot; of the bot.</p>
+
+</dd>
+<dt id="Bot-Variable">Bot Variable</dt>
+<dd>
+
+<p>A variable that describes the bot, such as its name, age, or other details you want to define for the bot.</p>
+
+</dd>
+<dt id="Client-Variable">Client Variable</dt>
+<dd>
+
+<p>A variable that the bot keeps about a specific client, or user of the bot. Usually as the client tells the bot information about itself, the bot could save this information into Client Variables and recite it later.</p>
+
+</dd>
+</dl>
+
+<h1 id="FORMAT">FORMAT</h1>
+
+<p>A RiveScript document should be parsed line by line, and preferably arranged in the interpreter&#39;s memory in an efficient way.</p>
+
+<p>The first character on each line should be the <code>command</code>, and the rest of the line is the command&#39;s <code>arguments</code>. The <code>command</code> should be a single character that is not a number or a letter.</p>
+
+<p>In its most simple form, a valid RiveScript trigger/response pair looks like this:</p>
+
+<pre><code>  + hello bot
+  - Hello, human.</code></pre>
+
+<h1 id="WHITESPACE">WHITESPACE</h1>
+
+<p>A RiveScript interpreter should ignore leading and trailing whitespace characters on any line. It should also ignore whitespace characters surrounding individual arguments of a RiveScript command, where applicable. That is to say, the following two lines should be interpreted as being exactly the same:</p>
+
+<pre><code>  ! global debug = 1
+  !    global    debug=    1</code></pre>
+
+<h1 id="COMMANDS">COMMANDS</h1>
+
+<h2 id="DEFINITION">! DEFINITION</h2>
+
+<p>The <code>!</code> command is for defining variables within RiveScript. It&#39;s used to define information about the bot, define global arrays that can be used in multiple triggers, or override interpreter globals such as debug mode.</p>
+
+<p>The format of the <code>!</code> command is as follows:</p>
+
+<pre><code>  ! type name = value</code></pre>
+
+<p>Where <code>type</code> is one of <code>version, global, var, array, sub,</code> or <code>person</code>. The <code>name</code> is the name of the variable being defined, and <code>value</code> is the value of said variable.</p>
+
+<p>Whitespace surrounding the <code>=</code> sign should be stripped out.</p>
+
+<p>Setting a value to <code>&lt;undef&gt;</code> will undefine the variable (deleting it or uninitializing it, depending on the implementation).</p>
+
+<p>The variable types supported are detailed as follows:</p>
+
+<h3 id="version">version</h3>
+
+<p>It&#39;s highly recommended practice that new RiveScript documents explicitly define the version of RiveScript that they are following. RiveScript 2.00 has some compatibility issues with the old 1.x line (see <a href="#REVERSE-COMPATIBILITY">&quot;REVERSE COMPATIBILITY&quot;</a>). Newer RiveScript versions should encourage that RiveScript documents define their own version numbers.</p>
+
+<pre><code>  ! version = 2.00</code></pre>
+
+<h3 id="global">global</h3>
+
+<p>This should override a global variable at the interpreter level. The obvious variable name might be &quot;debug&quot; (to enable/disable debugging within the RiveScript interpreter).</p>
+
+<p>The interpreter should take extra care not to allow reserved globals to be overridden by this command in ways that might break the interpreter.</p>
+
+<p>Examples:</p>
+
+<pre><code>  ! global debug = 1</code></pre>
+
+<h3 id="var">var</h3>
+
+<p>This should define a &quot;bot variable&quot; for the bot. This should only be used in an initialization sense; that is, as the interpreter loads the document, it should define the bot variable as it reads in this line. If you&#39;d want to redefine or alter the value of a bot variable, you should do so using a tag inside of a RiveScript document (see <a href="#TAGS">&quot;TAGS&quot;</a>).</p>
+
+<p>Examples:</p>
+
+<pre><code>  ! var name      = RiveScript Bot
+  ! var age       = 0
+  ! var gender    = androgynous
+  ! var location  = Cyberspace
+  ! var generator = RiveScript</code></pre>
+
+<h3 id="array">array</h3>
+
+<p>This will create an array of strings, which can then be used later in triggers (see <a href="#TRIGGER">&quot;+ TRIGGER&quot;</a>). If the array contains single words, separating the words with a space character is fine. If the array contains items with multiple words in them, separate the entries with a pipe symbol (<code>&quot;|&quot;</code>).</p>
+
+<p>Examples:</p>
+
+<pre><code>  ! array colors = red green blue cyan magenta yellow black white orange brown
+  ! array be     = is are was were
+  ! array whatis = what is|what are|what was|what were</code></pre>
+
+<p>Arrays have special treatment when spanned over multiple lines. Each extension of the array data is treated individually. For example, to break an array of many single-words into multiple lines of RiveScript code:</p>
+
+<pre><code>  ! array colors = red green blue cyan
+  ^ magenta yellow black white
+  ^ orange brown</code></pre>
+
+<p>The data structure pulled from that code would be identical to the previous example above for this array.</p>
+
+<p>Since each extension line is processed individually, you can combine the space-delimited and pipe-delimited formats. In this case, we can add some color names to our list that have multiple words in them.</p>
+
+<pre><code>  ! array colors = red green blue cyan magenta yellow
+  ^ light red|light green|light blue|light cyan|light magenta|light yellow
+  ^ dark red|dark green|dark blue|dark cyan|dark magenta|dark yellow
+  ^ white orange teal brown pink
+  ^ dark white|dark orange|dark teal|dark brown|dark pink</code></pre>
+
+<p>Finally, if your array consists of almost entirely single-word items, and you want to add in just one multi-word item, but don&#39;t want to require an extra line of RiveScript code to accomplish this, just use the <code>\s</code> tag where you need spaces to go.</p>
+
+<pre><code>  ! array blues = azure blue aqua cyan baby\sblue sky\sblue</code></pre>
+
+<h3 id="sub">sub</h3>
+
+<p>The <code>sub</code> variables are for defining substitutions that should be run against the client&#39;s message before any attempts are made to match it to a reply.</p>
+
+<p>The interpreter should do the minimum amount of formatting possible on the client&#39;s message until after it has been passed through all the substitution patterns.</p>
+
+<p><b>NOTE:</b> Spaces are allowed in both the variable name and the value fields.</p>
+
+<p>Examples:</p>
+
+<pre><code>  ! sub what&#39;s  = what is
+  ! sub what&#39;re = what are
+  ! sub what&#39;d  = what did
+  ! sub a/s/l   = age sex location
+  ! sub brb     = be right back
+  ! sub afk     = away from keyboard
+  ! sub l o l   = lol</code></pre>
+
+<h3 id="person">person</h3>
+
+<p>The <code>person</code> variables work a lot like <code>sub</code>s do, but these are run against the bot&#39;s response, specifically within <code>&lt;person&gt;</code> tags (See <a href="#TAGS">&quot;TAGS&quot;</a>).</p>
+
+<p>Person substitutions should swap first- and second-person pronouns. This is so that ex. if the client asks the bot a direct question using &quot;you&quot; when addressing the bot, if the bot uses the client&#39;s message in the response it should swap &quot;you&quot; for &quot;I&quot;.</p>
+
+<p>Examples:</p>
+
+<pre><code>  ! person you are = I am
+  ! person i am    = you are
+  ! person you     = I
+  ! person i       = you</code></pre>
+
+<h2 id="LABEL">&gt; LABEL</h2>
+
+<p>The <code>&gt;</code> and <code>&lt;</code> commands are for defining a subset of your code under a certain label. The label command takes between one and three arguments. The first argument defines the type of the label, which is one of <code>begin, topic,</code> or <code>object</code>. The various types are as follows.</p>
+
+<h3 id="begin">begin</h3>
+
+<p>This is a special label used with the <code>BEGIN block</code>. Every message the client sends to the bot gets passed through the Begin Statement first, and the response in there determines whether or not to get an actual reply.</p>
+
+<p>Here&#39;s a full example of the Begin Statement.</p>
+
+<pre><code>  &gt; begin
+
+    + request
+    - {ok}
+
+  &lt; begin</code></pre>
+
+<p>In the <code>BEGIN block</code>, the trigger named &quot;<code>request</code>&quot; is called by the interpreter, and it should return the tag &quot;<code>{ok}</code>&quot; to tell the interpreter that it&#39;s OK to get a real reply. This way the bot could have a &quot;maintenance mode,&quot; or could filter the results of your trigger based on a variable.</p>
+
+<p>Here&#39;s a maintenance mode example:</p>
+
+<pre><code>  &gt; begin
+
+    + request
+    * &lt;id&gt; eq &lt;bot master&gt; =&gt; {ok} // Always let the bot master get a reply
+    * &lt;env maint&gt; eq true  =&gt; Sorry, I&#39;m not available for chat right now!
+    - {ok}
+
+  &lt; begin
+
+  // Allow the owner to change the maintenance mode
+  + activate maintenance mode
+  * &lt;id&gt; eq &lt;bot master&gt; =&gt; &lt;env maint=true&gt;Maintenance mode activated.
+  - You&#39;re not my master! You can&#39;t tell me what to do!
+
+  + deactivate maintenance mode
+  * &lt;id&gt; eq &lt;bot master&gt; =&gt; &lt;env maint=false&gt;Maintenance mode deactivated.
+  - Only my master can deactivate maintenance mode!</code></pre>
+
+<p>With this example, if the global variable &quot;maint&quot; is set to &quot;true&quot;, the bot will always reply &quot;Sorry, I&#39;m not available for chat right now!&quot; when a user sends it a message -- unless the user is the bot&#39;s owner.</p>
+
+<p>Here is another example that will modify the response formatting based on a bot variable called &quot;mood,&quot; to simulate humanoid moods for the bot:</p>
+
+<pre><code>  &gt; begin
+
+    + request
+    * &lt;get mood&gt; == happy =&gt; {ok} :-)
+    * &lt;get mood&gt; == sad   =&gt; {lowercase}{ok}{/lowercase}
+    * &lt;get mood&gt; == angry =&gt; {uppercase}{ok}{/uppercase}
+    - {ok}
+
+  &lt; begin</code></pre>
+
+<p>In this example the bot will use smiley faces when it&#39;s happy, reply in all lowercase when it&#39;s sad, or all uppercase when it&#39;s angry. If its mood doesn&#39;t fall into any of those categories, it replies normally.</p>
+
+<p>Here is one last example: say you want your bot to interview its users when they first talk to it, by asking them for their name:</p>
+
+<pre><code>  &gt; begin
+
+    + request
+    * &lt;get name&gt; == undefined =&gt; {topic=newuser}{ok}
+    - {ok}
+
+  &lt; begin
+
+  &gt; topic newuser
+    + *
+    - Hello! My name is &lt;bot name&gt;! I&#39;m a robot. What&#39;s your name?
+
+    + _
+    % * what is your name
+    - &lt;set name=&lt;formal&gt;&gt;Nice to meet you, &lt;get name&gt;!{topic=random}
+  &lt; topic</code></pre>
+
+<p>Begin blocks are <b>optional!</b> They are not required. You only need to manually define them if you need to do any &quot;pre-processing&quot; or &quot;post-processing&quot; on the user&#39;s message or the bot&#39;s response. Having no begin block is the same as having a super basic begin block, which always returns <code>{ok}</code>.</p>
+
+<h3 id="topic">topic</h3>
+
+<p>A topic is a smaller set of responses to which the client will be bound until the topic is changed to something else. The default topic is <code>random</code>.</p>
+
+<p>The <code>topic</code> label only requires one additional argument, which is the name of the topic. The topic&#39;s name should be one word and lowercase.</p>
+
+<p>Example:</p>
+
+<pre><code>  + i hate you
+  - Well then, I won&#39;t talk to you until you take that back.{topic=apology}
+
+  &gt; topic apology
+
+    + *
+    - I won&#39;t listen to you until you apologize for being mean to me.
+    - I have nothing to say until you say you&#39;re sorry.
+
+    + (sorry|i apologize)
+    - Okay. I guess I&#39;ll forgive you then.{topic=random}
+
+  &lt; topic</code></pre>
+
+<p>Topics are able to <code>include</code> and <code>inherit</code> triggers that belong to a different topic. When a topic <code>includes</code> another topic, it means that the triggers in another topic are made available in the topic that did the inclusion (hereby called the &quot;source topic&quot;, which includes triggers from the &quot;included topic&quot;).</p>
+
+<p>When a topic inherits another topic, it means that the entire collection of triggers of the source topic <i>and</i> any included topics, will have a higher matching priority than the inherited topics.</p>
+
+<p>See <a href="#Sorting-Triggers">&quot;Sorting +Triggers&quot;</a> to see how triggers are sorted internally. The following example shows how includes and inheritence works:</p>
+
+<pre><code>  // This is in the default &quot;random&quot; topic and catches all non-matching
+  // triggers.
+  + *
+  - I&#39;m afraid I don&#39;t know how to reply to that!
+
+  &gt; topic alpha
+    + alpha trigger
+    - Alpha&#39;s response.
+  &lt; topic
+
+  &gt; topic beta
+    + beta trigger
+    - Beta&#39;s response.
+  &lt;
+
+  &gt; topic gamma
+    + gamma trigger
+    - Gamma&#39;s response.
+  &lt; topic
+
+  &gt; topic delta
+    + delta trigger
+    - Delta&#39;s response.
+
+    + *
+    - You can&#39;t access any other triggers! Haha!
+  &lt; topic</code></pre>
+
+<p>These are all normal topics. Alpha, beta, and gamma all have a single trigger corresponding to their topic names. If the user were put into one of these topics, this is the only trigger available. Anything else would give them a &quot;NO REPLY&quot; error message. They are unable to match the <code>*</code> trigger at the top, because that trigger belongs to the &quot;<code>random</code>&quot; topic, and they&#39;re not in that topic.</p>
+
+<p>Now let&#39;s see how we can pair these topics up with includes and inheritence.</p>
+
+<pre><code>  &gt; topic ab includes alpha
+    + hello bot
+    - Hello human!
+  &lt; topic
+
+  // Matching order:
+  alpha trigger
+  hello bot</code></pre>
+
+<p>If the user were put into topic &quot;<code>ab</code>&quot;, they could match the trigger <code>hello bot</code> as well as the trigger <code>alpha trigger</code>, as if they were both in the same topic.</p>
+
+<p>Note that in the matching order, &quot;alpha trigger&quot; is at the top: this is because it is the longest trigger. If the user types &quot;alpha trigger&quot;, the interpreter knows that &quot;alpha trigger&quot; does not belong to the topic &quot;ab&quot;, but since &quot;ab&quot; includes triggers from &quot;alpha&quot;, the interpreter searches there and finds the trigger. Then it gives the user the correct reply of &quot;Alpha&#39;s response.&quot;</p>
+
+<pre><code>  &gt; topic abc includes alpha beta
+    + how are you
+    - Good, how are you?
+  &lt; topic
+
+  // Matching order:
+  how are you
+  alpha trigger
+  beta trigger</code></pre>
+
+<p>In this case, &quot;how are you&quot; is on the top of the matching list because it has three words, then &quot;alpha trigger&quot; and &quot;beta trigger&quot; -- &quot;alpha trigger&quot; is first because it is longer than &quot;beta trigger&quot;, even though they both have 2 words.</p>
+
+<p>Now consider this example:</p>
+
+<pre><code>  &gt; topic abc includes alpha beta
+    + how are you
+    - Good, how are you?
+
+    + *
+    - You matched my star trigger!
+  &lt; topic
+
+  // Matching order:
+  how are you
+  alpha trigger
+  beta trigger
+  *</code></pre>
+
+<p>Notice what happened here: we had a trigger of simply <code>*</code> in the &quot;abc&quot; topic - <code>*</code> is the fallback trigger which matches anything that wasn&#39;t matched by a better trigger. But this trigger is at the end of our matching list! This is because the triggers available in the &quot;alpha&quot; and &quot;beta&quot; topics are included in the &quot;abc&quot; topic, meaning they all share the same &quot;space&quot; when the triggers are sorted. Since <code>*</code> has the lowest sort priority, it ends up at the very end of the collective list.</p>
+
+<p>What if we want <code>*</code>, or any other short trigger, to match in our current topic before anything in an included topic? We need to <code>inherit</code> another topic. Consider this:</p>
+
+<pre><code>  &gt; topic abc inherits alpha beta
+    + how are you
+    - Good, how are you?
+
+    + *
+    - You matched my star trigger!
+  &lt; topic
+
+  // Matching order:
+  how are you
+  *
+  alpha trigger
+  beta trigger</code></pre>
+
+<p>Now the <code>*</code> trigger is the second on the matching list. Because &quot;abc&quot; <i>inherits</i> alpha and beta, it means that the collection of triggers inside &quot;abc&quot; are sorted independently, and <i>then</i> the triggers of alpha and beta are sorted. So this way every trigger in &quot;abc&quot; inherits, or <i>overrides</i>, all triggers in the inherited topics.</p>
+
+<p>Of course, using a <code>*</code> trigger in a topic that inherits other topics is useless, because you could just leave the topic as it is. However it might be helpful in the case that a trigger in your topic is very short or has very few words, and you want to make sure that this trigger will have a good chance of matching before anything that appears in a different topic.</p>
+
+<p>You can combine inherited and included topics together, too.</p>
+
+<pre><code>  &gt; topic abc includes alpha beta delta inherits gamma
+    + how are you
+    - Good, how are you?
+  &lt; topic
+
+  // Matching order:
+  how are you
+  alpha trigger
+  delta trigger
+  beta trigger
+  *
+  gamma trigger</code></pre>
+
+<p>In this example, the combined triggers from abc, alpha, beta, and delta are all merged together in one pool and sorted amongst themselves, and then triggers from gamma are placed after them in the sort list.</p>
+
+<p>This effectively means you can combine the triggers from multiple topics together, and have ALL of those triggers override triggers from an inherited topic.</p>
+
+<p>You can use as many &quot;includes&quot; and &quot;inherits&quot; keywords as you want, but the order you specify them has no effect. So the following two formats are identical:</p>
+
+<pre><code>  &gt; topic alpha includes beta inherits gamma
+  &gt; topic alpha inherits gamma includes beta</code></pre>
+
+<p>In both cases, alpha and beta&#39;s triggers are pooled and have higher priority than gamma&#39;s. If gamma wants to include beta and have alpha&#39;s triggers be higher priority than gamma&#39;s and beta&#39;s, gamma will need to include beta first.</p>
+
+<pre><code>  &gt; topic gamma includes beta
+  &gt; topic alpha inherits gamma</code></pre>
+
+<p>In this case the triggers in &quot;alpha&quot; are higher priority than the combined triggers in gamma and beta.</p>
+
+<h3 id="object">object</h3>
+
+<p>Objects are bits of program code that the interpreter should try to process. The programming language that the interpreter was written in will determine whether or not it will attempt to process the object.</p>
+
+<p>See <a href="#OBJECT-MACROS">&quot;OBJECT MACROS&quot;</a> for more information on objects.</p>
+
+<p>The <code>object</code> label should have two arguments: a lowercase single-word name for the object, and the programming language that the object should be interpreted by, which should also be lowercase.</p>
+
+<p>Example:</p>
+
+<pre><code>  &gt; object encode perl
+    my ($obj,$method,@args) = @_;
+    my $msg = join(&quot; &quot;,@args);
+
+    use Digest::MD5 qw(md5_hex);
+    use MIME::Base64 qw(encode_base64);
+
+    if ($method eq &#39;md5&#39;) {
+      return md5_hex($msg);
+    }
+    else {
+      return encode_base64($msg);
+    }
+  &lt; object</code></pre>
+
+<h2 id="TRIGGER">+ TRIGGER</h2>
+
+<p>The <code>+</code> command is the basis for all things that actually do stuff within a RiveScript document. The trigger command is what matches the user&#39;s message to a response.</p>
+
+<p>The trigger&#39;s text should be entirely lowercase and not contain any symbols (except those used for matching complicated messages). That is, a trigger that wants to match &quot;<code>what&#39;s your name</code>&quot; shouldn&#39;t be used; you should use a <a href="#sub">&quot;sub&quot;</a>stitution to convert <code>what&#39;s</code> into <code>what is</code> ahead of time.</p>
+
+<p>Example:</p>
+
+<pre><code>  + are you a bot
+  - How did you know I&#39;m a robot?</code></pre>
+
+<h3 id="Atomic-Trigger">Atomic Trigger</h3>
+
+<p>An atomic trigger is a trigger that matches nothing but plain text. It doesn&#39;t contain any wildcards (<code>*</code>) or optionals, but it may contain alternations. Atomic triggers should take higher priority for matching a client&#39;s message than should triggers containing wildcards and optionals.</p>
+
+<p>Examples:</p>
+
+<pre><code>  + hello bot
+  + what is your name
+  + what is your (home|office) phone number
+  + who is george w bush</code></pre>
+
+<h3 id="Trigger-Wildcards">Trigger Wildcards</h3>
+
+<p>Using an asterisk (<code>*</code>) in the trigger will make it act as a wildcard. Anything the user says in place of the wildcard may still match the trigger. For example:</p>
+
+<pre><code>  + my name is *
+  - Pleased to meet you, &lt;star&gt;.</code></pre>
+
+<p>An asterisk (<code>*</code>) will match any character (numbers and letters). If you want to only match numbers, use <code>#</code>, and to match only letters use <code>_</code>. Example:</p>
+
+<pre><code>  // This will ONLY take a number as the wildcard.
+  + i am # years old
+  - I will remember that you are &lt;star&gt; years old.
+
+  // This will ONLY take letters but not numbers.
+  + my name is _
+  - Nice to meet you, &lt;star&gt;.</code></pre>
+
+<p>The values matched by the wildcards can be retrieved in the responses by using the tags <code>&lt;star1&gt;</code>, <code>&lt;star2&gt;</code>, <code>&lt;star3&gt;</code>, etc. in the order that the wildcard appeared. <code>&lt;star&gt;</code> is an alias for <code>&lt;star1&gt;</code>.</p>
+
+<h3 id="Trigger-Alternations">Trigger Alternations</h3>
+
+<p>An alternation in a trigger is a sub-set of strings, in which any one of the strings will still match the trigger. For example, the following trigger should match both &quot;are you okay&quot; and &quot;are you alright&quot;:</p>
+
+<pre><code>  + are you (okay|alright)</code></pre>
+
+<p>Alternations can contain spaces in them, too.</p>
+
+<pre><code>  + (are you|you) (okay|alright)</code></pre>
+
+<p>That would match all of the following questions from the client:</p>
+
+<pre><code>  are you okay
+  are you alright
+  you okay
+  you alright</code></pre>
+
+<p>Alternations match the same as wildcards do; they can be retrieved via the <code>&lt;star&gt;</code> tags.</p>
+
+<h3 id="Trigger-Optionals">Trigger Optionals</h3>
+
+<p>Triggers can contain optional words as well. Optionals are written similarly to alternations, but they use square braces. The following example would match both &quot;what is your phone number&quot; as well as &quot;what is your <b>home</b> phone number&quot;</p>
+
+<pre><code>  + what is your [home] phone number</code></pre>
+
+<p>Optionals do <b>NOT</b> match like wildcards do. They do NOT go into the <code>&lt;star&gt;</code> tags. The reason for this is that optionals are optional, and won&#39;t always match anything if the client didn&#39;t actually say the optional word(s).</p>
+
+<h3 id="Arrays-in-Triggers">Arrays in Triggers</h3>
+
+<p>Arrays defined via the <a href="#DEFINITION">&quot;! DEFINITION&quot;</a> <a href="#array">&quot;array&quot;</a> commands can be used within a trigger. This is the only place where arrays are used, and they&#39;re added as a convenience feature.</p>
+
+<p>For example, you can make an array of color names, and then use that array in multiple triggers, without having to copy a whole bunch of alternation code between triggers.</p>
+
+<pre><code>  ! array colors = red green blue cyan magenta yellow black white orange brown
+
+  + i am wearing a (@colors) shirt
+  - I don&#39;t know if I have a shirt that&#39;s colored &lt;star&gt;.
+
+  + my favorite color is (@colors)
+  - I like &lt;star&gt; too.
+
+  + i have a @colors colored *
+  - Have you thought about getting a &lt;star&gt; in a different color?</code></pre>
+
+<p>When an array is called within parenthesis, it should be matched into a <code>&lt;star&gt;</code> tag. When the parenthesis are absent, however, it should not be matched into a <code>&lt;star&gt;</code> tag.</p>
+
+<h3 id="Priority-Triggers">Priority Triggers</h3>
+
+<p>A new feature proposed for RiveScript 2.00 is to add a priority tag to triggers. When the interpreter sorts all the loaded triggers into a search sequence, any triggers that have a priority defined will be sorted with higher priority triggers first.</p>
+
+<p>The idea is to have &quot;important&quot; triggers that should always be matched before a different trigger, which may have been a better match, can be tried. The best example would be for commands. For example:</p>
+
+<pre><code>  + google *
+  - Searching Google... &lt;call&gt;google &lt;star&gt;&lt;/call&gt;
+
+  + * or not
+  - Or yes. &lt;@&gt;</code></pre>
+
+<p>In that example, if the bot had a Google search function and the user wanted to search for whether or not Perl is a superior programming language to PHP, the user might ask &quot;<code>google is perl better than php or not</code>&quot;. However, without priorities in effect, that question would actually match the &quot;<code>* or not</code>&quot; trigger, because that trigger has more words than &quot;<code>google *</code>&quot; does.</p>
+
+<p>Adding a priority to the &quot;<code>google *</code>&quot; trigger would ensure that conflicts like this don&#39;t happen, by always sorting the Google search trigger with higher priority than the other.</p>
+
+<pre><code>  + {weight=100}google *
+  - Searching Google... &lt;call&gt;google &lt;star&gt;&lt;/call&gt;</code></pre>
+
+<p><b>NOTE:</b> It would NOT be recommended to put a priority tag on every one of your triggers. To the interpreter this might mean extra processing work to sort prioritized triggers by each number group. Only add priorities to triggers that need them.</p>
+
+<h2 id="RESPONSE">- RESPONSE</h2>
+
+<p>The <code>-</code> tag is used to indicate a response to a matched trigger. A single response to a single trigger is called an &quot;atomic response.&quot; When more than one response is given to a single trigger, the collection of responses become a &quot;random response,&quot; where a response is chosen randomly from the list. Random responses can also use a <code>{weight}</code> tag to improve the likelihood of one response being randomly chosen over another.</p>
+
+<h3 id="Atomic-Response">Atomic Response</h3>
+
+<p>A single response to a single trigger makes an Atomic Response. The bot will respond pretty much the same way each time the trigger is matched.</p>
+
+<p>Examples:</p>
+
+<pre><code>  + hello bot
+  - Hello human.
+
+  + my name is *
+  - Nice to meet you, &lt;star&gt;.
+
+  + i have a (@colors) shirt
+  - You&#39;re not the only one that has a &lt;star&gt; shirt.</code></pre>
+
+<h3 id="Random-Response">Random Response</h3>
+
+<p>Multiple responses to a single trigger will be chosen randomly.</p>
+
+<pre><code>  + hello
+  - Hey there!
+  - Hello!
+  - Hi, how are you?
+
+  + my name is *
+  - Nice to meet you, &lt;star&gt;.
+  - Hi, &lt;star&gt;, my name is &lt;bot name&gt;.
+  - &lt;star&gt;, nice to meet you.</code></pre>
+
+<h3 id="Weighted-Random-Response">Weighted Random Response</h3>
+
+<p>When using random responses, it&#39;s possible to give weight to them to change the likelihood that a response will be chosen. In this example, the response of &quot;Hello there&quot; will be much more likely to be chosen than would the response of &quot;Hi&quot;.</p>
+
+<pre><code>  + hello
+  - Hello there!{weight=50}
+  - Hi.</code></pre>
+
+<p>When the <code>{weight}</code> tag isn&#39;t used, a default weight of 1 is implied for that response. The <code>{weight}</code> should always be a number greater than zero and must be an integer (no decimal point).</p>
+
+<h2 id="PREVIOUS">% PREVIOUS</h2>
+
+<p>The <code>%</code> command is for drawing the user back to finish a short discussion. Its behavior is similar to using topics, but is implied automatically and used for short-term things. It&#39;s also less strict than topics are; if the client replies in a way that doesn&#39;t match, a normal reply is given anyway. For example:</p>
+
+<pre><code>  + knock knock
+  - Who&#39;s there?
+
+  + *
+  % who is there
+  - &lt;star&gt; who?
+
+  + *
+  % * who
+  - lol! &lt;star&gt;! That&#39;s hilarious!</code></pre>
+
+<p>The text of the <code>%</code> command looks similar to the text next to the trigger. In essence, they work the same; the only difference is that the <code>%</code> command matches the last thing that the <i>bot</i> sent to you.</p>
+
+<p>Here&#39;s another example:</p>
+
+<pre><code>  + i have a dog
+  - What color is it?
+
+  + (@colors)
+  % what color is it
+  - That&#39;s an odd color for a dog.</code></pre>
+
+<p>In that case, if the client says &quot;I have a dog,&quot; the bot will reply asking what color it is. Now, if I tell it the color in my next message, it will reply back and tell me what an odd color that is. However, if I change the topic instead and say something else to the bot, it will answer my new question anyway. This is in contrast to using topics, where I&#39;d be stuck inside of the topic until the bot resets the topic to <code>random</code>.</p>
+
+<p>Similarly to the wildcards in <code>+ Trigger</code>, the wildcards matched in the <code>% Previous</code> command are put into <code>&lt;botstar&gt;</code>. See <a href="#TAGS">&quot;TAGS&quot;</a> for more information.</p>
+
+<h2 id="CONTINUE">^ CONTINUE</h2>
+
+<p>The <code>^</code> command is used to continue the text of a lengthy previous command down to the new line. It can be used to extend any other command. Example:</p>
+
+<pre><code>  + tell me a poem
+  - Little Miss Muffit sat on her tuffet\n
+  ^ in a nonchalant sort of way.\n
+  ^ With her forcefield around her,\n
+  ^ the Spider, the bounder,\n
+  ^ Is not in the picture today.</code></pre>
+
+<p>Note that when the <code>^</code> command continues the previous command, no spaces or line breaks are implied at the joining of the two lines. The <code>\s</code> and <code>\n</code> tags must be explicitly defined where needed.</p>
+
+<h2 id="REDIRECT">@ REDIRECT</h2>
+
+<p>The <code>@</code> command is used to redirect an entire response to appear as though the client asked an entirely different question. For example:</p>
+
+<pre><code>  + my name is *
+  - Nice to meet you, &lt;star&gt;.
+
+  + call me *
+  @ my name is &lt;star&gt;</code></pre>
+
+<p>If the client says &quot;call me John&quot;, the bot will redirect it as though the client actually said &quot;my name is John&quot; and give the response of &quot;Nice to meet you, John.&quot;</p>
+
+<h2 id="CONDITION">* CONDITION</h2>
+
+<p>The <code>*</code> command is used with conditionals when replying to a trigger. Put simply, they compare two values, and when the comparison is true the associated response is given. The syntax is as follows:</p>
+
+<pre><code>  * value symbol value =&gt; response</code></pre>
+
+<p>The following inequality symbols may be used:</p>
+
+<pre><code>  ==  equal to
+  eq  equal to (alias)
+  !=  not equal to
+  ne  not equal to (alias)
+  &lt;&gt;  not equal to (alias)
+  &lt;   less than
+  &lt;=  less than or equal to
+  &gt;   greater than
+  &gt;=  greater than or equal to</code></pre>
+
+<p>In each of the value places, tags can be used to i.e. insert client or bot variables.</p>
+
+<p>Examples:</p>
+
+<pre><code>  + am i a boy or a girl
+  * &lt;get gender&gt; eq male   =&gt; You told me you were a boy.
+  * &lt;get gender&gt; eq female =&gt; You told me you were a girl.
+  - You never told me what you were.
+
+  + am i your master
+  * &lt;id&gt; eq &lt;bot master&gt; =&gt; Yes, you are.
+  - No, you&#39;re not my master.
+
+  + my name is *
+  * &lt;get name&gt; eq &lt;star&gt;    =&gt; I know, you told me that already.
+  * &lt;get name&gt; ne undefined =&gt; Did you get a name change?&lt;set name=&lt;star&gt;&gt;
+  - &lt;set name=&lt;star&gt;&gt;Nice to meet you, &lt;star&gt;.</code></pre>
+
+<p>It&#39;s recommended practice to always include at least one response in case all of the conditionals return false.</p>
+
+<p><b>NOTE:</b> Conditionals are tried in the order they appear in the RiveScript document, and the next condition is tried when the previous ones are false.</p>
+
+<h2 id="COMMENT">// COMMENT</h2>
+
+<p>The <code>//</code> command is for putting comments into your RiveScript document. The C-style multiline comment syntax <code>/* */</code> is also supported.</p>
+
+<p>Comments on their own line should be ignored by all interpreters. For inline comments, only the <code>//</code> format is acceptable. If you want a literal <code>//</code> in your RiveScript data, escape at least one of the symbols, i.e. <code>\//</code> or <code>\/\/</code> or <code>/\/</code>.</p>
+
+<p>Examples:</p>
+
+<pre><code>  // A single regular comment
+
+  /*
+    This comment can span
+    multiple lines
+  */
+
+  &gt; begin // The &quot;BEGIN&quot; block
+    + request // This is required
+    - {ok}    // An {ok} means to get a real reply
+  &lt; begin//End the begin block</code></pre>
+
+<h1 id="OBJECT-MACROS">OBJECT MACROS</h1>
+
+<p>An <code>object macro</code> is a piece of program code that is processed by the interpreter to give a little more &quot;kick&quot; to the RiveScript. All objects are required to define the programming language they use. Ones that don&#39;t should result in vociferous warnings by the interpreter.</p>
+
+<p>Objects should be able to be declared inline within RiveScript code, however they may also be defined by the program utilizing the interpreter as well. All objects should receive, at a minimum, some kind of reference to the RiveScript interpreter object that called them.</p>
+
+<p>Here is an example of a simple Perl object that encodes a bit of text into MD5 or Base64.</p>
+
+<pre><code>  &gt; object encode perl
+    my ($obj,$method,@args) = @_;
+    my $msg = join(&quot; &quot;,@args);
+
+    use Digest::MD5 qw(md5_hex);
+    use MIME::Base64 qw(encode_base64);
+
+    if ($method eq &#39;md5&#39;) {
+      return md5_hex($msg);
+    }
+    else {
+      return encode_base64($msg);
+    }
+  &lt; object</code></pre>
+
+<p>To call an object within a response, call it in the format of:</p>
+
+<pre><code>  &lt;call&gt;object_name arguments&lt;/call&gt;</code></pre>
+
+<p>For example:</p>
+
+<pre><code>  + encode * in md5
+  - The MD5 hash of &quot;&lt;star&gt;&quot; is: &lt;call&gt;encode md5 &lt;star&gt;&lt;/call&gt;
+
+  + encode * in base64
+  - The Base64 hash of &quot;&lt;star&gt;&quot; is: &lt;call&gt;encode base64 &lt;star&gt;&lt;/call&gt;</code></pre>
+
+<p>In the above examples, <code>encode</code> calls on the object named &quot;encode&quot;, which we defined above; <code>md5</code> and <code>base64</code> calls on the method name, which is received by the object as <code>$method</code>. Finally, <code>@args</code> as received by the object would be the value of &lt;star&gt; in this example.</p>
+
+<p><code>$obj</code> in this example would be a reference to the RiveScript interpreter.</p>
+
+<h1 id="TAGS">TAGS</h1>
+
+<p>Tags are bits of text inserted within the argument space of a RiveScript command. As a general rule of thumb, tags with &lt;angle brackets&gt; are for setting and getting a variable or for inserting text. Tags with {curly brackets} modify the text around them, such as to change the formatting of enclosed text.</p>
+
+<p>No tags can be used within <code>! Definition</code> and <code>&gt; Label</code> under any circumstances.</p>
+
+<p>Unless otherwise specified, all of the tags can be used within every RiveScript command.</p>
+
+<h2 id="star-star1---starN">&lt;star&gt;, &lt;star1&gt; - &lt;starN&gt;</h2>
+
+<p>The <code>&lt;star&gt;</code> tags are used for matching responses. See <a href="#TRIGGER">&quot;+ TRIGGER&quot;</a> for usage examples.</p>
+
+<p>The <code>&lt;star&gt;</code> tags can NOT be used within <code>+ Trigger</code>.</p>
+
+<h2 id="botstar-botstar1---botstarN">&lt;botstar&gt;, &lt;botstar1&gt; - &lt;botstarN&gt;</h2>
+
+<p>If the trigger included a <code>% Previous</code> command, <code>&lt;botstar&gt;</code> will match any wildcards that matched the bot&#39;s previous response.</p>
+
+<pre><code>  + ask me a question
+  - What color&#39;s your {random}shirt shoes socks{/random}
+
+  + *
+  % what colors your *
+  - I wouldn&#39;t like &lt;star&gt; as a color for my &lt;botstar&gt;.</code></pre>
+
+<h2 id="input1---input9-reply1---reply9">&lt;input1&gt; - &lt;input9&gt;; &lt;reply1&gt; - &lt;reply9&gt;.</h2>
+
+<p>The input and reply tags insert the previous 1 to 9 things the client said, and the last 1 to 9 things the bot said, respectively. When these tags are used with <code>+ Trigger</code>, they should be formatted against substitutions first. This way, the bot might be able to detect when the client is repeating themself or when they&#39;re repeating the bot&#39;s replies.</p>
+
+<pre><code>  + &lt;reply1&gt;
+  - Don&#39;t repeat what I say.
+
+  + &lt;input1&gt;
+  * &lt;input1&gt; eq &lt;input2&gt; =&gt; That&#39;s the second time you&#39;ve repeated yourself.
+  * &lt;input1&gt; eq &lt;input3&gt; =&gt; If you repeat yourself again I&#39;ll stop talking to you.
+  * &lt;input1&gt; eq &lt;input4&gt; =&gt; That&#39;s it. I&#39;m done talking to you.{topic=blocked}
+  - Please don&#39;t repeat yourself.</code></pre>
+
+<p><code>&lt;input&gt;</code> and <code>&lt;reply&gt;</code> are aliases for <code>&lt;input1&gt;</code> and <code>&lt;reply1&gt;</code>, respectively.</p>
+
+<h2 id="id">&lt;id&gt;</h2>
+
+<p>The <code>&lt;id&gt;</code> tag inserts the client&#39;s ID, as told to the RiveScript interpreter when the client&#39;s ID and message were passed in.</p>
+
+<h2 id="bot">&lt;bot&gt;</h2>
+
+<p>Insert a bot variable, which was previously defined via the <code>! Definition</code> <a href="#var">&quot;var&quot;</a> commands.</p>
+
+<pre><code>  + what is your name
+  - I am &lt;bot name&gt;, a chatterbot created by &lt;bot company&gt;.
+
+  + my name is &lt;bot name&gt;
+  - &lt;set name=&lt;bot name&gt;&gt;What a coincidence, that&#39;s my name too!</code></pre>
+
+<p>The <code>&lt;bot&gt;</code> tag allows assignment as well (which deprecates the old <code>{!...}</code> tag.</p>
+
+<pre><code>  + set mood to (happy|angry|sad)
+  * &lt;get master&gt; == true =&gt; &lt;bot mood=&lt;star&gt;&gt;Updated my mood.
+  - Only my botmaster can do that.</code></pre>
+
+<h2 id="env">&lt;env&gt;</h2>
+
+<p>Insert a global variable, which was previously defined via <code>! Definition</code> <a href="#global">&quot;global&quot;</a> commands.</p>
+
+<pre><code>  + is debug mode enabled
+  * &lt;env debug&gt; == 1 =&gt; Yes, debug mode is active.
+  - No, debug mode is set to &quot;&lt;env debug&gt;&quot;</code></pre>
+
+<p>The <code>&lt;env&gt;</code> tag allows assignment as well (which deprecates the old <code>{!...}</code> tag).</p>
+
+<pre><code>  + turn debug mode on
+  * &lt;get master&gt; == true =&gt; &lt;env debug=1&gt;Debug mode enabled.
+  - You can&#39;t turn debug mode on.</code></pre>
+
+<h2 id="get-set">&lt;get&gt;, &lt;set&gt;</h2>
+
+<p>Get and set a client variable. These variables are local to the user ID that is chatting with the bot.</p>
+
+<pre><code>  + my name is *
+  - &lt;set name=&lt;star&gt;&gt;Nice to meet you, &lt;star&gt;.</code></pre>
+
+<p>&lt;get&gt; can be used within <code>+ Trigger</code>, but &lt;set&gt; can not.</p>
+
+<h2 id="add-sub-mult-div">&lt;add&gt;, &lt;sub&gt;, &lt;mult&gt;, &lt;div&gt;</h2>
+
+<p>Add, subtract, multiply, and divide a numeric client variable, respectively.</p>
+
+<pre><code>  + give me 5 points
+  - &lt;add points=5&gt;I&#39;ve added 5 points to your account.</code></pre>
+
+<p>These tags can not be used within <code>+ Trigger</code>.</p>
+
+<h2 id="topic1">{topic=...}</h2>
+
+<p>Change the client&#39;s topic. This tag can only be used with <code>* Condition</code> and <code>- Response</code>.</p>
+
+<h2 id="weight">{weight=...}</h2>
+
+<p>When used with <code>- Response</code>, this will weigh the response more heavily to be chosen when random responses are available. When used with <code>+ Trigger</code>, this sets that trigger to have a higher matching priority.</p>
+
+<h2 id="pod">{@...}, &lt;@&gt;</h2>
+
+<p>Perform an inline redirection. This should work like a regular redirection but is embedded within another response. This tag can only be used with <code>- Response</code>, and in the response part of a <code>* Condition</code>.</p>
+
+<p>&lt;@&gt; is an alias for {@&lt;star&gt;}</p>
+
+<pre><code>  + your *
+  - I think you meant to say &quot;you are&quot; or &quot;you&#39;re&quot;, not &quot;your&quot;. {@you are &lt;star&gt;}</code></pre>
+
+<h2 id="pod1">{!...}</h2>
+
+<p>Perform an inline definition. This can be used just like the normal <code>! Definition</code> command from within a reply. This tag can only be used with <code>- Response</code>.</p>
+
+<p><b>This tag is deprecated</b>. This tag&#39;s purpose was to redefine a global or bot variable on the fly. Instead, the env and bot tags allow assignment.</p>
+
+<pre><code>  + set bot mood to *
+  - &lt;bot mood=&lt;star&gt;&gt;Bot mood set to &lt;star&gt;.</code></pre>
+
+<h2 id="random-...-random">{random}...{/random}</h2>
+
+<p>Insert a sub-set of random text. This tag can NOT be used with <code>+ Trigger</code>. Use the same array syntax as when defining arrays (separate single-word groups with spaces and multi-word groups with pipes).</p>
+
+<pre><code>  + say something random
+  - This {random}sentence statement{/random} has a random {random}set of words|gang of vocabulary{/random}.</code></pre>
+
+<h2 id="person-...-person-person">{person}...{/person}, &lt;person&gt;</h2>
+
+<p>Process <a href="#person">&quot;person&quot;</a> substitutions on a group of text.</p>
+
+<pre><code>  + say *
+  - Umm... &quot;&lt;person&gt;&quot;</code></pre>
+
+<p>In that example, if the client says &quot;say you are a robot&quot;, the bot should reply, &quot;Umm... &quot;I am a robot.&quot;&quot;</p>
+
+<p>&lt;person&gt; is an alias for {person}&lt;star&gt;{/person}.</p>
+
+<h2 id="formal-...-formal-formal">{formal}...{/formal}, &lt;formal&gt;</h2>
+
+<p>Formalize A String Of Text (Capitalize Every First Letter Of Every Word).</p>
+
+<pre><code>  + my name is *
+  - Nice to meet you, &lt;formal&gt;.</code></pre>
+
+<p>&lt;formal&gt; is an alias for {formal}&lt;star&gt;{/formal}.</p>
+
+<h2 id="sentence-...-sentence-sentence">{sentence}...{/sentence}, &lt;sentence&gt;</h2>
+
+<p>Format a string of text in sentence-case (capitilizing only the first letter of the first word of each sentence).</p>
+
+<p>&lt;sentence&gt; is an alias for {sentence}&lt;star&gt;{/sentence}.</p>
+
+<h2 id="uppercase-...-uppercase-uppercase">{uppercase}...{/uppercase}, &lt;uppercase&gt;</h2>
+
+<p>FORMAT A STRING OF TEXT INTO UPPERCASE.</p>
+
+<p>&lt;uppercase&gt; is an alias for {uppercase}&lt;star&gt;{/uppercase}.</p>
+
+<h2 id="lowercase-...-lowercase-lowercase">{lowercase}...{/lowercase}, &lt;lowercase&gt;</h2>
+
+<p>format a string of text into lowercase.</p>
+
+<p>&lt;lowercase&gt; is an alias for {lowercase}&lt;star&gt;{/lowercase}.</p>
+
+<h2 id="ok">{ok}</h2>
+
+<p>This is used only with the &quot;request&quot; trigger within the BEGIN block. It tells the interpreter that it&#39;s okay to go and get a real response to the client&#39;s message.</p>
+
+<h2 id="s">\s</h2>
+
+<p>Inserts a white space character. This is useful with the <code>^ Continue</code> command.</p>
+
+<h2 id="n">\n</h2>
+
+<p>Inserts a line break character.</p>
+
+<h2 id="pod2">\/</h2>
+
+<p>Inserts a forward slash.</p>
+
+<h2 id="pod3">\#</h2>
+
+<p>Inserts a pound symbol.</p>
+
+<h1 id="INTERPRETER-IMPLEMENTATION">INTERPRETER IMPLEMENTATION</h1>
+
+<p>Interpreters of RiveScript should follow these guidelines when interpreting RiveScript code. This details some of the priorities for processing tags and sorting internal data structures. This part of the document should be programming-language-independent.</p>
+
+<h2 id="STANDARD-GLOBAL-VARIABLES">STANDARD GLOBAL VARIABLES</h2>
+
+<p>The interpreter must support the following standard global variables:</p>
+
+<pre><code>  depth = a recursion limit before an attempt to fetch a reply will be abandoned.</code></pre>
+
+<p>It&#39;s recommended to also have a <code>debug</code> variable for consistency, but it may not be applicable.</p>
+
+<p>The <code>depth</code> variable is strongly encouraged, though. It&#39;s to set a user-defineable recursion limit when fetching a response. For example, a pair of triggers like this will cause infinite recursion:</p>
+
+<pre><code>  + one
+  @ two
+
+  + two
+  @ one</code></pre>
+
+<p>The interpreter should protect itself against such possibilities and provide a <code>depth</code> variable to allow the user to adjust the recursion limit.</p>
+
+<pre><code>  ! global depth = 25</code></pre>
+
+<h2 id="PARSING-GUIDELINES">PARSING GUIDELINES</h2>
+
+<p>Interpreters should parse all of the RiveScript documents ahead of time and store them in an efficient way in which replies can be looked up quickly.</p>
+
+<h3 id="Sorting-Triggers">Sorting +Triggers</h3>
+
+<p>Triggers should be sorted in a &quot;most specific first&quot; order. That is:</p>
+
+<pre><code>  1. Atomic triggers first. Sort them so that the triggers with the most amount
+     of words are on top. For multiple triggers with the same amount of words,
+     sort them by length, and then alphabetically if there are still matches
+     in length.
+  2. Sort triggers that contain optionals in their triggers next. Sort them in
+     the same manner as the atomic triggers.
+  3. Sort triggers containing wildcards next. Sort them by the number of words
+     that aren&#39;t wildcards. The order of wildcard sorting should be as follows:
+
+     A. Alphabetic wildcards (_)
+     B. Numeric wildcards (#)
+     C. Global wildcards (*)
+
+  4. The very bottom of the list will be a trigger that simply matches * by
+     itself, if it exists. If triggers of only _ or only # exist, sort them in
+     the same order as in step 3.</code></pre>
+
+<h3 id="Sorting-Previous">Sorting %Previous</h3>
+
+<p><code>% Previous</code> triggers should be sorted in the same manner as <code>+ Triggers</code>, and associated with the reply group that they belong to (creating pseudotopics for each <code>% Previous</code> is a good way to go).</p>
+
+<h3 id="Syntax-Checking">Syntax Checking</h3>
+
+<p>It will be helpful if the interpreter also offers syntax checking and will give verbose warnings when it tries to parse something that doesn&#39;t follow standards. When possible, it should try to correct the error, but should still emit a warning so that the author might fix it.</p>
+
+<p>It would also be good practice to keep track of file names and line numbers of each parsed command, so that syntax warnings can direct the author to the exact location where the problem occurred.</p>
+
+<h2 id="REPLY-FETCHING">REPLY FETCHING</h2>
+
+<p>When attempting to get a response to a client&#39;s message, the interpreter should support the sending of a &quot;sender ID&quot; along with the message. This would preferably be a screen name or handle of the client who is sending the message, and the interpreter should be able to keep different groups of user variables for each user ID. The &lt;id&gt; tag should substitute for the user&#39;s ID.</p>
+
+<p>If the BEGIN block was defined in any of the loaded RiveScript documents, it should be tried for the &quot;request&quot; trigger. That is, this trigger should be matched:</p>
+
+<pre><code>  &gt; begin
+    + request
+    - {ok}
+  &lt; begin</code></pre>
+
+<p>The interpreter should make the request for that trigger in the context of the calling user, and allow it to change the user&#39;s topic or set a user variable immediately. Do not process any other tags that are present in the response (see <a href="#TAG-PRIORITY">&quot;TAG PRIORITY&quot;</a>).</p>
+
+<p>If the response contains the <code>{ok}</code> tag, then make a second request to try to match the client&#39;s actual message. When a response was found, substitute the <code>{ok}</code> tag from the BEGIN response with the text of the actual response the client wanted, and then process any remaining tags in the BEGIN response. Finally, return the reply to the client.</p>
+
+<p>When fetching responses, the following order of events should happen.</p>
+
+<pre><code>  1. Build in a system of recursion prevention. Since replies can redirect to
+     other replies, there&#39;s the possibility of deep recursion. The first thing
+     that the reply fetching routine should do is prevent this from getting out
+     of control.
+  2. Dig through the triggers under the client&#39;s current topic. Check to see if
+     there are any %Previous commands on any of these topics and see if they
+     match the bot&#39;s last message to the client. If so, make sure the client&#39;s
+     current message matches the trigger in question. If so, we have a response
+     set; skip to step 4.
+  3. Find a trigger that matches the client&#39;s message. If one is found, we have
+     a response set; continue to step 4.
+
+  4. If we found a reply set, process the reply. First check if this reply set
+     has a &quot;solid redirection&quot; (an @ command). If so, recurse the response
+     routine with the redirection trigger and resume from step 1. Break when an
+     eventual response was returned.
+  5. Process conditionals if they exist in order. As soon as one of them returns
+     true, we have a response and break. If none are true, continue to step 6.
+  6. See if there is more than one response to this trigger. If any of the random
+     responses has a {weight}, take that into account as a random response is
+     chosen. If we have a reply now, break.
+  7. If there is still no reply, insert a generic &quot;no reply&quot; error message.</code></pre>
+
+<p>When a reply was obtained, then tags should be executed on them in the order defined under <a href="#TAG-PRIORITY">&quot;TAG PRIORITY&quot;</a>.</p>
+
+<h2 id="TAG-PRIORITY">TAG PRIORITY</h2>
+
+<h3 id="Within-BEGIN-Request">Within BEGIN/Request</h3>
+
+<p>Within the &quot;request&quot; response of the BEGIN block, the following tags can be executed prior to getting a real response for the client&#39;s message:</p>
+
+<pre><code>  {topic}
+  &lt;set&gt;</code></pre>
+
+<p>All other tags, especially modifier tags, must be held off until the final response has been given. Substitute <code>{ok}</code> for the final response, and then process the other tags.</p>
+
+<p>Things like this should be able to work:</p>
+
+<pre><code>  &gt; begin
+
+    + request
+    * &lt;get name&gt; eq undefined =&gt; {topic=new_user}{ok}
+    * &lt;bot mood&gt; eq happy     =&gt; {ok}
+    * &lt;bot mood&gt; eq angry     =&gt; {uppercase}{ok}{/uppercase}
+    * &lt;bot mood&gt; eq sad       =&gt; {lowercase}{ok}{/lowercase}
+    - {ok}
+
+  &lt; begin</code></pre>
+
+<h3 id="Within-Trigger">Within +Trigger</h3>
+
+<p>All tags that appear within the context of <code>+ Trigger</code> must be processed prior to any attempts to match on the trigger.</p>
+
+<h3 id="Within-Replies">Within Replies</h3>
+
+<p>The order that the tags should be processed within a response or anywhere else that a tag is allowed is as follows:</p>
+
+<pre><code>  &lt;star&gt;      # Static text macros
+  &lt;input&gt;     #
+  &lt;reply&gt;     #
+  &lt;id&gt;        #
+  \s          #
+  \n          #
+  \\          #
+  \#          #
+  {random}    # Random text insertion (which may contain other tags)
+  &lt;person&gt;    # String modifiers
+  &lt;formal&gt;    #
+  &lt;sentence&gt;  #
+  &lt;uppercase&gt; #
+  &lt;lowercase&gt; #
+  &lt;bot&gt;*      # Insert bot variables
+  &lt;env&gt;*      # Insert environment variables
+  &lt;set&gt;*      # User variable modifiers
+  &lt;add&gt;*      #
+  &lt;sub&gt;*      #
+  &lt;mult&gt;*     #
+  &lt;div&gt;*      #
+  &lt;get&gt;*      # Get user variables
+  {topic}     # Set user topic
+  &lt;@&gt;         # Inline redirection
+  &lt;call&gt;      # Object macros.</code></pre>
+
+<p>* The variable manipulation tags should all be processed &quot;at the same time&quot;, not in any particular order. This will allow, for example, the following sort of trigger to work:</p>
+
+<pre><code>  + my name is *
+  * &lt;get name&gt; != undefined =&gt;
+    ^ &lt;set oldname=&lt;get name&gt;&gt;I thought your name was &lt;get oldname&gt;?
+    ^ &lt;set name=&lt;formal&gt;&gt;
+  - &lt;set name=&lt;formal&gt;&gt;Nice to meet you.</code></pre>
+
+<p>In older implementations of RiveScript, `set` tags were processed earlier than `get` making it impossible to copy variables. Implementations should process this group of tags from the most-embedded outward.</p>
+
+<p>An easy way to do this is with a regular expression that matches a tag that contains no other tag, and make multiple passes until no tags remain that match the regexp:</p>
+
+<pre><code>  /&lt;([^&lt;]+?)&gt;/</code></pre>
+
+<h1 id="REVERSE-COMPATIBILITY">REVERSE COMPATIBILITY</h1>
+
+<p>RiveScript 2.00 will have limited backwards compatibility with RiveScript 1.x documents. Here is a full breakdown of the differences:</p>
+
+<pre><code>  RiveScript Changes from 1.02 to 2.00
+  ------------------------------------
+
+  REMOVED:
+
+  - Variants of !DEFINITION
+    - ! addpath
+    - ! include
+    - ! syslib
+  - RiveScript Libraries (RSL files)
+  - RiveScript Packages  (RSP files)
+    - These made code management messy. Keep your own
+      brain&#39;s files together!
+
+  COMPATIBLE CHANGES:
+
+  - Object macros now require the programming language to be defined.
+    - Old way: &gt; object encode
+    - New way: &gt; object encode perl
+  - The ^CONTINUE command can extend every command.
+  - Most tags can be used with almost every command.
+  - Topics can inherit triggers from other topics now.
+
+  INCOMPATIBLE CHANGES:
+
+  - Conditionals work differently now. Instead of comparing variables to values,
+    they compare values to values, and each value can &lt;get&gt; variables to compare.
+    - Old way: * name       =  Bob =&gt; Hello Bob!
+    - New way: * &lt;get name&gt; eq Bob =&gt; Hello Bob!
+  - Conditionals no longer use a single = for &quot;equal to&quot; comparison. Replace it
+    with either == or &quot;eq&quot;.
+  - Object macros will receive a reference to the RiveScript object as their first
+    argument.
+  - Objects are called in a new &lt;call&gt; syntax instead of the old &amp;object one.
+
+  NEW THINGS:
+
+  - {weight} is a valid tag in triggers now to increase matching priority.
+  - &lt;env&gt; has been added for calling global variables.
+  - &lt;botstar&gt; has been added for wildcard matching on %previous.
+  - Conditionals have more inequality comparisons now:
+    &quot;==&quot; and &quot;eq&quot;        : equal to
+    &quot;!=&quot;, &quot;ne&quot;, and &quot;&lt;&gt;&quot; : not equal to</code></pre>
+
+<p>Nice interpreters might be able to fix some old RiveScript code to make them work. For example, if a condition is found that has one equals sign instead of two, it could print a warning that it&#39;s detected RiveScript 1.x code in action and automatically adjust it to 2.x standards, and perhaps reparse the entire file or group of files, assuming that they are RiveScript 1.x code and fix these inconsistencies altogether.</p>
+
+<p>Or perhaps there will just be a converter tool created that would go through code that it already assumes will be RiveScript 1.x and update it to 2.x standards.</p>
+
+<h1 id="REVISIONS">REVISIONS</h1>
+
+<pre><code>  Rev 12 - Nov 30, 2014
+  - Added implementation guidelines for dealing with variable-setting tags.
+
+  Rev 11 - Jun 13, 2013
+  - Clarify the ability for the &lt;bot&gt; and &lt;env&gt; tags to be used for assignment.
+
+  Rev 10 - May 15, 2012
+  - Deprecated the {!...} tag. It was intended for reassigning global or bot
+    variables. Instead use &lt;env name=value&gt;, &lt;bot name=value&gt;.
+
+  Rev 9 - Jul 31, 2009
+  - Added more explicit details on the usage of the BEGIN block, under the
+    section on &gt;Labels / &quot;begin&quot;
+  - Revised the WD, fixing some typos.
+
+  Rev 8 - Jul 30, 2009
+  - The proper format for the `! version` line is to be `! version = 2.00`,
+    and not `! version 2.00`
+  - Included the &quot;includes&quot; option for triggers and changed how &quot;inherits&quot;
+    works.
+
+  Rev 7 - Dec  4, 2008
+  - Topics are able to inherit additional triggers that belong to different
+    topics, in the &quot;&gt; topic alpha inherits beta&quot; syntax.
+  - Added more documentation to the &quot;! array&quot; section of the document. Also
+    check that section for some changes to the way arrays should be processed by
+    the interpreter.
+  - Deprecated the # command for inline comments. Use only // and /* */.
+
+  Rev 6 - Sep 15, 2008
+  - Updated the section about # for inline comments: when used next to a
+    +Trigger, there should be at least 2 spaces before the # symbol and 1 space
+    after, to avoid confusion with # as a wildcard character.
+
+  Rev 5 - Jul 22, 2008
+  - Added two new variants of the wildcard: # will match only numbers and _ will
+    match only letters. * will still match anything at all.
+
+  Rev 4 - Jun 19, 2008
+  - Rearranged tag priorities:
+    - &lt;bot&gt; and &lt;env&gt; moved higher up.
+
+  Rev 3 - Apr  2, 2008
+  - Typo fix: under the !person section, the examples were using !sub
+  - Inconsistency fix: under %Previous it was saying the wildcards were
+    unmatchable, but this isn&#39;t the case (they go into &lt;botstar&gt;).
+  - Typo fix: under OBJECT MACROS, fixed the explanation of the code to match
+    the new object syntax.
+  - Inconsistency fix: &lt;@&gt; can be used in the response portion of conditionals.
+  - Rearranged the tag priorities:
+    - String modifiers (person - lowercase) come in higher priority than
+      {random}
+    - &lt;env&gt; comes in after &lt;bot&gt;
+  - Typo fix: updated the object syntax (&lt;call&gt;) in the priority list.
+
+  Rev 2 - Feb 18, 2008
+  - Moved {random} to higher tag priority.
+  - Change the &amp;object syntax to &lt;call&gt;
+  - Added the &lt;env&gt; variable.
+  - Added the &lt;botstar&gt; variable.
+
+  Rev 1 - Jan 15, 2008
+  - Added the {priority} tag to triggers, to increase a trigger&#39;s matching
+    priority over others, even when another trigger might be a better match
+    to the client&#39;s message.</code></pre>
+
+<h1 id="DISCLAIMER">DISCLAIMER</h1>
+
+<p>Note that this document is only a working draft of the RiveScript 2.00 specification and may undergo numerous changes before a final standard is agreed on. Changes to this document after the creation date on January 14, 2008 will be noted in a change log.</p>
+
+<p>http://www.rivescript.com/</p>
+
+
+</body>
+
+</html>
+
+

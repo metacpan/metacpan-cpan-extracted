@@ -1,0 +1,19 @@
+--- 
+abstract: Examining Attributes of a user
+author: Kevin Falcone  C<< <falcone@bestpractical.com> >>
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: RT-Extension-AttributeWalker
+no_index: 
+  directory: 
+    - bin
+    - inc
+    - t
+requires: 
+  RT: 0
+  Test::More: 0
+version: 0.02

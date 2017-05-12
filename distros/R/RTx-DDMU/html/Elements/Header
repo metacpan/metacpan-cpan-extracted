@@ -1,0 +1,103 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"> 
+<head>  
+<title><%$Title%></title>  
+% if ($Refresh > 0) {
+    <meta http-equiv="refresh" content="<%$Refresh%>" />
+% }
+<link rel="start" href="wiki" />  
+<link rel="search" href="search" />  
+<link rel="help" href="wiki/" />  
+% if ($RSSAutoDiscovery) {    
+    <link rel="alternate" href="<%$RSSAutoDiscovery%>" type="application/rss+xml" title="RSS RT Search" />
+% }
+<link rel="stylesheet" href="<%$RT::WebPath%>/NoAuth/css/<% $RT::WebDefaultStylesheet %>/main.css" type="text/css" media="all" />
+<link rel="stylesheet" href="<%$RT::WebPath%>/NoAuth/css/print.css" type="text/css" media="print" />
+<style type="text/css">   
+@import url(<%$RT::WebPath%>/NoAuth/trac.css); 
+@import url(<%$RT::WebPath%>/NoAuth/webrt.css); 
+@import url(<%$RT::WebPath%>/NoAuth/report.css);  
+@import url(<%$RT::WebPath%>/NoAuth/search.css);
+</style>  
+<script src="<%$RT::WebPath%>/NoAuth/trac.js" type="text/javascript">
+</script> 
+    <script type="text/javascript" src="<%$RT::WebPath%>/NoAuth/js/util.js"></script>
+    <script type="text/javascript" src="<%$RT::WebPath%>/NoAuth/js/titlebox-state.js"></script>
+    <script type="text/javascript"><!--
+	onLoadHook("loadTitleBoxStates()");
+% if ($Focus) {
+	onLoadHook("focusElementById('<% $Focus %>')");
+% }
+% if ($onload) {
+	onLoadHook("<% $onload |n %>");
+% }
+    --></script>
+
+</head>
+<body<% $id && qq[ id="comp-$id"] |n %>>
+
+% if ($ShowBar) {
+<div id="quickbar">
+<div id="quick-personal">
+<span class="hide"><a href="#skipnav"><&|/l&>Skip Menu</&></a> | </span>
+% if ($session{'CurrentUser'}->Name) {
+<&|/l, "<span>".$session{'CurrentUser'}->Name."</span>" &>Logged in as [_1]</&>
+% } else {
+<&|/l&>Not logged in.</&>
+% }
+%if ($session{'CurrentUser'}->HasRight( Right => 'ModifySelf', Object => $RT::System )) {
+| <a href="<%$RT::WebPath%><%$Prefs%>"><&|/l&>Preferences</&></a>
+% }
+<& /Elements/Callback, %ARGS &>
+% unless (!$session{'CurrentUser'}->Name
+%         or ($RT::WebExternalAuth and !$RT::WebFallbackToInternalAuth)) {
+| <a  href="<%$RT::WebPath%>/NoAuth/Logout.html<%$URL ? "?URL=".$URL : ''%>"><&|/l&>Logout</&></a>
+% }
+</div>
+% }
+
+% if ($session{'CurrentUser'}->Name) {
+<div id="banner">
+    <div id="header">  
+	<a id="logo" href="http://www.bestpractical.com/">
+	<img src="<%$RT::WebImagesURL%>/bplogo.gif" alt="RT" /></a>  <hr />
+    </div>
+    <form id="search" action="search" method="get"> 
+    <div>  
+	<label for="proj-search">Search:</label>  
+	<input type="text" id="proj-search" name="q" size="10" value="" />  
+	<input type="submit" value="Search" />  
+	<input type="hidden" name="wiki" value="on" />  
+	<input type="hidden" name="changeset" value="on" />  
+	<input type="hidden" name="ticket" value="on" />
+    </div>
+    </form>
+<& /Elements/Navigator &>
+% }
+
+<%INIT>
+$r->headers_out->{'Pragma'} = 'no-cache';
+$r->headers_out->{'Cache-control'} = 'no-cache';
+
+my $id = $m->request_comp->path;
+$id =~ s|^/||g;
+$id =~ s|/|-|g;
+$id =~ s|\.html$||g;
+$id =~ s|index$||g
+if $id ne 'index';
+$id =~ s|-$||g;
+</%INIT>
+
+<%ARGS>
+$Prefs => '/User/Prefs.html'
+#$Focus => 'focus'
+$Focus => ''
+$Title =>  'RT'
+$Code => undef
+$Refresh => 0
+$Why => undef
+$ShowBar => 1
+$URL => undef
+$RSSAutoDiscovery => undef
+$onload => undef
+</%ARGS>
+

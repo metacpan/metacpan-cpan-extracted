@@ -1,0 +1,22 @@
+=head2 Fri Jan 13 17:34:03 2012: C<Module> L<RT::IODEF|RT::IODEF>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/rt3/local/plugins/RT-IODEF/lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

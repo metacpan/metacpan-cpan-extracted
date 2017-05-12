@@ -1,0 +1,119 @@
+NAME
+    RDF::KV - Embed RDF linked data in plain old HTML forms
+
+VERSION
+    Version 0.05
+
+SYNOPSIS
+        my $kv = RDF::KV->new(
+            subject    => $uri,      # ordinarily the Request-URI
+            graph      => $graphuri, # URI for the default graph
+            namespaces => $ns,       # default namespace prefix map
+            callback   => \&rewrite, # form-results-rewriting callback
+        );
+
+        # Processes a hashref-of-parameters, like found in Catalyst or
+        # Plack::Request. This call will ignore obviously non-matching
+        # keys, but will croak on botched attempts to use the protocol.
+
+        my $patch = eval { $kv->process($params) };
+        if ($@) {
+            # return 409 Conflict ...
+        }
+
+        # add/remove statements from the graph
+        $patch->apply($model);
+
+DESCRIPTION
+    This module provides a reference implementation for the RDF-KV protocol
+    <http://doriantaylor.com/rdf-kv>. The objective of this protocol is to
+    convey RDF linked data from a web browser to a web server using no
+    mechanism beyond conventional "application/x-www-form-urlencoded" HTML
+    forms. The overarching purpose is to facilitate the development of
+    linked data applications by making the apparatus of JavaScript an
+    *optional*, rather than a *mandatory*, consideration.
+
+    This protocol implementation works by culling key-value pairs denoted in
+    a prescribed syntax from POSTed form input (parsed by something like
+    CGI, Plack::Request or Catalyst), and then stitching them together to
+    create a patch object which is then applied to an RDF::Trine::Model
+    graph.
+
+METHODS
+  new
+    Instantiate the object. The following parameters are also (read-only)
+    accessors.
+
+    subject
+        This is the default subject URI (or blank node).
+
+    graph
+        This is the default graph URI.
+
+    namespaces
+        This URI::NamespaceMap object will enable URI abbreviation through
+        the use of CURIEs in form input.
+
+    callback
+        Supply a callback function that will be applied to subject and
+        object values, for instance to rewrite a URI. The return value of
+        this function must be understood by "add_this" in RDF::KV::Patch.
+
+  process \%CONTENT
+    Process form content and return an RDF::KV::Patch object. This is the
+    only significant method.
+
+CAVEATS
+    BYOS == Bring Your Own Security.
+
+AUTHOR
+    Dorian Taylor, "<dorian at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-rdf-kv at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=RDF-KV>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc RDF::KV
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=RDF-KV>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/RDF-KV>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/RDF-KV>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/RDF-KV/>
+
+SEE ALSO
+    RDF::KV::Patch
+    URI::BNode
+    RDF::Trine
+
+LICENSE AND COPYRIGHT
+    Copyright 2013 Dorian Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0>.
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

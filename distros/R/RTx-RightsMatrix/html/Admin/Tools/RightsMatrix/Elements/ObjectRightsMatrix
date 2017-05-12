@@ -1,0 +1,270 @@
+
+<& /Elements/ListActions, actions => \@results &>
+
+% if (!$PickUser) {
+<FORM METHOD=POST ACTION="<%$m->request_comp->name%>" ENCTYPE="multipart/form-data">
+<INPUT TYPE=HIDDEN NAME=Principal VALUE="<%$principal->Id%>">
+<INPUT TYPE=HIDDEN NAME=Save VALUE="1">
+<INPUT TYPE=HIDDEN NAME=Edit VALUE="1">
+<INPUT TYPE=HIDDEN NAME=ObjectType VALUE="<%$ObjectType%>">
+
+<table border="1" cellspacing="0">
+<tr>
+<th >Right</th>
+<th colspan="<% scalar(@objects)+1 %>" ><%$ObjectString%></th>
+</tr>
+<tr>
+<td>Name</td>
+% foreach my $object ( @objects ) {
+<td>
+  <table cellspacing="0" border="0"><tr><td><tr><td align="center" colspan="2"><b>
+%   $EquivObjects = ref($ObjectSystem) eq 'RT::System' ? [] : [ $ObjectSystem ]; # RT bug workaround
+%   if ( $Super or $session{CurrentUser}->HasRight(Right => 'Admin'.$ObjectString, Object => $object, EquivObjects => $EquivObjects) ) {
+      <a href="<%$RT::WebPath%>/Admin/<%$ObjectString%>s/Modify.html?id=<%$object->id%>"><% $object->Name %></a>
+%   }
+%   else {
+    <% $object->Name %>
+%   }
+    </b>
+  </td></tr>
+  <tr><td width="50%" align="center">All</td><td width="50%" align="center">Direct</td></tr>
+  </table>
+</td>
+% }
+<td>
+  <table cellspacing="0"><tr><td><tr><td align="center" colspan="2"><b>
+%   $EquivObjects = ref($ObjectSystem) eq 'RT::System' ? [] : [ $ObjectSystem ]; # RT bug workaround
+% if ( $Super or $session{CurrentUser}->HasRight(Right => 'Admin'.$ObjectString, Object => $RT::System, EquivObjects => $EquivObjects) ) {
+      <a href="<%$RT::WebPath%>/Admin/Global/index.html"><i>Global</i></a>
+% }
+% else {
+    <i>Global</i>
+% }
+    </b>
+  </td></tr>
+  <tr><td width="50%" align="center">All</td><td width="50%" align="center">Direct</td></tr>
+  </table>
+</td>
+</tr>
+
+% my $i;
+% RIGHTS:
+% foreach my $right (@sorted_rights) {
+% $i++;
+<tr class="<% $i%2 ? 'oddline' : 'evenline'%>" >
+  <td><b><% $right %></b></td>
+%   $EquivObjects = ref($ObjectSystem) eq 'RT::System' ? [] : [ $ObjectSystem ]; # RT bug workaround
+%   my $GlobalRight = $Super ? 1 : $principal->HasRight(Right => $right, Object => $ObjectSystem, EquivObjects => $EquivObjects);
+%  foreach my $object ( @objects ) {
+%      if ( $RightApplies->(Right => $right, Object => $ObjectType->new($RT::SystemUser), Principal => $principal) ) {
+%         my $has_direct = $principal->_HasDirectRight(Right => $right, Object => $object);
+         <td align="center">
+           <table cellspacing="0" border="0" width="100%">
+            <tr>
+%            my $url = $WhereFrom->(Principal => $principal, Object => $object, Right => $right);
+%   $EquivObjects = ref($ObjectSystem) eq 'RT::System' ? [] : [ $ObjectSystem ]; # RT bug workaround
+             <td width="50%" align="center"><a href="<%$url%>"><% ($GlobalRight or $has_direct or $principal->HasRight(Right => $right, Object => $object, EquivObjects => $EquivObjects)) ? 'Y' : '&nbsp;' |n %></a></td>
+%           if ($Edit) {
+             <td width="50%" align="center">
+                 <input type="checkbox" name="object-<%$object->id%>" value="<%$right%>" <% $has_direct ? "checked=1" : '' %> >
+                 <input type="hidden" name="object-<%$object->id%>-magic" value="<%$right%>" >
+             </td>
+%           }
+%           else {
+             <td width="50%" align="center"><% $has_direct ? 'Y' : '&nbsp;' |n %></td>
+%           }
+            </tr>
+           </table>
+         </td>
+%      }
+%      else {
+         <td align="center">-</td>
+%      }
+%  }
+%# Global
+%  if ( $RightApplies->(Right => $right, Object => $ObjectSystem, Principal => $principal) ) {
+         <td align="center">
+           <table cellspacing="0" border="0" width="100%">
+            <tr>
+%            my $url = $WhereFrom->(Principal => $principal, Object => $ObjectSystem, Right => $right);
+             <td width="50%" align="center"><a href="<% $url %>"><% $GlobalRight ? 'Y' : '&nbsp;' |n %></a></td>
+%           my $has_direct = $principal->_HasDirectRight(Right => $right, Object => $ObjectSystem);
+%           if ($Edit) {
+             <td width="50%" align="center">
+                 <input type="checkbox" name="object-0" value="<%$right%>" <% $has_direct ? "checked=1" : '' %> >
+                 <input type="hidden" name="object-0-magic" value="<%$right%>" >
+             </td>
+%           }
+%           else {
+             <td width="50%" align="center"><% $has_direct ? 'Y' : '&nbsp;' |n %></td>
+%           }
+            </tr>
+           </table>
+         </td>
+%  }
+%  else {
+         <td align="center">-</td>
+%  }
+</tr>
+% }
+</table>
+
+<p>
+<b>Note:</b> click on any <b>Y</b> under 'All' to see exactly how that user/group/role has received that right.
+</p>
+
+%#<& /Elements/TitleBoxEnd &>
+
+%if ($ARGS{Edit}) {
+<& /Elements/Submit, Label => loc("Save Changes"), Caption => "For user/group being viewed", Reset => 1 &>
+%}
+</FORM>
+% } # end PickUser
+
+<FORM METHOD=POST ACTION="<%$m->request_comp->name%>" ENCTYPE="multipart/form-data">
+<INPUT TYPE=HIDDEN NAME=ObjectType VALUE="<%$ObjectType%>">
+<& /Elements/TitleBoxStart, title => loc('View rights for'),   color=> "#993333", width => "100%" &>
+Select User or Group: <& /Admin/Tools/RightsMatrix/Elements/SelectPrincipalForRightsMatrix, Principal => $ARGS{Principal}, System => $ObjectSystem &>
+% if ($session{CurrentUser}->HasRight(Right => 'AdminUsers', Object => $RT::System)) {
+- or -
+Enter username: <INPUT NAME="User" VALUE="<%$ARGS{User}%>">
+Edit mode: <input type="checkbox" name="Edit"  <%$ARGS{Edit} ? 'CHECKED=1' : ''%> value='1' >
+% }
+<& /Elements/TitleBoxEnd &>
+
+<& /Elements/Submit &>
+</FORM>
+
+<%INIT>
+my @results;
+my $principal = $PrincipalObj;
+
+my ($ObjectString) = $ObjectType =~ /RTx?.*::(.*)/;
+
+if ( $ARGS{Principal} and $ARGS{User} ) {
+        $m->comp("/Elements/Error", Why => loc("You can't select a user and enter one manually."));
+        $m->abort;
+}
+
+my $objects = "${ObjectType}s"->new($session{CurrentUser});
+$objects->UnLimit;
+$objects->Limit(FIELD => 'id', OPERATOR => '>', VALUE => 0);
+if ($FilterField and $FilterValue) {
+    $objects->Limit(FIELD => $FilterField, OPERATOR => $FilterOp, VALUE => $FilterValue);
+}
+my @objects = @{ $objects->ItemsArrayRef };
+$m->comp('/Elements/Callback', _CallbackName => $ObjectString.'Sort', objects => \@objects);
+
+my $object = $ObjectType->new($RT::SystemUser);
+my $object_rights = $object->AvailableRights();
+my %rights = ( %$SystemRights, %$object_rights );
+
+my @sorted_rights = sort { defined $SystemRights->{$a} cmp defined $SystemRights->{$b} || $a cmp $b } keys %rights;
+
+my $EquivObjects = ref($ObjectSystem) eq 'RT::System' ? [] : [ $ObjectSystem ];
+my $Super = $principal->HasRight(Right => 'SuperUser', Object => $RT::System, EquivObjects => $EquivObjects);
+
+
+# process object rights changes
+if ($ARGS{Save}) {
+    foreach my $arg (keys %ARGS) {
+
+        next unless $arg =~ /^object-(\d+)-magic$/;
+        my ($oid) = ($1);
+        my $object = $ObjectType->new($session{CurrentUser});
+
+        my ($rv, $msg);
+        if ($oid > 0) {
+            ($rv, $msg) = $object->Load($oid);
+            if (! $rv) {
+                push @results, "Could not load object $ObjectType $oid";
+                next;
+            }
+        }
+        else {
+            $object = $ObjectSystem;
+        }
+
+        my %remaining_rights = %rights;
+        my @requested_rights = ref($ARGS{"object-$oid"}) ? @{$ARGS{"object-$oid"}} : $ARGS{"object-$oid"};
+
+        foreach (@requested_rights) {
+            delete $remaining_rights{$_};
+            if (! $principal->_HasDirectRight(Right => $_, Object => $object) ) {
+                ($rv, $msg) = $principal->GrantRight(Right => $_, Object => $object);
+                if ($rv and $oid) {
+                    push @results, ("Right $_ granted for object '" . ($object->Name ? $object->Name : 'Global') . "'");
+                }
+                elsif ($rv) {
+                    push @results, ("Right $_ granted for object 'Global'");
+                }
+                else {
+                }
+            }
+        }
+
+        foreach (keys %remaining_rights) {
+            if ($principal->_HasDirectRight(Right => $_, Object => $object) ) {
+                ($rv, $msg) = $principal->RevokeRight(Right => $_, Object => $object);
+                if ($rv and $oid) {
+                    push @results, ("Right $_ revoked for object '" . ($object->Name ? $object->Name : 'Global') . "'");
+                }
+                elsif ($rv) {
+                    push @results, ("Right $_ revoked for object 'Global'");
+                }
+                else {
+                    push @results, ("Right $_ NOT revoked for object '" . ($object->Name ? $object->Name : 'Global') . "'" . "': $msg");
+                }
+            }
+        }
+    }
+}
+
+my $RightApplies = sub {
+
+    my %args = @_;
+
+    if    (ref($args{Object}) eq ref($ObjectSystem)) {
+        return ( $rights{$args{Right}} and $args{Principal} !~ /^(.*)-Role$/ );
+    }
+    elsif (ref($args{Object}) eq $ObjectType) {
+        return $object_rights->{$args{Right}};
+    }
+
+    return 0;
+
+};
+
+my $WhereFrom = sub {
+
+    my %args = @_;
+
+    my @callers = $m->callers();
+    my $user_context = ( grep { $_->dir_path() =~ /User/ } @callers ) ? 'User/' : '';
+
+    return    "$RT::WebPath/Admin/Tools/RightsMatrix/${user_context}${ObjectString}RightsMatrix.html?"
+            . "WhereFrom=1"
+            . "&PrincipalId=" . $args{Principal}->id
+            . "&ObjectId="    . $args{Object}->id
+            . "&ObjectType="  . ref($args{Object})
+            . "&Right="       . $args{Right}
+            ;
+};
+</%INIT>
+<%ARGS>
+$User => undef
+$Edit => 0
+$PrincipalObj
+$ObjectType
+$ObjectSystem => $RT::System
+$SystemRights => $RT::System::RIGHTS
+$FilterField => undef
+$FilterValue => undef
+$FilterOp => '='
+$PickUser => 0
+</%ARGS>
+<%ONCE>
+use RTx::RightsMatrix;
+use RTx::RightsMatrix::RolePrincipal;
+
+</%ONCE>

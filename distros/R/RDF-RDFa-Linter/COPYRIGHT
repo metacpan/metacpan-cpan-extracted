@@ -1,0 +1,67 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDF-RDFa-Linter
+Upstream-Contact: Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/RDF-RDFa-Linter
+
+Files: COPYRIGHT
+Copyright: None
+License: public-domain
+Comment: This file! Automatically generated.
+
+Files: inc/Module/Install.pm
+Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Base.pm
+Copyright: Copyright 2003, 2004 by Audrey Tang <autrijus@autrijus.org>.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Include.pm
+Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Makefile.pm
+Copyright: Copyright 2002, 2003, 2004 Audrey Tang and Brian Ingerson.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Metadata.pm
+Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Package.pm
+Copyright: Copyright (c) 2011. Ingy doet Net.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/TrustMetaYml.pm
+Copyright: This software is copyright (c) 2011-2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Scalar/Util.pm
+Copyright: Copyright (c) 1997-2007 Graham Barr <gbarr@pobox.com>. All rights reserved. Copyright (c) 1999 Tuomas J. Lukka <lukka@iki.fi>. All rights reserved.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/YAML/Tiny.pm
+Copyright: Copyright 2006 - 2012 Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/unicore/Name.pm
+Copyright: 1993-2012, Larry Wall and others
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/utf8.pm
+Copyright: 1993-2012, Larry Wall and others
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/RDF/RDFa/Linter.pm
+Copyright: Copyright (C) 2010 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes LICENSE MANIFEST.SKIP Makefile.PL README TODO examples/lint_facebook.pl examples/lint_schemaorg_example.pl inc/Module/Package/Dist/RDF.pm lib/RDF/RDFa/Linter/Error.pm lib/RDF/RDFa/Linter/Service.pm lib/RDF/RDFa/Linter/Service/CreativeCommons.pm lib/RDF/RDFa/Linter/Service/Facebook.pm lib/RDF/RDFa/Linter/Service/Google.pm lib/RDF/RDFa/Linter/Service/SchemaOrg.pm linter-service/check.cgi linter-service/linter-template.xml meta/changes.ttl meta/doap.ttl meta/makefile.ttl t/01basic.t
+Copyright: Unknown
+License: Unknown
+
+License: GPL-1.0+ or Artistic-1.0
+ This software is copyright (c) 2012 by the copyright holder(s).
+ 
+ This is free software; you can redistribute it and/or modify it under
+ the same terms as the Perl 5 programming language system itself.

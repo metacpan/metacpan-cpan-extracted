@@ -1,0 +1,1355 @@
+<HTML>
+<HEAD>
+<TITLE>Relations::Family - DBI/DBD::mysql Relational Query Engine module.</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+  <!-- beginning of leaf header-->
+
+  <TABLE border=0  cellpadding=0 cellspacing=0 width=100%>
+  <TR>
+    <TD valign=middle width='100%'
+    bgcolor='#cc0066'> <font face='sans-serif' size='+1'
+    color='#ff99cc'>&nbsp;&nbsp;&nbsp;Relations::Family - DBI/DBD::mysql relational query engine object.</font>
+    </TD>
+  </TR>
+  </TABLE>
+  <p>&nbsp</p>
+  <!-- end of leaf content-->
+  
+
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#abstract">ABSTRACT</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#what it does">WHAT IT DOES</A></LI>
+		<LI><A HREF="#calling relations::family routines">CALLING RELATIONS::FAMILY ROUTINES</A></LI>
+		<LI><A HREF="#query arguments">QUERY ARGUMENTS</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::family functions">LIST OF RELATIONS::FAMILY FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#add_member">add_member</A></LI>
+		<LI><A HREF="#add_lineage">add_lineage</A></LI>
+		<LI><A HREF="#add_rivalry">add_rivalry</A></LI>
+		<LI><A HREF="#add_value">add_value</A></LI>
+		<LI><A HREF="#get_chosen">get_chosen</A></LI>
+		<LI><A HREF="#set_chosen">set_chosen</A></LI>
+		<LI><A HREF="#get_available">get_available</A></LI>
+		<LI><A HREF="#choose_available">choose_available</A></LI>
+		<LI><A HREF="#get_reunion">get_reunion</A></LI>
+		<LI><A HREF="#to_text">to_text</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::family properties">LIST OF RELATIONS::FAMILY PROPERTIES</A></LI>
+	<UL>
+
+		<LI><A HREF="#abstract">abstract</A></LI>
+		<LI><A HREF="#members">members</A></LI>
+		<LI><A HREF="#names">names</A></LI>
+		<LI><A HREF="#labels">labels</A></LI>
+		<LI><A HREF="#values">values</A></LI>
+	</UL>
+
+	<LI><A HREF="#relations::family demo  finder">RELATIONS::FAMILY DEMO - FINDER</A></LI>
+	<UL>
+
+		<LI><A HREF="#setup">Setup</A></LI>
+		<LI><A HREF="#overview">Overview</A></LI>
+		<LI><A HREF="#structure">Structure</A></LI>
+		<LI><A HREF="#role of family">Role of Family</A></LI>
+		<LI><A HREF="#usage">Usage</A></LI>
+		<LI><A HREF="#examples">Examples</A></LI>
+	</UL>
+
+	<LI><A HREF="#change log">CHANGE LOG</A></LI>
+	<UL>
+
+		<LI><A HREF="#relationsfamily0.94">Relations-Family-0.94</A></LI>
+		<LI><A HREF="#relationsfamily0.93">Relations-Family-0.93</A></LI>
+	</UL>
+
+	<LI><A HREF="#todo list">TODO LIST</A></LI>
+	<LI><A HREF="#other related work">OTHER RELATED WORK</A></LI>
+	<UL>
+
+		<LI><A HREF="#relations (perl)">Relations (Perl)</A></LI>
+		<LI><A HREF="#relationsquery (perl)">Relations-Query (Perl)</A></LI>
+		<LI><A HREF="#relationsabstract (perl)">Relations-Abstract (Perl)</A></LI>
+		<LI><A HREF="#relationsadmin (php)">Relations-Admin (PHP)</A></LI>
+		<LI><A HREF="#relationsfamily (perl)">Relations-Family (Perl)</A></LI>
+		<LI><A HREF="#relationsdisplay (perl)">Relations-Display (Perl)</A></LI>
+		<LI><A HREF="#relationsreport (perl)">Relations-Report (Perl)</A></LI>
+		<LI><A HREF="#relationsstructure (xml)">Relations-Structure (XML)</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Relations::Family - DBI/DBD::mysql Relational Query Engine module.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  # DBI, Relations::Family Script that creates some queries.</PRE>
+<PRE>
+  #!/usr/bin/perl</PRE>
+<PRE>
+  use DBI;
+  use Relations::Family;</PRE>
+<PRE>
+  $dsn = &quot;DBI:mysql:finder&quot;;</PRE>
+<PRE>
+  $username = &quot;root&quot;;
+  $password = '';</PRE>
+<PRE>
+  $dbh = DBI-&gt;connect($dsn,$username,$password,{PrintError =&gt; 1, RaiseError =&gt; 0});</PRE>
+<PRE>
+  $abstract = new Relations::Abstract($dbh);</PRE>
+<PRE>
+  $family = new Relations::Family($abstract);</PRE>
+<PRE>
+  $family-&gt;add_member(-name     =&gt; 'account',
+                      -label    =&gt; 'Cust. Account',
+                      -database =&gt; 'finder',
+                      -table    =&gt; 'account',
+                      -id_field =&gt; 'acc_id',
+                      -query    =&gt; {-select   =&gt; {'id'    =&gt; 'acc_id',
+                                                  'label' =&gt; &quot;concat(cust_name,' - ',balance)&quot;},
+                                    -from     =&gt; ['account','customer'],
+                                    -where    =&gt; &quot;customer.cust_id=account.cust_id&quot;,
+                                    -order_by =&gt; &quot;cust_name&quot;});</PRE>
+<PRE>
+  $family-&gt;add_member(-name     =&gt; 'customer',
+                      -label    =&gt; 'Customer',
+                      -database =&gt; 'finder',
+                      -table    =&gt; 'customer',
+                      -id_field =&gt; 'cust_id',
+                      -query    =&gt; {-select   =&gt; {'id'    =&gt; 'cust_id',
+                                                  'label' =&gt; 'cust_name'},
+                                    -from     =&gt; 'customer',
+                                    -order_by =&gt; &quot;cust_name&quot;});</PRE>
+<PRE>
+  $family-&gt;add_member(-name     =&gt; 'purchase',
+                      -label    =&gt; 'Purchase',
+                      -database =&gt; 'finder',
+                      -table    =&gt; 'purchase',
+                      -id_field =&gt; 'pur_id',
+                      -query    =&gt; {-select   =&gt; {'id'    =&gt; 'pur_id',
+                                                  'label' =&gt; &quot;concat(
+                                                               cust_name,
+                                                               ' - ',
+                                                               date_format(date, '%M %D, %Y')
+                                                             )&quot;},
+                                    -from     =&gt; ['purchase',
+                                                  'customer'],
+                                    -where    =&gt; 'customer.cust_id=purchase.cust_id',
+                                    -order_by =&gt; ['date desc',
+                                                  'cust_name']});</PRE>
+<PRE>
+  $family-&gt;add_lineage(-parent_name  =&gt; 'customer',
+                       -parent_field =&gt; 'cust_id',
+                       -child_name   =&gt; 'purchase',
+                       -child_field  =&gt; 'cust_id');</PRE>
+<PRE>
+  $family-&gt;add_rivalry(-brother_name  =&gt; 'customer',
+                       -brother_field =&gt; 'cust_id',
+                       -sister_name   =&gt; 'account',
+                       -sister_field  =&gt; 'cust_id');</PRE>
+<PRE>
+  $family-&gt;set_chosen(-label  =&gt; 'Customer',
+                      -ids    =&gt; '2,4');</PRE>
+<PRE>
+  $available = $family-&gt;get_available(-label  =&gt; 'Purchase');</PRE>
+<PRE>
+  print &quot;Found $available-&gt;{count} Purchases:\n&quot;;</PRE>
+<PRE>
+  foreach $id (@{$available-&gt;{ids_array}}) {</PRE>
+<PRE>
+    print &quot;Id: $id Label: $available-&gt;{labels_hash}-&gt;{$id}\n&quot;;</PRE>
+<PRE>
+  }</PRE>
+<PRE>
+  $family-&gt;add_value(-name         =&gt; 'Cust. Account',
+                     -sql          =&gt; &quot;concat(cust_name,' - ',balance)&quot;,
+                     -member_names =&gt; 'customer,account');</PRE>
+<PRE>
+  $family-&gt;add_value(-name         =&gt; 'Paid',
+                     -sql          =&gt; &quot;if(balance &gt; 0,'NO','YES')&quot;,
+                     -member_names =&gt; 'account');</PRE>
+<PRE>
+  $family-&gt;add_value(-name         =&gt; 'Customer',
+                     -sql          =&gt; 'cust_name',
+                     -member_names =&gt; 'customer');</PRE>
+<PRE>
+  $family-&gt;add_value(-name         =&gt; 'Purchase',
+                     -sql          =&gt; &quot;concat(
+                                         cust_name,
+                                         ' - ',
+                                         date_format(date, '%M %D, %Y')
+                                       )&quot;,
+                     -member_names =&gt; 'purchase,customer');</PRE>
+<PRE>
+  $reunion = $family-&gt;get_reunion(-data       =&gt; 'Paid,Purchase',
+                                  -use_labels =&gt; 'Customer',
+                                  -order_by   =&gt; 'Customer,Purchase');</PRE>
+<PRE>
+  $matrix = $abstract-&gt;select_matrix(-query =&gt; $reunion);</PRE>
+<PRE>
+  print &quot;Found &quot; . scalar @$matrix . &quot; Values:\n&quot;;</PRE>
+<PRE>
+  foreach $row (@$matrix) {</PRE>
+<PRE>
+    print &quot;Customer: $row-&gt;{'Customer'}\n&quot;;
+    print &quot;Purchase: $row-&gt;{'Purchase'}\n&quot;;
+    print &quot;Paid: $row-&gt;{'Paid'}\n\n&quot;;</PRE>
+<PRE>
+  }</PRE>
+<PRE>
+  $dbh-&gt;disconnect();</PRE>
+<P>
+<HR>
+<H1><A NAME="abstract">ABSTRACT</A></H1>
+<P>This perl module uses perl5 objects to simplify searching through
+and reporting on large, complex MySQL databases, especially those 
+with foreign keys. It uses an object orientated interface, complete 
+with functions to create and manipulate the relational family.</P>
+<P>The current version of Relations::Family is available at</P>
+<PRE>
+  <A HREF="http://www.gaf3.com">http://www.gaf3.com</A></PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="what it does">WHAT IT DOES</A></H2>
+<P>With Relations::Family you can create a 'family' of members for querying 
+records. A member could be a table, or it could be a query on a table, like
+all the different months from a table's date field. Once the members are
+created, you can specify how those members are related, who's using who
+as a foreign key lookup, and what values in members you might be interested 
+in reporting on, like whether a customer has paid their bill.</P>
+<P>Once the 'family' is complete, you can select records from one member, and
+the query all the matching records from another member. For example, say you 
+a product table being used as a lookup for a order items tables, and you want
+to find all the order items for a certain product. You can select that 
+product's record from the product member, and then view the order item 
+records to find all the order items for that product.</P>
+<P>You can also build a large query for report purposes using the selections 
+from various members as well as values you might be interested in. For 
+example, say you want to know which customer are paid up and how much 
+business they've generated in the past. You can specify which members'
+selections you want to use to narrow down the report and which values
+you'd like in the report and then use the query returned to see who's
+paid and for how much.</P>
+<P>
+<H2><A NAME="calling relations::family routines">CALLING RELATIONS::FAMILY ROUTINES</A></H2>
+<P>Most standard Relations::Family routines use both an ordered, named and
+hashed argument calling style. (All except for <CODE>to_text())</CODE> This is because 
+some routines have as many as eight arguments, and the code is easier to 
+understand given a named or hashed argument style, but since some people, 
+however, prefer the ordered argument style because its smaller, I'm glad 
+to do that too.</P>
+<P>If you use the ordered argument calling style, such as</P>
+<PRE>
+  $family-&gt;add_lineage('customer','cust_id','purchase','cust_id');</PRE>
+<P>the order matters, and you should consult the function defintions 
+later in this document to determine the order to use.</P>
+<P>If you use the named argument calling style, such as</P>
+<PRE>
+  $family-&gt;add_lineage(-parent_name  =&gt; 'customer',
+                       -parent_field =&gt; 'cust_id',
+                       -child_name   =&gt; 'purchase',
+                       -child_field  =&gt; 'cust_id');</PRE>
+<P>the order does not matter, but the names, and minus signs preceeding them, do.
+You should consult the function defintions later in this document to determine 
+the names to use.</P>
+<P>In the named arugment style, each argument name is preceded by a dash.  
+Neither case nor order matters in the argument list.  -name, -Name, and 
+-NAME are all acceptable.  In fact, only the first argument needs to begin with 
+a dash.  If a dash is present in the first argument, Relations::Family assumes
+dashes for the subsequent ones.</P>
+<P>If you use the hashed argument calling style, such as</P>
+<PRE>
+  $family-&gt;add_lineage({parent_name  =&gt; 'customer',
+                        parent_field =&gt; 'cust_id',
+                        child_name   =&gt; 'purchase',
+                        child_field  =&gt; 'cust_id'});</PRE>
+<P>or</P>
+<PRE>
+  $family-&gt;add_lineage({-parent_name  =&gt; 'customer',
+                        -parent_field =&gt; 'cust_id',
+                        -child_name   =&gt; 'purchase',
+                        -child_field  =&gt; 'cust_id'});</PRE>
+<P>the order does not matter, but the names, and curly braces do, (minus signs are
+optional). You should consult the function defintions later in this document to 
+determine the names to use.</P>
+<P>In the hashed arugment style, no dashes are needed, but they won't cause problems
+if you put them in. Neither case nor order matters in the argument list. 
+parent_name, Parent_Name, PARENT_NAME are all acceptable. If a hash is the first 
+argument, Relations::Family assumes that is the only argument that matters, and 
+ignores any other arguments after the {}'s.</P>
+<P>
+<H2><A NAME="query arguments">QUERY ARGUMENTS</A></H2>
+<P>Some of the Relations functions recognize an argument named query. This
+argument can either be a hash or a Relations::Query object.</P>
+<P>The following calls are all equivalent for $object-&gt;function($query).</P>
+<PRE>
+  $object-&gt;function({select =&gt; 'nothing',
+                     from   =&gt; 'void'});</PRE>
+<PRE>
+  $object-&gt;function(Relations::Query-&gt;new(-select =&gt; 'nothing',
+                                          -from   =&gt; 'void'));</PRE>
+<P>
+<HR>
+<H1><A NAME="list of relations::family functions">LIST OF RELATIONS::FAMILY FUNCTIONS</A></H1>
+<P>An example of each function is provided in either 'test.pl' and 'demo.pl'.</P>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+  $family = new Relations::Family($abstract);</PRE>
+<PRE>
+  $family = new Relations::Family(-abstract =&gt; $abstract);</PRE>
+<P>Creates creates a new Relations::Family object using a Relations::Abstract
+object.</P>
+<P>
+<H2><A NAME="add_member">add_member</A></H2>
+<PRE>
+  $family-&gt;add_member($name,
+                      $label,
+                      $database,
+                      $table,
+                      $id_field,
+                      $query,
+                      $alias);</PRE>
+<PRE>
+  $family-&gt;add_member(-name     =&gt; $name,
+                      -label    =&gt; $label,
+                      -database =&gt; $database,
+                      -table    =&gt; $table,
+                      -id_field =&gt; $id_field,
+                      -query    =&gt; $query,
+                      -alias    =&gt; $alias);</PRE>
+<P>Creates and adds a member to a family. There's three basic groups of 
+arguments in an add_member call. The first group sets how to name 
+the member. The second sets how to configure the member. The third 
+group explains how to create the query to display the member's records 
+for selection.</P>
+<P><STRONG>$name</STRONG> and <STRONG>$label</STRONG> - 
+In the first group, $name and $label set the internal and external
+identity, so both must be unique to the family. Typically, $name 
+is a short string used for quickly specifying a member when coding
+with a family, while $label is a longer string used to display the 
+identity of a member to user using the program. $label can have 
+spaces within it, $name cannot.</P>
+<P><STRONG>$database</STRONG>, <STRONG>$table</STRONG>, <STRONG>$alias</STRONG> and <STRONG>$id_field</STRONG> - 
+In the second group, $database, $table and $id_field set the MySQL
+properties. The $database and $table variables are the database 
+and table used by the member, while $id_field is the member's 
+table's primary key field. Relations::Family uses this info when
+connecting members to each other during a query.</P>
+<P>Two or more members might use the same table in a database, or 
+they might use the same table name in two different databases. 
+Under either of these circumstances, if just the table name was 
+used when building queries, MySQL would get confused. Enter 
+$alias. This value is used to alias the table of the member. If
+no alias is sent, this value is set to the table name of the
+member.</P>
+<P><STRONG>$query</STRONG> - 
+This is the query used to populate a member's selection list. The
+query must select two fields, 1) the id of the member, labeled 
+'id', and 2) the label of the member, labeled 'label'. The id
+field is what identifies one record from another in a way that is
+understandable to the database. The id field is usually the primary 
+key. The label field is used to distinguish one record from another 
+in a way that is understandable to the user. If a Relations::Query
+object is sent (see Query Arguments above), the object is cloned
+so the orginal is not modified.</P>
+<P>
+<H2><A NAME="add_lineage">add_lineage</A></H2>
+<PRE>
+  $family-&gt;add_lineage($parent_name,
+                       $parent_field,
+                       $child_name,
+                       $child_field);</PRE>
+<PRE>
+  $family-&gt;add_lineage(-parent_name  =&gt; $parent_name,
+                       -parent_field =&gt; $parent_field,
+                       -child_name   =&gt; $child_name,
+                       -child_field  =&gt; $child_field);</PRE>
+<PRE>
+  $family-&gt;add_lineage(-parent_label =&gt; $parent_label,
+                       -parent_field =&gt; $parent_field,
+                       -child_label  =&gt; $child_label,
+                       -child_field  =&gt; $child_field);</PRE>
+<P>Adds a one-to-many relationship to a family. This is used when a 
+member, the child, is using another member, the parent, as a 
+lookup.</P>
+<P><STRONG>$parent_name</STRONG> or <STRONG>$parent_label</STRONG> - 
+Specifies the parent member by name or label.</P>
+<P><STRONG>$parent_field</STRONG> - 
+Specifies the field in the parent member that holds the values 
+used by the child member's child_field, usually the parent 
+member's primary key.</P>
+<P><STRONG>$child_name</STRONG> or <STRONG>$child_label</STRONG> - 
+Specifies the child member by name or label.</P>
+<P><STRONG>$child_field</STRONG> - 
+Specifies the field in the child member that stores the values 
+of the parent member's field.</P>
+<P>
+<H2><A NAME="add_rivalry">add_rivalry</A></H2>
+<PRE>
+  $family-&gt;add_rivalry($brother_name,
+                       $brother_field,
+                       $sister_name,
+                       $sister_field);</PRE>
+<PRE>
+  $family-&gt;add_rivalry(-brother_name  =&gt; $brother_name,
+                       -brother_field =&gt; $brother_field,
+                       -sister_name   =&gt; $sister_name,
+                       -sister_field  =&gt; $sister_field);</PRE>
+<PRE>
+  $family-&gt;add_rivalry(-brother_label =&gt; $brother_label,
+                       -brother_field =&gt; $brother_field,
+                       -sister_label  =&gt; $sister_label,
+                       -sister_field  =&gt; $sister_field);</PRE>
+<P>Adds a one-to-one relationship to a family. This is used when a 
+member, the sister, is using another member, the parent, as a 
+lookup, and there is no more than one sister record for a given
+brother record.</P>
+<P><STRONG>$brother_name</STRONG> or <STRONG>$brother_label</STRONG> - 
+Specifies the brother member by name or label.</P>
+<P><STRONG>$brother_field</STRONG> - 
+Specifies the field in the brother member that holds the values 
+used by the sister member's sister_field.</P>
+<P><STRONG>$sister_name</STRONG> or <STRONG>$sister_label</STRONG> - 
+Specifies the sister member by name or label.</P>
+<P><STRONG>$sister_field</STRONG> - 
+Specifies the field in the sister member that stores the values 
+of the brother member's field.</P>
+<P>
+<H2><A NAME="add_value">add_value</A></H2>
+<PRE>
+  $family-&gt;add_value($name,
+                     $sql,
+                     $member_names);</PRE>
+<PRE>
+  $family-&gt;add_value(-name         =&gt; $name,
+                     -sql          =&gt; $sql,
+                     -member_names =&gt; $member_names);</PRE>
+<PRE>
+  $family-&gt;add_value(-name          =&gt; $name,
+                     -sql           =&gt; $sql,
+                     -member_labels =&gt; $member_labels);</PRE>
+<P>Adds a value to a family object. Values are used when creating
+a report query from a family object using the get_reunion
+function. Each value object is a column in the report query.</P>
+<P><STRONG>$name</STRONG> - 
+The name of the column in the report query from get_reunion.</P>
+<P><STRONG>$sql</STRONG> - 
+The sql code for a value. When the report query is created, all 
+the values appear in the form ``select $sql as $name''. When 
+referencing a member's table in the $sql of a value, make sure 
+you use the alias from a member, if the alias is any different
+from the table name,</P>
+<P><STRONG>$member_names</STRONG> or <STRONG>$member_labels</STRONG> - 
+Specifies the members needed, by name or label, by this value
+to build its $sql field. Either can be a comma delimitted 
+string or array reference.</P>
+<P>
+<H2><A NAME="get_chosen">get_chosen</A></H2>
+<PRE>
+  $chosen = $family-&gt;get_chosen($name);</PRE>
+<PRE>
+  $chosen = $family-&gt;get_chosen(-name =&gt; $name);</PRE>
+<PRE>
+  $chosen = $family-&gt;get_chosen(-label =&gt; $label);</PRE>
+<P>Returns a member's selected records in a couple different forms,
+as well as the other goodies to control the selection process.</P>
+<P><STRONG>$name</STRONG> or <STRONG>$label</STRONG> - 
+Specifies the member by name or label.</P>
+<P><STRONG>$chosen</STRONG> - 
+A hash reference of all returned values.</P>
+<P><STRONG>$chosen-&gt;{count}</STRONG> - 
+The number of selected records.</P>
+<P><STRONG>$chosen-&gt;{ids_string}</STRONG> - 
+A comma delimtted string of the ids of the selected records.</P>
+<P><STRONG>$chosen-&gt;{ids_array}</STRONG> - 
+An array reference of the ids of the selected records.</P>
+<P><STRONG>$chosen-&gt;{ids_select}</STRONG> - 
+An array reference of the ids and labels separated by tabs: ``$id\t$label''
+This is used to populate the &lt;OPTION&gt; values of an HTML &lt;SELECT&gt; list so
+that the list selections returned from the CGI module contain both the id 
+and label of each selected record.</P>
+<P><STRONG>$chosen-&gt;{labels_string}</STRONG> - 
+A tab delimtted string of the labels of the selected records.
+If labels were not set with set_chosen, this is not available.</P>
+<P><STRONG>$chosen-&gt;{labels_array}</STRONG> - 
+An array reference of the labels of the selected records. If labels 
+were not set with set_chosen, this is not available.</P>
+<P><STRONG>$chosen-&gt;{labels_hash}</STRONG> - 
+A hash reference of the labels of the selected records, keyed 
+by the selected ids. If labels were not set with set_chosen, this is not 
+available.</P>
+<P><STRONG>$chosen-&gt;{labels_select}</STRONG> - 
+A hash reference of the labels of the selected records, keyed by ids 
+and labels separated by tabs: ``$id\t$label''. This is used to populate 
+the &lt;OPTION&gt; display of an HTML &lt;SELECT&gt; list while using the CGI
+module. If labels were not set with set_chosen, this is not available.</P>
+<P><STRONG>$chosen-&gt;{match}</STRONG> - 
+The match argument set with set_chosen().</P>
+<P><STRONG>$chosen-&gt;{group}</STRONG> - 
+The group argument set with set_chosen().</P>
+<P><STRONG>$chosen-&gt;{filter}</STRONG> - 
+The filter argument set with set_chosen().</P>
+<P><STRONG>$chosen-&gt;{limit}</STRONG> - 
+The limit argument set with set_chosen().</P>
+<P><STRONG>$chosen-&gt;{ignore}</STRONG> - 
+The ignore argument set with set_chosen().</P>
+<P>
+<H2><A NAME="set_chosen">set_chosen</A></H2>
+<PRE>
+  $family-&gt;set_chosen($name,
+                      $ids,
+                      $labels,
+                      $match,
+                      $group,
+                      $filter,
+                      $limit,
+                      $ignore);</PRE>
+<PRE>
+  $family-&gt;set_chosen(-name   =&gt; $name,
+                      -ids    =&gt; $ids,
+                      -labels =&gt; $labels,
+                      -match  =&gt; $match,
+                      -group  =&gt; $group,
+                      -filter =&gt; $filter,
+                      -limit  =&gt; $limit,
+                      -ignore =&gt; $ignore);</PRE>
+<PRE>
+  $family-&gt;set_chosen(-label  =&gt; $label,
+                      -ids    =&gt; $ids,
+                      -labels =&gt; $labels,
+                      -match  =&gt; $match,
+                      -group  =&gt; $group,
+                      -filter =&gt; $filter,
+                      -limit  =&gt; $limit,
+                      -ignore =&gt; $ignore);</PRE>
+<PRE>
+  $family-&gt;set_chosen(-label   =&gt; $label,
+                      -selects =&gt; $selects,
+                      -match   =&gt; $match,
+                      -group   =&gt; $group,
+                      -filter  =&gt; $filter,
+                      -limit   =&gt; $limit,
+                      -ignore  =&gt; $ignore);</PRE>
+<P>Sets the member's records selected by a user, as well as 
+some other goodies to control the selection process.</P>
+<P><STRONG>$name</STRONG> or <STRONG>$label</STRONG> - 
+Specifies the member by name or label.</P>
+<P><STRONG>$ids</STRONG> -
+The ids selected. Can be a comma delimitted string, an array.</P>
+<P><STRONG>$labels</STRONG> -
+The labels selected. Can be a tab delimitted string, an
+array, or a hash keyed by $ids. It is isn't necessary to 
+send these, unless you want the selected labels returned 
+by get_chosen.</P>
+<P><STRONG>$selects</STRONG> -
+An array of selected ids and labels. Each array member is a
+string of the id and label value separated by a tab: ``$id\t$label''.
+This when you used the ids_select and labels_select from 
+<CODE>get_available()</CODE> to populate a &lt;SELECT&gt; list using the CGI module.</P>
+<P><STRONG>$match</STRONG> -
+Match any or all. Null or 0 for any, 1 for all. This deals with
+multiple selections from a member and how that affects matching
+records from another member. If a member is set to match any, 
+calling <CODE>get_available()</CODE> for another member will return records 
+from the second member that are connected to any of the 
+first member's selections. If a member is set to match all, calling 
+<CODE>get_available()</CODE> on another member will return records from the 
+second member that are connected to all of the first member's
+selections.</P>
+<P><STRONG>$group</STRONG> -
+Group include or exclude. Null or 0 for include, 1 for exclude. 
+This deals with whether to return matching records or non 
+matching records. If a member is set to group include, calling 
+<CODE>get_available()</CODE> for another member will return records from the 
+second member that are connected to the first member's selections. 
+If a member is set to group exclude, calling <CODE>get_available()</CODE> on 
+another member will return records from the second member that 
+are not connected to the first member's selections.</P>
+<P><STRONG>$filter</STRONG> -
+Filter labels. In order to simplify the selection process, you 
+can specify a filter to only show a select group of records 
+from a member for selecting. The filter argument accepts a string,
+$filter, and places it in the clause ``having label like 
+'%$filter%'''.</P>
+<P><STRONG>$limit</STRONG> -
+Limit returned records. In order to simplify the selection 
+process, you can specify a limit clause to only show a certain 
+number of records from a member for selecting. The limit argument 
+accepts a string, $limit, and places it in the clause ``limit 
+$limit'', so it can be a single number, or two numbers separated
+by a comma.</P>
+<P><STRONG>$ignore</STRONG> -
+Ignore or not. Null or 0 for don't ignore, 1 for ignore. If a 
+member is set to don't ignore, calling <CODE>get_available()</CODE> for another 
+member will return records from the second member that are related
+in some way (depending on match and group) to the first member's 
+selections.  If a member is set to ignore, calling <CODE>get_available()</CODE> 
+on another member will return records from the second member while 
+completely ignoring the first member's selections.</P>
+<P>
+<H2><A NAME="get_available">get_available</A></H2>
+<PRE>
+  $available = $family-&gt;get_available($name);</PRE>
+<PRE>
+  $available = $family-&gt;get_available(-name =&gt; $name);</PRE>
+<PRE>
+  $available = $family-&gt;get_available(-label =&gt; $label);</PRE>
+<P>Returns a member's available records, records related in some way 
+to the currently selected records in other members, which are not
+being ignored.</P>
+<P><STRONG>$name</STRONG> or <STRONG>$label</STRONG> - 
+Specifies the member by name or label.</P>
+<P><STRONG>$available</STRONG> - 
+A hash reference of all returned values.</P>
+<P><STRONG>$available-&gt;{count}</STRONG> - 
+The number of available records.</P>
+<P><STRONG>$available-&gt;{ids_array}</STRONG> - 
+An array reference of the ids of the available records.</P>
+<P><STRONG>$available-&gt;{ids_select}</STRONG> - 
+An array reference of ids and labels. Each array member is a 
+record's id and label separated by a tab: ``$id\t$label''. This is
+used to populate a &lt;SELECT&gt; list using the CGI module so that 
+you can see both the ids and labels selected by a user.</P>
+<P><STRONG>$available-&gt;{labels_array}</STRONG> - 
+An array reference of the labels of the available records.</P>
+<P><STRONG>$available-&gt;{labels_hash}</STRONG> - 
+A hash reference of the labels of the available records, keyed 
+by the available ids.</P>
+<P><STRONG>$available-&gt;{labels_select}</STRONG> - 
+A hash reference of the labels of the available records, keyed 
+by a record's id and label separated by a tab: ``$id\t$label''. This 
+is used to populate a &lt;SELECT&gt; list using the CGI module so that 
+you can see both the ids and labels selected by a user.</P>
+<P>
+<H2><A NAME="choose_available">choose_available</A></H2>
+<PRE>
+  $chosen = $family-&gt;choose_available($name);</PRE>
+<PRE>
+  $chosen = $family-&gt;choose_available(-name =&gt; $name);</PRE>
+<PRE>
+  $chosen = $family-&gt;choose_available(-label =&gt; $label);</PRE>
+<P>Narrows down a member's chosen records using the available 
+records to that member. So if five records are selected in a 
+member, but only three of those records are now available
+(as if called with get_available()), this function will cause
+the member to only have those three records chosen.</P>
+<P><STRONG>$name</STRONG> or <STRONG>$label</STRONG> - 
+Specifies the member by name or label.</P>
+<P><STRONG>$chosen</STRONG> - 
+A hash reference of all returned values. See the <CODE>get_chosen()</CODE>
+function for all values within the hash.</P>
+<P>
+<H2><A NAME="get_reunion">get_reunion</A></H2>
+<PRE>
+  $reunion = $family-&gt;get_reunion($data,
+                                  $use_names,
+                                  $group_by,
+                                  $order_by);</PRE>
+<PRE>
+  $reunion = $family-&gt;get_reunion(-data        =&gt; $data,
+                                  -use_names   =&gt; $use_names,
+                                  -group_by    =&gt; $group_by,
+                                  -order_by    =&gt; $order_by);</PRE>
+<PRE>
+  $reunion = $family-&gt;get_reunion(-data        =&gt; $data,
+                                  -use_labels  =&gt; $use_labels,
+                                  -group_by    =&gt; $group_by,
+                                  -order_by    =&gt; $order_by);</PRE>
+<PRE>
+  $reunion = $family-&gt;get_reunion(-data         =&gt; $data,
+                                  -use_name_ids =&gt; $use_name_ids,
+                                  -group_by     =&gt; $group_by,
+                                  -order_by     =&gt; $order_by);</PRE>
+<PRE>
+  $reunion = $family-&gt;get_reunion(-data           =&gt; $data,
+                                  -use_label_ids  =&gt; $use_label_ids,
+                                  -group_by       =&gt; $group_by,
+                                  -order_by       =&gt; $order_by);</PRE>
+<P>Returns a report query of the values specified by $data, 
+grouped and ordered by the values specified by $group_by and 
+$order_by, using the chosen ids of members specified by
+$use_names or $use_labels, or the ids specified by 
+$use_name_ids or $use_label_ids.</P>
+<P><STRONG>$data</STRONG> - 
+Specifies the values by name to be selected in the reunion.</P>
+<P><STRONG>$use_names</STRONG> or <STRONG>$use_labels</STRONG> - 
+Specifies by name or label which members' chosen ids to use 
+in narrowing down the report query. Either can be a comma 
+delimitted string or array reference.</P>
+<P><STRONG>$use_name_ids</STRONG> or <STRONG>$use_label_ids</STRONG> - 
+Specifies by name or label which ids to use in narrowing down the 
+report query. Must be a hash ref of strings of comma delimitted id 
+values, keyed by name or label.</P>
+<P><STRONG>$group_by</STRONG> and <STRONG>$order_by</STRONG> - 
+Specifies the values by name to use in the group by and order 
+by clause of the report query. Either can be a comma 
+delimitted string or array reference.</P>
+<P><STRONG>$reunion</STRONG> - 
+The report query in the form of a Relations::Query object.</P>
+<P>
+<H2><A NAME="to_text">to_text</A></H2>
+<PRE>
+  $text = $family-&gt;to_text($string,$current);</PRE>
+<P>Returns a text representation of a family. Useful for debugging purposes.</P>
+<P><STRONG>$string</STRONG> - 
+String to use for indenting.</P>
+<P><STRONG>$current</STRONG> - 
+Current number of indents.</P>
+<P><STRONG>$text</STRONG> - 
+Textual representation of the family object.</P>
+<P>
+<HR>
+<H1><A NAME="list of relations::family properties">LIST OF RELATIONS::FAMILY PROPERTIES</A></H1>
+<P>
+<H2><A NAME="abstract">abstract</A></H2>
+<P>The Relations::Abstract object a family uses to query and such.</P>
+<P>
+<H2><A NAME="members">members</A></H2>
+<P>An array reference of the members in a family.</P>
+<P>
+<H2><A NAME="names">names</A></H2>
+<P>A hash reference of the members in a family, keyed by members' names.</P>
+<P>
+<H2><A NAME="labels">labels</A></H2>
+<P>A hash reference of the members in a family, keyed by members' labels.</P>
+<P>
+<H2><A NAME="values">values</A></H2>
+<P>A hash reference of the values in a family, keyed by values' names.</P>
+<P>
+<HR>
+<H1><A NAME="relations::family demo  finder">RELATIONS::FAMILY DEMO - FINDER</A></H1>
+<P>
+<H2><A NAME="setup">Setup</A></H2>
+<P>Included with this distribution is demo.pl, which demonstrates all the listed
+functionality of Relations::Family. You must have MySQL, Perl, DBI, DBD-MySQL, 
+Relations, Relations::Query, Relations::Abstract, and Relations::Family 
+installed.</P>
+<P>After installing everything, run demo.pl by typing</P>
+<PRE>
+  perl demo.pl</PRE>
+<P>while in the Relations-Family installation directory.</P>
+<P>
+<H2><A NAME="overview">Overview</A></H2>
+<P>This demo revolves around the finder database. This database is for a made up 
+company that sells three different types of products - Toiletry: Soap, Towels,
+etc., Dining: Plates Cups, etc. and Office: Phones, Faxes, etc. The demo is an
+app that allows you to search through that database</P>
+<P>
+<H2><A NAME="structure">Structure</A></H2>
+<PRE>
+                    |---------|
+                    |  item   |        |------------|
+                    |---------|        |  product   |        |-----------|
+                    | item_id |        |------------|        |   type    |
+                /-M-|  pur_id |    /-1-|  prod_id   |        |-----------|
+                |   | prod_id |-M-/    |  prod_name |    /-1-|  type_id  |
+                |   |   qty   |        |  type_id   |-M-/    | type_name |
+                |   |---------|        |------------|        |-----------|
+                |
+                |   |---------|         |--------------|
+                |   | pur_sp  |         | sales_person |
+                |   |---------|         |--------------|        
+                |   |  ps_id  |     /-1-|    sp_id     |      |----------|  
+                |-M-| pur_id  |    /    |    f_name    |      |  region  |
+|-----------|   |   |  sp_id  |-M-/     |    l_name    |      |----------|
+| purchase  |   |   |---------|         |    reg_id    |-M--1-|  reg_id  |
+|-----------|   |                       |--------------|      | reg_name |
+|  pur_id   |-1-/                                             |----------|
+| cust_id   |-M-\      |--------------|          
+|   date    |    \     |   customer   |          |--------------|
+|-----------|     \    |--------------|          |   account    |
+                   \-1-|   cust_id    |-1--\     |--------------|
+                       |  cust_name   |     \    |    acc_id    |
+                       |    phone     |      \-1-|   cust_id    |
+                       |--------------|          |   balance    |
+                                                 |--------------|</PRE>
+<P>There's a type table for the different types of products, and a product table 
+for the different products. There's also a one-to-many relationship between type 
+to product, because each product is of a specific type.</P>
+<P>A similar relationship exists between the sales_person table, which holds all 
+the different sales people, and the region table, which holds the regions for
+the sales peoples. Each sales person belongs to a particular region, so there's
+a one-to-many relationship from the region table to the sales_person table.</P>
+<P>If there's sellers, there's buyers. This is the function of the customer 
+table. There is also an account table, for the accounts for each customer.
+Since each customer has only one account, there is merely a one-to-one
+relationship between customer and account.</P>
+<P>With sellers and buyers, there must be purchases. Enter the purchase table,
+which holds all the purchases. Since only one customer makes a certain 
+purchase, but one customer could make many purchases, there is a one-to-many 
+relationship from the customer table to the purchase table.</P>
+<P>Each purchase contains some number of products at various quantities. This is 
+the role of the item table. One purchase can have multiple items, so there is
+a one-to-many relationship from the purchase table to the item table.</P>
+<P>A product is the item purchased at different quantities, and a product can be
+in multiple purchases. Thus, there is a one-to-many relationship from the 
+product table to the item table.</P>
+<P>Finally, zero or more sales people can get credit for a purchase, so there 
+is many-to-many relationship between the sales_person and purchase tables.
+This relationship is handled by the pur_sp table, so there is a one-to-many
+relationship from the purchase table to the pur_sp table and a one-to-many 
+relationship from the sales_person table to the pur_sp table.</P>
+<P>
+<H2><A NAME="role of family">Role of Family</A></H2>
+<P>Family's role in this is true to it's name sake: It brings all of this into
+one place, and allows tables to connect to one another. A member in the finder 
+family is created for each table in the finder database, and a lineage (for
+one-to-many's) or a rivalry (for one-to-one's) for each relationship.</P>
+<P>With Family, you can select records from one member and find all the 
+connecting records in other members. For example, to see all the products
+made by a purchase, you'd go to the purchase member, and select the purchase
+in question, and then go to the product's member. The avaiable records
+in product would be all the product on that purchase.</P>
+<P>
+<H2><A NAME="usage">Usage</A></H2>
+<P>To run the demo, make sure you've followed the setup instructions, and go
+to the directory in which you've placed demo.pl and finder.pm. Run demo.pl
+like a regular perl script.</P>
+<P>The demo starts with a numbered listing of all the members of the finder 
+family. To view available records from a member and/or make selections, type
+in the member's number and hit return.</P>
+<P>The first thing you'll be asked is if you want to choose available. This 
+narrows down the current selected members of a list by the available 
+records for a list. Enter 'Y' for yes, and 'N' for no. It defaults to 'N' so 
+a blank is the same as no.</P>
+<P>You'll then get two questions regarding the presentation of a member's 
+records. I'll go into both here.</P>
+<P>Limit is for displaying only a certain number of avaiable records at a time.
+It's fed into a MySQL limit clause so it can be one number, or two separated
+by a comma. To just see X number of rows from the begining, just enter X. To
+see X number of rows starting at Y, enter Y,X.</P>
+<P>Filter is for filtering available records for display. It takes a string, and
+only returns member's available records that have the entered string in their
+label. Just enter the text to filter by.</P>
+<P>You'll then get a numbered listing of all the available records for that member, 
+as well as the match, group, ignore, limit and filter settings for that member.</P>
+<P>Next, you'll get some questions regarding which records are to be selectecd,
+and how those selections are to be used (or not used!). I'll go into them here.</P>
+<P>Selections are the records you want to choose. To choose records, type each 
+number in, separating with commas.</P>
+<P>Match is whether you want other lists to match any of your multiple selections 
+from this member or all of them. 0 for many, 1 for all.</P>
+<P>Group is whether you want to include what was selected in this member, or 
+exclude was selected, in matching other member's records. 0 for include,
+1 for exclude.</P>
+<P>Finally, you'll be asked if you want to do this again. 'Y' for yes, 'N' for
+no. It defaults to 'Y', so just type return for yes. If you choose yes, 
+you'll get a list of members, go through the selection/viewing process again.</P>
+<P>If you press 'N', demo.pl will ask if you want to create a reunion. A reunion
+is like a final report query. It defaults to 'N', so just type return for no. 
+If you choose no, the program will exit.</P>
+<P>If you choose yes, you'll get a list of all the values in finder. At the Data
+prompt, type in all values (by number) you'd like to see in the report query,
+separating each with a comma. At the Group By prompt, type in all values (by 
+number) you'd like to group by in the report query, separating each with a 
+comma. At the Order By prompt, well, I bet you can figure it out.</P>
+<P>After filling out the value information, a list of all members will be 
+displayed. You'll be asked which members chosen values should be used in the 
+query. Enter the numbers of the members to use for this.</P>
+<P>After that's all set, you'll get the customized results of your report query.</P>
+<P>
+<H2><A NAME="examples">Examples</A></H2>
+<P>All together, this system can be used to figure out a bunch of stuff. Here's
+some ways to query certain records. With each example, it's best to restart 
+demo.pl for scratch (exit and rerun).</P>
+<P><STRONG>Limit and Filter</STRONG> - 
+There are 17 Sales Persons in the database. Though this isn't terribly many, 
+you can lower the number sales people displayed at one time with Family two 
+different ways, by limitting or by filtering. Here's examples for both.</P>
+<P>First, let's look at all the sales people
+- From the members list, select 7 for Sales Person.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 17 available records:</P>
+<PRE>
+   (2)  Mimi Butterfield
+   (12) Jennie Dryden
+   (6)  Dave Gropenhiemer
+   (14) Karen Harner
+   (1)  John Lockland
+   (4)  Frank Macena
+   (13) Mike Nicerby
+   (5)  Joyce Parkhurst
+   (17) Calvin Peterson
+   (8)  Fred Pirozzi
+   (16) Mya Protaste
+   (9)  Sally Rogers
+   (15) Jose Salina
+   (3)  Sheryl Saunders
+   (11) Ravi Svenka
+   (10) Jane Wadsworth
+   (7)  Hank Wishings</PRE>
+<P>These are all the sales people.
+- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Now, let's just look at the first 5 sales peoeple.
+- From the members list, select 7 for Sales Person.
+- Don't choose available. (or just hit return)
+- Set limit to 5. 
+- No filter. (or just hit return)
+- There should be 5 available records:</P>
+<PRE>
+   (2)  Mimi Butterfield
+   (12) Jennie Dryden
+   (6)  Dave Gropenhiemer
+   (14) Karen Harner
+   (1)  John Lockland</PRE>
+<P>These are the first 5 sales people
+- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>How 'bout the last 5 sales people.
+- From the members list, select 7 for Sales Person.
+- Don't choose available. (or just hit return)
+- Set limit to 12,5. 
+- No filter. (or just hit return)
+- There should be 5 available records:</P>
+<PRE>
+   (15) Jose Salina
+   (3)  Sheryl Saunders
+   (11) Ravi Svenka
+   (10) Jane Wadsworth
+   (7)  Hank Wishings</PRE>
+<P>These are the last 5 sales people. Limit started at the 12th record,
+and allowed the next 5 records.
+- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Finaly, let's find all the sales people that have the letter 'y' in
+the first or last name.
+- From the members list, select 7 for Sales Person.
+- Don't choose available, and no limit.  (or just hit return)
+- Set filter to y. 
+- There should be 6 available records:</P>
+<PRE>
+   (12) Jennie Dryden
+   (13) Mike Nicerby
+   (5)  Joyce Parkhurst
+   (16) Mya Protaste
+   (9)  Sally Rogers
+   (3)  Sheryl Saunders</PRE>
+<P>These are all the people with the letter 'y' in their first or last name.
+- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply N, to 'Again?' (to go to reunion)
+- Reply N, to 'Create Reunion?' (to quit)</P>
+<P><STRONG>The Selections Effect</STRONG> - A purchase contains one or more products, and you can
+see which product were purchased on a purchased order by selected a record
+from the purchase member, and viewing the avaiable records of the product 
+member. Varney solutions made a purchase on jan 4th, 2001, and we'd like to 
+see what they bought.</P>
+<P>First, let's see all the products.
+- From the members list, select 3 for Product.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 13 available records:</P>
+<PRE>
+   (6)  Answer Machine
+   (13) Bowls
+   (9)  Copy Machine
+   (12) Cups
+   (10) Dishes
+   (8)  Fax
+   (7)  Phone
+   (11) Silverware
+   (4)  Soap
+   (3)  Soap Dispenser
+   (5)  Toilet Paper
+   (1)  Towel Dispenser
+   (2)  Towels</PRE>
+<P>These are all the products.
+- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Let's pick a purchase to view the products from.
+- From the members list, select 5 for Purchase.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 8 available records:</P>
+<PRE>
+   (6)  Last Night Diner - May 9th, 2001
+   (3)  Harry's Garage - April 21st, 2001
+   (7)  Teskaday Print Shop - April 7th, 2001
+   (4)  Simply Flowers - March 10th, 2001
+   (2)  Harry's Garage - February 8th, 2001
+   (8)  Varney Solutions - January 4th, 2001
+   (1)  Harry's Garage - December 7th, 2000
+   (5)  Last Night Diner - November 3rd, 2000</PRE>
+<P>- From the available records, select 8 for Varney Solutions' Purchase.
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Now, we'll check out all the products on that purchase.
+- From the members list, select 3 for Product.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 4 available records:</P>
+<PRE>
+   (6)  Answer Machine
+   (9)  Copy Machine
+   (8)  Fax
+   (7)  Phone</PRE>
+<P>These are the products purchased by Varney in January.
+- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply N, to 'Again?' (to go to reunion)
+- Reply N, to 'Create Reunion?' (to quit)</P>
+<P><STRONG>Matching Multiple</STRONG> - You can also lookup purchases by products. 
+Furthermore you can look purcahses up by selecting many products, 
+and finding purchases that have any of the selected products. You
+can even find purchases that contain all the selected products.</P>
+<P>First, let's see all the purchases.
+- From the members list, select 5 for Purchase.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 8 available records:</P>
+<PRE>
+   (6)  Last Night Diner - May 9th, 2001
+   (3)  Harry's Garage - April 21st, 2001
+   (7)  Teskaday Print Shop - April 7th, 2001
+   (4)  Simply Flowers - March 10th, 2001
+   (2)  Harry's Garage - February 8th, 2001
+   (8)  Varney Solutions - January 4th, 2001
+   (1)  Harry's Garage - December 7th, 2000
+   (5)  Last Night Diner - November 3rd, 2000</PRE>
+<P>- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Now, we'll check out all the products, select a few, and set matching to
+any so we can purchases that have any (Soap or Soap Dispenser).
+- From the members list, select 3 for Product.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 13 available records:</P>
+<PRE>
+   (6)  Answer Machine
+   (13) Bowls
+   (9)  Copy Machine
+   (12) Cups
+   (10) Dishes
+   (8)  Fax
+   (7)  Phone
+   (11) Silverware
+   (4)  Soap
+   (3)  Soap Dispenser
+   (5)  Toilet Paper
+   (1)  Towel Dispenser
+   (2)  Towels</PRE>
+<P>These are all the products.
+- From the available records, select 4,3 for Soap, and Soap Dispenser
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Now, we'll see which purchases contain either Soap or Soap Dispenser.
+- From the members list, select 5 for Purchase.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 3 available records:</P>
+<PRE>
+   (3)  Harry's Garage - April 21st, 2001
+   (2)  Harry's Garage - February 8th, 2001
+   (1)  Harry's Garage - December 7th, 2000</PRE>
+<P>- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Now, we'll check out all the products, select a few, and set matching to
+all so we can purchases that have all (Soap and Soap Dispenser).
+- From the members list, select 3 for Product.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 13 available records, Soap and Soap Dispenser *'ed,</P>
+<PRE>
+   (6)  Answer Machine
+   (13) Bowls
+   (9)  Copy Machine
+   (12) Cups
+   (10) Dishes
+   (8)  Fax
+   (7)  Phone
+   (11) Silverware
+ * (4)  Soap
+ * (3)  Soap Dispenser
+   (5)  Toilet Paper
+   (1)  Towel Dispenser
+   (2)  Towels</PRE>
+<P>These are all the products, with Soap and Soap Dispenser already selected.
+- From the available records, select 4,3 for Soap, and Soap Dispenser
+- Match = 1 (means 'all')
+- Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Now, we'll see which purchase contain both Soap and Soap Dispenser.
+- From the members list, select 5 for Purchase.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 1 available record:</P>
+<PRE>
+   (1)  Harry's Garage - December 7th, 2000</PRE>
+<P>This is the only purchase that contains both Soap and Soap Dispenser. 
+- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply N, to 'Again?' (to go to reunion)
+- Reply N, to 'Create Reunion?' (to quit)</P>
+<P><STRONG>Group Inclusion/Exclusion</STRONG> - Sometimes you'd like to find all records
+the records not connected to your selections from a particular member.
+Say you wanted to check up on all the orders from customers, except the
+Harry's Garage, who would have already let you know if there was a 
+problem.</P>
+<P>First, let's see all the purchases.
+- From the members list, select 5 for Purchase.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 8 available records:</P>
+<PRE>
+   (6)  Last Night Diner - May 9th, 2001
+   (3)  Harry's Garage - April 21st, 2001
+   (7)  Teskaday Print Shop - April 7th, 2001
+   (4)  Simply Flowers - March 10th, 2001
+   (2)  Harry's Garage - February 8th, 2001
+   (8)  Varney Solutions - January 4th, 2001
+   (1)  Harry's Garage - December 7th, 2000
+   (5)  Last Night Diner - November 3rd, 2000</PRE>
+<P>- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Let's pick a customer to not view the purchases from.
+- From the members list, select 1 for Customer.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 5 available records:</P>
+<PRE>
+   (1)  Harry's Garage
+   (4)  Last Night Diner
+   (3)  Simply Flowers
+   (5)  Teskaday Print Shop
+   (2)  Varney Solutions</PRE>
+<P>- From the available records, select 1 for Harry's Garage.
+- Match = 0 (or just hit return)
+- Group = 1 (means 'exclude')
+- Reply Y, to 'Again?' (to select another member)</P>
+<P>Now, we'll check out all the purchases not from Harry's Garage.
+- From the members list, select 5 for Purchase.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 5 available records:</P>
+<PRE>
+   (6)  Last Night Diner - May 9th, 2001
+   (7)  Teskaday Print Shop - April 7th, 2001
+   (4)  Simply Flowers - March 10th, 2001
+   (8)  Varney Solutions - January 4th, 2001
+   (5)  Last Night Diner - November 3rd, 2000</PRE>
+<P>- No Selections (or just hit return)
+- Match = 0, Group = 0 (or just hit return)
+- Reply N, to 'Again?' (to go to reunion)
+- Reply N, to 'Create Reunion?' (to quit)</P>
+<P><STRONG>Basic Reunion</STRONG> - Let's first check out which customers 
+owe us money, except for Varney Solutions of course, since
+we owe them a favor.</P>
+<P>First, let's see all the customers.
+- From the members list, select 1 for Customer.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 8 available records:</P>
+<PRE>
+   (1)  Harry's Garage
+   (4)  Last Night Diner
+   (3)  Simply Flowers
+   (5)  Teskaday Print Shop
+   (2)  Varney Solutions</PRE>
+<P>- From the available records, select 2 for Varney Solutions
+- Match = 0 (or just hit return)
+- Group = 1 (means 'exclude')
+- Reply N, to 'Again?' (to go to reunion)
+- Reply Y, to 'Create Reunion?' (to create a report)</P>
+<P>Next, we have to decide which values we want in out report. After 
+selecting create reunion, you should get a list of all values. 
+- Data = select 0,1,2 for Customer, their Account and whether or 
+not they've paid, Paid.
+- Group By = (just hit return)
+- Order By = 1, to order by customer.</P>
+<P>Finally, we have to decide which members we're going to use to 
+narrow down the query. A list will be displayed of all members
+in finder.
+- From the members list, select 1 for Customer.
+- You should get 4 results, each with 3 fields:</P>
+<PRE>
+  Customer: Harry's Garage
+  Cust. Account: Harry's Garage - 134.87
+  Paid: NO</PRE>
+<PRE>
+  Customer: Last Night Diner
+  Cust. Account: Last Night Diner - 54.65
+  Paid: NO</PRE>
+<PRE>
+  Customer: Simply Flowers
+  Cust. Account: Simply Flowers - 0.00
+  Paid: YES</PRE>
+<PRE>
+  Customer: Teskaday Print Shop
+  Cust. Account: Teskaday Print Shop - 357.72
+  Paid: NO</PRE>
+<P><STRONG>Advanced Reunion</STRONG> - Let's see how many each each Office
+product we sold and sort from least to most of numbers
+sold.</P>
+<P>First, let's see all the product types.
+- From the members list, select 8 for Type.
+- Don't choose available, no limit, and no filter. (or just hit return)
+- There should be 8 available records:</P>
+<PRE>
+   (3)  Dining
+   (2)  Office
+   (1)  Toiletry</PRE>
+<P>- From the available records, select 2 for Office
+- Match = 0 (or just hit return)
+- Group = 0 (or just hit return)
+- Reply N, to 'Again?' (to go to reunion)
+- Reply Y, to 'Create Reunion?' (to create a report)</P>
+<P>Next, we have to decide which values we want in out report.  
+- Data = select 3,9 for Product and Sold
+- Group By = select 3 for Product
+- Order By = select 9 for Sold</P>
+<P>Finally, we have to decide which members we're going to use to 
+narrow down the query. A list will be displayed of all members
+in finder.
+- From the members list, type 8 for Type.
+- You should get 4 results, each with 2 fields:</P>
+<PRE>
+  Sold: 2
+  Product: Answer Machine</PRE>
+<PRE>
+  Sold: 2
+  Product: Fax</PRE>
+<PRE>
+  Sold: 7
+  Product: Phone</PRE>
+<PRE>
+  Sold: 15
+  Product: Copy Machine</PRE>
+<P>
+<HR>
+<H1><A NAME="change log">CHANGE LOG</A></H1>
+<P>
+<H2><A NAME="relationsfamily0.94">Relations-Family-0.94</A></H2>
+<P><STRONG>Setting Get Reunion IDs</STRONG></P>
+<P>Added functionality to get_reunion to accept an alternative set of 
+member' ids to use in the reunion query. This was done for the 
+Relations::Report module's Iteration module.</P>
+<P>
+<H2><A NAME="relationsfamily0.93">Relations-Family-0.93</A></H2>
+<P><STRONG>Add Member Query Cloning</STRONG></P>
+<P>If a Relations::Query object is sent to the <CODE>add_member()</CODE> function 
+through $query, that query is now cloned so Relations-Family won't
+muck with the original.</P>
+<P><STRONG>Query Argument Functionality</STRONG></P>
+<P>Originally, the help files said that any function requiring a $query
+argument could take a Relations::Query argument, a hash, or a string.
+This isn't true (even before the above changes). The functions 
+require a hash of query pieces (keyed with select, from, etc.) or a
+Relations::Query object. This is because Relations::Family builds on 
+the query and needs the pieces separated to do this.</P>
+<P>
+<HR>
+<H1><A NAME="todo list">TODO LIST</A></H1>
+<P><STRONG>Local Listing</STRONG></P>
+<P>Add functionality to the Member module so that a member can function
+as lookup values for a certain field. This would allow enum fields to 
+be tied to a member, and allow user to select enum field values to 
+narrow down a query.</P>
+<P><STRONG>Names and Labels of Values</STRONG></P>
+<P>Add a name and label property to the Value modules. This is so Family
+will be more XML compatible since the Value module's current name 
+property can contain spaces and would be ill suited for an ID value 
+since it can contain spaces. Value will then be like Member will a 
+lowercase no spaces name for internals and a anything goes label for
+display purposes.</P>
+<P><STRONG>XML Functionality</STRONG></P>
+<P>Add functionality so that a Family module (and all its kids) can 
+import and export their configuration to XML. This will be useful when 
+the PHP and Java versions of Relations::Family come about. People
+will be able to port from one language to another with little effort.</P>
+<P>
+<HR>
+<H1><A NAME="other related work">OTHER RELATED WORK</A></H1>
+<P>
+<H2><A NAME="relations (perl)">Relations (Perl)</A></H2>
+<P>Contains functions for dealing with databases. It's mainly used as 
+the foundation for the other Relations modules. It may be useful for 
+people that deal with databases as well.</P>
+<P>
+<H2><A NAME="relationsquery (perl)">Relations-Query (Perl)</A></H2>
+<P>An object oriented form of a SQL select query. Takes hashes.
+arrays, or strings for different clauses (select,where,limit)
+and creates a string for each clause. Also allows users to add to
+existing clauses. Returns a string which can then be sent to a 
+database.</P>
+<P>
+<H2><A NAME="relationsabstract (perl)">Relations-Abstract (Perl)</A></H2>
+<P>Meant to save development time and code space. It takes the most common 
+(in my experience) collection of calls to a MySQL database, and changes 
+them to one liner calls to an object.</P>
+<P>
+<H2><A NAME="relationsadmin (php)">Relations-Admin (PHP)</A></H2>
+<P>Some generalized objects for creating Web interfaces to relational 
+databases. Allows users to insert, select, update, and delete records from 
+different tables. It has functionality to use tables as lookup values 
+for records in other tables.</P>
+<P>
+<H2><A NAME="relationsfamily (perl)">Relations-Family (Perl)</A></H2>
+<P>Query engine for relational databases.  It queries members from 
+any table in a relational database using members selected from any 
+other tables in the relational database. This is especially useful with 
+complex databases: databases with many tables and many connections 
+between tables.</P>
+<P>
+<H2><A NAME="relationsdisplay (perl)">Relations-Display (Perl)</A></H2>
+<P>Module creating graphs from database queries. It takes in a query through a 
+Relations-Query object, along with information pertaining to which field 
+values from the query results are to be used in creating the graph title, 
+x axis label and titles, legend label (not used on the graph) and titles, 
+and y axis data. Returns a graph and/or table built from from the query.</P>
+<P>
+<H2><A NAME="relationsreport (perl)">Relations-Report (Perl)</A></H2>
+<P>A Web interface for Relations-Family, Reations-Query, and Relations-Display. 
+It creates complex (too complex?) web pages for selecting from the different 
+tables in a Relations-Family object. It also has controls for specifying the 
+grouping and ordering of data with a Relations-Query object, which is also 
+based on selections in the Relations-Family object. That Relations-Query can 
+then be passed to a Relations-Display object, and a graph and/or table will 
+be displayed.</P>
+<P>
+<H2><A NAME="relationsstructure (xml)">Relations-Structure (XML)</A></H2>
+<P>An XML standard for Relations configuration data. With future goals being 
+implmentations of Relations in different languages (current targets are 
+Perl, PHP and Java), there should be some way of sharing configuration data
+so that one can switch application languages seamlessly. That's the goal
+of Relations-Structure A standard so that Relations objects can 
+export/import their configuration through XML.</P>
+
+
+    <!-- beginning of leaf footer-->
+    <p>&nbsp;</p>
+    <TABLE border=0  cellpadding=0 cellspacing=0 width=100%>
+    <TR>
+      <TD valign=middle
+        bgcolor='#cc0066'> <font face='sans-serif' size='+1'
+        color='#ff99cc'>&nbsp;&nbsp;&nbsp;Relations::Family - DBI/DBD::mysql relational query engine object.</font>
+      </TD>
+    </TR>
+    </TABLE>
+    <!-- end of leaf footer-->
+  
+</BODY>
+
+</HTML>

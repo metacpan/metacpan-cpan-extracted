@@ -1,0 +1,1044 @@
+# Use 'perldoc Changes' to read this file.
+
+=head1 NAME
+
+Changes - razor-agents
+
+=head2 2.85 (July 21, 2008)
+
+=over 4
+
+=item *
+
+Relicense under Artistic License 2.0.  See LICENSE for details.
+
+=back
+
+=head2 2.84 (May 10, 2007)
+
+=over 4
+
+=item *
+
+Update discovery hostname.
+
+=back
+
+=head2 2.83 (May 8, 2007)
+
+=over 4
+
+=item *
+
+Remove all uses of C<$'> from code.  This removes a global regex
+engine slowdown.  [issues.apache.org #5312]
+
+=back
+
+=over 4
+
+=item *
+
+Comment out or replace shell commands with Perl equivalents.
+This removes the prerequisites of uname(1) and GNU mkdir(1).
+
+=back
+
+=head2 2.82 (May 26, 2006)
+
+=over 4
+
+=item *
+
+Always disconnect from discovery server after performing
+discovery. This fixes a long standing bug wherein razor-report
+and razor-check would attempt to report to or check against the
+discovery servers.
+
+=back
+
+=head2 2.81 (Mar 16, 2006)
+
+=over 4
+
+=item *
+
+Update service policy.
+
+=back
+
+=head2 2.80 (Feb 27, 2006)
+
+=over 4
+
+=item *
+
+Untaint filenames loaded from the config file.  [Bug #1395719]
+
+=back
+
+=head2 2.79 (Feb 16, 2006)
+
+=over 4
+
+=item *
+
+Change C++ comments to C comments.  [Patch #1431589]
+
+=back
+
+=head2 2.78 (Oct 01, 2005)
+
+=over 4
+
+=item *
+
+When registering with a username and password, accept existing credentials
+if they authenticate successfully.
+
+=item *
+
+When autoregistering, attempt to write a test identity before attempting
+to register credentials.
+
+=item *
+
+Always remove the existing identity symlink before overwriting, as -e $fn
+can return false for a symlink that still exists.
+
+=item *
+
+Added several error checks to the register process.
+
+=item *
+
+Disconnect from the register server before returning when errors occur.
+
+=item *
+
+Ensure that checks and reports are sent to the appropriate servers. [Bug
+#1267559]
+
+=back
+
+=head2 2.77 (Aug 17, 2005)
+
+=over 4
+
+=item *
+
+Fixed corrupted distribution.
+
+=back
+
+=head2 2.76 (Aug 15, 2005)
+
+=over 4
+
+=item *
+
+When no reporter identity is found, attempt to register automatically.
+
+=item *
+
+When -home is specified on the command line, default C<global_razorhome> to
+the provided value.  [Gentoo #101070]
+
+=back
+
+=head2 2.75 (July 6, 2005)
+
+=over 4
+
+=item *
+
+Removed two debugging statements accidentally checked into 2.74.
+
+=item *
+
+Applied syslog patch from Debian bug #295727 to reintroduce support for
+'sys-syslog' and 'syslog' log targets.  [Feature #1229433]
+
+=item *
+
+Modified Makefile.PL to honor DESTDIR when installing section 5 man
+pages.  [Bug #1227167]
+
+=item *
+
+Fixed failure for razor-agents to exit with error when unknown
+parameters were specified.  [Bug #1229450]
+
+=item *
+
+Fixed bug for when razor-agents was invoked without ``-f'' but reading
+from STDIN, causing the shell to be unusable until the forked
+background process was killed off.  [Bug #1229887]
+
+
+=back
+
+=head2 2.74 (June 28, 2005)
+
+=over 4
+
+=item *
+
+Fixed handling of configuration options; under certain circumstances,
+neither the defaults nor the configuration file would set necessary
+variables such as C<listfile_discovery>.
+
+=item *
+
+Fixed handling of -home option; when provided, it will be accepted
+without further checks.
+
+=item *
+
+Fixed installation of man(5) pages by non-root users to local man
+directories.  [Patch #1227162]
+
+=item *
+
+Reverted a patch that was intended to add support for overriding
+razorhome under certain circumstances.  The patch introduced new
+issues with external program integration (eg. Amavis).
+[Bug #1074391]
+
+=item *
+
+Corrected a spelling error in a debug message.
+
+=item *
+
+Added several defined checks to avoid unnecessary warnings when
+manipulating server lists.
+
+=item *
+
+Corrected the preprocessing fix shipped with 2.70 and updated the
+test suite to match.  [Bug #1001417]
+
+=item *
+
+Updated preproc implementation (deHTMLxs) to match other clients.
+
+=back
+
+=head2 2.72 (June 16, 2005)
+
+=over 4
+
+=item *
+
+C<razor-client> no longer creates symlinks to itself upon installation;
+four new scripts have been added to the distribution to replace this
+functionality (C<razor-admin>, C<razor-check>, C<razor-report>, C<razor-revoke>).
+
+=back
+
+=head2 2.71 (June 15, 2005)
+
+=over 4
+
+=item *
+
+A fix to Makefile.PL script to correctly invoke C<razor-client>
+after installation. Thanks to Liam Quinn for the patch.
+
+=back
+
+=head2 2.70 (June 10, 2005)
+
+=over 4
+
+=item *
+
+Fixed preprocessing of unusual HTML messages. This resolves the
+segfault issue in razor-agents. [Bug #1001417]
+
+=item *
+
+Fixed handling of certain malformed headers.
+
+=item *
+
+Explicitly specify the record separator as C<\n> when reading files, to
+ensure that someone else hasn't set it to undef. [Patch #537813]
+
+=item *
+
+C<razorzone> is no longer supported and has been removed from the
+documentation.
+
+=item *
+
+Allow the config file to set razorhome.  [Bug #1074391]
+
+=item *
+
+Razor Agents no longer go into an infinite loop when discovery
+fails. [Bug #1016039]
+
+=item *
+
+Properly creates C<razor-*> symlinks after installation.  [Bug #874468]
+
+=item *
+
+Default to PERLPREFIX instead of PREFIX when installing man5 pages.
+[Bug #1001320]
+
+=item *
+
+Removed a call to $sha1->reset() which was breaking SHA1 calculation.
+[Bug #1004858]
+
+=item *
+
+C<use_engines> is no longer supported and has been removed from
+the documentation.  [Bug #1120311]
+
+=item *
+
+Shuffle the discovery, catalogue, and nomination server lists
+after loading them from disk; this prevents razor-agents from
+always starting with the same catalogue server.
+
+=item *
+
+Replace the complex DNS lookup logic for discovery servers with
+a single DNS round robin.  [Bug #604679]
+
+=item *
+
+Remove the ICMP ping logic for finding the "fastest" catalogue
+server; the configuration option for this logic is now ignored.
+[Support #739464]
+
+=item *
+
+Removed stale engine code for various signature types that are no
+longer used.
+
+=back
+
+=head2 2.67 (December 03, 2004)
+
+=over 4
+
+=item *
+
+This is a patch release that fixes a bug in the Whiplash
+signature scheme. The bug was in the new code added to support
+canonicalization of domains. It caused the signature algorithm
+to generate no signatures on valid content.
+
+=back
+
+=head2 2.66 (December 02, 2004)
+
+=over 4
+
+=item *
+
+Introduced support for country domain canonicalization in the
+Whiplash signature scheme. This means domains like foo.co.uk
+would be extracted correctly by Whiplash. This change affords a
+considerable improvement in accuracy.
+
+=item *
+
+Modified the revocation logic to do signature-only
+communications with the server. All versions of razor-agents
+prior to this sent the entire message on razor-revoke, and even
+though the backend would drop the messages after computing
+signatures, this entailed a privacy risk. From this version on
+razor-agents will _never_ send the contents of a revoked message
+to the backend servers.
+
+=item *
+
+Fixed a bug in C<se> (supported engines) computation, which was
+broken when the C<se> mask was larger than 8 bits. This would
+sometimes disable the use of engine 4 (ehash). This fix would
+also afford an increase in accuracy due to ehash being used
+everytime.
+
+=item *
+
+Fixed a bug in report by message. Version 2.61 would drop MIME
+headers on certain spam messages which would cause the backend
+to ignore these messages as malformed.
+
+=back
+
+=head1 2.61 (July 06, 2004)
+
+=over 4
+
+=item *
+
+Introduced the Whiplash signature scheme. Whiplash signatures
+are based on canonical domain names present in URLs embedded in
+spam messages. A Whiplash signature is also a function of the
+length of the spam message. It's important to note that not all
+whiplashes are used as classifiers. The Whiplash engine is
+augmented by sophesticated logic on the Razor2 backend to select
+the Whiplashes that are used to filter spam.
+
+=item *
+
+Fixed a bug in MIME parser whereby some broken MIME mails were
+invisible to the system. [Bug #788723]
+
+=item *
+
+We override the C<use_engines> parameter in the config file
+because this version supports different engines but leaves the
+config file untouched. [Bug #984374]
+
+=item *
+
+Engine 1 support completely removed. Engine 1 was a signature
+scheme compatible with the old razor v1 signatures, which is no
+longer supported on the backend. [Bug #975490]
+
+=back
+
+=head1 2.40 (Dec 07, 2003)
+
+=over 4
+
+=item *
+
+Applied patch from Michael (lemkemch) to make Razor Agents work on VMS.
+(SF patch #797003).
+
+=item *
+
+Applied another Makefile.PL patch from Michael Schwern to correctly
+install manpages in part 5 of the manual set in various versions of perl.
+
+=item *
+
+Applied patch from Mark Martinec and Vivek Khera of Amavid to untaint
+various file targets obtained from user input. This is the same patch pointed
+to by the SpamAssassin FAQ
+[http://www.spamassassin.org/released/Razor2.patch]
+
+=item *
+
+Support for HTTP 1.1 tunneling [SF patch #821324] by Jon Schewe.
+
+=item *
+
+Applied Anne Bennett's patch to Logger.pm to introduce a new log
+target, "syslog-sys", that talks to Syslog over a Unix socket rather
+than a TCP socket.
+
+=item *
+
+Applied Anne Bennett's patch to deHTML.xs to get rid of the type
+mismatch warning.
+
+=item *
+
+Removed computation of signatures that are no longer supported by the
+backend -- engines 1, 2 and 3. Digest::Nilsimsa no longer required by
+Razor Agents.
+
+=back
+
+=head1 2.36 (Aug 05, 2003)
+
+=over 4
+
+=item *
+
+Removed some experimental code.
+
+=back
+
+=head1 2.35 (Aug 05, 2003)
+
+=over 4
+
+=item *
+
+Applied a patch to Makefile.PL by Michael Schwern. This patch makes
+Makefile.PL compatible with new MakeMaker and behave better in general.
+
+=item *
+
+C++ style comments in deHTML code replaced with C comments so the code
+compiles with C compilers other than GCC.
+
+=item *
+
+Applied patch [SF patch #766292] by Suren A. Chilingaryan to detect and
+skip body parts that only contain MIME headers.
+
+=back
+
+=head1 2.34 (May 16, 2003)
+
+=over 4
+
+=item *
+
+Fixed a bug where razor-check would terminate prematurely on messages for
+which it could not compute a signature. Thanks to Bela Lubkin for tracking
+this and several other bugs down! [vipul]
+
+=item *
+
+We don't do server sorting by distance anymore. Most servers are closeby,
+so we use the order the discovery server gives us. [vipul]
+
+=item *
+
+Introduced SOCKS support. Net::SOCKS is required in order to use SOCKS.
+Specify socks_server in the config file. [vipul]
+
+=item *
+
+Fixed a bug in String::split_mime(); the MIME boundry was being spuriously
+set in certain cases. [SF bug #707850 by Jams H Thompson]. [vipul]
+
+=item *
+
+Razor agents use getpwuid() instead of getlogin() to determine the user's
+home directory. [SF bug #650410 by Jochen Erwied]. [vipul]
+
+=item *
+
+A bug in the selection of zone prefixes in bootstrap discovery was fixed.
+[SF bug #604679 by Bill Sobel] [vipul]
+
+=item *
+
+Razorhome is gleaned from the config file passed to razor-agents, if all
+else fails. "razor-report -conf=/etc/razor/razor.conf spam" will use
+/etc/razor as its home if no other home is found (eg in $HOME/.razor).
+To force a particular Razorhome value, use the -home=path option. [vipul]
+
+=item *
+
+Rewrote many error messages to be descriptive and helpful. [vipul]
+
+=item *
+
+auth=ai provides client name and version. [vipul]
+
+=item *
+
+discover() will force bootstrap discovery when all discovery servers are
+unavailable. This fixes a bug where by razor-agents would try to connect
+to the old Razor2 discovery server found in servers.discovery.lst. [vipul]
+
+=item *
+
+reportit() in background mode will return faster. [vipul]
+
+=item *
+
+checkit(), reportit(), parse_mbox(), etc take an ARRAY hash as an argument
+when provided against the `aref' key. [vipul]
+
+=back
+
+=head1 2.22 (Nov 21 2002)
+
+=over 4
+
+=item *
+
+Turned off verbose logging in ehash that was left on by mistake. [vipul]
+
+=item *
+
+Some user contributed additions to the FAQ.
+
+=back
+
+
+
+=head1 2.21 (Nov 19 2002)
+
+=over 4
+
+=item *
+
+Ephemeral Hash reverts to the entire content when both sections are
+composed of whitespace. This makes a certain type of false positives go
+away. [vipul]
+
+=item *
+
+Razor2::Client::Core skips whitespace only message parts. [vipul]
+
+=item *
+
+DebugLevel 15 prints out the content after preprocessing, just before the
+signatures are computed. [vipul]
+
+=back
+
+
+
+=head1 2.20 (Oct 15, 2002) (First Stable Version)
+
+=over 4
+
+=item *
+
+If log file isn't writable for whatever reason, we write logs to
+/dev/null. [vipul]
+
+=item *
+
+We look for stray C<\r>'s in the split_mime function. Thanks to
+Jim <jim@ironchicken.org> for pointing this out. [vipul]
+
+=item *
+
+Added a significantly faster XS version of deHTML code. [vipul]
+
+=item *
+
+Made ::Agent taint friendly. [vipul]
+
+=item *
+
+Added support for passing an already open filehandle to C<::Agent::checkit()>
+and C<::Agent::parse_mbox()> [vipul]
+
+=item *
+
+Made logic_method 4 the default. [vipul]
+
+=item *
+
+Added Razor2::Syslog to the package. [vipul]
+
+=back
+
+=head1 2.14 (July 24, 2002)
+
+=over 4
+
+=item *
+
+General release of 2.126 [chad]
+
+=back
+
+=head1 2.126 (July 24, 2002)
+
+=over 4
+
+=item *
+
+Improved logic again for detecting spam.
+[chad, vipul]
+
+=item *
+
+Run-time warnings are disabled unless in debug mode.
+[chad]
+
+=back
+
+=head1 2.125 (July 18, 2002)
+
+=over 4
+
+=item *
+
+Improved logic for detecting spam, now we only
+look at visible and/or significant mime parts.
+[chad, vipul]
+
+=item *
+
+Mime parts cleaned to only whitespace are now ignored on
+the client side,
+that is, they are not checked against server
+[chad]
+
+=item *
+
+Fixed bug in report (err 202)
+[chad]
+
+=item *
+
+Quieted more warnings
+[chad]
+
+
+
+
+
+=back
+
+=head1 2.123 (July 17, 2002)
+
+=over 4
+
+=item *
+
+Fixed bug in revoke/report
+[chad]
+
+=item *
+
+Whitelist now looks at all 'Received:' headers for matching
+[chad]
+
+
+=item *
+
+Added debuglevel, whitelist cmd-line options
+[chad]
+
+=item *
+
+Quieted more warnings
+[chad]
+
+
+
+
+
+=back
+
+=head1 2.122 (July 15, 2002)
+
+=over 4
+
+=item *
+
+Renamed razor-register razor-admin. To register, you must
+'razor-admin -register'
+[chad]
+
+=item *
+
+Cleanded up how we store mail parts.  Each mail object now
+has a part object that stores info relevant to that part.
+[chad]
+
+=item *
+
+Fixed parse_mbox (reading mbox and rfc822 mails)
+[chad]
+
+=item *
+
+Backup any existing identity files before writing over them (with new identity)
+[chad]
+
+=item *
+
+Added lock file support, so only one process writes to servers.*.lst at a time
+[chad]
+
+=item *
+
+Added rediscover_wait_dns
+[chad]
+
+=item *
+
+Fixed a bug when we rediscover, we save info to list correctly but
+when using it we skip the first server
+[chad]
+
+=item *
+
+Fixed whitelist so rule 'from xx' only matches 'From: .*xx' not 'From .*xx'
+(Note the ':')
+[chad]
+
+=item *
+
+Made exit codes cleaner
+[chad]
+ 0 or 1       => no error
+ 2 or greater => error
+
+=item *
+
+Fixed error msg/exit code after disconnect
+[chad]
+
+=item *
+
+Added -w to razor binaries
+[chad]
+
+=item *
+
+If authen fails 'cuz unknown user (213), attempt re-register
+[chad]
+
+=item *
+
+Quieted a bunch of warnings
+[chad]
+
+
+
+
+
+
+=back
+
+=head1 2.12 (June 28, 2002)
+
+=over 4
+
+=item *
+
+Man pages install correctly.
+[chad]
+
+=item *
+
+Updated 'razor-register -create' so it creates home, conf,
+and forces discovery creating all .lst files.
+[chad]
+
+=item *
+
+added -discover switch to force discovery
+[chad]
+
+=item *
+
+Everytime server bumps srl, force discovery.
+[chad]
+
+=item *
+
+Fixed bug in preprocessor for engine 1, might
+have caused false postivies.
+[chad]
+
+=item *
+
+Whitelist fixed.
+[chad]
+
+=item *
+
+Default logging is much more quiet,
+debuglevel changed from 5 to 3.
+[chad]
+
+=item *
+
+Debug mode (-d) default debuglevel changed from 5 to 9
+[chad]
+
+=item *
+
+Fixed lots of logging foo.
+[chad]
+
+=back
+
+
+
+=head1 2.10 (June 22, 2002)
+
+=over 4
+
+=item *
+
+Significantly improved runtime by not loading all packages
+until they are needed.
+These include: Time::HiRes Net::Ping Net::DNS.
+[chad]
+
+=item *
+
+Non-mbox support added, thanx to Aaron Hopkins <aaron@die.net>.
+Now you can do:
+
+ razor-check mail1 mbox mail2 ...
+
+=item *
+
+-M mbox option has been removed, Razor Agents will figure out
+if file is mbox or not.
+[chad]
+
+=item *
+
+Fixed a couple bugs relating to incorrect logs.
+[chad]
+
+=item *
+
+Fixed a bug relating to first-time caching of a new server.
+[chad]
+
+=item *
+
+Added ep4 to default server cache.
+[chad]
+
+=back
+
+
+
+=head1 2.09 (June 20, 2002)
+
+=over 4
+
+=item *
+
+Added a BUGS file to distribution
+[chad]
+
+=item *
+
+Added an overview manpage, razor-agents(1), updated the rest.
+[chad]
+
+=item *
+
+Overhauled how razorhome, config files, identity files,
+and -create work.
+Support the case where there is not and never will be a razor home dir.
+New options:
+
+ -home=razorhome  (all Razor Agents)
+ -ident=identity  (report, revoke, and register)
+
+
+=item *
+
+Should not check/report if length of cleaned body part is 0.
+[chad]
+
+=item *
+
+razor-register -sys switch removed
+[chad]
+
+=item *
+
+Fixed various bugs relating to engine 1 and razor 1 compatibility
+[chad]
+
+=item *
+
+Fixed bugs relating to sending/receiving queries to/from server.
+[chad]
+
+=back
+
+=head1 2.08 (June 16, 2002)
+
+=over 4
+
+=item *
+
+Removed the debug statements from Razor2::Signature::Ephemeral. [vipul]
+
+=back
+
+=head1 2.07 (June 15, 2002)
+
+=over 4
+
+=item *
+
+Added deNewline.pm to the tarball.  It was missing from 2.06. [vipul]
+
+=back
+
+=head1 2.06 (June 15, 2002)
+
+=over 4
+
+=item *
+
+Added a deNewline preprocessor that removes trailing C<\n>s. Reflected the
+change in the server code as well. The reason for this is that MUAs (like
+mutt) strip trailing C<\n>'s so there's no way to get to the original
+message. This change necessitates upgrade from old 2.x agents. [vipul]
+
+=item *
+
+Fixed a bug in Config.pm to use EUID instead of UID to discover user's
+Razor config directory. Thanks to Theo Van Dinter <felicity@kluge.net> for
+the patch. [vipul]
+
+=item *
+
+Fixed a bug in sort in Razor2::String. [vipul]
+
+=back
+
+=head1 2.05 (June 15, 2002)
+
+=over 4
+
+=item *
+
+Fixed port bug with bootstrap_discovery (initial register fails) -chad
+
+=back
+
+=head1 2.04 (June 13, 2002)
+
+=over 4
+
+=item *
+
+Added 'use_engines' to razor-agent.conf(5) [chad]
+
+=item *
+
+Fixed a bug in reading port from server:port. Thanks to Theo Van Dinter <felicity@kluge.net>. [chad]
+
+=item *
+
+Client behaves properly by sending a=q when done with server. [chad]
+
+=item *
+
+Client now turns off VR2 by default. [chad]
+
+=item *
+
+Logs to stdout if -d (debuggin) cmd-line option is used. [chad]
+
+=item *
+
+Register string now Razor-Agents v2.xx. [chad]
+
+=back
+
+=head1 2.03 (June 13, 2002)
+
+=over 4
+
+=item *
+
+Fixed a bug in deHTML that was causing razor-check to hang on certain type
+of content.
+
+=item *
+
+Fixed a bug in regexes in the MIME decoding function.
+
+=back
+
+
+

@@ -1,0 +1,54 @@
+<!-- $Id: dbi.html,v 1.2 2000/10/22 10:59:00 aigan Exp $ -->
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "dtd/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="se" lang="se">
+  <head>
+    <title>
+      Wraf DBI Interface
+    </title>
+  </head>
+  <body>
+
+    <h1>Wraf DBI Interface</h1>
+
+    <p>Statements storeded in a DBI interface will have their
+      resources also stored in the DB. If you say that a specific
+      class is a subClassOf another class, this means that the URI
+      subClassOf is stored in the DB, even if it is primarly handled
+      by the RDFS interface.
+    </p>
+
+
+    <h2>Models</h2>
+
+    <p>The node will point to a model and that model will hold
+      information about the origin of the information and then it was
+      last updated. The agent will be the URI for the server and the
+      source will be the URI of the interface.  The details of this
+      has not been developed.
+    </p>
+
+    <h2>Interfaces</h2>
+
+    <p>The object in the cache will be marked with the interface that
+      handles its storage/retrievel. Other modules could offer methods
+      for the object.
+    </p>
+
+    <p>A search for a resource will use the range/content of the
+      object. The find method for a model will search its contents, a
+      find for a interface will search the interface and a find for
+      the RDF::Service object will search all connected interfaces.
+    </p>
+
+    <p>It's one thing to be the owner or home interface of a node, and
+      antoher thing to say something about the node or with the
+      node. If we want to know everything said about a thing, we will
+      have to search all interfaces that could give a part of the
+      answer. But if we only want to know whats said from a limited
+      number or sources, we can restrict the search to the interfaces
+      that handles the models owned by the source we are intrested in.
+    </p>
+
+  </body>
+</html>

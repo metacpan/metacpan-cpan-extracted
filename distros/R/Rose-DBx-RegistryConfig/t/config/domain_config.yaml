@@ -1,0 +1,62 @@
+# -----------------------------------------------------------------------------
+#
+#   DOMAIN_CONFIG: Data source definitions used to build data source registry
+#                  (Rose::DBx::RegistryConfig default representation)
+# -----------------------------------------------------------------------------
+# For demonstration and testing, the following namespace representation has the
+# same meaning as the much-longer Rose::DB default format (below) and is
+# recognized by the Rose::DBx::RegistryConfig default domain parser (which knows
+# that types assume the default values for unspecified settings and that
+# each database name, if unspecified, is the same as the type name:
+dev-local:
+    defaults:
+        driver:         sqlite
+        host:           localhost
+        connect_options:
+                        ShowErrorStatement: 0
+    taxonomy:
+        database:   t/db/taxonomy.sqlite
+    art_gallery:
+        database:   t/db/art_gallery.sqlite
+    some_other_db1:
+        database:   t/db/some_other_db1.sqlite
+    some_other_db2:
+        database:   t/db/some_other_db2.sqlite
+    some_other_db3:
+        database:   t/db/some_other_db3.sqlite
+#
+# The following is the standard Rose::DB representation of the same
+# configuration as used in ROSEDBRC (it is undesirably redundant for setups
+# such as this):
+#
+# dev-local:
+#     taxonomy:
+#         driver:         sqlite
+#         host:           localhost
+#         database:       t/db/taxonomy.sqlite
+#         connect_options:
+#                         ShowErrorStatement: 0
+#     art_gallery:
+#         driver:         sqlite
+#         host:           localhost
+#         database:       t/db/art_gallery.sqlite
+#         connect_options:
+#                         ShowErrorStatement: 0
+#     some_other_db1:
+#         driver:         sqlite
+#         host:           localhost
+#         database:       t/db/some_other_db1.sqlite
+#         connect_options:
+#                         ShowErrorStatement: 0
+#     some_other_db2:
+#         driver:         sqlite
+#         host:           localhost
+#         database:       t/db/some_other_db2.sqlite
+#         connect_options:
+#                         ShowErrorStatement: 0
+#     some_other_db3:
+#         driver:         sqlite
+#         host:           localhost
+#         database:       t/db/some_other_db3.sqlite
+#         connect_options:
+#                         ShowErrorStatement: 0

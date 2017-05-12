@@ -1,0 +1,19 @@
+@prefix : <#>.
+
+<> :comment "hey there".
+
+<> :comment """ Hey there! """.
+
+<> :comment """\
+What's up doc!!!
+""".
+
+<> :comment """
+
+He said "How are you?".  This surprised me.
+
+""".
+
+<> :comment " Double quoted string \
+across mulitple lines \
+by escaping the newline".

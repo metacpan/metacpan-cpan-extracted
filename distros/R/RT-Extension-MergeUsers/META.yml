@@ -1,0 +1,33 @@
+---
+abstract: 'Merges two users into the same effective user'
+author:
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-MergeUsers
+no_index:
+  directory:
+    - html
+    - inc
+    - xt
+  package:
+    - RT::User
+    - RT::Users
+    - RT::Principal
+requires:
+  perl: 5.8.3
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://github.com/bestpractical/rt-extension-mergeusers
+version: 1.02_01
+x_module_install_rtx_version: '0.37'
+x_requires_rt: 4.0.0

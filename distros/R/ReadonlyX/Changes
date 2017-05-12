@@ -1,0 +1,25 @@
+Revision history for Perl extension ReadonlyX.
+
+1.04 2016-07-18T12:04:41Z
+
+    - Fake $Readonly::VERSION
+
+1.03 2016-07-16T21:39:43Z
+
+    - Don't clobber predefined variables with implicit undef
+    - More documentation updates
+    - Wrap tests that could fail due to bugs in perl related to readonly arrays
+    - Include Readonly vs. ReadonlyX benchmarks in docs and update eg/benchmark.pl
+
+1.02 2016-07-16T12:40:12Z
+
+    - Minor documentation update
+
+1.01 2016-07-16T01:41:17Z
+
+    - Hide fake Readonly package from PAUSE (I hope)
+
+1.00 2016-07-16T01:29:19Z
+
+    - Brand spankin' new!
+    - This passes a modernized variation of Readonly's 2.05 test suite

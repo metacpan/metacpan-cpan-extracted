@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+
+use strict;
+use Carp;
+use Games::Roguelike::Utils qw(:all);
+
+$| = 1;
+open STDERR, ">&STDOUT";
+
+#### TEST POV ####
+
+my @map;
+
+$map[0] = '
+ 12345678
+1######k#
+2#@     #
+3###  ###
+';
+
+$map[1] = '
+ 12345678
+1######k#
+2###### #
+3#@     #
+4###  ###
+';
+
+$map[2] = '
+ 12345678
+1#  k####
+2# #    #
+3#@ #   #
+4###  ###
+';
+
+$map[3] = '
+ 12345678
+1    k
+2    ###
+3     @#
+';
+
+$map[4] = '
+ 12345678
+1#@#    #
+2# #    #
+3# #    #
+4##k  ###
+';
+
+$map[5] = '
+ 12345678
+1#@#k   #
+2#      #
+3#      #
+4##   ###
+';
+
+$map[6] = '
+ 12345678
+1#@#    # 
+2# #k   #
+3#      #
+4#    ###
+';
+
+$map[7] = '
+ 12345678
+1#@..k  #
+2#      #
+3#      #
+4#    ###
+';
+
+if (@ARGV) {
+	my @m;
+	for (@ARGV) {
+		push @m, $map[$_];
+	}
+	@map = @m;
+}
+
+for my $map (@map) {
+my @m;
+my ($x, $y, $cx, $cy, $tx, $ty);
+$y=0;
+for (split(/\n/, $map)) {
+	next if /^$/;
+	$x = 0;
+        for (split(//, $_)) {
+                if ($_ eq '@') {
+                        $cx = $x;
+                        $cy = $y;
+                        $m[$x][$y] = '.';
+                } elsif ($_ eq 'k') {
+                        $tx = $x;
+                        $ty = $y;
+                        $m[$x][$y] = '.';
+                }  else {
+                        $m[$x][$y] = $_;
+                }
+        ++$x;
+        }
+        ++$y;
+}
+
+print "\n*********** V: $cx,$cy -> $tx,$ty\n";
+
+print $map;
+
+my $r = Games::Roguelike::Area->new(noconsole=>1);
+my $c = Games::Roguelike::Mob->new($r, x=>$cx,y=>$cy,pov=>7);
+$r->{map} = \@m;
+$r->{debugfov} = 1;
+$Games::Roguelike::Area::OKINLINEPOV = 1;
+my $resc = $r->checkpov($c, $tx, $ty);
+print "FOV C: " . $resc . "\n";
+$Games::Roguelike::Area::OKINLINEPOV = 0;
+my $resp = $r->checkpov($c, $tx, $ty);
+$| = 1;
+print "FOV P: " . $resp . "\n";
+print "*****ERROR MISMATCH*****" if $resc != $resp;
+}
+

@@ -1,0 +1,11 @@
+%# Forbid direct access in this directory -- everything goes thru dhandler
+<%INIT>
+my $path_info = $r->path_info;
+my $dir_path = $m->request_comp->dir_path;
+$path_info =~ s{^$dir_path}{};
+$m->notes(dhandler_arg => $path_info);
+return $m->comp('dhandler');
+</%INIT>
+<%FLAGS>
+inherit	=> undef
+</%FLAGS>

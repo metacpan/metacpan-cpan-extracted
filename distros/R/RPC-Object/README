@@ -1,0 +1,34 @@
+RPC-Object
+==========
+
+RPC::Object is a lightweight implementation to allow remote procedure
+calls. It is designed to be simple and only work between Perl codes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module only requires these core modules and libraries:
+
+     threads
+     threads::shared
+     Carp
+     IO::Socket
+     Storable
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2006 - 2007 by Jianyuan Wu <jwu@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

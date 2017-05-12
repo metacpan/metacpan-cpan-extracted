@@ -1,0 +1,4 @@
+0.05
+    Fix a UI bug that broke ColumnMap and made the Delete link it ticket lists look awful
+    Check for DeleteTicket before displaying a link
+    RT4 compat notes

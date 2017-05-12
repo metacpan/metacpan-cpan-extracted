@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 72cc4d448d90e7a29bf7958eca4189475fe3b979 Build.PL
+SHA1 61a900315874e030c0d985133620a79a8be3b965 Changes
+SHA1 d3d57bc086298a088fe2443e29499e96850ce23e INSTALL
+SHA1 a06528f602225b83744243733b686a769e65e840 LICENSE
+SHA1 6925067716e1967baa57687e1d2366e168f125ed MANIFEST
+SHA1 6c7d8d5164b5cac0b5c48e7d293e8d7d9e97aab6 META.yml
+SHA1 826009780c92725f0092ec6e3d72fd7fd864bf6c Makefile.PL
+SHA1 0494f0248e4122b5988efd954c61719eb23ac034 README
+SHA1 593b4d5a29eec2183dfbcc2a4f44a73de8673ffb dist.ini
+SHA1 95166dd3cbe857aaa1900e15a9017e38bcb27722 lib/RPG/Dice.pm
+SHA1 327bf5e538b5fb86b9aeaeef682e14544d8996f1 perltidy.LOG
+SHA1 8d453adb9306698cf2c632e3f436b9c788891be0 t/01-AA-Dice.t
+SHA1 37c76478095a35373855a774597cb89cbae3b768 t/99-PodTest.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 52f8153d160cb76d2ba52d0a9c8e8dff928145ee t/release-eol.t
+SHA1 083d9cf27e0bc6a123241fb0a361a2c029983b0c t/release-kwalitee.t
+SHA1 ecd6305379975ecc5ce20f4c3e76bfcfe462e2d4 t/release-pod-coverage.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (Cygwin)
+
+iQIcBAEBAgAGBQJRBuaeAAoJEG3q6AJEOjrhuxgP/1+A6qAL2whhfQueEUMa1quo
+AWPq9B9XKOT+xffa3YEgRdpBBXGVtJ374jtVQD0otrduLufLRdR/cnAWgn44pbZw
+aszx5HZ7vLJ4N1ASQBgsj5h2RHh7k2HQN16vyfKni2iAAUPESTzTZ/2Kxh1LQD6I
+WiB4oWvMZMZ8UoIwRolji5RtfXhLrt9VbkeXjS1H3apSRmB27ltDJFQIJv9FNK9O
+e1DfafclfNA1RLVAjyLGPNPxC9dLM0jYBOsAZBrlAWdIco+R3kYf594BQudYGRzd
+iZ+GLBUa5FDkjCmDAjXQ3si3KgEPi9VEoo7Ifx1GTg4xXp6zQK8cWLSNSNqIoamB
+S+QDe+GV/PGOhYHXVJBKgb1pRfbuA8rBKgfYlZZqeOqsrPYsgi9+294Y7ulY5lNK
+G9vvJNtWMG71X6hHigCChQ40GX2MmmHzP2QKFuK0Pg+GBQwOihzxgz3Uhofx6KMI
+1CHfOwHcV7iN/rxv7m14ZMLb5zXW/mFAx3DKWXdX9m+vutmevhiPl90Ed2GhTRtQ
+Mj2DN6r1pIiiS25ayy0803HFeqtOv3bWsLIFT73j3934sPVtgFBQC6Hu348X7rTx
+ZHVv7YaJ0aEXB55+UT6I1BuPdJMHe6VvxjifXpNNzTSMbZXGkkmHOYRyMxu1oJFA
+VzM3OmpacOjrwKyD1AAt
+=r6sh
+-----END PGP SIGNATURE-----

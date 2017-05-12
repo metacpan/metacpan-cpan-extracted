@@ -1,0 +1,50 @@
+NAME
+    RT::Extension::CustomFieldsOnUpdate - edit ticket's custom fields on
+    reply/comment
+
+DESCRIPTION
+    This extension allows the update of tickets' custom fields on reply and
+    comment pages.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::CustomFieldsOnUpdate');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::CustomFieldsOnUpdate));
+
+        or add RT::Extension::CustomFieldsOnUpdate to your existing @Plugins
+        line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-CustomFieldsOnUpdate@rt.cpan.org|mailto:bug-RT-Extension-CustomFieldsOnUpdate@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-CustomFieldsOnUpdate>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2016 by Best Practical Solutions
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

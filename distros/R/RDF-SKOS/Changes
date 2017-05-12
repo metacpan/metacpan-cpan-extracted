@@ -1,0 +1,10 @@
+Revision history for RDF::SKOS
+
+0.03    Sun Nov 15 09:34:20 CET 2009
+	- smaller documentation fixes
+	- added some ideas into the TODO
+	- added RDF::Redland
+
+0.02    Sat Nov 14 16:51:56 CET 2009
+	- first experimental release
+

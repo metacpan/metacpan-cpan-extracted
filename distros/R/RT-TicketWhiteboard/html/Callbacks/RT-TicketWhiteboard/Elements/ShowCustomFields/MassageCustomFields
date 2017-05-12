@@ -1,0 +1,6 @@
+<%args>
+$CustomFields => undef
+</%args>
+<%init>
+$CustomFields->Limit(FIELD => 'Name', OPERATOR => '!=', VALUE => 'Whiteboard');
+</%init>

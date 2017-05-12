@@ -1,0 +1,7 @@
+/*
+ * Test 1-05 : bound subject and predicate
+ */
+
+SELECT *
+SOURCE <model1.nt>
+WHERE  (<http://rdf.org/r-1>, <http://rdf.org/p-1>, ?z)

@@ -1,0 +1,24 @@
+0.1 - 15-12-2016
+        - Initial release implementing all set-related primitives and
+          the commonly used "simple" operations.
+
+0.2 - 17-12-2016
+        - Fixed our dependencies to correctly include DBD::SQLite.
+        - Implemented several missing primitives:
+           * bitcount()
+           * echo()
+           * getrange()
+           * mget()
+           * mset()
+           * msetnx()
+           * ping()
+           * randomkey()
+           * rename()
+           * renamenx()
+           * setnx()
+           * setrange()
+
+0.3 - 22-12-2016
+	- Added missing tests to distribution.
+	- Updated test-cases to use in-memory SQLite database, with the hope
+        this will fix test-cases on Microsoft Windows.

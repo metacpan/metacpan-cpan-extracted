@@ -1,0 +1,43 @@
+NAME
+    Radioactive::Decay - allow scalar values to decay over time
+
+SYNOPSIS
+      use Radioactive::Decay;
+
+      my $halflife = 10;
+      tie my $var, $Radioactive::Decay, $halflife;
+
+      $var = 40;
+      sleep 10;
+      print $var;  # 20
+      sleep 10;
+      print $var;  # 10
+
+DESCRIPTION
+    This allows you to tie a scalar variable so that it will decay over
+    time.
+
+    For example, if you set a half-life of 30 seconds, then a variable which
+    is set to 100 now will be 25 in a minute's time.
+
+    We're sure there are all manner of useful applications for this, and
+    hopefully someone will let us know what they are.
+
+AUTHOR
+    Tony Bowden and Marty Pauley
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Radioactive-Decay@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2000-2005 Tony Bowden, Marty Pauley
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License; either version
+      2 of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

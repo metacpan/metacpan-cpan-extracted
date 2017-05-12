@@ -1,0 +1,60 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDF-vCard
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/RDF-vCard
+
+Files: README
+ bin/vcard2rdf
+ bin/vcard2xml
+ lib/RDF/vCard.pm
+ lib/RDF/vCard/Entity.pm
+ lib/RDF/vCard/Entity/WithXmlSupport.pm
+ lib/RDF/vCard/Exporter.pm
+ lib/RDF/vCard/Importer.pm
+ lib/RDF/vCard/Line.pm
+ t/01basic.t
+Copyright: Copyright 2011 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ TODO
+ examples/example.vcard
+ examples/example1.pl
+ examples/example2.pl
+ examples/example3.pl
+Copyright: Unknown
+License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

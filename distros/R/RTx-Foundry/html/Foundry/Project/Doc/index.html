@@ -1,0 +1,8 @@
+<%INIT>
+our $Get;
+my $name = $QueueObj->OriginObj->CustomFieldValue('UnixName');
+$m->print($Get->("$name/index.php?page=$name"));
+</%INIT>
+<%ARGS>
+$QueueObj
+</%ARGS>

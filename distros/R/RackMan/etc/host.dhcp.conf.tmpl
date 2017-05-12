@@ -1,0 +1,8 @@
+host [% host_fqdn %] {
+    option routers [% gateway %];
+    hardware ethernet [% if0_mac %];
+    fixed-address [% if0_ip %];
+    next-server 192.168.0.13;
+    option root-path "/home/relmgr/base-release-8.2-amd64/dvd1";
+    filename "pxeboot.amd64";
+}

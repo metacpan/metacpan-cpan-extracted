@@ -1,0 +1,28 @@
+@base <http://localhost/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix wv: <http://vocab.org/waiver/terms/norms> .        
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+</dataset#foo> a void:Dataset ;
+	   dcterms:title "This is a title"@en, "Blåbærsyltetøy"@nb ;
+	   dcterms:license <http://example.org/open-data-license> ;
+	   void:triples 4 ;
+	   void:entities 2 ;
+	   void:properties 3 ;
+	   void:distinctSubjects 2 ;
+	   void:distinctObjects 4 ;
+	   void:uriSpace "http://localhost";
+	   void:sparqlEndpoint <http://localhost/sparql> ;	
+	   void:vocabulary <http://www.w3.org/1999/02/22-rdf-syntax-ns#>, <http://www.w3.org/2000/01/rdf-schema#>, <http://xmlns.com/foaf/0.1/> .
+
+</dataset> prov:wasGeneratedBy _:blank .
+_:blank prov:wasAssociatedWith <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-16> .
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-16> a prov:SoftwareAgent ;
+							      rdfs:label "RDF::Generator::Void, Version 0.16"@en .

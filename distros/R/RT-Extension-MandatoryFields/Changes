@@ -1,0 +1,45 @@
+#   Revision history for RT-Extension-MandatoryFields
+
+
+##  0.6 (Fri, 07 Jun 2013 14:27:22 +0200)
+
+*   Allow the setting of a list of queue indeces where the field is mandatory (thanks to Davide Imbeni)
+*   Also allow to use the keyword 'all' with the same effect as 'true' (Davide)
+*   Added Italian translation (Davide)
+*   Updated to Module::Install 1.06 (thanks to Tatsuhiko Miyagawa)
+
+
+##  0.5 (Tue, 03 Jan 2012 09:53:08 +0100)
+
+*   Added Spanish and Catalan translations
+*   Localize field names
+
+
+##  0.4 (Tue, 20 Dec 2011 12:40:16 +0100)
+
+*   Added priority field
+*   Added German translation
+*   Cleaned up code
+
+
+##  0.3 (Tue, 29 Nov 2011 11:08:11 +0100)
+
+*   More supported fields
+*   Updated installation routines
+*   Improved meta information
+*   Enhanced documentation (now POD only)
+
+
+##  0.2 (Thu, 17 Nov 2011 15:11:23 +0100)
+
+*   Re-packaging
+
+
+##  0.1.1 (Thu, 17 Nov 2011 13:44:19 +0100)
+
+*   Added SIGNATURE; improved meta information
+
+
+##  0.1 (Tue, 15 Nov 2011 10:07:47 +0100)
+
+*   Initial release.

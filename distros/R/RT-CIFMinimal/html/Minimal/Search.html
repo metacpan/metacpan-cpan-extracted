@@ -1,0 +1,38 @@
+<& /Minimal/Elements/Header, 
+    Title       => $title,
+    current_tab => "/Minimal/Search.html",
+&>
+<& /Elements/ListActions, actions => \@results &>
+
+% $m->comp('Elements/SearchBox');
+% if($text){
+% $m->out($text);
+% }
+
+
+<%INIT>
+my $title = loc("Collective Intelligence");
+$text = undef;
+
+if($q){
+    if($q =~ /^#?(\d+)$/){
+        RT::Interface::Web::Redirect(RT->Config->Get('WebURL')."Minimal/Display.html?id=".$1);
+    } else {
+        require RT::CIFMinimal;
+        $text = RT::CIFMinimal::cif_data({
+            user    => $session{'CurrentUser'}->UserObj(),
+            q       => $q,
+            results => \@results,
+        });
+    }
+}
+</%INIT>
+
+
+<%ARGS>
+$q => undef
+$text => undef
+@results => undef
+$nolog => undef
+$fields => undef
+</%ARGS>

@@ -1,0 +1,33 @@
+NAME
+       RPC::Any::Interface::PSGI - a PSGI interface for RPC::Any
+
+SYNOPSIS
+         # in app.psgi
+         use RPC::Any::Server::JSONRPC::PSGI;
+
+         # Create a server where calling Foo.bar will call My::Module->bar.
+         my $server = RPC::Any::Server::JSONRPC::PSGI->new(
+             dispatch  => { 'Foo' => 'My::Module' },
+             allow_get => 0,
+         );
+
+         my $handler = sub{ $server->handle_input(@_) };
+
+DESCRIPTION
+       RPC::Any::Interface::PSGI is a PSGI interface for RPC::Any. It is based
+       on RPC::Any::Interface::CGI and allows you to run RPC::Any::Server
+       subclasses on any web servers that support PSGI.
+
+       This module cannot be used directly. You must use RPC::Any::Server
+       subclasses that consume this module such as
+       RPC::Any::Server::JSONRPC::PSGI and RPC::Any::Server::XMLRPC::PSGI.
+
+AUTHOR
+       Sherwin Daganato <sherwin@daganato.com>
+
+LICENSE
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+SEE ALSO
+       RPC::Any Plack PSGI

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Provides a Reflex Stream object that can use POE::Filters",
+   "author" : [
+      "Nicholas R. Perez <nperez@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Reflexive-Stream-Filtering",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "POE::Filter::Stream" : "0",
+            "Reflex::Event" : "0",
+            "Reflex::Stream" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "POE::Filter::Line" : "0",
+            "Socket" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://nickandperla.net/reflexive-stream-filtering.git"
+      }
+   },
+   "version" : "1.122150"
+}
+

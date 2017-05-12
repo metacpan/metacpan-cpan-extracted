@@ -1,0 +1,11 @@
+name: RT-Todo
+version: 0.02
+abstract: RT Todo Extension
+author: Jesse Vincent <jesse@bestpractical.com>
+license: perl
+distribution_type: module
+no_index:
+  directory:
+    - html
+    - inc
+generated_by: Module::Install version 0.36

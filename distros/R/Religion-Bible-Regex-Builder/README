@@ -1,0 +1,83 @@
+Religion-Bible-Regex-Builder 
+
+    * NAME
+    * VERSION
+    * SYNOPSIS
+    * DESCRIPTION
+    * FUNCTIONS
+          o new
+          o key
+          o book
+          o abbreviation
+          o bookname_type Arguments: a string that is either a book name of an abbreviations 
+    * DEPENDENCIES
+    * BUGS AND LIMITATIONS
+    * AUTHOR
+    * LICENCE AND COPYRIGHT 
+
+NAME 
+
+Religion::Bible::Regex::Builder - builds regular expressions that match Bible References
+
+SYNOPSIS 
+
+        use Religion::Bible::Regex::Builder;
+
+        use warnings;
+
+        use Religion::Bible::Regex::Config;
+        use Religion::Bible::Regex::Builder;
+
+        my $configfile = 'config.yml';
+
+        my $c = new Religion::Bible::Regex::Config($configfile);
+        my $r = new Religion::Bible::Regex::Builder($c);
+        my $text = "Ge 1:1, Mt 6:33, see page 4:5 and Jn 3:16";
+        $text =~ s/$r->{reference_biblique}/<ref id="$&">$&<\/ref>/g;
+
+        print $text . "\n";
+
+-------- This prints: <ref id="Ge 1:1">Ge 1:1</ref>, <ref id="Mt 6:33">Mt 6:33</ref>, see page 4:5 and <ref id="Jn 3:16">Jn 3:16</ref>
+
+DESCRIPTION
+
+This module builds highly configurable regular expressions for parsing Bible
+references. The goal of this project is to make higher level Bible viewing,
+editing and tagging tools easier to create. The configuration files are in YAML
+format.
+
+FUNCTIONS 
+
+new
+
+Builds the set of regular expressions for parsing Bible references.
+
+Parameters: 1. A Religion::Bible::Regex::Config object which gives
+configurations such as the Books and Abbreviations to recognize, key phrases
+which mark the beginning of a verse or list of verses, etc ...  key
+
+Returns the key given an abbreviations or the canonical book name book
+
+Returns the canonical book name given an abbreviations or a key abbreviation
+
+Returns the abbreviation given the canonical book name or a key bookname_type
+Arguments: a string that is either a book name of an abbreviations
+
+    Returns CANONICAL_NAME if the argument is in the list of CANONICAL NAMES
+Returns ABBREVIATIONS  if the argument is in the list of ABBREVIATIONS Returns
+NONE if the argument is empty Returns UNKNOWN otherwise
+
+
+DEPENDENCIES  BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to
+bug-religion-bible-regex-builder@rt.cpan.org, or through the web interface at
+http://rt.cpan.org.  AUTHOR
+
+Daniel Holmlund <holmlund.dev@gmail.com> LICENCE AND COPYRIGHT 
+
+Copyright (c) 2009, Daniel Holmlund <holmlund.dev@gmail.com>. All rights
+reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See perlartistic.

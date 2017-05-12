@@ -1,0 +1,201 @@
+html {
+        min-width: 915px;
+} /*IE7*/
+
+body {
+        color: #393733;
+        margin: 0;
+        padding: 0 20px;
+        text-align: center;
+        background: #DDDDDD;
+}
+
+img {
+        border: none;
+}
+
+p {
+        line-height: 1.4;
+}
+
+input{
+        line-height: 1;
+}
+
+#container {
+        text-align: left;
+        margin: 0 auto;
+        max-width: 1200px;
+        position: relative;
+}
+
+#wrapper {
+        padding: 15px 0 0 19px;
+        min-height: 500px;
+} /*IE6*/
+
+#contents {
+        clear: both;
+        padding: 0 15px 30px 0;
+        margin-top: 7px;
+        background: #FFFFFF;
+}
+
+.spacer{ clear: both; }
+.sidebar {
+        float: right;
+        width: 300px;
+        clear: both;
+        margin: 0 0 2em 0;
+        min-height: 500px;
+}
+.sidebar_section {
+        margin: 1em 0 1em 0;
+        min-height: 100px;
+}
+
+.sidebar_section h2{
+        border-bottom: 2px solid #036;
+        padding: 0 1em 0 0em;
+        font-size: 120%;
+        text-align: right;
+}
+
+#header {
+        background: #036;
+        color: #fff;
+        float: left;
+        width: 100%;
+        margin-bottom: 0px;
+        border-bottom: 1px solid white;
+        position: relative;
+        text-align: left;
+}
+
+#header h1 {
+        font-size: 150%;
+        padding: .2em;
+        margin: .2em;
+}
+
+#nav {
+        background: #036;
+        color: #fff;
+        float: left;
+        width: 100%;
+        margin-bottom: 5px;
+        position: relative;
+        text-align: right;
+}
+
+#nav .menu {
+    display: inline
+    width:   75%;
+    float:   left; 
+    margin:  0px;
+    padding: 0px;
+    list-style-type: none;
+    color: #FFFFFF;
+    background: #036
+}
+
+#nav .menu li {
+    display: inline;
+}
+
+#nav .menu li a {
+    float: left;
+    width: 7em;
+    color: #FFFFFF;
+    background:color #036;
+    padding: 0.2em .2em;
+    text-decoration: none;
+    border-right: 1px solid #fff;
+    text-align: center;
+    font-size: 105%;
+    font-weight: bold;
+}
+
+#nav .menu li a:hover {
+    background-color: #369;
+    color: #fff;
+}
+
+#login-status{
+   padding: .2em 1em 0 0;
+   font-size: 80%;
+}
+
+#search{
+        float: right;
+        width: 300;
+        padding: 1em;
+}
+#searchbox{
+        line-height: 1.4;
+        font-size: 90%;
+        border: 2px solid #FFF;
+        padding-left: 3px;
+}
+#searchsub{
+        background-color: #036;
+        font-weight: bold;
+        font-size: 90%;
+        color: white;
+        border: 2px solid #369;
+}
+
+.pager {
+    display: inline
+    margin:  0px;
+    padding: 0px;
+    list-style-type: none;
+    font-size: 80%;
+}
+
+.pager li {
+    display: inline;
+    margin: 1px;
+}
+
+.pager li a {
+    padding: 1px 3px 1px 3px;
+    text-decoration: none;
+    color: #036;
+    border: 1px solid #036;
+    text-align: center;
+    font-weight: bold;
+}
+
+.pager li a:hover {
+    color: #369;
+    border: 1px solid #369;
+}
+
+.collection_actions {
+    display: inline
+    margin:  0px;
+    padding: 0px;
+    list-style-type: none;
+}
+
+.collection_actions li {
+    display: inline;
+    margin: 0.2em;
+}
+
+.collection_actions li a {
+    /* background-color #9CF;  */
+    /* padding: 0.2em .2em;    */
+    /* text-decoration: none;  */
+    /* border: 1px solid #369; */
+    text-align: center;
+    font-weight: bold;
+}
+
+th {
+  font-weight: bold;
+  padding-left:  4px;
+  padding-right: 4px;
+  text-align: center;
+}

@@ -1,0 +1,94 @@
+{
+   "abstract" : "convert from RDF to iCalendar",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "Directory",
+      "Event",
+      "RDF",
+      "SemWeb",
+      "Semantic Web",
+      "Todo",
+      "hCal",
+      "hCalendar",
+      "iCal",
+      "iCalendar",
+      "vCalendar"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-iCalendar",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "RDF::vCard" : "0.010",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "RDF::iCalendar" : {
+         "file" : "lib/RDF/iCalendar.pm",
+         "version" : "0.005"
+      },
+      "RDF::iCalendar::Entity" : {
+         "file" : "lib/RDF/iCalendar/Entity.pm",
+         "version" : "0.005"
+      },
+      "RDF::iCalendar::Exporter" : {
+         "file" : "lib/RDF/iCalendar/Exporter.pm",
+         "version" : "0.005"
+      },
+      "RDF::iCalendar::Line" : {
+         "file" : "lib/RDF/iCalendar/Line.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=RDF-iCalendar"
+      },
+      "homepage" : "https://metacpan.org/release/RDF-iCalendar",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-rdf-icalendar.git",
+         "web" : "https://github.com/tobyink/p5-rdf-icalendar"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perlrdf",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/project"
+   },
+   "version" : "0.005"
+}

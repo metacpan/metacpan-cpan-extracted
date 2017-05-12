@@ -1,0 +1,28 @@
+<%init>
+my %remote = RT->Config->Get("RemoteLinks");
+return unless keys %remote;
+
+my $pretty_remote = sub {
+    my $alias  = shift or return;
+    my $remote = RTx::RemoteLinks->LookupRemote($alias)
+        or return;
+
+    my $uri = URI->new($remote)
+        or return $remote;
+
+    return $uri->can("host") ? $uri->host : $uri;
+};
+
+my @alias = sort { lc($a) cmp lc($b) } keys %remote;
+</%init>
+<br />
+% if (@alias == 1) {
+<&|/l, $pretty_remote->($alias[0]), $alias[0] &>Enter links to remote RT tickets on [_1] as "[_2]:###", where ### is the ticket number.</&>
+% } else {
+<&|/l&>Enter links to remote RT tickets using the following forms:</&>
+<ul>
+%     foreach (@alias) {
+  <li><strong><% $_ %>:###</strong> for <% $pretty_remote->($_) %></li>
+%     }
+</ul>
+% }

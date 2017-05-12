@@ -1,0 +1,15 @@
+Revision history for Perl extension resque-delay-perl
+
+0.03 2017-05-08T03:34:18Z
+    - ignore cpanfile.snapshot
+    - update dependency
+    - correspondence of extend payload (SEE ALSO https://github.com/diegok/resque-perl/pull/22)
+
+0.02 2017-04-10T06:01:44Z
+    - more extensible payload
+    - no use default start_time
+
+0.01 2017-04-07T03:24:55Z
+
+    - original version
+

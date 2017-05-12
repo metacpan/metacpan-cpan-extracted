@@ -1,0 +1,50 @@
+RT-Extension-MandatorySubject - Enforce users to fill the subject when creating a ticket
+
+This RT Extension enforces users to fill the subject when creating a ticket via
+the web interface.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Then, to make it active, add it to @Plugins in RT site configuration file
+(RT_SiteConfig.pm), example:
+
+    Set(@Plugins,qw(RT::Extension::MandatorySubject) );
+
+SUPPORT AND DOCUMENTATION
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc RT::Extension::MandatorySubject
+
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=RT-Extension-MandatorySubject
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/RT-Extension-MandatorySubject
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/RT-Extension-MandatorySubject
+
+    Search CPAN
+        http://search.cpan.org/dist/RT-Extension-MandatorySubject
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2011 Emmanuel Lacour
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+

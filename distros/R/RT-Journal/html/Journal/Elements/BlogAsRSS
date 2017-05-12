@@ -1,0 +1,44 @@
+<%flags>
+inherit => undef
+</%flags>
+<?xml version="1.0"?>
+<rss version="0.92" xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule">
+ 	<channel>
+<title><&|/l,$user&>Journal of [_1]</&></title>
+					<link><&Attr, Name=>'BaseURL', User=> $User&></link>
+							<description><&Attr, Name=>'Name', User=> $User&></description>
+
+
+%while( my $post =  $EntriesObj->Next) {
+% my $my_category =  $post->FirstCustomFieldValue('RT-Journal::Category');
+<item>
+<link><&Attr, Name=>'BaseURL', User=> $User&>/Entry/<%$post->id%></link>
+<title><%$post->Subject|| loc('Untitled')%></title>
+<description>
+<![CDATA[
+% my $content = $post->Transactions->First->Content;
+% $content =~ s/-- (.*)$//gism;
+%# $content =~ s/\</&lt;/gism;
+%# $content =~ s/\>/&gt;/gism;
+% $content =~ s/\n/<br \/>/gi;
+<%$content|n%>
+% my $refto = $post->RefersTo;
+<ul>
+% while( my $link = $refto->Next ) {
+<li><A href="<%$link->TargetURI->Resolver->HREF%>"><%$link->TargetURI->Resolver->HREF%></a>
+% }
+</ul>
+<hr>
+[<a href="<& Attr, User => $User, Name=>'BaseURL'&>/Entry/<%$post->Id%>">Comments</a>]
+
+Category: <a href="/Category<%$my_category%>"><%$my_category%></a>
+]]></description>
+</item>
+% }
+</channel>
+</rss>
+<%ARGS>
+$User => undef
+$user	=> undef
+$EntriesObj => undef
+</%ARGS>

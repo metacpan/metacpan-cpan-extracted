@@ -1,0 +1,34 @@
+# $File: //depot/RT/osf/README $ $Author: autrijus $
+# $Revision: #6 $ $Change: 9903 $ $DateTime: 2004/02/04 19:01:19 $
+
+This is the README file for RTx::Foundry, the base classes for
+the "RT Foundry" online collaboration system.
+
+Please type "perldoc RTx::Foundry" after installation to see
+the module usage information.
+
+* Installation
+
+RTx::Foundry the standard perl module install process:
+
+cpansign -v		# optional; see SIGNATURE for details
+perl Makefile.PL
+make
+make test
+make install
+
+* Copyright
+
+Copyright 2004 by Academia Sinica, Taiwan.
+
+(Except where explictly superceded by other copyright notices)
+
+This work is made available to you under the terms of Version 2 of
+the GNU General Public License. A copy of that license should have
+been provided with this software, but in any event can be snarfed
+from www.gnu.org.
+
+This work is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.

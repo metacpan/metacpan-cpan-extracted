@@ -1,0 +1,66 @@
+=head1 NAME
+
+ResourcePool::Command::DBI::SelectRow - A DBI command to execute one-row select statements.
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Command::DBI::SelectRow;
+ 
+ # simple usage
+ my $cmd = ResourcePool::Command::DBI::SelectRow->new();
+ eval {
+ 	my @row = $pool->execute($cmd
+ 		, 'select id, name, value from test where id = ?'
+ 		, 5
+ 	);
+     # @row holds an array holding three values corresponding to the
+     # selected fields
+ };
+
+=head1 DESCRIPTION
+
+
+This command can be used to execute one-row select statements in a DBI database using the L<ResourcePool|ResourcePool> command execution environment.
+
+In order to understand this Class, and more importantly this document, you need to know a few terms I use in this document, if you are new to this class you should read the L<TERMS sections of ResourcePool::Command::DBI::Execute|ResourcePool::Command::DBI::Execute/TERMS>first.
+
+The use of this class if safe for all databases and drivers. If the select does not return any rows, the array returned by the execute() method will be empty. If the statement returns more than one record, only the first is fetched and returned.
+
+=head2 S<ResourcePool::Command::DBI::SelectRow-E<gt>new>
+
+Instantiates a new Select object. The parameters are identical to those of the L<ResourcePool::Command::DBI::Execute|ResourcePool::Command::DBI::Execute> class.
+
+
+=head2 S<$pool-E<gt>execute>
+
+Similar to the same named method of the L<ResourcePool::Command::DBI::Execute|ResourcePool::Command::DBI::Execute> class. The only difference is that it returns an array holding the columns of the selected row.
+
+
+=head1 TODO
+
+
+
+=over 4
+
+=item Documentation
+
+Year, we really need documentation.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBI|DBI>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Factory|ResourcePool::Factory>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2004 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

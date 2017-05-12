@@ -1,0 +1,15 @@
+Revision history for Regexp-Keywords
+
+0.01    2009-08-31/15:43
+        First version, posted an RFC on PerlMonks, but unreleased.
+
+0.02    2009-09-10/09:37
+        POD added.
+        More usefull methods added.
+        Not released yet.
+
+0.03    2009-09-29/20:06
+        Minor bugs fixed.
+        Code cleaned.
+        Tests passed.
+        Released on an unsuspecting world.

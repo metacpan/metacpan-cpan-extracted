@@ -1,0 +1,22 @@
+---
+abstract: 'Simple status changing action, generates actions based on your config'
+author:
+  - 'Kevin Falcone  C<< <falcone@bestpractical.com> >>'
+  - 'Kevin Falcone <falcone@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: gplv2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Action-SetStatus
+no_index:
+  directory:
+    - inc
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.01

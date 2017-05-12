@@ -1,0 +1,37 @@
+Router-R3 version 0.9.0
+======================
+
+    This mod is a XS wrapper around a C library R3.
+
+    R3 is an URL router library with high performance, thus, it's implemented in C. It compiles your route paths into a prefix trie.
+
+    By using the constructed prefix trie in the start-up time, you can dispatch routes with efficiency.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SEE ALSO
+
+The original C version L<"github repository"|https://github.com/c9s/r3> by L<c9s|https://metacpan.org/author/CORNELIUS>
+
+This mod's L<"github repository"|https://github.com/CindyLinz/Perl-Router-R3>
+All the source files with this mod are in the Router-R3 directory.
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2014 by Cindy Wang (CindyLinz)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

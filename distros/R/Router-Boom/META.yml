@@ -1,0 +1,47 @@
+---
+abstract: 'Fast routing engine for web applications'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Router-Boom
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Router::Boom:
+    file: lib/Router/Boom.pm
+    version: '1.03'
+  Router::Boom::Method:
+    file: lib/Router/Boom/Method.pm
+    version: '1.03'
+  Router::Boom::Node:
+    file: lib/Router/Boom/Node.pm
+requires:
+  Class::Accessor::Lite: '0.05'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/Router-Boom/issues
+  homepage: https://github.com/tokuhirom/Router-Boom
+  repository: git://github.com/tokuhirom/Router-Boom.git
+version: '1.03'
+x_contributors:
+  - 'Fuji, Goro <goro-fuji@cookpad.com>'
+  - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'

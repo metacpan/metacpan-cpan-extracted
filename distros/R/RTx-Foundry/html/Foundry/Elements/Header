@@ -1,0 +1,52 @@
+%# The universe does not have laws -- it has habits, and habits can be broken.
+<HTML><HEAD><TITLE><% $RT::Organization %></TITLE>
+% if ($Refresh > 0) {
+<META HTTP-EQUIV="REFRESH" CONTENT="<% $Refresh %>">
+% }
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Pragma" content="no-cache">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="stylesheet" href="/stylesheet/style.css" type="text/css">
+<link rel="stylesheet" href="/Edit/styles.css" type="text/css">
+<script language=javascript src="/function/MM_openBrWindow.js"></script>
+<script language=javascript src="/function/DynaTD.js"></script>
+<script language=javascript src="/function/swapImgRestore.js"></script>
+<script language=javascript src="/function/MM_findObj.js"></script>
+<script language=javascript src="/function/showHideLayers.js"></script>
+<script language=javascript src="/function/goToURL.js"></script>
+<script language=javascript src="/function/ClearDefault.js"></script>
+<script language=javascript src="/function/Pro.js"></script>
+% if (!$RT::IsMSIE) {
+<style><!--
+INPUT.button { border: 1px solid #c4e1f0; margin: 0; cursor: hand; width: 22px; height: 22px }
+INPUT.button_disabled { border: 1px solid #c4e1f0; margin: 0; width: 22px; height: 22px }
+INPUT.button:hover { border-top: 1px solid white; border-left: 1px solid white; border-right: 1px solid black; border-bottom: 1px solid black; margin: 0 }
+TD.button:hover { border-top: 1px solid white; border-left: 1px solid white; border-right: 1px solid black; border-bottom: 1px solid black; }
+--></style>
+% }
+</HEAD>
+<BODY BGCOLOR="#DDEEFF" TEXT="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0"
+% $m->print(qq(onLoad="$OnLoad")) if $OnLoad;
+>
+    <& Top &>
+    <& Tab, Text => $Title, Queue => $ARGS{Queue} &>
+<form name="mainform" id="mainform" style="margin: 0" action="<% $Action %>" method="<% $Method %>"
+% if ($Enctype) {
+	enctype="<% $Enctype %>"
+% }
+>
+<table width="99%" align="center" border=2 bgcolor="#C4E1F0"><tr><td>
+<table width="100%" align="center" border=0><tr><td>
+<%INIT>
+return if $m->notes('Header'); $m->notes('Header' => 1); # counter-reentrant
+$Action =~ s!//+!/!g;
+</%INIT>
+<%ARGS>
+$Title	    => ''
+$Method	    => 'Get'
+$Action	    => $r->uri
+$Enctype    => ''
+$OnLoad	    => ''
+$Buttons    => []
+$Refresh    => undef
+</%ARGS>

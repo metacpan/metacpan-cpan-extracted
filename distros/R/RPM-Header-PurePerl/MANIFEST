@@ -1,0 +1,9 @@
+MANIFEST
+Makefile.PL
+README
+lib/RPM/Header/PurePerl.pm
+lib/RPM/Header/PurePerl/Tagtable.pm
+test-1.0-1.i686.rpm
+dump_rpm.pl
+t/getrpmname.t
+META.yml                                 Module meta-data (added by MakeMaker)

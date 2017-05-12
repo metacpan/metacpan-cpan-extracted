@@ -1,0 +1,4 @@
+<%init>
+$m->comp('Elements/_SetDefaults');
+$m->call_next(%ARGS);
+</%init>

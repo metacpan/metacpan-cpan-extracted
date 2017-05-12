@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:g="http://example.org/graph#"
+      xmlns:rat="http://www.kjetil.kjernsmo.net/software/rat/xmlns"
+      xmlns:sub="http://www.kjetil.kjernsmo.net/software/rat/substitutions#"
+      xmlns:foaf="http://xmlns.com/foaf/0.1/"
+      xmlns:dbp="http://dbpedia.org/property/"
+      xmlns:dbo="http://dbpedia.org/ontology/"
+      rat:doctype-public="-//W3C//DTD XHTML+RDFa 1.0//EN"
+      rat:doctype-system="http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd"
+      xml:lang="en">
+  <head>
+  </head>
+  <body>
+    <h1>Aircraft produced in 1973</h1>
+    <table>
+      <tr><th>Name</th><th>Produced</th><th>First flight</th></tr>
+      <rat:graph g:graph="query2" endpoint="http://dbpedia.org/sparql">
+	<tr about="sub:resource">
+	  <td property="foaf:name" datatype="rdf:XMLLiteral"><rat:variable name="sub:name"/></td>
+	  <td property="dbo:produced">1973</td>
+	  <td property="dbp:firstFlight" datatype="rdf:XMLLiteral"><rat:variable name="sub:first"/></td>
+	</tr>
+      </rat:graph>
+    </table>
+  </body>
+</html>

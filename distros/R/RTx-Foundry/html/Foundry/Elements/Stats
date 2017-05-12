@@ -1,0 +1,21 @@
+%# "Pascal is not a high-level language."
+%# 		-- Steven Feiner
+
+<table border="0" cellspacing="1" cellpadding="2" width=100%>
+<tr><td class="tableTitle"><&|/l&>Statistics</&></td></tr>
+<tr bgcolor="white"><td><nobr>
+<&|/l, $QueueCount &>Projects: [_1]</&>
+</nobr></td></tr>
+<tr bgcolor="white"><td><nobr>
+<&|/l, $UserCount &>Users: [_1]</&>
+</nobr></td></tr>
+</table>
+<%INIT>
+my $Queues = RT::Queues->new($RT::SystemUser);
+$Queues->LimitToEnabled;
+my $QueueCount = $Queues->Count;
+my $Users = RT::Users->new($RT::SystemUser);
+$Users->LimitToPrivileged;
+$Users->LimitToEnabled;
+my $UserCount = $Users->Count;
+</%INIT>

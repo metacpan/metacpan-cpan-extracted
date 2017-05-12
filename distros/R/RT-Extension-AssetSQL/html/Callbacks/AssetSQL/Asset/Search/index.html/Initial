@@ -1,0 +1,5 @@
+<%INIT>
+if (RT->Config->Get('AssetSQL_HideSimpleSearch')) {
+    $m->redirect( RT->Config->Get("WebPath") .'/Asset/Search/Build.html' );
+}
+</%INIT>

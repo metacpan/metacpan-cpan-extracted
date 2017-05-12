@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use 5.008003;
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+my $sid = shift or die "Usage: $0 <session id>";
+die "Doesn't look like session id" unless $sid =~ /^[0-9a-f]+$/;
+
+require RT;
+RT::LoadConfig();
+RT::Init();
+
+require RT::Interface::Web::Session;
+tie my %session, 'RT::Interface::Web::Session', $sid;
+
+require Data::Dumper;
+print Data::Dumper::Dumper( \%session );
+

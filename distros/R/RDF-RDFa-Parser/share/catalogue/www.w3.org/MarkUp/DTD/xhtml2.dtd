@@ -1,0 +1,54 @@
+<!-- ....................................................................... -->
+<!-- XHTML 2.0 DTD  ........................................................ -->
+<!-- file: xhtml2.dtd
+-->
+
+<!-- The Extensible HyperText Markup Language (XHTML) version 2.0
+
+     Copyright (c)2004-2005 W3C (MIT, ERCIM, Keio), All Rights Reserved.
+
+     Permission to use, copy, modify and distribute the XHTML 2.0 DTD and
+     its  accompanying documentation for any purpose and without fee is
+     hereby  granted in perpetuity, provided that the above copyright notice
+     and  this paragraph appear in all copies.  The copyright holders make no 
+     representation about the suitability of the DTD for any purpose.
+
+     It is provided "as is" without expressed or implied warranty.
+     For details, please refer to the W3C software license at:
+
+        http://www.w3.org/Consortium/Legal/copyright-software
+
+        Editor:   Masayasu Ishikawa <mimasa@w3.org>
+        Revision: $Id: xhtml2.dtd,v 1.2 2005/06/14 15:29:08 mimasa Exp $
+-->
+
+<!-- Please use this public identifier to identify it:
+
+         "-//W3C//DTD XHTML 2.0//EN"
+-->
+<!ENTITY % XHTML.version  "-//W3C//DTD XHTML 2.0//EN" >
+
+<!-- Use this URI to identify the default namespace:
+
+         "http://www.w3.org/2002/06/xhtml2/"
+-->
+
+<!--================ Character mnemonic entities =========================-->
+
+<!ENTITY % XHTMLlat1 PUBLIC
+   "-//W3C//ENTITIES Latin 1 for XHTML//EN"
+   "http://www.w3.org/MarkUp/DTD/xhtml-lat1.ent">
+%XHTMLlat1;
+
+<!ENTITY % XHTMLsymbol PUBLIC
+   "-//W3C//ENTITIES Symbols for XHTML//EN"
+   "http://www.w3.org/MarkUp/DTD/xhtml-symbol.ent">
+%XHTMLsymbol;
+
+<!ENTITY % XHTMLspecial PUBLIC
+   "-//W3C//ENTITIES Special for XHTML//EN"
+   "http://www.w3.org/MarkUp/DTD/xhtml-special.ent">
+%XHTMLspecial;
+
+<!-- end of XHTML 2.0 DTD  ................................................. -->
+<!-- ....................................................................... -->

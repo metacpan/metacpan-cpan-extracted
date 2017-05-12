@@ -1,0 +1,12 @@
+[Changes for 0.13 - 8 Nov, 2006]
+
+* Add support for resolving script symlink with -chdir.
+* No longer eval Apache2 in config, as mod_perl thinks it's fatal.
+
+[Changes for 0.11 - 26 Mar, 2005]
+
+* Various apache1 module/symbol mapping fixes.
+
+[Changes for 0.10 - 11 Jan, 2005]
+
+Initial Release.

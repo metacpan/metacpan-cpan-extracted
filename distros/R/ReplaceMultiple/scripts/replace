@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Slurp;
+use ReplaceMultiple;
+use Getopt::Long;
+use Text::CSV;
+
+my $csvFile;
+GetOptions('csv=s' => \$csvFile);
+
+if(!defined $csvFile) {
+  print "--csv option is mandatory.\n";
+  exit;
+}
+
+if(@ARGV > 1) {
+  print "Usage:\nreplace --csv PAIRS.csv [INFILE] > OUTFILE\n";
+  exit;
+}
+
+my %replStrings;
+my $csv = Text::CSV->new;
+open my $csvfh, "<", $csvFile or die "$csvFile: $!";
+while(my $row = $csv->getline($csvfh)) {
+  if(@$row != 2) {
+    print "The CSV file must have exactly two values in a row!";
+    exit;
+  }
+  $replStrings{$row->[0]} = $row->[1];
+}
+$csv->eof or die "$csvFile: $!";
+close $csvfh;
+
+my $text = read_file($ARGV[0] // \*STDIN);
+
+replace_multiple_inplace(\%replStrings, \$text);
+print $text;

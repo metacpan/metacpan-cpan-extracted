@@ -1,0 +1,11 @@
+Revision history for Perl extension XML-RSS-Parser-Lite.
+
+0.12  Thu Jul 26 15:00:50 2012
+	Updated version by Thomas Blanchard:
+	- includes optional RSS 2 fields according to specifications (bug 44730)
+	- includes backward compatibility with RSS 1 specification (bug 6090)
+	- corrects missing dependency for XML::Parser::Lite (bug 63194)
+
+0.10  Nov 02 2003
+	- CPAN version by Erik Bosrup
+

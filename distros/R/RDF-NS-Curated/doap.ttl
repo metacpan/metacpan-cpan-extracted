@@ -1,0 +1,89 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006000"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-rdf-ns-curated/issues>;
+	doap:created         "2015-07-27"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:download-page   <https://metacpan.org/release/RDF-NS-Curated>;
+	doap:homepage        <https://metacpan.org/release/RDF-NS-Curated>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:name            "RDF-NS-Curated";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-rdf-ns-curated>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "A curated set of RDF prefixes".
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "RDF-NS-Curated-0.001"^^xsd:string;
+	dc:issued            "2015-07-27"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Trivial bug fixes";
+	dc:identifier        "RDF-NS-Curated-0.002"^^xsd:string;
+	dc:issued            "2015-09-01"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Add more prefixes.";
+	dc:identifier        "RDF-NS-Curated-0.003"^^xsd:string;
+	dc:issued            "2017-01-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>
+	a                    doap:Version;
+	rdfs:label           "Remove duv prefix, spec unreliable.";
+	dc:identifier        "RDF-NS-Curated-0.004"^^xsd:string;
+	dc:issued            "2017-01-23"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>
+	a                    doap:Version;
+	rdfs:label           "Correct duv prefix.";
+	dc:identifier        "RDF-NS-Curated-0.005"^^xsd:string;
+	dc:issued            "2017-01-23"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK";
+	foaf:page            <https://metacpan.org/author/KJETILK>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>.
+

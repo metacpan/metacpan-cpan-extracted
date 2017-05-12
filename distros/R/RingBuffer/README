@@ -1,0 +1,33 @@
+RingBuffer version 0.04
+=======================
+
+This PERL module provides the abstract ability to implement a Ring Buffer.
+You can set the size of the ring and you can also set the type of object
+that the ring 'holds'.
+
+I implemented this because I needed a PERL version of the ring buffer that
+I was using in my Atmel programming.  It is designed to be easily translated
+to C.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Travis Kent Beste
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

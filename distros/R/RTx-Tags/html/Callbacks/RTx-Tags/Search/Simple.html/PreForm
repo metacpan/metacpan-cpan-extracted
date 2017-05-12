@@ -1,0 +1,8 @@
+<p>Searching custom field values can be done with
+<strong>.<em>CFieldName</em>:<em>keyword</em></strong>
+e.g; <tt>.tags:spam</tt>.
+Negation is also permitted by prepending a <tt>-</tt>
+i.e; <tt>-.tags:spam</tt> finds ham.
+Alternatively for tags, use the cloud of links below:</p>
+
+<& /Elements/TagCloud &>

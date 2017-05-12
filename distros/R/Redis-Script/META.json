@@ -1,0 +1,79 @@
+{
+   "abstract" : "wrapper class for Redis' script",
+   "author" : [
+      "@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-Script",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Redis" : "0",
+            "Test::More" : "0.98",
+            "Test::RedisServer" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Redis::Script" : {
+         "file" : "lib/Redis/Script.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shogo82148/p5-Redis-Script/issues"
+      },
+      "homepage" : "https://github.com/shogo82148/p5-Redis-Script",
+      "repository" : {
+         "url" : "git://github.com/shogo82148/p5-Redis-Script.git",
+         "web" : "https://github.com/shogo82148/p5-Redis-Script"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Ichinose Shogo <shogo82148@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

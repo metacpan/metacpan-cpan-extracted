@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# $HeadURL: https://svn.oucs.ox.ac.uk/people/oliver/pub/librpc-serialized-perl/trunk/examples/ipcserver.run $
+# $LastChangedRevision: 1281 $
+# $LastChangedDate: 2008-10-01 16:16:56 +0100 (Wed, 01 Oct 2008) $
+# $LastChangedBy: oliver $
+#
+# Daemontools run script for RPC::Serialized::Server running under ipcserver.
+#
+exec 2>&1
+
+SERVER=/usr/sbin/rpc-serialized-server
+CONFIG=/usr/share/doc/librpc-serialized-perl/examples/server.yml
+SOCKET=/var/run/rpc-serialized-example-server.socket
+
+exec envuidgid daemon ipcserver -U -p -v $SOCKET $SERVER $CONFIG

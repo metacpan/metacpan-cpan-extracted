@@ -1,0 +1,465 @@
+=pod
+
+=begin readme text
+
+RPC::ExtDirect::Client
+======================
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+RPC::ExtDirect::Client - Ext.Direct client in Perl
+
+=head1 SYNOPSIS
+
+    use RPC::ExtDirect::Client;
+
+    my $client = RPC::ExtDirect::Client->new(host => 'localhost');
+    
+    my $result = $client->call(
+        action   => 'Action',
+        method   => 'Method',
+        arg      => [ 'foo', 'bar' ],
+        cookies  => { foo => 'bar' },
+        metadata => { baz => 'qux' },
+    );
+
+=head1 DESCRIPTION
+
+=for readme continue
+
+This module implements Ext.Direct client in pure Perl. Its main purpose
+is to be used for testing server side Ext.Direct classes, complementing
+L<RPC::ExtDirect::Server>. It can also be used for testing Ext.Direct
+Actions developed in languages other than Perl, or for something else
+altogether.
+
+This client is synchronous, i.e. all method calls are blocking. If you
+need a non-blocking way of calling an Ext.Direct server, take a look at
+L<RPC::ExtDirect::Client::Async> instead.
+
+Unless configured otherwise, RPC::ExtDirect::Client will use
+L<HTTP::Tiny> for the transport layer.
+
+=for readme stop
+
+If you are not sure what Ext.Direct is, read L<RPC::ExtDirect::Intro>
+first.
+
+=head1 CAVEATS
+
+=head2 Blocking requests
+
+Before a client object can be used, it needs an instance of the
+L<Ext.Direct API|RPC::ExtDirect::Intro/API>. There are two ways of
+initializing the API: remotely from a server, and locally by passing
+an L<RPC::ExtDirect::API> object instance to the client constructor:
+
+    my $api = RPC::ExtDirect::API->new_from_hashref(
+        api_href => { ... },
+    );
+    
+    my $client = RPC::ExtDirect::Client->new(
+        host => 'localhost',
+        port => 8080,
+        api  => $api,
+    );
+
+When a local API instance is used, the client object will be available
+immediately. Otherwise, the constructor will block until the 
+L<API declaration|RPC::ExtDirect::Intro/"API declaration"> is retrieved
+and parsed. This may cause a significant delay that depends on the
+underlying transport's default timeout for HTTP requests (60 sec for
+HTTP::Tiny). To avoid that, set the timeout explicitly:
+
+    my $client = RPC::ExtDirect::Client->new(
+        host    => 'localhost',
+        timeout => 1, # This parameter is passed to HTTP::Tiny
+    );
+
+Applying a timeout in the constructor will set it for every request
+made by the client object; if that is not desirable, you can set
+a timeout individually for each request:
+
+    my $client = RPC::ExtDirect::Client->new(
+        host    => 'localhost',
+        timeout => 10, # Initialization may be slow
+    );
+    
+    my $data = $client->call(
+        timeout => 1, # This *should* work fast, or else
+        ...
+    );
+
+For transport modules other than HTTP::Tiny you may have to use a
+different parameter to set the timeout.
+
+=head2 Error handling
+
+RPC::ExtDirect::Client tries to follow the principle of least
+astonishment, and will throw an exception by calling C<Carp::croak>
+whenever it encounters an error. This can happen in any method call:
+
+=over 4
+
+=item *
+
+In constructor, if the remote API declaration retrieval failed or
+the result is garbled;
+
+=item *
+
+In L</call>/L</submit>/L</poll>, if HTTP request failed;
+
+=item *
+
+In L</call>, if the arguments do not conform to the Method's definition;
+
+=item *
+
+In L</call> or L</poll>, if the corresponding API type is not defined,
+etc.
+
+=back
+
+It is strongly recommended to guard calls to the client object in
+C<eval> blocks if you require any kind of error handling besides basic
+error message printed to STDERR:
+
+    my $client = eval { RPC::ExtDirect::Client->new( ... ) }
+        or do { ... # Handle the error };
+    
+    my $data = eval { $client->call( ... ) };
+    
+    if ( $@ ) {
+        ...
+    }
+
+=head1 CLIENT OBJECT INTERFACE
+
+RPC::ExtDirect::Client provides several public methods:
+
+=over 4
+
+=item C<new>
+
+Constructor. Returns a new client instance and initializes an
+L<Ext.Direct API|RPC::ExtDirect::Intro/API> instance from the server,
+unless L</api> parameter is provided. Accepts named arguments in a
+hash.
+
+Parameters:
+
+=over 8
+
+=item C<api>
+
+Optional L<RPC::ExtDirect::API> instance to use. If not given, a new
+instance will be created from the remote API provided by the server.
+
+=item C<config>
+
+Optional L<RPC::ExtDirect::Config> instance to be used. If not provided,
+a new Config instance will be created unless L</api> parameter is
+provided, in which case the Config instance in the API object will be
+used.
+
+=item C<host>
+
+Server's host name or IP address. This parameter is mandatory.
+
+=item C<port>
+
+Optional port number to use when connecting to the server. Defaults to
+C<80>.
+
+=item C<proto>
+
+Optional protocol to use when connecting to the server. Defaults to
+C<http>.
+
+=item C<cookies>
+
+Cookies to set when calling server side; can be either L<HTTP::Cookies>
+object or a hashref containing key-value pairs. Setting this in
+constructor will pass the same cookies to all subsequent client calls.
+
+=back
+
+The following parameters are deprecated and should be set on a Config
+instance instead:
+
+=over 8
+
+=item C<api_path>
+
+URI for Ext.Direct API published by server.
+See L<RPC::ExtDirect::Config/api_path>.
+
+=item C<router_path>
+
+URI for Ext.Direct remoting requests.
+See L<RPC::ExtDirect::Config/router_path>.
+
+=item C<poll_path>
+
+URI for Ext.Direct events. See L<RPC::ExtDirect::Config/poll_path>.
+
+=item C<remoting_var>
+
+JavaScript variable name used to assign Ext.Direct remoting API object to.
+See L<RPC::ExtDirect::Config/remoting_var>.
+
+=item C<polling_var>
+
+JavaScript variable name used to assign Ext.Direct polling API object to.
+See L<RPC::ExtDirect::Config/polling_var>.
+
+=back
+
+All other arguments are passed to the transport module constructor. See
+L<HTTP::Tiny/new> for more detail.
+
+=item C<get_api>
+
+Instance method. Returns an L</api_class_client> object with the
+L<Ext.Direct API|RPC::ExtDirect::Intro/API> declaration published by
+the server.
+
+Accepts one mandatory positional argument, API type, that can be either
+C<'remoting'> or C<'polling'> to retrieve the corresponding API object.
+
+=item C<call>
+
+Instance method. Calls the specified
+L<Ext.Direct Method|RPC::ExtDirect::Intro/Method> on the server side
+and returns the execution L<Result|RPC::ExtDirect::Intro/Result>, or an
+L<Exception|RPC::ExtDirect::Intro/Exception>. Accepts named arguments
+in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<action>
+
+L<Ext.Direct Action|RPC::ExtDirect::Intro/Action> (class) name. This
+parameter is mandatory.
+
+=item C<method>
+
+L<Ext.Direct Method|RPC::ExtDirect::Intro/Method> name to call. This
+parameter is mandatory.
+
+=item C<arg>
+
+Ext.Direct Method arguments; use arrayref for methods that accept ordered
+parameters or hashref for named parameters. This parameter is mandatory
+even for Methods that accept no arguments; in such case, pass an empty
+arrayref.
+
+=item C<metadata>
+
+Ext.Direct Method metadata; use arrayref for methods that accept ordered
+metadata or hashref for named metadata. Metadata is always optional.
+
+=item C<cookies>
+
+Optional set of cookies for this particular call only. Cookies should be
+in the same format as for constructor, see L</new>.
+
+=back
+
+All other arguments are passed to the transport module constructor. See
+L<HTTP::Tiny/new> for more detail.
+
+=item C<submit>
+
+Instance method. Submits an HTML form request to a
+L<Form Handler|RPC::ExtDirect::Intro/"Form Handler Method"> method and
+returns the execution L<Result|RPC::ExtDirect::Intro/Result>, or an
+L<Exception|RPC::ExtDirect::Intro/Exception>. Accepts named arguments
+in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<action>
+
+L<Ext.Direct Action|RPC::ExtDirect::Intro/Action> (class) name. This
+parameter is mandatory.
+
+=item C<method>
+
+L<Ext.Direct Method|RPC::ExtDirect::Intro/Method> name to call. This
+parameter is mandatory.
+
+=item C<arg>
+
+A hashref of the Method arguments. This parameter is mandatory, unless
+L</upload> is specified.
+
+=item C<metadata>
+
+A hash- or arrayref of Method metadata. This parameter is always
+optional.
+
+=item C<upload>
+
+An optional arrayref of file names to upload. Files should be readable
+by the current process, or L</submit> will die with an error.
+
+=item C<cookies>
+
+Optional set of cookies for this particular call only. Cookies should be
+in the same format as for constructor, see L</new>.
+
+=back
+
+All other arguments are passed to the transport module constructor. See
+L<HTTP::Tiny/new> for more detail.
+
+=item C<upload>
+
+A shortcut for L</submit>, for better readability when uploading files.
+
+=item C<poll>
+
+Instance method. Polls server side for
+L<Ext.Direct Events|RPC::ExtDirect::Intro/Event>, returns a list of
+hashrefs with event data. If so desired, these hashrefs can be used
+to instantiate L<RPC::ExtDirect::Event> objects:
+
+    my @events = map { RPC::ExtDirect::Event->new($_) } $client->poll();
+
+B<PLEASE NOTE> that in versions < 1.0 this method used to return a
+scalar value which could be either a single event hashref, or an arrayref
+of event hashrefs. It will continue following that behavior when called
+in scalar context, but doing that is no longer recommended (although
+not exactly deprecated).
+
+This method accepts the following named parameters in a hashref:
+
+=over 8
+
+=item C<cookies>
+
+Optional set of cookies for this particular call only. Cookies should be
+in the same format as for constructor, see L</new>.
+
+=back
+
+All other arguments are passed to the transport module constructor. See
+L<HTTP::Tiny/new> for more detail.
+
+=back
+
+=head1 CONFIGURATION OPTIONS
+
+RPC::ExtDirect::Client adds the following options specific to the Client,
+and sets them in the L<RPC::ExtDirect::Config> instance it uses:
+
+=over 4
+
+=item C<api_class_client>
+
+Class name to use when instantiating API objects from remote server
+JavaScript response. Default is C<RPC::ExtDirect::Client::API>; use
+subclass name if you need to augment the stock API class behavior.
+
+=item C<transport_class>
+
+Class name to use when instantiating transport objects that are used to
+connect to the remote server. Default is L<HTTP::Tiny>.
+
+=back
+
+=head1 ACCESSOR METHODS
+
+For RPC::ExtDirect::Client, the following
+L<accessor methods|RPC::ExtDirect::Config/"ACCESSOR METHODS"> are
+provided:
+
+=over 4
+
+=item C<config>
+
+Return the current L<RPC::ExtDirect::Config> instance held in the
+client object, or set a new one.
+
+=item C<host>
+
+Return the current host name or IP address of the server, or set
+a new one.
+
+=item C<port>
+
+Return the current port to use when connecting to the server, or set
+a new one.
+
+=item C<cookies>
+
+Return the set of cookies to use with every Ext.Direct request, or set
+a new one. See L</new> for more information.
+
+=item C<http_params>
+
+Return a hashref with HTTP parameters to be used with every
+Ext.Direct request, or set a new one. These parameters will be passed
+to the transport object's constructor (see L</transport_class>).
+
+By default this hashref will be populated with all "extra" arguments
+passed to L</new> and does not need to be manipulated directly.
+
+=back
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make && make test
+    make install
+
+=end readme
+
+=for readme stop
+
+=head1 SEE ALSO
+
+For more information on using Ext.Direct with Perl, see L<RPC::ExtDirect>.
+L<RPC::ExtDirect::Server> can be used to provide lightweight drop-in for
+production environment to run Ext.Direct tests. Tests themselves are
+better written using L<Test::ExtDirect> that will utilize both ::Server
+and ::Client in transparent and convenient fashion.
+
+=head1 ACKNOWLEDGEMENTS
+
+I would like to thank IntelliSurvey, Inc for sponsoring my work
+on this module.
+
+=head1 BUGS AND LIMITATIONS
+
+At this time there are no known bugs in this module. Please report
+problems to the author, patches are always welcome.
+
+Use L<Github tracker|https://github.com/nohuhu/RPC-ExtDirect-Client/issues>
+to open bug reports, this is the easiest and quickest way to get your
+issue fixed.
+
+=for readme continue
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2016 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

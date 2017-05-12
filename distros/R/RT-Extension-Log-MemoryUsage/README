@@ -1,0 +1,69 @@
+NAME
+    RT::Extension::Log::MemoryUsage - log information about memory used by
+    RT processes
+
+SYNOPSIS
+        # in RT site config
+
+        # register plugins
+        Set( @Plugins, qw(
+            ... other plugins ...
+            RT::Extension::Log::MemoryUsage
+        ));
+        Set(@MasonParameters,
+            plugins => [qw(RT::Extension::Log::MemoryUsage::MPL)],
+        );
+
+        # setup logging to see messages
+        Set( $LogToScreen, 'info');
+        # or
+        Set( $LogToSyslog, 'info');
+
+DESCRIPTION
+    This extension helps identify requests that cause a memory usage spikes.
+
+    RT is a big application with many modules, extensions and different ways
+    to run system. As well, there are tons of ways to screw up memory usage.
+    It's hard to detect memory leaks and not only them, but just places in
+    code that like to eat lots of memory. This extension reports memory
+    usage changes after each request to the server. Unix `ps` command is
+    used to get this information.
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make install
+
+    Change RT site config according to "SYNOPSIS", restart server.
+
+RESULTS
+    When RT handles a request this plugin logs two messages. Before the
+    request and after. Something like:
+
+        memory after '/index.html' =>
+            pid: 25956; rss: 55380 (+20); rsz: 55380 (+20);
+            vsz: 129168 (+144); tsiz: 0; %mem: 2.6;
+        memory before '/index.html' =>
+            pid: 25956; rss: 55360 (-20); rsz: 55360 (-20);
+            vsz: 129024 (-144); tsiz: 0; %mem: 2.6;
+
+    Message issued before request shows change in memory usage since
+    previouse request to this process. Usually it shows negative numbers,
+    except for request after first touch of a component. Negative numbers is
+    a result of taking sample a little bit earlier after request when some
+    memory is not freed yet, but it is free before next request. As you can
+    see above in example all additional memory was freed between requests.
+
+    When a page requested for the first time then usually numbers don't
+    match. This happens cuz perl have to compile new code and that code
+    stays in the system for the whole time.
+
+    However, if you have a page X and constantly next request doesn't
+    reclaim all memory before then you have a memory leak.
+
+AUTHOR
+    Ruslan Zakirov <ruz@bestpractical.com>
+
+LICENSE
+    Under the same terms as perl itself.
+

@@ -1,0 +1,52 @@
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+    // Load the Visualization API and the piechart package.
+    google.load('visualization', '1', {'packages':['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.setOnLoadCallback(drawChart);
+
+    // Callback that creates and populates a data table,
+    // instantiates the pie chart, passes in the data and
+    // draws it.
+    function drawChart() {
+        // Create our data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Impact');
+        data.addColumn('number', 'Count');
+%#        data.addRows([['search',5],['botnet',15]]);
+% $m->out('data.addRows('.$json.');');
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, {width: 800, height: 480, title: "By Impact: <% $q %>"});
+    }
+</script>
+<!--Div that will hold the pie chart-->
+<div id="chart_div"></div>
+
+<%init>
+    use Data::Dumper;
+    my @entries = @{$feed->{'feed'}->{'entry'}};
+    my $hash = {};
+    foreach my $e (@entries){
+        my $impact = $e->{'impact'};
+        if($hash->{$impact}){
+            $hash->{$impact}++;
+        } else {
+            $hash->{$impact} = 1;
+        }
+    }
+    my @array;
+    foreach my $e (keys %$hash){
+        push(@array,[$e,$hash->{$e}]);
+    }
+    my $json = JSON::to_json(\@array);
+</%init>
+
+<%args>
+$feed => undef
+$string => 'impact'
+$number => 'count'
+$q  => undef
+</%args>

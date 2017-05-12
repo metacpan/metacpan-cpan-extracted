@@ -1,0 +1,45 @@
+Revision history for Regexp-Common-VATIN
+
+v1.0      2015-08-05 18:46:58-05:00 America/Chicago
+    - Updated and corrected Ireland patterns.
+
+v0.0.12   2014-03-27 14:10:11-05:00 America/Chicago
+    - Loosened Ireland's pattern given a probable misprint on the European
+      Commission website.
+
+v0.0.11   2014-03-25 16:34:23-05:00 America/Chicago
+    - Updated pattern for Ireland (IE).
+
+v0.0.10   2014-03-25 11:09:24-05:00 America/Chicago
+    - Added pattern for Croatia (HR).
+    - Accomodated usage of ISO-3166 by allowing access to the Greece's pattern
+      with the key, "GR".
+
+v0.0.9    2013-03-05 18:20:13 America/Chicago
+    - Added Slovenia.
+
+v0.0.8    2013-03-04 13:06:43 America/Chicago
+    - Added pattern of Isle of Man.
+
+v0.0.7    2013-03-04 12:50:20 America/Chicago
+    - Fixed patterns for Spain and the Netherlands.
+
+v0.0.6    2013-03-01 14:58:12 America/Chicago
+    - Fixed Italy regexp.
+
+v0.0.5    2013-02-22 13:16:01 America/Chicago
+    - Removed word boundaries from patterns.
+    - Updated POD with warning.
+
+v0.0.4    2013-02-20 10:56:45 America/Chicago
+    - For the sake of JavaScript compatibility, replaced POSIX character classes
+      in regular expressions with character ranges
+
+v0.0.3    2013-02-20 03:15:55 America/Chicago
+    - Removed qr() quoting of patterns on creation.
+
+v0.0.2    2013-02-14 17:05:41 America/Chicago
+    - Fixed POD.
+
+v0.0.1    2013-02-14 15:32:33 America/Chicago
+    - First version, released on an unsuspecting world.

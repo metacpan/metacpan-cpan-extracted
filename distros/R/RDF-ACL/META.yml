@@ -1,0 +1,44 @@
+---
+abstract: 'access control lists for the semantic web'
+author:
+  - 'Toby Inkster'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::10 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RDF-ACL
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  RDF::ACL:
+    file: lib/RDF/ACL.pm
+    version: '0.104'
+requires:
+  Data::UUID: '0'
+  Error: '0'
+  RDF::Query: '0'
+  RDF::Query::Client: '0'
+  RDF::TrineX::Functions: '0'
+  Scalar::Util: '0'
+  URI: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/RDF-ACL/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-ACL
+  homepage: https://metacpan.org/release/RDF-ACL
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-rdf-acl.git
+version: '0.104'

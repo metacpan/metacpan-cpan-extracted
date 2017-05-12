@@ -1,0 +1,26 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+                                     
+<>
+        dc:description          "Changes for RDF::EARL" ;
+        dcterms:references      <http://purl.org/NET/cpan-uri/dist/RDF-EARL/project> .
+
+<http://kasei.us/code/files/RDF-EARL-0.001.tar.gz>
+        dcterms:isVersionOf <http://purl.org/NET/cpan-uri/dist/RDF-EARL/project> ;
+
+        doap:Version    [
+                        doap:revision     "0.001" ;
+                        doap:created      "2012-08-26" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Initial release." ;
+                        ] .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-EARL/project>
+        a doap:Project ;
+        doap:download-page      <http://search.cpan.org/dist/RDF-EARL/> ;
+        doap:download-mirror    <http://github.com/kasei/rdf-earl/> .

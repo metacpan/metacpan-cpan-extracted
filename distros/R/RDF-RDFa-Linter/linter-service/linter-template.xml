@@ -1,0 +1,87 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head profile="http://www.w3.org/1999/xhtml/vocab">
+		<title xmlns:dc="http://purl.org/dc/terms/" property="dc:title" />
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+		<script type="text/javascript">
+			$(function () {
+				$('.tabs').addClass('jquery');
+			
+				var tabContainers = $('.tabs > div');
+				tabContainers.hide().filter(':first').show();
+				
+				$('.tabNavigation a').click(function () {
+					tabContainers.hide();
+					tabContainers.filter(this.hash).show();
+					$('.tabNavigation a').removeClass('selected');
+					$(this).addClass('selected');
+					return false;
+				}).filter(':first').click();
+			});
+		</script>
+		<style type="text/css">
+			@import url("images/PixelGreen.css");
+		</style>
+	</head>
+	<body>
+		<div id="wrap">
+			<div id="header">
+				<div id="header-content">
+					<div class="head" />
+					<div id="slogan" class="summary" />
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a href="#" class="selected">Results</a></li>
+						<li><a href="/faq">FAQ</a></li>
+					</ul>
+				</div>
+			</div>
+			<div id="content-wrap">
+				<div id="content">
+					<div id="main" class="nosidebar">
+						<div class="tabNavigationContainer">
+							<span>Result tabs:</span>
+							<ul class="tabNavigation" />
+						</div>
+						<div class="tabs" />
+					</div>
+				</div>
+			</div>
+			<div id="footer">
+				<div id="footer-content">
+					<div class="col float-left space-sep">
+						<h6>RDFa Links</h6>
+						<ul class="flist">
+							<li><a href="http://www.w3.org/TR/rdfa-syntax/">XHTML+RDFa 1.0 Recommendation</a></li>
+							<li><a href="http://www.w3.org/TR/rdfa-core/">RDFa Core 1.1 Draft</a></li>
+							<li><a href="http://www.w3.org/TR/xhtml-rdfa/">XHTML+RDFa 1.1 Draft</a></li>
+							<li><a href="http://www.w3.org/TR/rdfa-in-html/">HTML+RDFa Draft</a></li>
+							<li><a href="http://www.w3.org/TR/xhtml-rdfa-primer/">RDFa Primer</a></li>
+							<li><a href="http://rdfa.info/">rdfa.info</a></li>
+						</ul>
+					</div>
+					<div class="col float-left space-sep">
+						<h6>Service Links</h6>
+						<ul class="flist">
+							<li><a href="http://opengraphprotocol.org/">Open Graph Protocol</a></li>
+							<li><a href="http://www.w3.org/Submission/ccREL/">ccREL</a></li>
+							<li><a href="http://www.google.com/support/webmasters/bin/answer.py?hl=en&amp;answer=99170">Google Rich Snippets</a></li>
+						</ul>
+					</div>
+					<div class="col float-left">
+						<p xmlns:foaf="http://xmlns.com/foaf/0.1/" rel="foaf:maker"
+						rev="foaf:made">Programming by <a about="http://tobyinkster.co.uk/#i"
+						typeof="foaf:Person" rel="foaf:homepage" href="http://tobyinkster.co.uk/"
+						property="foaf:name">Toby Inkster</a>.</p>
+						<p>Hosting donated by <a href="http://melvincarvalho.com/"
+						>Melvin Carvalho</a> and domain name supplied by <a
+						href="http://creativecommons.org/">Creative Commons</a>.</p>
+						<p>Most icons taken from <a href="http://www.famfamfam.com/lab/icons/silk/"
+						>FamFamFam Silk</a>.</p>
+						<p>Design based on <a href="http://www.styleshout.com/templates/preview/PixelGreen13/index.html"
+						>Pixel Green</a> by <a href="http://www.styleshout.com/">styleshout</a>.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

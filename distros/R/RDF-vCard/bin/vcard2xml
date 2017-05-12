@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+use strict;
+
+BEGIN
+{
+	print STDERR "Reading vCard input from STDIN.\n"
+		unless @ARGV;
+}
+
+use RDF::vCard;
+use XML::LibXML;
+
+my $importer = RDF::vCard::Importer->new;
+my @cards;
+
+unless (@ARGV)
+{
+	my ($lang) = split /\./, $ENV{LANG};
+	$lang =~ s/_/-/g;
+
+	local $/ = undef;
+	my $input = <>;
+	
+	push @cards, $importer->import_string($input, lang => $lang);
+}
+
+while (my $input = shift @ARGV)
+{
+	if ($input =~ /^(ftp|http|https|file):/i)
+	{
+		push @cards, $importer->import_url($input);
+	}
+	else
+	{
+		push @cards, $importer->import_file($input);
+	}
+}
+
+my $doc;
+foreach my $c (@cards)
+{
+	if ($doc)
+	{
+		$c->add_to_document($doc);
+	}
+	else
+	{
+		die "No XML support available (please install XML::LibXML)\n"
+			unless $c->can('to_xml');
+		# Kinda annoying that we only get it as a string, and then need to parse it as XML. :-(
+		$doc = XML::LibXML->new->parse_string($c->to_xml);
+	}
+}
+
+printf("%s\n", $doc->toString) if $doc;

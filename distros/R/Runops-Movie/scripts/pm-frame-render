@@ -1,0 +1,23 @@
+#!perl
+use strict;
+use warnings;
+use autodie 'system';
+use Getopt::Long qw( GetOptions );
+use autodie qw( system );
+use Carp::Always;
+
+GetOptions(
+  help    => sub { die },
+  'dir=s' => \ my $dir,
+  'in=s'  => \ my $in,
+  'png=s' => \ my $png
+)
+  or die "@ARGV";
+
+system 'pm-frame-read',       '--dir', $dir, '--in', $in;
+system 'pm-frame-make-graph', '--dir', $dir;
+system 'pm-frame-deparent',   '--dir', $dir;
+system 'pm-frame-redge',      '--dir', $dir;
+system 'pm-frame-sum-size',   '--dir', $dir;
+system 'pm-frame-names',      '--dir', $dir;
+system 'pm-frame-png',        '--dir', $dir, '--png', $png;

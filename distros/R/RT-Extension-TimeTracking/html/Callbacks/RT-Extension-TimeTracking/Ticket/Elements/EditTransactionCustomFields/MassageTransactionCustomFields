@@ -1,0 +1,7 @@
+<%INIT>
+$CustomFields->Limit( FIELD => 'Name', VALUE => 'Actor', OPERATOR => '!=', CASESENSITIVE => 0 );
+</%INIT>
+
+<%ARGS>
+$CustomFields
+</%ARGS>

@@ -1,0 +1,71 @@
+{
+   "abstract" : "Utility functions for checking references",
+   "author" : [
+      "Sawyer X <xsawyerx@cpan.org>",
+      "Aaron Crane <arc@cpan.org>",
+      "Vikenty Fesunov <vyf@cpan.org>",
+      "Gonzalo Diethelm <gonzus@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ref-Util",
+   "prereqs" : {
+      "develop" : {
+         "requires" : {
+            "Devel::PPPort" : "3.23",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "XSLoader" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "B::Concise" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Ref::Util" : {
+         "file" : "lib/Ref/Util.pm",
+         "version" : "0.113"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/p5pclub/ref-util/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/p5pclub/ref-util.git",
+         "web" : "https://github.com/p5pclub/ref-util"
+      }
+   },
+   "version" : "0.113",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

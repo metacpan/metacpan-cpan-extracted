@@ -1,0 +1,161 @@
+#!/usr/bin/env perl
+#---------------------------------------------------------------------
+use strict;
+use warnings;
+our $VERSION = "0.03";
+
+use RSSycklr;
+use Getopt::Long ();
+use Pod::Usage qw( pod2usage );
+use Carp;
+#---------------------------------------------------------------------
+my ( $opt_versions, $opt_versions_long, $opt_man, $opt_help,
+     $opt_config, $opt_output );
+
+Getopt::Long::GetOptions(
+                         'help'          => \$opt_help,
+                         'man'           => \$opt_man,
+                         'versions'      => \$opt_versions,
+#                         'VERSIONS'      => \$opt_versions_long,
+                         'config_file=s' => \$opt_config,
+                         'out=s'         => \$opt_output,
+                         );
+
+pod2usage(-verbose => 1) && exit(0) if $opt_help;
+pod2usage(-verbose => 2) && exit(0) if $opt_man;
+versions() && exit(0) if $opt_versions || $opt_versions_long;
+
+die "config_file argument is required. Try 'rssycklr -help'\n" unless $opt_config;
+die "config_file '$opt_config' does not exist\n" unless -e $opt_config;
+die "config_file '$opt_config' is not readable\n" unless -r _;
+
+my $rssycklr = RSSycklr->new( load_config => $opt_config );
+#$rssycklr->config($opt_config);
+
+binmode STDOUT, ":utf8";
+$rssycklr->process($rssycklr->template,
+                   {
+                       rssycklr => $rssycklr,
+                   },
+                   $opt_output
+                   )
+    or croak $rssycklr->tt2->error();
+
+exit 0;
+
+#---------------------------------------------------------------------
+sub versions {
+    print
+        "\nVersion info\n",
+        "       RSSycklr --> $RSSycklr::VERSION\n",
+        "           perl --> $]\n",
+        "             OS --> $^O\n",
+        "       rssycklr --> $main::VERSION\n",
+        "      Called as --> $0\n",
+        "\n";
+
+    return 1 unless $opt_versions_long;
+
+    for my $mod ( sort keys %INC )
+    {
+        no strict "refs";
+        no warnings "uninitialized";
+        $mod =~ s,/,::,g;
+        $mod =~ s,\.pm,,g;
+        printf("%50s --> %s\n",
+               $mod,
+               ${$mod . "::VERSION"} || "-"
+               );
+    }
+    1;
+}
+
+
+
+__DATA__
+
+=head1 NAME
+
+rssycklr - Command line tool for basic interaction with L<RSSycklr>.
+
+=head1 SYNOPSIS
+
+    rssycklr -c ./config_file.yml [-o /www/html_snippet.html]
+
+See L<RSSycklr/CONFIGURATION> for C<-config_file> options.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-config_file>
+
+Path to a L<YAML> configuration file.
+
+=item B<-out>
+
+A file name for output. Prints to STDOUT if there is no C<-out> specified.
+
+=item B<-version>
+
+Prints version information.
+
+=back
+
+=head1 DESCRIPTION
+
+This is a simple way to use the L<RSSycklr> module without having to write code. It can be used for things like writing an include file on a crontab.
+
+[I'll try to expand this in the future.]
+
+=head1 AUTHOR
+
+Ashley Pond V, C<< <ashley@cpan.org> >>.
+
+=head1 BUGS
+
+I love good feedback and bug reports. Please report any bugs or feature requests directly to me via email or through the web interface at L<http://rt.cpan.org/Public/Dist/Display.html?Name=RSSycklr>.
+
+=head1 SEE ALSO
+
+L<RSSycklr>.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (E<copy>) 2008 Ashley Pond V.
+
+This program is free software; you can redistribute it or modify it or
+both under the same terms as Perl itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+Because this software is licensed free of charge, there is no warranty
+for the software, to the extent permitted by applicable law. Except
+when otherwise stated in writing the copyright holders or other
+parties provide the software "as is" without warranty of any kind,
+either expressed or implied, including, but not limited to, the
+implied warranties of merchantability and fitness for a particular
+purpose. The entire risk as to the quality and performance of the
+software is with you. Should the software prove defective, you assume
+the cost of all necessary servicing, repair, or correction.
+
+In no event unless required by applicable law or agreed to in writing
+will any copyright holder, or any other party who may modify and/or
+redistribute the software as permitted by the above licence, be liable
+to you for damages, including any general, special, incidental, or
+consequential damages arising out of the use or inability to use the
+software (including but not limited to loss of data or data being
+rendered inaccurate or losses sustained by you or third parties or a
+failure of the software to operate with any other software), even if
+such holder or other party has been advised of the possibility of such
+damages.
+
+=cut

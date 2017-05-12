@@ -1,0 +1,78 @@
+@prefix :     <http://usefulinc.com/ns/doap#> .
+@prefix dc:   <http://purl.org/dc/terms/> .
+@prefix my:   <http://purl.org/NET/cpan-uri/dist/RDF-Helper-Properties/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dcs:  <http://ontologi.es/doap-changeset#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+
+<>
+    dc:title     "DOAP for RDF-Helper-Properties"@en ;
+    dc:subject   my:project ;
+    dc:creator   <http://www.kjetil.kjernsmo.net/foaf#me> .
+
+my:project :release    my:v_0_24 .
+my:v_0_24
+    a           :Version ;
+    dc:issued   "2016-12-29"^^xsd:date ;
+    :revision   "0.24"^^xsd:string ;
+    rdfs:label "Update to Moo."@en ;
+    dc:contributor <http://purl.org/NET/cpan-uri/person/haarg> ;
+    owl:sameAs <http://packages.qa.debian.org/librdf-helper-properties-perl#upstreamsrc_0.24> ;
+    dcs:changeset [
+      dcs:item [ 
+                 rdfs:label "Update to Moo."@en ; a dcs:Update ;
+                 dcs:blame <http://purl.org/NET/cpan-uri/person/haarg> 
+               ] ;
+    ] .
+
+my:project :release    my:v_0_22 .
+my:v_0_22
+    a           :Version ;
+    dc:issued   "2012-08-13"^^xsd:date ;
+    :revision   "0.22"^^xsd:string ;
+    dc:contributor <http://tobyinkster.co.uk/#i> ;
+    dcs:changeset [
+      dcs:item [ rdfs:label "'title' method called in list context now also returns literal datatype and language."@en ; a dcs:Addition ] ;
+    ] .
+
+my:project :release    my:v_0_20 .
+my:v_0_20
+    a           :Version ;
+    dc:issued   "2012-08-10"^^xsd:date ;
+    rdfs:label  "Refactoring"@en ;
+    :revision   "0.20"^^xsd:string ;
+    dc:contributor <http://tobyinkster.co.uk/#i> ;
+    dcs:changeset [
+      dcs:item [ rdfs:label "Drop dependency on deprecated Error.pm; use Carp::confess instead."@en ; a dcs:Update ] ;
+      dcs:item [ rdfs:label "Expose 'cache' attribute publicly, and allow it to accept CHI/Cache::Cache objects."@en ] ;
+      dcs:item [ rdfs:label "'page_properties' and 'title_properties' attributes allow list of properties understood to be customized."@en ; a dcs:Addition ] ;
+      dcs:item [ rdfs:label "Refactored module."@en ] ;
+      dcs:item [ rdfs:label "use Any::Moose"@en ] ;
+    ] .
+
+my:v_0_10
+    a           :Version ;
+    dc:issued   "2010-08-26"^^xsd:date ;
+    rdfs:label "Fix nasty warnings."@en ;
+    :revision   "0.10"^^xsd:string ;
+    dcs:changeset [
+      dcs:item
+       [ rdfs:label "Fix the warning described in http://search.cpan.org/~shlomif/Error-0.17016/lib/Error.pm#COMPATIBILITY"@en ; a dcs:Update ] 
+    ] .
+
+my:v_0_08
+    a           :Version ;
+    dc:issued   "2010-08-18"^^xsd:date ;
+    rdfs:label "Splitting off from RDF::LinkedData and passing predicates."@en ;
+    :revision   "0.08"^^xsd:string ;
+    dcs:changeset [
+      dcs:item
+        [ rdfs:label "RDF::Helper::Properties used to be RDF::LinkedData::Predicates."@en ; a dcs:Update ] ,
+        [ rdfs:label "Give RDF::LinkedData::Predicates antlers."@en ; a dcs:Change ] ,
+        [ rdfs:label "create a helper_properties method to pass the properties."@en ; a dcs:Addition ] 
+    ] .
+
+
+

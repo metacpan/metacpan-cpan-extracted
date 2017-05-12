@@ -1,0 +1,69 @@
+<& Elements/Header, Title => loc('Advanced Apikeys') &>
+<& /Elements/ListActions, actions => \@results &>
+<& Elements/AdvancedApikeyGeneration, 
+    groups => \%group_map,
+    %ARGS
+&>
+<& Elements/AdvancedApikeyDisplay, 
+    recs    => \@recs,
+    %ARGS 
+&>
+<& Elements/ApikeyDisplayGroups,
+    groups  => \%group_map,
+    %ARGS
+&>
+
+<%INIT>
+return 0;
+require CIF::WebAPI::APIKey;
+my $user = $session{'CurrentUser'}->UserObj();
+
+my $g = $user->OwnGroups();
+my %group_map;
+while(my $grp = $g->Next()){
+    next unless($grp->Name() =~ /^DutyTeam (\S+)/);
+    my $guid = lc($1);
+    my $priority = $grp->FirstCustomFieldValue('CIFGroupPriority');
+    $group_map{$guid} = $priority;
+}
+$group_map{'everyone'} = 1000;
+my @sorted = sort { $group_map{$a} <=> $group_map{$b} } keys(%group_map);
+
+#if($GenerateKey){
+#    require CIF::WebAPI::APIKey;
+#    if($writeaccess){
+#        $writeaccess = 0 unless($session{'CurrentUser'}->UserObj->Privileged());
+#    }
+#    push(@results,'key '.$id->uuid().' successfully generated for: '.$user);
+#    if($userid ne $session{'CurrentUser'}->UserObj->Name()){
+#        
+#        push(@results,'key '.$id2->uuid().' successfully generated for: '.$user);
+#    }
+#}
+
+if($PurgeKey){
+    my $r = CIF::WebAPI::APIKey->retrieve(uuid => $uuid);
+    my $_uuid = $r->uuid();
+    if($r->delete()){
+        push(@results,$_uuid.' deleted');
+    } else {
+        push(@results,'error trying to delete: '.$_uuid);
+    }
+}
+
+my @recs = CIF::WebAPI::APIKey->search(uuid_alias => $user->EmailAddress());
+
+#A hack to make sure that session gets rewritten.
+$session{'i'}++;
+</%INIT>
+
+<%ARGS>
+$GenerateKey => undef
+$PurgeKey => undef
+$uuid => undef
+$key_description => undef
+@results => undef
+$writeaccess => undef
+$access => undef
+$group => undef
+</%ARGS>

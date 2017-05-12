@@ -1,0 +1,3 @@
+dbmsd.sh
+start_dbserver
+stop_dbserver

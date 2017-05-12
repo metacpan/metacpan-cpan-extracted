@@ -1,0 +1,9 @@
+<%ARGS>
+$Headers => undef
+</%ARGS>
+<%init>
+return unless ($Headers =~ /^RT-PGP-Status:\s*(.*?)$/gism);
+my $status = $1;
+return unless ($status =~ /^(?:GOOD|BAD)/i);
+</%init>
+<h1><%$status%></h1>

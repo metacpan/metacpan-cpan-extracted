@@ -1,0 +1,709 @@
+=pod
+
+=begin readme text
+
+RPC::ExtDirect::Server
+======================
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+RPC::ExtDirect::Server - A tiny but capable Ext.Direct server
+
+=head1 SYNOPSIS
+
+    use RPC::ExtDirect::Server;
+    
+    my $server = RPC::ExtDirect::Server->new(
+        port       => 8080,
+        static_dir => 'htdocs',
+    );
+
+    print "Ext.Direct server is running on port 8080\n";
+
+    $server->run();
+
+=head1 DESCRIPTION
+
+=for readme continue
+
+This module implements a minimal Ext.Direct capable server in pure Perl.
+Its main purpose is to be used as a lightweight drop-in replacement for
+more complex production environments like Plack or Apache/mod_perl, e.g.
+for testing and mockups.
+
+It can also be used successfully as the basis for production application
+servers when feature richness is not a requirement, or when backwards
+compatibility is the primary concern. Another possible application for
+RPC::ExtDirect::Server is embedded systems; due to its small footprint
+and pure Perl dependencies it can be used easily in resource constrained
+platforms.
+
+Finally, many legacy computing systems can be retrofitted with modern
+HTML5 Web interface applications with Ext.Direct back end built on top
+of RPC::ExtDirect::Server; it is compatible with (and is tested against!)
+Perl 5.6 and newer.
+
+=for readme stop
+
+=head1 TESTING USAGE
+
+This section is only of interest to the people interested in technical
+detail; if you just want to know how to write tests for your Ext.Direct
+Perl code, head over to L<Test::ExtDirect>.
+
+=head2 Perl to Perl
+
+RPC::ExtDirect::Server is most commonly used as a test bed for modules
+that provide Ext.Direct API in client-server applications. Usually,
+a test script is created for every Ext.Direct Action package. At the
+start of the test script, an instance of RPC::ExtDirect::Server is
+started in background; when the test calls have been made and the
+script is finishing, the server instance will be automatically shut
+down.
+
+An example of such script:
+
+    # t/01_test.t
+    
+    use Test::More tests => 2;
+    use RPC::ExtDirect::Server::Util;
+    
+    # Ext.Direct Action package
+    use MyApp::Server::Foo;
+    
+    my ($host, $port) = maybe_start_server();
+    
+    ok $port, "Got host: $host with port: $port";
+    
+    # Test something involving MyApp::Server::Foo
+    ...
+    
+    # Optional, the server will be shut down automatically
+    # when the script is finished
+    stop_server();
+
+L<RPC::ExtDirect::Server::Util> package provides utility functions
+for starting and stopping the server. Special attention is paid to
+starting the server correctly, avoiding duplicate starts and potential
+collisions on ports that may be already listened on by other
+applications.
+
+It is also possible to bypass starting an instance of
+RPC::ExtDirect::Server when another server is listening at a known
+port; this is useful for debugging server side Ext.Direct Methods.
+The complement is starting the server in foreground, to debug the code:
+
+    # In terminal session 1 (-f means don't fork, start in foreground)
+    perl -d t/01_foo.t -f
+    
+    RPC::ExtDirect::Server is listening on 127.0.0.1:39680
+
+    # In terminal session 2 (-p means don't start server, use port)
+    perl t/01_foo.t -p 39680
+    
+    1..x
+    ...
+
+See also L<RPC::ExtDirect::Client> for details on making Ext.Direct
+calls from a pure Perl client, and L<Test::ExtDirect> for examples
+of test scripts built on top of both Server and Client.
+
+=head2 Perl to JavaScript
+
+A similar usage pattern involves starting an RPC::ExtDirect::Server
+instance with one or more Ext.Direct Action packages loaded, and
+running JavaScript client tests against it with a headless browser
+using a module like L<WWW::Mechanize::PhantomJS> or similar.
+
+Alternatively you can use a browser control tool like Selenium to
+run the tests in a live browser environment. See L<WWW::Selenium>
+and more modern L<Selenium::Remote::Driver> for details and
+examples.
+
+=head1 PRODUCTION USAGE
+
+=head2 Overview
+
+At this point you may be asking: why would I even think about using
+RPC::ExtDirect::Server in production environment? Isn't L<Plack>
+what is considered the industry standard for Perl Web applications
+these days? And you would be absolutely right.
+
+Except one tiny thing: Plack comes with a cost. It depends on many
+modules that may not build on your system, it does not support Perls
+older than 5.8, and it adds overhead (albeit small) to HTTP request
+processing. But the main reason is: Plack gives nothing substantial
+for HTML5 applications.
+
+In traditional Web sites and applications, you may have needed to
+generate HTML markup for the pages; usually with a templating tool
+like L<Template::Toolkit> or similar. You also needed to create
+URI handlers to respond to user input; you may have used a fully
+featured framework like L<Catalyst>, L<Dancer>, or L<Mojolicious>
+to do that.
+
+In HTML5 applications built with Ext JS or Sencha Touch, you don't
+create HTML pages anymore. You write JavaScript instead, that will
+be downloaded to the client browser and executed; in turn, that
+JavaScript code will create the HTML markup for the browser to
+render, and handle user interaction. It can also use Ext.Direct
+to communicate with the server side.
+
+While this approach places heavier computational burden on the
+client browser, it also simplifies things enormously on the server
+side. In fact, the server tasks are reduced to only two: serving
+static content (JavaScript files, CSS stylesheets, images, etc),
+and handling Ext.Direct requests.
+
+That also means that there is no need to have a glue framework
+like Plack between raw HTTP requests and the actual code that
+implements Ext.Direct Methods, unless you plan to deploy a hybrid
+old-school/HTML5 RIA application, or migrate to RIA architecture
+in stages.
+
+This approach has been successfully proven in production with an
+application server that was later generalized into this module
+and released to CPAN (not the other way around).
+
+=head2 Handling Ext.Direct requests
+
+The main purpose of RPC::ExtDirect::Server is serving Ext.Direct
+requests. It does not need any particular configuration to do that;
+just C<use> the modules that implement your Ext.Direct
+L<Actions|RPC::ExtDirect::Intro/Action> in the script that runs
+the server.
+
+Sometimes you need to adjust some configuration option, or create
+the Ext.Direct L<API|RPC::ExtDirect::Intro/API> dynamically instead
+of using attributes; you can pass several options that affect server
+behavior to the server's L<constructor|/new>:
+
+    use RPC::ExtDirect::API;
+    use RPC::ExtDirect::Config;
+    use RPC::ExtDirect::Server;
+    
+    my $config = RPC::ExtDirect::Config->new(
+        foo => 'bar',
+    );
+    
+    my $api = RPC::ExtDirect::API->new_from_hashref(
+        config   => $config,
+        api_href => {
+            'MyApp::Server::Foo' => {
+                ...
+            }
+        }
+    );
+    
+    my $server = RPC::ExtDirect::Server->new(
+        api        => $api,
+        config     => $config,
+        static_dir => '/var/run',
+        ...
+    );
+    
+    $server->run();
+
+RPC::ExtDirect::Server has three public methods that can be overridden
+in a subclass to enhance or augment its default behavior; see
+L</handle_extdirect_api>, L</handle_extdirect_router>, and
+L</handle_extdirect_poll>.
+
+=head2 Serving static documents
+
+Sometimes the application server you are creating is really tiny and
+does not justify setting up a fully-fledged front end HTTP server like
+Apache or Nginx; or you may be working on a prototype and want do avoid
+the hassle of setting up and configuring reverse proxy deployment.
+
+For situations like this, RPC::ExtDirect::Server has a built in static
+document handler. It is very basic and not very performant but is
+perfectly capable of serving any content including HTML files, images,
+JavaScript files, etc.
+
+If L<HTTP::Date> module is installed, the server will honor the
+C<If-Modified-Since> HTTP header sent by clients; if the document
+requested has not been changed since that time, "304 Not Modified"
+will be served instead of the actual content. This helps greatly with
+downloading multiple JavaScript files that Ext JS or Sencha Touch
+projects are usually comprised of, without the need to implement a
+forking back end.
+
+If L<File::LibMagic> or L<File::MimeInfo> is installed, it will be used
+to detect the content type of the files served. If both are installed,
+File::LibMagic takes precedence. If neither is available, the built in
+guesstimator will look at the file extension (suffix) and match it to
+the list of most common MIME types.
+
+There are several configuration options that affect the static handler,
+see L<constructor|/new>.
+
+=head2 Custom URI handlers
+
+In certain cases, you may want to run some code matched to some URI
+instead of serving a document; an example would be serving plain Ajax
+requests, or creating a well-known alias for a document.
+
+In such cases, a custom URI handler can be useful. A handler is a piece
+of Perl code that will be called as if it was an RPC::ExtDirect::Server
+instance method, passing the server and CGI objects to it:
+
+    sub custom_uri {
+        my ($self, $cgi) = @_;
+        
+        my $path_info = $cgi->path_info();
+        
+        # logit() is a dummy logger in RPC::ExtDirect::Server
+        $self->logit("Called for URI: $path_info");
+        
+        # Do something, print full HTTP headers and content
+        print $cgi->header(
+            -status => '200 OK',
+            ...
+        );
+        
+        ...
+        
+        return 1;
+    }
+
+The handlers are installed by passing L</dispatch> configuration
+option to the RPC::ExtDirect::Server constructor:
+
+    my $server = RPC::ExtDirect::Server->new(
+        ...
+        dispatch => [
+            # Format is simple: URI_matcher => coderef
+            qr{^/foo} => \&custom_uri, # Regex objects are ok
+            '^/bar'   => \&custom_uri, # String patterns are also ok
+        ],
+    );
+
+The handlers are matched top to bottom and the first one wins; this
+means that if more than one handlers will match an URI, only the
+first one will be called.
+
+Note that Ext.Direct calls to the API generator
+(L</handle_extdirect_api>), Router (L</handle_extdirect_router>), and
+Event Provider (L</handle_extdirect_poll>) are going through the same
+dispatch mechanism; these handlers are matched to the URIs specified
+by L<api_path|RPC::ExtDirect::Config/api_path>,
+L<router_path|RPC::ExtDirect::Config/router_path>, and
+L<poll_path|RPC::ExtDirect::Config/poll_path> Config options,
+respectively. The Ext.Direct handlers are installed after all custom
+handlers and it is possible to intercept requests to Ext.Direct URIs
+if any of your handlers will match these URIs before the standard
+handlers have a chance to kick in.
+
+=head2 CGI.pm or else?
+
+While L<CGI.pm|CGI> has been one of the most venerable Perl modules
+since time immemorial, it has long been touted for deprecation -
+and for a host of very valid reasons! It is not recommended to be
+used in new projects anymore and is going to be removed from the Perl
+core in 5.22. It is already available on CPAN and can be installed from
+there if you really need it.
+
+RPC::ExtDirect::Server is built around CGI.pm I<API> but that does not
+mean that CGI.pm is the only module it can work with. L<CGI::Simple>
+can be used instead; however considering that CGI.pm has been undergoing
+a revival and refactoring it is no longer necessary to use CGI::Simple
+or other CGI.pm replacement unless you have a very valid reason to do so.
+
+It is also possible that other modules may be implementing API that is
+compatible with CGI.pm; in that case RPC::ExtDirect::Server should also
+work with these modules with minimal or no modifications. If you would
+like to use a custom module, you will need to pass the L</cgi_class>
+configuration option to the server constructor:
+
+    my $server = RPC::ExtDirect::Server->new(
+        cgi_class => 'CGI::Foo',
+        ...
+    );
+
+Doing this will assign C<cgi_class> and set C<cgi_init> method for
+the underlying L<HTTP::Server::Simple::CGI> to use.
+
+You can also set the L</cgi_class> config option to use CGI.pm even
+if CGI::Simple is installed:
+
+    my $server = RPC::ExtDirect::Server->new(
+        cgi_class => 'CGI',
+        ...
+    );
+
+=head2 Handling errors
+
+As with any HTTP server handling static content, error conditions are
+unavoidable and have to be treated properly to be recognized by client
+browsers. RPC::ExtDirect::Server provides only basic handling for 403
+(Forbidden) and 404 (Not found) errors: a log message will be printed
+to STDERR if debugging is turned on, and a header with corresponding
+error status will be printed out, but no response body. Anything more
+advanced you would have to implement in a subclass.
+
+By convention, the methods that handle errors are named C<handle_xxx>,
+where C<xxx> is the error code. You can override the C<handle_403> and
+C<handle_404> methods; they receive the CGI object and URI that caused
+the error as positional arguments.
+
+=head1 PRODUCTION DEPLOYMENT
+
+If you plan to use RPC::ExtDirect::Server in production environment,
+there are some things to consider with regards to server deployment.
+
+The first thing is choosing the deployment architecture. Some popular
+options are standalone application server and reverse proxy
+configuration.
+
+=head2 Standalone application server
+
+In this configuration, RPC::ExtDirect::Server is the only HTTP server
+component, combining both application server and static document
+server. This option is well suited for small deployments serving
+applications that will produce low amount of HTTP requests, especially
+for static documents.
+
+Unfortunately there is no hard and fast rule for determining what
+exactly is low amount of requests, as that would depend greatly on
+the hardware capabilities of the server system; as a rule of thumb,
+a system that gets less than 10 requests per second at peak could be
+considered a good fit for the standalone deployment option.
+
+If you plan to have the server listening at port 80 (HTTP) or 443
+(HTTPS) in Unix-like systems, you will need to start it with elevated
+privilege level (root); it is also recommended to drop the privilege
+level to a restricted user immediately after binding to the port.
+Do not write the code to do that yourself, use L<Net::Server> instead.
+
+It is also very helpful to have L<HTTP::Date> module available in
+C<@INC>, as this will turn on C<If-Modified-Since> header support in
+RPC::ExtDirect::Server. This helps greatly by avoiding serving rarely
+changed documents; for a typical HTML5 RIA application that would be
+its HTML and JavaScript files, CSS stylesheets, and image assets that
+comprise 99% of all application content.
+
+=head2 Reverse proxy configuration
+
+In this case, RPC::ExtDirect::Server is placed behind a front end HTTP
+server like L<Apache|http://httpd.apache.org> or
+L<Nginx|http://nginx.org> that will listen to incoming requests and
+serve all documents except preconfigured set of URIs that it will
+relay, or I<proxy>, to the application server. This option works well
+for larger applications where you would anticipate the need for load
+balancing, or a lot of static HTTP traffic hitting the server.
+
+In reverse proxy setups, RPC::ExtDirect::Server is usually responsible
+only for serving Ext.Direct requests; occasionally you may also want
+to map certain URIs to a L<custom URI handler|/"Custom URI handlers">.
+
+It is not recommended to run the application server with elevated
+privilege level in this configuration; when both the front end server
+and application server are running on the same host it is also
+advisable to have the application server listening only on the loopback
+interface (127.0.0.1 or similar) so that it would not be accessible
+directly but only through the front end server.
+
+For an example of reverse proxy configuration setup with Nginx, see
+this article: L<http://nginx.com/resources/admin-guide/reverse-proxy>.
+
+=head2 Increasing server performance
+
+For production deployment you should also consider the application
+server performance. When testing your code, the bulk of the
+RPC::ExtDirect::Server run time is spent starting up and tearing down;
+rarely the server speed would become an issue. Not so for production
+environment where you expect the server process to spend most of its
+time handling actual requests.
+
+The biggest limiting factor is the one-thread one-process architecture
+of L<HTTP::Server::Simple> on which RPC::ExtDirect::Server is based.
+However, this problem can be easily remedied by using L<Net::Server>
+module with one of its I<personalities>, e.g. L<Net::Server::PreFork>:
+
+    package My::Server;
+    
+    use Net::Server::PreFork;
+    use RPC::ExtDirect::Server;
+    
+    use base 'RPC::ExtDirect::Server';
+    
+    # This should return the class name of a Net::Server personality
+    sub net_server { 'Net::Server::PreFork' }
+    
+    package main;
+    
+    my $server = My::Server->new(
+        host       => '127.0.0.1',
+        port       => 8080,
+        static_dir => '/var/run',
+    );
+    
+    $server->run();
+
+Another easy speed gain can be had by installing L<JSON::XS> module;
+it will be used automatically when detected.
+
+=head2 Troubleshooting server issues
+
+Sometimes you may need to turn on debugging output to troubleshoot
+issues. To do that, pass C<debug> option to server constructor:
+
+    my $server = RPC::ExtDirect::Server->new(
+        debug => 1,
+        ...
+    );
+
+Logging is done by the L</logit> method that prints messages to
+STDERR. You can override the method to do something more advanced.
+
+=head1 SERVER OBJECT INTERFACE
+
+RPC::ExtDirect::Server provides several public methods:
+
+=over 4
+
+=item C<new>
+
+Constructor. Returns a new server instance but does not start
+listening to requests (call </run> for that). Accepts named arguments
+in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<api>
+
+Optional L<RPC::ExtDirect::API> instance to be used instead of the
+default L<global API tree|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">.
+
+=item C<config>
+
+Optional L<RPC::ExtDirect::Config> instance to be used. If not provided,
+the Config instance in the API object (either default or passed in L</api>
+parameter) will be used.
+
+=item C<host>
+
+Optional hostname or IP address to bind to. Defaults to 127.0.0.1.
+
+=item C<port>
+
+Optional port to bind to. Defaults to 8080.
+
+=item C<static_dir>
+
+Optional path to the root directory for the static content. Defaults
+to C</tmp>.
+
+=item C<cgi_class>
+
+Optional class name to use instead of L<CGI> to instantiate CGI objects.
+
+=item C<dispatch>
+
+Optional arrayref with L<custom URI handlers|/"Custom URI handlers">.
+Use the following format:
+
+    [
+        # URI_matcher => coderef
+        qr{^/foo} => \&custom_uri, # Regex objects are ok
+        '^/bar'   => \&custom_uri, # String patterns are also ok
+    ]
+
+=item C<index_file>
+
+Name of the index file that clients will be redirected to when they
+request a directory instead of a document. Defaults to C<index.html>.
+
+=item C<expires_after>
+
+Expiration interval for the static documents to set in the C<Expires>
+header, in seconds. Defaults to 3 days.
+
+=item C<buffer_size>
+
+Buffer size in bytes to use when reading files from disk and writing
+them to the socket. Defaults to 256 kilobytes.
+
+=back
+
+=item C<run>
+
+Instance method. Runs the server, never returns.
+
+=back
+
+There are also several instance methods not intended to be called
+directly that can be overridden in a subclass to augment their
+behavior:
+
+=over 4
+
+=item C<handle_request>
+
+The topmost method that handles every request. Accepts only one
+positional argument, which is a new L<CGI> object (or similar).
+Tries to match the request URI to any of the handlers and run it
+if found; if not, runs L</handle_default>.
+
+You will rarely need to override this method, if ever.
+
+=item C<handle_default>
+
+This method will process requests that are not handled by any
+L<custom URI handlers|/"Custom URI handlers"> or default
+Ext.Direct handlers. Usually this means a request for static
+content, or an error; C<handle_default> will call a corresponding
+handler (see below).
+
+=item C<handle_directory>
+
+This method will process requests for URIs that match directories
+in the file system and issue redirects to the corresponding index
+files (see L</index_file>) with HTTP code 301.
+
+=item C<handle_static>
+
+This method will process requests for URIs that match files in
+the file system, with root defined by L</static_dir> parameter.
+If the file is not readable, L</handle_403> will be called to
+serve an error response; otherwise, the file content will be
+served with status code 200.
+
+=item C<handle_extdirect_api>
+
+This method will process requests for
+L<Ext.Direct API|RPC::ExtDirect::Intro/API>; it is in fact a thin
+wrapper for L<CGI::ExtDirect/api> method.
+
+=item C<handle_extdirect_router>
+
+This method will process
+L<Ext.Direct Router|RPC::ExtDirect::Intro/Router> requests. This
+is a wrapper for L<CGI::ExtDirect/route> method.
+
+=item C<handle_extdirect_poll>
+
+This method will process
+L<Ext.Direct Event poll|RPC::ExtDirect::Intro/Event> requests. This
+is a wrapper for L<CGI::ExtDirect/poll> method.
+
+=item C<handle_403>
+
+This method is called when an URI was matched to a file in the file
+system, but it's unreadable by the server process. The default action
+is to print HTTP headers with "403 Forbidden" status code and an
+empty body.
+
+=item C<handle_404>
+
+This method is called when an URI was not matched to either a handler
+or static file or directory. The default action is to print HTTP
+headers with "404 Not Found" status code and an empty body.
+
+=item C<logit>
+
+Print C<@_> as debug output to STDERR, but only if L</debug> flag
+is set to truthy value.
+
+=item C<print_banner>
+
+Print welcoming banner to STDOUT if debugging is on. The default
+banner is:
+
+    __PACKAGE__: You can connect to your server at http://host:port/
+
+=back
+
+=head1 ACCESSOR METHODS
+
+For RPC::ExtDirect::Server, the following
+L<accessor methods|RPC::ExtDirect::Config/"ACCESSOR METHODS"> are
+provided:
+
+=over 4
+
+=item C<api>
+
+Return the current L<RPC::ExtDirect::API> instance held in the server
+object, or set a new one.
+
+=item C<config>
+
+Return the current L<RPC::ExtDirect::Config> instance held in the
+server object, or set a new one.
+
+=item C<dispatch>
+
+Return the current arrayref with URI handlers, or set a new one.
+Note that this arrayref is different from the L</dispatch>
+constructor parameter, and should not be changed unless you know
+what you are doing.
+
+=item C<static_dir>
+
+Return the current static content root directory, or set a new one.
+
+=item C<index_file>
+
+Return the current index file name, or set a new one.
+
+=item C<expires_after>
+
+Return the current value for C<Expires> header to set when serving
+static content, or set a new one.
+
+=item C<buffer_size>
+
+Return the buffer size to use when reading files from disk, or
+set a new one.
+
+=back
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make && make test
+    make install
+
+=end readme
+
+=for readme stop
+
+=head1 ACKNOWLEDGEMENTS
+
+I would like to thank IntelliSurvey, Inc for sponsoring my work
+on this module.
+
+=head1 BUGS AND LIMITATIONS
+
+At this time there are no known bugs in this module. Please report
+problems to the author, patches are always welcome.
+
+Use L<Github tracker|https://github.com/nohuhu/RPC-ExtDirect-Server/issues>
+to open bug reports, this is the easiest and quickest way to get your
+issue fixed.
+
+=for readme continue
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2016 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+
+Portions of the code that were taken from HTTP::Date are copyright
+(c) 1995-1999, Gisle Aas.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

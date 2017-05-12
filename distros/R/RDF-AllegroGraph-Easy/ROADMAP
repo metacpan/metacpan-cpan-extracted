@@ -1,0 +1,21 @@
+This Perl API to the AG3/4 servers has been so far a free-time
+activity for me. Consequently - apart from the proof of concept at the
+beginning - I have little incentives to really push on to get a soso
+feature-complete onto the road. Most satisfaction I get from offering
+a more-or-less elegant API to the Perl user, hiding some
+idiosynchrasies of the AG server. That is, I believe in the casual
+user :-)
+
+Still, with a bit of nudging I do invest on/off timeslots to make
+inroads into the AGv4 protocol (see the Changes file for tracking).
+
+That said, I am open to suggestions to speed up the process of feature
+coverage and/or think more about performance when using AG with Perl
+for large data sets.
+
+Overall Roadmap:
+
+   - feature completeness sometime in Q1'11
+   - performance tuning (memory usage, speed, round tripping) Q2'11
+     and Q3'11
+

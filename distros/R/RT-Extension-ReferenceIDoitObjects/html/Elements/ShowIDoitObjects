@@ -1,0 +1,270 @@
+%# RT::Extension::ReferenceIDoitObjects
+%#
+%# Copyright (C) 2011-17 synetics GmbH, <https://i-doit.com/>
+%#
+%# This program is free software: you can redistribute it and/or modify
+%# it under the terms of the GNU Affero General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# This program is distributed in the hope that it will be useful,
+%# but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%# GNU Affero General Public License for more details.
+%#
+%# You should have received a copy of the GNU Affero General Public License
+%# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%#
+%# Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+<div id="idoitObjectBrowser" style="position: relative; min-width: 400px;">
+    <div id="dataStore" style="display: none;"></div>
+    <div id="idoitNotice" class="ui-corner-all" style="display: none;"></div>
+    <div id="idoitObjectBrowserContent" style="display: none;">
+        <ul>
+            <li><a href="#idoitSelectedObjectsTab"><% loc('Selected objects') %></a></li>
+        </ul>
+
+        <a href="<% RT->Config->Get('IDoitURL') %>" title="<% loc('Go to i-doit') %>" target="_blank">
+            <img src="<% RT->Config->Get('WebPath') %>/static/images/i-doit.png" alt="i-doit" style="position: absolute; top: 5px; right: 8px; height: 28px;" border="0" />
+        </a>
+
+        <img id="idoitLoadingSign" src="<% RT->Config->Get('WebPath') %>/static/images/ui-anim_basic_16x16.gif" alt="<% loc('Loading...') %>" height="16" width="16" style="position: absolute; opacity: 0; z-index: 100; right: 80px; top: 12px;" border="0" />
+
+        <div id="idoitSelectedObjectsTab">
+            <table id="idoitAllObjectsTable" class="compact" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th width="5%"><% loc('ID') %></th>
+                        <th width="35%"><% loc('Name') %></th>
+                        <th width="35%"><% loc('Type') %></th>
+                        <th width="15%"><% loc('Location') %></th>
+                        <th width="10%"><% loc('Link') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="<% RT->Config->Get('WebPath') %>/NoAuth/js/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+    window.addEventListener('load', function load (event) {
+        var $ = $ || jQuery,
+            showCustomFields = <% $IDoitShowCustomFields %>,
+            objectTable = $('#idoitAllObjectsTable').dataTable({
+                "bJQueryUI": true,
+                "bAutoWidth": false,
+                "bPaginate": false,
+                "bLengthChange": false,
+                "bSort": false,
+                "oLanguage": {
+                    "sProcessing": "<% loc('Loading...') %>",
+                    "sLengthMenu": "<% loc('Show _MENU_ objects') %>",
+                    "sZeroRecords": "<% loc('No objects has been selected yet.') %>",
+                    "sInfo": "<% loc('_START_ to _END_ of _TOTAL_ objects') %>",
+                    "sInfoEmpty": "<% loc('0 to 0 of 0 objects') %>",
+                    "sInfoFiltered": "<% loc('(filtered from _MAX_ objects)') %>",
+                    "sInfoPostFix": "",
+                    "sSearch": "<% loc('Filter') %>",
+                    "sUrl": "",
+                    "oPaginate": {
+                        "sFirst": "&laquo;",
+                        "sPrevious": "&lsaquo;",
+                        "sNext": "&rsaquo;",
+                        "sLast": "&raquo;"
+                    }
+                }
+            }),
+            objects = [<% $IDoitObjects %>],
+            apiKey = '<% $IDoitAPIKey %>',
+            notice = $('#idoitNotice'),
+            content = $('#idoitObjectBrowserContent'),
+            renderLocationTree = function (tree) {
+                if (tree.length > 0) {
+                    // Trim location tree:
+                    if (tree.length > 3) {
+                        tree = [tree[0], '&hellip;', tree.slice(-1)];
+                    }
+
+                    return tree.join(' &raquo; ');
+                }
+
+                return '&ndash;';
+            };
+
+        // Hide custom fields:
+        if (showCustomFields === 0) {
+            $('tr#<% $IDoitObjectsField %> td.value').parent().hide();
+            $('tr#<% $IDoitTenantField %> td.value').parent().hide();
+        }
+
+        if (apiKey.length === 0) {
+            notice.html(
+                '<% loc("Please select an i-doit tenant.") %>'
+            ).fadeIn(500);
+        } else if (objects.length === 0) {
+            notice.html(
+                '<% loc("No objects has been selected yet.") %>'
+            ).fadeIn(500);
+        } else {
+            notice.html(
+                '<% loc("Loading...") %>'
+            ).fadeIn(500);
+
+            $.ajax({
+                "url": '<% $IDoitAPI %>',
+                "data": JSON.stringify({
+                    "method": "cmdb.objects",
+                    "params": {
+                        "filter": {
+                            "ids": objects,
+                            "location": true
+                        },
+                        "language": "<% $Language %>",
+                        "apikey": apiKey
+                    },
+                    "id": "1",
+                    "jsonrpc": "2.0",
+                }),
+                "contentType": "application/json",
+                "type": "POST",
+                "dataType": "json",
+                "async": true,
+                "success": function (response) {
+                    var entities = [];
+
+                    if (response.error == null) {
+                        notice.hide();
+                        content.tabs();
+                        content.show();
+
+                        $.each(response.result, function (i, e) {
+                            var link = '<a href="<% $IDoitURL %>?objID=' + e.id + '" title="<% loc('Go to i-doit') %>" target="_blank">&raquo; i-doit</a>';
+                            entities.push([e.id, e.title, e.type_title, renderLocationTree(e.location), link]);
+                        });
+
+                        objectTable.fnAddData(entities);
+                    } else {
+                        notice.html(
+                            '<% loc("Error while loading pre-selecting objects") %>'
+                        ).fadeIn(500);
+                        content.css({display: 'none'});
+                    }
+                }
+            });
+        }
+    }, false);
+</script>
+
+<%INIT>
+
+use JSON;
+
+$IDoitURL = RT->Config->Get('IDoitURL');
+unless($IDoitURL) {
+    my $msg = loc('URL for i-doit is not configured.');
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+$IDoitAPI = RT->Config->Get('IDoitAPI');
+unless($IDoitAPI) {
+    my $msg = loc("URL for i-doit's API is not configured.");
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+my $cfTenant = 'i-doit tenant';
+
+$IDoitTenant = $ticket->FirstCustomFieldValue($cfTenant);
+unless($IDoitTenant) {
+    $IDoitTenant = RT->Config->Get('IDoitDefaultTenant');
+
+    unless ($IDoitTenant) {
+        my $msg = loc('Default tenant is not configured.');
+        RT::Logger->error($msg);
+        $$skip_create = 1;
+        push @{$results}, $msg;
+    }
+}
+
+%IDoitTenantKeys = RT->Config->Get('IDoitTenantKeys');
+unless(%IDoitTenantKeys) {
+    my $msg = loc("Tenant keys for i-doit's API are not configured.");
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+while ( my ($key, $value) = each(%IDoitTenantKeys) ) {
+    if ($key == $IDoitTenant) {
+        $IDoitAPIKey = $value;
+        last;
+    }
+}
+
+my $cf = RT::CustomField->new($RT::SystemUser);
+$cf->LoadByName(Name => $cfTenant);
+unless($cf->id) {
+    my $msg = sprintf(loc("Custom field %s does not exist."), $cfTenant);
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+$IDoitTenantField = 'CF-' . $cf->id . '-ShowRow';
+
+my $cfObjects = 'i-doit objects';
+
+my $IDoitObjectValues = $ticket->CustomFieldValues($cfObjects);
+my @IDoitObjects;
+while (my $IDoitObjectValue = $IDoitObjectValues->Next) {
+  push(@IDoitObjects, $IDoitObjectValue->Content);
+}
+
+$IDoitObjects = join(',', @IDoitObjects);
+
+$cf = RT::CustomField->new($RT::SystemUser);
+$cf->LoadByName(Name => $cfObjects);
+unless($cf->id) {
+    my $msg = sprintf(loc("Custom field %s does not exist."), $cfObjects);
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+$IDoitObjectsField = 'CF-' . $cf->id . '-ShowRow';
+
+$IDoitShowCustomFields = RT->Config->Get('IDoitShowCustomFields');
+if ($IDoitShowCustomFields < 0 || $IDoitShowCustomFields > 1) {
+    my $msg = loc('Configuration option to show/hide i-doit related custom fields is not set.');
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+$Language = substr($session{CurrentUser}->UserObj->Lang, 0, 2) || 'en';
+
+</%INIT>
+
+<%ARGS>
+$skip_create => undef
+$results => undef
+
+$ticket => undef
+
+$Language => undef
+
+$IDoitURL => undef
+$IDoitAPI => undef
+$IDoitAPIKey => undef
+%IDoitTenantKeys => undef
+$IDoitTenant => undef
+$IDoitTenantField => undef
+$IDoitObjects => undef
+$IDoitObjectsField => undef
+$IDoitShowCustomFields => undef
+</%ARGS>

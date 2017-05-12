@@ -1,0 +1,33 @@
+@CustomFields = (
+    {
+        Name       => 'Trademark',
+        LookupType => 'RT::Catalog-RT::Asset',
+        Type       => 'Freeform',
+        MaxValues  => 1,
+    },
+    {
+        Name       => 'Serial Number',
+        LookupType => 'RT::Catalog-RT::Asset',
+        Type       => 'Freeform',
+        MaxValues  => 1,
+    },
+    {
+        Name       => 'Warranty Status',
+        LookupType => 'RT::Catalog-RT::Asset',
+        Type       => 'Freeform',
+        MaxValues  => 1,
+    },
+    {
+        Name       => 'Warranty Start Date',
+        LookupType => 'RT::Catalog-RT::Asset',
+        Type       => 'Date',
+        MaxValues  => 1,
+    },
+    {
+        Name       => 'Warranty End Date',
+        LookupType => 'RT::Catalog-RT::Asset',
+        Type       => 'Date',
+        MaxValues  => 1,
+    },
+);
+

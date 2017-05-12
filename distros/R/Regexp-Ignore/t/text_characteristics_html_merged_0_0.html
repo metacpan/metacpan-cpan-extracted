@@ -1,0 +1,526 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w<font color=green>3</font>.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="./test1_files/filelist.xml">
+<link rel=Edit-Time-Data href="./test1_files/editdata.mso">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]--><!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Rani Pinchuk</o:Author>
+  <o:LastAuthor>Rani Pinchuk</o:LastAuthor>
+  <o:Revision>3</o:Revision>
+  <o:TotalTime>4</o:TotalTime>
+  <o:Created>2001-12-27T17:23:00Z</o:Created>
+  <o:LastSaved>2001-12-27T21:52:00Z</o:LastSaved>
+  <o:Pages>1</o:Pages>
+  <o:Words>104</o:Words>
+  <o:Characters>593</o:Characters>
+  <o:Lines>4</o:Lines>
+  <o:Paragraphs>1</o:Paragraphs>
+  <o:CharactersWithSpaces>728</o:CharactersWithSpaces>
+  <o:Version>9.2720</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
+ </w:WordDocument>
+</xml><![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:Verdana;
+	panose-1:2 11 6 4 3 5 4 4 2 4;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-pitch:variable;
+	mso-font-signature:536871559 0 0 0 415 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-bidi-font-family:"Times New Roman";}
+h2
+	{mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:2;
+	font-size:14.0pt;
+	font-family:Arial;
+	font-style:italic;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;
+	text-underline:single;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+</head>
+
+<body lang=EN-US link=blue vlink=purple style='tab-interval:.5in'>
+
+<div class=Section1>
+
+<div align=center>
+
+<table border=1 cellspacing=0 cellpadding=0 width=595 style='width:6.2in;
+ border-collapse:collapse;border:none;mso-border-alt:double windowtext 1.5pt;
+ mso-padding-alt:0in 5.4pt 0in 5.4pt'>
+ <tr style='height:52.4pt'>
+  <td width=481 valign=top style='width:360.6pt;border:double windowtext 1.5pt;
+  background:silver;padding:0in 5.4pt 0in 5.4pt;height:52.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><span lang=NL style='font-size:
+  8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:NL'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoNormal align=center style='text-align:center;tab-stops:42.55pt'><b
+  style='mso-bidi-font-weight:normal'><span style='font-size:18.0pt;color:red'>Testing
+  Regexp::Ignore classes</span></b><b style='mso-bidi-font-weight:normal'><span
+  lang=NL style='font-size:18.0pt;font-family:Arial;color:red;mso-ansi-language:
+  NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal align=center style='text-align:center;tab-stops:42.55pt'><span
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt'>&nbsp;&nbsp;</span><span
+  lang=NL style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></p>
+  <p class=MsoNormal align=center style='text-align:center;tab-stops:42.55pt'><b><span
+  style='font-size:13.5pt;font-family:Verdana;color:#FF3333'>Written by <a href="mailto:rani@cpan.org">Rani Pinchuk</a></span></b><b><span
+  style='font-size:14.0pt;mso-bidi-font-size:13.5pt;font-family:Verdana;
+  color:#FF3333'></span></b><b><span style='font-size:16.0pt;mso-bidi-font-size:
+  13.5pt;font-family:Verdana;color:#FF3333'></span></b><b><span
+  style='font-size:18.0pt;mso-bidi-font-size:13.5pt;font-family:Verdana;
+  color:#FF3333'></span></b><b><span style='font-size:20.0pt;mso-bidi-font-size:
+  13.5pt;font-family:Verdana;color:#FF3333'></span></b><b><span
+  style='font-size:24.0pt;mso-bidi-font-size:13.5pt;font-family:Verdana;
+  color:#FF3333'></span></b><b><span style='font-size:20.0pt;mso-bidi-font-size:
+  13.5pt;font-family:Verdana;color:#FF3333'></span></b><b><span
+  style='font-size:18.0pt;mso-bidi-font-size:13.5pt;font-family:Verdana;
+  color:#FF3333'></span></b><b><span style='font-size:16.0pt;mso-bidi-font-size:
+  13.5pt;font-family:Verdana;color:#FF3333'></span></b><b><span
+  style='font-size:14.0pt;mso-bidi-font-size:13.5pt;font-family:Verdana;
+  color:#FF3333'></span></b><b><span style='font-size:13.5pt;font-family:Verdana;
+  color:#FF3333'></span></b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></p>
+  <p class=MsoNormal align=center style='text-align:center;tab-stops:42.55pt'><span
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt'>&nbsp;</span><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></p>
+  </td>
+  <td width=114 valign=top style='width:85.8pt;border:double windowtext 1.5pt;
+  border-left:none;mso-border-left-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt;
+  height:52.4pt'>
+  <h2><span lang=NL style='mso-ansi-language:NL'>TESTING<o:p></o:p></span></h2>
+  <p class=MsoNormal><span lang=NL style='mso-ansi-language:NL'>With many blaaaa<o:p></o:p></span></p>
+  </td>
+ </tr>
+</table>
+
+</div>
+
+<p class=MsoNormal align=center style='text-align:center;tab-stops:.5in 42.55pt'><span
+lang=NL style='mso-ansi-language:NL'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.0pt;
+mso-bidi-font-size:12.0pt'>&nbsp;&nbsp;</span></b><b><u><span lang=NL
+style='font-size:13.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:
+NL'><o:p></o:p></span></u></b></p>
+
+<p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.0pt;
+mso-bidi-font-size:12.0pt'>&nbsp;&nbsp;</span></b><b><u><span lang=NL
+style='font-size:13.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:
+NL'><o:p></o:p></span></u></b></p>
+
+<p class=MsoNormal align=center style='text-align:center;tab-stops:.5in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;tab-stops:42.55pt'><b><u><span
+style='font-size:16.0pt'><a href="#end">This link goes to the end of the
+document</a> just like that</span></u></b><b><u><span lang=NL style='font-size:
+16.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></u></b></p>
+
+<p class=MsoNormal align=center style='text-align:center;tab-stops:42.55pt'><b><span
+style='font-size:11.0pt;mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><u><span
+lang=NL style='font-size:16.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></u></b></p>
+
+<p class=MsoNormal style='tab-stops:42.55pt'>&nbsp;<span lang=NL
+style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:
+NL'><o:p></o:p></span></p>
+
+<div align=center>
+
+<table border=1 cellspacing=0 cellpadding=0 width=595 style='width:6.2in;
+ border-collapse:collapse;border:none;mso-border-alt:double windowtext 1.5pt;
+ mso-padding-alt:0in 5.4pt 0in 5.4pt'>
+ <tr style='height:23.1pt;mso-yfti-irow:0'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt;height:23.1pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:18.0pt;
+  color:red'>NR.</span></b><b><span lang=NL style='font-size:18.0pt;font-family:
+  Arial;color:red;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border:double windowtext 1.5pt;
+  border-left:none;mso-border-left-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt;
+  height:23.1pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:18.0pt;
+  color:red'>Name</span></b><b><span lang=NL style='font-size:18.0pt;
+  font-family:Arial;color:red;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border:double windowtext 1.5pt;
+  border-left:none;mso-border-left-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt;
+  height:23.1pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:18.0pt;
+  color:red'>Title</span></b><b><span lang=NL style='font-size:18.0pt;
+  font-family:Arial;color:red;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:1'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>1</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><font color=red>1</font>_bla</span></b><b><span
+  style='font-size:13.5pt;font-family:Symbol;mso-ascii-font-family:"Times New Roman";
+  mso-hansi-font-family:"Times New Roman";mso-char-type:symbol;mso-symbol-font-family:
+  Symbol'><span style='mso-char-type:symbol;mso-symbol-font-family:Symbol'></span></span></b><b><span
+  style='font-size:13.5pt'></span></b><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'> </span></b><b><span lang=NL style='font-size:
+  8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA First Phase</span></b><b><span style='font-size:13.5pt'> -
+  GENERAL</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:2'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>2</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><font color=red>2</font>_bla</span></b><b><span
+  style='font-size:13.5pt;font-family:Symbol;mso-ascii-font-family:"Times New Roman";
+  mso-hansi-font-family:"Times New Roman";mso-char-type:symbol;mso-symbol-font-family:
+  Symbol'><span style='mso-char-type:symbol;mso-symbol-font-family:Symbol'></span></span></b><b><span
+  style='font-size:13.5pt'></span></b><b><span lang=NL style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA First Phase</span></b><b><span style='font-size:13.5pt'> -
+  Planning</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:3'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>3</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><font color=red>33</font>_bla</span></b><b><span
+  style='font-size:13.5pt;font-family:Symbol;mso-ascii-font-family:"Times New Roman";
+  mso-hansi-font-family:"Times New Roman";mso-char-type:symbol;mso-symbol-font-family:
+  Symbol'><span style='mso-char-type:symbol;mso-symbol-font-family:Symbol'></span></span></b><b><span
+  style='font-size:13.5pt'></span></b><b><span lang=NL style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA Second Phase</span></b><b><span style='font-size:13.5pt'>
+  - GENERAL</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:4'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>4</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><a
+  href="bla_44"><font color=red>44</font>_BLA</a></span></b><b><span lang=NL style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA Second Phase</span></b><b><span style='font-size:13.5pt'>
+  - Planning</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:5'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>5</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><a
+  href="bla_555"><font color=red>555</font>_BLA</a></span></b><b><span lang=NL style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA Third Phase</span></b><b><span style='font-size:13.5pt'> -
+  GENERAL</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:6'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>6</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><a
+  href="bla_123456"><font color=red>123456</font>_BLA</a></span></b><b><span lang=NL style='font-size:
+  8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA Third Phase</span></b><b><span style='font-size:13.5pt'> -
+  Planning</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:7'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>7</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><font color=red>7</font>_BLA</span></b><b><span
+  lang=NL style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA Testing</span></b><b><span style='font-size:13.5pt'> -
+  Inroduction</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:8'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>8</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><font color=red>88</font>_BLA</span></b><b><span
+  lang=NL style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA Testing </span></b><b><span style='font-size:13.5pt'>-
+  Planning</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:9'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>9</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><font color=red>99</font>_BlA</span></b><b><span
+  lang=NL style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA</span></b><b><span style='font-size:13.5pt'> - Why BLA and
+  not FOO?</span></b><b><span lang=NL style='font-size:8.0pt;mso-bidi-font-size:
+  12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:10'>
+  <td width=73 valign=top style='width:54.8pt;border:double windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:double windowtext 1.5pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'>10</span></b><b><span
+  lang=NL style='font-size:13.5pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt'>&nbsp;</span></b><b><span lang=NL
+  style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=193 valign=top style='width:144.4pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt'><a
+  href="bla_10"><font color=red>10</font>_bLA</a></span></b><b><span lang=NL style='font-size:8.0pt;
+  mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+  <td width=330 valign=top style='width:247.2pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 1.5pt;border-right:double windowtext 1.5pt;
+  mso-border-top-alt:double windowtext 1.5pt;mso-border-left-alt:double windowtext 1.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='tab-stops:42.55pt'><b><span style='font-size:13.5pt;
+  color:#400080'>BLA</span></b><b><span style='font-size:13.5pt;color:#800040'>
+  </span></b><b><span style='font-size:13.5pt;color:black'>- Why BLA and not
+  BAR?</span></b><b><span style='font-size:13.5pt'> </span></b><b><span
+  lang=NL style='font-size:8.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+  mso-ansi-language:NL'><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+</table>
+
+</div>
+
+<p class=MsoNormal style='tab-stops:42.55pt'>&nbsp;<span lang=NL
+style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;mso-ansi-language:
+NL'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='tab-stops:42.55pt'>&nbsp;</p>
+
+
+<div class=MsoNormal align=center style='text-align:center;tab-stops:42.55pt'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p class=MsoNormal style='tab-stops:42.55pt'><b>&nbsp;<a name=end>End</a> </b><b><span
+style='font-size:8.0pt;mso-bidi-font-size:12.0pt'>(Written by <a href="mailto:rani@cpan.org">Rani Pinchuk</a>)</span></b><b><span
+lang=NL style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial;
+mso-ansi-language:NL'><o:p></o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center;tab-stops:.5in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+=head1 NAME
+
+Reaction::Manual::Unicode - Unicode support in Reaction
+
+=head1 DESCRIPTION
+
+This document gives you notes about using Unicode in Reaction.
+
+=head1 Working with Catalyst
+
+Catalyst has a plugin which is named L<Catalyst::Plugin::Unicode>, It decodes
+the request parameters to utf8 when preparing parameters, and decodes the
+response body after the request is finalized. Since, Reaction uses utf8 by
+default, and does this already. So, you should avoid using the
+L<Catalyst::Plugin::Unicode>.
+
+=head1 Note about LayoutSet
+
+LayoutSet files B<MUST> be in utf8, since ASCII is a subset of utf8, You don't
+need to worry about anything if you are using plain ASCII. But people who uses
+CJK, must be sure to configure your editors to save files in utf8.
+
+=head1 Note about Database
+
+If you don't see the correct result. Be sure to double check the database
+related configuration (connecting parameter or database server side config for
+example). Database B<MUST> be configured to use utf8. Reaction won't decode or
+encode anything. It just return the data as it is from database.
+
+=head1 SEE ALSO
+
+=over 
+
+=item * L<Reaction::Manual>
+
+=item * L<utf8>
+
+=back
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

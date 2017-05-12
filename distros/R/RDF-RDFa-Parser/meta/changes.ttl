@@ -1,0 +1,633 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Parser/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2009-01-13"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.01.tar.gz> ;
+	rdfs:label      "Original version"@en ;
+	rdfs:comment    "Forked from Swignition."@en ;
+	rdfs:seeAlso    <http://buzzword.org.uk/swignition/rdfa> .
+
+my:project :release my:v_0-02 .
+my:v_0-02
+	a               :Version ;
+	dc:issued       "2009-01-13"^^xsd:date ;
+	:revision       "0.02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.02.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-01 ;
+		dcs:item
+			[ rdfs:label "Make XML parser more tolerant."@en ] ,
+			[ rdfs:label "Fix bug in Turtle output."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Disable thing-described-by.org URIs by default."@en ; rdfs:comment "Suggested by danbri"@en ] ,
+			[ rdfs:label "Add KjetilK's patch."@en ; rdfs:comment "I can no longer remember what this patch did!"@en ]
+		] .
+
+my:project :release my:v_0-03 .
+my:v_0-03
+	a               :Version ;
+	dc:issued       "2009-01-14"^^xsd:date ;
+	:revision       "0.03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.03.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-02 ;
+		dcs:item
+			[ rdfs:label "Bugfix for @property."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_0-04 .
+my:v_0-04
+	a               :Version ;
+	dc:issued       "2009-01-14"^^xsd:date ;
+	:revision       "0.04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.04.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-03 ;
+		dcs:item
+			[ rdfs:label "Rewrite callback stuff."@en ] ,
+			[ rdfs:label "Provide graph() method to output graph."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Include some test cases as part of the installation."@en ; a dcs:Addition ]
+		] .
+
+my:project :release my:v_0-10 .
+my:v_0-10
+	a               :Version ;
+	dc:issued       "2009-01-19"^^xsd:date ;
+	:revision       "0.10"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.1.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-04 ;
+		dcs:item
+			[ rdfs:label "Fix broken support for XML literals."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Support for KjetilK's named graph idea."@en ; a dcs:Addition ] ,
+			[ rdfs:label "More test cases, including XML Literals and named graphs."@en ; a dcs:Addition , dcs:Update ] ,
+			[ rdfs:label "Improve documentation and include it inline in the module code."@en ; a dcs:Addition , dcs:Documentation ]
+		] .
+
+my:project :release my:v_0-11 .
+my:v_0-11
+	a               :Version ;
+	dc:issued       "2009-01-19"^^xsd:date ;
+	:revision       "0.11"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.11.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-10 ;
+		dcs:item
+			[ rdfs:label "Make named graphs handling more predictable for triples spread across multiple elements."@en ; a dcs:Update ]
+		] .
+
+my:project :release my:v_0-20 .
+my:v_0-20
+	a               :Version ;
+	dc:issued       "2009-11-24"^^xsd:date ;
+	:revision       "0.20"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.20.tar.gz> ;
+	rdfs:label      "Version 2 (kinda)"@en ;
+	rdfs:comment    "By this point, the module was evolving completely separately from Swignition."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-11 ;
+		dcs:item
+			[ rdfs:label "The graph() and graphs() methods now return RDF::Trine::Model objects."@en ; a dcs:Update ] ,
+			[ rdfs:label "Allow various parsing options to be passed to constructor."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Support for @prefix now optional, off by default."@en ] ,
+			[ rdfs:label "Support for @lang now optional, off by default."@en ] ,
+			[ rdfs:label "Support for extended @rel/@rev now optional, off by default."@en ] ,
+			[ rdfs:label "Support for HEAD, BODY and BASE elements now optional, on by default."@en ] ,
+			[ rdfs:label "Support for full URIs instead of CURIEs now optional, off by default."@en ] ,
+			[ rdfs:label "Add optional support for xml:base."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Add optional support for embedded RDF/XML."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Add optional support for XFN 1.1 keywords."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Diallow Safe CURIEs in @src/@href."@en ; a dcs:Removal ] ,
+			[ rdfs:label "Module SVN repository now at <http://goddamn.co.uk/svn-web/perlmods/browse/>"@en ; a dcs:Update ; rdfs:seeAlso <http://goddamn.co.uk/viewvc/perlmods/> ]
+		] .
+
+my:project :release my:v_0-21 .
+my:v_0-21
+	a               :Version ;
+	dc:issued       "2009-11-28"^^xsd:date ;
+	:revision       "0.21"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.21.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-20 ;
+		dcs:item
+			[ rdfs:label "Use RDF::Trine::Node::Literal::XML if it exists."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Various test case compliance fixes (passes XHTML test suite)."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_0-22 .
+my:v_0-22
+	a               :Version ;
+	dc:issued       "2009-12-03"^^xsd:date ;
+	:revision       "0.22"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.22.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-21 ;
+		dcs:item
+			[ rdfs:label "Various test case compliance fixes (passes HTML4 and HTML5 test suites)"@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Flexible keyword extensibility (optional)."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Special rel='alternate stylesheet' handling (optional, good for HTML5)."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Allow suffix-less CURIEs without colons (optional)."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Allow case-insensitive CURIE prefixes (optional, good for HTML)."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Empty CURIE prefix can be configured (optional)."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Add Auto Config feature."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Make xml:lang support optional (enabled by default)."@en ; a dcs:Addition ]
+		] .
+
+my:project :release my:v_0-30 .
+my:v_0-30
+	a               :Version ;
+	dc:issued       "2010-01-18"^^xsd:date ;
+	:revision       "0.30"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-0.30.tar.gz> ;
+	rdfs:label      "Version 3 (kinda)"@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-22 ;
+		dcs:item
+			[ rdfs:label "Special support for RDFa in Atom (Yahoo's weirdly-named 'DataRSS')."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Add support for a default prefix (different from empty prefix)."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Include a catalogue of doctypes to speed up XML parsing."@en ; a dcs:Addition , dcs:Packaging ] ,
+			[ rdfs:label "Upgrade distribution to my new packaging regime (signatures, auto-generated changelogs, etc)"@en ; a dcs:Update , dcs:Packaging ] ,
+			[ rdfs:label "Copyright 2010."@en ; a dcs:Update , dcs:Documentation ] ,
+			[ rdfs:label "Change set_callbacks parameters and support additional callbacks."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_1-00_00 .
+my:v_1-00_00
+	a               :Version ;
+	dc:issued       "2010-01-29"^^xsd:date ;
+	:revision       "1.00_00"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.00_00.tar.gz> ;
+	rdfs:label      "1.00 Preview"@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-30 ;
+		dcs:item
+			[ rdfs:label "Improve named graph documentation."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "Correct name of XML::Atom::OWL module in POD."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "Document auto-config in non-XHTML XML."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "&set_callbacks no longer supports old argument syntax."@en ; a dcs:Removal ] ,
+			[ rdfs:label "&named_graphs no longer supported as a way to enable named graph support."@en ; a dcs:Removal ]
+	] .
+
+my:project :release my:v_1-00_01 .
+my:v_1-00_01
+	a               :Version ;
+	dc:issued       "2010-02-04"^^xsd:date ;
+	:revision       "1.00_01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.00_01.tar.gz> ;
+	rdfs:label      "1.00 Preview'"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-00_00 ;
+		dcs:item
+			[ rdfs:label "Fix double use of &consume in POD SYNOPSIS."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "POD NAME section short description to match description in CPAN registered modules list."@en ; a dcs:Update ]
+		]  .
+
+my:project :release my:v_1-00_02 .
+my:v_1-00_02
+	a               :Version ;
+	dc:issued       "2010-02-05"^^xsd:date ;
+	:revision       "1.00_02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.00_02.tar.gz> ;
+	rdfs:label      "1.00 Preview''"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-00_01 ;
+		dcs:item
+			[ rdfs:label "Arrange methods in a more sensible order for documentation."@en ] ,
+			[ rdfs:label "Document HTML support better."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "Document Atom support better."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "Document SVG support better."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "Document RDF/XML support better."@en ; a dcs:Documentation ]
+		]  .
+
+my:project :release my:v_1-00 .
+my:v_1-00
+	a               :Version ;
+	dc:issued       "2010-02-18"^^xsd:date ;
+	:revision       "1.00"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.00.tar.gz> ;
+	rdfs:label      "Stable"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-00_02 ;
+		dcs:item
+			[ rdfs:label "Release RDF::RDFa::Parser 1.00 and RDF::RDFa::Parser::Redland 1.00."@en ]
+		] .
+
+my:project :release my:v_1-00-001 .
+my:v_1-00-001
+	a               :Version ;
+	dc:issued       "2010-03-26"^^xsd:date ;
+	:revision       "1.00.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.00.001.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_1-00 ;
+		dcs:item
+			[ rdfs:label "Don't use <img alt> in plain literal stringification."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_1-00-002 .
+my:v_1-00-002
+	a               :Version ;
+	dc:issued       "2010-04-09"^^xsd:date ;
+	:revision       "1.00.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.00.002.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_1-00-001 ;
+		dcs:item
+			[ rdfs:label "Properly enforce scoping of prefix mappings (use Storable qw/dclone/)."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_1-09_00 .
+my:v_1-09_00
+	a               :Version ;
+	dc:issued       "2010-04-19"^^xsd:date ;
+	:revision       "1.09_00"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_00.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-00 ;
+		dcs:item
+			[ rdfs:label "Don't use <img alt> in plain literal stringification."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Properly enforce scoping of prefix mappings (use Storable qw/dclone/)."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Change syntax of @prefix to match current RDFa 1.1 editors' drafts."@en ; a dcs:Update ] ,
+			[ rdfs:label "Support @vocab attribute to set default attribute."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Support @profile attribute to load externally-defined keywords and terms."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Refactor a lot of code, especially CURIE processing."@en ] ,
+			[ rdfs:label "Broke support for CURIEs with zero-length suffxes."@en ; a dcs:Regression ]
+		] .
+
+my:project :release my:v_1-09_01 .
+my:v_1-09_01
+	a               :Version ;
+	dc:issued       "2010-04-19"^^xsd:date ;
+	:revision       "1.09_01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_01.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 2"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_00 ;
+		dcs:item
+			[ rdfs:label "Fix packaging problem (profile modules were not in MANIFEST)."@en ; a dcs:Bugfix, dcs:Packaging ]
+		] .
+		
+my:project :release my:v_1-09_02 .
+my:v_1-09_02
+	a               :Version ;
+	dc:issued       "2010-04-21"^^xsd:date ;
+	:revision       "1.09_02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_02.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 3"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_01 ;
+		dcs:item
+			[ rdfs:label "Refactor error handling code to add a new 'onerror' callback, and an 'errors' method to get a list of errors."@en ] ,
+			[ rdfs:label "New 'oncurie' callback."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Deprecate OPTS_XXXX functions in favour of a new RDF::RDFa::Parser::Config object which allows host languages and RDFa versions to be combined more flexibly."@en ] ,
+			[ rdfs:label "Allow CURIEs to have zero-length suffixes."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Broke auto_config."@en ; a dcs:Regression ]
+		] .
+
+my:project :release my:v_1-09_03 .
+my:v_1-09_03
+	a               :Version ;
+	dc:issued       "2010-04-21"^^xsd:date ;
+	:revision       "1.09_03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_03.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 4"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_02 ;
+		dcs:item
+			[ rdfs:label "Support @role attribute."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Use latest list of IANA terms from draft-nottingham-http-link-header-09.txt."@en ; a dcs:Update ]
+		] .
+
+my:project :release my:v_1-09_04 .
+my:v_1-09_04
+	a               :Version ;
+	dc:issued       "2010-04-24"^^xsd:date ;
+	:revision       "1.09_04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_04.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 5"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_03 ;
+		dcs:item
+			[ rdfs:label "Fix auto_config."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Provide more inclusive XML DTD catalogue."@en ; a dcs:Update , dcs:Packaging ] ,
+			[ rdfs:label "Integrate official RDFa test suite into module tests."@en ; a dcs:Update , dcs:Packaging ] ,
+			[ rdfs:label "new_from_url shortcut."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Special Open Graph Protocol support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Makefile.PL doesn't reflect proper requirements from running tests."@en ; a dcs:Regression , dcs:Packaging ]
+		] .
+
+my:project :release my:v_1-09_05 .
+my:v_1-09_05
+	a               :Version ;
+	dc:issued       "2010-05-01"^^xsd:date ;
+	:revision       "1.09_05"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_05.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 6"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_04 ;
+		dcs:item
+			[ rdfs:label "Tests require File::Slurp. Add this dep to Makefile.PL."@en ; a dcs:Bugfix , dcs:Packaging ]
+		] .
+
+my:project :release my:v_1-09_06 .
+my:v_1-09_06
+	a               :Version ;
+	dc:issued       "2010-05-05"^^xsd:date ;
+	:revision       "1.09_06"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_06.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 7"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_05 ;
+		dcs:item
+			[ rdfs:label "Test Suite tests are failing on systems that don't have RDF::Query; make these tests optional."@en ; a dcs:Bugfix , dcs:Packaging ] ,
+			[ rdfs:label "Support case-sensitive/-insensitive prefixes on a prefix-by-prefix basis rather than parser-by-parser."@en ] ,
+			[ rdfs:label "@profile properly supports multiple URIs."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_1-09_07 .
+my:v_1-09_07
+	a               :Version ;
+	dc:issued       "2010-05-21"^^xsd:date ;
+	:revision       "1.09_07"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_07.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 8"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_06 ;
+		dcs:item
+			[ rdfs:label "Allow an LWP::UserAgent to be supplied when configuring the parser."@en ]
+		] .
+
+my:project :release my:v_1-09_08 .
+my:v_1-09_08
+	a               :Version ;
+	dc:issued       "2010-05-21"^^xsd:date ;
+	:revision       "1.09_08"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_08.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 8 - bugfix edition"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_07 ;
+		dcs:item
+			[ rdfs:label "Remove 'my' from a couple of lines."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_1-09_09 .
+my:v_1-09_09
+	a               :Version ;
+	dc:issued       "2010-05-26"^^xsd:date ;
+	:revision       "1.09_09"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_09.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 9"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_09 ;
+		dcs:item
+			[ rdfs:label "Improved DataRSS support; differentiate between DataRSS and plain Atom."@en ] ,
+			[ rdfs:label "Handle <?profile ?> processing instructions."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Hard-coded the Yahoo SearchMonkey profile."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Allow Config.pm to provide a list of default profiles to the parser."@en ; a dcs:Addition ]
+		] .
+
+my:project :release my:v_1-09_10 .
+my:v_1-09_10
+	a               :Version ;
+	dc:issued       "2010-05-27"^^xsd:date ;
+	:revision       "1.09_10"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_10.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 10"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_09 ;
+		dcs:item
+			[ rdfs:label "UTF-8 fixes necessitating requiring a newer version of RDF::Trine."@en ]
+		] .
+
+my:project :release my:v_1-09_11 .
+my:v_1-09_11
+	a               :Version ;
+	dc:issued       "2010-06-16"^^xsd:date ;
+	:revision       "1.09_11"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.09_11.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Preview 11"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_10 ;
+		dcs:item
+			[ rdfs:label "Various media-type handling clean-ups."@en ] ,
+			[ rdfs:label "Auto-Config fixes and clean-ups."@en ] ,
+			[ rdfs:label "Rearrange some of the documentation in the FEATURES section."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "Support for OpenDocument's slightly unusual flavour of RDFa."@en ; a dcs:Addition ]
+		] .
+
+my:project :release my:v_1-091 .
+my:v_1-091
+	a               :Version ;
+	dc:issued       "2010-10-06"^^xsd:date ;
+	:revision       "1.091"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.091.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 1"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-09_11 ;
+		dcs:item
+			[ rdfs:label "Various clean-ups."@en ] ,
+			[ rdfs:label "Generate less-predictable blank node identifiers."@en ] ,
+			[ rdfs:label "Add test cases covering @profile."@en ; a dcs:Packaging ] ,
+			[ rdfs:label "Support rdfa:vocabulary in Profiles."@en ; a dcs:Addition ]
+		] .
+
+my:project :release my:v_1-092 .
+my:v_1-092
+	a               :Version ;
+	dc:issued       "2010-10-20"^^xsd:date ;
+	:revision       "1.092"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.092.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 2"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-091 ;
+		dcs:item
+			[ rdfs:label "If @graph support is enabled, and RDFa attributes are being used in a non-standard namespace, assume @graph is in that namespace too."@en ] ,
+			[ rdfs:label "RDFa Profiles establish both a case-sensitive and case-insensitive term mapping."@en ] ,
+			[ rdfs:label "Strongly deprecate keyword_bundles config option - use default_profiles instead."@en ] ,
+			[ rdfs:label "Reimplement RDFa 1.0 keyword concept using profiles."@en ] ,
+			[ rdfs:label "There was an inconsistency between the code and documentation for the name of the oncurie/ontoken callback. It's now called ontoken."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Load Profile modules via Module::Pluggable."@en ] ,
+			[ rdfs:label "The final prefix defined in @prefix was being ignored due to a regexp bug. Fixed."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_1-093 .
+my:v_1-093
+	a               :Version ;
+	dc:issued       "2010-12-09"^^xsd:date ;
+	:revision       "1.093"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.093.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 3"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-092 ;
+		dcs:item
+			[ rdfs:label "new_from_url didn't work when called without a Config object."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Second parameter to ontriple callback is now a hashref of elements rather than just the current element - this change is to help support the RDFa API."@en ] ,
+			[ rdfs:label "Deprecated pretriple_literal and pretriple_resource callbacks - use ontriple instead."@en ] ,
+			[ rdfs:label "@graph is now parsed like @about by default."@en ] ,
+			[ rdfs:label "Use official GRDDL profile URI for hard-coded support for GRDDL keywords instead of previously used internal identifier."@en ] ,
+			[ rdfs:label "Fix failure parsing embedded RDF/XML with blank nodes."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Improve HTTP caching behaviour."@en ],
+			[ rdfs:label "Change cache directory."@en ] ,
+			[ rdfs:label "Support @cite - not part of RDFa, but often provides useful information."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Support @longdesc - not part of RDFa, but often provides useful information."@en ; a dcs:Addition ] ,
+			[ rdfs:label "IETF link types now use an aggressively cached copy of http://www.iana.org/assignments/link-relations/link-relations.xml."@en ] ,
+			[ rdfs:label "Clarify language around default prefix versus default vocabulary (or in RDFa 1.0 default prefix versus 'no prefix'). This involved renaming a couple of configuration options: prefix_default => vocab_default; prefix_empty => prefix_default."@en ]
+		] .
+
+my:project :release my:v_1-094 .
+my:v_1-094
+	a               :Version ;
+	dc:issued       "2011-02-09"^^xsd:date ;
+	:revision       "1.094"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.094.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 4"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-093 ;
+		dcs:item
+			[ rdfs:label "Improve SYNOPSIS section."@en ; a dcs:Documentation ] ,
+			[ rdfs:label "Copyright 2011."@en ; a dcs:Update, dcs:Documentation ] ,
+			[ rdfs:label "Issue warning when encountering a profile that is not a valid URI."@en ] ,
+			[ rdfs:label "Issue warning when encountering a profile URI contains a fragment identifier."@en ] ,
+			[ rdfs:label "Include 'tagsoup' configuration set for dealing with content from the wild."@en ; a dcs:Addition ] ,
+			[ rdfs:label "@prefix wasn't working - ignored all but the first prefix."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Support new RDFa 1.1 feature where XMLLiterals are recursed into."@en ; a dcs:Update ] ,
+			[ rdfs:label "The opengraph method now recognises the old Open Graph Protocol namespace for better backcompat."@en ; a dcs:Addition ] ,
+			[ rdfs:label "The opengraph method now returns the first value in the list when called in scalar context. (Previously returned an arrayref.)"@en ]
+		] .
+
+my:project :release my:v_1-095 .
+my:v_1-095
+	a               :Version ;
+	dc:issued       "2011-09-23"^^xsd:date ;
+	:revision       "1.095"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.095.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 5"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-094 ;
+		dcs:item
+			[ rdfs:label "RDF::RDFa::Parser no longer does any HTTP caching. Caching should be handled at the application level."@en ; a dcs:Removal ] ,
+			[ rdfs:label "Change 'profiles' option to 'profile_attr', and disable it for RDFa 1.1 to match forthcoming WD."@en ; a dcs:Change , dcs:Update ] ,
+			[ rdfs:label "RDF::RDFa::Parser::Profile::RDFa11 for the default RDFa 1.1 profile."@en ; a dcs:Addition , dcs:Update ] ,
+			[ rdfs:label "Add 'src_sets_object' option, and enable it for RDFa 1.1."@en ; a dcs:Addition , dcs:Update ] ,
+			[ rdfs:label "Add 'inlist_attr' option, and enable it for RDFa 1.1. This enables support for RDF Collections."@en ; a dcs:Addition , dcs:Update ] ,
+			[ rdfs:label "Add 'vocab_triple' option, and enable it for RDFa 1.1."@en ; a dcs:Addition , dcs:Update ] ,
+			[ rdfs:label "'processor_graph' method."@en ; a dcs:Addition ]
+		] .
+
+my:project :release my:v_1-096 .
+my:v_1-096
+	a               :Version ;
+	dc:issued       "2011-10-13"^^xsd:date ;
+	:revision       "1.096"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.096.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 6"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-095 ;
+		dcs:item
+			[ rdfs:label "Allow @inlist to work with @rev."@en ] ,
+			[ rdfs:label "use 5.010"@en ; a dcs:Update ] ,
+			[ rdfs:label "Build package with Module::Package::RDF"@en ; a dcs:Packaging ] ,
+			[ rdfs:label "Move some tests from 't' to 'xt'."@en ; a dcs:Packaging ]			
+		] .
+
+my:project :release my:v_1-096_01 .
+my:v_1-096_01
+	a               :Version ;
+	dc:issued       "2012-05-16"^^xsd:date ;
+	:revision       "1.096_01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.096_01.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 6.01"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-096 ;
+		dcs:item
+			[ rdfs:label "Support CURIEs which end in colon."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Currently passing RDFa 1.1 test suite for RDFa 1.0 and 1.1 in HTML4, HTML5 and XHTML1 ('xt' tests, available in repo but not on CPAN)."@en ; a dcs:Packaging ] ,
+			[ rdfs:label "Start cleaning up 'examples' directory."@en ; a dcs:Packaging ] ,
+			[ rdfs:label "Support HTML5 <time> element, and @datetime attribute."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Support HTML5 <data> element, and @value attribute."@en ; a dcs:Addition ] ,
+			[ rdfs:label "@vocab takes precedence over terms."@en ; a dcs:Update ] ,
+			[ rdfs:label "Implement support for @property with resource objects."@en ; a dcs:Update ] ,
+			[ rdfs:label "Change RDFa 1.1 @typeof bindings; can bind to objects."@en ; a dcs:Update ] ,
+			[ rdfs:label "Roll back @inlist plus @rev support."@en ; a dcs:Removal ] ,
+			[ rdfs:label "When _:foo found in a predicate, don't generate a random bnode identifier, instead treat as a weird URI."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Replace rdfa:hasVocabulary predicate with rdfa:usesVocabulary."@en ; a dcs:Update ] ,
+			[ rdfs:label "RDF::RDFa::Parser::InitialContext."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Dropped a little relative URI resolution hack that I don't think is needed any more."@en ; a dcs:Removal ] ,
+			[ rdfs:label "Remove @profile support, plus entire profile mechanism."@en ; a dcs:Removal ]
+		] .
+
+my:project :release my:v_1-096_02 .
+my:v_1-096_02
+	a               :Version ;
+	dc:issued       "2012-05-17"^^xsd:date ;
+	:revision       "1.096_02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.096_02.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 6.02"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-096_01 ;
+		dcs:item
+			[ rdfs:label "XHTML5 is now a host language in its own right - a mashup between HTML5 and XHTML1, but with added xml:base support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "The xml:base attribute was being ignored in a few places when it shouldn't have been."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Now passing RDFa 1.1 test suite for RDFa 1.1 in XML, SVG and XHTML5."@en ; a dcs:Packaging ] ,
+			[ rdfs:label "Promote an old OpenDocument example to a test case."@en ; a dcs:Packaging ]
+		] .
+
+
+my:project :release my:v_1-096_03 .
+my:v_1-096_03
+	a               :Version ;
+	dc:issued       "2012-05-20"^^xsd:date ;
+	:revision       "1.096_03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.096_03.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 6.03"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-096_02 ;
+		dcs:item
+			[ rdfs:label "Fix crash in RDFa version guessing."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "RDF::RDFa::Parser Distiller PSGI in the 'examples' directory."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Allow unparsable markup (i.e. DOM cannot be generated) to result in a simple error (reported via error callbacks, etc) rather than croaking."@en ] ,
+			[ rdfs:label "Slight improvements to processor_graph, to allow it to pass test cases from RDFa 1.1 test suite."@en ] ,
+			[ rdfs:label "New output_graph and processor_and_output_graph methods."@en ; a dcs:Addition ] ,
+			[ rdfs:label "ERR_CODE_CURIE_UNDEFINED is now a warning, not an error."@en ] ,
+			[ rdfs:label "Lots more work on 'xt' tests - can now output EARL, which is bundled in the 'meta' directory of the release."@en ; a dcs:Packaging ]
+		] .
+
+my:project :release my:v_1-096_04 .
+my:v_1-096_04
+	a               :Version ;
+	dc:issued       "2012-05-24"^^xsd:date ;
+	:revision       "1.096_04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.096_04.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 6.04"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-096_03 ;
+		dcs:item
+			[ rdfs:label "Implement minor changes for new version of Atom+RDFa draft spec."@en ; a dcs:Update ] ,
+			[ rdfs:label "RDF::TrineX::Parser::RDFa - a less crufty API layered on top of RDF::RDFa::Parser."@en ; a dcs:Addition ]
+		] .
+
+my:project :release my:v_1-097 .
+my:v_1-097
+	a               :Version ;
+	dc:issued       "2012-06-07"^^xsd:date ;
+	:revision       "1.097"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Parser-1.097.tar.gz> ;
+	rdfs:label      "RDFa 1.1 Release Candidate 7"@en ;
+	dcs:changeset [
+		dcs:versus my:v_1-096_04 ;
+		dcs:item
+			[ rdfs:label "Add RDFa1.1+role test suite to 'xt' - tests all pass."@en ] ,
+			[ rdfs:label "Two new methods for RDF::TrineX::Parser::RDFa - rdfa_flavour and rdfa_version."@en ; a dcs:Addition ],
+			[ rdfs:label "@role no longer respects @vocab."@en ; a dcs:Update ]
+		] .
+

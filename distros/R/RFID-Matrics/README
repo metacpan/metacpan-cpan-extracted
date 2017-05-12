@@ -1,0 +1,16 @@
+# Written by Scott Gifford <gifford@umich.edu>
+# Copyright (C) 2004 The Regents of the University of Michigan.
+# See the file LICENSE included with the distribution for license
+# information.
+
+The modules under RFID::Matrics provide access to the Matrics RFID
+reader, by implementing the host/reader communication protocol.
+
+See the perldoc for RFID::Matrics::Reader for an overview, and the
+file matrics.pl for some sample code.
+
+See the rfid-perl Web page for other information, and instructions for
+subscribing to the mailing list:
+
+    http://www.eecs.umich.edu/~wherefid/code/rfid-perl/
+

@@ -1,0 +1,522 @@
+#!/usr/bin/perl -w
+# RT is (c) 1996-2004 Jesse Vincent <jesse@fsck.com>
+
+# Version 1.23
+
+use strict;
+use warnings;
+
+$| = 1;
+my $export_dir_base = shift;
+
+die "You must specify an export dir" unless ($export_dir_base);
+
+my $mode  = ( shift || 'all' );
+my $since = ( shift || undef );
+
+# Set to 0 to not bother exporting dead/deleted tickets.
+my $export_dead = 1;
+# set to 0 to skip disabled queues, make sure there aren't
+# any tickets in those queues
+my $export_disabled_queues = 1;
+
+my $export_dir_counter = 0;
+$export_dir_base .= "/";
+&checkDirExists($export_dir_base);
+
+# make this ridiculously large if you don't want a limit
+my $export_dir_limit = 1000;
+my $export_dir       = "$export_dir_base" . "tickets-" . "$export_dir_counter";
+&checkDirExists($export_dir);
+
+use Carp;
+use Getopt::Long qw(:config pass_through);
+use Data::Dumper;
+use Storable qw(nstore);
+use lib "/opt/rt-bps/lib";
+use lib "/opt/rt-bps/etc";
+
+use RT::Record;
+@RT::Record::ISA = qw(DBIx::SearchBuilder::Record);
+
+my %FIELD_MAPPINGS = (
+    'RT::Ticket' => [
+                      'EffectiveId',
+                      'Queue',
+                      'Requestors',
+                      'Owner',
+                      'Subject',
+                      'InitialPriority',
+                      'FinalPriority',
+                      'Priority',
+                      'Status',
+                      'TimeWorked',
+                      'TimeLeft',
+                      'Created',
+                      'Creator',
+                      'Told',
+                      'Resolved',
+                      'Starts',
+                      'Started',
+                      'Due',
+                      'Creator',
+                      'Created',
+                      'LastUpdatedBy',
+                      'LastUpdated',
+                      'id'
+                    ],
+    'RT::Attachment' => [
+                          'TransactionId',
+                          'MessageId',
+                          'Parent',
+                          'ContentType',
+                          'Subject',
+                          'Content',
+                          'ContentEncoding',
+                          'Headers',
+                          'Filename',
+                          'Creator',
+                          'Created',
+                          'id'
+                        ], 
+    'RT::Group' => [
+                     'Pseudo',
+                     'Description',
+                     'Name',
+                     'id'
+                   ],
+    'RT::User' => [
+                    'WebEncoding',
+                    'Privileged',
+                    'AuthSystem',
+                    'Password',
+                    'MobilePhone',
+                    'Disabled',
+                    'WorkPhone',
+                    'LastUpdated',
+                    'PagerPhone',
+                    'ExternalContactInfoId',
+                    'ContactInfoSystem',
+                    'Creator',
+                    'LastUpdatedBy',
+                    'HomePhone',
+                    'Address1',
+                    'Created',
+                    'ExternalAuthId',
+                    'Comments',
+                    'NickName',
+                    'Address2',
+                    'FreeformContactInfo',
+                    'RealName',
+                    'City',
+                    'EmailAddress',
+                    'EmailEncoding',
+                    'State',
+                    'Signature',
+                    'Zip',
+                    'Organization',
+                    'PagerEmailAddress',
+                    'Lang',
+                    'Gecos',
+                    'Country',
+                    'Name',
+                    'id'
+                  ],
+    'RT::Transaction' => [
+                           'OldValue',
+                           'Ticket',
+                           'NewValue',
+                           'Creator',
+                           'TimeTaken',
+                           'Type',
+                           'Field',
+                           'Created',
+                           'Data',
+                           'id'
+                         ],
+    'RT::Link' => [
+                    'Target',
+                    'Base',
+                    'LocalTarget',
+                    'Creator',
+                    'Type',
+                    'LastUpdatedBy',
+                    'LocalBase',
+                    'Created',
+                    'LastUpdated',
+                  ],
+    'RT::KeywordSelect' => [
+                             'ObjectValue',
+                             'Disabled',
+                             'ObjectField',
+                             'Depth',
+                             'Single',
+                             'Keyword',
+                             'Name',
+                             'ObjectType',
+                             'id'
+                           ],
+    'RT::Queue' => [
+                    'id',
+                    'Name',
+                    'Description',
+                    'CorrespondAddress',
+                    'CommentAddress',
+                    'InitialPriority',
+                    'FinalPriority',
+                    'DefaultDueIn',
+                    'Creator',
+                    'Created',
+                    'LastUpdatedBy',
+                    'LastUpdated',
+                    'Disabled'
+                   ]
+);
+
+use RT::Interface::CLI qw(CleanEnv LoadConfig DBConnect GetCurrentUser GetMessageContent);
+use RT::Groups;
+use RT::Users;
+use RT::Queues;
+use RT::ACL;
+use RT::Tickets;
+
+#Clean out all the nasties from the environment
+CleanEnv();
+
+#Load etc/config.pm and drop privs
+LoadConfig();
+
+#Connect to the database and get RT::SystemUser and RT::Nobody loaded
+DBConnect();
+
+package RT::Faketix;
+
+use RT::EasySearch;
+use RT::Ticket;
+
+use vars qw( @ISA );
+@ISA = qw(RT::EasySearch);
+
+sub _Init {
+    my $self = shift;
+    $self->{'table'}       = 'Tickets';
+    $self->{'primary_key'} = 'id';
+    return ( $self->SUPER::_Init(@_) );
+}
+
+sub NewItem {
+    RT::Ticket->new( shift->CurrentUser );
+}
+
+package main;
+
+my $ds;
+
+if ( $mode =~ /^all$/i ) {
+
+    print STDERR "Exporting Groups\n";
+    my $Groups = RT::Groups->new($RT::SystemUser);
+    $Groups->LimitToReal();
+    $Groups->{'find_disabled_rows'} = 1;
+    foreach my $Group ( @{ $Groups->ItemsArrayRef } ) {
+
+        my $group;
+
+        foreach my $param ( sort @{$FIELD_MAPPINGS{'RT::Group'}} ) {
+            $group->{$param} = $Group->_Value($param)
+              if ( $Group->_Value($param) );
+        }
+        my $members = $Group->MembersObj();
+        foreach my $member ( @{ $members->ItemsArrayRef } ) {
+            push @{ $group->{Member} }, $member->UserObj->Id;
+        }
+        push @{ $ds->{'Group'} }, $group;
+    }
+
+    print STDERR "Exporting Users\n";
+    my @users = export_users($ds);
+    $ds->{'User'} = \@users;
+
+    print STDERR "Exporting Queues\n";
+    export_queues($ds);
+    print STDERR "Exporting Keywords\n";
+    my $global_ks    = RT::KeywordSelects->new($RT::SystemUser);
+    $global_ks->LimitToQueue(0);
+    $global_ks->{'find_disabled_rows'} = 1;
+    foreach my $keysel ( @{ $global_ks->ItemsArrayRef } ) {
+
+        foreach my $param ( sort @{$FIELD_MAPPINGS{'RT::KeywordSelect'}} ) {
+            $ds->{Global}->{'CustomField'}->{ $keysel->id }->{$param} = $keysel->_Value($param)
+              if ( $keysel->_Value($param) );
+        }
+        my $descendents = $keysel->KeywordObj->Descendents;
+        foreach my $desc ( keys %{$descendents} ) {
+            push @{ $ds->{Global}->{'CustomField'}->{ $keysel->id }->{Value} },
+              $descendents->{$desc};
+
+        }
+    }
+
+    print STDERR "Exporting Scrips\n";
+    my $scrips = RT::Scrips->new($RT::SystemUser);
+    $scrips->LimitToGlobal();
+    foreach my $scrip ( @{ $scrips->ItemsArrayRef } ) {
+        my $scrip_ds = { Condition => $scrip->ConditionObj->Name(),
+                         Template  => $scrip->TemplateObj->Name(),
+                         Action    => $scrip->ActionObj->Name(), };
+        push ( @{ $ds->{'Global'}->{'Scrip'} }, $scrip_ds );
+
+    }
+
+    print STDERR "Exporting ACLs\n";
+    my $ACL = RT::ACL->new($RT::SystemUser);
+    $ACL->LimitToSystem();
+
+    foreach my $ace ( @{ $ACL->ItemsArrayRef } ) {
+        my $right_ds = { PrincipalType => $ace->PrincipalType,
+                         PrincipalId   => $ace->PrincipalObj->Id,
+                         Name          => $ace->RightName };
+        if ( $ace->PrincipalType eq 'Group' && $ace->PrincipalObj->Pseudo ) {
+            $right_ds->{'Role'} = $ace->PrincipalObj->Name;
+            delete $right_ds->{'PrincipalId'};
+        }
+
+        push ( @{ $ds->{'Global'}->{'Right'} }, $right_ds );
+    }
+
+    print STDERR "Exporting Links\n";
+    my $links = RT::Links->new($RT::SystemUser);
+    $links->UnLimit();
+    while ( my $l = $links->Next ) {
+        my $link_ds;
+        foreach my $param ( sort @{$FIELD_MAPPINGS{'RT::Link'}} ) {
+            $link_ds->{$param} = $l->_Value($param)
+              if ( $l->_Value($param) );
+        }
+        push ( @{ $ds->{'Link'} }, $link_ds );
+    }
+    open( META, ">$export_dir_base/metadata" );
+    print META "sub Data {\n";
+    print META scalar Dumper($ds);
+    print META "}\n";
+    print META "sub ExportType {return('full')}\n";
+    print META "\n1;\n";
+    close(META);
+    undef($ds);
+
+    export_tickets();
+}
+else {
+    my @users = export_users($ds);
+    $ds->{'User'} = \@users;
+
+    open( META, ">$export_dir_base/metadata" );
+    print META "sub Data {\n";
+    print META scalar Dumper($ds);
+    print META "}\n";
+    print META "sub ExportType {return('incremental')}\n";
+    print META "\n1;\n";
+    close(META);
+    undef($ds);
+    export_tickets($since);
+}
+
+# {{{ export_tickets
+sub export_tickets {
+    my $since = shift;
+    my $tix   = RT::Faketix->new($RT::SystemUser);
+    $tix->Limit( FIELD => 'id', OPERATOR => "!=", VALUE => "0" );
+    if ($since) {
+        $tix->Limit( FIELD    => 'LastUpdated',
+                     OPERATOR => ">=",
+                     VALUE    => $since );
+    }
+    ## XXX we could Limit on 'Status' '!=' 'dead' if $export_dead == 0,
+    ## but then we'd not be able to say /why/ we're not exporting the
+    ## ticket...
+
+    while ( my $t = $tix->Next ) {
+        my $tick_ds;
+        if (!$export_dead && ($t->Status eq 'dead')) {
+            print STDERR "\nNot exporting dead ticket " . $t->Id ;
+            next;
+        }
+        print STDERR "\nExporting ticket " . $t->Id ;
+        $export_dir_counter++;
+        if ( $export_dir_counter % $export_dir_limit == 0) {
+            $export_dir = "$export_dir_base" . "tickets-" . $export_dir_counter;
+            &checkDirExists($export_dir);
+            print STDERR "* export_dir changed - $export_dir\n";
+
+        }
+
+        foreach my $param ( sort @{$FIELD_MAPPINGS{'RT::Ticket'}} ) {
+            $tick_ds->{$param} = $t->_Value($param)
+              if ( $t->_Value($param) );
+        }
+        $tick_ds->{'Queue'} = $t->QueueObj->Name;
+
+        my $watchers = $t->Watchers();
+        my $watchers_ds;
+        foreach my $w ( @{ $watchers->ItemsArrayRef } ) {
+            my $ds = { Type  => $w->Type,
+                       Email => ($w->Email||$w->OwnerObj->EmailAddress),
+		       Owner => $w->Owner,
+                       Id    => $w->Id };
+
+            push ( @{$watchers_ds}, $ds );
+        }
+        $tick_ds->{'Watchers'} = $watchers_ds;
+
+        my $selects = $t->QueueObj->KeywordSelects();
+        while ( my $ks = $selects->Next ) {
+            my $keywords = $t->KeywordsObj( $ks->Id );
+            while ( my $key = $keywords->Next ) {
+
+                my $name = $key->KeywordObj->RelativePath( $ks->KeywordObj );
+                push ( @{ $tick_ds->{'CustomFields'}->{ $ks->id } }, $name );
+            }
+        }
+
+        my $tr    = $t->Transactions;
+        while ( my $trans = $tr->Next ) {
+            my $trans_ds;
+            print STDERR ".";
+            foreach my $tr_param ( @{$FIELD_MAPPINGS{'RT::Transaction'}} ) {
+                $trans_ds->{$tr_param} = $trans->_Value($tr_param)
+                  if ( $trans->_Value($tr_param) );
+            }
+            my $attachments = RT::Attachments->new($RT::SystemUser);
+            $attachments->Limit( FIELD    => 'TransactionId',
+                                 OPERATOR => "=",
+                                 VALUE    => $trans->Id );
+
+            while ( my $att = $attachments->Next ) {
+                my $att_ds;
+                print STDERR ".";
+                foreach
+                  my $att_param ( @{$FIELD_MAPPINGS{'RT::Attachment'}} ) {
+                        if ($att_param eq 'Content') {
+                                $att_ds->{$att_param} = $att->Content();
+
+                         } else {
+
+                                $att_ds->{$att_param} = $att->_Value($att_param)
+                                        if (defined $att->_Value($att_param) );
+                         }
+                }
+                $att_ds->{'id'} = $att->id;
+                push ( @{ $trans_ds->{'Attachment'} }, $att_ds );
+            }
+
+            push ( @{ $tick_ds->{'Transaction'} }, $trans_ds );
+        }
+
+	nstore ($tick_ds, "$export_dir/t-" . $tick_ds->{id} );
+
+    }
+}
+# }}}
+
+sub export_users {
+    my $ds = shift;
+    my $since = ( shift || 0 );
+
+    my $users = RT::Users->new($RT::SystemUser);
+    if ($since) {
+        $users->Limit( FIELD    => 'LastUpdated', OPERATOR => ">=", VALUE    => $since );
+    }
+    else {
+        $users->UnLimit();
+    }
+    $users->{'find_disabled_rows'} = 1;
+
+    my @users;
+    foreach my $user ( @{ $users->ItemsArrayRef } ) {
+        my $user_ds;
+        foreach my $param ( sort @{$FIELD_MAPPINGS{'RT::User'}} ) {
+            $user_ds->{$param} = $user->_Value($param)
+              if ( $user->_Value($param) );
+        }
+        push ( @users, $user_ds );
+    }
+    return (@users);     
+}
+
+sub export_queues {
+    my $ds = shift;
+
+    my $Queues = RT::Queues->new($RT::SystemUser);
+    $Queues->UnLimit();
+    if ($export_disabled_queues) {
+        $Queues->{'find_disabled_rows'} = 1;
+    }
+
+    foreach my $Queue ( @{ $Queues->ItemsArrayRef } ) {
+        my $queue_ds;
+        foreach my $param ( sort @{$FIELD_MAPPINGS{'RT::Queue'}} ) {
+            $queue_ds->{$param} = $Queue->_Value($param)
+              if ( $Queue->_Value($param) );
+        }
+        my $watchers = $Queue->Watchers();
+        my $watchers_ds;
+        foreach my $w ( @{ $watchers->ItemsArrayRef } ) {
+            my $ds = { Type  => $w->Type,
+                       Email => $w->Email,
+                       Id    => $w->Id };
+
+            push ( @{$watchers_ds}, $ds );
+        }
+        $queue_ds->{'Watchers'} = $watchers_ds;
+
+        my $ks = $Queue->KeywordSelects();
+        $ks->{'find_disabled_rows'} = 1;
+        foreach my $keysel ( @{ $ks->ItemsArrayRef } ) {
+            next if ($keysel->ObjectValue == 0);
+            my $ks_ds;
+            foreach my $param ( sort @{$FIELD_MAPPINGS{'RT::KeywordSelect'}} ) {
+                $ks_ds->{$param} = $keysel->_Value($param)
+                  if ( $keysel->_Value($param) );
+            }
+            my $descendents = $keysel->KeywordObj->Descendents;
+            foreach my $desc ( keys %{$descendents} ) {
+                push @{ $ks_ds->{Value} }, $descendents->{$desc};
+
+            }
+            push ( @{ $queue_ds->{'CustomField'} }, $ks_ds );
+        }
+
+        my $ACL = RT::ACL->new($RT::SystemUser);
+        $ACL->LimitToQueue( $Queue->Id );
+
+        foreach my $ace ( @{ $ACL->ItemsArrayRef } ) {
+            my $right_ds = { PrincipalType => $ace->PrincipalType,
+                             PrincipalId   => $ace->PrincipalObj->Id,
+                             Name          => $ace->RightName };
+            if ( $ace->PrincipalType eq 'Group' && $ace->PrincipalObj->Pseudo )
+            {
+                $right_ds->{'Role'} = $ace->PrincipalObj->Name;
+                delete $right_ds->{'PrincipalId'};
+            }
+            push ( @{ $queue_ds->{'Right'} }, $right_ds );
+        }
+        my $scrips = RT::Scrips->new($RT::SystemUser);
+        $scrips->LimitToQueue( $Queue->Id );
+        foreach my $scrip ( @{ $scrips->ItemsArrayRef } ) {
+            my $scrip_ds = { Condition => $scrip->ConditionObj->Name(),
+                             Template  => $scrip->TemplateObj->Name(),
+                             Action    => $scrip->ActionObj->Name(), };
+            push ( @{ $queue_ds->{'Scrip'} }, $scrip_ds );
+        }
+        push ( @{ $ds->{'Queue'} }, $queue_ds );
+
+    }
+
+}
+
+sub checkDirExists {
+    my ($dir) = @_;
+    if ( !( -d "$dir" ) ) {
+        mkdir( "$dir", 0771 ) || die "Couldn't create directory '$dir'";
+    }
+}

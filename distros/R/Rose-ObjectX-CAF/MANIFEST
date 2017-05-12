@@ -1,0 +1,11 @@
+Changes
+lib/Rose/ObjectX/CAF.pm
+lib/Rose/ObjectX/CAF/MethodMaker.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-basic.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

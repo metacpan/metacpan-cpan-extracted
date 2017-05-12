@@ -1,0 +1,110 @@
+NAME
+    RT-Extension-Assets-Import-CSV - RT Assets Import from CSV
+
+PREREQUISITES
+    This version of RT::Extension::Assets::Import::CSV requires RT 4.4, as
+    that version of RT has Assets built in.
+
+    If you're running RT 4.2 with the Assets extension, you should seek an
+    older version of this extension; specifically, version 1.4.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::Assets::Import::CSV');
+
+        See "CONFIGURATION", below, for the remainder of the required
+        configuration.
+
+    Restart your webserver
+    Run bin/rt-assets-import-csv
+        See bin/rt-assets-import-csv --help for more information.
+
+CONFIGURATION
+    The following configuration would be used to import a three-column CSV
+    of assets, where the column titled serviceTag is unique:
+
+        Set( $AssetsImportUniqueCF, 'Service Tag' );
+        Set( %AssetsImportFieldMapping,
+            'Name'           => 'description',
+            'CF.Service Tag' => 'serviceTag',
+            'CF.Location'    => 'building',
+            'CF.Serial #'    => 'serialNo',
+        );
+
+  Constant values
+    If you want to set an RT column or custom field to a static value for
+    all imported assets, precede the "CSV field name" (right hand side of
+    the mapping) with a slash, like so:
+
+        Set( $AssetsImportUniqueCF, 'Service Tag' );
+        Set( %AssetsImportFieldMapping,
+            'Name'           => 'description',
+            'Catalog'        => \'Hardware',
+            'CF.Service Tag' => 'serviceTag',
+            'CF.Location'    => 'building',
+            'CF.Serial #'    => 'serialNo',
+        );
+
+    Every imported asset will now be added to the Hardware catalog in RT.
+    This feature is particularly useful for setting the asset catalog, but
+    may also be useful when importing assets from CSV sources you don't
+    control (and don't want to modify each time).
+
+  Computed values
+    You may also compute values during import, by passing a subroutine
+    reference as the value in the %AssetsImportFieldMapping. This subroutine
+    will be called with a hash reference of the parsed CSV row.
+
+        Set( $AssetsImportUniqueCF, 'Service Tag' );
+        Set( %AssetsImportFieldMapping,
+            'Name'           => 'description',
+            'CF.Service Tag' => 'serviceTag',
+            'CF.Location'    => 'building',
+            'CF.Weight'      => sub { $_[0]->{"Weight (kg)"} || "(unknown)" },
+        );
+
+    Using computed columns may cause false-positive "unused column"
+    warnings; these can be ignored.
+
+  Numeric identifiers
+    If you are already using a numeric identifier to uniquely track your
+    assets, and wish RT to take over handling of that identifier, you can
+    choose to leave $AssetsImportUniqueCF unset, and assign to id in the
+    %AssetsImportFieldMapping:
+
+        Set( %AssetsImportFieldMapping,
+            'id'             => 'serviceTag',
+            'Name'           => 'description',
+            'CF.Service Tag' => 'serviceTag',
+            'CF.Serial #'    => 'serialNo',
+        );
+
+    This requires that, after the import, RT becomes the generator of all
+    asset ids. Otherwise, asset id conflicts may occur.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-Assets-Import-CSV@rt.cpan.org|mailto:bug-RT-Extension-Assets-Import-CSV@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Assets-Import-CSV>.
+
+COPYRIGHT
+    This extension is Copyright (C) 2014-2016 Best Practical Solutions, LLC.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

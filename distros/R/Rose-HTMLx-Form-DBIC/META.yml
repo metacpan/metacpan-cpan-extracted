@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Rose-HTMLx-Form-DBIC
+version:            0.08
+abstract:           Integration of Rose::HTML::Form with DBIx::Class
+author:
+    - Zbigniew Lukasiak
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DBIx::Class::ResultSet::RecursiveUpdate:  0
+    Moose:                0
+    Rose::HTML::Object:   0.600
+    Rose::Object:         0.85
+    Scalar::Util:         1.19
+    String::Random:       0
+    Template:             0
+    Test::Simple:         0.44
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

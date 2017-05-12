@@ -1,0 +1,25 @@
+bin/billing_report.pl
+bin/install_deps.pl
+bin/record_consolidator.pl
+bin/target_maker.pl
+bin/uplink_summary.pl
+bin/validate_targets.sh
+Changes
+examples/billing_report.csv
+examples/uplink_report.html
+INSTALL
+lib/RTG/Report.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+rtgreport.conf
+t/is_arrayref.t
+t/pod-coverage.t
+t/pod.t
+t/reporter.t
+t/should_skip.t
+t/status.t
+t/timestamp_sanity.t
+META.json                                Module JSON meta-data (added by MakeMaker)

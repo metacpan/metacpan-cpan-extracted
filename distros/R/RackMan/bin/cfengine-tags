@@ -1,0 +1,444 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Path;
+use File::Spec::Functions;
+use Getopt::Long;
+use List::MoreUtils qw< uniq >;
+use RackMan;
+use RackMan::Config;
+use RackMan::Tasks;
+
+
+$::PROGRAM = "Cfengine tags generator";
+$::VERSION = "1.07";
+$::COMMAND = basename($0);
+
+
+use constant {
+    CONFIG_SECTION  => "cfengine-tags",
+};
+
+
+#
+# main
+#
+MAIN: {
+    if (not caller()) {
+        run();
+        exit RackMan->status;
+    }
+}
+
+
+#
+# run()
+# ---
+sub run {
+    # detect if stdout is connected to a terminal
+    (-t STDOUT ? $Term::ANSIColor::AUTORESET : $ENV{ANSI_COLORS_DISABLED}) = 1;
+    $|++;
+
+    # default options
+    my %options = (
+        config  => "/usr/local/etc/rack.conf",
+    );
+
+    # parse options
+    Getopt::Long::Configure(qw< no_auto_abbrev no_ignore_case >);
+    GetOptions(\%options, qw{
+        help|usage|h!  man!  version|V!
+        verbose|v!  config|c=s  output-path|path|O=s
+        attrs|A=s  tags|T=s  filter|F=s  class_names|class-names|N
+    }) or pod2usage(0);
+
+    # handle --version, --help and --man
+    $options{man}       and pod2usage(2);
+    $options{help}      and pod2usage(1);
+    $options{version}   and print "$::PROGRAM v$::VERSION\n" and exit;
+
+    # read configuration file
+    my $config = RackMan::Config->new(-file => $options{config});
+
+    # check for mandatory parameters
+    RackMan->error("missing config parameter [".CONFIG_SECTION."]/path")
+        if not $config->val(CONFIG_SECTION, "path");
+
+    # instanciate the backend object
+    my $rackman = RackMan->new({ options => \%options, config => $config });
+
+    # do the actual work
+    push @ARGV, $config->val(CONFIG_SECTION, "type", "server") if not @ARGV;
+    process($rackman, @ARGV);
+}
+
+
+#
+# pod2usage()
+# ---------
+sub pod2usage {
+    my ($n) = @_;
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ -exitval => 0, -verbose => $n, -noperldoc => 1 });
+}
+
+
+#
+# process()
+# -------
+sub process {
+    my ($rackman, @args) = @_;
+
+    # construct the list of wanted tags, if any
+    my $tags_list = $rackman->options->{tags}
+            || $rackman->config->val(CONFIG_SECTION, "tags", "");
+    $tags_list =~ s/^ +| +$//g;
+    my %wanted_tag = map { $_ => 1 } split / *, */, $tags_list;
+
+    # construct the list of wanted attributes, if any
+    my @attrs = split / *, */, $rackman->options->{attrs}
+            || $rackman->config->val(CONFIG_SECTION, "attrs", "");
+
+    # construct the filter
+    my %filter;
+    my $filter = $rackman->options->{filter}
+            || $rackman->config->val(CONFIG_SECTION, "filter", "");
+    if ($filter) {
+        for my $token (split / *, */, $filter) {
+            if (index($token, "tag:") == 0) {
+                $filter{tag}{ lc substr($token, 4) } = 1;
+                next
+            }
+
+            if (index($token, "=") > 0) {
+                my ($name, $value) = split /=/, $token;
+                push @{ $filter{attr}{$name} }, $value;
+                next
+            }
+        }
+    }
+
+    # NOTE: I know that the way to first list the devices, then find their
+    # tags, then construct the reverse hash by tags, is pretty inefficient
+    # but it's also pretty easy to code, way easier for me than trying to
+    # find the correct SQL requests (or the DBIx::Class equivalents) :p
+
+    # fetch the list of devices of the given type(s)
+    my @types = map { split /[, ]+/ } @args;
+    my @devices = map {
+        RackMan::Tasks->task_list({ rackman => $rackman, type => $_ })
+    } @types;
+
+    # construct the lists of devices for each tag
+    my %devices_by_tag;
+
+    for my $device (@devices) {
+        next if $device->{name} eq "(null)";
+        my $rackdev = $rackman->device_by_id($device->{id});
+
+        # fetch the tags for this RackObject, filter them if needed
+        my @tags = map { s/\W+/_/g; $_ } map lc,
+            @{ $rackdev->explicit_tags },
+            @{ $rackdev->implicit_tags };
+        @tags = grep $wanted_tag{$_}, @tags if $tags_list;
+        next unless @tags;
+
+        # fetch the attributes of this RackObject
+        my %attr = %{ $rackdev->attributes };
+
+        # filter out devices without the requested tags or attributes
+        if ($filter) {
+            # filter on tags
+            if (exists $filter{tag}) {
+                next unless grep $filter{tag}{$_}, @tags;
+            }
+
+            # filter on attributes
+            if (exists $filter{attr}) {
+                my $keep = 0;
+
+                ATTR:
+                for my $name (keys %{ $filter{attr} }) {
+                    for my $value (@{ $filter{attr}{$name} }) {
+                        next unless exists $attr{$name} and defined $attr{$name};
+                        $keep ||= $value eq $attr{$name};
+                        last ATTR if $keep;
+                    }
+                }
+
+                next unless $keep;
+            }
+        }
+
+        # fetch the FQDN of this RackObject
+        my $fqdn = $attr{FQDN};
+        RackMan->warning("RackObject '$device->{name}' lacks a FQDN")
+            and next unless $fqdn;
+
+        # check if it correctly resolves
+        my (undef, undef, $addrtype, $length, @addrs) = gethostbyname($fqdn);
+        RackMan->warning("RackObject '$device->{name}' has a non resolvable FQDN")
+            and next unless @addrs;
+
+        # mogrify it for Cfengine
+        $fqdn =~ s/[-.]/_/g if $rackman->options->{class_names};
+
+
+        # to avoid conflicts, construct a mapping of each tag to its 
+        # "fully qualified name", which includes the parent tags
+        my (%tag_path, @comps);
+
+        # (private function to linearize the tag tree)
+        my $walk; $walk = sub {
+            my ($node) = @_;
+
+            if (keys %$node) {
+                for my $tag (keys %$node) {
+                    push @comps, $tag;
+                    $walk->($node->{$tag});
+                    pop @comps;
+                }
+            }
+            else {
+                $tag_path{$comps[0]} = join "_", reverse @comps;
+            }
+        };
+
+        $walk->($rackdev->tag_tree);
+
+        # post-process: lowercase, remove non-word chars
+        %tag_path = map { s/\W+/_/g; $_ } map lc, %tag_path;
+
+
+        # associate the FQDN to each corresponding tag
+        for my $tag (@tags) {
+            push @{ $devices_by_tag{$tag_path{$tag} || $tag} }, $fqdn;
+        }
+
+        # also associate the FQDN to each requested attribute
+        for my $attr_name (@attrs) {
+            push @{ $devices_by_tag{ $attr{$attr_name} } }, $fqdn;
+        }
+    }
+
+    # write the tags files
+    my $dir = $rackman->options->{"output-path"}
+           || $rackman->config->val(CONFIG_SECTION, "path");
+    mkpath $dir;
+
+    for my $tag (keys %devices_by_tag) {
+        my $file = catfile($dir, $tag);
+        open my $fh, ">", $file
+            or RackMan->error("can't write file '$file': $!");
+        print {$fh} map "$_\n", uniq sort @{ $devices_by_tag{$tag} };
+        close $fh;
+    }
+}
+
+
+1
+
+__END__
+
+=head1 NAME
+
+cfengine-tags - Generate tags files for Cfengine
+
+=head1 SYNOPSIS
+
+    cfengine-tags [--config /etc/rack.conf] [--tags tag1,tag2,...] [type]
+    cfengine-tags { --help | --man | --version }
+
+
+=head1 OPTIONS
+
+=head2 Standard options
+
+=over
+
+=item B<-c>, B<--config> I<path>
+
+Specify the path to the configuration file.
+Default to F</usr/local/etc/rack.conf>
+
+=item B<-O>, B<--path>, B<--output-path> I<path>
+
+Specify the path where to write the tags files. This option overrides
+the C<[cfengine-tags]/path> config parameter.
+
+=item B<-v>, B<--verbose>
+
+Run the program in verbose mode.
+
+=back
+
+=head2 Program options
+
+=over
+
+=item B<-T>, B<--tags> I<list of tags>
+
+Specify a comma-separated list of tags to process. This option overrides
+the C<[cfengine-tags]/tags> config parameter.
+
+=item B<-A>, B<--attrs> I<list of attributes>
+
+Specify a comma-separated list of attributes, which values will be used
+as tag names. This option overrides the C<[cfengine-tags]/attrs> config
+parameter.
+
+=item B<-F>, B<--filter> I<list of tokens>
+
+Specify a comma-separated list of tokens, defining tags and attribute
+values. This option overrides the C<[cfengine-tags]/filter> config
+parameter. See the corresponding documentation for more details.
+
+=item B<-N>, B<--class-names>
+
+Request to mogrify the host names so they are valid Cfengine class names.
+This was the default behaviour for versions of this program older than 1.06.
+This option is now needed to enable this behaviour.
+
+=back
+
+=head2 Help options
+
+=over
+
+=item B<-h>, B<--help>
+
+Print a short usage description, then exit.
+
+=item B<--man>
+
+Print the manual page of the program, then exit.
+
+=item B<-V>, B<--version>
+
+Print the program name and version, then exit.
+
+=back
+
+
+=head1 DESCRIPTION
+
+This program generate a bunch of definition files for Cfengine, one for
+each RackTables tag, containing the names of the devices with that tag.
+
+The list of tags to process can be given by the C<[cfengine-tags]/tags>
+config parameter or the C<--tags> option. If no explicit list is provided,
+process all the tags attached to the devices.
+
+In a similar way, a list of attributes can be given with the
+C<[cfengine-tags]/attrs> config parameter or the C<--attrs> option.
+The value of these attributes will be mogrified to generate additional tags.
+
+A filter can be given, either by the C<[cfengine-tags]/filter> config
+parameter or the C<--filter> option, to filter the result devices list:
+only the devices with any of the given tags or attribute name-value pairs
+will be included. A lack of tag or attribute definition disables the
+filtering of that type.
+
+
+=head1 CONFIGURATION
+
+cfengine-tags(1)'s configuration is stored in rack(1)'s configuration,
+with the following additional definitions.
+
+
+=head2 Section [cfengine-tags]
+
+=over
+
+=item *
+
+C<path> - specify the path where to write the tags files;
+will be overridden by the C<--output-path> option
+
+=item *
+
+C<type> - specify the default type if none is given to the command;
+default to C<"server">.
+
+=item *
+
+C<tags> - specify the defaults tags as a comma-separated list;
+will be overridden by the C<--tags> option
+
+=item *
+
+C<attrs> - specify some attributes, as a comma-separated list, which
+values will be used as tag names; will be overridden by the C<--attrs>
+option
+
+=item *
+
+C<filter> - specify a filter; will be overridden by the C<--filter>
+option. See L<"FILTER SYNTAX"> for details and examples.
+
+When defined, only the devices with the matching tags and attributes
+will be included in the resulting lists. When no tag or attribute
+pair is defined, the filtering fot that particular type is disabled.
+
+=back
+
+
+=head1 FILTER SYNTAX
+
+A filter is a comma-separated list of tokens, defining tags and
+attribute values used as criteria to determine which device to keep.
+The general syntax is:
+
+    token, token, ...
+
+with no arbitrary limits on the number of tokens.
+The syntax of a token works like this:
+
+=over
+
+=item *
+
+a token in the form C<tag:name> defines the tag with the given name
+
+=item *
+
+a token in the form C<attr=value> defines the pair (attribute, value)
+
+=back
+
+=head2 Examples
+
+=over
+
+=item *
+
+only keep the devices with the tags C<generic> and C<infra> (no attribute
+filtering):
+
+    tag:generic, tag:infra
+
+=item *
+
+only keep the devices with the attribute C<Use> set to C<prod> or C<preprod>
+(no tag filtering):
+
+    Use=prod, Use=preprod
+
+=item *
+
+only keep the devices with the tag C<cfengine> and the attribute C<Use>
+set to C<prod> or C<preprod>:
+
+    tag:cfengine, Use=prod, Use=preprod
+
+=back
+
+
+=head1 AUTHOR
+
+Sebastien Aperghis-Tramoni (sebastien@aperghis.net)
+
+=cut
+

@@ -1,0 +1,42 @@
+2009-07-04  Kingpin  <Martin@BLUEMAX>
+
+	* lib/RDF/Simple/Serialiser/N3.pm (render): try not to put <> around non-URI items
+	(render): count @prefix triples
+
+2009-07-03  Kingpin  <Martin@BLUEMAX>
+
+	* lib/RDF/Simple/Serialiser/N3.pm (render): if object has no ID, use its URI instead
+
+2009-07-01  Kingpin  <Martin@BLUEMAX>
+
+	* lib/RDF/Simple/Serialiser/N3.pm (render): do not output namespace prefixes whose value is undef or empty
+
+2009-01-12  Kingpin  <Martin@BLUEMAX>
+
+	* lib/RDF/Simple/Serialiser/N3.pm (render): renamed from render_rdfxml
+	
+	* lib/RDF/Simple/Serialiser/NT.pm (render): renamed from render_rdfxml
+
+2008-07-26  Kingpin  <Martin@BLUEMAX>
+
+	* lib/RDF/Simple/Serialiser/NT.pm (render_rdfxml): use Regexp::Common to detect numeric values
+
+	* lib/RDF/Simple/Serialiser/N3.pm (render_rdfxml): use Regexp::Common to detect numeric values
+
+2008-07-16  Kingpin  <Martin@BLUEMAX>
+
+	* t/foaf-nt.t: new test
+
+	* lib/RDF/Simple/Serialiser/NTriples.pm: new module
+
+	* lib/RDF/Simple/Serialiser/NT.pm: new module
+
+2008-07-07  Kingpin  <Martin@BLUEMAX>
+
+	* lib/RDF/Simple/Serialiser/N3.pm (get_triple_count): new method
+	(reset_triple_count): new method
+
+2008-04-29    <Martin@BLUEMAX>
+
+	* first release
+

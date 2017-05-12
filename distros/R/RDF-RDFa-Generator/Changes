@@ -1,0 +1,54 @@
+RDF-RDFa-Generator
+==================
+
+Created:      2010-05-05
+Home page:    <https://metacpan.org/release/RDF-RDFa-Generator>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDFa-Generator>
+
+0.103  2012-12-12
+
+ - (Bugfix) Fix strange buglet that affected RDF::RDFa::Linter.
+ - (Packaging) Upgrade distribution build system.
+ - Drop common::sense and parent.pm deps.
+
+0.102  2011-07-06
+
+ - (Bugfix) <meta> element should name @name, not @nane.
+ - (Bugfix) Namespaces in HTML::Head and HTML::Hidden.
+
+0.101  2010-09-06
+
+ - (Addition) Icons for a few extra classes.
+ - (Addition) Support 'namespaces' option for the constructor, for
+   compatibility with other Trine serialisers.
+ - (Addition) use RDF::Prefixes.
+
+0.100  2010-07-25
+
+ - (Addition) HTML::Pretty now includes cross-links to other resources.
+
+0.05  2010-05-27
+
+ - (Bugfix) UTF-8 fixes.
+
+0.04  2010-05-21
+
+ - HTML::Hidden and HTML::Pretty now use @about instead of @src to set the
+   subject URI.
+ - HTML::Pretty no longer makes 'javascript:' URLs into links.
+
+0.03  2010-05-19
+
+ - (Addition) HTML::Pretty can now force safe HTML (prevents injection
+   attacks).
+ - (Bugfix) HTML::Pretty Fallback to sorting by object now works.
+
+0.02  2010-05-18
+
+ - (Addition) HTML::Pretty can now include additional textual notes in the
+   output. This functionality added for RDF::RDFa::Linter.
+ - Using FamFamFam Silk icons.
+
+0.01  2010-05-09  # Original version
+
+

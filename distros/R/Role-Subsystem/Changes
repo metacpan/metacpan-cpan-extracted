@@ -1,0 +1,14 @@
+Revision history for Role-Subsystem
+
+0.101341  2013-10-15 22:21:30 America/New_York
+          update bugtracker and repo metadata
+
+0.101340  2010-05-14 21:46:51 America/New_York
+          the name of the "what_id" method is now a parameter
+
+0.101262  2010-05-06 15:00:22 America/New_York
+          further expanded documentation
+
+0.101261  2010-05-06 11:33:42 America/New_York
+          second release
+          rejiggered documentation

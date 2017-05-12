@@ -1,0 +1,103 @@
+1.12 SUN 20 April 2014, 16:00am BST
+  - ... and I'm done for another decade. Warning about
+    deprecation added, quietened down some warnings.
+
+1.11 Sun 20 April 2014, 11:20am BST
+  - Version bump to fix permissioning
+
+1.10 Mon 14 April 2014, 01:55pm BST
+  - TEN YEAR ANNIVERSARY RELEASE or something
+  - Re-release to get back authorized status
+  - perltidy'd the source
+  - Stopped RTF::Config from altering the PATH
+  - 5.6.2 new minimum version
+  - Added 'use warnings' throughout
+
+1.09 Tue 30 March 2004, 13:00pm BST
+
++ Decided to release a 'production' version. It works, it works
+  well, it just lacks some documentation. This way, people will
+	find it. That's good.
+
++ Fixed a bug that'd allow trailing data after the last }
+
+1.8_7 Wed 17 March 2004, 15:00pm GBT
+
++ Actually fixed ansi/charmap problem actually for real :-/
+
+1.8_6 Sun 14 March 2004, 22:00pm GBT
+
++ 'ansi' and 'char_map' files put into modules, to make
+  packing the module into an executable easier, and to
+  make some really nasty code redundant
++ RTF::TEXT::Converter does The Right Thing with entities
+  and blank lines, even on non \ansi files...
++ Little files now get converted properly
+- \ulnone treated like \ul0 in RTF::Control
+
+1.8_5 Sat 24 January 2004, 10:45pm GBT
+
++ Documentation is almost done
++ RTF::Parser is fully tested
++ Final beta release?
+
+1.8_3 Jan 22 January 2004, 12:55pm GBT
+
++ Added documentation for the HTML and TEXT converting
+  modules
+
+1.8_2 Mon 12 January 2004, 07:10pm GBT
+
++ Added RTF::Control tests and documentation
++ Added more RTF::Parser docs
++ Moved executables into their own directory
+
+1.8_1 Thu 28 August 2003, 10:00pm GBT
+
++ Rewrote all of RTF::Parser
++ Documented RTF::Parser's interface
++ Added a nice big sample in the docs
+
+1.7 mercredi, 28 juillet 1999, 12:10:54 MET DST
+
+- Corrected problem with the loading of the char_map file
+  (problem reported by matt chisholm <strthrwr@prtr-13.ucsc.edu>)
+- Added a rtf to text converter
+
+1.6 jeudi, 11 mars 1999, 14:19:56 MET
+
+- Added tests
+
+1.5 mercredi,  3 mars 1999, 13:37:49 MET
+- minor enhancements of RTF::Parser
+- More coherent method naming
+  (e.g. groupStart() is now named group_start())
+
+1.4 vendredi, 26 février 1999, 13:20:02 MET
+- Added minimal support for numbered lists
+- many bugs corrected
+
+1.3 jeudi, 11 février 1999, 12:42:39 MET
+- HTML documents seems well-formed
+
+1.2 mercredi, 13 janvier 1999, 18:18:05 MET
+- Corrected bad access to the char_map file.
+
+1.1 vendredi, 18 décembre 1998, 15:09:28 MET
+- Better char processing.
+
+1.0 vendredi, 30 octobre 1998, 12:54:44 MET
+- Better processing of paragraphs in table
+- Added a binary() method to RTF::Parser
+
+0.9 vendredi, 23 octobre 1998, 13:35:00 MET DST
+- Added Makefile.PL from Neil Bowers (<neilb@cre.canon.co.uk>)
+- Added support for para justification processing.
+
+0.8 vendredi, 16 octobre 1998, 12:37:28 MET DST
+- Responded to a problem reported by Joerg Heitkoetter
+  (<joerg@de.uu.net>) thank to a patch of
+  Rolf Howarth (<rolf@parallax.co.uk>)
+
+0.7
+- Many helpful comments from Bruce gingery (<bgingery@gtcs.com>)

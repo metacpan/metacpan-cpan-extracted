@@ -1,0 +1,10 @@
+Revision history for Reflexive-Role-DataMover: 1.122130
+
+1.122130  2012-07-31 20:06:16 Europe/Amsterdam
+        Stave off bit rot with the newer versions of Reflex
+
+1.110030  2011-01-03 09:55:14 America/Chicago
+        Small bug fix in the tests to clean up the temp files
+
+1.103420  2010-12-08 03:50:21 America/Chicago
+        Initial Release

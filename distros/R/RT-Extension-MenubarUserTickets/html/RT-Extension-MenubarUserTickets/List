@@ -1,0 +1,14 @@
+<%init>
+</%init>
+<SCRIPT>
+	function gotoUserSubmit(form) {
+		form.Query.value += " AND Owner = '" + form.Owner.value + "'";
+	}
+</SCRIPT>
+<form method="post" action="/rt/Search/Results.html" name="gotoUser" onsubmit="gotoUserSubmit(this);">
+	<input type="hidden" name="Order" value="DESC"/>
+	<input type="hidden" name="OrderBy" value="Priority"/>
+	<input type="hidden" name="Query" value="(Status = 'new' OR Status = 'open')"/>
+	<input type="submit" class="button" value="<&|/l&>Show tickets for</&>"/>&nbsp;
+	<& /Elements/SelectOwner, Name => "Owner" &>
+</form>

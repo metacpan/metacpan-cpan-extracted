@@ -1,0 +1,31 @@
+#!/opt/perl-5.8.5/bin/perl
+use strict;
+
+use lib qw(/opt/rt3/lib);
+
+use RT;
+RT::LoadConfig;
+RT::Init;
+use RT::Ticket;
+
+my $top = RT::Ticket->new( $RT::SystemUser);
+$top->Create(Queue => 'general', Subject => 'Top TreeView Ticket');
+my $child_1 = new_child($top->id, 'second level #1');
+my $child_2 = new_child($top->id, 'second level #2');
+my $sub_1 = new_child($child_2->id, 'third level #1');
+my $sub_2 = new_child($child_2->id, 'third level #2');
+
+
+my $kid2 = RT::Ticket->new( $RT::SystemUser);
+$kid2->Create(Queue => 'general', Subject => 'another Second level TreeView Ticket', MemberOf => $top->id);
+$kid2->AddLink(Type => 'MemberOf', Target => $sub_2->id);
+
+
+
+sub new_child {
+    my $parent_id = shift;
+    my $subject = shift;
+    my $kid1 = RT::Ticket->new( $RT::SystemUser);
+    $kid1->Create(Queue => 'general', Subject => $subject.'-TreeView', MemberOf => $parent_id);
+    return($kid1);
+}

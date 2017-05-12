@@ -1,0 +1,118 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 78e50e186b04c8fe1defaa098f1c192181b3d837 COPYING
+SHA1 8a1535804954eed70c8bcaad7df114b8d16e88df Changelog.md
+SHA1 6f6abdf121d5de617e880980f1fc0d9ae84ddefd MANIFEST
+SHA1 30732a5045c730baf75d689f6ffbce7669da7da6 MANIFEST.SKIP
+SHA1 73a54df1bd239c268d5b823fc4fdb74f506edb1a META.yml
+SHA1 f165d0d77efc9e1a00c0fa107a8df457f117dce0 Makefile.PL
+SHA1 5c77896dfcdf2da5806d622ce8e2ba372d566ed5 README.md
+SHA1 03f28192870c15e56922d79d46bfbbc585b04a22 TODO.md
+SHA1 fff7ec23eec9774a0a9c5a6576a747fbc9756f9c etc/i-doit_api_proxy.php
+SHA1 7a73cfc5e6a04f8a569aaa86107205ea5a966fe5 etc/initialdata
+SHA1 1d6ebf88a8040e3cdd27f3f99116685155aa485c html/Callbacks/ReferenceIdoitObjects/Elements/Header/Head
+SHA1 03a8f163dd4ccf8f078b35c4dc0f1db36b3f0c0e html/Callbacks/ReferenceIdoitObjects/Elements/Tabs/Privileged
+SHA1 f1390db619ded9c84220d3690d08a66e6a4ef0ee html/Callbacks/ReferenceIdoitObjects/Ticket/Create.html/AfterBasics
+SHA1 17decfa5803e393bc073347eeb31293843b158c0 html/Callbacks/ReferenceIdoitObjects/Ticket/Create.html/FormStart
+SHA1 74a369d0bae0e265a6ce5d717dce8b612897b7ae html/Callbacks/ReferenceIdoitObjects/Ticket/Elements/ShowSummary/LeftColumn
+SHA1 6fb802f9e26a565e561906305065b516ed476800 html/Callbacks/ReferenceIdoitObjects/Ticket/ModifyAll.html/AfterBasics
+SHA1 ddb99585d29c36ef8c41f222d314efae0f0f0764 html/Elements/SelectIDoitObjects
+SHA1 bbc9508c3b054712c6ec81fef06c41e40f546b41 html/Elements/ShowIDoitObjects
+SHA1 fd32cd86b69b798719934d558aef56a70497a1a2 html/NoAuth/css/chosen.min.css
+SHA1 85ffcb7d3c6a6d6429631fd39ef70d4ebb97b7f4 html/NoAuth/css/i-doit_object_browser.css
+SHA1 383e0698bf8ea55a6fdec3456b3a60f89b2308c5 html/NoAuth/css/jquery.dataTables.min.css
+SHA1 9dd6a493d2044e12fcf21addfe0cd93293568d69 html/NoAuth/js/chosen.jquery.min.js
+SHA1 9e1e8dc22883cee14e20fa2921696cd330c7d7be html/NoAuth/js/jquery.dataTables.min.js
+SHA1 cb42186b9f07f9a011689cf5b66b54d9d14d556b html/NoAuth/js/referenceidoitobjects.js
+SHA1 b711e748cfcbe8616592e79e7f093a44d2aac5c4 html/Ticket/Elements/EditIDoitObjects
+SHA1 c77fea4fb03f449ba24b7d16b8ced188874aa3e8 html/Ticket/Elements/ShowIDoitObjects
+SHA1 bf259babc004a562f3f4f9d106920e662e7f70ef html/Ticket/ModifyIDoitObjects.html
+SHA1 232f4c97414c56d94f3b58d1d6a980ed4b7b72ce inc/Module/AutoInstall.pm
+SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
+SHA1 6f600f997754e378372022338397e11304bcd4a1 inc/Module/Install/Admin.pm
+SHA1 cd0a3b098547ab4e8ade00c5330aa9f6b3b8da1c inc/Module/Install/Admin/Bundle.pm
+SHA1 cb5e4e4e7ed502288b859696fac6bd88761b5095 inc/Module/Install/Admin/Compiler.pm
+SHA1 ade2cd33c1dd7a50ca7a583c038c1bae3e0dce4b inc/Module/Install/Admin/Find.pm
+SHA1 cbd7f1b8b1305e5e1e021d98c4ccd426abee636a inc/Module/Install/Admin/Include.pm
+SHA1 8b56c5ab23aff87d3f26ead0413ed76a27fbde6b inc/Module/Install/Admin/Makefile.pm
+SHA1 ef1e5c0c4b93909b88db1858a8dc1c3670917c00 inc/Module/Install/Admin/Manifest.pm
+SHA1 af2d9b16870213c343692025d8467ae7f98778f1 inc/Module/Install/Admin/Metadata.pm
+SHA1 b09e0ac66677f2d146b0e461665b5e5f26478bcd inc/Module/Install/Admin/ScanDeps.pm
+SHA1 74113163f6c42f84e0b18df6a8d2dc15ac21dc30 inc/Module/Install/Admin/WriteAll.pm
+SHA1 63e1527b13cdc1b5271e7215852df6d3de12adc4 inc/Module/Install/AutoInstall.pm
+SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
+SHA1 77f87d329ab629d75df7e5d3a23e5641f53f6652 inc/Module/Install/Bundle.pm
+SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
+SHA1 c7f612458ae4a2fababab8806d21ed31876aae4f inc/Module/Install/Compiler.pm
+SHA1 6cd2a70d0b2ad1a63280c4b56f35f0be5579b721 inc/Module/Install/DSL.pm
+SHA1 0bf8ecfd36d43df7f03832e8693146fdfca29821 inc/Module/Install/Deprecated.pm
+SHA1 dc0fddf64d77872bef20939c87af5f8b77e1280f inc/Module/Install/External.pm
+SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
+SHA1 0c70de66cdd063352766d49db176e5f710f75fe7 inc/Module/Install/Include.pm
+SHA1 253bd29a58ffd37e8c81b1905b05506311e254c3 inc/Module/Install/Inline.pm
+SHA1 a28f105ac4a31e0e91691c1da699dd5021f34c39 inc/Module/Install/MakeMaker.pm
+SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
+SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
+SHA1 47911f4ab8b32265e837017dc2be798161f8aaff inc/Module/Install/PAR.pm
+SHA1 696e605f50d9c5710f69f5a80513ef3c908fe0b1 inc/Module/Install/Philosophy.pod
+SHA1 3b092ed8ce4fa9ed6667f681b54f4a624695e508 inc/Module/Install/RTx.pm
+SHA1 5c589819986050dd79faf8572992a9790ae89f2e inc/Module/Install/RTx/Factory.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 ec573ce8b2ad78c33cabd2c5db16d89544f0bde3 inc/Module/Install/Run.pm
+SHA1 e3a659d39ea4dafc3710a699c3f6b1899b70fa54 inc/Module/Install/Scripts.pm
+SHA1 8057872efd55c155d12f009cb190a81f7f775703 inc/Module/Install/Share.pm
+SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
+SHA1 1349967ec3cd8c41a7717750ae23ede9824a2f39 inc/Module/Install/With.pm
+SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
+SHA1 4ba6b14ca5341c08031bd15306523b491dcaac4f lib/RT/Extension/ReferenceIDoitObjects.pm
+SHA1 30c2ba342f6736ab9c17b2a9896d5080082a4153 po/de.po
+SHA1 2d7b7c58e303c7c5e8c9eca06fb239a4b1a4aaee static/images/chosen/chosen-sprite.png
+SHA1 ac1d3dd7af917de06f285b5d10221d51a00d7a68 static/images/chosen/chosen-sprite@2x.png
+SHA1 4fd6412cf91a9486b25ffb06ff93d43c245bd5ef static/images/datatables/back_disabled.png
+SHA1 e834dda063b9f3b726a7e1d0d56dd4fd08256b6b static/images/datatables/back_enabled.png
+SHA1 d0cea8669214fdfdebc6d38249ddeb3cb0b5bd07 static/images/datatables/back_enabled_hover.png
+SHA1 c30deed1f703efd6e58e3188ea51fc6fab46f35f static/images/datatables/forward_disabled.png
+SHA1 63bbb33409d8420563e57a15b56e9bc5048e6f52 static/images/datatables/forward_enabled.png
+SHA1 b8dfb55cc3b5b250ef29838c83f2788fd45083de static/images/datatables/forward_enabled_hover.png
+SHA1 fdadf7f5935f4a411ab19366c6590546432acd0f static/images/datatables/sort_asc.png
+SHA1 2d39f08b8706a492e6c4847006c22ff1208949f6 static/images/datatables/sort_asc_disabled.png
+SHA1 cb35461ff7f6547daed299080563969b41fed878 static/images/datatables/sort_both.png
+SHA1 79bc8ee64be969c8c02db30a9317e534a3db7877 static/images/datatables/sort_desc.png
+SHA1 7bc88275f1d99623505dfa0d6730978e5c65525e static/images/datatables/sort_desc_disabled.png
+SHA1 21117f74c1256a9045626a08027068ea0e930842 static/images/i-doit.png
+SHA1 d2b7e4e31fe8e1c6b720e33448674102879e4246 static/images/ui-anim_basic_16x16.gif
+SHA1 3987a51914e4ffa806ad31ce27fedd752468e3bf t/00-load.t
+SHA1 3103325cf2332a7b30bb51bdddceeb0e1d915b36 t/boilerplate.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCAAGBQJYbmyGAAoJEMSWwRrcaVQBIfoP/0GVklR3Iwp3F+mHssKs6C+T
+Zt1WwfHJz6rckJXo9hv4XLfr33xDT8MjFuXkqKykXOO6Kt2fCV9lstK5payacdVf
+mA+HdSRQ/ilHtzq9pzKYoL+djmWHKZxodk6poZumybdpNtfMZIIwq9yM/G95x2zz
+cWaPoTiN/0+eiLRgbGpHyOnunWpG0M0IR00O9vOMmnlRXy84zwn3vRvC12ZLJ0HB
+j1vc3mK9iIShsOZhXCVRV18Kt7B8EvwfiLfIXVt590V9+iOfCky6oFfraXt/AKTq
+V2tdWPkZfcv9zeV+RAXgSJCLBZVstUrd7V/89nO+vmq8+SxJcDbtRVc1NfAFiL8C
+kE8HG9Ec534iWoM01xXzU402x8UeESkeWUfI9ZuRQXUx0ZDYDiuEMkZz/SVa48uR
+SUau0hp+Do5sVtuM61VKnxZuQACxWgAWR5Lgc5sk6X6/s8Q1UEi+zjM6AbvOgBfx
+fClLuCID4MtX/YjCpIAKUzmsMNZKnKqZH3q+Ss/RQ27mfh71LI42deDHCVbKFu99
+9CdNk3ymhmWcFQT9jXkRILZZn69aiB77MYBvikR6kfs4Bkhmva4AaAEnVXn1sOaQ
+xaBHsgFds4PLOuhrSp50FLAMpS5v3Zm58/z7VITBf1PJ+1tFiLGpUv9qgGLuBlj4
+IfItvEnhVeGiB66nFtFA
+=WC4T
+-----END PGP SIGNATURE-----

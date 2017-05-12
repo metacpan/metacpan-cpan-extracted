@@ -1,0 +1,20 @@
+-pbp      # Start with Perl Best Practices
+-w        # Show all warnings
+-iob      # Ignore old breakpoints
+#-l=0      # Allow lines to be as long as they want
+-l=79     # Allow lines to be as long as they want
+-mbl=2    # No more than 2 blank lines
+-i=2      # Indentation is 2 columns
+-ci=2     # Continuation indentation is 2 columns
+-vt=0     # Less vertical tightness
+-pt=1     # High parenthesis tightness
+-bt=1     # High brace tightness
+-sbt=1    # High square bracket tightness
+-isbc     # Don't indent comments without leading space
+-ole=unix # files need to be unixy
+
+-bbb      # breaks before major blocks
+-blbs=1   # put two spaces before each sub
+
+#-sct     # Stack closing tokens when possible to avoid lines with isolated opening tokens
+#-sot     # Stack opening tokens when possible to avoid lines with isolated opening tokens

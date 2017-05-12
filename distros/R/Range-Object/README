@@ -1,0 +1,54 @@
+Range::Object version 0.93
+==========================
+
+This suite of modules implements unified API for manipulating ranges of
+objects of different kinds.
+
+In terms of Range::Object namespace, a range is defined as a set of items,
+either disjointed (individual) or contiguous, or a combination of separate
+items and ranges. Intersecting or adjacent ranges are not supported directly
+and will be collapsed silently into wider contiguous range.
+
+Although Range::Object descendant module can store any number of separate
+values (objects) and ranges, it is optimized for storing contiguous ranges
+of arbitrary length with minimal memory and storage footprint; the other
+effect of this being fast serialization and deserialization of Range::Object
+instances. It cannot come without cost though; Range::Object uses more
+CPU cycles than similar hash-based modules.
+
+Good application for this kind of object storage can be an implementation
+of user permission tables for large number of objects, especially if such
+permissions are typically assigned in large contiguous ranges. For
+example, if an user has read permission for objects 1-10000 and write
+permission for objects 1-100, 200-300 and 1000-9999, storing these
+identificators as hash keys is memory expensive, and can become
+prohibive when number of tables and users increase. Compared to that
+approach, Range::Object can be a reasonable compromise between memory
+and CPU utilization.
+
+This module also comes useful for user input validation when dealing with
+HTML forms or something similar.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  List::Util
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 by Alexander Tokarev.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,12 @@
+1.25  Thu Oct 13 00:15:54 PDT 2016
+    - Refactored unit tests to use ref_ok instead of isa_ok
+    - Core dependency updates
+    - Version aligned with Client
+
+1.20  Thu May 14 22:30:11 PDT 2015
+    - Updated to support metadata feature in RPC::ExtDirect 3.20+
+    - More tests, as usual
+
+1.00  Tue Jun 24 21:37:54 2014
+    - Initial version 1.0 released to CPAN
+

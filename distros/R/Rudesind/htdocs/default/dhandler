@@ -1,0 +1,15 @@
+<%args>
+$gallery
+$image => undef
+</%args>
+
+<%init>
+if ($image)
+{
+    $m->comp( 'image.mas', %ARGS );
+}
+else
+{
+    $m->comp( 'gallery.mas', %ARGS );
+}
+</%init>

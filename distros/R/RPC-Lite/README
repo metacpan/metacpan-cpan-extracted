@@ -1,0 +1,46 @@
+RPC-Lite version 0.10
+=====================
+
+RPC::Lite is a lightweight, easy-to-use yet extensible framework
+for remote process communication.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+***NOTE: This module requires that your perl be compiled with
+         ithreads support, even if you're not planning on using
+         threading.
+
+This module requires these other modules and libraries:
+
+  REQUIRED
+
+    threads
+    threads::shared
+    IO::Socket
+    IO::Select
+    Data::Dumper
+
+  RECOMMENDED
+
+    JSON
+    XML::Simple
+ 
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Andrew Burke (aburke@bitflood.org)
+Copyright (C) 2010 by Jeremy Muhlich (jmuhlich@bitflood.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

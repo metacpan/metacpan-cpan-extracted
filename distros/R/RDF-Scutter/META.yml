@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         RDF-Scutter
+version:      0.1
+version_from: lib/RDF/Scutter.pm
+installdirs:  site
+requires:
+    LWP::RobotUA:                  0
+    RDF::Redland:                  1.0.2.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

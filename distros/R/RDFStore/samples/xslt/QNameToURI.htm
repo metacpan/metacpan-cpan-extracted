@@ -1,0 +1,53 @@
+
+<!DOCTYPE html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Mapping of Namespace qualified element names (QNames) to URIs</TITLE>
+<META NAME="keywords" CONTENT="XML,RDF,XLink,namespace,URI">
+<LINK href="../OHCG_Style.css" rel="stylesheet"/>
+</HEAD>
+<BODY>
+<H2>Mapping namespace qualitied element names to URIs</H2>
+<H2>a proposal</H2>
+<P>It is necessary to map namespace qualified element 
+names (<A href="http://web3.w3.org/TR/REC-xml-names/#ns-qualnames">QNames</A>) to URIs for a variety of purposes but particularly in RDF. The 
+RDF Model and Syntax specification directs this <A href="http://web3.w3.org/TR/REC-rdf-syntax/#grammar">mapping</A> to occur via concatenation of the namespace URI 
+with the local name. This is acceptable when the namespace URI does 
+not end with a character which cannot be used to begin an element 
+name (an <A href="http://web3.w3.org/TR/REC-xml-names/#NT-NCName">NCName</A>) i.e. a <A href="http://www.w3.org/TR/REC-xml#NT-Letter">Letter</A> or 
+'_', because the first non Letter or '_' encountered from the end of the URI can 
+be used to delimit the namespace URI from the element name. Yet when the URI 
+ends in a Letter or '_', several URI, NCName pairs may map to the same 
+concatenated URI.</P>
+<P>It is proposed for namespace URIs that when a namespace URI ends in a Letter 
+or '_' that a '#' be inserted between the namespace URI and the element tag name 
+to create the resultant URI. When such a URI is resolvable to a resource of 
+media type text/html or text/xml, the fragment identifier resolves to an 
+identifier of the element name. When the document is of type text/html, the 
+identifier might point to a section which describes the element. When the 
+document is of type text/xml (or application/xml) and the base document contains 
+an RDF Schema, the identifier is expected to point to the Property or Class 
+definition for the element name.</P>
+<P>This mapping has the additional effect of constraining the vocabulary or 
+grammar for a given namespace to those specified by the authority which controls 
+the base URI. In particular when resolution of the URI involves a DNS lookup, 
+the ultimate authority is the Administrative Contact for the root DNS name, 
+though this contact may delegate authority for derivatives of this DNS entry as 
+it sees fit. For example given a root DNS entry:</P>
+<P>openhealth.org</P>
+<P><A href="ftp://openhealth.org">ftp://openhealth.org</A></P>
+<P><A href="http://www.openhealth.org">http://www.openhealth.org</A></P>
+<P><A href="http://www.openhealth.org/RDF/">http://www.openhealth.org/RDF/</A></P>
+<P>are derivatives which might be administered 
+independently. If the namespace URI does resolve to a document, the absense of a 
+particular fragment identifier might indicate that the element name is not part 
+of the vocabulary associated with the namespace 
+URI. In any case, given this mapping of a namespace qualified element name to a URI, the ability to create
+new element names within a given namespace URI qualified XML namespace is the same as the ability to create new URIs derived from the namespace URI.</P>
+<P>Jonathan Borden</P>
+<P><a href="http://www.openhealth.org">The Open Healthcare Group</a></P>
+<P>September 17, 2000</P>
+<P>&nbsp;</P>
+<P>&nbsp;</P>
+</BODY>
+</HTML>

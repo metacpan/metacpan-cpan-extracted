@@ -1,0 +1,61 @@
+=head1 NAME
+
+ResourcePool::Factory::DBI - A L<DBI|DBI> Factory for L<ResourcePool|ResourcePool>
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Factory::DBI;
+ 
+ my $factory =  ResourcePool::Factory::DBI->new(
+                        $data_source,
+                        $username,
+                        $auth,
+                        \%attr);
+
+=head1 DESCRIPTION
+
+
+This class is a factory class for L<DBI|DBI> resources to be used with the ResourcePool.
+
+Please have a look at L<ResourcePool::Factory|ResourcePool::Factory> documentation to learn about the purpose of such a factory.
+
+=head2 S<ResourcePool::Factory::DBI-E<gt>new($data_source, $username, $auth, \%attr)>
+
+Takes the same arguments as the connect method of the L<DBI|DBI> perl module.
+
+=over 4
+
+=item $data_source
+
+The L<DBI|DBI> data source.
+
+=item $username
+
+The username used to authenticate.
+
+=item $auth
+
+The password used to authenticate.
+
+=item \%attr
+
+L<DBI|DBI> attributes.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBI|DBI>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Factory|ResourcePool::Factory>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2004 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

@@ -1,0 +1,70 @@
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+    // Load the Visualization API and the piechart package.
+    google.load('visualization', '1', {'packages':['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.setOnLoadCallback(drawChart);
+
+    // Callback that creates and populates a data table,
+    // instantiates the pie chart, passes in the data and
+    // draws it.
+    function drawChart() {
+        // Create our data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'DetectTime');
+%#        data.addColumn('number', 'botnet infrastructure');
+%#        data.addColumn('number', 'botnet domain');
+%#        data.addRow(['2011-01-01',0,1]);
+%#        data.addRow(['2011-01-02',1,10]);
+% foreach (keys %impacts){
+        data.addColumn('number', '<% $_ %>');
+% }
+% $m->out('data.addRows('.$json.');');
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, {width: 800, height: 480, Vaxis: {maxValue: 10}, curveType: "function"});
+    }
+</script>
+<!--Div that will hold the pie chart-->
+<div id="chart_div"></div>
+
+<%init>
+    use Data::Dumper;
+    use DateTime::Format::DateParse;
+    my @entries = @{$feed->{'feed'}->{'entry'}};
+    my $hash = {};
+    my @impacts;
+    foreach my $e (@entries){
+        my $impact = $e->{'impact'};
+        my $dt = $e->{'detecttime'};
+        $dt = DateTime::Format::DateParse->parse_datetime($dt);
+        $dt = $dt->ymd();
+        if($hash->{$dt}->{$impact}){
+            $hash->{$dt}->{$impact}++;
+        } else {
+            $hash->{$dt}->{$impact} = 1;
+        }
+    }
+    my @array;
+    my %impacts;
+    my @dt_sorted = sort { $a cmp $b } keys %$hash;
+
+    foreach my $date (@dt_sorted){
+        my @impact_sorted = sort { $a cmp $b } keys (%{$hash->{$date}});
+        warn Dumper(@impact_sorted);
+        foreach (@impact_sorted){
+            
+            push(@array,[$date,$hash->{$date}->{$_}]);
+        }
+    }
+    my $json = JSON::to_json(\@array);
+    warn Dumper($json);
+</%init>
+
+<%args>
+$feed => undef
+$string => 'impact'
+$number => 'count'
+$q  => undef
+</%args>

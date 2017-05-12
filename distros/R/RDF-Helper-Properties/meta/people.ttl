@@ -1,0 +1,26 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+    a           foaf:Person ;
+    owl:sameAs  <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+    foaf:name   "Kjetil Kjernsmo" ;
+    foaf:mbox   <mailto:kjetilk@cpan.org> .
+
+<http://kasei.us/about/foaf.xrdf#greg>
+    a           foaf:Person ;
+    owl:sameAs  <http://purl.org/NET/cpan-uri/person/gwilliams> ;
+    foaf:name   "Gregory Todd Williams" ;
+    foaf:mbox   <mailto:gwilliams@cpan.org> .
+
+<http://tobyinkster.co.uk/#i>
+    a           foaf:Person ;
+    owl:sameAs  <http://purl.org/NET/cpan-uri/person/tobyink> ;
+    foaf:name   "Toby Inkster" ;
+    foaf:mbox   <mailto:tobyink@cpan.org> .
+
+<http://purl.org/NET/cpan-uri/person/haarg>     
+    a           foaf:Person ;
+    foaf:nick   "haarg";
+    foaf:name   "Graham Knop" .

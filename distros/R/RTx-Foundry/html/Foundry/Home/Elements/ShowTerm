@@ -1,0 +1,15 @@
+%# You will feel hungry again in another hour.
+
+% my $TemplateObj = RT::Template->new($RT::SystemUser);
+% $TemplateObj->Load($Template);
+<p align="center">
+<textarea style="width: 80%" rows="15" cols="79" readonly><% $TemplateObj->Content %></textarea>
+<br><br>
+<input type="hidden" name="Step" value="1">
+<input type="submit" name="Action-Agree" value="<&|/l&>I Agree</&>">
+<input type="submit" name="Action-Disagree" value="<&|/l&>I Do Not Agree</&>" onclick="this.disabled = true; location.href='/'; return false">
+</p>
+
+<%ARGS>
+$Template
+</%ARGS>

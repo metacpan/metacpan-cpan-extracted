@@ -1,0 +1,12 @@
+0.5.2 - CPAN Testers cleanup dealing with dependency specification
+cleanliness and conditionalizing non-core module loads / skips.
+Includes Kwalitee improvements and support to make REST::Resource more
+graceful in a restrictive environment where optional components are
+not available (e.g. FCGI, JSON, XML::Dumper).  Fixed POD oddities.
+
+0.5.1 - Deliverable / distribution cleanup to deal with broken
+presumption that Module::Build can be replaced by ExtUtils::MakeMaker.
+Also cleaned up actual faults in deliverable.
+
+0.5.0 - Initial release to CPAN and significant fork from
+WWW::Resource.

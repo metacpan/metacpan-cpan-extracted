@@ -1,0 +1,15 @@
+=for layout widget
+
+[% list %]
+
+=for layout list
+
+<ul>
+[% content %]
+</ul>
+
+=for layout item
+
+<li>[% value | html %]</li>
+
+=cut

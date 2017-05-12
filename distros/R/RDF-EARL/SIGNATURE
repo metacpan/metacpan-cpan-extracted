@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 17feca7174338970fe50f9d444f55a9b3e7bef7f Changes.ttl
+SHA1 029a57ae9dd3e7fac2306fecfc0a2aa9279f6190 MANIFEST
+SHA1 7bd49ec598d559b7246f735ac29a26afca42ff3e META.yml
+SHA1 91877fc66bda208db520e8e94497b77ad8326365 Makefile.PL
+SHA1 958b4df070972e0a34224d5cf40b4ebcf6826064 README
+SHA1 53b08a2e448ac8751374a8eed725dfc09aa5fb63 inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 150c0cf35e6b96a0d8eea62194c8abc0da182c86 inc/Module/Install/Base.pm
+SHA1 70c3500a28a1e5d255599ce3f44e9a7b80759109 inc/Module/Install/Can.pm
+SHA1 5f0d6d859fb1cf84cd9bbb1e263d18f581c7e537 inc/Module/Install/Fetch.pm
+SHA1 75f901a4b514a772b03223e1b08e3b5cc78b1667 inc/Module/Install/Makefile.pm
+SHA1 29044991152cb220fcd2a5ccc3512139d2f5f577 inc/Module/Install/Metadata.pm
+SHA1 896bba60ebe29b3b60fce8414f923fec97bf53e1 inc/Module/Install/Win32.pm
+SHA1 e5c82926a05f844765964b013b31c48eefbb208c inc/Module/Install/WriteAll.pm
+SHA1 6d1de64f976e998074a187422e8c9740e2167087 lib/RDF/EARL.pm
+SHA1 0a42f7a1b2998e41dadf45542663b053ba79bb8e t/00-load.t
+SHA1 dda20899a167933dd890d0296420003f759c77ed t/01-simple.t
+SHA1 9115f7ffe1933ad736dc292f3c89595b36ed6aa2 xt/pod-coverage.t
+SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlA6Q6MACgkQhPK6VMqoyC33zgCfVPcmHS4ZYgOVanO4BErQGOgQ
+yLgAoJq0f/TEXys1hz4UkhRK8gSma+Ge
+=ynjQ
+-----END PGP SIGNATURE-----

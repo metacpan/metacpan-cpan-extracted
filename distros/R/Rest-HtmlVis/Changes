@@ -1,0 +1,50 @@
+Revision history for Rest-HtmlVis
+
+0.13  2016-04-14 16:45:05 CEST
+	Fixed missing Footer
+
+0.12  2016-04-11 15:32:10 CEST
+	Added footer support
+	Fixed default params in form
+
+0.11  2016-04-09 18:51:09 CEST
+	Added support fir GET_FORM
+	Added error handling
+
+0.10  2016-04-09 00:45:39 CEST
+	Added support for utf8
+	Rewrite Content block
+	Set right urlmap
+
+0.09  2016-04-08 02:46:14 CEST
+	Added yaml parser for struct
+
+0.08  2015-09-08 14:51:57 CEST
+	Form configuration is case insensitive
+	Added "Get As" to post form
+
+0.07  2015-09-03 13:54:05 CEST
+	Fixed baseurl link in conf
+	Changed links to link
+
+0.06  2015-08-28 16:20:13 CEST
+	Added radio and checkbox form elements
+
+0.05  2015-05-20 18:52:42 CEST
+	Added env to GET_FORM
+	Added select element for GET_FORM
+	Fixed empty content
+
+0.04  2015-04-02 10:17:30 CEST
+	Fixed global variable
+
+0.03  2015-03-31 19:10:43 CEST
+	Changed default static path to htmlvis, for better compatibility
+	Added missing bootstrap directory
+
+0.02  2015-03-24 02:29:48 CET
+	Switch to milla
+
+0.01    4. Mar 2015
+        First version.
+

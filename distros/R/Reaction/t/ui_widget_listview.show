@@ -1,0 +1,43 @@
+use strict;
+use warnings;
+use Reaction::UI::Widget::ListView;
+use Data::Dump::Streamer qw(Dump);
+
+my ($name, $data);
+
+sub FakeRCTX::render {
+  shift;
+  ($name, $data) = @_;
+}
+
+sub FakeVP::field_names { [ qw(foo bar baz) ] }
+
+sub FakeVP::field_label_map { ({ foo => 'Foo', bar => 'Bar', baz => 'Baz' }); }
+
+my $w = bless({ viewport => 'VIEWPORT' }, 'Reaction::UI::Widget::ListView');
+
+my $rctx = bless({}, 'FakeRCTX');
+
+$w->render_header($rctx, { self => $w, viewport => bless({}, 'FakeVP') });
+
+print "Name: ${name}\n";
+print "Data: ";
+print Dump($data);
+
+my $first = $data->{_}->();
+
+print "First: ";
+print Dump($first);
+
+$first->($rctx);
+
+print "Name: ${name}\n";
+print "Data: ";
+print Dump($data);
+
+my $inner = $data->{_}->();
+
+print "Inner: ";
+print Dump($inner);
+
+print $inner->();

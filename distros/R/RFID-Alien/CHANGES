@@ -1,0 +1,21 @@
+Version 0.001
+=============
+
+Initial release.
+
+Version 0.002
+=============
+
+Factored much code into seperate classes, available seperately in
+RFID::Base and RFID::EPC.  These changes should allow different
+readers to be addressed with roughly the same interface, much like
+accessing different databases with DBI drivers.
+
+
+Version 0.003 (Wed Apr 26 13:14:23 EDT 2006)
+============================================
+
+Fix incorrect timeout units in reader modules.
+
+alien.pl: Add -r "restart" option to automatically re-connect on error.
+          Add -q "quiet" option to suppress all output except ISEE messages.

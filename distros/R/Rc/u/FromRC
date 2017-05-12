@@ -1,0 +1,9 @@
+rc.h
+footobar.c
+lex.c
+input.c
+nalloc.c
+heredoc.c
+parse.y
+print.c
+tree.c

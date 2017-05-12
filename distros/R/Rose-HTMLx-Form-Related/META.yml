@@ -1,0 +1,30 @@
+---
+abstract: 'RHTMLO forms, living together'
+author:
+  - 'Peter Karman <karman@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.132510'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Rose-HTMLx-Form-Related
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dump: 0
+  MRO::Compat: 0
+  Rose::HTML::Objects: 0
+  Rose::HTMLx::Form::Field::Autocomplete: 0
+  Rose::HTMLx::Form::Field::Boolean: 0
+  Rose::HTMLx::Form::Field::PopUpMenuNumeric: 0
+  Rose::HTMLx::Form::Field::Serial: 0.002
+  Scalar::Util: 0
+  Test::More: 0
+version: 0.24

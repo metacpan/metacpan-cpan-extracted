@@ -1,0 +1,64 @@
+NAME
+    RFC::RFC822::Address -- RFC 822 style address validation.
+
+SYNOPSIS
+        use RFC::RFC822::Address qw /valid/;
+
+        print "Valid\n" if valid 'abigail@example.com';
+
+DESCRIPTION
+    This module checks strings to see whether they are have the valid
+    syntax, as defined in RFC 822 [1]. One subroutine, "valid", can be
+    imported, which takes a single string as argument. If the string is
+    valid according to RFC 822, a true value is returned, else a false value
+    is returned.
+
+REFERENCES
+    [1] David H. Crocker (revisor): "STANDARD FOR THE FORMAT OF ARPA
+        INTERNET TEXT MESSAGES". RFC 822. 13 August 1982.
+
+CAVEATS and BUGS
+    This module sets the variable $Parse::RecDescent::skip. This will
+    influence all other "Parse::RecDescent" parsers. And this parser will
+    break if you set $Parse::RecDescent::skip to another value. It doesn't
+    look that it is possible to set an alternative skip value for each
+    parser, other than setting the skip value on each production.
+
+    Example A.1.5 in RFC 822 is wrong. It should use
+    *"Galloping Gourmet"@ANT.Down-Under*.
+
+    This module should have been named "RFC::822::Address". However, perl
+    5.004 doesn't like the 822 part, and at the time of this writing MacPerl
+    is still at 5.004.
+
+    This module is slow.
+
+DEVELOPMENT
+    The current sources of this module are found on github,
+    <git://github.com/Abigail/rfc--rfc822--address.git>.
+
+AUTHOR
+    Abigail <mailto:cpan@abigail.be>.
+
+COPYRIGHT and LICENSE
+    This program is copyright 1999, 2000, 2009 by Abigail.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+

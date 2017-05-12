@@ -1,0 +1,7 @@
+2011-06-25 Jan Gehring <jan.gehring, gmail.com> (0.2.0)
+  * changed the api. now you have to name the full augeas path.
+  * added get action.
+
+2011-06-25 Jan Gehring <jan.gehring, gmail.com> (0.1.0)
+  * inital version
+

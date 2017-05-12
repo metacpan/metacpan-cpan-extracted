@@ -1,0 +1,50 @@
+
+BACKGROUND
+
+"Random Jungle" is a fast implementation of the Random Forests algorithm, developed
+and released under an open source license by D. Schwarz, I. Konig, and A. Ziegler [1].
+See http://randomjungle.sourceforge.net/ for information about the Random Jungle project.
+
+RandomJungle::Jungle provides a simplified interface to access Random Jungle
+input and output data. See RandomJungle::Tree and RandomJungle::Tree::Node for
+methods relating to the classification trees produced by Random Jungle.  The other modules
+in the RandomJungle bundle (e.g., RandomJungle::File::*) are primarily for internal use.
+
+SCOPE
+
+The RandomJungle* modules in this release DO NOT implement the Random Forests algorithm.
+Instead, they are designed to provide a simplified interface to the input and output data
+files for the Random Jungle implementation.
+
+Furthermore, these modules are not intended to be a comprehensive library.  They were created
+to solve specific problems encountered by a research team.  Specifically, these modules were
+designed to work under the parameters in which our team uses Random Jungle (e.g., genotype
+data in a specified ped format, out-of-bag and XML output file parameters set).  An example
+of how we call Random Jungle is as follows:
+
+rjunglesparse-1.0.361_static --file=input.raw --ntree=100 --depvarname=PHENOTYPE
+--outprefix=outputfile --impmeasure=3 --memmode=2 --maxtreedepth=100
+--targetpartitionsize=1 --pedfile -w2 --oob
+
+See the files that are included in the /t directory for examples of file format.  See also the
+/scripts directory for examples of how these modules can be used with the input/output files.
+
+These modules will not provide full functionality if other command line options (e.g., file formats)
+are used.  In that case, these modules will need to be extended (I tried to design them with that
+in mind).  Code contributions are welcome.
+
+INSTALLATION
+
+You should be able to use this set of instructions to install the module:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+REFERENCES
+
+[1]:  Schwarz et al.  On safari to Random Jungle: a fast implementation of Random Forests for high-dimensional data.
+Bioinformatics 26(14):1752-8. July 2010. http://www.ncbi.nlm.nih.gov/pubmed/20505004

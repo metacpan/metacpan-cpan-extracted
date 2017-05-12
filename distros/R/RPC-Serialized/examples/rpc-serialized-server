@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+#
+# $HeadURL: https://svn.oucs.ox.ac.uk/people/oliver/pub/librpc-serialized-perl/trunk/examples/rpc-serialized-server $
+# $LastChangedRevision: 1327 $
+# $LastChangedDate: 2008-10-01 16:16:56 +0100 (Wed, 01 Oct 2008) $
+# $LastChangedBy: oliver $
+#
+
+use strict;
+use warnings FATAL => 'all';
+
+use RPC::Serialized::Config;
+
+my $config = RPC::Serialized::Config->new( shift @ARGV );
+
+my $class = $config->server_class;
+eval "require $class"
+    or die "Failed to load $class: $@";
+
+my $server = $class->new( $config->data_serializer );
+
+if ( $config->acl_path ) {
+    require RPC::Serialized::AuthzHandler::ACL;
+    my $authz = RPC::Serialized::AuthzHandler::ACL->new( $config->acl_path );
+    $server->authz_handler($authz);
+}
+
+while ( my ( $h, $c ) = each %{ $config->handlers } ) {
+    $server->handler( $h, $c );
+}
+
+$server->process;

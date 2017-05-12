@@ -1,0 +1,21 @@
+Revision history for Perl extension Regexp::Parserton.
+
+0.51  2016-04-01T13:01:00
+	- Fix pre-reqs.
+	- Rename perl-5.21.11/regexp.t perl-5.21.11/regexp.txt so my make file 'validator' ignores it.
+	- Add t/generate.tests.txt.
+	- Remove scripts/synopsis.(pl,log) and rename scripts/simple.pl to scripts/synopsis.pl.
+	- Clean up this file, and hence also Changelog.ini.
+
+0.50  2016-04-01T10:13:00
+	- Add BNF for extended patterns.
+	- Expand scripts/synopsis.pl to effectivly run tests.
+	- Create a simplistic t/test.t.
+	- Rename as_string() to _string2re().
+	- Add new as_string().
+	- Expand BNF. Output to indented tree.
+	- Add reset();
+	- Add scripts/simple.pl and scripts/test.pl (a non-test copy of t/test.t).
+
+0.01  2016-02-14T12:40:00
+	- Original version

@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+@ScripActions = (
+    {  Name        => '[CustomerGroups] Substitute on ticket Requestor, Cc and AdminCc', # loc
+       Description => 'Substitute users for customer groups ticket Requestor, Cc and AdminCc' , # loc
+       ExecModule  => 'ChangeUsersToGroups',
+       Argument    => 'Requestor,Cc,AdminCc'
+    },
+    {  Name        => '[CustomerGroups] Substitute on ticket Requestor and Cc', # loc
+       Description => 'Substitute users for customer groups ticket Requestor and Cc' , # loc
+       ExecModule  => 'ChangeUsersToGroups',
+       Argument    => 'Requestor,Cc'
+    },
+    {  Name        => '[CustomerGroups] Substitute on ticket Requestor', # loc
+       Description => 'Substitute users for customer groups ticket Requestor' , # loc
+       ExecModule  => 'ChangeUsersToGroups',
+       Argument    => 'Requestor'
+    },
+)

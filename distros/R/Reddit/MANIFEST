@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Reddit.t
+lib/Reddit.pm
+lib/Reddit/Type/Subreddit.pm
+lib/Reddit/Type/User.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

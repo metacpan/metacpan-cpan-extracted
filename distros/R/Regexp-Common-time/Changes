@@ -1,0 +1,37 @@
+Revision history for Perl module Regexp::Common::time.
+
+0.07 2014-09-08
+    - Update tests.
+    - Add use warnings;
+
+0.06 2014-08-26
+
+    - Remove Build.PL and keep only Makefile.PL 
+    - Add resources to META files.
+
+0.05 2013-11-20
+
+    - Fix test RT #87476
+
+
+0.04 2008-05-29
+
+    - Possible fix for Taiwanese locale test failures.
+      Thanks to CPAN tester "imacat".
+
+
+0.03 2008-05-25
+
+    - Bug fix: Makefile.PL had a syntax error.
+
+
+0.02 2008-05-23
+
+    - Add mail, MAIL, and american formats.
+    - Fix many broken test cases.
+
+
+0.01 2005-12-04
+
+    - First version
+

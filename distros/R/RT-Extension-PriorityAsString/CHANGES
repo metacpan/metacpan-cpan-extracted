@@ -1,0 +1,33 @@
+1.04 2016-04-01
+ - Mark compatibility with RT 4.4
+
+1.03 2014-12-18
+ - Sign the release
+
+1.02 2014-09-29
+ - Provide our own copy of CSSClass(), for compatibility with RT 4.0
+
+1.01 2014-09-29
+ - Ensure that priorities with spaces have them translated to _ before
+   being embedded in CSS classes
+
+1.00 2014-06-17
+ - Actually make PriorityAsStringOrder optional, as the documentation
+   claimed
+ - Packaging updates
+
+0.05 2014-06-09
+ - Allow restricting PriorityAsString to individual queues
+ - Avoid inserting HTML into CSV export
+
+0.04 2011-06-14
+ - RT4 compatibility
+ - better localization and css classes from cloos
+
+0.03 2009-09-05
+ - return exact match if it's in the map, switch to heuristic only after
+   the check
+
+0.02 2009-06-18
+ - initial release
+

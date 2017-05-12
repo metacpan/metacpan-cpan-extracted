@@ -1,0 +1,16 @@
+1.02 2014-12-18
+ - Packaging updates
+
+1.01 2014-07-01
+ - Drop patch for Creator/Created, which is not necessary
+
+1.00 2014-06-17
+ - Packaging updates
+
+0.02 2013-01-02
+ - Set the transaction creator by altering currentuser, not by passing
+   Creator/Created
+
+0.01 2012-07-15
+ - First version
+

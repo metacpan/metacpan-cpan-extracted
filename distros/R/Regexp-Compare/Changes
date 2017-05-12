@@ -1,0 +1,99 @@
+Revision history for Perl extension Regexp::Compare.
+
+0.01  Sat Apr 29 19:04:23 2006
+	- original version
+
+0.02  Sat May  6 07:40:31 2006
+	- fixed some memory leaks
+	- more successful compares (i.e. of the same regexps)
+	- more tests
+
+0.03  Sun May 21 08:11:16 2006
+	- fixed infinite loop
+	- fixed some memory leaks
+	- more successful compares (now recognizing non-greedy constructs)
+	- added some comments
+	- more tests
+
+0.04  Tue Jun 13 15:19:34 2006
+	- better compares for curlies (including fix for https://rt.cpan.org/Ticket/Display.html?id=19864 )
+	- more tests
+
+0.05  Fri Jun 16 07:06:00 UTC 2006
+	- better parsing of character classes (including fix for https://rt.cpan.org/Ticket/Display.html?id=19861 )
+	- more tests
+
+0.06  Sun Feb 18 07:28:28 UTC 2007
+	- fixed infinite loop
+
+0.07  Mon Mar 24 14:13:23 UTC 2008
+	- support for perl 5.10
+
+0.08  Thu Apr 17 15:00:13 UTC 2008
+	- fixed bug in generic quantifier (a.k.a. curly brace) handling
+
+0.09  Sat Aug 29 10:47:34 UTC 2009
+	- better Unicode handling
+	- updated save_destructor call for perl 5.10.1
+
+0.10  Thu Sep  3 07:00:17 UTC 2009
+	- more systematic comparison of character classes
+
+0.11  Sun Oct 31 07:14:22 UTC 2010
+	- fixed bug in generic quantifier (a.k.a. curly brace) handling
+
+0.12  Sat Nov 20 08:03:05 UTC 2010
+	- added support for perl 5.12
+
+0.13  Tue Dec 21 08:46:00 UTC 2010
+	- fixed bug in curly handling (fix for https://rt.cpan.org/Public/Bug/Display.html?id=63964); many thanks to starenka for debugging support
+
+0.14  Sun Jan 16 12:55:53 UTC 2011
+	- more tests, better star handling
+
+0.15  Sun Jul  3 07:02:38 UTC 2011
+	- added support for perl 5.14, removed support for perl 5.8
+
+0.16  Tue Jul 12 11:46:55 UTC 2011
+	- distinguishing byte vs. character matches
+	- interpreting \z
+
+0.17  Sat Sep 10 06:11:28 UTC 2011
+	- not matching Unicode characters against .
+	- improved comparison of character classes
+
+0.18  Sun Jun  3 12:22:56 UTC 2012
+	- added support for perl 5.16, removed support for perl 5.10
+	- better matching of hexadecimal digits
+	- worse matching of upper- and lowercase letters
+
+0.19  Wed Jun  6 16:02:42 UTC 2012
+	- requiring perl 5.12 in Makefile.PL
+	- added support for \N
+
+0.20  Fri Nov 16 16:43:40 UTC 2012
+	- recognizing more names of character classes
+
+0.21  Thu Oct 24 14:11:52 UTC 2013
+	- requiring at least perl 5.14, supporting perl 5.18.x
+	- partial support for /a modifier
+
+0.22  Thu Oct 24 14:42:18 UTC 2013
+	- fixed for perl 5.18.x
+
+0.23  Tue May 27 18:29:19 UTC 2014
+	- requiring at least perl 5.16, supporting perl 5.20.x
+
+0.24  Thu Jul  2 12:53:02 UTC 2015
+	- requiring at least perl 5.18, supporting perl 5.22.x
+	- partial support for posessive quantifier
+	- more tests
+
+0.25  Sun Dec 25 12:15:50 UTC 2016
+	- requiring at least perl 5.20, supporting perl 5.24.x
+
+0.26  Mon Dec 26 09:09:59 UTC 2016
+	- fixed dependency declaration, obsolete assert
+
+0.27  Sat Dec 31 13:30:36 UTC 2016
+	- fixed obsolete asserts

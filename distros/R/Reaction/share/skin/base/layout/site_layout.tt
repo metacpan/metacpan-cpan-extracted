@@ -1,0 +1,50 @@
+=for layout widget
+
+[% doctype %]
+
+<html>
+
+<head>
+  [% head %]
+</head>
+
+<body>
+  [% body %]
+</body>
+
+</html>
+
+=for layout head
+
+<title>[% title %]</title>
+
+[% head_meta %]
+[% head_scripts %]
+[% head_style %]
+
+=for layout head_meta
+
+[% meta_info %]
+
+=for layout meta_http_header
+
+<meta http-equiv="[% meta_name %]" content="[% meta_value %]" />[% "\n" %]
+
+=for layout meta_member
+
+<meta name="[% meta_name %]" content="[% meta_value %]" />[% "\n" %]
+
+=for layout head_scripts
+
+=for layout head_style
+
+=for layout doctype
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+=for layout body
+
+[% inner %]
+
+=cut

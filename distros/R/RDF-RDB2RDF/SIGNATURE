@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 4363ec01af9bf0655862266a6314c4a1b6b54867 COPYRIGHT
+SHA1 984da34af86615d07dc4db653828b69ebf9de379 CREDITS
+SHA1 4f78ca9b69ed837c2ac091bf4b3d1ba665c5d1da Changes
+SHA1 a52cd2bce86f3d9909f2a5b545a1b4e241a52170 INSTALL
+SHA1 0ca9d9afc0902546f27a2ccb1f8b3e4bf5e3d9ab LICENSE
+SHA1 7a9a4f2c2b513a97d6a9a5e17f3d38209341190f MANIFEST
+SHA1 f785f9660bba2d9cc1dc22b77305ca806d596f8c META.json
+SHA1 b69c330ede5a72b0d90c8fc18c0561c3e68aa63f META.yml
+SHA1 440a712cec17bae801c27b54a953028009641403 Makefile.PL
+SHA1 f9a57c1e2152e4b7b85a899b5bdd8b524eb306ca README
+SHA1 32ca1f1fe626556e13497340b83216121668bfa6 TODO
+SHA1 e023e2f3fee12ba844ecadbe32b27795df1383a3 dist.ini
+SHA1 5771af31463d413f934230e5e05153f8610c4e8e doap.ttl
+SHA1 94d4e42b427e4da8b46672c277bc9f705db29991 examples/directmapping.pl
+SHA1 41d6df790d894d8ac3a21f1b872f53c537ff018f examples/directmapping_store.pl
+SHA1 654cd5d06b4d5a81a15fe8ccd616c7145d00afa9 examples/directmapping_store_library.pl
+SHA1 b25f34cc34248c4d3edb0ed5cf3bbd8badf6747e lib/RDF/RDB2RDF.pm
+SHA1 01f7846bac6972a21553f138e655cec9ace2d57e lib/RDF/RDB2RDF/DatatypeMapper.pm
+SHA1 156b419ce993ead8c6545fe7266b71a36316e6f4 lib/RDF/RDB2RDF/DirectMapping.pm
+SHA1 58d01a87ad33b263f055e00242fde9e483a8f6b2 lib/RDF/RDB2RDF/DirectMapping/Store.pm
+SHA1 890ecc63d046f38cbdd9c20a43f0e552c4ddac28 lib/RDF/RDB2RDF/DirectMapping/Store/Mixin/SuperGetPattern.pm
+SHA1 15d78d374f8b8485b88b872458ebdc3177a444dd lib/RDF/RDB2RDF/R2RML.pm
+SHA1 a1b372828d93d13d71f7b277ccb3042a421f8558 lib/RDF/RDB2RDF/Simple.pm
+SHA1 a1df461b167de0cb7f875a97090684caaa82d869 lib/URI/Escape/Optimistic.pm
+SHA1 001ce16f54a2a1708b88ea5de64468ea77456b1b t/01basic.t
+SHA1 28ec858d5ca459ed3808c55f9954c5329aaff2df t/02library.t
+SHA1 363a8faf157a3236ed225004533f9a05678d9838 t/03nulls.t
+SHA1 10134da946581f46be1b3bfa225d443e389ef695 t/04column-not-urlencoded.t
+SHA1 4beaf99eb9214abeae0198ff3818618e2bc9ad18 t/05langcol.t
+SHA1 34c2173273ed5431f5223afbc1566ef41678ec3d t/library.sqlite
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlI8WMwACgkQzr+BKGoqfTmv8wCcC2zY6zIaaimTdPzo9CbGCRU1
+H7cAn3o437SnHTZ/PVf7YlxJ+h+kcZxn
+=a2f8
+-----END PGP SIGNATURE-----

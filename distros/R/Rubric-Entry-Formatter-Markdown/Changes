@@ -1,0 +1,22 @@
+Revision history for Rubric-Entry-Formatter-Markdown
+
+0.555     2013-10-15 22:33:29 America/New_York
+          update bugtracker and repo metadata
+
+0.554     2012-02-24 08:17:32 America/New_York
+          add multimarkdown support
+
+          convert to Dist::Zilla
+
+0.553     2008-02-24
+          perl-critic tests
+
+0.552     2006-11-06
+          perl-critic tests
+
+0.551     2006-06-23
+          update module::install version
+
+0.01      200?-??-??
+          First version, released on an unsuspecting world.
+

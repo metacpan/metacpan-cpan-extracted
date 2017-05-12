@@ -1,0 +1,16 @@
+Revision history for Perl extension Religion::Islam::Quran.
+
+2.0  Dec 9, 2013
+	
+	removed QuranArabicUnicode.txt to save ~5MB space
+	fixed RemoveDiacritic function
+	added more Quran languages and English Transliteration
+	refactored the code
+	Arabic surah names in unicode utf-8 instead of entities
+	SurahName method works on multi-lingual interface now
+	converted all database files to utf-8
+
+
+1.0  May  4 18:22:25 2006
+	- original version; created
+

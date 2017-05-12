@@ -1,0 +1,4 @@
+<%init>
+$m->comp('/Ticket/Attachment/dhandler', %ARGS);
+$m->abort;
+</%init>

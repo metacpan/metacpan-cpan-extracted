@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 76d1421da289ceb26b8c348c9dac9a40dc3b6fff Changes
+SHA1 2b62862506261761499b1ea61eb80858e2468bcd MANIFEST
+SHA1 f5ff1c914b04ec4d7705b208204ce3530ec99ce8 MANIFEST.SKIP
+SHA1 2bd5e7dd1dabbee3de281f37f04dd3db4ade8fdb META.yml
+SHA1 cf96a4408a49978f248f504be6612070969b3525 Makefile.PL
+SHA1 9b482e331d3bf9ffad16ea175bf56cecd4f121a1 README
+SHA1 21667ce56c0ca1f0a7fd4083d751acb893230dd4 lib/RDF/Scutter.pm
+SHA1 877ebe0036c732c347beb4d252711dfc9e779ce6 t/RDF-Scutter.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDZr1SlE/Gp2pqC7wRAoJBAJ95onwY17my+Xfx12YjMPpn+rFRhACfbmqV
+IztbXqLFETqpdQU7ek7GyIY=
+=+3W0
+-----END PGP SIGNATURE-----

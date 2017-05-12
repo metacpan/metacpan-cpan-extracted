@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Rose-HTMLx-Form-Field-Autocomplete.t
+lib/Rose/HTMLx/Form/Field/Autocomplete.pm
+META.yml                                 Module meta-data (added by MakeMaker)

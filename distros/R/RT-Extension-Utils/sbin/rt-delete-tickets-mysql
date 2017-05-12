@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+
+use 5.008003;
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+print "Are you sure want to delete forever tickets with status 'deleted'? [y/N]: ";
+exit unless <> =~ /^y(es)?$/i;
+
+my $dbh = $RT::Handle->dbh;
+$dbh->{'RaiseError'} = 1;
+$dbh->{'PrintError'} = 1;
+
+exit unless int $dbh->do('DELETE FROM Tickets WHERE Status = ?', undef, 'deleted');
+$dbh->do(
+    'DELETE t.* FROM Tickets t LEFT JOIN Tickets c
+        ON c.id = t.EffectiveId WHERE c.id IS NULL'
+);
+$dbh->do(
+    'DELETE t.* FROM Groups t LEFT JOIN Tickets c
+        ON c.id = t.Instance WHERE t.Domain = ? AND c.id IS NULL',
+    undef, 'RT::Ticket-Role',
+);
+$dbh->do(
+    'DELETE t.* FROM Principals t LEFT JOIN Groups c
+        ON c.id = t.id WHERE t.PrincipalType = ? AND c.id IS NULL',
+    undef, 'Group'
+);
+$dbh->do(
+    'DELETE t.* FROM GroupMembers t LEFT JOIN Groups c
+        ON c.id = t.GroupId WHERE c.id IS NULL'
+);
+$dbh->do(
+    'DELETE t.* FROM CachedGroupMembers t LEFT JOIN Groups c
+        ON c.id = t.GroupId WHERE c.id IS NULL'
+);
+while(1) {
+    last unless int $dbh->do(
+        'DELETE t.* FROM CachedGroupMembers t LEFT JOIN CachedGroupMembers c
+            ON c.id = t.Via WHERE t.Via != t.id AND c.id IS NULL'
+    );
+}
+foreach my $t (qw(Ticket Group)) {
+    $dbh->do(
+        "DELETE t.* FROM Transactions t LEFT JOIN ${t}s c
+            ON c.id = t.ObjectId WHERE t.ObjectType = ? AND c.id IS NULL",
+        undef, 'RT::'.$t,
+    );
+}
+$dbh->do(
+    'DELETE t.* FROM Attachments t LEFT JOIN Transactions c
+        ON c.id = t.TransactionId WHERE c.id IS NULL'
+);
+
+foreach my $t (qw(Ticket Group)) {
+    $dbh->do(
+        "DELETE t.* FROM ObjectCustomFieldValues t LEFT JOIN ${t}s c
+            ON c.id = t.ObjectId WHERE t.ObjectType = ? AND c.id IS NULL",
+        undef, 'RT::'.$t,
+    );
+}
+
+my %type_and_table = (
+    ObjectCustomFieldValues => 'RT::ObjectCustomFieldValue',
+    Attachments             => 'RT::Attachment',
+    Transactions            => 'RT::Transaction',
+    Tickets                 => 'RT::Ticket',
+    Groups                  => 'RT::Group',
+    CachedGroupMembers      => 'RT::CachedGroupMember',
+    GroupMembers            => 'RT::GroupMember',
+    Principals              => 'RT::Principal',
+);
+
+while ( my ($table, $type) = each %type_and_table ) {
+    $dbh->do(
+        "DELETE t.* FROM Attributes t LEFT JOIN $table c
+            ON c.id = t.ObjectId
+            WHERE t.ObjectType = ? AND c.id IS NULL",
+        undef, $type
+    );
+}
+

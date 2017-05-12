@@ -1,0 +1,32 @@
+---
+abstract: 'Automatically fill data in RT ticket from preconfigured sources.'
+author:
+  - 'Ilya Chesnokov <chesnokov@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RTx-FillTicketData
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+    - po
+    - static
+  etc: []
+requires:
+  perl: 5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ichesnokov/RTx-FillTicketData
+version: '0.03'
+x_module_install_rtx_version: '0.37'
+x_requires_rt: 4.0.0

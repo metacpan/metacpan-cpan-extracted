@@ -1,0 +1,10 @@
+<%init>
+return unless $message->TransactionObj->Type =~ /^(?:Correspond|Comment)$/;
+$$display_headers{'x-rt-attach'} = 1;
+</%init>
+
+<%args>
+$message => undef
+$headers => []
+$display_headers => {}
+</%args>

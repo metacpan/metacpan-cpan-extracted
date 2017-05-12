@@ -1,0 +1,14 @@
+name: Regexp-DefaultFlags
+version: 0.01
+abstract: Set default flags on regular expressions
+author: Damian Conway <dconway@cpan.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  perl: 5.005
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.35

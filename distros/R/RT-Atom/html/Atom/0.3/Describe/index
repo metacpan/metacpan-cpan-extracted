@@ -1,0 +1,30 @@
+%# [OPTIONS AnyURI]
+%# On a container, returns the schema of objects acceptable by this container.
+%# On an object, returns the schema acceptable by the specified update types.
+%# 200: Success.  Body is schema in a format determined by content negotiation.
+%# 400: Request failed.  Body is error message in text/plain.
+%# 404: There is no container matching the specified URI.
+<%INIT>
+my $accessible = $Object->_ClassAccessible;
+
+my $map;
+while (my ($k, $v) = each %$accessible) {
+    $map->{$k} = '' if $v->{write};
+}
+
+return $m->comp($Resource, %ARGS, Map => $map);
+</%INIT>
+<%ARGS>
+$Path
+$BaseURI
+$Now
+$ShowLink
+$ShowEntry
+$X
+
+$Resource
+$Object
+$Type
+$CollectionClass
+$FeedURI
+</%ARGS>

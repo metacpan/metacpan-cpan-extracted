@@ -1,0 +1,20 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+dc:title <http://example.org/blurb> "Title"@en-us .
+dc:creator <http://example.org/blurb> "Creator"@en-us .
+dc:subject <http://example.org/blurb> "Subject and Keywords"@en-us .
+dc:description <http://example.org/blurb> "Description"@en-us .
+dc:publisher <http://example.org/blurb> "Publisher"@en-us .
+dc:contributor <http://example.org/blurb> "Contributor"@en-us .
+dc:date <http://example.org/blurb> "Date"@en-us .
+dc:type <http://example.org/blurb> "Resource Type"@en-us .
+dc:format <http://example.org/blurb> "Format"@en-us .
+dc:identifier <http://example.org/blurb> "Resource Identifier"@en-us .
+dc:source <http://example.org/blurb> "Source"@en-us .
+dc:language <http://example.org/blurb> "Language"@en-us .
+dc:relation <http://example.org/blurb> "Relation"@en-us .
+dc:coverage <http://example.org/blurb> "Coverage"@en-us .
+dc:rights <http://example.org/blurb> "Rights Management"@en-us .

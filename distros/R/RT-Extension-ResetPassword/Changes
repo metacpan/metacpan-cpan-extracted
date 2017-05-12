@@ -1,0 +1,37 @@
+Revision history for Perl module RT::Extension::ResetPassword
+
+1.04 2016-11-01
+ - Update ENV reference to use the new RequestENV function
+
+1.03 2015-03-05
+ - Fix a "Use of uninitialized value" warning
+
+1.02 2014-09-05
+ - Fix the log message for non-existant users
+
+1.01 2014-09-04
+ - Fix MANIFEST
+
+1.00 2014-09-03
+ - Add a configuration parameter, HidePasswordResetErrors, to not leak
+   if the email address is in use/
+ - Updated packaging.
+
+0.06 2014-03-10
+ - Switch to using a ResetPassword Template rather than a hardcoded message
+   Contributed by Christian Loos
+ - Added pod abstract (which MetaCPAN, search.cpan.org, etc expect to find)
+ - Added Changes file, populated from git log comments
+
+0.05 2012-02-07
+ - password reset only for user with password
+ - don't allow requests for disabled users
+
+0.04 2011-09-19
+ - Add a gitignore and move README into lib
+ - Update MI::RTx This avoids needing RTHOME or a prompt to install on RT4
+ - mention RT4
+
+0.03 2009-06-24
+ - First release to CPAN
+

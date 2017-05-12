@@ -1,0 +1,75 @@
+NAME
+    RT::Extension::RepliesToResolved - intercept replies to resolved tickets
+
+DESCRIPTION
+    Intercepts replies via email to resolved tickets, and creates a new
+    ticket rather than updating the resolved ticket. There are a few reasons
+    to do this:
+
+    "Thank you" messages re-open tickets and mess with statistics.
+    People keep sending new questions into old tickets.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        Only run this the first time you install this module.
+
+        If you run this twice, you may end up with duplicate data in your
+        database.
+
+        If you are upgrading this module, check for upgrading instructions
+        in case changes need to be made to your database.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::RepliesToResolved');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::RepliesToResolved));
+
+        or add RT::Extension::RepliesToResolved to your existing @Plugins
+        line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+    Configuration for this extension is defined in
+
+        /opt/rt4/local/plugins/RT-Extension-RepliesToResolved/etc/RepliesToResolved_Config.pm
+
+    You can read about the options in that file and then set your own
+    options in your RT_SiteConfig.pm file.
+
+    By default, after 7 days, this module will intercept mail to resolved
+    tickets and force the creation of a new ticket. It then creates a
+    RefersTo link between the two tickets. Each of these (time, statuses,
+    link) is configurable.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-RepliesToResolved@rt.cpan.org|mailto:bug-RT-Extension-RepliesToResolved@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-RepliesToResolved>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2014-2015 by Best Practical Solutions
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

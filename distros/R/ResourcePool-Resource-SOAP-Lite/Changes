@@ -1,0 +1,21 @@
+Changelog for ResourcePool::Resource::SOAP::Lite
+
+V1.0103 - 2011-01-31
+  *  Re-added the missing POD Documentation
+
+V1.0102 - 2009-11-25
+
+  *  The testing was fixed to work correctly against my new homepage. 
+
+V1.0101 - 2003-05-07
+
+  *  A bug which caused useless error messages when a problem with a 
+     server happend has been fixed. The error message does now 
+     include the proxy URL of the failed server. 
+
+V1.0100 - 2003-02-27
+
+  *  This release included a tiny Call command for SOAP::Lite. So you 
+     can use the fail over algorithms of ResourcePool::LoadBalancer 
+     for SOAP RPC calls. 
+

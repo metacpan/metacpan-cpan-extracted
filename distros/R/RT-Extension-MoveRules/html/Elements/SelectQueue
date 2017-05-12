@@ -1,0 +1,124 @@
+% if ($Lite) {
+<input name="<% $Name %>" size="25" value="<% $Default %>" class="<% $Class %>" />
+% }
+% else {
+<select name="<% $Name %>" <% $OnChange ? 'onchange="'.$OnChange.'"' : '' |n %> class="<% $Class %>">
+%     if ($ShowNullOption) {
+  <option value="">-</option>
+%     }
+%     for my $queue ( @$list ) {
+  <option value="<% $NamedValues ? $queue->{'Name'} : $queue->{'Id'} %>"\ 
+% if ( lc $queue->{'Name'} eq lc $Default ) {
+ selected="selected"\
+% }
+% if ( $queue->{'Disabled'} ) {
+ disabled="disabled"\
+% }
+  >
+    <% $queue->{Name} %>
+
+% if ( $Verbose and $queue->{'Description'} ) {
+    (<%$queue->{Description}%>)
+% }
+% if ( $queue->{'Disabled'} ) {
+    (<% $queue->{'Disabled'} %>)
+% }
+  </option>
+%     }
+</select>
+% }
+<%args>
+$CheckQueueRight => 'CreateTicket'
+$ShowNullOption => 1
+$ShowAllQueues => 1
+$Name => undef
+$Verbose => undef
+$NamedValues => 0
+$Default => 0
+$Lite => 0
+$OnChange => undef
+$Class => 'select-queue'
+</%args>
+<%INIT>
+
+my $list;
+
+my $cache_key = "SelectQueue---"
+                . $session{'CurrentUser'}->Id
+                . "---$CheckQueueRight---$ShowAllQueues";
+
+my $rpath = $m->request_path;
+my $caller = $m->caller->path;
+if ( $Lite ) {
+    # do nothing
+}
+elsif (
+    $rpath eq '/Ticket/Modify.html'
+    && $caller eq '/Ticket/Elements/EditBasics'
+) {
+    my $tid = $m->request_args->{'id'};
+    my $ticket = LoadTicket( $tid );
+
+    my $current = $ticket->QueueObj;
+
+    my @queues = RT::Extension::MoveRules->Possible(
+        Ticket => $ticket
+    );
+    foreach my $qid ( @queues ) {
+        my $queue  = RT::Queue->new( $session{'CurrentUser'} );
+        $queue->Load( $qid );
+        unless ( $queue->id ) {
+            $RT::Logger->error("Queue '$qid' listed in \@MoveRules option");
+            next;
+        }
+
+        my ($status, $msg) = RT::Extension::MoveRules->CheckPossibility(
+            From => $current, To => $queue,
+            Ticket => $ticket,
+        );
+        ($status, $msg) = RT::Extension::MoveRules->CheckRule(
+            From => $current, To => $queue,
+            Ticket => $ticket,
+        ) if $status;
+
+        push @$list, {
+            Id          => $queue->Id,
+            Name        => $queue->Name,
+            Description => $queue->Description,
+            $status? () : (Disabled => $msg),
+        };
+    }
+}
+elsif (defined $session{$cache_key}) {
+    $list = $session{$cache_key};
+} else {
+    my $q = RT::Queues->new( $session{'CurrentUser'} );
+    $q->UnLimit;
+    
+    while (my $queue = $q->Next) {
+        next unless $ShowAllQueues
+            || $queue->CurrentUserHasRight( $CheckQueueRight );
+
+        push @{$session{$cache_key}}, {
+            Id          => $queue->Id,
+            Name        => $queue->Name,
+            Description => $queue->Description,
+        };
+    }
+    $list = $session{$cache_key};
+}
+
+unless ( $Default ) {
+    $Default = '';
+}
+elsif ( $Default =~ /\D/) {
+    my $queue = RT::Queue->new( $session{'CurrentUser'} );
+    $queue->Load( $Default );
+    unless ( $Default ) {
+        $RT::Logger->error("Couldn't load default queue '$Default'");
+        $Default = '';
+    } else {
+        $Default = $queue->Name;
+    }
+}
+</%init>

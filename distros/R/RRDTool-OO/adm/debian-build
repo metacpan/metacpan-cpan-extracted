@@ -1,0 +1,4 @@
+
+rm -rf debian
+dh-make-perl --desc 'Object-oriented Perl interface to RRDTool' --email 'Mike Schilli cpan@perlmeister.com' --pkg-perl --arch any --build --depends "librrds-perl,liblog-log4perl-perl"
+mv ../librrdtool-oo-perl*deb .

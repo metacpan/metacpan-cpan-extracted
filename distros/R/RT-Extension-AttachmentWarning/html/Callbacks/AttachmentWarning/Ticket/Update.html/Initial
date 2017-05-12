@@ -1,0 +1,7 @@
+% if ( $ARGSRef->{'AddMoreAttach'} || $ARGSRef->{'SubmitTicket'} ) {
+<&/Elements/AttachmentWarning, %ARGS &>
+% }
+
+<%args>
+$ARGSRef
+</%args>

@@ -1,0 +1,7 @@
+Revision history for Rapi::Demo::CrudModes
+
+1.01 2015-07-06
+    - Add Bravo and BravoNote example sources (test simple rels)
+
+1.00 2015-06-07
+    - First CPAN release

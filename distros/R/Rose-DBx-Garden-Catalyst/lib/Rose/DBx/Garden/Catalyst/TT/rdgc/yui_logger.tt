@@ -1,0 +1,1 @@
+[% PROCESS crud/yui_logger.tt %]

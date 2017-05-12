@@ -1,0 +1,227 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.012"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "URI::Escape"^^doap-deps:CpanId ], [ doap-deps:on "Data::UUID"^^doap-deps:CpanId ], [ doap-deps:on "DBI"^^doap-deps:CpanId ], [ doap-deps:on "JSON 2.50"^^doap-deps:CpanId ], [ doap-deps:on "MIME::Base64"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine 0.135"^^doap-deps:CpanId ], [ doap-deps:on "match::simple"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "DBD::SQLite"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDB2RDF>;
+	doap:category        [ rdfs:label "RDF" ], [ rdfs:label "RDBMS" ], [ rdfs:label "Database" ], [ rdfs:label "Turtle" ], [ rdfs:label "R2RML" ], [ rdfs:label "RDB2RDF" ], [ rdfs:label "Direct Mapping" ], [ rdfs:label "SQL" ], [ rdfs:label "DBI" ], [ rdfs:label "R2R" ], [ rdfs:label "Semantic Web" ];
+	doap:created         "2011-09-13"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/RDF-RDB2RDF>;
+	doap:homepage        <https://metacpan.org/release/RDF-RDB2RDF>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "RDF-RDB2RDF";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-006>, <http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-007>, <http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-008>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rdf-rdb2rdf>;
+	];
+	doap:shortdesc       "map relational database to RDF declaratively"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>;
+	rdfs:seeAlso         <http://answers.semanticweb.com/questions/11245/#11652>, <http://buzzword.org.uk/2011/sqlite-to-rdf/>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release"@en;
+	dc:identifier        "RDF-RDB2RDF-0.001"^^xsd:string;
+	dc:issued            "2011-09-15"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDB2RDF-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDB2RDF-0.002"^^xsd:string;
+	dc:issued            "2011-09-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Allow 'process' method to take a callback."@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Support 20 Sept 2011 Working Draft of R2RML"@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDB2RDF-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDB2RDF-0.003"^^xsd:string;
+	dc:issued            "2011-09-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Include more test cases, inspired by RDB2RDF Working Group's tests."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Include RDF::RDB2RDF::DirectMapping class."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Include RDF::RDB2RDF::DirectMapping::Store class."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix blank node scoping in R2RML mapping."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Various fixes."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDB2RDF-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDB2RDF-0.004"^^xsd:string;
+	dc:issued            "2011-10-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Further optimise RDF::RDB2RDF::DirectMapping::Store::get_statements allowing it to narrow down the list of columns to select from the database when fewer than '*' are needed."@en;
+		], [
+			rdfs:label "Optimise RDF::RDB2RDF::DirectMapping::Store::get_pattern in cases when all statements with the pattern share a common subject."@en;
+		], [
+			rdfs:label "Provide warn_sql option for RDF::RDB2RDF::DirectMapping."@en;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document handle_table and handle_table_rdfs methods for RDF::RDB2RDF::DirectMapping."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDB2RDF-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDB2RDF-0.005"^^xsd:string;
+	dc:issued            "2011-11-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Template substitutions that will result in URIs now correctly uri_encode substituted values.";
+		], [ rdfs:label "Handle SQL datatypes better." ], [
+			a doap-changeset:Addition;
+			rdfs:label "Provide ignore_tables option for DirectMapping.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDB2RDF-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDB2RDF-0.006"^^xsd:string;
+	dc:issued            "2012-06-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Reduce dependencies (parent.pm, common::sense, DBIx::Admin::TableInfo, etc)."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "RDB2RDF Working Group tests are now 'xt'."@en;
+		], [
+			rdfs:label "A number of small changes to fix compliance issues with R2RML and Direct Mapping test suites.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "RDF::RDB2RDF::DirectMapping::Store supports new_with_config.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "RDF::TrineX::Store::DirectMapping is now an alias for RDF::RDB2RDF::DirectMapping::Store.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDB2RDF-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-007>
+	a                    doap:Version;
+	rdfs:label           "The name's Bond... James Bond";
+	dc:identifier        "RDF-RDB2RDF-0.007"^^xsd:string;
+	dc:issued            "2012-06-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Properly dereference hashref for Perl < 5.14.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDB2RDF-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDB2RDF/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDB2RDF-0.008"^^xsd:string;
+	dc:issued            "2013-09-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Update;
+			rdfs:label "Author test cases cope better with newer RDF::Trine versions which are less tolerant of ill-formed IRIs.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support rrx:languageColumn.";
+			doap-changeset:thanks <urn:uuid:f4453a77-69eb-4062-b78c-d6e836f7483d>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Correctly skip generating triples when fields are null.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/88815>;
+			doap-changeset:thanks <urn:uuid:f4453a77-69eb-4062-b78c-d6e836f7483d>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Avoid IRI-encoding things that are already fully-formed IRIs.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/88816>;
+			doap-changeset:thanks <urn:uuid:f4453a77-69eb-4062-b78c-d6e836f7483d>;
+		], [ rdfs:label "Misc refactoring and tidying." ], [
+			a doap-changeset:Update;
+			rdfs:label "Stop using smart match operator and given/when (which each provoke warnings in Perl 5.18.x) in favour of match::simple and for/if respectively.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Use Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDB2RDF-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/88815>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "88815"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=88815>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/88816>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "88816"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=88816>.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+<urn:uuid:f4453a77-69eb-4062-b78c-d6e836f7483d>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:vladimir.alexiev@ontotext.com>;
+	foaf:name            "Vladimir Alexiev".
+

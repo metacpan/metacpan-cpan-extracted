@@ -1,0 +1,29 @@
+1.02 2017-05-01
+ - Declare 4.4 compatibility
+
+1.01 2014-12-15
+ - Packaging updates
+
+1.00 2014-06-20
+ - Packaging updates
+ - Document SetOwnerToCurrentUser (#96591)
+ - Allow subrefs as values, for dynamic defaults (#64844)
+
+0.06 2014-02-06
+ - Fix docs bug
+
+0.05 2014-02-06
+ - Updated for 4.2
+
+0.04 2011-05-20
+ - Fixes for 3.8.10 and 4.0.0 compatibility
+
+0.03 2009-06-30
+ - CPANize
+
+0.02 2008-12-04
+ - Update installer for 3.8 compatibility
+
+0.01 2007-06-18
+ - Initial release.
+

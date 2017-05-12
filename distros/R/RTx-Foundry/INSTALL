@@ -1,0 +1,163 @@
+RTx::Foundry Quick Start (FreeBSD only)
+=======================================
+
+Adjust the "example.org" suffix and the hostnames below with your
+local settings.
+
+In the main host "db.example.org", make and launch two clean FreeBSD
+Jails: "cvs.example.org" and "www.example.org".
+
+You may wish also to point "lists.example.org" to the same machine
+as "www.example.org".
+
+In DB, make sure that:
+
+    /home/svn and /home/cvs are shared across VCS and WWW
+    PostgreSQL is running and allows access from VCS and WWWW
+
+Ready?  Let's go!
+
+#####################################################################
+# 0. OPTIONAL FULL CLEANUP - commands on both hosts
+#####################################################################
+pkg_add -r portupgrade
+rehash
+pkg_deinstall -aOfr	# at least clean up www/apache2 if installed
+
+#####################################################################
+# 1. CVSUP - commands on both hosts (assuming FreeBSD 4-STABLE)
+#####################################################################
+pkg_add -rf cvsup-without-gui
+echo "*default  host=cvsup13.tw.FreeBSD.org" > /usr/local/etc/cvsupfile
+echo "*default  base=/usr" >> /usr/local/etc/cvsupfile
+echo "*default  prefix=/usr" >> /usr/local/etc/cvsupfile
+echo "*default  release=cvs" >> /usr/local/etc/cvsupfile
+echo "*default  tag=RELENG_4" >> /usr/local/etc/cvsupfile
+echo "*default  delete use-rel-suffix" >> /usr/local/etc/cvsupfile
+echo "src-crypto" >> /usr/local/etc/cvsupfile
+echo "src-secure" >> /usr/local/etc/cvsupfile
+echo "src-include" >> /usr/local/etc/cvsupfile
+echo "ports-all" >> /usr/local/etc/cvsupfile
+rehash
+cvsup -z -g /usr/local/etc/cvsupfile
+
+#####################################################################
+# 2. SET UP PORTS - commands on both hosts
+#####################################################################
+cd /usr
+rm -rf ports/*/*/work
+rm -rf ports/lang/perl5.8
+fetch -q -o - http://p4.elixus.org/snap/rt-ports.tar.gz | tar zxf -
+fetch -q -o - http://p4.elixus.org/snap/sympa-ports.tar.gz | tar zxf -
+cd /usr/ports/lang/perl5.8
+make install clean
+rehash
+use.perl port >& /dev/null
+
+#####################################################################
+# 3a. WWW HOST - commands
+#####################################################################
+cd /usr/ports/www/rtfoundry
+make install \
+    DB_TYPE=Pg DB_HOST=db.example.org DB_DBA_USER=pgsql \
+    -DINITIAL_INSTALL -DWITH_APACHE2 -DWITH_POSTFIX
+
+echo 'sendmail_enable="NONE"' >> /etc/rc.conf
+cd /usr/local/etc/rc.d
+
+ln -fs /usr/local/sbin/postfix postfix.sh
+ln -fs /etc/mail/aliases.db /etc/aliases.db
+ln -fs /usr/local/bin/mhonarc /usr/bin/mhonarc
+ln -fs /usr/local/sbin/sendmail /usr/sbin/sendmail
+
+# GOSUB 3aa
+# GOSUB 3ab
+
+newaliases
+
+/usr/local/etc/rc.d/sympa start
+/usr/local/etc/rc.d/apache2.sh start
+/usr/local/etc/rc.d/postfix.sh start
+
+#####################################################################
+# 3aa. WWW HOST - append to /usr/local/etc/apache2/httpd.conf
+#####################################################################
+LoadModule perl_module libexec/apache2/mod_perl.so
+LoadModule suexec_module libexec/apache2/mod_suexec.so
+LoadModule fastcgi_module libexec/apache2/mod_fastcgi.so
+
+FastCgiWrapper /usr/local/sbin/suexec
+FastCgiServer /usr/local/sympa/bin/wwsympa.fcgi -processes 3
+
+NameVirtualHost *
+
+<VirtualHost *>
+        ServerName www.example.org
+        Include /usr/local/rt3/local/etc/Foundry/httpd.conf.mod_perl2
+</VirtualHost>
+<VirtualHost *>
+        ServerName devlist.example.org
+        Include /usr/local/rt3/local/etc/Foundry/sympa.conf.fastcgi
+</VirtualHost>
+
+# RETURN to 3a
+
+#####################################################################
+# 3ab. WWW HOST - append to /etc/aliases
+#####################################################################
+rt:         "|/usr/local/rt3/bin/rt-mailgate --queue NewUser --action correspond --url http://www.example.org/"
+rt-comment: "|/usr/local/rt3/bin/rt-mailgate --queue NewUser --action comment --url http://www.example.org/"
+
+# RETURN to 3a
+
+#####################################################################
+# 3b. VCS HOST - commands
+#####################################################################
+cd /usr/ports/devel/rtfoundry-vcs/
+make install \
+    DB_TYPE=Pg DB_HOST=db.example.org DB_DBA_USER=pgsql \
+    RT_URL=http://www.example.org -DINITIAL_INSTALL
+
+echo "Port 2222" >> /etc/ssh/sshd_config
+
+/usr/local/etc/rc.d/sshdcvs.sh start
+/usr/local/etc/rc.d/rtfoundry-vcs.sh start
+
+#####################################################################
+# A. WWW HOST CONFIG - files list
+#####################################################################
+/usr/local/etc/foundry.conf
+/usr/local/etc/sympa.conf
+/usr/local/etc/wwsympa.conf
+/usr/local/etc/postfix/main.cf
+/usr/local/etc/postfix/aliases.cf
+/usr/local/etc/apache2/httpd.conf
+/usr/local/rt3/etc/RT_SiteConfig.pm
+
+#####################################################################
+# B. VCS HOST CONFIG - files list
+#####################################################################
+/usr/local/etc/foundry.conf
+/etc/ssh/sshd_config
+/etc/ssh/sshdcvs_config
+
+#####################################################################
+# C. MIGRATING EXISTING DATABASE - notes
+#####################################################################
+Remember to make full backups of everything before migrating.
+
+Remember to delete everything from the "sessions" table.
+
+Remember to copy over the "cookie" line in the old sympa.conf to
+overwrite the new one.  Otherwise sympa's user accounts will break.
+
+Remember to re-use the same RT_NAME.  Otherwise all links will break.
+
+Remember to transfer the Kwiki data in /usr/local/rt3/var/Foundry/.
+
+Remember to transfer old list archives and data directories (namely
+arc/ and expl/) to /usr/local/sympa/.
+
+Remember to transfer aliases at /etc/mail/sympa_aliases and modify
+the hostnames in it accordingly.
+

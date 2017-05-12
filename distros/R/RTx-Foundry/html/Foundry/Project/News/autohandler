@@ -1,0 +1,7 @@
+%# Collaboration, n.:
+%# 	A literary partnership based on the false assumption that the
+%# other fellow can spell.
+% $m->call_next;
+<%ATTR>
+Tab2	=> 'News'
+</%ATTR>

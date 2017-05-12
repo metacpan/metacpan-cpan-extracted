@@ -1,0 +1,45 @@
+NAME
+        RT::Interface::Email::RequiredHeaders - only accept new tickets via email with a certain header
+
+SYNOPSIS
+        Used to enforce ticket-creation from a web-interface.
+        Doesn't accept new emails to the support queue without a special header.
+
+INSTALL
+        # etc/RT_SiteConfig.pm
+        # Note: Must come before Filter::TakeAction in MailPlugins (if present)
+
+        Set(@Plugins,(qw/
+            RT::Interface::Email::RequiredHeaders
+        /));
+        Set(@MailPlugins, (qw/
+            Auth::MailFrom
+            RequiredHeaders
+        /));
+        Set(%Plugin_RequiredHeaders, (
+            "required"  => [qw/X-RT-RequiredHeader/], # required is always required
+            # "queues"  => [qw/General/],             # defaults to all queues
+            # # change default rejection message:
+            # "message" => "Error: You can only submit issues via the web.",
+       ));
+
+AUTHOR
+        Alister West - http://alisterwest.com/
+
+LICENCE AND COPYRIGHT
+        Copyright 2013, Alister West
+
+        This module is free software; you can redistribute it and/or
+        modify it under the same terms as Perl. See http://dev.perl.org/licenses/.
+
+CHANGES
+    1.2 - 2013-06-03 - CPAN-ified
+    1.1 - 2013-06-03 - GitHub-ified
+    1.0 - 2013-05-30 - Initial working plugin
+
+GetCurrentUser - RT MailPlugin Callback
+        Returns: ($CurrentUser, $auth_level) - not-triggered passthough inputs.
+        Returns: ($CurrentUser, -1 )         - halt further processing and send rejection notice.
+
+        See RT::Interface::Email::GetAuthenticationLevel for more on $auth_level.
+

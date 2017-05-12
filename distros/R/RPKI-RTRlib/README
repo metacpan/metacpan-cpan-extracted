@@ -1,0 +1,30 @@
+RPKI-RTRlib
+===========
+
+RPKI::RTRlib provides a simple interface to RTRlib (http://rpki.realmv6.org/). 
+The RTRlib is an open-source C implementation of the RPKI/Router Protocol client. The library allows to fetch and store validated prefix origin data from a RTR-cache and performs origin verification of prefixes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other libraries:
+
+  RTRlib (http://rpki.realmv6.org/)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Robert Schmidt
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 c44d58470bcd27c1530cba73ccd7cad202de612d .travis.yml
+SHA1 89373716a4a1da152ffac5762f19932200994f42 Changes
+SHA1 855ed8f3e59364e97c80ab260a37f132d2c792c7 MANIFEST
+SHA1 16d75b7e61d133b5b287330209903358f982b336 MANIFEST.SKIP
+SHA1 e491fb7a933982c53db776317c11be8332641613 META.yml
+SHA1 57d26de322229ad225ae8224c2abe3b09a274f9f Makefile.PL
+SHA1 8be9a9c6cf359bf95dbab46ec6bfd0a2f1155128 README
+SHA1 8cd57101d252a96d050dc1add5aa24c057609697 html/Callbacks/Gravatar/Admin/Users/Modify.html/LeftColumnBottom
+SHA1 4238db911108735bf9faa724c858586e71804012 html/Callbacks/Gravatar/Prefs/AboutMe.html/FormLeftColumn
+SHA1 fd63a0d97ec1221c8b36a8ae448b30c8cacc3612 html/Callbacks/Gravatar/Ticket/Elements/ShowRequestor/AboutThisUser
+SHA1 0708f7f2b3c10848256b342ec87c84255666f7a7 html/Callbacks/Gravatar/User/Elements/Portlets/ExtraInfo/BeforeExtraInfo
+SHA1 26b822ecd087e1a6002c10cedad75a90285c5978 html/Callbacks/Gravatar/User/Prefs.html/FormLeftColumn
+SHA1 2595fb82cb2d44d1acb3b4c913f9a13e82ccb6df html/Elements/Gravatar
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 cdc494e5568350dc9ca590838c85fb2cdf17caac lib/RT/Extension/Gravatar.pm
+SHA1 dcc02c105943007779736f6f022453ca95825e4c xt/00-compile.t
+SHA1 e41e2de1865fd497ced1150df308a3b2509ead0f xt/00-mason-syntax.t
+SHA1 dd588fc25760508a9d85ee23db3024714692a9b5 xt/99-policy.t
+SHA1 98c0963f6c4ab5972f63d18d47d1bf13afdedcb3 xt/lib/RT/Extension/Gravatar/Test.pm.in
+SHA1 77c68add5ff60e63623c279255c44ad0dae3fba4 xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJX0S5sAAoJEKq6dEXbZ7ZrG1MP/igB6JrqrSNbADlWKJNIYNpw
+fJ6wKAQboxT+rOz30McHNyugRwPD+w0QDVvm1QyYIU46osJytRT6tGrtupYFz1e5
+4kuTbU25dFPrFfUI5QfdM4PK6mrVkdQtW3X3eWszw5CQuxeHSqDy4tpv4dukMcEb
+YEJ0uroIexJ2ylBBKOXhyJCcAHnUvZX1lOZMYFSX/r+hAW8+wKKNJ0Fp/tj5RfR5
+jyY/RQSUfMFx4G3dquNfQGAwQ3bJjBISLuFcFTP/zza2MwfNt5JQ2W5EcfgYUzgP
+u2iA+l9tqirCqlZX5YPIVEK8AtflhaX+/eVrwAdGJkMQc98VngxCwoZ3S1NSDnvZ
+vW0TtIb0VRszpMF5QYomMU1garvo1UPr8/UTFnpdgC9LIwJpcXsSqLGbfPQa/BR0
+Li5XDOjd0JXsO7AwNLmGzDjalcz/xtwDrLWSvjK2EkBtHgf4rrQw6E9W7//RpqRq
+Si2GEcjMIZ3EwZDExx8kbqy/6aebVZG/pDgSnq7rdk7+O/KrR9Etz2q5nnz6n32Q
+fOH8Ho9XUMiiHDe4Tc4MGwHa2x4SZPo2mqX1lDQ2Emr6xpRL6t/awV1L9E/AdY/n
+ZyBxX40iYQ5khpWbKsbD0bPJcKoRFKAq0Jws0yshOPnxxC/dBTQ5d0XGo3PuOVoc
+FjUj2EBz7nZ1R0V0yWIz
+=XgAQ
+-----END PGP SIGNATURE-----

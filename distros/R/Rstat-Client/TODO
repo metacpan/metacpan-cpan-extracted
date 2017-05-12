@@ -1,0 +1,7 @@
+# $Id: //eai/perl5/Rstat-Client/2.2/src/distro/TODO#1 $
+
+TODO list for Rstat::Client
+
+* add more tests
+* switch to version 4 of the rstatd protocol, rewrite struct packing
+  and tests to handle version 4 protocol

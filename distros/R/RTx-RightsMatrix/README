@@ -1,0 +1,36 @@
+RTx-RightsMatrix
+
+RTx::RightsMatrix is an extension for Request Tracker (RT) that
+makes managing and understanding RT rights easier. Once installed
+an RT administrator can access the interface under Configuration ->
+Tools -> Rights Matrix.
+
+Users can also see and manage rights under Preferences -> My Rights.
+(Note: The user menu requires RT > 3.4.4 or a callback must be
+added to UserTabs)
+
+RTx::RightsMatrix also includes support for mananging Asset Tracker
+(AT) rights. AT is an asset tracking extension for RT.
+
+WARNING
+
+This is a beta release and should probably not be used in a
+production environment. However, it wouldn't hurt to install it
+in production and use it to view rights, but not manage them.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    RTHOME=/opt/rt3 perl Makefile.PL
+    make
+    make test    # tests will only run if your database is rt3regression
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Todd Chapman
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

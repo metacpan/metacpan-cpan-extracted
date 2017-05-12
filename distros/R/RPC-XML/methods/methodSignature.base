@@ -1,0 +1,7 @@
+Name:		system.methodSignature
+Version:	1.2
+Hidden:		no
+Signature:	array string
+Signature:	array array
+Helpfile:	methodSignature.help
+Codefile:	methodSignature.code

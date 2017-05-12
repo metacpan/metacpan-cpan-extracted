@@ -1,0 +1,37 @@
+1.10 2015-01-02
+ - Update documentation
+ - Note only for 4.0.x, not 4.2.x
+
+1.00 2011-10-27
+ - Rewrite internals
+ - RT 4.0 compatibility
+
+0.10 2008-11-28
+ - Find documentation in local/plugins/ directory
+
+0.09 2008-09-15
+ - update installer
+
+0.08 2007-10-09
+ - fix some packaging issues
+
+0.07 2007-10-09
+ - add a link back to RT
+
+0.06 2007-10-03
+ - update list of dependencies
+ - enable auto_install
+
+0.05 2007-09-24
+ - support .pod files as well as .pm files
+
+0.04 2007-07-24
+ - only skip modules with an _ if they're _Vendor, _Overlay or _Local.
+   Again, Thanks to Carlos
+
+0.03 2007-07-24
+ - Added support for the RT local lib directory. Thanks to Carlos Fuentes
+
+0.02 2004-05-28
+ - Locked down to only work for SuperUsers
+

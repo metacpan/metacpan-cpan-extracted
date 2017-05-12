@@ -1,0 +1,59 @@
+0.08     2016-12-19
+
+- Call CPAN::Meta->load_file to load a meta file instead of
+  CPAN::Meta->new. Patch by Michiel Beijen. GitHub #3.
+
+
+0.07     2016-11-13
+
+- Added a --debug-ua flag. When enabled this uses LWP::ConsoleLogger to dump
+  the interaction with RT.
+
+- Handle a failure to find a user associated with an RT ticket or transaction
+  gracefully. Apparently it's possible for the Creator field for a transaction
+  to contain an email that's no longer in RT.
+
+
+0.06     2016-11-13
+
+- Really fix the default repo. This distro could really use some tests.
+
+
+0.05     2016-11-13
+
+- The default repo generated when prompts were enabled would include both the
+  user/org name and the repo name, when it should just be the repo name.
+
+
+0.04     2016-11-13
+
+- Added a shebang line to rt-to-github.pl
+
+- The metacpan-github-names.pl will no longer be installed. This is only used
+  for development.
+
+
+0.03     2016-11-12
+
+- Added a --test option that you should use when testing a conversion. This
+  sets --force and --no-resolve. It also changes how ticket bodies are
+  formatted to avoid @mentioning people.
+
+- Fixed links to attachments with spaces and other characters that needed URI
+  escaping.
+
+- Also include tickets with a status of "patched".
+
+- Added a monkey patch to work around
+  https://rt.cpan.org/Ticket/Display.html?id=118729, which caused some ticket
+  or comment bodies to be lost entirely.
+
+
+0.02     2016-11-06
+
+- Fix order of POD sections in the docs.
+
+
+0.01     2016-11-06
+
+- First release upon an unsuspecting world.

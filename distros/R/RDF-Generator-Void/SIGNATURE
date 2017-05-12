@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 d58e6212d7b85c50c4edd7b67eead738bfacfdfb COPYRIGHT
+SHA1 19305090b8e4b5f850898a75a66674eb530ae754 CREDITS
+SHA1 29f88eaa6efdfd0fa425c77c387e6bce93ca03cb Changes
+SHA1 4aecb61688b7c592d2b688401d5a5bfd96d96102 INSTALL
+SHA1 07979035d1028ff22101063841c8b256374467b9 LICENSE
+SHA1 874ad1eeb206a3df9156329c91a0063ec8219a73 MANIFEST
+SHA1 6c63b7ddd2276a835c49828c45ea95d8a7be6f8b META.json
+SHA1 a02511d8dc855340ca9652780fc5c5bb0856649d META.yml
+SHA1 d2749e301677e1c365475e8ad9eeaa2b52b52443 Makefile.PL
+SHA1 939a8f8b93b3686275cd756eff0c7a1872b0efb8 README
+SHA1 7905a697a9c9c780acd5669499d9e8c969d29bec dist.ini
+SHA1 e28b7baa6c12ae3707afcb5454b69303141465f4 doap.ttl
+SHA1 973bad695f6177bca8d9168004dd0c025fd87d19 lib/App/perlrdf/Command/Void.pm
+SHA1 b1354f3416106985bce449a71ce2cbae09fe2c73 lib/RDF/Generator/Void.pm
+SHA1 03c704e6a404b1a682000baeda1ecc48cce33354 lib/RDF/Generator/Void/Meta/Attribute/ObjectList.pm
+SHA1 d45c6d59ba140b55ea6f5006bd96293d3e64cef4 lib/RDF/Generator/Void/Stats.pm
+SHA1 12f3d13dcf989c6f81ce2148b779605150536bb7 t/00-load.t
+SHA1 40911817f6debf589b9c83520f3c271eba6bb532 t/basic.t
+SHA1 a7f934e5942200ecd42c1d98afcb2a5dbfebe88a t/data/basic-expected.ttl
+SHA1 874a27ab32d5762e603c7e213708e3d9752eef76 t/data/basic.ttl
+SHA1 54c14502cfe404c069fb4a06dfa6fb8245762def t/data/generated-expected.ttl
+SHA1 24c3b5e756f7be18edfb814f2ea1d2a38e391f20 t/data/generated.ttl
+SHA1 62b1c9fb8c0671dad83a9c307bffe520de1c5182 t/extended.t
+SHA1 a937d713e1fc44bca4dadad27840d801eb6b49b3 t/levels.t
+SHA1 97aba14e3b8da592ff41bd8f8f91f8f3b03da0ba t/perlrdfapp.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIVAwUBVsEM0X++6N86nkqlAQgWTg//aG3P4jwiTpng8Hl3jnIhm+WrVHJCFRmW
+Uq+g+nCTY2tI7EOtWAs+JS6QTLXqD7eyBhXH674XzByXt/yraX1jn2dUWVXeW1zz
+v+6EH4mi8xH2Y62IVJk4zeOd2NqDoGQ1GYmQIh1JaHlHubIkYkVmmxC951/JUceR
+hA4uBp55W2no49vLmTz1bTl+7MEMLOj5LiPhiH+/WDRGFCj8TvFGwcUHQ7TUTg4u
+y+Q3weqAQGsV2xSMfi9I0XKr5YDsrrozfyqKNbbKR6XRRKmauE8b9nMAlIvsAGpz
+RkTJ4p8QTLShEXhCefz4B6FIJ6/7/L8F7J5UL52ANaHIQy6l2vXl5uF0000bJN8v
+iAU9Dd02BnDuRSFpivW2AOGRv9TG64B62IvqyQDFRKt0w61JMK4Q5iqPnugW84DC
+bdhEyqPfrKsPkmN7yxcfxu8QfHAzE+ld1OAHaySJAVlGCAU4DaahUgYDaCRTNA/p
+9QIEz5RBLNWvoYts34XtZzKBvkMCEYN23oefM9A9jH4GLpwjUDnV9qkrVREMkIF9
+3OpTeihWOSCLRhtv8AD6G7VdpAITPy+7dRSxm1b+eCju12CijJfDx1Ns1xpLySmS
+Sov3J3Q1L16bvr77HtztW0husXaflP8g+kqiWKqSQni6eGx8P8cTfSwBhGE2whpY
+IhmGHNiqWww=
+=HmK9
+-----END PGP SIGNATURE-----

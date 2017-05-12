@@ -1,0 +1,2 @@
+* Better checks for schema.org.
+* Facebook: check integer, boolean and enumerated properties.

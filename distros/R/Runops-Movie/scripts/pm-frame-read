@@ -1,0 +1,305 @@
+#!perl
+use strict;
+use warnings;
+use 5.010_000;
+use feature ':5.10';
+use Carp::Always;
+use File::Spec::Functions qw( catfile );
+use Getopt::Long qw( GetOptions );
+use Runops::Movie::Util qw( pretty_size );
+
+# Options
+#
+my $VALID_POINTER = 7;
+my $SV_SIZE = 64;
+my $CV_SIZE = 3000;
+my %out;
+GetOptions(
+    help              => sub{ die 'pod2usage( -verbose => 2 )' },
+    'sv_size=i'       => \ $SV_SIZE,
+    'CV_SIZE=i'       => \ $CV_SIZE,
+    'valid_pointer=i' => \ $VALID_POINTER,
+
+    'in=s'            => \ my( $in_file ),
+    'dir=s'           => \ my( $out_dir ),
+    map {; "$_=s" => \ $out{$_}{name} }
+    qw( contains type file name stash size shares function vertex ),
+)
+  or die 'pod2usage( -verbose => 2 )';
+
+# --dir automagic
+#
+if ( $out_dir ) {
+    $out{$_}{name} //= catfile( $out_dir, "frame.$_" ) for keys %out;
+}
+
+# Option validation
+#
+if ( ! $in_file ) {
+    die 'pod2usage( -verbose => 2 )';
+}
+if ( $out_dir ) {
+    # Everything is a-ok
+}
+elsif ( my @missing =
+            grep { ! $out{$_}{name} }
+            @out{qw( contains type file name stash size shares function )}
+    ) {
+    # Something is missing
+    die "Missing: @missing";
+}
+
+# Open files
+#
+open my($in), '<', $in_file
+    or die "Can't open $in_file: $!";
+for my $nm ( sort keys %out ) {
+    open $out{$nm}{fh}, '>', $out{$nm}{name}
+        or die "Can't open $out{$nm}{name} for writing: $!";
+}
+
+
+type( 0, '' );
+
+# Big damn readline loop
+#
+my $self;
+my $type;
+while ( my $line = <$in>) {
+    given ( $line ) {
+        when ( /^SV = (\w+)\S+ at 0x([[:xdigit:]]+)/ ) {
+            $type = "$1";
+            $self = "$2";
+            vertex( $self );
+            type( $self, $type );
+        }
+        when ( ! defined $type ) {
+        }
+        default {
+            given ($type) {
+                when ('PV') {
+                    given ($line) {
+                        when (/^\s+LEN\s+=\s+(\d+)/) {
+                            my $len = 0 + $1;
+                            my $size = $SV_SIZE + $len;
+                            size( $self, $size );
+                        }
+                    }
+                }
+                when ('PVCV') {
+
+=pod
+
+SV = PVCV(0xa84f690) at 0xadab3d4
+  REFCNT = 1
+  FLAGS = ()
+  IV = 0
+  NV = 0
+  COMP_STASH = 0x0
+  ROOT = 0x0
+  XSUB = 0xe57814
+  XSUBANY = 1
+  GVGV::GV = 0xadab3bc  "XML::LibXML::Document" :: "getDocumentElement"
+  FILE = "LibXML.c"
+  DEPTH = 0
+  FLAGS = 0x0
+  OUTSIDE_SEQ = 0
+  PADLIST = 0x0
+  OUTSIDE = 0x0 (null)
+
+=cut
+
+                    given ($line) {
+                        when (/^\s+REFCNT/) {
+                            size( $self, $CV_SIZE );
+                        }
+                        when (/^\s+PADLIST\s+=\s+0x([[:xdigit:]]+)/ ) {
+                            contains( $self, $1 );
+                        }
+                        when ( /^\s+GVGV::GV = [^"]*"(.+)" :: "(.+)"/ ) {
+                            my $packaged = "$1";
+                            my $function = "$2";
+                            function( $self, "\Q$packaged", "\Q$function" );
+                        }
+                        when ( /^\s+FILE = "(.+)"/ ) {
+                            my $file = "$1";
+                            file( $self, "\Q$file" );
+                        }
+                    }
+                }
+                when ('PVGV') {
+
+=pod
+
+  REFCNT = 1
+  FLAGS = (GMG,SMG,MULTI)
+  IV = 0
+  NV = 0
+  MAGIC = 0xbb0d0e8
+    MG_VIRTUAL = &PL_vtbl_glob
+    MG_TYPE = PERL_MAGIC_glob(*)
+    MG_OBJ = 0xb76c3034
+  NAME = "default_as_hash_options"
+  NAMELEN = 23
+  GvSTASH = 0xaa38714"DAS2::Results::MetaScoreForName"
+  GP = 0xc15d788
+    SV = 0xb76b3d7c
+    REFCNT = 1
+    IO = 0x0
+    FORM = 0x0  
+    AV = 0x0
+    HV = 0x0
+    CV = 0xa76a95c
+    CVGEN = 0x174967
+    GPFLAGS = 0x0
+    LINE = 435
+    FILE = "/opt/w3data/da-8704/common/lib/Common/Thing.pm"
+    FLAGS = 0x2
+    EGV = 0xb76c3034"default_as_hash_options"
+
+=cut
+
+                    given ($line) {
+                        when (/^\s+(?:MG_OBJ|SV|IO|FORM|AV|HV|CV|)\s+=\s+0x([[:xdigit:]]+)/) {
+                            contains( $self, "$1" );
+                        }
+                        when (/^\s+NAME = "(.+)"/) {
+                            name( $self, "\Q$1" );
+                        }
+                        when (/^\s+GvSTASH = 0x[[:xdigit:]]+\s*"(.+)"/ ) {
+                            stash( $self, "\Q$1" );
+                        }
+                    }
+                }
+                when ('PVHV') {
+
+=pod
+
+  REFCNT = 1
+  FLAGS = (SHAREKEYS)
+  IV = 3
+  NV = 0
+  ARRAY = 0xba63f18  (0:6, 1:1, 2:1)
+  hash quality = 90.0%
+  KEYS = 3
+  FILL = 2
+  MAX = 7
+  RITER = -1
+  EITER = 0x0
+
+ARRAY(0xba63f18)
+    [0xa76f658 "filter_keys"] => 0xba2dd00
+    [0xa703d18 "records_found"] => 0xb75fe73c
+    [0xa76de20 "count_keys"] => 0xb7633440
+
+=cut
+                    given ($line) {
+                        when ( /^\s+MAX\s+=(\d+)/ ) {
+                            my $size = $SV_SIZE * $1;
+                            size( $self, $size );
+                        }
+                        when (/^\s+\[0x([[:xdigit:]]+)\s+".+"\]\s+=>\s+0x([[:xdigit:]]+)/){
+                            my $ptr1 = "$1";
+                            my $ptr2 = "$2";
+                            shares( $self, $ptr1 );
+                            contains( $self, $ptr2 );
+                        }
+                    }
+                }
+                when ('NULL') {
+                    given ($line) {
+                        when(/^\s+REFCNT/) {
+                            size( $self, $SV_SIZE );
+                        }
+                    }
+                }
+                when ('PVAV') {
+
+=pod
+
+  REFCNT = 2
+  FLAGS = (PADBUSY,PADMY)
+  IV = 0
+  NV = 0
+  ARRAY = 0xcbaef08
+  FILL = 10
+  MAX = 11
+  ARYLEN = 0x0
+  FLAGS = (REAL)
+
+AvARRAY(0xcbaef08) = {{0xb75bd480,0xb7b776cc,0xb79dfbc8,0xb75e5ee4,0xb7664148,0xb93a3cc,0xb76011d8,0xb7b51590,0xb762993c,0xb761a4a4,0xb7b50288}{PL_sv_undef}}
+
+=cut
+
+                    given ($line) {
+                        when (/^  MAX = (\d+)/) {
+                            size( $self, ($SV_SIZE * 3 + 4*$1) );
+                        }
+                        when (/^AvARRAY\(+0x[[:xdigit:]]+\) = \{+/ ) {
+                            pos() = $-[0];
+                            while (/0x([[:xdigit:]]+)/g) {
+                                contains( $self, "$1" );
+                            }
+                        }
+                    }
+                }
+                when ('IV') {
+                    given ($line) {
+                        when (/^\s+REFCNT/) {
+                            size( $self, $SV_SIZE );
+                        }
+                    }
+                }
+                when ('RV') {
+                    given ($line) {
+                        when (/^\s+RV\s+=\s+0x([[:xdigit:]]+)/) {
+                            contains( $self, "$1" );
+                            size( $self, $SV_SIZE );
+                        }
+                    }
+                }
+                when (/^PV(?:IV|NV|MG)\z/) {
+                    given ($line) {
+                        when (/^\s+LEN\s+=\s+(\d+)/) {
+                            size( $self, $SV_SIZE + $1 );
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+for my $nm ( sort keys %out ) {
+    close $out{$nm}{fh}
+        or warn "Can't flush $out{$nm}{name}: $!";
+    say "Wrote $out{$nm}{name} (@{[ pretty_size( -s $out{$nm}{name} ) ]})";
+}
+
+sub function;
+sub file;
+sub name;
+sub stash;
+sub size;
+sub shares;
+sub vertex;
+BEGIN {
+    for my $nm ( qw( function file name stash size shares vertex ) ) {
+        no strict 'refs';
+        *$nm = sub {
+            use strict;
+            local $" = ',';
+            say { $out{$nm}{fh} } "$nm(@_).";
+        };
+    }
+}
+sub type {
+    say {$out{type}{fh}} "type($_[0],'$_[1]').";
+}
+sub contains {
+    if ( $VALID_POINTER <= length $_[1] ) {
+        local $" = ',';
+        say { $out{contains}{fh} } "contains(@_).";
+    }
+    return;
+}

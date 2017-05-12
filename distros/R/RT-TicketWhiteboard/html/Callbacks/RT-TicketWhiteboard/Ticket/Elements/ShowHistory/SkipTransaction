@@ -1,0 +1,13 @@
+<%args>
+$Transaction => undef
+$skip => undef
+</%args>
+<%init>
+return unless ( $Transaction->Type eq 'CustomField' and $Transaction->Field );
+
+my $cf = RT::CustomField->new( $session{CurrentUser} );
+$cf->Load( $Transaction->Field );
+
+$$skip = 1 if ( $cf->Name eq 'Whiteboard' );
+
+</%init>

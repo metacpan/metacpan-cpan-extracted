@@ -1,0 +1,55 @@
+---
+abstract: 'pure Perl RDF inferencing'
+author:
+  - 'Ivan Herman'
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+  Test::RDF: 0.24
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - Inference
+  - OWL
+  - RDF
+  - RDFS
+  - RL
+  - Reasoning
+  - Rules
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: RDF::Closure
+name: RDF-Closure
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Data::UUID: 0
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  DateTime::Format::XSD: 0
+  DateTime::TimeZone: 0
+  Error: 0
+  Module::Pluggable: 0
+  Number::Fraction: 0
+  Parse::RecDescent: 0
+  RDF::Trine: 0.135
+  URI: 0
+  XML::LibXML: 1.94
+  namespace::clean: 0
+  perl: 5.8.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-Closure
+  homepage: https://metacpan.org/release/RDF-Closure
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-rdf-closure
+version: 0.001

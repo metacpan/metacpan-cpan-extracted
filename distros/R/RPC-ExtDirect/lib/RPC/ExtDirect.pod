@@ -1,0 +1,516 @@
+=pod
+
+=begin readme text
+
+RPC::ExtDirect
+==============
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+RPC::ExtDirect - Easily integrate Perl server code with JavaScript apps
+
+=head1 SYNOPSIS
+
+    package Foo::Bar;
+    
+    use RPC::ExtDirect Action => 'FooBar';
+    
+    sub sum : ExtDirect(len => 2) {
+        my ($class, $a, $b) = @_;
+        
+        return $a + $b;
+    }
+    
+    sub login : ExtDirect(params => ['user, 'pass']) {
+        my ($class, %arg) = @_;
+        
+        if ( $arg{user} eq 'foo' && $arg{pass} eq 'bar' ) {
+            return {
+                success => \1,  # JSON::true
+            };
+        }
+        else {
+            return {
+                success => \0,  # JSON::false
+                error   => "You shall not pass!"
+            };
+        }
+    }
+
+=head1 DESCRIPTION
+
+=for readme continue
+
+RPC::ExtDirect suite of modules provides an easy, simple and robust way to
+write Perl server side code that could be used with HTML5 Rich Internet
+Applications based on JavaScript frameworks
+L<Ext JS|http://www.sencha.com/products/extjs/> and
+L<Sencha Touch|http://www.sencha.com/products/touch/>.
+
+The suite consists of the core RPC::ExtDirect module that implements Ext.Direct
+protocol and transport layer, several server environment-specific peripheral
+gateways, a standalone pure Perl server, two Perl clients, and even its own
+specialized testing scaffold! We've got it covered front to back. :)
+
+=for readme stop
+
+=head1 INTRODUCTION AND EXAMPLES
+
+If you are not familiar with Ext.Direct, start with L<RPC::ExtDirect::Intro>
+for more explanations and a few examples, both easy and more advanced.
+
+=head1 WHEN TO USE IT, AND WHY
+
+Ext.Direct is a Remote Procedure Call (RPC) protocol provided out of the box
+with JavaScript frameworks by L<Sencha|http://www.sencha.com>. It is deeply
+integrated in the data services, and is supported by a slew of components.
+Besides that, Ext.Direct also has several major advantages over similar
+protocols like XML-RPC and JSON-RPC:
+
+=over 4
+
+=item *
+
+Built in service discovery mechanism: server side API is published to the
+client via GET requests to a preconfigured URI
+
+=item *
+
+Dead simple client side invocation via functional stubs created from the
+API declaration
+
+=item *
+
+Support for call metadata that is handled separately from the arguments
+for method invocation
+
+=item *
+
+Support for request batching with configurable timeout
+
+=item *
+
+Easy file uploads via form submits, with all the complexity handled behind
+the curtains by the framework and the server side stack
+
+=item *
+
+Asynchronous push notifications via event polling
+
+=back
+
+All this makes Ext.Direct a no-brainer when developing Web apps with Ext JS or
+Sencha Touch. And with RPC::ExtDirect, choosing Perl to write server side code
+for Web apps comes naturally, too. :)
+
+=for readme stop
+
+=head1 HOW TO USE
+
+Since Ext.Direct is just a transport layer, you don't need to change your app
+architecture to work around it. If you have an existing server side API you
+can publish it with minimal effort; if you're starting from scratch, add the
+classes and methods as you go.
+
+Note that with Ext.Direct, we're talking about classes and methods - that owes
+to the fact that Ext.Direct originated in Ext JS framework, which itself is
+written in JavaScript with object-oriented approach in mind. This does not mean
+you can't go functional or even procedural with RPC::ExtDirect; it is perfectly
+possible to cook your own flavor of spaghetti code under the light OOP sauce that
+RPC::ExtDirect provides.
+
+In order for a method to be published to the outside world, it needs to be
+declared in the L<Ext.Direct API|RPC::ExtDirect::Intro/API>. As of version 3.0,
+it can be done in two ways: either with C<ExtDirect> attribute as shown in the
+L</SYNOPSIS>, or by including the method in a hashref fed to L<RPC::ExtDirect::API>
+constructor. See L<RPC::ExtDirect::API/"COMPILE VS RUN TIME DEFINITION"> for more
+detail.
+
+=head1 METHODS AND CALLING CONVENTIONS
+
+Unlike Ext.Direct specification (and reference PHP implementation, too)
+RPC::ExtDirect does not impose strict architectural notation on server
+side code. There is no mandatory object instantiation and no assumption
+about the code called. That said, an RPC::ExtDirect Method should conform
+to the following conventions:
+
+=over 4
+
+=item *
+
+Be a class method, i.e. be aware that its first argument will be the package
+(class) name. Just ignore it if you don't want it.
+
+=item *
+
+Ordered (numbered) arguments are passed as list in C<@_>, so C<$_[1]> is
+the first argument. No more than number of arguments declared in the
+L<Method|RPC::ExtDirect::Intro/Method> definition will be passed to the
+Method; any extra will be dropped silently. Less arguments than declared
+will result in an L<Exception|RPC::ExtDirect::Intro/Exception> returned
+to the client side, and Method never gets called.
+
+=item *
+
+Named arguments are passed as a hash in C<@_>. No arguments other than
+declared will be passed to the L<Method|RPC::ExtDirect::Intro/Method>;
+extra arguments will be dropped silently. If not all arguments are
+present for the remoting invocation, an
+L<Exception|RPC::ExtDirect::Intro/Exception> will be returned and the
+Method never gets called.
+
+Starting with Ext JS 4.2.2, it is possble to relax the argument checking
+requirements; see L<RPC::ExtDirect::API/"Lazy parameter checking"> for
+more information.
+
+=item *
+
+Form handlers are passed their arguments as a hash in C<@_>. Standard
+Ext.Direct form field values are removed from the argument hash;
+uploaded file(s) will be passed in the C<file_uploads> hash element.
+It will only be present when there are uploaded files. For more info,
+see L</"FILE UPLOADS">.
+
+Note that any field values in a submitted form will be JSON encoded
+by the client side.
+
+=item *
+
+All remoting Methods are called in scalar context. Returning one scalar
+value is OK; returning array- or hashref is OK too.
+
+Do not return blessed objects; it is almost always not obvious how to
+serialize them into JSON that is expected by the client side. JSON
+encoder will choke and an L<Exception|RPC::ExtDirect::Intro/Exception>
+will be returned to the client. Having said that, if you know what you
+are doing, it is possible to adjust the Serializer's behavior with
+L<RPC::ExtDirect::Config/json_options> Config option.
+
+=item *
+
+If an error is encountered while processing request, throw
+an exception: C<die "My error string\n">. Note that C<"\n"> at
+the end of error string; if you don't add it, C<die()> will
+append file name and line number to the error message
+which is probably not the best idea for errors that are not
+shown in server console but rather passed on to the JavaScript client.
+
+RPC::ExtDirect will trim that last C<"\n"> for you before
+sending the L<Exception|RPC::ExtDirect::Intro/Exception> back to the
+client side.
+
+=item *
+
+Poll handler methods are called in list context and do not
+receive any arguments except the environment object. Return value
+must be a list of instantiated L<Event|RPC::ExtDirect::Intro/Event>
+objects, see L<RPC::ExtDirect::Event> for more detail.
+
+=back
+
+=head1 CALL METADATA
+
+Imagine a Web application with an editable Grid populated with data
+from a database table. To update the database when changes are saved,
+the client will send an array of changed records that will be passed
+to the corresponding Ext.Direct Method as call arguments. But what
+about the table name?
+
+The usual approach is to create a separate set of 4 CRUD methods
+(Create, Read, Update, Delete) for each table, and expose these
+methods as a separate L<Action|RPC::ExtDirect::Intro/Action>. While
+tried and true, this approach leads to bloated Ext.Direct API
+when there are many tables, with lots of packages and code duplication
+just for the sake of editing a database table. This can be especially
+frustrating when the application has many similar tables differing
+only in the name.
+
+Call metadata allows solving this and many other problems by passing
+some information to the called Method along with the main data but not
+as a part of the arguments. In particular, using metadata allows for
+having one set of CRUD methods for all similar data tables and send
+different table name for each call as metadata.
+
+More of it, Ext JS (and RPC::ExtDirect, too) allow having different
+calling convention for Method arguments and metadata, e.g. having a
+L<Named Method|RPC::ExtDirect::Intro/"Named Method"> with ordered
+(by position) metadata, and vice versa.
+
+Call metadata is a new feature in Ext JS 5.1+.
+
+=head1 HOOKS
+
+Hooks provide an option to intercept method calls and modify arguments
+passed to the methods, or cancel their execution. Hooks are intended
+to be used as a shim between task-oriented Methods and Web specifics.
+
+Methods should not, to the reasonable extent, be aware of their
+environment or care about it; Hooks are expected to know how to deal with
+Web intricacies but not be task oriented.
+
+The best uses for Hooks are: application or package-wide pre-call setup,
+user authorization, logging, cleanup, testing, etc. Or you can think of
+the Hooks as poor man's method wrappers without L<Moose's|Moose> power
+(and associated costs).
+
+See more in L<RPC::ExtDirect::API::Hook>.
+
+=head1 ENVIRONMENT OBJECTS
+
+Since Hooks, and sometimes Methods too, need to be aware of their Web
+environment, it is necessary to give them access to it in some way
+without locking in on platform specifics. RPC::ExtDirect's answer to
+this problem is environment objects.
+
+An environment object provides platform-agnostic interface for accessing
+HTTP headers, cookies, form field values, etc. Such object is guaranteed
+to have the same set of methods that behave the same way across all
+platforms supported by RPC::ExtDirect, avoiding portability issues.
+
+The interface is modeled after the de facto standard CGI.pm:
+
+=over 4
+
+=item *
+
+C<$value = $env-E<gt>param('name')> will retrieve a parameter by name
+
+=item *
+
+C<@list = $env-E<gt>param()> will get the list of available parameters
+
+=item *
+
+C<$cookie = $env-E<gt>cookie('name')> will retrieve a cookie
+
+=item *
+
+C<@cookies = $env-E<gt>cookie()> will return the list of cookies
+
+=item *
+
+C<$header = $env-E<gt>http('name')> will return an HTTP header
+
+=item *
+
+C<@headers = $env-E<gt>http()> will return the list of HTTP headers
+
+=back
+
+Of course it is possible to use environment object in a more sophisticated
+way if you like to, however do not rely on it having a well-known class
+name as it is not guaranteed. Environment objects are simple helpers
+held together by duck type.
+
+Starting with RPC::ExtDirect 3.0, only L<Hooks|/HOOKS> will receive
+an environment object by default. For Methods to receive them as well,
+you need to specify a L<RPC::ExtDirect::API::Method/env_arg> parameter
+in Method definition.
+
+=head1 FILE UPLOADS
+
+Ext.Direct offers native support for file uploading by using temporary
+HTML forms. RPC::ExtDirect supports this feature; upload requests can be
+processed in a
+L<Form Handler Method|RPC::ExtDirect::Intro/"Form Handler Method">.
+The interface aims to be platform agnostic and will try to do its best
+to provide the same results in all HTTP environments supported by
+RPC::ExtDirect.
+
+In a Form Handler Method, arguments are passed as a hash. If one or more
+file uploads were associated with request, the argument hash will contain
+a key with value set to arrayref of file hashrefs. The default name for
+this key is C<file_uploads>; this can be configured using
+L<upload_arg|RPC::ExtDirect::API::Method/upload_arg> Method parameter.
+
+Each file hashref will have the following keys:
+
+=over 4
+
+=item C<type>
+
+MIME type of the file, if provided
+
+=item C<size>
+
+File size, in octets
+
+=item C<path>
+
+Path to a temporary file that holds uploaded content
+
+=item C<handle>
+
+Open IO::Handle for the temporary file
+
+=item C<basename>
+
+Name portion of the originally submitted file name, if provided by the
+client side
+
+=item C<filename>
+
+Full original path as sent by the client, if any
+
+=back
+
+All files passed to a Method need to be processed in that Method;
+existence of temporary files is not guaranteed after Method returns.
+
+=head1 GATEWAYS
+
+In RPC::ExtDirect parlance, a Gateway is a module that deals with the
+specifics of a particular Web server environment. At the time of writing
+this documentation, the following gateways are available for
+RPC::ExtDirect:
+
+=over 4
+
+=item CGI gateway
+
+L<CGI::ExtDirect> is used with the ole goode L<CGI> environment; it is
+also compatible with the newer L<CGI::Simple> module that is a drop-in
+replacement for C<CGI.pm>.
+
+This gateway is most often used for testing Ext.Direct interfaces, usually
+with L<Test::ExtDirect> helper module. However, CGI environment is easy
+to use and set up practically anywhere, and it can be used in the variety
+of situations where a full blown Perl application server is not feasible.
+
+One example of such usage would be retrofitting a legacy system with a
+modern HTML5 Web interface.
+
+=item Plack gateway
+
+L<Plack::Middleware::ExtDirect> implements an RPC::ExtDirect interface
+for L<Plack> application server environment. This gateway should also be
+used instead of the L<Apache gateway|/"Apache gateway"> in L<mod_perl>
+environment.
+
+=item AnyEvent::HTTPD gateway
+
+L<AnyEvent::HTTPD::ExtDirect> implements a completely asynchronous
+interface for RPC::ExtDirect, based on L<AnyEvent::HTTPD> module.
+
+=item Apache gateway
+
+L<Apache::ExtDirect> is a legacy gateway for Apache/L<mod_perl>
+environment. Since it was written, Apache has fallen out of usage with
+the author and so the gateway is mostly unsupported. You can use
+L<Plack gateway|/"Plack gateway"> instead, with one of the built in
+Apache/Plack handlers.
+
+=back
+
+=head1 MIGRATING FROM PREVIOUS VERSIONS
+
+If you are using less than current RPC::ExtDirect version, please
+refer to L<RPC::ExtDirect::Migration> document for the notes and
+explanations that might prove useful for migration.
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make && make test
+    make install
+
+=end readme
+
+=for readme continue
+
+=head1 DEPENDENCIES
+
+RPC::ExtDirect is dependent on the following modules:
+L<Attribute::Handlers>, L<JSON>.
+
+The oldest Perl version RPC::ExtDirect is routinely tested against
+is 5.6.2.
+
+=for readme stop
+
+=head1 BUGS AND LIMITATIONS
+
+At this time there are no known bugs in this module. Please report
+problems to the author, patches are always welcome.
+
+Use L<Github tracker|https://github.com/nohuhu/RPC-ExtDirect/issues>
+to open bug reports, this is the easiest and quickest way to get your
+issue fixed.
+
+=head1 SEE ALSO
+
+Take a look at these useful modules that are a part of RPC::ExtDirect
+family:
+
+=over 4
+
+=item *
+
+L<RPC::ExtDirect::Server> - a prebuilt Ext.Direct server in Perl, based on
+L<HTTP::Server::Simple>.
+
+=item *
+
+L<RPC::ExtDirect::Client> - a synchronous Ext.Direct client in Perl.
+
+=item *
+
+L<RPC::ExtDirect::Client::Async> - a fully asynchronous Ext.Direct client
+in Perl, with API compatible to L<RPC::ExtDirect::Client>.
+
+=item *
+
+L<Test::ExtDirect> - a set of helper subroutines that make unit testing
+Ext.Direct APIs a breeze.
+
+=back
+
+Also you can find additional information in the following Web site links:
+
+=over 4
+
+=item *
+
+L<Ext JS product website|http://www.sencha.com/products/extjs/>
+
+=item *
+
+L<Sencha Touch product website|http://www.sencha.com/products/touch/>
+
+=item *
+
+L<Ext.Direct specification|http://www.sencha.com/products/extjs/extdirect/>
+
+=item *
+
+L<Ext.Direct support forum|http://www.sencha.com/forum/forumdisplay.php?47>
+
+=item *
+
+L<Ext.Direct plugin for jQuery|https://github.com/ha-sash/jquery-ext-direct-client>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+I would like to thank IntelliSurvey, Inc for sponsoring my work
+on versions 2.x and 3.x of the RPC::ExtDirect suite of modules.
+
+=for readme continue
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2011-2016 by Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<"perlartistic">.
+
+=cut

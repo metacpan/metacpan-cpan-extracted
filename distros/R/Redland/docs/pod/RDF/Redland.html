@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Redland RDF Application Framework - Perl RDF::Redland Class</title>
+</head>
+<body>
+
+<h1 style="text-align:center">Redland RDF Application Framework - Perl RDF::Redland Class</h1>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+        <li><a href="#name">NAME</a></li>
+        <li><a href="#synopsis">SYNOPSIS</a></li>
+        <li><a href="#description">DESCRIPTION</a></li>
+        <li><a href="#static_methods">STATIC METHODS</a></li>
+        <li><a href="#see_also">SEE ALSO</a></li>
+        <li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<h2><a name="name" id="name">NAME</a></h2>
+<p>RDF::Redland - Redland RDF Class</p>
+
+<h2><a name="synopsis" id="synopsis">SYNOPSIS</a></h2>
+<pre>
+  use RDF::Redland;
+  my $storage=new RDF::Redland::Storage("hashes", "test", "new='yes',hash-type='memory'");
+  my $model=new RDF::Redland::Model($storage, "");
+</pre>
+<pre>
+  ...
+</pre>
+
+<h2><a name="description" id="description">DESCRIPTION</a></h2>
+<p>This class initialises the Redland RDF classes.</p>
+<p>See the main classes for full detail: <a href="Redland/Node.html">the RDF::Redland::Node manpage</a>, <a href="Redland/BlankNode.html">the RDF::Redland::BlankNode manpage</a>, <a href="Redland/URINode.html">the RDF::Redland::URINode manpage</a>, <a href="Redland/LiteralNode.html">the RDF::Redland::LiteralNode manpage</a>, <a href="Redland/XMLLiteralNode.html">the RDF::Redland::XMLLiteralNode manpage</a>, <a href="Redland/URI.html">the RDF::Redland::URI manpage</a>, <a href="Redland/Statement.html">the RDF::Redland::Statement manpage</a>, <a href="Redland/Model.html">the RDF::Redland::Model manpage</a>, <a href="Redland/Storage.html">the RDF::Redland::Storage manpage</a>, <a href="Redland/Parser.html">the RDF::Redland::Parser manpage</a>, <a href="Redland/Query.html">the RDF::Redland::Query manpage</a>, <a href=
+"/docs/pod/RDF/Redland/QueryResults.html">the RDF::Redland::QueryResults manpage</a>, <a href="Redland/Iterator.html">the RDF::Redland::Iterator manpage</a>, <a href="Redland/Stream.html">the RDF::Redland::Stream manpage</a> and <a href="Redland/RSS.html">the RDF::Redland::RSS manpage</a>.</p>
+
+<h2><a name="static_methods" id="static_methods">STATIC METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_set_log_handler" id="item_set_log_handler">set_log_handler SUB</a></strong></dt>
+<dd>
+<p>Set <em>SUB</em> as the subroutine to be called on any Redland error, warning or log message. The subroutine must have the followign signature:</p>
+</dd>
+<dd>
+<pre>
+  sub handler ($$$$$$$$$) {
+    my($code, $level, $facility, $message, $line, $column, $byte, $file, $uri)=@_;
+    # int error code
+    # int log level
+    # int facility causing the error (parsing, serializing, ...)
+    # string error message
+    # int line number (&lt;0 if not relevant)
+    # int column number (&lt;0 if not relevant)
+    # int byte number (&lt;0 if not relevant)
+    # string file name or undef
+    # string URI or undef
+    
+    # ...do something with the information ...
+  };
+</pre></dd>
+<dd>
+<pre>
+  RDF::Redland::set_log_handler(\&amp;handler);
+</pre></dd>
+</dl>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_reset_log_handler" id="item_reset_log_handler">reset_log_handler</a></strong></dt>
+</dl>
+</div>
+<p>Reset redland to use the default logging handler, typically printing the message to stdout or stderr and exiting on a fatal error.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_set_error_handler" id="item_set_error_handler">set_error_handler SUB</a></strong></dt>
+</dl>
+</div>
+<p>The method set_log_handler is much more flexible than this and includes this functionality.</p>
+<p>Set <em>SUB</em> as the subroutine to be called on a Redland error with the error message as the single argument. For example:</p>
+<pre>
+  RDF::Redland::set_error_handler(sub {
+    my $msg=shift;
+    # Do something with $msg
+  });
+</pre>
+<p>The default if this is not set, is to run die $msg</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_set_warning_handler" id="item_set_warning_handler">set_warning_handler SUB</a></strong></dt>
+</dl>
+</div>
+<p>The method set_log_handler is much more flexible than this and includes this functionality.</p>
+<p>Set <em>SUB</em> as the subroutine to be called on a Redland warning with the warning message as the single argument. For example:</p>
+<pre>
+  RDF::Redland::set_warning_handler(sub {
+    my $msg=shift;
+    # Do something with $msg
+  });
+</pre>
+<p>The default if this is not set, is to run warn $msg</p>
+
+<h2><a name="see_also" id="see_also">SEE ALSO</a></h2>
+<p><a href="Redland/Node.html">the RDF::Redland::Node manpage</a>, <a href="Redland/BlankNode.html">the RDF::Redland::BlankNode manpage</a>, <a href="Redland/URINode.html">the RDF::Redland::URINode manpage</a>, <a href="Redland/LiteralNode.html">the RDF::Redland::LiteralNode manpage</a>, <a href="Redland/XMLLiteralNode.html">the RDF::Redland::XMLLiteralNode manpage</a>, <a href="Redland/URI.html">the RDF::Redland::URI manpage</a>, <a href="Redland/Statement.html">the RDF::Redland::Statement manpage</a>, <a href="Redland/Model.html">the RDF::Redland::Model manpage</a>, <a href="Redland/Storage.html">the RDF::Redland::Storage manpage</a>, <a href="Redland/Parser.html">the RDF::Redland::Parser manpage</a>, <a href="Redland/Query.html">the RDF::Redland::Query manpage</a>, <a href="Redland/QueryResults.html">the
+RDF::Redland::QueryResults manpage</a>, <a href="Redland/Iterator.html">the RDF::Redland::Iterator manpage</a>, <a href="Redland/Stream.html">the RDF::Redland::Stream manpage</a> and <a href="Redland/RSS.html">the RDF::Redland::RSS manpage</a>.</p>
+
+<h2><a name="author" id="author">AUTHOR</a></h2>
+<p>Dave Beckett - <a href="http://purl.org/net/dajobe/">http://purl.org/net/dajobe/</a></p>
+<hr />
+
+<p>(C) Copyright 2000-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, (C) Copyright 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>

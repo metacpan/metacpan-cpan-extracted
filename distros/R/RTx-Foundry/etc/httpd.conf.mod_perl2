@@ -1,0 +1,28 @@
+DocumentRoot /usr/local/rt3/share/html
+
+PerlSetVar MasonArgsMethod CGI
+RedirectMatch ^/$ /Foundry/index.html
+
+PerlModule Apache::DBI
+PerlRequire /usr/local/rt3/bin/webmux.pl
+DirectoryIndex index.html
+
+<FilesMatch "\.cgi$">
+    Options +ExecCGI
+</FilesMatch>
+<FilesMatch "\.html$">
+    SetHandler perl-script
+    PerlHandler RT::Mason
+</FilesMatch>
+<FilesMatch "\.js$">
+    SetHandler perl-script
+    PerlHandler RT::Mason
+</FilesMatch>
+<LocationMatch "/Attachment/">
+    SetHandler perl-script
+    PerlHandler RT::Mason
+</LocationMatch>
+<LocationMatch "/REST/">
+    SetHandler perl-script
+    PerlHandler RT::Mason
+</LocationMatch>

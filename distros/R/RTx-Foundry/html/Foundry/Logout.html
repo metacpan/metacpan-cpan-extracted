@@ -1,0 +1,8 @@
+<& /Foundry/index.html &> 
+<%INIT>
+if (defined %session) {
+	tied(%session)->delete;
+}
+$session{CurrentUser}->Load('guest');
+$RT::Guest = 1;
+</%INIT>

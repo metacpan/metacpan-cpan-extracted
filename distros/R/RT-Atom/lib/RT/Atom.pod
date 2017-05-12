@@ -1,0 +1,509 @@
+=head1 NAME
+
+RT::Atom - The RT-Atom API
+
+=head1 VERSION
+
+This document describes version 0.03 of RT::Atom, released May 19, 2004.
+
+=head1 DESCRIPTION
+
+This RT extension implements a REST-style web service interface, based
+on the B<Atom draft specification>, version 0.3.
+
+For more information on Atom and REST, please consult the references
+in the L</SEE ALSO> section.
+
+=head2 The RT-Atom URI space
+
+Some example canonical URIs are:
+
+    /Atom/0.3                                   # FeedURI (Container)
+    /Atom/0.3/RT-Tickets                        # FeedURI (Container)
+    /Atom/0.3/RT-Tickets                        # PostURI (Container)
+    /Atom/0.3/RT-Tickets/15                     # EditURI (Object)
+    /Atom/0.3/RT-Tickets/15,16,17               # PostURI (ResultSet)
+    /Atom/0.3/RT-Tickets/15.Subject             # EditURI (Property)
+    /Atom/0.3/RT-Tickets/15/Transactions        # FeedURI (Container)
+
+Note that the C<15> above is the C<Id>; if you want element indices,
+use these URIs instead:
+
+    /Atom/0.3/RT-Users/*0                     # EditURI (Object)
+    /Atom/0.3/RT-Users/*-1                    # EditURI (Object)
+    /Atom/0.3/RT-Users.Count                  # EditURI (Property)
+
+A RT-Atom server may also supply alias URIs.  Whenever an user request such
+a URI, it is redirected to the canonical URL with a I<301 Moved Permanently>.
+
+Here are some example aliases:
+
+    /Atom                       # /Atom/0.3
+    /Atom/0.3/tickets           # /Atom/0.3/RT-Tickets
+    /Atom/0.3/Tickets           # /Atom/0.3/RT-Tickets
+    /Atom/0.3/Ticket/15         # /Atom/0.3/RT-Tickets/15
+    /Atom/0.3/Users/somename    # /Atom/0.3/Users/1234
+
+=head2 Sample exchange
+
+Create an C<autrijus> user, then add it to all groups that has C<root>
+as member.
+
+First, the B<RT::Client> code using its OO interface:
+
+    my $rt = RT::Client->new('http://guest:guest@localhost/');
+
+    my $user = $rt->Users->add(
+        Name => 'autrijus',
+        EmailAddress => 'autrijus@example.com',
+    );
+
+    $rt->Groups->search(Members => { Name => 'root' })->update(
+        Members => { add => $user },
+    );
+
+And now the actual requests and responses.  First, the Authentication
+part: (The C<Accept> header will be omitted for brevity from now on.)
+
+    HEAD /Atom/0.3
+    Accept: application/atom+xml,*/*
+
+        401 Authorization Required
+        WWW-Authenticate: WSSE realm="localhost", profile="UsernameToken"
+
+Log in and probe the C<Users> collection:
+
+    OPTIONS /Atom/0.3/Users
+    X-WSSE: UsernameToken Username="guest", ...
+
+        301 Moved Permanently
+        Location: /Atom/0.3/RT-Users
+
+Try again: (The C<X-WSSE> header is generated anew; it will be omitted
+for brevity from now on.)
+
+    OPTIONS /Atom/0.3/Users
+    X-WSSE: UsernameToken Username="guest", ...
+
+        200 OK
+        <entry>
+          <content type="text/xml" mode="xml">
+            <body Name=""
+                  EmailAddress=""
+                  ...>
+              ...
+            </body>
+          </content>
+        </entry>
+
+Now create a user.  RT-Atom supports two type of payloads for this,
+distinguished by their C<Content-Type> headers.  First is AtomEntry:
+
+    POST /Atom/0.3/Users
+    Content-Type: application/atom+xml
+
+    <entry>
+      <content type="text/xml" mode="xml">
+        <body Name="autrijus"
+              EmailAddress="autrijus@example.com" />
+      </content>
+    </entry>
+
+Another one is a form post.  Clients should use C<multipart/form-data>:
+
+    POST /Atom/0.3/Users
+    Content-type: multipart/form-data; boundary=---
+
+    ---
+    Content-Disposition: form-data; name="Name"
+    
+    autrijus
+    ---
+    Content-Disposition: form-data; name="EmailAddress"
+    
+    autrijus@example.com
+
+However, the server may also support C<application/x-www-form-urlencoded>:
+
+    POST /Atom/0.3/Users
+    Content-Type: application/x-www-form-urlencoded
+
+    Name=autrijus&EmailAddress=autrijus%4dexample.com
+
+In all cases above, the server will return:
+
+        303 See Other
+        Location: /Atom/0.3/RT-Users/20
+
+Now we can learn something about the freshly created user: 
+
+    GET /Atom/0.3/RT-Users/20
+
+        200 OK
+        <entry>
+          <content type="text/xml" mode="xml">
+            <body Name="autrijus"
+                  EmailAddress="autrijus@example.com"
+                  ...>
+              ...
+            </body>
+          </content>
+        </entry>
+
+Next we learn something about Groups:
+
+    OPTIONS /Atom/0.3/Groups
+
+        301 Moved Permanently
+        Location: /Atom/0.3/RT-Groups
+
+    OPTIONS /Atom/0.3/RT-Groups
+
+        200 OK
+        <entry>
+          <content type="text/xml" mode="xml">
+            <body Name="" ...>
+              <Members />
+            </body>
+          </content>
+        </entry>
+
+Now we make a query on Groups:
+
+    HEAD /Atom/0.3/RT-Groups?Members-name=root&rows=all
+
+        200 OK
+        Content-Location: /Atom/0.3/RT-Groups/1,2,3,5,8,13
+
+Before we perform an update on the result set, we again probe
+for its representation:
+
+    OPTIONS /Atom/0.3/RT-Groups/1,2,3,5,8,13
+
+        200 OK
+        <entry>
+          <content type="text/xml" mode="xml">
+            <body>
+              <Members />
+            </body>
+          </content>
+        </entry>
+
+Finally, the modification and its response:
+
+    POST /Atom/0.3/RT-Groups/1,2,3,5,8,13
+    Content-Type: application/x-www-form-urlencoded
+
+    Members-add=30
+
+The server may respond with this:
+
+        207 Multiple Status
+        <entry>
+          <content type="multipart/parallel" mode="xml">
+            <body>
+              <response status="200">Member added.</head>
+              <response status="200">Member added.</head>
+            </body>
+          </content>
+        </entry>
+
+=head2 Authentication
+
+The authentication algorithm uses the C<WWW-Authenticate>,
+C<Authorization>, and C<X-WSSE> headers as specified in the Atom
+Authentication Protocol.
+
+However, instead of using plaintext as the shared password between
+client and server, RT-Atom uses this digest function:
+
+    md5_hex(join(':', $username, $realm, md5_hex($password)));
+
+The RT server may choose to support other authentication methods, such
+as C<Basic> or C<Digest>.
+
+=head2 Identity Switching
+
+Once authenticated, the server should check for the C<X-RT-CurrentUser>
+header.  If this header is present, it takes one of the following actions:
+
+=over 4
+
+=item If the authenticated user does not have the C<SuperUser> right
+
+The server returns I<401 Authorization Required> without processing the
+request body.
+
+=item If the server cannot find the new user
+
+The server returns I<406 Forbidden> without processing the request body.
+
+=item If the user has the C<SuperUser> right, and a new user is found
+
+The client assumes the identity of the new user specified in the header.
+The request proceeds as usual.
+
+=back
+
+=head2 Content Negotiation
+
+The server understands a number of HTTP headers for content negotiation:
+
+=over 4
+
+=item Accept
+
+Specifies the content type the client is willing to process.  A RT-Atom
+client must include C<application/atom+xml> in its C<Accept> list.
+
+=item Accept-Charset
+
+The character encoding expected by the client.  If unspecified, defaults
+to C<UTF-8>.  If the requested encoding cannot represent certain codepoints
+in the response, the server must use XML character references (C<&#xABCD;>)
+instead.
+
+If none of the requested encodings are supported by the server, a I<406
+Not Acceptable> error is returned.
+
+=item Accept-Language
+
+The languages to use in human-readable C<CDATA> parts, notably response texts.
+
+=back
+
+=head1 RESOURCE TYPES
+
+=head2 Container
+
+...
+
+=head2 ResultSet
+
+...
+
+=head2 Object
+
+...
+
+=head2 Property
+
+A scalar attached to a single Object; accepts only Get/Set operations
+(i.e. I<GET>/I<PUT> methods).
+
+The MIME type for both operations is C<text/plain>, with a mandatory
+extra newline at the end.  For example:
+
+    % lwp-request -m GET .../Tickets/15.Status
+    new
+    % echo resolved | lwp-request -m PUT .../Tickets/15.Status
+    resolved
+
+The C<...> above stands for something like C<http://example.com/Atom/0.3/>.
+
+=head1 OPERATIONS
+
+Here is a list of all operations supported by this API, including their
+possible response status codes and meanings:
+
+=head2 Search - I<GET FeedURI>
+
+Search for objects within an container.
+
+Possible query parameters: I<rows> (mandatory), I<page>, I<query>,
+I<columns>.  Additional query parameters may also be available.
+
+If entries are found, the C<Content-Location> header is set to a URL
+pointing to the ResultSet.
+
+    200: Success.  Body is the result serialized as an AtomFeed.
+    400: Request failed.  Body is the error message.
+    404: There is no container matching the specified URI.
+
+=head2 Get - I<GET EditURI>
+
+Retrieve a representation of an object or property.
+
+Possible query parameters: I<expand>.
+
+    200: Success.  Body is the serialized item.
+    400: Request failed.  Body is the error message.
+    404: There is no object matching the specified URI.
+
+=head2 Set - I<PUT EditURI>
+
+Modifies an object or property with the serialization in the request body.
+
+    200: Success.  Body is the serialized item again.
+    400: Request failed.  Body is the error message.
+    404: There is no object matching the specified URI.
+
+Clients without I<PUT> support may use I<POST EditURI!PUT> instead.
+
+=head2 Remove - I<DELETE EditURI>
+
+Remove the specified object.
+
+    200: Successfully deleted.  Body is the success message.
+    400: Request failed.  Body is the error message.
+    404: There is no object matching the specified URI.
+
+Clients without I<DELETE> support may use I<POST EditURI!DELETE> instead.
+
+=head2 Describe - I<OPTIONS [ PostURI | EditURI | FeedURI ]>
+
+On a container's I<PostURI>, returns the schema of objects acceptable by this
+container.
+
+On an object's I<PostURI>, returns the schemata acceptable by it,
+differentiated with the C<type> attribute.
+
+On I<EditURI>, returns the schema of the object or the property, which is a
+I<GET> without actual contents.
+
+On I<FeedURI>, returns the schema of available query parameters and their types.
+
+    200: Success.  Body is the requested schema.
+    400: Request failed.  Body is the error message.
+    404: There is no container matching the specified URI.
+
+Clients without I<OPTIONS> support may use I<GET AnyURI!OPTIONS> instead.
+
+=head2 Add - I<POST PostURI> (Container)
+
+Create a new object from the AtomEntry in the request's body.
+
+    200: Created, but the new object has no EditURI.  Body is the
+         success message.
+    303: Created.  The 'Location' header is set to the new object's
+         EditURI (for subsequent Get/Update).  Body is the success message.
+    400: Request failed.  Body is the error message.
+    404: There is no container matching the specified URI.
+
+=head2 Update - I<POST PostURI> (Object)
+
+Updates an object.
+
+    207: Updated.  Body is the status code and messages for each update.
+    400: Request failed.  Body is the error message.
+    404: The specific object is not found, or supports no such post type.
+
+=head1 LINK DISCOVERY
+
+Methods, object membership and properties are all discovered via the
+C<link> tag inside I<AtomFeed> and I<AtomEntry> constructs.
+
+The design goal is to facilitate lazy loading - the client need not
+to follow the link to retrieve any representations immediately; it
+can wait until the first operation is performed on that object, and
+follow the link responsible for that operation.
+
+Whenever the client receives an Atom construct, it may look at each
+C<link> tag.  The C<title> attribute is the member name of the link;
+but if it begins with C<_>, then it is a backlink.
+
+The C<href> attribute is the target URI.  The C<rel> attribute determines
+the type of the link target:
+
+=over 4
+
+=item service.feed
+
+A Container.
+
+=item service.edit
+
+An Object or Property.
+
+=item service.post
+
+An operation supported by the object that shares the same C<title>.
+If no such object is found, this operation applies to the object itself.
+
+=back
+
+For example, an object's Atom representation may have the following links:
+
+    <link title="Groups"
+          rel="service.feed"
+          href="/Atom/0.3/RT-Groups" />
+    <link title="Groups"
+          rel="service.post"
+          href="/Atom/0.3/RT-Groups" />
+
+The client may then infer these relationships:
+
+=over 4
+
+=item * $obj has a member named I<Groups>.
+
+=item * $obj->Groups is a I<Container>.
+
+=item * $obj->Groups may be called to I<add> an object inside it.
+
+=item * $obj->Groups->add( key => 'value' ) should be translated to this:
+
+    POST /Atom/0.3/RT-Groups
+    Content-Type: application/x-www-form-urlencoded
+
+    key=value
+
+Or this:
+
+    POST /Atom/0.3/RT-Groups
+    Content-Type: application/atom+xml
+
+    <entry>
+      <content type="text/xml" mode="xml">
+        <body key="value" />
+      </content>
+    </entry>
+
+=back
+
+=head1 SEE ALSO
+
+L<RT::Client>, L<XML::Atom>.
+
+Atom Tutorial:
+L<http://www.atomenabled.org/developers/tutorials/api-quick-guide.php>
+
+Atom API Specification (definitions of I<FeedURI>, I<EditURI> and
+I<PostURI>): L<http://www.atomenabled.org/developers/api/atom-api-spec.php>
+
+Atom Format Specification (definitions of I<AtomFeed> and I<AtomEntry>):
+L<http://www.atomenabled.org/developers/syndication/atom-format-spec.php>
+
+Atom Authentication Protocol:
+L<http://www.xml.com/pub/a/2003/12/17/dive.html>
+
+HTTP 1.1 Status codes:
+L<http://www.w3.org/Protocols/rfc2616/rfc2616.html>.
+
+Paul Prescod's REST resources: L<http://www.prescod.net/rest/>
+
+The Atom Wiki: L<http://www.intertwingly.net/wiki/pie/FrontPage>
+
+The REST Wiki: L<http://internet.conveyor.com/RESTwiki/moin.cgi/FrontPage>
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2004 by Best Practical Solutions, LLC.
+
+(Except where explicitly superseded by other copyright notices)
+
+This work is made available to you under the terms of Version 2 of
+the GNU General Public License. A copy of that license should have
+been provided with this software, but in any event can be snarfed
+from www.gnu.org.
+
+This work is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+=cut

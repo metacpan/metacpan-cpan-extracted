@@ -1,0 +1,15 @@
+Changes
+inc/ExtUtils/MY_Metafile.pm
+lib/RPC/XML/Parser/XS.pm
+libxml2_config.pl
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/00-use.t
+t/01-non-well-formed.t
+t/02-valid.t
+typemap
+XS.xs
+META.yml                                 Module meta-data (added by MakeMaker)

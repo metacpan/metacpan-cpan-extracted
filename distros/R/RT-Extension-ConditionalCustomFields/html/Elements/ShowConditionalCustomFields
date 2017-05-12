@@ -1,0 +1,35 @@
+%   if ($CustomField->ConditionedByCustomField) {
+<script type="text/javascript">
+jQuery(function() {
+%       if ($ParentSelector eq 'id') {
+    var conditionedby_id = <% 'CF-' . $CustomField->ConditionedByCustomField->id . '-ShowRow' |h,n,j%>;
+    conditionedby_id = conditionedby_id.replace(/:/g,'\\:');
+    var cf_id = <% 'CF-' . $CustomField->id . '-ShowRow' |h,n,j%>;
+    cf_id = cf_id.replace(/:/g,'\\:');
+    var conditionedby_val = '<% $CustomField->ConditionedByCustomFieldValue->Name %>';
+    if (jQuery.trim(jQuery('#'+conditionedby_id+' td.value').text()) != conditionedby_val) {
+        jQuery('#'+cf_id).hide();
+    }
+    else {
+        jQuery('#'+cf_id).show();
+    }
+%       } else {
+    var conditionedby_class = <% '.record-field.CustomField__' . $CustomField->ConditionedByCustomField->Name . '_' |h,n,j%>;
+    conditionedby_class = conditionedby_class.replace(/:/g,'\\:');
+    var cf_class = <% '.record-field.CustomField__' . $CustomField->Name . '_' |h,n,j%>;
+    cf_class = cf_class.replace(/:/g,'\\:');
+    var conditionedby_val = '<% $CustomField->ConditionedByCustomFieldValue->Name %>';
+    if (jQuery.trim(jQuery(conditionedby_class+' .value').text()) != conditionedby_val) {
+        jQuery(cf_class).hide();
+    }
+    else {
+        jQuery(cf_class).show();
+    }
+%       }
+});
+</script>
+%   }
+<%ARGS>
+$CustomField
+$ParentSelector => 'id'
+</%ARGS>

@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Rose-DBx-RegistryConfig
+version:             0.01
+abstract:            Rose::DB with auto-registration of data sources from YAML configuration file
+license:             ~
+author:              
+    - Karl Erisman <karl.erisman@icainformatics.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    DBD::SQLite:                   0
+    Rose::DB:                      0
+    Test::Deep:                    0
+    Test::More:                    0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

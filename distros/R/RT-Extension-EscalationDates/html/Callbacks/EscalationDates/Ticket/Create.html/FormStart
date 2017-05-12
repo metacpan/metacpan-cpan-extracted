@@ -1,0 +1,33 @@
+<%INIT>
+my $PriorityField = RT->Config->Get('PriorityField');
+my $cf = RT::CustomField->new($RT::SystemUser);
+$cf->LoadByNameAndQueue(Name => $PriorityField, Queue => '0');
+
+unless ($cf->id) {
+    my $msg = loc('Custom field "[_1]" does not exist.', $PriorityField);
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+my $ARGSRef = $ARGS{'ARGSRef'};
+my $cfPriorityField = 'CustomField-' . $cf->id;
+
+if ((!$$ARGSRef{$cfPriorityField}) || ($$ARGSRef{$cfPriorityField} =~ /^[ \t]*$/)) {
+    my $DefaultPriority = RT->Config->Get('DefaultPriority');
+
+    unless ($DefaultPriority) {
+        my $msg = loc('Default priority is not configured.');
+        RT::Logger->error($msg);
+        $$skip_create = 1;
+        push @{$results}, $msg;
+    }
+
+    $$ARGSRef{$cfPriorityField} = $DefaultPriority;
+}
+</%INIT>
+
+<%ARGS> 
+$skip_create => undef
+$results => undef
+</%ARGS>

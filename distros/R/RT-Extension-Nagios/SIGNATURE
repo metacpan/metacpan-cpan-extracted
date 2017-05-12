@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 51360fd618e91d3b5b35c7f133c03830928dded1 Changes
+SHA1 01f5ec16eea51aaefc88c085325440683b7d07ee MANIFEST
+SHA1 32dfa7bb293468142ebaab5510aedaedf3ddb341 META.yml
+SHA1 ff58b9efa5d99f40aef630e94fb35305f6ff9536 Makefile.PL
+SHA1 fcf1511102fbc3c3a86247e234999a20451b57ce README
+SHA1 425598f123c64a701f53443719a2ea37a7293411 etc/initialdata
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 6e010ba20a9d0ae23d8d0ff516868c1e571c2d44 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 3c1dfb4026217790d12467ac6a80bb2e3f3992db lib/RT/Action/UpdateNagiosTickets.pm
+SHA1 8b4fa0f59fb0ca5f8f0f51e9e9d63dc8a38b4d84 lib/RT/Extension/Nagios.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSQa3QACgkQMflWJZZAbqDAlgCfe3NpXBNTTpli+FWFBUgmVw1W
+KKgAnj+1N7kvRRxzv0AeaiyGxEmB+VVu
+=TSRW
+-----END PGP SIGNATURE-----

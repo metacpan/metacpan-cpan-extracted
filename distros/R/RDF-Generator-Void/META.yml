@@ -1,0 +1,59 @@
+---
+abstract: 'Generate voiD descriptions based on data in an RDF model.'
+author:
+  - 'Kjetil Kjernsmo <kjetilk@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  FindBin: '0'
+  Test::More: '0.88'
+  Test::RDF: '1.10'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RDF-Generator-Void
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  App::perlrdf::Command::Void:
+    file: lib/App/perlrdf/Command/Void.pm
+    version: '0.01'
+  RDF::Generator::Void:
+    file: lib/RDF/Generator/Void.pm
+    version: '0.16'
+  RDF::Generator::Void::Meta::Attribute::ObjectList:
+    file: lib/RDF/Generator/Void/Meta/Attribute/ObjectList.pm
+  RDF::Generator::Void::Stats:
+    file: lib/RDF/Generator/Void/Stats.pm
+recommends:
+  App::perlrdf: '0.004'
+requires:
+  Data::UUID: '0'
+  Moose: '0'
+  RDF::Trine: '0'
+  URI: '0'
+  aliased: '0'
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  Identifier: http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/project
+  bugtracker: https://github.com/kjetilk/RDF-Generator-Void/issues
+  homepage: https://metacpan.org/module/RDF::Generator::Void
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/kjetilk/RDF-Generator-Void/
+version: '0.16'
+x_contributors:
+  - 'Konstantin Baierer (KBA) <kba@cpan.org>'
+  - 'Toby Inkster'
+  - 'Mohammad S Anwar (MANWAR) <manwar@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

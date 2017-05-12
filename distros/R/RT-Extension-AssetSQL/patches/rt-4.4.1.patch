@@ -1,0 +1,379 @@
+diff --git a/lib/RT/Assets.pm b/lib/RT/Assets.pm
+index b52308a..e05a7ae 100644
+--- a/lib/RT/Assets.pm
++++ b/lib/RT/Assets.pm
+@@ -241,7 +241,7 @@ sub OrderByCols {
+     my $class = $self->_RoleGroupClass;
+ 
+     for my $row (@_) {
+-        if ($row->{FIELD} =~ /^CF\.(?:\{(.*)\}|(.*))$/) {
++        if ($row->{FIELD} =~ /^(?:CF|CustomField)\.(?:\{(.*)\}|(.*))$/) {
+             my $name = $1 || $2;
+             my $cf = RT::CustomField->new( $self->CurrentUser );
+             $cf->LoadByNameAndCatalog(
+diff --git a/share/html/Asset/CreateLinkedTicket.html b/share/html/Asset/CreateLinkedTicket.html
+index e2753b1..971b175 100644
+--- a/share/html/Asset/CreateLinkedTicket.html
++++ b/share/html/Asset/CreateLinkedTicket.html
+@@ -47,12 +47,33 @@
+ %# END BPS TAGGED BLOCK }}}
+ <%args>
+ $Asset => undef
++@Assets => ()
+ $Requestors => ''
+ </%args>
+ <%init>
+-my $asset = LoadAsset($Asset);
++my @asset_objs;
++my $single_asset;
++
++# Support passing a single asset or many, as with bulk update.
++if ( $Asset ){
++    push @asset_objs, LoadAsset($Asset);
++    $single_asset = 1;
++}
++elsif ( @Assets ){
++    @asset_objs = map { LoadAsset($_) } @Assets;
++    $single_asset = 1 if @asset_objs == 1;
++}
++else {
++    Abort('No asset specified');
++}
+ </%init>
+-<& /Elements/Header,
+-    Title => loc("Create linked ticket for asset #[_1]: [_2]", $asset->id, $asset->Name) &>
++% if ($single_asset){
++    <& /Elements/Header,
++        Title => loc("Create linked ticket for asset #[_1]: [_2]", $asset_objs[0]->id, $asset_objs[0]->Name) &>
++%}
++%else{
++    <& /Elements/Header,
++        Title => loc("Create linked ticket for multiple assets") &>
++%}
+ <& /Elements/Tabs &>
+-<& /Asset/Elements/CreateLinkedTicket, AssetObj => $asset, Requestors => $Requestors &>
++<& /Asset/Elements/CreateLinkedTicket, AssetObj => \@asset_objs, Requestors => $Requestors &>
+diff --git a/share/html/Asset/Elements/AssetSearchBasics b/share/html/Asset/Elements/AssetSearchBasics
+index de9c35b..9557c8c 100644
+--- a/share/html/Asset/Elements/AssetSearchBasics
++++ b/share/html/Asset/Elements/AssetSearchBasics
+@@ -54,7 +54,7 @@
+ </td></tr>
+ <tr class="asset-status"><td class="label"><label for="Status"><&|/l&>Status</&></label></td>
+     <td class="value" colspan="3">
+-<& /Asset/Elements/SelectStatus, Name => 'Status', CatalogObj => $CatalogObj, DefaultValue => 1,
++<& /Asset/Elements/SelectStatus, Name => 'Status', Catalogs => { $CatalogObj->id => 1 }, DefaultValue => 1,
+        Default => ($ARGS{'Status'} || '') &>
+ </td></tr>
+ <tr class="asset-name"><td class="label"><label for="Name"><&|/l&>Name</&></label></td>
+diff --git a/share/html/Asset/Elements/CreateLinkedTicket b/share/html/Asset/Elements/CreateLinkedTicket
+index 17102bd..b3b87a2 100644
+--- a/share/html/Asset/Elements/CreateLinkedTicket
++++ b/share/html/Asset/Elements/CreateLinkedTicket
+@@ -50,21 +50,50 @@ $AssetObj
+ $Requestors => ''
+ </%args>
+ <%init>
++my @asset_objs;
++if ( ref $AssetObj eq 'ARRAY' ){
++    # Accept an array of asset objects
++    @asset_objs = @$AssetObj;
++}
++else{
++    # Also support passing a single asset object
++    push @asset_objs, $AssetObj;
++}
++
+ my @description = map { $m->interp->apply_escapes($_, 'h') }
+-    $AssetObj->id, $AssetObj->Name;
++    $asset_objs[0]->id, $asset_objs[0]->Name;
++
++my $refers_to = join ' ', map { "asset:" . $_->id } @asset_objs;
++
++# Find possible requestors
++my %role_addresses;
++foreach my $asset (@asset_objs){
++    for my $role ($asset->Roles) {
++        # Create a hash with email addresses to easily de-dupe the lists from multiple assets
++        map { $role_addresses{$role}{$_} = 1 } $asset->RoleGroup($role)->MemberEmailAddresses;
++    }
++}
++
+ </%init>
+ <form action="<% RT->Config->Get("WebPath") %><% $session{CurrentUser}->Privileged ? "/Ticket" : "/SelfService" %>/Create.html" id="AssetCreateLinkedTicket">
+-  <input name="new-RefersTo" value="asset:<% $AssetObj->id %>" type="hidden">
+-  <input name="Subject" value="<% $AssetObj->Name %>" type="hidden">
++  <input name="new-RefersTo" value="<% $refers_to %>" type="hidden">
++  <input name="Subject" value="<% $asset_objs[0]->Name %>" type="hidden">
++% if ( @asset_objs == 1 ){
+   <&|/l_unsafe,
+     $m->scomp("/Elements/SelectNewTicketQueue"),
+     @description &>Create a new ticket in the [_1] queue about asset #[_2]: [_3].</&>
++% }
++% else {
++<&|/l_unsafe,
++    $m->scomp("/Elements/SelectNewTicketQueue"),
++    &>Create a new ticket in the [_1] queue about multiple assets.</&>
++% }
+ % if ($Requestors) {
+     <input type="hidden" name="Requestors" value="<% $Requestors%>" />
+ % } else {
+ %     my $first = 1;
+-%     for my $role ($AssetObj->Roles) {
+-%         my $addr = $AssetObj->RoleGroup($role)->MemberEmailAddressesAsString;
++%     for my $role ($asset_objs[0]->Roles) {
++%         my $addr = join ', ', keys %{$role_addresses{$role}};
+ %         next unless defined $addr and length $addr;
+   <br>
+   <label>
+diff --git a/share/html/Asset/Elements/SelectCatalog b/share/html/Asset/Elements/SelectCatalog
+index aa5d5fc..8c65e46 100644
+--- a/share/html/Asset/Elements/SelectCatalog
++++ b/share/html/Asset/Elements/SelectCatalog
+@@ -48,7 +48,7 @@
+ <& /Elements/SelectObject,
+     Name           => "Catalog",
+     ShowAll        => $ShowAll,
+-    ShowNullOption => 0,
++    ShowNullOption => $ShowNullOption,
+     CheckRight     => "CreateAsset",
+     %ARGS,
+     ObjectType     => "Catalog",
+@@ -59,6 +59,7 @@
+ $ShowAll => 0
+ $Default => undef
+ $UpdateSession => 1
++$ShowNullOption => 0
+ </%args>
+ <%init>
+ my $catalog_obj = LoadDefaultCatalog($Default || '');
+diff --git a/share/html/Asset/Elements/SelectStatus b/share/html/Asset/Elements/SelectStatus
+index ef3e826..99717da 100644
+--- a/share/html/Asset/Elements/SelectStatus
++++ b/share/html/Asset/Elements/SelectStatus
+@@ -45,22 +45,27 @@
+ %# those contributions and any derivatives thereof.
+ %#
+ %# END BPS TAGGED BLOCK }}}
+-<& /Elements/SelectStatus, %ARGS &>
++<& /Elements/SelectStatus, %ARGS, Type => 'asset', Object => $AssetObj && $AssetObj->id ? $AssetObj : $CatalogObj, Lifecycles => \@Lifecycles &>
+ <%init>
+-if ($AssetObj and $AssetObj->Id) {
++my @Lifecycles;
++for my $id (keys %Catalogs) {
++    my $catalog = RT::Catalog->new($session{'CurrentUser'});
++    $catalog->Load($id);
++    push @Lifecycles, $catalog->LifecycleObj if $catalog->id;
++}
++
++if ($AssetObj && $AssetObj->id) {
+     $ARGS{DefaultValue} = 0;
+     $ARGS{Default} = $DECODED_ARGS->{Status} || $ARGS{Default};
+     $ARGS{Object} = $AssetObj;
+-} else {
+-    my $lifecycle = ($CatalogObj || "RT::Catalog")->LifecycleObj;
+-    if ( not $ARGS{DefaultValue} ){
+-        $ARGS{DefaultValue} = 0;
+-        $ARGS{Default} ||= $DECODED_ARGS->{Status} || $lifecycle->DefaultOnCreate;
+-    }
+-    $ARGS{Statuses} = [ $AssetObj ? $lifecycle->Transitions("") : $lifecycle->Valid ];
++} elsif ( $CatalogObj ) {
++    my $lifecycle = $CatalogObj->LifecycleObj;
++    $ARGS{DefaultValue} = 0;
++    $ARGS{Default} ||= $DECODED_ARGS->{Status} || $lifecycle->DefaultOnCreate;
+ }
+ </%init>
+ <%args>
+ $AssetObj   => undef
+ $CatalogObj => undef
++%Catalogs => ()
+ </%args>
+diff --git a/share/html/Asset/Helpers/CreateLinkedTicket b/share/html/Asset/Helpers/CreateLinkedTicket
+index 6728b7b..f487d52 100644
+--- a/share/html/Asset/Helpers/CreateLinkedTicket
++++ b/share/html/Asset/Helpers/CreateLinkedTicket
+@@ -46,11 +46,19 @@
+ %#
+ %# END BPS TAGGED BLOCK }}}
+ <%args>
+-$Asset
++@Asset => ()
++$Asset => undef
+ $Requestors => ''
+ </%args>
+ <%init>
+-my $asset = LoadAsset($Asset);
++my @asset_objs;
++if ( @Asset ){
++    @asset_objs = map { LoadAsset($_) } @Asset;
++}
++elsif ( $Asset ){
++    push @asset_objs, LoadAsset($Asset);
++}
++
+ </%init>
+-<& /Asset/Elements/CreateLinkedTicket, AssetObj => $asset, Requestors => $Requestors &>
++<& /Asset/Elements/CreateLinkedTicket, AssetObj => \@asset_objs, Requestors => $Requestors &>
+ % $m->abort;
+diff --git a/share/html/Asset/Search/index.html b/share/html/Asset/Search/index.html
+index f1ebfa5..903ceb4 100644
+--- a/share/html/Asset/Search/index.html
++++ b/share/html/Asset/Search/index.html
+@@ -58,6 +58,7 @@ my $title = ( $ARGS{'SearchAssets'} or $ARGS{q} ) ?
+       loc("Found [quant,_1,asset,assets]",$assets->Count)
+     : loc("Assets");
+ 
++$m->callback( CallbackName => 'Initial', Assets => $assets, ARGSRef => \%ARGS);
+ </%init>
+ <& /Elements/Header, Title => $title &>
+ <& /Elements/Tabs &>
+diff --git a/share/html/Elements/CollectionList b/share/html/Elements/CollectionList
+index 5325b2e..08ce079 100644
+--- a/share/html/Elements/CollectionList
++++ b/share/html/Elements/CollectionList
+@@ -50,6 +50,10 @@ if (!$Collection && $Class eq 'RT::Tickets') {
+     $Collection = RT::Tickets->new( $session{'CurrentUser'} );
+     $Collection->FromSQL($Query);
+ }
++elsif (!$Collection && $Class eq 'RT::Assets') {
++    $Collection = RT::Assets->new( $session{'CurrentUser'} );
++    $Collection->FromSQL($Query);
++}
+ 
+ # flip HasResults from undef to 0 to indicate there was a search, so
+ # dashboard mail can be suppressed if there are no results
+@@ -70,7 +74,7 @@ if ( $Rows ) {
+ 
+ # XXX: ->{'order_by'} is hacky, but there is no way to check if
+ # collection is ordered or not
+-if ( @OrderBy && ($AllowSorting || !$Collection->{'order_by'}) ) {
++if ( @OrderBy && ($AllowSorting || $PreferOrderBy || !$Collection->{'order_by'}) ) {
+     if ( $OrderBy[0] =~ /\|/ ) {
+         @OrderBy = split /\|/, $OrderBy[0];
+         @Order = split /\|/,$Order[0];
+@@ -203,7 +207,8 @@ $Title         => loc('Ticket Search')
+ $BaseURL       => RT->Config->Get('WebPath') . $m->request_comp->path .'?'
+ @PassArguments => qw( Query Format Rows Page Order OrderBy)
+ 
+-$AllowSorting   => 0
++$AllowSorting   => 0  # Make headers in table links that will resort results
++$PreferOrderBy  => 0  # Prefer the passed-in @OrderBy to the collection default
+ $ShowNavigation => 1
+ $ShowHeader     => 1
+ $ShowEmpty      => 0
+diff --git a/share/html/Elements/SelectStatus b/share/html/Elements/SelectStatus
+index 7eb678d..3183a90 100644
+--- a/share/html/Elements/SelectStatus
++++ b/share/html/Elements/SelectStatus
+@@ -94,7 +94,7 @@ if ( @Statuses ) {
+     }
+ 
+     if (not keys %statuses_by_lifecycle) {
+-        for my $lifecycle (map { RT::Lifecycle->Load($_) } RT::Lifecycle->List($Type)) {
++        for my $lifecycle (map { RT::Lifecycle->Load(Type => $Type, Name => $_) } RT::Lifecycle->List($Type)) {
+             $statuses_by_lifecycle{$lifecycle->Name} = [ $lifecycle->Valid ];
+         }
+     }
+diff --git a/share/html/Elements/ShowSearch b/share/html/Elements/ShowSearch
+index c154bca..ff8c32b 100644
+--- a/share/html/Elements/ShowSearch
++++ b/share/html/Elements/ShowSearch
+@@ -51,7 +51,7 @@
+     titleright => $customize ? loc('Edit') : '',
+     titleright_href => $customize,
+     hideable => $hideable &>
+-<& $query_display_component, hideable => $hideable, %$ProcessedSearchArg, ShowNavigation => 0, Class => 'RT::Tickets', HasResults => $HasResults &>
++<& $query_display_component, hideable => $hideable, %$ProcessedSearchArg, ShowNavigation => 0, Class => $SearchArg && ($SearchArg->{SearchType}||'') eq 'Asset' ? 'RT::Assets' : 'RT::Tickets', HasResults => $HasResults, PreferOrderBy => 1 &>
+ </&>
+ <%init>
+ my $search;
+@@ -75,7 +75,13 @@ if ($SavedSearch) {
+     }
+     $SearchArg->{'SavedSearchId'} ||= $SavedSearch;
+     $SearchArg->{'SearchType'} ||= 'Ticket';
+-    if ( $SearchArg->{SearchType} ne 'Ticket' ) {
++    if ( $SearchArg->{SearchType} eq 'Asset' ) {
++        $query_link_url = RT->Config->Get('WebPath') . "/Asset/Search/Results.html";
++        $customize = RT->Config->Get('WebPath') . '/Asset/Search/Build.html?'
++            . $m->comp( '/Elements/QueryString',
++            SavedSearchLoad => $SavedSearch );
++    }
++    elsif ( $SearchArg->{SearchType} ne 'Ticket' ) {
+ 
+         # XXX: dispatch to different handler here
+         $query_display_component
+diff --git a/share/html/Elements/Tabs b/share/html/Elements/Tabs
+index 866e8f2..b819a44 100644
+--- a/share/html/Elements/Tabs
++++ b/share/html/Elements/Tabs
+@@ -1105,7 +1105,7 @@ my $build_main_nav = sub {
+         PageMenu()->child( edit => title => loc('Edit'), path => '/Prefs/MyRT.html' );
+     }
+ 
+-    $m->callback( CallbackName => 'Privileged', Path => $request_path );
++    $m->callback( CallbackName => 'Privileged', Path => $request_path, ARGSRef => \%ARGS );
+ };
+ 
+ my $build_selfservice_nav = sub {
+@@ -1172,7 +1172,7 @@ my $build_selfservice_nav = sub {
+         }
+     }
+ 
+-    $m->callback( CallbackName => 'SelfService', Path => $request_path );
++    $m->callback( CallbackName => 'SelfService', Path => $request_path, ARGSRef => \%ARGS );
+ };
+ 
+ 
+diff --git a/share/html/Search/Elements/EditFormat b/share/html/Search/Elements/EditFormat
+index 4e2bfd8..4c305d2 100644
+--- a/share/html/Search/Elements/EditFormat
++++ b/share/html/Search/Elements/EditFormat
+@@ -97,10 +97,12 @@ jQuery( function() {
+ <select name="Link">
+ <option value="None">-</option>
+ <option value="Display"><&|/l&>Display</&></option>
++% if ($IncludeTicketLinks) {
+ <option value="Take"><&|/l&>Take</&></option>
+ <option value="Respond"><&|/l&>Respond</&></option>
+ <option value="Comment"><&|/l&>Comment</&></option>
+ <option value="Resolve"><&|/l&>Resolve</&></option>
++% }
+ </select>
+ </span>
+ </div>
+@@ -159,4 +161,5 @@ $selected{$_}++ for grep {defined} @{ $selected };
+ <%ARGS>
+ $CurrentFormat => undef
+ $AvailableColumns => undef
++$IncludeTicketLinks => 1
+ </%ARGS>
+diff --git a/share/static/js/assets.js b/share/static/js/assets.js
+index 853ba86..8d5aaa0 100644
+--- a/share/static/js/assets.js
++++ b/share/static/js/assets.js
+@@ -34,6 +34,25 @@ jQuery(function() {
+             showModal
+         );
+     });
++    jQuery("#bulk-update-create-linked-ticket").click(function(ev){
++        ev.preventDefault();
++        var chkArray = [];
++
++        jQuery("input[name='UpdateAsset']:checked").each(function() {
++            chkArray.push(jQuery(this).val());
++        });
++
++        var selected = '';
++        for (var i = 0; i < chkArray.length; i++) {
++            selected += 'Asset=' + chkArray[i] + '&';
++        }
++        /* selected = chkArray.join(','); */
++        var url = RT.Config.WebHomePath + '/Asset/Helpers/CreateLinkedTicket?' + selected;
++        jQuery.post(
++            url,
++            showModal
++        );
++    });
+     jQuery("#assets-create").click(function(ev){
+         ev.preventDefault();
+         jQuery.get(

@@ -1,0 +1,43 @@
+---
+abstract: 'format and decode results using Data::Dumper::AutoEncode'
+author:
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v0.13.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Reply-Plugin-DataDumperAutoEncode
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Reply::Plugin::DataDumperAutoEncode:
+    file: lib/Reply/Plugin/DataDumperAutoEncode.pm
+    version: '0.02'
+requires:
+  Data::Dumper::AutoEncode: '0'
+  Reply::Plugin: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tsucchi/Reply-Plugin-DataDumperAutoEncode/issues
+  homepage: https://github.com/tsucchi/Reply-Plugin-DataDumperAutoEncode
+  repository: git://github.com/tsucchi/Reply-Plugin-DataDumperAutoEncode.git
+version: '0.02'
+x_contributors:
+  - 'Takuya Tsuchida <takuya.tsuchida@gmail.com>'

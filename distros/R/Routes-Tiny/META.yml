@@ -1,0 +1,50 @@
+---
+abstract: Routes
+author:
+  - 'Viacheslav Tykhanovskyi, C<vti@cpan.org>.'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Routes-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Routes::Tiny:
+    file: lib/Routes/Tiny.pm
+    version: '0.19'
+  Routes::Tiny::Match:
+    file: lib/Routes/Tiny/Match.pm
+  Routes::Tiny::Pattern:
+    file: lib/Routes/Tiny/Pattern.pm
+requires:
+  Carp: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/vti/routes-tiny/issues
+  homepage: https://github.com/vti/routes-tiny
+  repository: git://github.com/vti/routes-tiny.git
+version: '0.19'
+x_contributors:
+  - 'Sergey Zasenko <d3fin3@gmail.com>'
+  - 'Dmitry Smal <mialinx@gmail.com>'
+  - 'Dinar Sabitov <lolall@yandex.ru>'
+  - 'Jonathan R. Warden <john.warden@gmail.com>'
+  - 'Alexander Batyrshin <0x62ash@gmail.com>'
+  - 'vti <vti@clarive.com>'
+  - 'Konstantin Cherednichenko <dshadowukraine@gmail.com>'
+  - 'vti <viacheslav.t@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

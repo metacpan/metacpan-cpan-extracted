@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 dd0c385fa72e7abe0a9f5970fff0239e1c38f44f COPYRIGHT
+SHA1 47d579fe59012339100575f5eb64833086a25c39 CREDITS
+SHA1 3b79ae79b012347004c6b8ccd03c3c6bb8086741 Changes
+SHA1 937d452c5c4069f4cda9ffaf45a33f1eb5f060e8 LICENSE
+SHA1 14dafbda547ae2324d2941a5e129010193614d0e MANIFEST
+SHA1 114e60eb317e6b7710a701af6bf19c2d1dde09fc META.ttl
+SHA1 3957d4b94873816402373cacf22f30bb6d318ad4 META.yml
+SHA1 0b0e56610f6dd28e0a80f130123c0bee23c209b9 Makefile.PL
+SHA1 c3aeeeec28868cefab58e6c61cda9b53690fb2d7 README
+SHA1 5631f874b4a661510eb6fd2cd4de7cae346835c1 examples/microturtle.pl
+SHA1 68949aff2269759850a4cddc73516621ea97f1eb examples/pretdsl.pl
+SHA1 dd958efcae1beb874052114ecff206e534e9983b examples/shorthand-rdf.pl
+SHA1 08084a9f6f4ddbc374f0cbbea8fb9f9c1184d78a examples/vcard_ttl.pl
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 41f76ff6b39368a65da86377e43b34bacc2fb0eb inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 685e964c05a5f29d416f263c35589a10cb7296e1 inc/Module/Package/Dist/RDF.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 aa7d770d7facbac72c26dfddb6bc3e1616131a6e lib/RDF/TriN3.pm
+SHA1 408774065a53b2a078dfb954f9feb956b612c8a0 lib/RDF/Trine/Node/Formula.pm
+SHA1 330a0ca3c66d45ea195dc840c1f49047bb1be6fb lib/RDF/Trine/Parser/Notation3.pm
+SHA1 a255ce9ceaa063c5c75d1ab2cdebf2bb5d9023d4 lib/RDF/Trine/Parser/ShorthandRDF.pm
+SHA1 6cb6890697f8a57a5b010c6ac97e2b7790276c06 lib/RDF/Trine/Serializer/Notation3.pm
+SHA1 777d42e4d53e2e7b6e427d53b5090ee6e2676063 lib/RDF/TrineX/Parser/Pretdsl.pm
+SHA1 0a59500e93c92471e976011e32d291232ec132be meta/changes.ttl
+SHA1 ddfefa6c35ec051634b93d7c4b5604c5de631363 meta/doap.ttl
+SHA1 76cacb5d05202d44a34b31a1f31334ee646a9101 meta/makefile.ttl
+SHA1 48bb58ead95bd87fe3119190b10cd82dcf8ac09c t/01basic.t
+SHA1 761d677d9e49563ed84bed339289a4ef06cc5f3c t/02dbi.t
+SHA1 176ea1c966e931a622b8517bd7ba485aa8acf346 t/03shorthandrdf.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlI6HIkACgkQzr+BKGoqfTmUDwCffyJsLR2TKP0NP6IRK4zCGuS4
+hbUAn1/Q3uF56s3VK83q1RyAwpKGtjgJ
+=r6RO
+-----END PGP SIGNATURE-----

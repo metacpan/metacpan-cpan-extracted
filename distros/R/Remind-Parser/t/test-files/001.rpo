@@ -1,0 +1,34 @@
+# rem2ps begin
+September 2007 30 6 0
+Sunday Monday Tuesday Wednesday Thursday Friday Saturday
+August 31
+October 31
+# fileinfo 174 /home/luser/ktt/calendar/jewish-holidays.rem
+2007/09/01 * * * * Havdalah at 19:59
+# fileinfo 46 /home/luser/.reminders
+2007/09/02 * noweight * 1110  6:30pm Cook dinner
+# fileinfo 40 /home/luser/.reminders
+2007/09/02 * noweight * * Clean bathrooms
+# fileinfo 124 /home/luser/.reminders
+2007/09/27 * :paul:work: 240 780  1:00pm Off all afternoon
+# fileinfo 125 /home/luser/.reminders
+2007/09/27 * :travel: * 840  2:00pm Leave for Albany ca. 14:00
+# fileinfo 60 /home/luser/.reminders
+2007/09/27 * * 60 870  2:30pm Meet with Joan (weekly)
+# fileinfo 56 /home/luser/ktt/calendar/jewish-holidays.rem
+2007/09/27 * * * * Sukkot 1
+# fileinfo 45 /home/luser/.reminders
+2007/09/28 * noweight * 1050  5:30pm Gym
+# fileinfo 173 /home/luser/ktt/calendar/jewish-holidays.rem
+2007/09/28 * * * * Candle lighting at 18:10
+# fileinfo 17 /home/luser/ktt/calendar/sports.rem
+2007/09/29 * * * 720 12:00pm UM football (at Northwestern/no TV)
+# fileinfo 42 /home/luser/.reminders
+2007/09/29 * noweight * * Organizing day
+# fileinfo 46 /home/luser/.reminders
+2007/09/30 * noweight * 1110  6:30pm Cook dinner
+# fileinfo 40 /home/luser/.reminders
+2007/09/30 * noweight * * Clean bathrooms
+# fileinfo 41 /home/luser/.reminders
+2007/09/30 * noweight * * Plan the upcoming week
+# rem2ps end

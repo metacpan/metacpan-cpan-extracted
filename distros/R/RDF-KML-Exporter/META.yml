@@ -1,0 +1,48 @@
+---
+abstract: 'export RDF geo data to KML (Google Earth)'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - Geo
+  - Geographic
+  - Geography
+  - 'Google Earth'
+  - KML
+  - RDF
+  - 'Semantic Web'
+  - WGS84
+  - XML
+  - convert
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: RDF::KML::Exporter
+name: RDF-KML-Exporter
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Geo::GoogleEarth::Pluggable: 0
+  PerlX::Maybe: 0
+  RDF::TrineX::Functions: 0
+  Scalar::Util: 0
+  namespace::clean: 0
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-KML-Exporter
+  homepage: https://metacpan.org/release/RDF-KML-Exporter
+  license: http://dev.perl.org/licenses/
+  repository: http://goddamn.co.uk/svn-web/perlmods/browse/RDF-KML-Exporter/
+version: 0.003

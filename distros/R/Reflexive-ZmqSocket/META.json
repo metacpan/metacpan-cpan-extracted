@@ -1,0 +1,61 @@
+{
+   "abstract" : "Provides a reflexy way to talk over ZeroMQ sockets",
+   "author" : [
+      "Nicholas R. Perez <nperez@cpan.org>",
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Reflexive-ZmqSocket",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Errno" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Reflex::Base" : "0",
+            "Reflex::Event" : "0",
+            "Reflex::Role::Readable" : "0",
+            "Reflex::Role::Writable" : "0",
+            "Try::Tiny" : "0",
+            "ZeroMQ::Constants" : "0",
+            "ZeroMQ::Context" : "0",
+            "ZeroMQ::Socket" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Reflex::Trait::Watched" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/nperez/reflexive-zmq.git"
+      }
+   },
+   "version" : "1.130710"
+}
+

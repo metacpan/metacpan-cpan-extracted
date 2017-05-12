@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+# Compares a tokenized view of two RTF files
+
+use strict;
+use RTF::Tokenizer 1.01;
+use Text::Diff;
+
+my $first_file  = pretty_print( $ARGV[0] );
+my $second_file = pretty_print( $ARGV[1] );
+
+print diff \$first_file, \$second_file;
+
+sub pretty_print {
+
+    my $filename = shift;
+    my $output;
+
+    my $tokenizer = RTF::Tokenizer->new( file => $filename );
+
+    while (1) {
+
+        my ( $type, $token, $argument ) = $tokenizer->get_token();
+
+        last if $type eq 'eof';
+
+        $argument =~ s/\n/[n]/g;
+        $argument =~ s/\t/[t]/g;
+        $argument =~ s/\r/[r]/g;
+
+        $output .= "($type) $token $argument\n";
+
+    }
+
+    return $output;
+
+}
+

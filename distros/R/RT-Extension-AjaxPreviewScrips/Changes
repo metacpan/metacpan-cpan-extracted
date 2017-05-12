@@ -1,0 +1,41 @@
+Revision history for RT-Extension-AjaxPreviewScrips
+
+0.10 2015-04-28
+ - Use POST instead of GET for helper requests, to allow the textarea to
+   contain large amounts of text.
+ - Resolve a console error if the preview contained no recipient
+   checkboxes.
+
+0.09 2015-04-05
+ - Additional packaging fixes; don't index RT:: packages, use BPS author
+
+0.08 2015-03-20
+ - Packaging fixes; don't index HTML::Mason::Commands package, and
+   include repository metadata.
+
+0.07 2015-03-20
+ - Expand on the change in the previous release, to also properly catch
+   if the rich text editor did not enable itself due to an unrecognized
+   User-Agent.
+
+0.06 2015-03-17
+ - Prevent a JS error (which would break the preview) if the rich text
+   editor was disabled
+
+0.05 2014-11-24
+ - Prevent preview from getting out of sync when one-time CC checkboxes
+   were used
+
+0.04 2014-10-07
+ - Squelching applies to non-comment/correspond transactions as well
+
+0.03 2014-08-22
+
+0.02 2014-07-30
+ - Pass the just-submitted squelching information to the first AJAX request
+ - Remove mostly-duplicate code for Rules which can never trigger
+ - Add squelched recipients as preference
+ - 'Select All' checkbox for scrips correspondences/comments
+
+0.01 2014-07-14
+ - Initial version

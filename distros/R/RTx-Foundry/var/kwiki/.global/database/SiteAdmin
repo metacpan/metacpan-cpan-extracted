@@ -1,0 +1,17 @@
+== Edit | 編輯 ==
+* [HomePage] | [News] | [Privacy] | [TermOfUse] (en)
+* [首頁] | [新聞] | [隱私權聲明] | [使用條款] (zh_tw)
+* [首页] | [新闻] | [隐私权声明] | [使用条款] (zh_cn)
+
+== Config | 設定 ==
+* [User metadata fields http:/Edit/Queues/CustomField/?Queue=NewUser]
+* [NewUser email templates and Term-of-use http:/Edit/Queues/Template/?Queue=NewUser]
+* [Project metadata fields http:/Edit/Queues/CustomField/?Queue=NewProject]
+* [NewProject email templates and Term-of-use http:/Edit/Queues/Template/?Queue=NewProject]
+* [LoadPassword email templates http:/Edit/Queues/Template/?Queue=LostPassword]
+* [MemberChange email templates http:/Edit/Queues/Template/?Queue=MemberChange]
+* [Tracker metadata fields http:/Edit/Global/CustomField/]
+* [Tracker email templates http:/Edit/Global/Template/]
+
+== Help | 說明 ==
+* [Foundry Manual http:/NoAuth/docs/]

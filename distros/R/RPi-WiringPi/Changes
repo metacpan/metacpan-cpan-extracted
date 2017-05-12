@@ -1,0 +1,238 @@
+Revision history for Perl extension RPi::WiringPi.
+
+2.3612  2017-04-11
+        - added check in cleanup() so we don't throw undef warnings if there
+          weren't any pins registered during the program run
+        - added DAC test file
+        - add parent.pm as a prereq to make things 5.8.9 compliant
+        - remove rogue "use feature 'say'" lines from tests for 5.8.9 compliance
+        - fixed git links in Makefile.PL. They were pointing to the old p5- repo
+        - deleted RPi::WiringPi::LCD, and turned it into a standalone dist,
+          RPi::LCD
+        - we now require RPi::LCD v2.3601
+
+2.3611  2017-03-26
+        - added fritzing and breadboard layout for the ADC/DAC test
+          configuration for brewbuild CI
+        - clean up Pin::set_interrupt() code to call API code directly
+        - fix up tests that require sudo (we now recall the tests with sudo if
+          they are not called with it)
+        - in pud(), we no longer set the pin to INPUT automatically
+        - we now require WiringPi::API 2.3609 due to PUD/Interrupt fixes there
+        - added proper interrupt and pud tests
+        - in Util::cleanup(), removed the use of sudo for decommissioning pins
+        - added t/README file, which specifies the GPIO pins in use for the
+          unit test suite
+        - added unit test section to FAQ
+        - in Interrupt POD, specify that if the handler routine can't be found,
+          simply add the full package name to the callback 
+          (eg: 'main::callback)
+
+2.3610  2017-03-13
+        - added in support in adc() to allow usage of the MCP3008 ADC from
+          RPi::ADC::MCP3008 (closes #21)
+        - fix typos in some module names we're including
+        - added unregister_pin() again, we can now unregister pins manually
+        - began process of rewriting unit tests in preparation for full blown
+          automation
+
+2.3609  2017-03-13
+        - work on testing inheritance of sub modules
+        - quote two-decimal prereq versions as they were not valid unquoted
+        - change version scheme from 2.36.x to 2.360x in modules and prereqs
+
+2.36.8  2017-02-22
+        - we now require EUMM 6.72 to ensure multi-decimal version numbers of
+          prereqs don't break things
+
+2.36.7  2017-02-02
+        - undocumented the ability to use the various wiringPi setup routines.
+          The functionality is still present, we're just not going to advertise
+          that it's there. The officially supported pin mapping scheme is GPIO
+          (closes #16)
+        - added in support for RPi::DAC::MCP4922 digital to analog converters,
+          and added dac()
+        - finally dumped RPi::WiringPi::BMP180 as a standalone distribution,
+          RPi::BMP180 (closes #15)
+        - updated copyright year from 2016 to 2017
+        - added in support for RPi::DHT11 hygrometers (closes #17)
+        - POD cleanup/fixes related to the work done in this release, as well as
+          unrelated fixes
+
+2.36.6  2017-01-26
+        - * Notice * some functionality will be removed and/or hidden from the
+          next release, due to being incompatible or just plain me desiring to
+          rewrite them. Soft PWM is going as it doesn't work properly at this
+          level, and I'm seriously considering getting rid of all setup modes
+          less GPIO (as its a headache to maintain). I'll beef up the
+          translation tables though, so you can do such trickery as:
+          $ENV{RPI_PIN_MAP} = 'wpi'; or some such, and we'll translate the pin
+          numbers on the fly for you. Feedback welcome.
+
+        - updated FAQ, made section headers, fixed issue in shiftreg overview
+        - added breadboard diagram and fritzing project for dual 74HC595 shift
+          register connections, and other various schematics
+        - prereq version bumps: WiringPi::API v2.36.4, RPi::SPI v 2.36.4
+        - renamed error() to _error(), as it is literally an internal method
+          that traps $SIG collapses for cleanup, so that pod-coverage.t would
+          stop complaining
+
+2.36.5  2017-01-22
+        - added dpot(), returns a RPI::DigiPot::MCP4XXXX digital potentiometer
+          object
+
+2.36.4  2017-01-22
+        - fix params in POD, they weren't displaying correctly
+
+2.36.3  2017-01-22
+        - pod fixes/updates
+        - added BMP180 section to FAQ
+        - added untracked files
+        - removed the ability to use SYS (GPIO_SYS) mode. It was implemented to
+          avoid having to be root
+        - moved gpio_layout() from core to Util
+        - RPi::ADC::ADS is now a prereq (v1.01)
+        - added adc() (closes #12)
+        - moved pwm_range() to Util, leaving only object creation methods
+          in the core module
+        - fixed POD in reference to shiftreg (closes #13)
+        - added ADC section in FAQ
+        - added docs/, with fritzing drawings and images for basic pwm/ADC
+          setup
+        - incorporated RPi::SPI as spi() to provide direct access to the Serial
+          Peripheral Interface
+
+2.36.2  2017-01-14
+        - change versioning. The X.XX portion represents which version of
+          WiringPi::API and wiringPi we're compatible with
+        - cleaned up some tests due to previous changes
+        - added BMP180.pm module and all functionality of the barometric
+          pressure sensor per WiringPi::API
+        - updated ver of WiringPi::API prereq to v2.36.1
+
+1.02    2017-01-13
+        - incorporated shift registers after adding to WiringPi::API
+        - added shift_register()
+        - updated documentation (POD and Tutorial)
+
+1.01    2016-08-27
+        - no functional changes
+        - POD fixes, updates and clarifications (thanks 'jmlynesjr' from
+          PerlMonks for assisting)
+
+1.00    2016-08-24
+        - SYS mode has been disabled and hidden until the PWM and interrupt
+          functionality can be sorted out for that mode
+        - cleaned up manual test help info as to be accurate
+        - POD editing
+        - test cleanup (all standard unit tests skip if not on a Pi)
+        - all manual tests pass (interrupts are a bit iffy still)
+        - bumped prereq of WiringPi::API to 1.04
+
+0.99_06 2016-08-22
+        - POD cleanup
+        - cleanup() added, puts each registered pin in INPUT mode, and disables
+          PUD if set
+        - re-added register_pin(), we no longer keep track of objects, just the
+          GPIO scheme numbers for cleanup and error checking
+        - removed unregister_pin()
+        - we now die() if trying to use a pin that is already in use
+        - removed Interrupt::unset()
+        - removed Pin::unset_interrupt()
+        - software PWM is now implemented, but disabled due to issues yet to be
+          solved
+        - removed Board.pm from the distribution. The methods it used to handle
+          are now located directly in WiringPi.pm
+        - we now check for duplicate pins in $pi->pin() and in register_pin()
+        - added test for duplicate pin registration
+        - added system setup information in FAQ
+
+
+0.99_05 2016-08-18
+        - added Util::_sys_mode() to determine if we need wrappers for certain
+          calls or not
+        - changed back to the default setup() call instead of setup_sys(), as
+          a lot of wrapping needs to be done (such as in pin_mode() and pwm())
+          to make things work properly
+        - fixed calls to _sys_mode() in new(). Didn't have the _ prefix
+        - we now check if something else has called a setup() routine
+        - new env var, RPI_SCHEME, set when a setup routine is called so that
+          if it's called twice, we'll know and be able to carry on
+        - added new RPI_MODE_* constants that contain pin modes. This replaces
+          _sys_mode() (removed) and cleans up other logic
+        - renamed gpio_map() and gpio_scheme() to pin_map() and pin_scheme()
+          respectively
+        - added CLI binary "pinmap", prints out pin mappings
+        - fixed return issue in pin_map()
+        - Pin: pwm() and pull() have been updated to work in setup_sys() mode
+        - Pin: pull() now automatically sets the pin into INPUT mode()
+        - we now default to SYS mode (ie. non-root) (documentation enhanced)
+        - when creating a new pin object in SYS mode, we now export() the pin
+          in new()
+        - rewrote register_pin() and unregister_pin(). They both translate the
+          pin number to GPIO no matter the scheme, then unexport() it
+        - added manual tests for all four modes in test/*
+        - slight edits in FAQ/Tutorial
+        - bumped req RPi::WiringPi::Constant to 0.02
+        - bumped req WiringPi::API to 1.03
+
+0.99_04 2016-08-16
+        - added Tutorial/FAQ
+
+0.99_02 2016-08-16
+        - bumped sub module versions so they'd show up on the CPAN
+        - began adding more elaborate tests
+
+0.99_01 2016-08-16
+        - feature freeze. All work until 1.00 will be spent writing tests for
+          everything and ensuring documentation is accurate
+        - added Interrupt.pm, added associated methods in both WiringPi
+          and Pin
+        - Core::setup_sys() now exports all pins automatically with sudo. This
+          setup method is now the default if none is specified in new(),
+          meaning that by default, we now use the BCM pin numbering scheme
+        - renamed RPi::WiringPi::Core to WiringPi::API
+        - cleaned up code in Interrupt to deal with the much improved way we
+          now handle interrupts
+        - added pin_to_gpio() to Util, returns the BCM representation of a pin
+          number no matter what scheme is in use
+        - added interrupt_set() and interrupt_unset() to Pin
+
+0.05    2016-08-13
+        - renamed WiringPi::pin_map() to gpio_scheme()
+        - added WiringPi::gpio_map()
+        - new()'s setup param now accepts 'none', allowing us to pypass the
+          wiringPi's initialization
+        - new Util.pm, moved all utility methods from WiringPi to Util.
+          WiringPi now only handles SIGs and component objects
+        - moved all param checking from Core into the respective modules here
+          to keep Core as close to the C code as possible
+
+0.04    2016-08-11
+        - added LCD.pm module, for interfacing with LCD displays, along with
+          a massive update to Core
+        - changed LED::init() to just pass along the args hash, and let Core
+          deal with any issues
+
+0.03    2016-08-11
+        - wrote RPi::WiringPi::Constant as a standalone module
+        - added $SIG{__DIE__} handler so we can clean up properly on die()
+        - added 'fatal_exit' new() param for testing
+        - we now catch $SIG{INT} as well, with a test
+        - new method pin_map(), returns the current pin mapping
+        - tests now work on non-Pi boards (if wiringPi lib is installed)
+        - implemented 
+        - added Board.pm with methods rev(), wpi_to_gpio(), phys_to_gpio() and
+          pwm_range()
+
+0.02    2016-08-10
+        - implemented getAlt() in Core, and in Pin, mode() with no params
+          now returns the current mode of the pin
+        - added cleanup()
+
+0.01    2016-08-10
+        - initial prototype release
+        - added Pin.pm
+        - added error checking
+        - first round of tests
+        - NO_BOARD env var

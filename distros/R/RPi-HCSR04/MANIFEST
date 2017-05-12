@@ -1,0 +1,18 @@
+Changes
+docs/hcsr04.png
+HCSR04.xs
+lib/RPi/HCSR04.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/05-new.t
+t/10-raw.t
+t/15-cm.t
+t/20-inch.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

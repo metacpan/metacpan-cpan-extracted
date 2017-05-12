@@ -1,0 +1,129 @@
+% if(! param("nolayout")) {
+%    layout 'default';
+% }
+
+<h1>Task Details: <%= $task->{name} %></h1>
+
+<div id="task_info">
+
+<img src="/images/task_128.png" style="float: right;" class="task_image" />
+
+   <div class="info_table_area">
+      <div class="info_table_header"><span class="info_table_header">Task Information</span></div>
+      <table class="info_table">
+         <tr>
+            <th>Description: </th>
+            <td><%= $task->{desc} %></td>
+         </tr>
+         <tr>
+            <th>Server: </th>
+            <td>
+      % for my $server (@{$task->{server}}) {
+               <%= $server->{name} %>&nbsp;
+      % }
+            </td>
+         </tr>
+      </table>
+   </div>
+
+</div>
+
+<br />
+
+<div id="task_actions">
+
+   <div class="info_table_area">
+      <div class="info_table_header"><span class="info_table_header">Actions Available</span></div>
+      <ul>
+         <li>
+            <a onclick="run_task();">Run Now</a>
+         </li>
+      </ul>
+   </div>
+
+	<div id="progress" style="display: none;" >
+
+		<img id="status_icon" src="/images/blank.png" style="float: right; padding: 0px 32px;" />
+
+		<div style="margin: 20px; border: 1px solid black; background: #222; color: white; padding: 10px; width: 60%; height: 200px; overflow-y: scroll;" id="log_panel"></div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+function run_task() {
+
+	$.post("/project/<%= param("id") %>/task/run/<%= $task->{name} %>", { "task_name": "<%= $task->{name} %>" },
+		function(data){
+			console.log('JobID: ' + data.jobid);
+	      	$('#status_icon').attr('src', '/images/working.gif');
+			open_websocket(data.jobid)
+			notification.stop_timer();
+			notification.set_status(data.status);
+		});
+	//.error(function() { alert("error"); });
+
+}
+
+function open_websocket(jobid) {
+
+	$('#progress').show();
+
+    var ws = new (WebSocket || MozWebSocket)('<%= $tail_ws_url %>' + jobid);
+    var timer_id;
+    ws.onopen = function() {
+      console.log('Connection opened');
+      timer_id = setInterval(
+        function() {
+          console.log('Connection keepalive');
+          ws.send('keepalive');
+        },
+        1000 * 240
+      );
+    };
+    ws.onmessage = function(msg) {
+      if (msg.data.match(/^STATUS: done/)) {
+      	console.log('STATUS DONE >> ' + msg.data);
+      	$('#status_icon').attr('src', '/images/ok.png');
+      	notification.set_status('Completed');
+      	ws.close();
+      	return;
+      }
+
+      if (msg.data.match(/^STATUS/)) {
+      	console.log('STATUS >> ' + msg.data);
+      	notification.set_status(msg.data);
+      	return;
+      }
+
+	  var color = 'white';
+
+	  if (msg.data.match(/] INFO /)) {
+	  	color = 'green';
+	  }
+	  else if (msg.data.match(/] WARN /)) {
+	  	color = 'yellow';
+	  }
+	  else if (msg.data.match(/] ERROR /)) {
+	  	color = 'red';
+	  }
+      if (msg.data == '\n' && $('pre:last').text() == '\n') return;
+      $('<pre style="color: ' + color + '">').text(msg.data).appendTo('div#log_panel');
+
+      var log_panel = $('#log_panel')[0];
+
+      var scrollHeight = Math.max(log_panel.scrollHeight, log_panel.clientHeight);
+      log_panel.scrollTop = scrollHeight - log_panel.clientHeight;
+
+      console.log('DATA: '+ msg.data + '[' + color + ']');
+    };
+    ws.onclose = function() {
+      console.warn('Connection closed');
+      clearInterval(timer_id);
+      notification.start_timer();
+    };
+    ws.onerror = function(msg) {
+      console.error(msg.data);
+    };
+}
+</script>

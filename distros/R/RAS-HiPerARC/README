@@ -1,0 +1,32 @@
+RAS::HiPerARC.pm
+Version 1.03, June 9, 2000
+
+
+DESCRIPTION
+
+RAS::HiPerARC is a PERL 5 module for interfacing with a 
+3Com/USR Total Control HiPerARC remote access server. Using 
+this module, one can very easily construct programs to find a 
+particular user in a bank of ARCs, disconnect users, get usage 
+statistics, or execute arbitrary commands on a ARC.
+
+
+PREREQUISITES AND INSTALLATION
+
+This module uses Jay Rogers' Net::Telnet module. If you don't have 
+Net::Telnet, get it from CPAN or this module won't do much for you.
+
+Installation is easy:
+   perl Makefile.PL && make && make test
+   make install
+
+Check out the examples in the documentation for ideas on how you'd 
+want to use this module.
+
+
+DOCUMENTATION
+
+For more information and for examples, see the POD documentation 
+in the module itself. Try "pod2text HiPerARC.pm | more" or see 
+the installed manpage.
+

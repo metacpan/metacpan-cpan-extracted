@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  [%- SET 
+    File = c.stash.RapiFsFile 
+    code = c.stash.code 
+    pfx  = c.mount_url
+  -%]
+  
+  <link href="[% pfx %]/assets/local/misc/static/prism.css" rel="stylesheet" />
+  
+  <style>
+    pre, code {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+  </style>
+  
+</head>
+
+<body style="margin:0px;">
+
+<pre class="line-numbers" style="margin-top:0px;margin-bottom:0px;">
+<code class="language-[% File.code_language %] line-numbers">
+[%- code -%]
+</code>
+</pre>
+
+  <script src="[% pfx %]/assets/local/misc/static/prism.js"></script>
+</body>
+</html>

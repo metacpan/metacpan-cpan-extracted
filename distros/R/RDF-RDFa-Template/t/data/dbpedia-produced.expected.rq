@@ -1,0 +1,9 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>
+SELECT ?resource ?name ?first WHERE 
+{
+?resource dbo:produced "1973" .
+?resource foaf:name ?name .
+?resource dbp:firstFlight ?first .
+}

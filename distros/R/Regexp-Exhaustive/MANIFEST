@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Regexp/Exhaustive.pm
+t/010basic.t
+t/020interface.t
+t/031exhaustive.t
+t/032overlapping.t
+t/041exhaustive_vars.t
+t/042exhaustive_vars_eng.t
+t/050diagnostics.t
+t/100security.t
+META.yml                                 Module meta-data (added by MakeMaker)

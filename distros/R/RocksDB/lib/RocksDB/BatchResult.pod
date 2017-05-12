@@ -1,0 +1,41 @@
+=head1 NAME
+
+RocksDB::BatchResult - rocksdb::BatchResult object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $db = RocksDB->new('/path/to/db');
+  my $pos = 0;
+  for (my $iter = $db->get_updates_since($pos); $iter->valid; $iter->next) {
+      my $result = $iter->get_batch;
+      # get sequence
+      my $sequence = $result->sequence;
+      # get RocksDB::WriteBatch object
+      my $batch = $result->write_batch;
+  }
+
+=head1 DESCRIPTION
+
+B<RocksDB::BatchResult> is a rocksdb::BatchResult object.
+
+=head1 METHODS
+
+=head2 C<< $result->sequence() :Int >>
+
+Returns a SequenceNumber.
+
+=head2 C<< $result->write_batch() :RocksDB::WriteBatch >>
+
+Returns a RocksDB::WriteBatch object.
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::WriteBatch>, L<RocksDB::TransactionLogIterator>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

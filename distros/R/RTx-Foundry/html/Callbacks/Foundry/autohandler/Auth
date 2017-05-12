@@ -1,0 +1,27 @@
+%# Conscience is a mother-in-law whose visit never ends.
+%# 		-- H. L. Mencken
+<%INIT>
+$RT::Guest = 0;
+
+if ($user and !$no_login) {
+    delete $session{'CurrentUser'};
+    $m->comp('/Foundry/Elements/CheckUser', User => $user);
+}
+elsif (
+    $no_login or
+    !((defined $session{'CurrentUser'}) and ( $session{'CurrentUser'}->Id))
+) {
+    my $CurrentUser = RT::CurrentUser->new;
+    $CurrentUser->Load('guest') or die "Cannot load 'guest'";
+    $session{'CurrentUser'} = $CurrentUser;
+}
+
+$RT::Guest = 1 if $session{CurrentUser}
+    and $session{CurrentUser}->UserObj->Name eq 'guest';
+
+$m->notes(error => $ARGS{Error});
+</%INIT>
+<%ARGS>
+$user => undef
+$no_login => undef
+</%ARGS>

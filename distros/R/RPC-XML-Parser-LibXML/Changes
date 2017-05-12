@@ -1,0 +1,40 @@
+Revision history for Perl module RPC::XML::Parser::LibXML
+
+0.08 2013-11-20T04:56:09Z
+
+    - minil migrate
+
+0.07 2011-06-16
+
+    - do not use /etc/passwd for testing(tokuhirom)
+
+0.06 2011-06-13
+
+    - Don't allow external entities to be injected
+      Bump LibXML to 1.70 (because we need to specify %param to new() and
+      LibXML changed that method signature in a recent version)
+      (yannk)
+
+0.05 2010-09-27 18:08:24 JST
+
+    - Fixed a testing issue in dateTime.iso8601.
+      (Tokuhiro Matsuno)
+    - Depend to latest RPC::XML.
+      (Tokuhiro Matsuno)
+
+0.04 2008-10-24 17:59:12 PDT
+
+    - Fixed a bug where <value>foo</value> is not treated as <string>
+      as in XMLRPC spec.
+      (Benjamin Trott, Tatsuhiko Miyagawa)
+
+0.03 2008-08-27 20:59:32 PDT
+
+    - Fixed bug when findnodes() returns list including undeg.
+      (Tatsuhiko Miyagawa)
+    - miyagawa is taking over the maint bit to push to CPAN
+
+0.02 2008-04-07
+
+    - initial cpan release.
+

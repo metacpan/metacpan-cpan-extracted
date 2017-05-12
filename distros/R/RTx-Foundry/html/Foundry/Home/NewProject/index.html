@@ -1,0 +1,91 @@
+%# Ehrman's Commentary:
+%# 	(1) Things will get worse before they get better.
+%# 	(2) Who said things would get better?
+
+<& /Foundry/Elements/Header, Title => 'My Page', Method => 'Post' &>
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td><& /Foundry/Elements/Tabs, Text => 'Register Project' &></td>
+  </tr>
+  <tr> 
+    <td valign="top"> 
+      <table border="0" cellspacing="0" cellpadding="4" class="poptable" width="100%">
+        <tr> 
+          <td valign="top"> 
+	    <& ShowSteps, Step => $Step &>
+% if ($Step == 0) {
+	    <& /Foundry/Home/Elements/ShowTerm, Template => 'TermOfProject' &>
+% } else {
+%	    foreach my $error (@Error) {
+		&nbsp;* <font color="red"><% $error %></font><br>
+%	    }
+            <table width="100%" border="0" cellspacing="0" cellpadding="10">
+% if ($ARGS{id}) {
+%     $m->scomp('/Work/Tickets/Display.html', Queue => 'NewProject', %ARGS);
+              <tr> 
+                <td class="tableEmboss" height="400" align="left" valign="top">
+<&|/l, $RT::Organization&>Your project has been submitted to the [_1] administrators.</&>
+<&|/l&>Within 72 hours, you will receive notification of further instructions.</&>
+<p>
+<&|/l, $RT::Organization&>Thank you for choosing [_1].</&>
+		</td></tr>
+	    </table>
+% } else {
+		<input type="hidden" name="Step" value="1">
+		<& /Work/Tickets/Create.html, Queue => 'NewProject', NoUI => 1, Subject => 'New Project Registration', %ARGS, NoCF => { Notes => 1, Attachments => 1 }, Loc => 1 &>
+% }
+
+% }
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<br>
+</TD></TR>
+</TABLE>
+<%INIT>
+$m->abort if $RT::Guest;
+
+if ($Step == 1 and $Action eq 'Disagree') {
+    $m->print("<a href='/'>" . loc("Homepage") . '</a>');
+    return;
+}
+
+my ($ProjectName, $UnixName, $Rationale, $Description, $Platform,
+    $License, $Language, $Audience
+) = @ARGS{
+    map "CustomField-".RT::CustomField->NameToId($_, 'NewProject')."-Values",
+    qw( ProjectName UnixName Rationale PublicDescription Platform
+	License ProgrammingLanguage IntendedAudience )
+};
+
+my @Error;
+
+if ($ARGS{id}) {
+    push @Error, loc('Missing mandatory fields')
+	unless $ProjectName and $UnixName and $Rationale and
+	       $Description and $Platform and $License and
+	       $Language and $Audience;
+
+    push @Error, loc('ID must be 3-15 characters of lower-case letters or digits, beginning with a letter')
+	unless !$UnixName or $UnixName =~ /^[a-z][0-9a-z]{2,14}$/;
+    push @Error, loc('Project Name must be at most 40 charaters')
+	unless !$ProjectName or length($ProjectName) <= 40;
+    push @Error, loc('Public Description must be at most 255 charaters')
+	unless !$Description or length($Description) <= 255;
+    delete $ARGS{id} if @Error;
+    $Step = 2 if $ARGS{id};
+}
+
+</%INIT>
+<%ARGS>
+$user => ""
+$pass => undef
+$goto => undef
+$Error => undef
+$Action	=> undef
+$Step => 0
+</%ARGS>

@@ -1,0 +1,33 @@
+There are two files here:
+
+  example.schema
+
+You can feed this into the sqldef.pl program, and pipe the output to mSQL,
+as in:
+
+  sqldef.pl example.schema | msql rdbms
+
+Make sure you created the rdbms database, and that you have read/write
+access to it. Also, make sure rdbms doesn't have anything important in it!
+
+If you'd rather create the same databases, but put lots of data into them,
+you could try:
+
+  msql rdbms < example.sql
+
+If you'd like to try the example, put example.cgi somewhere under your web
+server, like your home directory. Make sure that .cgi programs are
+executable under your web server, or you can put this in a cgi-bin
+directory. Please see your web server docs for more info. Check to make
+sure the #! notation at the top of example.cgi points to the correct perl
+interpreter, and load it up in your web browser with a URL like:
+
+  http://localhost/cgi-bin/example.cgi?db=rdbms
+
+This assumes you copied it to your cgi-bin directory, and that the database
+you are using, as in the previous two examples in this README, is named
+rdbms.
+
+Have fun,
+
+Brian

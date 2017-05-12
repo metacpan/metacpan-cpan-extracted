@@ -1,0 +1,34 @@
+---
+abstract: "Make RT operate on \"customers\" not individual accounts"
+author:
+  - 'Craig Ringer <craig@2ndquadrant.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.6302
+  Module::Install::AutoManifest: 0.003
+  Module::Install::ReadmeFromPod: 0.20
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.6302
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-CustomerGroups
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+requires:
+  Carp: 0
+  Module::Install::RTx: 0.30
+  SMS::Send: 1.06
+  perl: 5.010001
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=RT-Extension-CustomerGroups
+  homepage: https://github.com/2ndQuadrant/rt-extension-customergroups-perl
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/2ndQuadrant/rt-extension-customergroups-perl.git
+version: 1.00

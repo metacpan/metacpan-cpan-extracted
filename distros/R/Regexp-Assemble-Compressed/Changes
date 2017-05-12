@@ -1,0 +1,11 @@
+Revision history for Perl extension Regexp::Assemble::Compressed
+
+0.02  Mon Sep 13 16:15:50 2010
+        - fix some bugs which appear when it's passed to add() some
+          negative patterns or complex character notaions inside []
+          (character class). Thanks to Mons Anderson for letting me know it
+          and sending me a patch.
+          https://rt.cpan.org/Ticket/Display.html?id=58859
+
+0.01  Fri Apr 10 22:46:32 2009
+        - original version

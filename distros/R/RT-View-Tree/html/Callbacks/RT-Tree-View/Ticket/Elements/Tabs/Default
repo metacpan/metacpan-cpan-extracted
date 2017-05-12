@@ -1,0 +1,46 @@
+%# BEGIN LICENSE BLOCK
+%# 
+%#  Copyright (c) 2002-2003 Jesse Vincent <jesse@bestpractical.com>
+%#  
+%#  This program is free software; you can redistribute it and/or modify
+%#  it under the terms of version 2 of the GNU General Public License 
+%#  as published by the Free Software Foundation.
+%# 
+%#  A copy of that license should have arrived with this
+%#  software, but in any event can be snarfed from www.gnu.org.
+%# 
+%#  This program is distributed in the hope that it will be useful,
+%#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+%#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%#  GNU General Public License for more details.
+%# 
+%# END LICENSE BLOCK
+
+<%init>
+if ($Ticket) {
+    $tabs->{'this'}->{'subtabs'}->{'_ZZ-Treeview'} = {
+        title => loc("Tree view"),
+        path  => "Search/Tree.html?id=" . $Ticket->id . "&Query=id%20=%20" . $Ticket->id
+    };
+    if ( $current_tab =~ qr{^Search/Tree.html} ) {
+        $tabs->{'this'}->{'current_subtab'} = "Search/Tree.html?id=" . $Ticket->id . "&Query=id%20=%20" . $Ticket->id
+    }
+}
+
+if ( $current_tab =~ qr{^Search/Tree.html} ) {
+
+    # insert after tab h
+    $tabs->{'hb_TreeView'} = {
+        title => loc($Title),
+        path  => $current_tab
+    };
+
+}
+
+</%init>
+<%args>
+$Title => undef
+$tabs =>undef
+$current_tab => undef
+$Ticket => undef
+</%args>

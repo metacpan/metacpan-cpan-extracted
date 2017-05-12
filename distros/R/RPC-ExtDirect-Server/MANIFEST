@@ -1,0 +1,27 @@
+Changes
+lib/RPC/ExtDirect/Server.pm
+lib/RPC/ExtDirect/Server.pod
+lib/RPC/ExtDirect/Server/Patch/HTTPServerSimple.pm
+lib/RPC/ExtDirect/Server/Util.pm
+lib/RPC/ExtDirect/Server/Util.pod
+Makefile.PL
+MANIFEST
+README
+t/01_basic.t
+t/02_extdirect.t
+t/03_cgi_simple.t
+t/04_cgi_class.t
+t/05_handlers.t
+t/06_file_libmagic.t
+t/07_file_mimeinfo.t
+t/htdocs/bar.png
+t/htdocs/dir/.placeholder
+t/htdocs/empty.gif
+t/htdocs/foo.txt
+t/htdocs/utf8.txt
+t/htdocs/win.html
+t/lib/RPC/ExtDirect/Server/Test/Util.pm
+t/pod.t
+t/server.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

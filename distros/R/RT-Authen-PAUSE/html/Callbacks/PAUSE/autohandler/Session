@@ -1,0 +1,53 @@
+<%ARGS>
+$user => undef
+$pass => undef
+</%ARGS>
+<%INIT>
+use LWP::UserAgent;
+
+# somebody is logged in
+return if $session{'CurrentUser'} and $session{'CurrentUser'}->Id;
+# no credentials
+return unless defined $user and length $user and defined $pass;
+# we don't auth root@localhost, which should be the local RT root
+return if lc $user eq 'root@localhost';
+
+$user = uc $user;
+
+# Try to load the user by PAUSE_ID
+my $cu = RT::CurrentUser->new();
+$cu->LoadByName( $user );
+unless ( $cu->id ) {
+    $RT::Logger->warning("No user '$user' in DB, broken import of users from pause?");
+    return;
+}
+
+# Proxy to PAUSE's auth
+my $ua = LWP::UserAgent->new( timeout => 5 );
+$ua->credentials('pause.perl.org:443', 'PAUSE', $user, $pass);
+
+my $res = $ua->get('https://pause.perl.org/pause/authenquery');
+
+# Successful login
+if ($res->code == 200) {
+    $RT::Logger->info("PAUSE login by $user from $ENV{REMOTE_ADDR}");
+
+    my $next = $session{'NextPage'}->{ $ARGS{'next'} || "" };
+       $next = $next->{'url'} if ref $next;
+
+    RT::Interface::Web::InstantiateNewSession();
+    $session{'CurrentUser'} = $cu;
+
+    RT::Interface::Web::Redirect( $next )
+        if $next and $m->request_comp->path eq '/NoAuth/Login.html';
+} else {
+    $RT::Logger->warning("PAUSE authentication failed with " . $res->code);
+
+    # If 401 then no dice, login failed.
+    # Other code => oops, PAUSE is down, or something.
+    $session{"Actions"}{""} = [loc("Unable to contact PAUSE for authentication (status [_1])", $res->code)]
+        if $res->code != 401;
+}
+
+return;
+</%INIT>

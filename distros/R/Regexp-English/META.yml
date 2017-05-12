@@ -1,0 +1,23 @@
+---
+abstract: 'Perl module to create regular expressions more verbosely'
+author:
+  - 'chromatic <chromatic@wgz.org>'
+build_requires:
+  Test::Simple: 0.60
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Regexp-English
+provides:
+  Regexp::English:
+    file: lib/Regexp/English.pm
+    version: 1.01
+requires:
+  Scalar::Util: 1.21
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01

@@ -1,0 +1,5 @@
+.svn
+blib
+pm_to_blib
+MANIFEST.bak
+t/critic.t

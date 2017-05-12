@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 79a17e22fb22ebeb7da8610729e520f3cbffadc7 Changes
+SHA1 b486a45dcb09c5ca25ff1d3fed657619d4a052ca MANIFEST
+SHA1 db01e0e49933e9c4804f7d36fd85cf9dcf578743 META.yml
+SHA1 bd4819e9d072f353967da4c66235651a375cefa9 Makefile.PL
+SHA1 8b7409759ffa054deab2fbcb19723a2c1af5ac43 README
+SHA1 aaef095f78a0747f507191d45deaf2cfa8bf5952 html/Callbacks/StallFutureTicket/Ticket/Create.html/BeforeCreate
+SHA1 59e69e8b99149999c0c74e6031def042569410aa inc/Module/AutoInstall.pm
+SHA1 eba6465ce5287959acc940e75b080205960b7ac6 inc/Module/Install.pm
+SHA1 9dc7102b5e2c3a791205ecc4f9d84a56632253ef inc/Module/Install/AutoInstall.pm
+SHA1 b1cf7431800187990981684e7f67e572e8f7a631 inc/Module/Install/Base.pm
+SHA1 8550a7c7d2ed0632f8bdb3b741dfccaa013a1403 inc/Module/Install/Can.pm
+SHA1 73b01297ba83de8dbe4a87f70bbad0460f973ae2 inc/Module/Install/Fetch.pm
+SHA1 cb6547200d5494081535f3d91d76dc4364ad1029 inc/Module/Install/Include.pm
+SHA1 318ae9c85a1e1c4b7be1586e7e93713714ba93f8 inc/Module/Install/Makefile.pm
+SHA1 27edaaee2dc9d9b0be98e09ae82e5fe81cd58ba6 inc/Module/Install/Metadata.pm
+SHA1 e51d256f3c61dc968e1f3226d04c6fd06c3586d8 inc/Module/Install/RTx.pm
+SHA1 5c589819986050dd79faf8572992a9790ae89f2e inc/Module/Install/RTx/Factory.pm
+SHA1 dc972927565015ffbbaae806ff44634cae6fa1d2 inc/Module/Install/ReadmeFromPod.pm
+SHA1 0ae795f0a9b6783872d393f92f9dc7173f7632e9 inc/Module/Install/Win32.pm
+SHA1 2ad05d85780f32385e90fc76da59f635d453e29a inc/Module/Install/WriteAll.pm
+SHA1 e1604b56e948d0f6688ad3290b8462583ff32191 lib/RT/Extension/StallFutureTicket.pm
+SHA1 69ddf10d38c15a469f792a3bf3b7d875801ad477 po/de.po
+SHA1 7c8828034ec0fc07d475933be64c72b0976191c0 t/00-load.t
+SHA1 8c6a5835d523f8d2eb59461b4ba252f98008fdc9 t/boilerplate.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk7nTsoACgkQWFkxZRfLwXIyzACgv00uRb0khklMCD3FL8DdvOgm
+9fsAnjFxKlT5RW76aeO4ZyEcyK+D/SOa
+=hKWh
+-----END PGP SIGNATURE-----

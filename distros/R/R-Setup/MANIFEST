@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/R-Setup.t
+t/R-Setup-Bootstrap.t
+t/R-Setup-Download.t
+t/R-Setup-Resolve.t
+t/R-Setup-Install.t
+t/R-Setup-Local.t
+lib/R/Setup.pm
+lib/R/Setup/Bootstrap.pm
+lib/R/Setup/Download.pm
+lib/R/Setup/Resolve.pm
+lib/R/Setup/Install.pm
+lib/R/Setup/Local.pm
+META.yml                                 Module meta-data (added by MakeMaker)

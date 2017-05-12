@@ -1,0 +1,26 @@
+MANIFEST
+inc/ExtUtils/AutoInstall.pm
+lib/Rsync/Config.pm
+lib/Rsync/Config/Atom.pm
+lib/Rsync/Config/Blank.pm
+lib/Rsync/Config/Comment.pm
+lib/Rsync/Config/Module.pm
+lib/Rsync/Config/Renderer.pm
+lib/Rsync/Config/Parser.pm
+t/10.01.renderer.t
+t/20.01.blank.t
+t/21.01.comment.t
+t/30.01.atom.t
+t/40.01.module.t
+t/50.01.config.t
+t/60.01.parser.t
+t/99.00.pod.t
+t/99.01.pod-coverage.t
+t/99.02.perl-critic.t
+t/perlcriticrc
+t/perltidyrc
+Makefile.PL
+AUTHORS
+CHANGES
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

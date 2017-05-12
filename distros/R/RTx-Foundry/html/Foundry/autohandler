@@ -1,0 +1,16 @@
+%# "I used to get high on life but lately I've built up a resistance."
+<%INIT>
+*NOTHING::AUTOLOAD = sub {''} unless ($RT::Nothing);
+$RT::Nothing ||= bless(\(my $x), 'NOTHING');
+my $Action = (
+    grep defined, map { /^Action-(.+?)(?:\.[xyXY])?$/ ? $1 : undef }
+    grep defined $ARGS{$_}, sort keys %ARGS
+)[-1];
+
+$ARGS{Queue} = $ARGS{Queue}[0] if ref $ARGS{Queue};
+$m->notes( HIColor => '#D1FAFC' );
+$m->call_next(%ARGS, Action => $Action);
+</%INIT>
+<%ATTR>
+AutoFlush => 1
+</%ATTR>

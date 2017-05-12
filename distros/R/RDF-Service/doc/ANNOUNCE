@@ -1,0 +1,26 @@
+The fourth alpha release of RDF::Service from the Wraf project
+
+        http://www.uxn.nu/wraf/
+
+has entered CPAN as
+  file: $CPAN/authors/id/J/JO/JONAS/RDF-Service-0.04.tar.gz
+  size: ??? bytes
+   md5: ???
+
+
+CHANGES
+    * Session metadata includes the acting person
+    * Support for changing IDS without saving added data
+    * many more changes and bugfixes
+
+
+DESCRIPTION
+    Wraf implements a RDF API that hopes to realize the Semantic
+    Web. The framework uses RDF for data, user interface, modules and
+    object methods. It uses interfaces to other sources in order to
+    integrate all data in one enviroment, regardless of storage form.
+
+    The homepage for Wraf is http://www.uxn.nu/wraf/ there you can
+    find the developers mailinglist and more background information.
+    Please send any comments to the developer mailinglist.
+

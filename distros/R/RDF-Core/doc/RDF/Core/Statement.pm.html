@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RDF::Core::Statement - RDF statement</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#interface">Interface</a></li>
+	</ul>
+
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>RDF::Core::Statement - RDF statement</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  require RDF::Core::Statement;</pre>
+<pre>
+  my $subject = new RDF::Core::Resource('<a href="http://www.gingerall.cz/employees/Jim">http://www.gingerall.cz/employees/Jim</a>');
+  my $predicate = $subject-&gt;new('<a href="http://www.gingerall.cz/rdfns#name">http://www.gingerall.cz/rdfns#name</a>');
+  my $object = new RDF::Core::Literal('Jim Brown');</pre>
+<pre>
+  my $statement = new RDF::Core::Statement($subject, $predicate, $object);</pre>
+<pre>
+  print $statement-&gt;getObject-&gt;getLabel.&quot;\n&quot;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>
+</p>
+<h2><a name="interface">Interface</a></h2>
+<ul>
+<li><strong><a name="item_new">new($subject, $predicate, $object)</a></strong><br />
+</li>
+Variables $subject and $predicate are resources, $object can be resource or literal
+<p></p>
+<li><strong><a name="item_getsubject">getSubject</a></strong><br />
+</li>
+<li><strong><a name="item_getpredicate">getPredicate</a></strong><br />
+</li>
+<li><strong><a name="item_getobject">getObject</a></strong><br />
+</li>
+<li><strong><a name="item_getlabel">getLabel</a></strong><br />
+</li>
+returns a content of statement in n-triple format.
+<p></p>
+<li><strong><a name="item_clone">clone</a></strong><br />
+</li>
+returns copy of statement
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is subject to the MPL (or the GPL alternatively).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ginger Alliance, <a href="mailto:rdf@gingerall.cz">rdf@gingerall.cz</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>RDF::Core::Resource, RDF::Core::Literal</p>
+
+</body>
+
+</html>

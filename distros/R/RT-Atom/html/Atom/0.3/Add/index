@@ -1,0 +1,59 @@
+%# [POST PostURI] (Container)
+%# Create a new object from the AtomEntry in the request's body.
+%# 204: Created, but the new object has no EditURI.
+%# 303: Created.  The 'Location:' header is set to the new object's EditURI
+%#      (for subsequent Get/Update).
+%# 400: Request failed.  Body is error message in text/plain.
+%# 404: There is no container matching the specified URI.
+<%INIT>
+my $obj = eval {$CollectionClass->new($session{CurrentUser})->NewItem}
+    or return $m->comp($ShowError, Status => 404);
+
+my %args = $m->request_args;
+$args{$1} = $2 while $Path =~ m{\G.*?(\w+)s/(\d+)/(?=\w)}g;
+
+# XXX - factor away the creation defaults
+$args{Requestor} ||= $session{CurrentUser}->Id
+    if $CollectionClass->isa('RT::Tickets');
+
+my $status = 400;
+
+my @rv;
+if ($Path =~ /.*\b(\w+)s/ and $Object and my $code = $Object->can("Add$1")) {
+    if ($1 eq 'CustomFieldValue' and my $q = eval { $Object->QueueObj->Id } and $args{Field} =~ /^(\d*\D.*)$/) {
+        my $name = $1;
+        my $cf = RT::CustomField->new($session{CurrentUser});
+        $cf->LoadByNameAndQueue( Queue => $q, Name => $name );
+        $cf->LoadByNameAndQueue( Queue => 0, Name => $name ) if !$cf->Id;
+        $args{Field} = $cf if $cf->Id;
+    }
+    @rv = $code->($Object, %args);
+    $status = 200 if $rv[0];
+}
+else {
+    @rv = $obj->Create( %args );
+    if (my $id = $obj->Id) {
+	$r->headers_out->{Location} = "$BaseURI/$Path/$id";
+	$status = 303;
+    }
+}
+
+$r->content_type('text/plain');
+$r->status($status);
+
+print $rv[-1], "\n";
+</%INIT>
+<%ARGS>
+$Path
+$BaseURI
+$Now
+$ShowLink
+$ShowEntry
+$ShowError
+$X
+
+$Type
+$Object
+$CollectionClass
+$FeedURI
+</%ARGS>

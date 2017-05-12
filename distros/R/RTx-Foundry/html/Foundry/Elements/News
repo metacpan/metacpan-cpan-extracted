@@ -1,0 +1,22 @@
+%# Science is what happens when preconception meets verification.
+
+<table border="0" cellspacing="1" cellpadding="2" width=100%>
+<tr><td class="tableTitle"><&|/l&>Foundry News</&></td></tr>
+% my $count = 0;
+% foreach my $item (@items) {
+%     last if $count++ == 2;
+<tr bgcolor="white"><td><nobr>
+<a href="?<% Encode::encode(latin1 => Encode::encode_utf8($item)) |u %>"><% $item %></a>
+</nobr></td></tr>
+% }
+</table>
+<%INIT>
+my $page = CGI::Util::escape(Encode::encode_utf8(loc("News")));
+my $file = "$RT::VarPath/Foundry/kwiki/.global/database/$page";
+open(my($fh), $file) or return;
+my @items = do {
+    local $/;
+    my $data = <$fh>;
+    $data =~ /\[(.+?)\]/g;
+};
+</%INIT>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<application>
+	<_param name="id" type="int" />
+	<_param name="action" />
+
+	<name />
+	<result type="int" />
+</application>
+

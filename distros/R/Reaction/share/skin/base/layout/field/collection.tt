@@ -1,0 +1,20 @@
+=for layout widget
+
+[% label_box %]
+[% list  %]
+
+=for layout label_box
+
+<span class="field_collection_label_box"> [% label %]: </span>
+
+=for layout list
+
+<ul>
+  [% call_next %]
+</ul>
+
+=for layout item
+
+<li>[% name %]</li>
+
+=cut

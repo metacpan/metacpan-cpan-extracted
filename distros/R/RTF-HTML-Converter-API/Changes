@@ -1,0 +1,6 @@
+Revision history for Perl extension RTF::HTML::Converter::API.
+
+0.01  Sun Feb 24 20:50:16 2002
+	- original version; created by h2xs 1.21 with options
+		-X RTF::HTML::Converter::API
+

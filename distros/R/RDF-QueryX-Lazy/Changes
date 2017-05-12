@@ -1,0 +1,18 @@
+RDF-QueryX-Lazy
+===============
+
+Created:      2011-10-29
+Home page:    <https://metacpan.org/release/RDF-QueryX-Lazy>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-QueryX-Lazy>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.003	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2011-11-16
+
+ - Avoid adding PREFIX declarations that are not used in the query.
+
+0.001	2011-10-30	Initial release

@@ -1,0 +1,109 @@
+NAME
+    RT::Action::UpdateIcestack - Send ticket updates to Icestack
+
+DESCRIPTION
+    This RT ScripAction is invoked when a ticket is updated and sends the
+    update through to Icestack.
+
+INSTALLATION
+    Can be installed using the following commands:
+
+        perl Makefile.PL
+        make
+        make install
+        make initdb
+
+CONFIGURATION
+  Enable Plugin
+    Update RT_SiteConfig.pm with a line similar to the below:
+
+        Set(@Plugins,(qw(RT::Action::UpdateIcestack)));
+
+  Create Scrip
+    This Scrip will invoke the ScripAction installed above whenever a ticket
+    is updated.
+
+        Log onto RT web interface as root
+        Click Tools->Configuration->Global->Scrips->Create
+        Enter in Scrip Fields as follows:
+            Description: Send update to Icestack
+            Condition: On Transaction
+            Action: Update Icestack
+            Template: Global template: Transaction
+            Stage: TransactionCreate
+        Click Create
+
+  Add custom fields to Users table
+    These fields are used to associate an RT User with a particular Icestack
+    instance.
+
+        Log onto RT web interface as root
+        Click Tools->Configuration->Custom Fields->Create
+            Name: IcestackCode
+            Description: Key code issued from Icestack
+            Type: Enter one value
+            Applies to: Users
+        Click Tools->Configuration->Custom Fields->Create
+            Name: IcestackHostURL
+            Description: Host URL used to push updates back into Icestack
+            Type: Enter one value
+            Applies to: Users
+        Click Create
+
+  Configure Icestack Integration
+    Icestack communicates with RT via an RT User. It is necessary to
+    populate the IcestackCode and IcestackHostURL fields for this User so
+    that the update mechanism will function.
+
+    This User should have access to one or more queues. These will be
+    visible to the Icestack system.
+
+    The instructions given below are for creation of new User and Queue(s).
+    It is also possible to modify an existing User.
+
+   Create User
+    As alluded to above this User will be associated with a particular
+    Icestack instance via the custom fields.
+
+        Log onto RT web interface as root
+        Click Tools->Configuration->Users->Create
+            Username: <user name>
+            Let this user access RT: CHECK
+            Let this user be granted rights (Privileged): CHECK
+            IcestackHostURL: <url>
+            IcestackCode: <code>
+        Click Create
+
+   Create Queue and assign rights for User
+    Create one or more Queues to be associated with the User and Icestack
+    instance.
+
+        Log onto RT web interface as root
+        Click Tools->Configuration->Queues->Create
+            Queue Name: <queue name>
+            Description: Queue for <user name>
+            Lifecycle: default
+        Click Create
+        Click Tools->Configuration->Queues->Select
+        Click <queue name>
+        Click User Rights
+        Add rights for this user: <user name>
+            Create tickets: CHECK
+            View queue: CHECK
+            View ticket summaries: CHECK
+            Modify tickets: CHECK
+            (others may be necessary, depending...)
+        Click Save Changes
+
+NOTES
+    To assist with testing the integration the XML exchange with Icestack is
+    logged to /tmp/ui_debug.log.
+
+AUTHOR
+    Mark Ibell <marki@econz.co.nz>
+
+COPYRIGHT
+    Copyright (c) 2013 Experieco Ltd. All rights reserved. Use of this
+    source code is governed by a BSD-style license that can be found in the
+    LICENSE file.
+

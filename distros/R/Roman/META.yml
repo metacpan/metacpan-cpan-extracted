@@ -1,0 +1,28 @@
+---
+abstract: functions for converting between Roman and Arabic numerals
+author:
+  - 'Alexandr Ciornii <alexchorny AT gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - roman numbers
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Roman
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: 5.57
+  perl: 5.006
+resources:
+  repository: http://github.com/chorny/Roman
+version: 1.24

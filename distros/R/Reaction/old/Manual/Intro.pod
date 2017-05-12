@@ -1,0 +1,62 @@
+=head1 NAME
+
+Reaction::Manual::Intro - Introduction to Reaction
+
+=head1 INTRODUCTION
+
+Reaction is basically an extended MVC:
+
+=over
+
+=item Domain Model 
+
+DBIC schema, etc.
+
+=item Interface Model 
+
+Model::DBIC::Schema and Action classes.
+
+=item Controller 
+
+Mediation and navigation.
+
+=item ViewPort
+
+View logic and event handling encapsulation.
+
+=item Renderer 
+
+View:: classes, handed viewports.
+
+=back
+
+=head1 THE REACTION WAY
+
+The idea is you separate your domain model, which encapsulates the domain
+itself, from your interface model, which is a model of how a particular app or
+class of apps interact with that domain and provides objects/methods to
+encapsulate the common operations it does.
+
+=head2 Basic usage
+
+XXX TODO
+
+=head1 SEE ALSO
+
+=over 
+
+=item * L<Reaction::Manual::Cookbook>
+
+=item * L<Reaction::Manual::FAQ>
+
+=back
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

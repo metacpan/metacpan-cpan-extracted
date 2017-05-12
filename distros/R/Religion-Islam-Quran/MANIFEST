@@ -1,0 +1,36 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Religion-Islam-Quran.t
+lib/Religion/Islam/Quran.pm
+
+lib/Religion/Islam/Quran/QuranAlbanian.txt
+lib/Religion/Islam/Quran/QuranArabic.txt
+lib/Religion/Islam/Quran/QuranAzerbaijani.txt
+lib/Religion/Islam/Quran/QuranChinese.txt
+lib/Religion/Islam/Quran/QuranDutch.txt
+lib/Religion/Islam/Quran/QuranEnglish.txt
+lib/Religion/Islam/Quran/QuranEnglishTransliteration.txt
+lib/Religion/Islam/Quran/QuranEnglishUS.txt
+lib/Religion/Islam/Quran/QuranFinnish.txt
+lib/Religion/Islam/Quran/QuranFrench.txt
+lib/Religion/Islam/Quran/QuranGerman.txt
+lib/Religion/Islam/Quran/QuranHarun.txt
+lib/Religion/Islam/Quran/QuranIndonesian.txt
+lib/Religion/Islam/Quran/QuranItalian.txt
+lib/Religion/Islam/Quran/QuranJapanese.txt
+lib/Religion/Islam/Quran/QuranLatin.txt
+lib/Religion/Islam/Quran/QuranMalaysian.txt
+lib/Religion/Islam/Quran/QuranMexican.txt
+lib/Religion/Islam/Quran/QuranPersian.txt
+lib/Religion/Islam/Quran/QuranPoland.txt
+lib/Religion/Islam/Quran/QuranPortuguese.txt
+lib/Religion/Islam/Quran/QuranRussian.txt
+lib/Religion/Islam/Quran/QuranSpanish.txt
+lib/Religion/Islam/Quran/QuranSwahili.txt
+lib/Religion/Islam/Quran/QuranTamil.txt
+lib/Religion/Islam/Quran/QuranThai.txt
+lib/Religion/Islam/Quran/QuranTurkish.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

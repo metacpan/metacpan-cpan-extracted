@@ -1,0 +1,84 @@
+SYNOPSIS
+
+     use Regexp::Pattern; # exports re()
+    
+     my $re = re('YouTube::video_id');
+     say "ID does not look like a YouTube video ID" unless $id =~ /\A$re\z/;
+    
+     # a dynamic pattern (generated on-demand) with generator arguments
+     my $re2 = re('Example::re3', {variant=>"B"});
+
+SPECIFICATION VERSION
+
+    0.1.0
+
+DESCRIPTION
+
+    Regexp::Pattern is a convention for organizing reusable regexp patterns
+    in modules.
+
+ Structure of an example Regexp::Pattern::* module
+
+     package Regexp::Pattern::Example;
+
+    # INSERT_BLOCK: lib/Regexp/Pattern/Example.pm def pod_verbatim
+
+    A Regexp::Pattern::* module must declare a package global hash variable
+    named %RE. Hash keys are pattern names, hash values are defhashes (see
+    DefHash). At the minimum, it should be:
+
+     { pat => qr/.../ },
+
+    Regexp pattern should be written as qr// literal, or (less desirable)
+    as a string literal. Regexp should not be anchored (qr/^...$/) unless
+    necessary. Regexp should not contain capture groups unless necessary.
+
+ Using a Regexp::Pattern::* module
+
+    A Regexp::Pattern::* module can be used manually by itself, as it
+    contains simply data that can be grabbed using a normal means, e.g.:
+
+     use Regexp::Pattern::Example;
+    
+     say "Input does not match blah"
+         unless $input =~ /\A$Regexp::Pattern::Example::RE{re1}{pat}\z/;
+
+    Regexp::Pattern (this module) also provides re() function to help
+    retrieve the regexp pattern.
+
+FUNCTIONS
+
+ re
+
+    Exported by default. Get a regexp pattern by name from a
+    Regexp::Pattern::* module.
+
+    Syntax:
+
+     re($name[, \%args ]) => $re
+
+    $name is MODULE_NAME::PATTERN_NAME where MODULE_NAME is name of a
+    Regexp::Pattern::* module without the Regexp::Pattern:: prefix and
+    PATTERN_NAME is a key to the %RE package global hash in the module. A
+    dynamic pattern can accept arguments for its generator, and you can
+    pass it as hashref in the second argument of re().
+
+    Die when pattern by name $name cannot be found (either the module
+    cannot be loaded or the pattern with that name is not found in the
+    module).
+
+SEE ALSO
+
+    Regexp::Common. Regexp::Pattern is an alternative to Regexp::Common.
+    Regexp::Pattern offers simplicity and lower startup overhead. Instead
+    of a magic hash, you retrieve available regexes from normal data
+    structure or via the provided re() function.
+
+    Regexp::Common::RegexpPattern, a bridge module to use patterns in
+    Regexp::Pattern::* modules via Regexp::Common.
+
+    Regexp::Pattern::RegexpCommon, a bridge module to use patterns in
+    Regexp::Common::* modules via Regexp::Pattern.
+
+    App::RegexpPatternUtils
+

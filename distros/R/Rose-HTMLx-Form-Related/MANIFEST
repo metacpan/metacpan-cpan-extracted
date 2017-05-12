@@ -1,0 +1,33 @@
+Changes
+lib/Rose/HTMLx/Form/Related.pm
+lib/Rose/HTMLx/Form/Related/DBIC.pm
+lib/Rose/HTMLx/Form/Related/DBIC/Metadata.pm
+lib/Rose/HTMLx/Form/Related/Metadata.pm
+lib/Rose/HTMLx/Form/Related/RDBO.pm
+lib/Rose/HTMLx/Form/Related/RDBO/Metadata.pm
+lib/Rose/HTMLx/Form/Related/RelInfo.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-rdbo.t
+t/02-dbic.t
+t/boilerplate.t
+t/dbic_create.pl
+t/MyDBIC/Form.pm
+t/MyDBIC/Form/Artist.pm
+t/MyDBIC/Form/Cd.pm
+t/MyDBIC/Form/CdCollection.pm
+t/MyDBIC/Form/CdEdition.pm
+t/MyDBIC/Form/Track.pm
+t/MyDBIC/Main.pm
+t/MyDBIC/Main/Artist.pm
+t/MyDBIC/Main/Cd.pm
+t/MyDBIC/Main/CdCollection.pm
+t/MyDBIC/Main/CdEdition.pm
+t/MyDBIC/Main/CdTrackJoin.pm
+t/MyDBIC/Main/Track.pm
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

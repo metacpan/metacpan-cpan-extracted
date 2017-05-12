@@ -1,0 +1,77 @@
+NAME
+    RT::Extension::ArticleTemplates - Turns Articles into dynamic templates
+
+DESCRIPTION
+    When this extension is installed, RT parses the content of Articles as a
+    template, when inserting the article into a ticket, using the
+    Text::Template module; this can be used to make your Articles dynamic.
+    Text::Template is the same module that RT's Templates use as well.
+
+VERY IMPORTANT
+    It's a SECURITY RISK to install this extension on systems where articles
+    can be changed by not trusted users.
+
+    if your articles contain text that currently looks like a template, it
+    will begin being parsed as Text::Template code after this extension is
+    installed -- even if it is not a valid template.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::ArticleTemplates');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::ArticleTemplates));
+
+        or add RT::Extension::ArticleTemplates to your existing @Plugins
+        line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+  ArticleTemplatesWithRequestArgs
+    Enabling this option passes in the Mason request arguments to your
+    article templates as the hashref $request_args.
+
+    Warning: Request args are user-controlled direct input, so all the
+    normal cautions of using them apply. Never trust user input.
+
+    Disabled by default.
+
+METHODS
+    The following methods from RT::Article are redefined:
+
+  ParseTemplate $CONTENT, %TEMPLATE_ARGS
+    Parses $CONTENT string as a template (Text::Template). $Article and
+    other arguments from %TEMPLATE_ARGS are available in code of the
+    template as perl variables.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-ArticleTemplates@rt.cpan.org|mailto:bug-RT-Extension-ArticleTemplates@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ArticleTemplates>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2014 by Best Practical Solutions
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

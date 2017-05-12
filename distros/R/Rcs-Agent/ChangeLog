@@ -1,0 +1,291 @@
+2007-08-20 17:39  nick
+
+	* Agent.pm: Added hpux detection stuff (thanks to Doug Wilson)
+
+2007-04-08 10:17  nick
+
+	* Agent.pm: Added description()
+
+	  * Fix pipestderrout call in diff() - suggested by dougw@cpan
+
+	  * bumped version to 1.04
+
+2007-04-08 10:15  nick
+
+	* MANIFEST: add t/description.t
+
+2007-04-08 10:14  nick
+
+	* LICENSE, Makefile.PL, README: Bumped Copyright year
+
+2007-04-08 10:13  nick
+
+	* t/: 00-initialize.t, checkin.t, checkout.t, description.t,
+	  diff.t, load.t, lock.t, parse.t, state.t: Bumped copyright year
+
+2005-05-31 14:53  nick
+
+	* Agent.pm: Untaint return value of cwd() for security purposes
+
+	  * fix a bunch of typos
+
+	  * these changes were suggested by Charlie Katz <ckatz / at /
+	  cfa.harvard.edu>
+
+2005-05-31 14:52  nick
+
+	* README: Updated revision and copyright year
+
+2005-05-20 14:49  nick
+
+	* Agent.pm: Typo in previous commit bug fix, from Charlie Katz
+	  <ckatz / at / cfa.harvard.edu>
+
+2003-10-22 10:59  nick
+
+	* Agent.pm: Typo in initialize() POD
+
+2003-05-02 16:06  nick
+
+	* Agent.pm: Released Rcs-Agent-1.03.
+
+	  * Added extra warning in initialize() about the potential dangers
+	  of using   binary-safe archives
+
+2003-04-28 16:52  nick
+
+	* Agent.pm: Added symbol_lookup() to allow all functions to take
+	  tags instead of revision numbers
+
+	  Added support for binary files (thanks to Nathan Ollerenshaw
+	  <nathan / at / valuecommerce.ne.jp>)
+
+2003-04-28 15:41  nick
+
+	* Agent.pm: Don't allow checkin() to check in a revision which
+	  already exists.
+
+2003-04-28 15:30  nick
+
+	* Agent.pm: Change from File::MkTemp to File::Temp
+
+2003-04-28 15:29  nick
+
+	* README: Note use of File::Temp instead of File::MkTemp
+
+2003-04-25 17:54  nick
+
+	* Makefile.PL: Changed to using File::Temp
+
+2003-01-08 12:34  nick
+
+	* Agent.pm: fix typo
+
+2002-05-07 14:11  nick
+
+	* t/diff.t: test for presence of both revision1 and revision2
+	  params.
+
+2002-05-07 14:08  nick
+
+	* Agent.pm: diff() would return error if both revision1 and
+	  revision2 parameters were not specified, contrary to
+	  documentation.  Pointed out by B Mills.
+
+	  * Some documentation typos and cleanups.
+
+	  * Bumped version to 1.02
+
+2002-02-19 18:09  nick
+
+	* MANIFEST: - add ChangeLog to MANIFEST
+
+2002-02-19 18:02  nick
+
+	* Agent.pm: - release version 1.01
+
+2002-02-11 15:51  nick
+
+	* t/checkout.t: - quit test early to stop warnings.  This needs to
+	  be fixed.
+
+2002-02-06 13:36  nick
+
+	* Agent.pm: - bug: "0" and blank lines in the log section were
+	  being ignored
+
+2002-01-10 14:21  nick
+
+	* Agent.pm: - bumped version to 1.00 - wahay, we have a release!
+
+2002-01-10 12:43  nick
+
+	* Agent.pm: - added DESTROY(), as some systems explicitly call this
+	  function
+
+2002-01-08 19:57  nick
+
+	* Agent.pm: - checkin() now expects "log" instead of "comment" -
+	  child() and parent() now accept "revision" parameter - bug with
+	  "revision" in AUTOLOAD()
+
+2002-01-07 13:26  nick
+
+	* Agent.pm: - more changes to documentation
+
+2002-01-07 13:03  nick
+
+	* Agent.pm, LICENSE, Makefile.PL, README, t/00-initialize.t,
+	  t/checkin.t, t/checkout.t, t/diff.t, t/load.t, t/lock.t,
+	  t/parse.t, t/state.t: - update Copyright notices on all files
+
+2002-01-07 12:51  nick
+
+	* Agent.pm: - bug: parse() was not locked against recursion.  -
+	  bug: parsing archives multiple times didn't clean out previous
+	  detritus - bug: finally fixed parent/child relationships - bug:
+	  log parser only stored the first line of the log.  - feature:
+	  changed all POD references to function names using C<blah> to
+	  blah(), which comes up better in POD.  - feature: added support
+	  for "author" tokens in RCS files.  Not sure why   this wasn't
+	  already present.  - feature: added parent(), child(),
+	  revisions(), symbols(), log_quote() and   log_unquote() -
+	  feature: added more stuff to the BUGS list :-( - feature: added a
+	  SEE ALSO section
+
+2002-01-06 21:47  nick
+
+	* Agent.pm: - folded locked() into AUTOLOAD/locker() for
+	  convenience - created rexists()
+
+2002-01-06 21:46  nick
+
+	* t/state.t: - more changes to test files
+
+2002-01-03 20:04  nick
+
+	* MANIFEST, t/state.t: - added t/state.t
+
+2002-01-03 20:04  nick
+
+	* README: - added some more contact email addresses
+
+2002-01-03 20:03  nick
+
+	* Agent.pm: - added AUTOLOAD functions.  This is a convenient way
+	  of handling	a bunch of methods which do much the same thing.
+
+2001-12-20 12:53  nick
+
+	* t/: checkin.t, diff.t, load.t, parse.t: - added licensing
+	  information
+
+2001-12-20 12:52  nick
+
+	* Makefile.PL: - MAN3PODS stuff taken out - location of Agent.pm
+	  file changed
+
+2001-12-20 12:52  nick
+
+	* t/checkout.t, t/lock.t, README: - added new files to distribution
+
+2001-12-20 12:51  nick
+
+	* MANIFEST: - more files moved around the place
+
+2001-12-20 12:50  nick
+
+	* t/00-initialize.t: - added t/00-initialize.t
+
+2001-12-20 12:49  nick
+
+	* LICENSE: - added LICENSE file
+
+2001-12-19 16:28  nick
+
+	* Agent.pm: - added initialize() - added disclaimers and all that
+
+2001-12-19 16:02  nick
+
+	* Makefile.PL: - added many page specification for package - added
+	  licensing information
+
+2001-12-19 15:17  nick
+
+	* Agent.pm: - more boring documentation
+
+2001-12-18 19:52  nick
+
+	* Agent.pm: - perldoc added for new(), err(), locked(), head(),
+	  archived(), timestamp()   and diff()
+
+2001-12-18 18:31  nick
+
+	* Agent.pm: - fleshed out lock() and checkout() - added
+	  $self->parse where necessary - reset error buffer at whenever new
+	  function executed
+
+2001-12-18 16:06  nick
+
+	* MANIFEST: - added test files
+
+2001-12-18 16:04  nick
+
+	* t/: checkin.t, diff.t, parse.t: - added t/checkin.t, t/diff.t
+
+2001-12-18 16:04  nick
+
+	* Makefile.PL: - added dependency for File::MkTemp
+
+2001-12-18 16:03  nick
+
+	* Agent.pm: - added istrue() - fleshed out checkin() - added
+	  working directory support to pipestderrout()
+
+2001-12-18 13:03  nick
+
+	* Agent.pm: - added and debugged pipestderrout() - diff() now
+	  working
+
+2001-12-17 19:07  nick
+
+	* Agent.pm: - rearranged some included modules - created and coded
+	  most of diff() - created templates for checkin(), checkout(),
+	  lock(), and unlock()
+
+2001-12-17 19:05  nick
+
+	* Makefile.PL: - added dependency on String::ShellQuote
+
+2001-12-12 17:17  nick
+
+	* Agent.pm: - parse() now seems to be working satisfactorily
+
+2001-12-12 15:52  nick
+
+	* t/parse.t: - added t/parse.t
+
+2001-11-23 18:14  nick
+
+	* Agent.pm: - Initial draft of parse().  Not yet working.
+
+2001-11-23 12:55  nick
+
+	* MANIFEST, t/load.t: - rename RCS::Agent to Rcs::Agent
+
+2001-11-23 12:54  nick
+
+	* Agent.pm: - new: completed for the moment and substantially
+	  functional - added locked() - added head() - added rcstimestamp()
+	  - added archived()
+
+2001-11-19 15:25  nick
+
+	* Agent.pm, MANIFEST, MANIFEST.SKIP, Makefile.PL, t/load.t: Initial
+	  import
+
+2001-11-19 15:25  nick
+
+	* Agent.pm, MANIFEST, MANIFEST.SKIP, Makefile.PL, t/load.t: Initial
+	  revision
+

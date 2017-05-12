@@ -1,0 +1,192 @@
+RDF::LinkedData - A Linked Data server implementation
+
+DESCRIPTION
+
+This module is used to create a Linked Data server that can
+serve RDF data out of an RDF::Trine::Model. It will look up URIs in
+the model and do the right thing (known as the 303 dance) and mint
+URLs for that, as well as content negotiation. Thus, you can
+concentrate on URIs for your things, you need not be concerned about
+minting URLs for the pages to serve it. In addition, optional modules
+can provide other important functionalities: Cross-origin resource
+sharing, VoID description, cache headers, SPARQL Endpoint, Triple
+Pattern Fragments, etc. As such, it encompasses a fair share of
+Semantic Web best practices, but possibly not in a very flexible Big
+Data manner.
+
+INSTALLATION
+
+On Debian and derivatives, such as Ubuntu, this module can be
+installed with all its dependencies using
+
+  apt-get install librdf-linkeddata-perl
+
+as root or using sudo. 
+
+To install the most recent module, it is likely that you already have
+the cpan tool installed. Then just run it on the command line. If you
+don't have it, see http://www.cpan.org/modules/INSTALL.html
+
+Then, in the cpan tool, type
+
+install RDF::LinkedData
+
+The relevant scripts and modules will be install to different paths
+depending on your system. To use it, you need to find the script
+linked_data.psgi, e.g. using locate.
+
+CONFIGURATION
+
+*Quick setup for a demo*
+ 
+One-liner
+ 
+It is possible to make it run with a single command line, e.g.:
+ 
+  PERLRDF_STORE="Memory;path/to/some/data.ttl" plackup -host localhost script/linked_data.psgi
+ 
+This will start a server with the default config on localhost on port
+5000, so the URIs you're going serve from the file data.ttl will have
+to have a base URI http://localhost:5000/.
+ 
+Using perlrdf command line tool
+ 
+A slightly longer example requires App::perlrdf, but sets up a
+persistent SQLite-based triple store, parses a file and gets the
+server with the default config running:
+ 
+  export PERLRDF_STORE="DBI;mymodel;DBI:SQLite:database=rdf.db"
+  perlrdf make_store
+  perlrdf store_load path/to/some/data.ttl
+  plackup -host localhost script/linked_data.psgi
+ 
+*Configuration*
+ 
+To configure the system for production use, create a configuration
+file rdf_linkeddata.json that looks something like:
+ 
+  {
+        "base_uri"  : "http://localhost:5000/",
+        "store" : {
+                   "storetype"  : "Memory",
+                   "sources" : [ {
+                                "file" : "/path/to/your/data.ttl",
+                                "syntax" : "turtle"
+                               } ]
+ 
+                   },
+        "endpoint": {
+                "html": {
+                         "resource_links": true
+                        }
+                    },
+        "cors": {
+                  "origins": "*"
+                },
+        "void": {
+                  "pagetitle": "VoID Description for my dataset"
+                },
+	      "expires" : "A86400" ,
+        "fragments" : { 
+                "fragments_path" : "/fragments" ,
+                "allow_dump_dataset" : 0
+        }	
+  }
+ 
+In your shell set
+ 
+  export RDF_LINKEDDATA_CONFIG=/to/where/you/put/rdf_linkeddata.json
+ 
+If the linked_data.psgi script was installed in /usr/local/bin, go:
+ 
+  plackup /usr/local/bin/linked_data.psgi --host localhost --port 5000
+ 
+The endpoint-part of the config sets up a SPARQL Endpoint. This requires
+the RDF::Endpoint module, which is recommended by this module. To
+use it, it needs to have some config, but will use defaults.
+ 
+It is also possible to set an expires time. This needs
+Plack::Middleware::Expires and uses Apache mod_expires syntax, in the
+example above, it will set an expires header for all resources to
+expire after 1 day of access. It is strongly recommended that this is
+used, as it can potentially speed up access to resources that aren't
+accessed frequently considerably, and take load off your server.
+
+The cors-part of the config enables Cross-Origin Resource
+Sharing, which is a W3C Recommendation for relaxing security
+constraints to allow data to be shared across domains. In most cases,
+this is what you want when you are serving open data, but in some
+cases, notably intranets, this should be turned off by removing this
+part.
+
+The void-part generates some statistics and a description of the
+dataset, using RDF::Generator::Void. It is strongly recommended to
+install and run that, but it can take some time to generate, so you
+may have to set the detail level.
+
+Finally, fragments add support for Triple Pattern Fragments, a
+work-in-progress, initiated by http://linkeddatafragments.org/ 
+It is a more lightweight but less powerful way to query RDF data than
+SPARQL. If you have this, it is recommended to have CORS enabled and
+required to have at least a minimal VoID setup.
+
+*Production server setup*
+
+In addition to the configuration above, a production system should set
+up a real Web server to run the Plack script. There are many ways to
+do this (as Plack provides an elegant separation of concerns between
+developers and system administrators). 
+
+To set this up under Apache, put this in the host configuration:
+
+  <Location />
+    SetHandler perl-script
+    PerlResponseHandler Plack::Handler::Apache2
+    SetEnv RDF_LINKEDDATA_CONFIG /to/where/you/put/rdf_linkeddata.json
+    PerlSetVar psgi_app /usr/local/bin/linked_data.psgi
+  </Location>
+
+  <Perl>
+    use Plack::Handler::Apache2;
+    $ENV{RDF_LINKEDDATA_CONFIG}='/to/where/you/put/rdf_linkeddata.json';
+    Plack::Handler::Apache2->preload("/usr/local/bin/linked_data.psgi");
+  </Perl>
+
+  <Location ~ "^/(dumps|js/|css/|favicon.ico)">
+    SetHandler default-handler
+  </Location>
+
+
+
+
+AUTHOR
+    Kjetil Kjernsmo, "<kjetilk@cpan.org>"
+
+BUGS
+    Please report any bugs using github
+    <https://github.com/kjetilk/RDF-LinkedData/issues>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc RDF::LinkedData
+
+    The perlrdf mailing list is the right place to seek help and discuss
+    this module:
+
+    <http://lists.perlrdf.org/listinfo/dev>
+
+ACKNOWLEDGEMENTS
+    This module was started by Gregory Todd Williams "<gwilliams@cpan.org>"
+    for RDF::LinkedData::Apache, but has been almost totally rewritten.
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Gregory Todd Williams
+
+    Copyright 2010 ABC Startsiden AS
+
+    Copyright 2010, 2011, 2012, 2013, 2014 Kjetil Kjernsmo
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

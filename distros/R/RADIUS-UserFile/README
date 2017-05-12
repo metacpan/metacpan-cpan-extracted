@@ -1,0 +1,15 @@
+
+RADIUS::UserFile -- a module to manipulate information in a RADIUS users file.
+
+Installation is the typical routine:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Copyright (c) 1998-2001 O'Shaughnessy Evans.  All rights reserved.  This
+version is distributed under the same terms as Perl itself (i.e. it's
+free), so enjoy.
+
+Please send any modifications or suggestions for improvement to me,
+O'Shaughnessy Evans <oevans@cpan.org>.  I'd be happy to hear from you.

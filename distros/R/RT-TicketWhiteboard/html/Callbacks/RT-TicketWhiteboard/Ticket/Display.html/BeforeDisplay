@@ -1,0 +1,11 @@
+<%args>
+$TicketObj
+$ARGSRef
+</%args>
+<%init>
+return unless $TicketObj;
+$TicketObj = $$TicketObj;
+return unless  ($TicketObj and $TicketObj->id);
+ProcessObjectCustomFieldUpdates(Object => $TicketObj, ARGSRef => $ARGSRef);
+</%init>
+

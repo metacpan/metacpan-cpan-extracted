@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c5e8324b541b0d1f45fa88d28bdb14b890ddb1c3 Changes
+SHA1 42b48686847e92163a57900b20adeb8650bcc04a MANIFEST
+SHA1 97776f8944d0f45406e1da88b8b6b3b2fcbf614e META.yml
+SHA1 f8468c1708138b709a99fb588a9ff0e932f7a8e8 Makefile.PL
+SHA1 75f0f7d2a5407f5788f1622f33099f12cbf6f42b README
+SHA1 30da2b3e283069663b2f6c8d88f9d3dd9f172928 html/Callbacks/QuickAssign/Elements/Tabs/Privileged
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 6e010ba20a9d0ae23d8d0ff516868c1e571c2d44 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 d9a53ac5393901f4b50e81b64c08a28c6aadc308 lib/RT/Extension/QuickAssign.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSQcLIACgkQMflWJZZAbqButwCgixzp1AG+bVXldC+dZifqR54A
+RTsAoK+PNVFkgX4T+AbjYMaqJy88WPj9
+=PFWC
+-----END PGP SIGNATURE-----

@@ -1,0 +1,104 @@
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>RRD::CGI::Image + DateSlider</title>
+    <link rel="stylesheet" href="css/dateslider.css" type="text/css" />
+    <style type="text/css">
+
+    body {
+    	font-family:arial;
+    }
+
+    label {
+//    	width:150px;
+    }
+
+    input {
+    	border:1px solid #000;
+    	font-size:.7em;
+    }
+
+    form#dates fieldset#datefields {
+    	border:0px;
+    	background-color:#EEEEEE;
+    }
+
+    form#dates fieldset#datefields label {
+    	font-size:.9em;
+    	width:50px;
+    	float:left;
+    }
+    form#dates fieldset#datefields input {
+//    	width:65px;
+    	float:left;
+    }
+
+    h1 {
+    	font-size:1em;
+    }
+
+    #slider-container {
+    	margin-left:50px;
+    }
+    
+    img {
+        margin: 10 0 15 0;
+    }
+
+    </style>
+</head>
+<body id="main" onload="">
+    <h1>Slide me</h1>
+    <img src="http://localhost/cgi-bin/rrd.png.cgi?--start=07/01/2008;--end=07/05/2008;--vertical-label=bps;--start=-5d;--end=-2d;--title=Integra+Portland-Seattle;DEF:ds0=cr01.ptleorte.integra.net/tengigabitethernet131.rrd:ds0:AVERAGE;DEF:ds1=cr01.ptleorte.integra.net/tengigabitethernet131.rrd:ds1:AVERAGE;CDEF:in=ds0,8,*;CDEF:out=ds1,8,*;LINE1:in%2333ee33:Input;LINE1:out%230000ff:Output" name="my_graph" />
+    <form id="dates">
+    	<fieldset id="datefields" onClick="update_graph()">
+    		<label for="datestart">Start:</label>  <input type="text" id="datestart" size="14"><br/>
+    		<label for="dateend">End:</label>      <input type="text" id="dateend"   size="14">
+    		<br/>
+    		<div id="slider">
+    			<div id="slider-container">
+    				<div id="sliderbar"></div>
+    			</div>
+    		</div>
+    	</fieldset>
+    </form>
+    <script type="text/javascript" src="js/prototype.js"></script>
+    <script type="text/javascript" src="js/scriptaculous.js?load=effects,dragdrop"></script>
+    <script type="text/javascript" src="js/date-en-US.js"></script>
+    <script type="text/javascript" src="js/dateslider.js"></script>
+    <script language="javascript">	
+
+        /* Dateslider options */
+        l_oOptions = {
+        	dragHandles: true,
+        	dayWidth: 1,
+        	dateFormat: 'MM/dd/yyyy HH:00',
+        	zoom: true
+        }
+
+        /* Create the dateslider */
+        p_oDateSlider = new DateSlider('sliderbar', '07/01/2008', '07/05/2008', 2008, 2008, l_oOptions);	
+        p_oDateSlider.attachFields($('datestart'), $('dateend'));
+
+        /* Show the dateslider onfocus */
+        [$('datestart'), $('dateend')].each(function(e) {
+        	e.observe('focus', function() {
+
+        	}); // end focus
+        }); // end each
+        
+        function update_graph() {
+            start = document.forms[0].datestart.value;
+            end   = document.forms[0].dateend.value;
+            url   = 'http://localhost/cgi-bin/rrd.png.cgi?'
+                  + '--vertical-label=bps;--title=Integra+Portland-Seattle;'
+                  + 'DEF:ds0=cr01.ptleorte.integra.net/tengigabitethernet131.rrd:ds0:MAX;'
+                  + 'DEF:ds1=cr01.ptleorte.integra.net/tengigabitethernet131.rrd:ds1:MAX;'
+                  + 'CDEF:in=ds0,8,*;CDEF:out=ds1,8,*;'
+                  + 'LINE1:in%2333ee33:Input;LINE1:out%230000ff:Output;'
+                  + '--start=' + start + ';'
+                  + '--end='   + end   + ';';
+            document.images[0].src=url;
+//            alert(url);
+        }
+    </script>
+</body>

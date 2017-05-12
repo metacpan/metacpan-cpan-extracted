@@ -1,0 +1,55 @@
+<html>
+<head>
+<title><& SELF:title &></title>
+<link rel="StyleSheet" href="<% $App->config->uri_root %>/plain/<% $view %>.css" type="text/css" />
+</head>
+
+<body>
+
+% if ($gallery) {
+<& header.mas, %ARGS, gallery => $gallery, image => $image &>
+% }
+
+% foreach my $e ( $App->errors ) {
+<p class="Rudesind-error-message"><% $e | h %></p>
+% }
+
+% foreach my $msg ( $App->messages ) {
+<p class="Rudesind-message"><% $msg | h %></p>
+% }
+
+% $m->call_next( gallery => $gallery, image => $image );
+
+<& footer.mas, %ARGS, gallery => $gallery, image => $image &>
+
+</body>
+</html>
+
+<%shared>
+my $view = $App->config->view;
+
+$r->content_type( 'text/html; charset=' . $App->config->charset );
+
+my $title;
+
+my ( $gallery, $image );
+
+if ( $r->uri =~ m{^/admin} )
+{
+    $title = 'Admin';
+}
+else
+{
+    my $path = $m->dhandler_arg || '/';
+
+    ( $gallery, $image ) = Rudesind::UI::new_from_path( $path, $App->config );
+
+    $m->redirect( $App->config->uri_root . '/' ) unless $gallery;
+
+    $title = $image ? $image->title : $gallery->title;
+}
+</%shared>
+
+<%method title>
+<% $title | h %>
+</%method>

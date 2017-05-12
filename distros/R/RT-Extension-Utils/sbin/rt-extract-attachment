@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+
+use 5.008003;
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+my $aid = shift or die "Usage: $0 <attachment id>";
+
+my $dbh = $RT::Handle->dbh;
+my ($filename, $content) = $dbh->selectrow_array(
+    "SELECT Filename, Content FROM Attachments WHERE id = ?", undef, $aid
+);
+unless ( defined $content && length $content ) {
+    die "Couldn't find attachment #$aid";
+}
+
+my ($extension) = (($filename||'') =~ /\.(.*)/);
+$extension ||= 'bin';
+
+{
+    open my $fh, '>:raw', 'attachment-'. $aid .'.'. $extension
+        or die "couldn't open file";
+    print $fh $content;
+    close $fh;
+}
+

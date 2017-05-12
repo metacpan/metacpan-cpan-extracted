@@ -1,0 +1,7 @@
+/*
+ * Test 4-03 : Binding object to string : strings are not resources : no match
+ */
+
+SELECT *
+SOURCE <model2.nt>
+WHERE  (?a, ?b, "http://rdf.org/s2")

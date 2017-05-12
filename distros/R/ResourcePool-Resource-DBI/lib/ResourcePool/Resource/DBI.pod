@@ -1,0 +1,50 @@
+=head1 NAME
+
+ResourcePool::Resource::DBI - A L<ResourcePool|ResourcePool> wrapper for L<DBI|DBI>
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Resource::DBI;
+ 
+ my $resource =  ResourcePool::Resource::DBI->new(
+                        $data_source, 
+                        $username, 
+                        $auth, 
+                        \%attr);
+
+=head1 DESCRIPTION
+
+
+This class is used by the L<ResourcePool|ResourcePool> internally to create L<DBI|DBI> connections. Its called by the corresponding L<ResourcePool::Factory::DBI|ResourcePool::Factory::DBI> object which passes the parameters needed to establish the L<DBI|DBI> connection.
+
+The only thing which has to been known by an application developer about this class is the implementation of the L<precheck()|/precheck> and L<postcheck()|/postcheck> methods:
+
+=head2 S<$resource-E<gt>precheck>
+
+Performs a $dbh->ping().
+
+B<Returns:> Returns true on success and false on fail
+
+=head2 S<$resource-E<gt>postcheck>
+
+Performs a rollback() on the session if AutoCommit is off.
+
+B<Returns:> always true
+
+=head1 SEE ALSO
+
+L<DBI|DBI>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Resource|ResourcePool::Resource>,
+L<ResourcePool::Factory::DBI|ResourcePool::Factory::DBI>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2004 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

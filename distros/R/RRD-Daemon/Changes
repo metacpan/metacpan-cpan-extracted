@@ -1,0 +1,6 @@
+1.01  18 Aug 2010
+	- fix tests to use $^X to run internal scripts
+	- list missing dependency on IPC::System::Simple
+
+1.00  07 Aug 2010
+	- initial version

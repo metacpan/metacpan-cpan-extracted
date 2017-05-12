@@ -1,0 +1,11 @@
+<%INIT>
+if($CustomField->Name() eq 'Restriction'){
+    $$Name = '/CIFMinimal/Elements/ShowCustomFieldRestriction';
+}
+</%INIT>
+
+<%ARGS>
+$Name
+$CustomField => undef
+$Object      => undef
+</%ARGS>

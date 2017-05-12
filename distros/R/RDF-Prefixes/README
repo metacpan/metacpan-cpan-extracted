@@ -1,0 +1,118 @@
+NAME
+    RDF::Prefixes - simple way to turn URIs into QNames
+
+SYNOPSIS
+     my $context = RDF::Prefixes->new;
+     say $context->qname('http://purl.org/dc/terms/title');  # dc:title
+     say $context->qname('http://example.net/rdf/dc#title'); # dc2:title
+     say $context->turtle;  # @prefix dc: <http://purl.org/dc/terms/> .
+                            # @prefix dc2: <http://example.net/rdf/dc#> .
+
+DESCRIPTION
+    This module is not so much for managing namespaces/prefixes in code (see
+    RDF::Trine::NamespaceMap for that), but as a helper for code that
+    serialises data using namespaces.
+
+    It generates pretty prefixes, reducing "http://purl.org/dc/terms/" to "dc"
+    rather than something too generic like like "ns01", and provides a context
+    for keeping track of namespaces already used, so that when
+    "http://purl.org/dc/elements/1.1/" is encountered, it won't stomp on the
+    previous definition of "dc".
+
+  Constructor
+    `new(\%suggestions, \%options)`
+        Creates a new RDF prefix context.
+
+        Suggestions for prefix mappings may be given, but there's no guarantee
+        that they'll be used.
+
+        The only option right now is 'syntax' that is used by the to_string
+        method.
+
+        Both hashrefs are optional.
+
+  Methods
+    `get_prefix($uri)`
+        Gets the prefix associated with a URI. e.g.
+        `get_prefix('http://purl.org/dc/terms/')` might return 'dc'.
+
+    `get_qname($uri)`
+        Gets a QName for a URI. e.g.
+        `get_qname('http://purl.org/dc/terms/title')` might return 'dc:title'.
+
+        Some URIs cannot be converted to QNames. In these cases, undef is
+        returned.
+
+    `get_curie($uri)`
+        As per `get_qname`, but allows for more relaxed return values,
+        suitable for RDFa, Turtle or Notation 3, but not RDF/XML. Should never
+        need to return undef.
+
+    `preview_prefix($uri)`, `preview_qname($uri)`, `preview_curie($uri)`
+        As per the "get" versions of these methods, but doesn't modify the
+        context.
+
+    `to_hashref`
+        Returns a hashref of prefix mappings used so far. This is not
+        especially necessary as the object may be treated as a hashref
+        directly:
+
+          foreach my $prefix (keys %$context)
+          {
+            printf("%s => %s\n", $prefix, $context->{$prefix});
+          }
+
+    `TO_JSON`
+        A synonym for to_hashref, provided for the benefit of the JSON
+        package.
+
+    `rdfa`
+        Return the same data as `to_hashref`, but as a string suitable for
+        placing in an RDFa 1.1 prefix attribute.
+
+    `sparql`
+        Return the same data as `to_hashref`, but as a string suitable for
+        prefixing a SPARQL query.
+
+    `turtle`
+        Return the same data as `to_hashref`, but as a string suitable for
+        prefixing a Turtle or Notation 3 file.
+
+    `xmlns`
+        Return the same data as `to_hashref`, but as a string of xmlns
+        attributes, suitable for use with RDF/XML or RDFa.
+
+    `to_string`
+        Calls either `rdfa`, `sparql`, `turtle` (the default) or `xmlns`,
+        based on the 'syntax' option passed to the constructor. This module
+        overloads the stringification operator, so explicitly calling
+        to_string is rarely necessary.
+
+         my $context  = RDF::Prefixes->new({}, {syntax=>'turtle'});
+         my $dc_title = 'http://purl.org/dc/terms/title';
+         print "# Prefixes\n" . $context;
+
+  Internationalisation
+    Strings passed to and from this module are expected to be utf8 character
+    strings, not byte strings. This is not explicitly checked for, but will be
+    checked in a future version, so be warned!
+
+    URIs containing non-Latin characters should "just work".
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2010-2013 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

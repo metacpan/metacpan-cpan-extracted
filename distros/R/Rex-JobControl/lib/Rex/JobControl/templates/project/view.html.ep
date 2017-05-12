@@ -1,0 +1,215 @@
+% use DateTime;
+% layout 'project';
+% title "Project " . $project->name . " / Jobs";
+<h2><%= $project->name %></h2>
+
+% my $jobs     = $project->jobs;
+% my $rexfiles = $project->rexfiles;
+% my $formulars = $project->formulars;
+
+% my $job_count = scalar (@{ $jobs });
+% my $rexfile_count = scalar (@{ $rexfiles });
+% my $formular_count = scalar (@{ $formulars });
+
+% if($job_count == 0 && $rexfile_count == 0 && $formular_count == 0) {
+
+<p>It seems that you just created this project. To get started you first have to upload/register one or more Rexfiles. After this you can create jobs and formulars.</p>
+
+% }
+
+<h3>Jobs</h3>
+% if ( scalar (@{ $jobs }) == 0 ) {
+<p>Currently this project has no jobs.</p>
+% } else {
+
+% for my $job (@{ $jobs }) {
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      <a href="/project/<%= $project->directory %>/job/<%= $job->directory %>"><%= $job->name %></a>
+    </h3>
+  </div>
+  <div class="panel-body">
+
+    <div>
+      <div class="col-xs-3">
+        Last execution
+      </div>
+      <div class="col-xs-9">
+        % if ($job->last_execution == 0) {
+        &nbsp;
+        % } else {
+        % my $dt = DateTime->from_epoch(epoch => $job->last_execution);
+        <%= $dt->ymd("-") %> <%= $dt->hms(":") %>
+        % } 
+      </div>
+
+    </div>
+
+    <div>
+      <div class="col-xs-3">
+        Last status
+      </div>
+      <div class="col-xs-9">
+        <%= $job->last_status %>
+      </div>
+
+    </div>
+
+    <div>
+
+      <div class="col-xs-12">
+        <hr>
+        <a href="/project/<%= $project->directory %>/job/<%= $job->directory %>/execute" class="btn btn-xs btn-success">Execute</a>
+        <a href="/project/<%= $project->directory %>/job/<%= $job->directory %>/edit" class="btn btn-xs btn-warning">Edit</a>
+        <button
+          href="/project/<%= $project->directory %>/job/<%= $job->directory %>/delete"
+          job_name="<%= $job->name %>"
+          class="delete-job-button btn btn-xs btn-danger">Remove</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+% }
+
+
+
+% }
+
+<a href="/project/<%= $project->directory %>/job/new" class="btn btn-sm btn-info">New Job</a>
+
+<hr>
+
+
+<h4>Rexfiles</h4>
+% if ( scalar (@{ $rexfiles }) == 0 ) {
+<p>Currently this project has no Rexfiles.</p>
+% } else {
+
+% for my $rexfile (@{ $project->rexfiles }) {
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title"><a href="/project/<%= $project->directory %>/rexfile/<%= $rexfile->directory %>"><%= $rexfile->name %></a></h3>
+  </div>
+  <div class="panel-body">
+
+    <div>
+      <div class="col-xs-2">
+        Tasks
+      </div>
+      <div class="col-xs-10">
+        <%= join(", ", @{ $rexfile->tasks }) %>
+      </div>
+    </div>
+
+      <div class="col-xs-12">
+        <hr>
+        <a 
+          href="/project/<%= $project->directory %>/rexfile/<%= $rexfile->directory %>/reload" 
+          class="btn btn-xs btn-primary">Reload</a>
+        <button
+          href="/project/<%= $project->directory %>/rexfile/<%= $rexfile->directory %>/delete"
+          rexfile_name="<%= $rexfile->name %>"
+          class="delete-rexfile-button btn btn-xs btn-danger">Remove</button>
+      </div>
+
+  </div>
+</div>
+% }
+
+% }
+
+<a href="/project/<%= $project->directory %>/rexfile/new" class="btn btn-sm btn-info">New Rexfile</a>
+
+<h4>Formulars</h4>
+% if ( scalar (@{ $formulars }) == 0 ) {
+<p>Currently this project has no Formulars.</p>
+% if ($job_count == 0) {
+<p>To create a formular you first have to create a job for it.</p>
+% }
+% } else {
+
+% for my $formular (@{ $formulars }) {
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title"><a href="/project/<%= $project->directory %>/formular/<%= $formular->directory %>"><%= $formular->name %></a></h3>
+  </div>
+  <div class="panel-body">
+
+    <div>
+      <div class="col-xs-2">
+        Job
+      </div>
+      <div class="col-xs-10">
+        <%= $formular->job->name %>
+      </div>
+    </div>
+
+
+    <div>
+      <div class="col-xs-2">
+        Steps
+      </div>
+      <div class="col-xs-10">
+        <%= join(", ", map { $_->{label} } @{ $formular->steps }) %>
+      </div>
+    </div>
+
+      <div class="col-xs-12">
+        <hr>
+        <a
+          href="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/execute?form_step=0"
+          class="btn btn-xs btn-success">Run</a>
+
+        <a href="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/edit" class="btn btn-xs btn-warning">Edit</a>
+
+        <button
+          href="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/delete"
+          formular_name="<%= $formular->name %>"
+          class="delete-formular-button btn btn-xs btn-danger">Remove</button>
+      </div>
+
+  </div>
+</div>
+% }
+
+% }
+
+<a href="/project/<%= $project->directory %>/formular/new" class="btn btn-sm btn-info">New Formular</a>
+
+
+
+<hr>
+
+<button
+  href="/project/<%= $project->directory %>/delete"
+  project_name="<%= $project->name %>"
+  class="delete-project-button btn btn-sm btn-danger">Remove</button>
+
+
+<script>
+
+$(document).ready(function() {
+  $(".delete-rexfile-button").click(function() {
+    delete_rexfile("Remove " + $(this).attr("rexfile_name") + "?", $(this).attr("href"));
+  });
+
+  $(".delete-job-button").click(function() {
+    delete_job("Remove " + $(this).attr("job_name") + "?", $(this).attr("href"));
+  });
+
+  $(".delete-project-button").click(function() {
+    delete_project("Remove " + $(this).attr("project_name") + "?", $(this).attr("href"));
+  });
+
+  $(".delete-formular-button").click(function() {
+    delete_formular("Remove " + $(this).attr("formular_name") + "?", $(this).attr("href"));
+  });
+
+});
+
+
+</script>
+
+

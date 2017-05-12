@@ -1,0 +1,57 @@
+---
+abstract: 'simple HTTP router'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Router-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Router::Simple:
+    file: lib/Router/Simple.pm
+    version: '0.17'
+  Router::Simple::Declare:
+    file: lib/Router/Simple/Declare.pm
+  Router::Simple::Route:
+    file: lib/Router/Simple/Route.pm
+  Router::Simple::SubMapper:
+    file: lib/Router/Simple/SubMapper.pm
+requires:
+  Class::Accessor::Lite: '0.05'
+  List::Util: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/tokuhirom/p5-router-simple/issues
+  homepage: https://github.com/tokuhirom/p5-router-simple
+  repository: git://github.com/tokuhirom/p5-router-simple.git
+version: '0.17'
+x_contributors:
+  - 'Shawn M Moore <sartak@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'nipotan <nipotan@nipotan.org>'
+  - 'Naoki Tomita <tomita@cpan.org>'
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Maurice Aubrey <maurice.aubrey@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

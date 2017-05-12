@@ -1,0 +1,8 @@
+  <div id="bpscredits">
+    <& /Elements/Logo, ShowName => 0 &>
+    <div id="copyright">
+<% loc("[_1] RT [_2] Copyright 1996-[_3] [_4].", '', '', '2012', qq{<a href="http://www.bestpractical.com?rt=$RT::VERSION">Best Practical Solutions, LLC</a>}) |n%>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{
+   "abstract" : "Generate RDF from a HTTP request",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.133380",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-Generator-HTTP",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Message" : "0",
+            "Moo" : "0",
+            "RDF::Trine" : "0",
+            "Types::Standard" : "0",
+            "URI" : "0",
+            "URI::NamespaceMap" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::RDF" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "RDF::Generator::HTTP" : {
+         "file" : "lib/RDF/Generator/HTTP.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-rdf-generator-http/issues"
+      },
+      "homepage" : "https://metacpan.org/release/RDF-Generator-HTTP",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-rdf-generator-http.git",
+         "web" : "https://github.com/kjetilk/p5-rdf-generator-http"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perlrdf",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/project",
+      "x_mailinglist" : "http://lists.perlrdf.org/listinfo/dev",
+      "x_wiki" : "http://wiki.perlrdf.org/"
+   },
+   "version" : "0.003"
+}

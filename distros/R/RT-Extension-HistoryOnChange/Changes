@@ -1,0 +1,8 @@
+Revision history for RT::Extension::HistoryOnChange
+
+0.02 2014-03-07
+ - add requires_rt('4.2.0') to prevent installs on 4.0
+
+0.01 2014-01-02
+ - Release to CPAN
+

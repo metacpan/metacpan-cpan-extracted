@@ -1,0 +1,18 @@
+digraph {
+ node [shape=Mrecord];
+ Ryu [ label = "{Ryu}" ];
+ Ryu_Source [ label = "{Ryu::Source}" ];
+ Ryu_Sink [ label = "{Ryu::Sink}" ];
+ Ryu_Transform [ label = "{Ryu::Transform}" ];
+ Ryu_Transform_Codec [ label = "{Ryu::Transform::Codec}" ];
+ Ryu_Stream [ label = "{Ryu::Stream|<chunk_size> +chunk_size\l|<encode> +encode\l|<decode> +decode\l}" ];
+ Ryu_Transform_String_ChunkSize [ label = "{Ryu::Transform::String::ChunkSize}" ];
+ Ryu_Transform_String_ChunkSize -> Ryu_Stream:chunk_size;
+ Ryu_Stream:encode -> Ryu_Transform_Codec;
+ Ryu_Stream:decode -> Ryu_Transform_Codec;
+ Ryu_Transform -> Ryu_Transform_Codec;
+ Ryu_Transform -> Ryu_Transform_String_ChunkSize;
+ Ryu_Source -> Ryu_Transform;
+ Ryu_Sink -> Ryu_Transform;
+}
+

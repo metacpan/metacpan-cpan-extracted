@@ -1,0 +1,37 @@
+<%ARGS>
+$Conditions => undef
+</%ARGS>
+<%INIT>
+my %queues = %{ $m->caller_args(1)->{queues} || {} };
+
+my %as_string = RT->Config->Get('PriorityAsStringQueues');
+
+# Leave it as-is if all queues use PriorityAsString; the overridden
+# /Elements/SelectPriority catches this case and always shows the
+# drop-down
+return unless %as_string;
+
+# Display the number input unless we know what queue's we're working
+# with
+return unless %queues;
+
+# Display the number input unless all queues specified use
+# PriorityAsString
+return unless scalar(keys %queues) == grep {$as_string{$_}} keys %queues;
+
+# Additionally, all queues in PriorityAsStringQueues must use the _same_
+# values for each name; if "High" is mapped to 10 in one queue and 100
+# in another, we can't use names
+my %values;
+for my $q (keys %queues) {
+    for my $priority (keys %{$as_string{$q}}) {
+        return if exists $values{$priority} and $as_string{$q}{$priority} != $values{$priority};
+        $values{$priority} = $as_string{$q}{$priority};
+    }
+}
+
+# Swap out the /Elements/SelectPriority for /Elements/SelectPriorityAsString
+my ($priority) = grep {$_->{Name} eq "Priority"} @{ $Conditions };
+$priority->{Value}{Path} = "/Elements/SelectPriorityAsString";
+$priority->{Value}{Arguments}{Mapping} = \%values;
+</%INIT>

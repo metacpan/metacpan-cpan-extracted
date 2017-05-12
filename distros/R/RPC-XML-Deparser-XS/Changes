@@ -1,0 +1,8 @@
+Revision history for Perl extension RPC::XML::Dearser::XS.
+
+0.02  Thr Oct 09 17:03:50 2008
+        - We no longer use libxml2 to write out XML.
+
+0.01  Thr Oct 02 00:00:00 2008
+	- original version; forked from RPC::XML::Parser::XS
+

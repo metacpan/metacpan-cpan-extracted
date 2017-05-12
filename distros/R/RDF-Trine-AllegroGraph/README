@@ -1,0 +1,55 @@
+RDF-Trine-AllegroGraph
+======================
+
+This package provides a compatibility layer between the generic RDF::Trine framework and
+AllegroGraph, the store (and server) provided by Franz Inc.
+
+With it you can use 'AllegroGraph' as additional backend store:
+
+    Pro: - using RDF::Trine's SPARQL 1.1 implementation and AG's
+           SPARQL 1.0 queries
+
+         - have a SPARQL protocol end point (not that of AG!) exposed
+
+    Con: probably VERY slow at any serious data set (will be
+         addressed in future versions)
+
+NOTE: This has only been tested with a AGv4 server, not AGv3.
+
+NOTE: This package will need a fair bit of work to perform nicely. As a prerequisite, RDF::Trine
+will have to allow for standard functionality to be replaced.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+To enable the test with a living AGv4 backend, do a
+
+  export AG4_SERVER=http://myuser:mypass@localhost:10035
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc RDF::Trine::AllegroGraph
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=RDF-Trine-AllegroGraph
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Robert Barta
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Developed at Perl RDF Hackathon London @ 2011. Supported by Franz Inc.
+

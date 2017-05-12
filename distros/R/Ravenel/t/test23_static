@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel;
+use Ravenel::Document;
+
+my $obj = new Ravenel( { 
+	'docroot' => $FindBin::Bin,
+	'dynamic' => 0,
+} );
+
+my Ravenel::Document $doc = $obj->add_document( {
+	'data'         => qq(
+<html>
+	<r:replace>
+		<p>{a} {b} {c} {a}</p>
+	</r:replace>
+</html>
+),
+	'prefix'       => 'r:',
+	'content_type' => 'html',
+	'name'         => 'test',
+} );
+
+my $res = $doc->parse();
+
+print $res . "\n" if ( $ARGV[0] );
+
+eval $res;
+print $@ if ( $@ );
+
+print test->get_html_content(
+	[
+		{ 'a' => 12345, 'b' => 'abcdef' },
+		{ 'a' => 23456, 'b' => 'bcdefg' },
+		{ 'a' => 34567, 'b' => 'cdefgh' },
+	],
+);
+

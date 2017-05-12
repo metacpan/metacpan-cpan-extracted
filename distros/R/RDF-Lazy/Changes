@@ -1,0 +1,26 @@
+Revision history for Perl module RDF::Lazy
+
+0.09  2015-10-26 16:32:04 CET
+    - Migrated to Dist::Milla
+    - Refactoring
+
+0.081  2013-07-01
+    - Fixed bad IRI bug
+
+0.08   2013-06-26
+    - Experimental support of loading with caching
+
+0.071  2012-08-27
+    - Added qname and ns methods
+
+0.07   2012-08-24
+    - Added support of RDF::NS
+
+0.063  2012-04-27
+    - Added serializers for RDF/XML and RDF/JSON
+
+0.062  2011-08-17
+    - Removed Template dependency and increased performance
+
+0.06   2011-07-14
+    - First version with this Change file

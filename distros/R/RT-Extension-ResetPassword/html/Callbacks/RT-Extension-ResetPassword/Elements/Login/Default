@@ -1,0 +1,2 @@
+<br/><div id="lostpassword" style="align:left;clear:both;">
+<a href="<%$RT::WebPath%>/NoAuth/ResetPassword/Request.html"><&|/l&>Forgot your password?</&></a></div>

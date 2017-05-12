@@ -1,0 +1,3 @@
+* If a regular expression is defined in the configuration file as empty, then often the regular expressions that are constructed are invalid.
+  We need to be sure Builder.pm can handle these cases.
+

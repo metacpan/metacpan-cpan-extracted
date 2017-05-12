@@ -1,0 +1,94 @@
+NAME
+    Retry
+
+SYNOPSIS
+    A one-feature module, this provides a method to wrap any function in
+    automatic retry logic, with exponential back-off delays, and a callback
+    for each time an attempt fails.
+
+    Example:
+
+      use Retry;
+      use Try::Tiny;
+      use LWP::UserAgent;
+
+      my $code_to_retry = sub {
+        my $r = LWP::UserAgent->new->get("http://example.com");
+        die $r->status_line unless $r->is_success;
+        return $r;
+      };
+
+      my $agent = Retry->new(
+        # This callback is optional:
+        failure_callback => sub { warn "Transient error: " . $_[0]; },
+      );
+
+      try {
+        $agent->retry($code_to_retry)
+      }
+      catch {
+        warn "All attempts failed: $_";
+      };
+
+ATTRIBUTES
+  retry_delay
+    This is the initial delay used when the routine failed, before retrying
+    again.
+
+    Every subsequent failure doubles the amount.
+
+    It defaults to 8 seconds.
+
+  max_retry_attempts
+    The maximum number of retries we should attempt before giving up
+    completely.
+
+    It defaults to 5.
+
+  failure_callback
+    Optional. To be notified of *every* failure (even if we eventually
+    succeed on a later retry), install a subroutine callback here.
+
+    For example:
+
+      Retry->new(
+          failure_callback => sub { warn "failed $count++ times" }
+      );
+
+METHODS
+  retry
+    Its purpose is to execute the passed subroutine, over and over, until it
+    succeeds, or the number of retries is exceeded. The delay between
+    retries increases exponentially. (Failure is indicated by the sub dying)
+
+    If the subroutine succeeds, then its scalar return value will be
+    returned by retry.
+
+    For example, you could replace this:
+
+      my $val = unreliable_web_request();
+
+    With this:
+
+       my $val = Retry->new->retry(
+           sub { unreliable_web_request() }
+       );
+
+AUTHOR
+    Toby Corkindale, <mailto:tjc@cpan.org>
+
+LICENSE
+    This module is released under the Perl Artistic License 2.0:
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    It is based upon source code which is Copyright 2010 Strategic Data Pty
+    Ltd, however it is used and released with permission.
+
+SEE ALSO
+    Attempt
+
+    Retry differs from Attempt in having exponentially increasing delays,
+    and by having a callback inbetween attempts.
+
+    However Attempt has a simpler syntax.
+

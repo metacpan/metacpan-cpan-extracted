@@ -1,0 +1,76 @@
+This tool allows an RT 3.x instance to integrate with a Subversion revision
+control system.
+
+To install the package in your RT instance, run the following commands:
+
+    perl Makefile.PL
+    make install
+
+To configure your subversion server to talk to an RT instance, you'll need 
+to do a bit of setup.
+
+
+In your RT::SiteConfig, set up the following variables:
+
+Set($PathToSvn, '/usr/bin/svn'); # or wherever your svn(1) binary lives
+
+Set($SvnRepository, 'http://svn.example.org/repository/'); 
+# or
+Set($SvnRepository, 'svn://svn.example.org/repository/');  
+
+
+You also need to add a "post-commit" hook to your svn repository
+so that it knows how to talk to RT. Basically, it does a simple
+HTTP "GET" request to tell RT to query the svn server for an update.
+We use this provoked poll method so that RT doesn't need to trust
+arbitrary incoming pings.  RT is careful to only apply each commit
+once.
+
+Create a _privileged_ RT user for the svn integration to use. It doesn't matter
+if that user has no specific rights; they just need to be able to log into RT's
+web interface.
+
+Add the following line (assuming you use curl) to your repository's 
+hooks/post-commit script:
+
+curl "http://rt.example.org/SVN/PullUpdate.html?user=guest&pass=guest&rev=$REV" &
+
+
+To tell RT which ticket a commit is associated with, put an RT-Ticket:
+line in your commit message. if there's no RT-Ticket: line, rt will
+ignore the commit message.  If you put "rtname#" before the ticket id, RT
+instances whose rtnames don't match what you've put in will act as if they
+haven't seen a ticket id.  This can be useful if you use svk to move subversion
+commits between repositories and want to track commit history across multiple
+RT instances.
+
+The other recognized commands are RT-Status and RT-Update.  RT-Action
+is an alias for RT-Update, if preferred.  Commands are
+case-insensitive and may occur in any order, at any point in the
+commit message.
+
+A couple simple examples:
+
+=====cut here======
+
+RT-Ticket: fsck.com#123 
+RT-Ticket: elixus.org#1525
+RT-Ticket: openfoundry.org#2113
+RT-Status: resolved
+RT-Update: comment
+
+This is a simple comment.
+
+======cut here=======
+
+    OR 
+
+======cut here=======
+
+RT-Ticket: 123 
+RT-Status: open
+RT-Update: correspond
+
+We've commmited a fix to your problem. Is it fixed in -HEAD?
+
+======cut here=======

@@ -1,0 +1,52 @@
+This is a Perl interface to the client facilities of XML-RPC for
+C/C++ (aka Xmlrpc-c).
+
+XML-RPC is a quick-and-easy way to make procedure calls over the
+Internet.  It converts the procedure call into an XML document, sends it
+to a remote server using HTTP, and gets back the response as XML.  See
+<http://www.xmlrpc.com>.
+
+
+Also see RPC::XML.  That serves the same purpose, but is is Perl all
+the way down to the operating system.  Its modules call other Perl
+modules that provide HTTP and XML services, and those call other Perl
+modules, etc.  By contrast, RPC::Xmlrpc_c::Client calls executable
+(machine language) libraries which are part of XML-RPC For C/C++.  It
+requires much less CPU time.  See below for details.
+
+Prerequisite: XML-RPC For C/C++.  You must have this installed on your
+system before building the RPC-Xmlrpc_c package.  You must have a
+working 'xmlrpc-c-config' shell command too; otherwise, you'll have to
+modify the Makefile.PL's to tell them how to link C code with your
+XML-RPC For C/C++ installation.
+
+You need Release 1.09 (December 2006) or better of XML-RPC For C/C++.
+
+XML-RPC For C/C++ probably will not work out-of-the-box on anything
+but Unix.
+
+See <http://xmlrpc-c.sourceforge.net/> .
+
+Like any conventional Perl module, you build this like this:
+
+  $ perl Makefile.PL
+  $ make
+
+
+
+Written by Bryan Henderson, December 2006.
+
+Contributed to the public domain by its author.
+
+
+PERFORMANCE
+-----------
+
+Compared to the RPC-XML package (RPC::XML::Client, etc):
+
+In an experiment with a simple "add two integers" RPC in December
+2006, a Perl program (which does nothing else) took 3 times as much
+CPU time to start up, perform one RPC, and report the result with
+RPC::XML::Client as with RPC::Xmlrpc_c::Client.  Subsequent RPCs (with
+the same client object, but everything else repeated) took 10 times as
+much CPU time with RPC::XML:Client as with RPC::Xmlrpc_c::Client.

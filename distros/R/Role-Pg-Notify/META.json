@@ -1,0 +1,57 @@
+{
+   "abstract" : "Client PostgreSQL notification Role",
+   "author" : [
+      "Kaare Rasmussen <kaare at cpan dot net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Role-Pg-Notify",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::Pg" : "3",
+            "DBI" : "0",
+            "Moose::Role" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : "0",
+            "Test::Class" : "0",
+            "Test::More" : "0",
+            "Test::Pod::Coverage" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kaare/Role-Pg-Notify.git",
+         "web" : "http://github.com/kaare/Role-Pg-Notify"
+      }
+   },
+   "version" : "0.001"
+}
+

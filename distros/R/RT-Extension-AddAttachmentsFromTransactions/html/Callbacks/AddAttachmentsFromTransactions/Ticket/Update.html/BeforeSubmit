@@ -1,0 +1,29 @@
+<&| /Widgets/TitleBox,
+    title    => loc('Include attachments'),
+    rolledup => 1,
+&>
+
+<& /Ticket/Elements/AddAttachmentsFromTransactions, Attachments => \%documents &>
+
+</&>
+<%init>
+return unless $Ticket;
+
+# NOTE: we can't use here $m->comp_exists('/Ticket/Elements/FindAttachments')
+#       because if you upgrade RT 4.0 to 4.2 then the component still exists
+#       but is unused by RT 4.2
+my $Attachments = $Ticket->can('Attachments')
+    ? $Ticket->Attachments                                             # RT 4.2
+    : $m->comp('/Ticket/Elements/FindAttachments', Ticket => $Ticket); # RT 4.0
+
+my %documents;
+while ( my $attach = $Attachments->Next() ) {
+    next unless defined $attach->Filename && length $attach->Filename;
+    unshift( @{ $documents{ $attach->Filename } }, $attach );
+}
+
+return unless keys %documents;
+</%init>
+<%args>
+$Ticket => undef
+</%args>

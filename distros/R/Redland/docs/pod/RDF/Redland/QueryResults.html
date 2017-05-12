@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Redland RDF Application Framework - Perl RDF::Redland::QueryResults Class</title>
+</head>
+<body>
+
+<h1 style="text-align:center">Redland RDF Application Framework - Perl RDF::Redland::QueryResults Class</h1>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+        <li><a href="#name">NAME</a></li>
+        <li><a href="#synopsis">SYNOPSIS</a></li>
+        <li><a href="#description">DESCRIPTION</a></li>
+        <li><a href="#constructor">CONSTRUCTOR</a></li>
+        <li><a href="#methods">METHODS</a></li>
+        <li><a href="#see_also">SEE ALSO</a></li>
+        <li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<h2><a name="name" id="name">NAME</a></h2>
+<p>RDF::Redland::QueryResults - Redland RDF Syntax Query Results Class</p>
+
+<h2><a name="synopsis" id="synopsis">SYNOPSIS</a></h2>
+<pre>
+  use RDF::Redland;
+</pre>
+<pre>
+  ...
+  my $query=new RDF::Redland::Query("query string", undef, undef, "sparql");
+  my $results=$model-&gt;query_execute($query);
+  # or my $results=$query-&gt;execute($model);
+  while(!$results-&gt;finished) {
+    for (my $i=0; $i &lt; $results-&gt;bindings_count(); $i++) {
+      my $name=$results-&gt;binding_name($i);
+      my $value=$results-&gt;binding_value($i);
+      # ... do something with the results
+    }
+    $results-&gt;next_result;
+  }
+</pre>
+<p>The $results in the example is an object of class RDF::Redland::QueryResults.</p>
+
+<h2><a name="description" id="description">DESCRIPTION</a></h2>
+<p>This class represents queries of various syntaxes over an RDF::Redland::Model returning a sequence of results that bind variable names to RDF::Redland::Node values.</p>
+
+<h2><a name="constructor" id="constructor">CONSTRUCTOR</a></h2>
+<p>There are no public constructors.</p>
+
+<h2><a name="methods" id="methods">METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_count" id="item_count">count</a></strong></dt>
+<dd>
+<p>Return the number of current results from the query.</p>
+</dd>
+</dl>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_finished" id="item_finished">finished</a></strong></dt>
+</dl>
+</div>
+<p>Return non-0 if the results have been exhausted.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_binding_name" id="item_binding_name">binding_name INDEX</a></strong></dt>
+</dl>
+</div>
+<p>Get the name of variable binding <em>INDEX</em> in the array of variable names.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_binding_names" id="item_binding_names">binding_names</a></strong></dt>
+</dl>
+</div>
+<p>Get the names all of the variable bindings as an array.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_binding_value" id="item_binding_value">binding_value INDEX</a></strong></dt>
+</dl>
+</div>
+<p>Get the value of the variable binding <em>INDEX</em> in the current query result.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_binding_values" id="item_binding_values">binding_values</a></strong></dt>
+</dl>
+</div>
+<p>Get the values of all of the variable bindings in the current query result.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_binding_value_by_name" id="item_binding_value_by_name">binding_value_by_name NAME</a></strong></dt>
+</dl>
+</div>
+<p>Get the value of the variable binding <em>NAME</em> in the current query result.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_bindings" id="item_bindings">bindings</a></strong></dt>
+</dl>
+</div>
+<p>Get the variable names and values of the current query result as a hash</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_bindings_count" id="item_bindings_count">bindings_count</a></strong></dt>
+</dl>
+</div>
+<p>Return the number of variable bindings.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_next_result" id="item_next_result">next_result</a></strong></dt>
+</dl>
+</div>
+<p>Move to the next query result.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_as_stream" id="item_as_stream">as_stream</a></strong></dt>
+</dl>
+</div>
+<p>Return a new RDF::Redland::Stream object representing the query results as an RDF Graph.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_to_string__5bformat_2duri__5bbase_2duri_5d_5d" id="item_to_string__5bformat_2duri__5bbase_2duri_5d_5d">to_string [FORMAT-URI [BASE-URI]]</a></strong></dt>
+</dl>
+</div>
+<p>Serialize to a string syntax in format <em>FORMAT-URI</em> using the optional <em>BASE-URI</em>. The default format when none is given is determined by librdf_query_results_to_string.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_is_bindings" id="item_is_bindings">is_bindings</a></strong></dt>
+</dl>
+</div>
+<p>Return non-0 if the query results format is variable bindings</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_is_boolean" id="item_is_boolean">is_boolean</a></strong></dt>
+</dl>
+</div>
+<p>Return non-0 if the query results format is a boolean</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_is_graph" id="item_is_graph">is_graph</a></strong></dt>
+</dl>
+</div>
+<p>Return non-0 if the query results format is an RDF graph</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_get_boolean" id="item_get_boolean">get_boolean</a></strong></dt>
+</dl>
+</div>
+<p>Get the boolean query result; non-0 is true.</p>
+
+<h2><a name="see_also" id="see_also">SEE ALSO</a></h2>
+<p><a href="Query.html">the RDF::Redland::Query manpage</a></p>
+
+<h2><a name="author" id="author">AUTHOR</a></h2>
+<p>Dave Beckett - <a href="http://purl.org/net/dajobe/">http://purl.org/net/dajobe/</a></p>
+<hr />
+
+<p>(C) Copyright 2000-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, (C) Copyright 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>

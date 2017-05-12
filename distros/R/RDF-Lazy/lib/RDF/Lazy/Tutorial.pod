@@ -1,0 +1,80 @@
+=head1 NAME
+
+RDF::Lazy::Tutorial - Tutorial to get started with RDF::Lazy
+
+=head1 A short introduction to RDF::Lazy as RDF templating system
+
+=head2 Three kinds of nodes
+
+The basic object in RDF::Lazy is a node (L<RDF::Lazy::Node>). A node represents
+an RDF node in an RDF graph. Every nody can be stringified to its value:
+
+    "$x"      Perl syntax
+    [% x %]   Template Toolkit syntax
+    {$x}      Smarty syntax
+
+There are three kinds of nodes:
+
+=over
+
+=item resource nodes
+
+implemented by L<RDF::Lazy::Resource> and stringified to their URI, for
+instance C<http://example.org/foo>.
+
+=item literal nodes
+
+implemented by L<RDF::Lazy::Literal> and stringified to their string value.
+instance C<hello world>.
+
+=item blank nodes
+
+implemented by L<RDF::Lazy::Literal> and stringified to C<_:> followed by
+their internal blank node identifier, for instance C<_:n0815>.
+
+=back
+
+Nodes have a couple of useful methods. For instance you can check the kind
+of a node C<x> with the methods C<is_resource> (or its alias C<is_uri>),
+C<is_literal>, and C<is_blank>:
+
+    $x->is_literal                         Perl syntax
+    [% x.is_literal %]                     Template Toolkit syntax
+    {$x->is_literal} or {$x.is_literal}    Smarty syntax
+
+The method C<str> is automatically called to stringify a node, so C<"$x">
+and C<<$x->str>> are equivalent. In HTML templates you can use the method
+C<esc> to HTML/XML-escape the stringified node value:
+
+    [% x.esc %]                            Template Toolkit syntax
+    {$x->esc} or {$x.esc}                  Smarty syntax
+
+=head2 No nodes without graph
+
+Each node in RDF::Lazy belongs to a particular RDF graph (L<RDF::Lazy>). You
+can access a node's graph by its C<graph> method, if needed. Graphs have some
+factory methods to create new node objects:
+
+    $g->uri("http://example.org/foo")      A resource node, belonging to $g
+    $g->literal("hello world")             A literal node, belonging to $g
+    $g->blank("n0815")                     A blank node, belonging to $g
+
+The graph methods C<ttl> and C<ttlpre> are handy o dump the whole graph in 
+Turtle syntax. The latter wraps and escapes Turtle for HTML output:
+
+    [% g.ttlpre %]
+
+For instance you can show the number of triples in a node's graph like this:
+
+    <p>The node's graph contains [% x.graph.size %] triples.</p>
+
+=head2 Traversing the graph
+
+One can traverse the RDF graph from any node. For instance, given a
+C<foaf:Person> node, one can get another resource linked via C<foaf:knows>: 
+
+    if ( $x->type('foaf:Person') ) {
+        $another_person = $x->foaf_knows;
+    }
+
+=cut

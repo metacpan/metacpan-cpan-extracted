@@ -1,0 +1,283 @@
+=head1 NAME
+
+Reaction::Manual::Widgets - Creating and extending Reaction Widgets
+
+=head1 WHAT IS A WIDGET
+
+A widget represents the Perl code used by the layout. Which widget to use
+can be set with the C<=widget> directive. For more on templates, look at
+L<Reaction::Manual::Templates>.
+
+The widget that is used defaults to a name built by the controller class
+and the name of the action. E.g. the action C<MyApp::Controller::Foo-E<gt>bar>
+would assume a widget named C<Foo::Bar> and look for it in the C<widget_search_path>
+defined in the C<share/skin/$skin_name/skin.conf> or the C<share/skin/defaults.conf>.
+
+=head1 A SIMPLE WIDGET
+
+The simplest widget would be this:
+
+  package MyApp::Widget::Foo;
+  use Reaction::UI::WidgetClass;
+
+  use namespace::autoclean;
+  
+  __PACKAGE__->meta->make_immutable;
+  
+  1;
+
+The use of L<Reaction::UI::WidgetClass> will import L<strict>, L<warnings>, L<Moose> and
+L<Reaction::Class>. It will also set L<Reaction::UI::Widget> as the base class of the 
+widget. If you want to extend an existing widget rather than create a new one, use 
+L<Moose/extends>.
+
+=head1 FRAGMENTS
+
+Layouts can use the C<=for layout $fragment> POD syntax to define fragments and use them
+like usual L<Template> variables.
+
+But sometimes it is desirable to have a fragment that invokes Perl code in the widget
+to render certain outputs. For this, the widget has its own mechanisms to handle
+fragments.
+
+=head2 Implementing a fragment
+
+A layout fragment can access the widgets attributes and other fragments like normal 
+L<Template> variables. But if a widget implements a fragment, that implementation will
+be used to provide the data and some additional control over the rendering of the layout.
+
+This abstracts the data manipulation view logic from the layouting view logic.
+
+A widget can implement a new fragment like this:
+
+  package MyApp::Widget::Foo;
+  use Reaction::UI::WidgetClass;
+  
+  use namespace::autoclean;
+  
+  implements fragment now {
+      arg timestamp => time();
+  };
+  
+  __PACKAGE__->meta->make_immutable;
+  
+  1;
+
+Now we can layout the provided data like this:
+
+  =widget Foo
+  
+  =for layout widget
+  
+  <h1>Info:</h1>
+  
+  [% now %]
+  
+  =for layout now
+  
+  <p>Timestamp: [% timestamp %]</p>
+  
+  =cut
+
+The C<widget> fragment is the root fragment of every widget. The widget directive sets
+the desired widget to C<Foo>. One of our C<widget_search_path>s should contain 
+C<MyApp::Widget>, so the widget class defined above can be found.
+
+The C<widget> fragment defined here will render the C<now> fragment implemented by the
+widget and layed out by the layout template. Assuming the current timestamp is
+C<1234567890>, the rendered output will look like this:
+
+  <h1>Info:</h1>
+  
+  <p>Timestamp: 1234567890</p>
+
+Let us take a closer look at the fragment implementation in the widget:
+
+  implements fragment now {
+      arg timestamp => time();
+  };
+
+This syntax might look a bit unusual, but it's not a source filter. The declarative style
+is provided by L<Devel::Declare>. This implements a fragment named C<now> in the current 
+widget. The body uses the C<arg> keyword to provide a new argument C<timestamp> to the 
+template with the value of the current return value of C<time()>.
+
+=head1 Extending a fragment
+
+Sometimes you don't want to redefine how a fragment is implemented, but merely extend on
+the current definition. An example would be adding the total number of entries in a 
+collection below the listing of the entries.
+
+Fortunately, L<Reaction> is based on L<Moose> and trying to stay as flexible as possible.
+In this case, Reaction allows us to use Moose method modifiers with fragments:
+
+  package MyApp::Widget::Bar;
+  use Reaction::UI::WidgetClass;
+  
+  use namespace::autoclean;
+  
+  extends 'MyApp::Widget::Foo';
+  
+  around fragment now {
+      call_next;
+      arg timestamp => sprintf '"%s"', $_{timestamp};
+  };
+  
+  __PACKAGE__->meta->make_immutable;
+  
+  1;
+
+The C<call_next> keyword will call the next implementation in the inheritance tree, just
+like it would call the next fragment when used in the layout template.
+
+The global hash C<%_> is used to provide the fragment arguments to the code block
+implementing it. For example, the viewport would be available in C<$_{viewport}>.
+
+Besides C<around>, you can also use C<before> and C<after>.
+
+=head1 Iterating over a fragment
+
+Many fragments are intended to be iterated over a collection of items. An example
+implementation of this is listed below:
+
+  package MyApp::Widget::Baz
+  use Reaction::UI::WidgetClass;
+  
+  use DateTime;
+  
+  use namespace::autoclean;
+  
+  my @Fields = qw( year month day hour minute second );
+  
+  implements fragment now {
+      arg dt_obj => DateTime->now;
+      render datetime_field => over [@Fields];
+  };
+  
+  implements fragment datetime_field {
+      arg field_name  => $_;
+      arg field_value => $_{dt_obj}->$_();
+  };
+  
+  __PACKAGE__->meta->make_immutable;
+  
+  1;
+
+Which could have a layout template like this:
+
+  =widget Baz
+  
+  =for layout widget
+  
+  <h1>Now:</h1>
+  
+  [% now %]
+  
+  =for layout now
+  
+  <ul>
+  [% content %]
+  </ul>
+  
+  =for layout datetime_field
+  
+  <li>[% field_name | ucfirst %]: [% field_value %]</li>
+  
+  =cut
+
+The C<widget> fragment defined in the layout template will render the C<now> fragment
+implemented in the widget class. It is setting the C<dt_obj> argument to a L<DateTime>
+object representing the current date and time. Then it will C<render> the fragment
+C<datetime_field> once for every item in the C<@Fields> array.
+
+The global topic variable C<$_> will be set to each corresponding value in the arguments
+to C<over>. The C<datetime_field> fragment will then for each field name set C<field_name>
+to the aforementioned value, and store the result of the method of that name on the C<dt_obj>
+in the C<field_value> argument.
+
+The layout simply formats and puts the components in place.
+
+=head1 WIDGETS PROVIDED BY REACTION
+
+=over
+
+=item L<Reaction::UI::Widget::SiteLayout>
+
+The common wrapper around the fully rendered site.
+
+=item L<Reaction::UI::Widget::ListView>
+
+Extends L<Reaction::UI::Widget::Grid> to provide actions and paging.
+
+=item L<Reaction::UI::Widget::Object>
+
+Rendering of a single object by a collection of viewports.
+
+=item L<Reaction::UI::Widget::Container>
+
+A base class that automatically provides callbacks to render attributes containing
+viewports on the current viewport.
+
+=item L<Reaction::UI::Widget::Collection>
+
+Renders a collection of member viewports in the current viewport.
+
+=item L<Reaction::UI::Widget::Grid>
+
+A subclass of L<Reaction::UI::Widget::Collection> providing header and footer
+as well as member actions. The C<default> skin contains layout sets to output
+this widget as a HTML table.
+
+=item L<Reaction::UI::Widget::Image>
+
+An image with optional width and height properties.
+
+=item L<Reaction::UI::Widget::Field>
+
+Base widget for fields. Contains a list of subclasses.
+
+=item L<Reaction::UI::Widget::Action>
+
+A widget representing a mutation of an object.
+
+=item L<Reaction::UI::Widget::Action::Link>
+
+Object mutation widget rendering a hyperlink.
+
+=item L<Reaction::UI::Widget::Data>
+
+Renders the data stored in the viewport's C<args> attribute.
+
+=item L<Reaction::UI::Widget::Value>
+
+Will take the C<value_string> or C<value> viewport method return value and provide it as 
+argument C<value> to the C<widget> fragment. It also contains a list of subclasses.
+
+=item L<Reaction::UI::Widget::URI>
+
+A hyperlink reference via an URI stored in the viewport.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Reaction::UI::WidgetClass>
+
+=item * L<Reaction::UI::Widget>
+
+=item * L<Reaction::Manual::Templates>
+
+=back
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut
+

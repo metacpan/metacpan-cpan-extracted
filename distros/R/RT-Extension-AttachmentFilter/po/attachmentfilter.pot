@@ -1,0 +1,3 @@
+msgid "File name %1 forbidden"
+msgstr ""
+

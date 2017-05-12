@@ -1,0 +1,87 @@
+NAME
+     RHP::Timer - A high resolution timer abstraction
+
+SYNOPSIS
+     use RHP::Timer ();
+     use My::Logger ();
+
+     $logger = My::Logger->new;
+     $timer  = RHP::Timer->new();
+
+     # timing data from the point of the caller
+     $timer->start('fizzbin');
+     fizzbin(); # how fast is fizzbin?
+     $logger->info(
+         sprintf("Timing caller: %s %s %d, timer_name: %s, time: %s",
+         @{$timer->checkpoint}));
+
+     # or simpler
+     $timer->start('foobin');
+     foobin();
+     $logger->info("pid $$ timer " . $timer->current . 
+         " took " . $timer->stop . " seconds");
+
+     # what was the last timing block?
+     $logger->info("Last timing block " . $timer->current . 
+         " took " . $timer->last_interval . " seconds");
+
+DESCRIPTION
+    RHP::Timer is a wrapper around Time::HiRes. I wrote it because I needed
+    some simple abstractions for timing programs to determine bottlenecks in
+    running programs.
+
+    The goals of RHP::Timer is to be easy to use, accurate, and simple.
+
+METHODS
+    new()
+         $timer = RHP::Timer->new();
+
+        Constructor which takes no arguments and returns a timer object
+
+    start()
+         $timer->start('fizzbin');
+
+        Starts the timer for 'fizzbin'
+
+    stop()
+         $interval = $timer->stop;
+
+        Stops the last timer started, and returns the number of seconds
+        between start and stop.
+
+    current()
+         $timer_name = $timer->current();
+         # $timer_name is 'fizzbin' from previous pod
+
+        Returns the name of the most recent timer started.
+
+    checkpoint()
+         [ caller(), $timer_name, $interval ] = $timer->checkpoint();
+
+        Stops the current timer and returns an array reference containing
+        caller() information, the name of the timer stopped, and the
+        interval of the last timing run. Useful for passing to a logfile in
+        sprintf or other format.
+
+    last_interval()
+         $last_interval = $timer->last_interval;
+
+        Returns the last timing interval recorded by the timer object.
+
+BUGS
+    None known yet. If you find any, or want a feature, email the author.
+
+SEE ALSO
+    Time::HiRes(3)
+
+AUTHOR
+    Fred Moyer <fred@redhotpenguin.com>
+
+COPYRIGHT
+    Copyright 2007 Red Hot Penguin Consulting LLC
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+

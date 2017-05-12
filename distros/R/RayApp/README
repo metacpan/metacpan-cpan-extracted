@@ -1,0 +1,52 @@
+
+
+	---------------------------------------------
+		This is README file for RayApp,
+	a framework for data-centric Web applications
+	---------------------------------------------
+
+RayApp changes the way you write Web applications. Instead of writing
+Perl code that prints HTML, or embedding the code inside of HTML
+markup, the Perl applications only process and return Perl data.
+No markup handling is done in the code of individual application,
+inside of the business logic. The applications code just returns Perl
+hash.
+
+To get the (X)HTML which is the traditional goal of Web applications,
+the Perl data is then serialized to XML, and postprocessed by XSLT to
+the desired output format, which may be HTML, XHTML, WML or anything
+else. In order to provide all parties involved (application programmers,
+Web designers, ...) with a common specification of the data layer, data
+structure description (DSD) file is a mandatory part of the applications.
+The data returned by the Perl code is fitted into the placeholders in
+the DSD XML document, creating the output XML stream.
+
+This way, application programmer knows what data is expected from their
+applications, and Web designer knows what XMLs the prostprocessing
+stage will be dealing with. In addition, application code can be tested
+separately from the presentation part, and tests for both application
+and presentation part can be written independently, in parallel.
+
+Of course, the necessary data passed from the application to the
+presentation can change in the course of time. Both application
+programmer and Web designer can use the old and new DSD and regression
+tests to easily migrate to the new structure. The system will never
+produce unexpected data output, since the data output is based on DSD
+which is known in advance.
+
+Installation:
+
+Download the RayApp-x.xxx.tar.gz file, extract it (tar xvzf), change
+to the RayApp-x.xxx directory, and do
+
+	perl Makefile.PL && make && make test && make install
+
+Documentation:
+
+After installation, man RayApp or perldoc RayApp should give you the
+documentation for this software.
+
+Author:
+
+Copyright (c) Jan Pazdziora 2001--2004, adelton@fi.muni.cz
+

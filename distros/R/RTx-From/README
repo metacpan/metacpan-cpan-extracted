@@ -1,0 +1,38 @@
+NAME
+    RTx::From - Make it easier to find users and their tickets
+
+SYNOPSIS
+    It can be hard to remember the exact name and email address of a user.
+    While powerful, the Configuration/Users search form can be tedious, nor
+    is it an obvious location. Therefore this simple plugin:
+
+    Adds a `from:' operator to Simple Search.
+        Note that unlike most other operators, which modify ticket queries,
+        this operator acts on principals and therefore cannot be
+        meaningfully combined with other search terms. The results of doing
+        so are undefined and unsupported. However, you may supply multiple
+        `from:' terms, which will be OR'd together.
+
+        There is also a work-around if you wish perform a complex query for
+        tickets from a fuzzily-remembered reqiestor:
+
+        * Search with `from:'
+        * Select "Requested" for the desired user
+        * "Edit Search"
+
+    Adds a brief description of the operator, and a link to the native user
+    search on Search/Simple.html.
+    Adds a sub-tab on a user's profile to a query for his tickets.
+
+AUTHOR
+    Jerrad Pierce <jpierce@cpan.org>
+
+LICENSE
+    * Thou shalt not claim ownership of unmodified materials.
+    * Thou shalt not claim whole ownership of modified materials.
+    * Thou shalt grant the indemnity of the provider of materials.
+    * Thou shalt use and dispense freely without other restrictions.
+        Except Admin/Users/from.html which is derived from GPL work by Best
+        Practical. But really, you can consider the above to be "the same
+        terms as perl itself."
+

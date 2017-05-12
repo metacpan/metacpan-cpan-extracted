@@ -1,0 +1,17 @@
+MANIFEST
+MANIFEST.SKIP
+LICENSE
+README
+Makefile.PL
+Agent.pm
+ChangeLog
+t/00-initialize.t
+t/load.t
+t/parse.t
+t/diff.t
+t/checkin.t
+t/checkout.t
+t/lock.t
+t/state.t
+t/description.t
+META.yml                                 Module meta-data (added by MakeMaker)

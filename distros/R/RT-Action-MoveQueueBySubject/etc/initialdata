@@ -1,0 +1,9 @@
+@ScripActions = (
+    {  
+      Name        => 'Move Queue by Subject',
+      Description => 'Moves a Ticket between Queues based on the Subject',
+      ExecModule  => 'MoveQueueBySubject',
+    },
+);
+
+1;

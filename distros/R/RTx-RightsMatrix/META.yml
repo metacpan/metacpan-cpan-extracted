@@ -1,0 +1,15 @@
+name: RTx-RightsMatrix
+version: 0.02.05
+abstract: RT RightsMatrix Extension
+author: Todd Chapman <todd@chaka.net>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  RT: 3.4
+no_index:
+  directory:
+    - inc
+    - html
+generated_by: Module::Install version 0.39

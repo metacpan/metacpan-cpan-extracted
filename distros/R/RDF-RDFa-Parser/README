@@ -1,0 +1,570 @@
+NAME
+    RDF::RDFa::Parser - flexible RDFa parser
+
+SYNOPSIS
+    If you're wanting to work with an RDF::Trine::Model that can be queried
+    with SPARQL, etc:
+
+     use RDF::RDFa::Parser;
+     my $url     = 'http://example.com/document.html';
+     my $options = RDF::RDFa::Parser::Config->new('xhtml', '1.1');
+     my $rdfa    = RDF::RDFa::Parser->new_from_url($url, $options);
+     my $model   = $rdfa->graph;
+
+    For dealing with local data:
+
+     use RDF::RDFa::Parser;
+     my $base_url = 'http://example.com/document.html';
+     my $options  = RDF::RDFa::Parser::Config->new('xhtml', '1.1');
+     my $rdfa     = RDF::RDFa::Parser->new($markup, $base_url, $options);
+     my $model    = $rdfa->graph;
+
+    A simple set of operations for working with Open Graph Protocol data:
+
+     use RDF::RDFa::Parser;
+     my $url     = 'http://www.rottentomatoes.com/m/net/';
+     my $options = RDF::RDFa::Parser::Config->tagsoup;
+     my $rdfa    = RDF::RDFa::Parser->new_from_url($url, $options);
+     print $rdfa->opengraph('title') . "\n";
+     print $rdfa->opengraph('image') . "\n";
+
+DESCRIPTION
+    RDF::TrineX::Parser::RDFa provides a saner interface for this module. If
+    you are new to parsing RDFa with Perl, then that's the best place to
+    start.
+
+  Forthcoming API Changes
+    Some of the logic regarding host language and RDFa version guessing is
+    likely to be removed from RDF::RDFa::Parser and
+    RDF::RDFa::Parser::Config, and shifted into RDF::TrineX::Parser::RDFa
+    instead.
+
+  Constructors
+    "$p = RDF::RDFa::Parser->new($markup, $base, [$config], [$storage])"
+        This method creates a new RDF::RDFa::Parser object and returns it.
+
+        The $markup variable may contain an XHTML/XML string, or a
+        XML::LibXML::Document. If a string, the document is parsed using
+        XML::LibXML::Parser or HTML::HTML5::Parser, depending on the
+        configuration in $config. XML well-formedness errors will cause the
+        function to die.
+
+        $base is a URL used to resolve relative links found in the document.
+
+        $config optionally holds an RDF::RDFa::Parser::Config object which
+        determines the set of rules used to parse the RDFa. It defaults to
+        XHTML+RDFa 1.1.
+
+        Advanced usage note: $storage optionally holds an RDF::Trine::Store
+        object. If undef, then a new temporary store is created.
+
+    "$p = RDF::RDFa::Parser->new_from_url($url, [$config], [$storage])"
+    "$p = RDF::RDFa::Parser->new_from_uri($url, [$config], [$storage])"
+        $url is a URL to fetch and parse, or an HTTP::Response object.
+
+        $config optionally holds an RDF::RDFa::Parser::Config object which
+        determines the set of rules used to parse the RDFa. The default is
+        to determine the configuration by looking at the HTTP response
+        Content-Type header; it's probably sensible to keep the default.
+
+        $storage optionally holds an RDF::Trine::Store object. If undef,
+        then a new temporary store is created.
+
+        This function can also be called as "new_from_url" or
+        "new_from_uri". Same thing.
+
+    "$p = RDF::RDFa::Parser->new_from_response($response, [$config],
+    [$storage])"
+        $response is an "HTTP::Response" object.
+
+        Otherwise the same as "new_from_url".
+
+  Public Methods
+    "$p->graph"
+        This will return an RDF::Trine::Model containing all the RDFa data
+        found on the page.
+
+        Advanced usage note: If passed a graph URI as a parameter, will
+        return a single named graph from within the page. This feature is
+        only useful if you're using named graphs.
+
+    "$p->graphs"
+        Advanced usage only.
+
+        Will return a hashref of all named graphs, where the graph name is a
+        key and the value is a RDF::Trine::Model tied to a temporary
+        storage.
+
+        This method is only useful if you're using named graphs.
+
+    "$p->opengraph([$property])"
+        If $property is provided, will return the value or list of values
+        (if called in list context) for that Open Graph Protocol property.
+        (In pure RDF terms, it returns the non-bnode objects of triples
+        where the subject is the document base URI; and the predicate is
+        $property, with non-URI $property strings taken as having the
+        implicit prefix 'http://ogp.me/ns#'. There is no distinction between
+        literal and non-literal values; literal datatypes and languages are
+        dropped.)
+
+        If $property is omitted, returns a list of possible properties.
+
+        Example:
+
+          foreach my $property (sort $p->opengraph)
+          {
+            print "$property :\n";
+            foreach my $val (sort $p->opengraph($property))
+            {
+              print "  * $val\n";
+            }
+          }
+
+        See also: <http://opengraphprotocol.org/>.
+
+    "$p->dom"
+        Returns the parsed XML::LibXML::Document.
+
+    "$p->uri( [$other_uri] )"
+        Returns the base URI of the document being parsed. This will usually
+        be the same as the base URI provided to the constructor, but may
+        differ if the document contains a <base> HTML element.
+
+        Optionally it may be passed a parameter - an absolute or relative
+        URI - in which case it returns the same URI which it was passed as a
+        parameter, but as an absolute URI, resolved relative to the
+        document's base URI.
+
+        This seems like two unrelated functions, but if you consider the
+        consequence of passing a relative URI consisting of a zero-length
+        string, it in fact makes sense.
+
+    "$p->errors"
+        Returns a list of errors and warnings that occurred during parsing.
+
+    "$p->processor_graph"
+        As per "$p->errors" but returns data as an RDF model.
+
+    "$p->output_graph"
+        An alias for "graph", but does not accept a parameter.
+
+    "$p->processor_and_output_graph"
+        Union of the above two graphs.
+
+    "$p->consume"
+        Advanced usage only.
+
+        The document is parsed for RDFa. As of RDF::RDFa::Parser 1.09x, this
+        is called automatically when needed; you probably don't need to
+        touch it unless you're doing interesting things with callbacks.
+
+        Calling "$p->consume(survive => 1)" will avoid crashing (e.g. when
+        the markup provided cannot be parsed), and instead make more errors
+        available in "$p->errors".
+
+    "$p->set_callbacks(\%callbacks)"
+        Advanced usage only.
+
+        Set callback functions for the parser to call on certain events.
+        These are only necessary if you want to do something especially
+        unusual.
+
+          $p->set_callbacks({
+            'pretriple_resource' => sub { ... } ,
+            'pretriple_literal'  => sub { ... } ,
+            'ontriple'           => undef ,
+            'onprefix'           => \&some_function ,
+            });
+
+        Either of the two pretriple callbacks can be set to the string
+        'print' instead of a coderef. This enables built-in callbacks for
+        printing Turtle to STDOUT.
+
+        For details of the callback functions, see the section CALLBACKS. If
+        used, "set_callbacks" must be called *before* "consume".
+        "set_callbacks" returns a reference to the parser object itself.
+
+    "$p->element_subjects"
+        Advanced usage only.
+
+        Gets/sets a hashref of { xpath => RDF::Trine::Node } mappings.
+
+        This is not touched during normal RDFa parsing, only being used by
+        the @role and @cite features where RDF resources (i.e. URIs and
+        blank nodes) are needed to represent XML elements themselves.
+
+CALLBACKS
+    Several callback functions are provided. These may be set using the
+    "set_callbacks" function, which takes a hashref of keys pointing to
+    coderefs. The keys are named for the event to fire the callback on.
+
+  ontriple
+    This is called once a triple is ready to be added to the graph. (After
+    the pretriple callbacks.) The parameters passed to the callback function
+    are:
+
+    *   A reference to the "RDF::RDFa::Parser" object
+
+    *   A hashref of relevant "XML::LibXML::Element" objects (subject,
+        predicate, object, graph, current)
+
+    *   An RDF::Trine::Statement object.
+
+    The callback should return 1 to tell the parser to skip this triple (not
+    add it to the graph); return 0 otherwise. The callback may modify the
+    RDF::Trine::Statement object.
+
+  onprefix
+    This is called when a new CURIE prefix is discovered. The parameters
+    passed to the callback function are:
+
+    *   A reference to the "RDF::RDFa::Parser" object
+
+    *   A reference to the "XML::LibXML::Element" being parsed
+
+    *   The prefix (string, e.g. "foaf")
+
+    *   The expanded URI (string, e.g. "http://xmlns.com/foaf/0.1/")
+
+    The return value of this callback is currently ignored, but you should
+    return 0 in case future versions of this module assign significance to
+    the return value.
+
+  ontoken
+    This is called when a CURIE or term has been expanded. The parameters
+    are:
+
+    *   A reference to the "RDF::RDFa::Parser" object
+
+    *   A reference to the "XML::LibXML::Element" being parsed
+
+    *   The CURIE or token as a string (e.g. "foaf:name" or "Stylesheet")
+
+    *   The fully expanded URI
+
+    The callback function must return a fully expanded URI, or if it wants
+    the CURIE to be ignored, undef.
+
+  onerror
+    This is called when an error occurs:
+
+    *   A reference to the "RDF::RDFa::Parser" object
+
+    *   The error level (RDF::RDFa::Parser::ERR_ERROR or
+        RDF::RDFa::Parser::ERR_WARNING)
+
+    *   An error code
+
+    *   An error message
+
+    *   A hash of other information
+
+    The return value of this callback is currently ignored, but you should
+    return 0 in case future versions of this module assign significance to
+    the return value.
+
+    If you do not define an onerror callback, then errors will be output via
+    STDERR and warnings will be silent. Either way, you can retrieve errors
+    after parsing using the "errors" method.
+
+  pretriple_resource
+    This callback is deprecated - use ontriple instead.
+
+    This is called when a triple has been found, but before preparing the
+    triple for adding to the model. It is only called for triples with a
+    non-literal object value.
+
+    The parameters passed to the callback function are:
+
+    *   A reference to the "RDF::RDFa::Parser" object
+
+    *   A reference to the "XML::LibXML::Element" being parsed
+
+    *   Subject URI or bnode (string)
+
+    *   Predicate URI (string)
+
+    *   Object URI or bnode (string)
+
+    *   Graph URI or bnode (string or undef)
+
+    The callback should return 1 to tell the parser to skip this triple (not
+    add it to the graph); return 0 otherwise.
+
+  pretriple_literal
+    This callback is deprecated - use ontriple instead.
+
+    This is the equivalent of pretriple_resource, but is only called for
+    triples with a literal object value.
+
+    The parameters passed to the callback function are:
+
+    *   A reference to the "RDF::RDFa::Parser" object
+
+    *   A reference to the "XML::LibXML::Element" being parsed
+
+    *   Subject URI or bnode (string)
+
+    *   Predicate URI (string)
+
+    *   Object literal (string)
+
+    *   Datatype URI (string or undef)
+
+    *   Language (string or undef)
+
+    *   Graph URI or bnode (string or undef)
+
+    Beware: sometimes both a datatype *and* a language will be passed. This
+    goes beyond the normal RDF data model.)
+
+    The callback should return 1 to tell the parser to skip this triple (not
+    add it to the graph); return 0 otherwise.
+
+FEATURES
+    Most features are configurable using RDF::RDFa::Parser::Config.
+
+  RDFa Versions
+    RDF::RDFa::Parser supports RDFa versions 1.0 and 1.1.
+
+    1.1 is currently a moving target; support is experimental.
+
+    1.1 is the default, but this can be configured using
+    RDF::RDFa::Parser::Config.
+
+  Host Languages
+    RDF::RDFa::Parser supports various different RDFa host languages:
+
+    *   XHTML
+
+        As per the XHTML+RDFa 1.0 and XHTML+RDFa 1.1 specifications.
+
+    *   HTML 4
+
+        Uses an HTML5 (sic) parser; uses @lang instead of @xml:lang; keeps
+        prefixes and terms case-insensitive; recognises the @rel relations
+        defined in the HTML 4 specification. Otherwise the same as XHTML.
+
+    *   HTML5
+
+        Uses an HTML5 parser; uses @lang as well as @xml:lang; keeps
+        prefixes and terms case-insensitive; recognises the @rel relations
+        defined in the HTML5 draft specification. Otherwise the same as
+        XHTML.
+
+    *   XML
+
+        This is implemented as per the RDFa Core 1.1 specification. There is
+        also support for "RDFa Core 1.0", for which no specification exists,
+        but has been reverse-engineered by applying the differences between
+        XHTML+RDFa 1.1 and RDFa Core 1.1 to the XHTML+RDFa 1.0
+        specification.
+
+        Embedded chunks of RDF/XML within XML are supported.
+
+    *   SVG
+
+        For now, a synonym for XML.
+
+    *   Atom
+
+        The <feed> and <entry> elements are treated specially, setting a new
+        subject; IANA-registered rel keywords are recognised.
+
+        By passing "atom_parser=>1" as a Config option, you can also handle
+        Atom's native semantics. (Uses XML::Atom::OWL. If this module is not
+        installed, this option is silently ignored.)
+
+        Otherwise, the same as XML.
+
+    *   DataRSS
+
+        Defines some default prefixes. Otherwise, the same as Atom.
+
+    *   OpenDocument XML
+
+        That is, XML content formatted along the lines of 'content.xml' in
+        OpenDocument files.
+
+        Supports OpenDocument bookmarked ranges used as typed or plain
+        object literals (though not XML literals); expects RDFa attributes
+        in the XHTML namespace instead of in no namespace. Otherwise, the
+        same as XML.
+
+    *   OpenDocument
+
+        That is, a ZIP file containing OpenDocument XML files.
+        RDF::RDFa::Parser will do all the unzipping and combining for you,
+        so you don't have to. The unregistered "jar:" URI scheme is used to
+        refer to files within the ZIP.
+
+  Embedded RDF/XML
+    Though a rarely used feature, XHTML allows other XML markup languages to
+    be directly embedded into it. In particular, chunks of RDF/XML can be
+    included in XHTML. While this is not common in XHTML, it's seen quite
+    often in SVG and other XML markup languages.
+
+    When RDF::RDFa::Parser encounters a chunk of RDF/XML in a document it's
+    parsing (i.e. an element called 'RDF' with namespace
+    'http://www.w3.org/1999/02/22-rdf-syntax-ns#'), there are three
+    different courses of action it can take:
+
+    0. Continue straight through it.
+        This is the behaviour that XHTML+RDFa seems to suggest is the right
+        option. It should mostly not do any harm: triples encoded in RDF/XML
+        will be generally ignored (though the chunk itself could
+        theoretically end up as part of an XML literal). It will waste a bit
+        of time though.
+
+    1. Parse the RDF/XML.
+        The parser will parse the RDF/XML properly. If named graphs are
+        enabled, any triples will be added to a separate graph. This is the
+        behaviour that SVG Tiny 1.2 seems to suggest is the correct thing to
+        do.
+
+    2. Skip the chunk.
+        This will skip over the RDF element entirely, and thus save you a
+        bit of time.
+
+    You can decide which path to take by setting the 'embedded_rdfxml'
+    Config option. For HTML and XHTML, you probably want to set
+    embedded_rdfxml to '0' (the default) or '2' (a little faster). For other
+    XML markup languages (e.g. SVG or Atom), then you probably want to set
+    it to '1'.
+
+    (There's also an option '3' which controls how embedded RDF/XML
+    interacts with named graphs, but this is only really intended for
+    internal use, parsing OpenDocument.)
+
+  Named Graphs
+    The parser has support for named graphs within a single RDFa document.
+    To switch this on, use the 'graph' Config option.
+
+    See also <http://buzzword.org.uk/2009/rdfa4/spec>.
+
+    The name of the attribute which indicates graph URIs is by default
+    'graph', but can be changed using the 'graph_attr' Config option. This
+    option accepts Clark Notation to specify a namespaced attribute. By
+    default, the attribute value is interpreted as like the 'about'
+    attribute (i.e. CURIEs, URIs, etc), but if you set the 'graph_type'
+    Config option to 'id', it will be treated as setting a fragment
+    identifier (like the 'id' attribute).
+
+    The 'graph_default' Config option allows you to set the default graph
+    URI/bnode identifier.
+
+    Once you're using named graphs, the "graphs" method becomes useful: it
+    returns a hashref of { graph_uri => trine_model } pairs. The optional
+    parameter to the "graph" method also becomes useful.
+
+    OpenDocument (ZIP) host language support makes internal use of named
+    graphs, so if you're parsing OpenDocument, tinker with the graph Config
+    options at your own risk!
+
+  Auto Config
+    RDF::RDFa::Parser has a lot of different Config options to play with.
+    Sometimes it might be useful to allow the page being parsed to control
+    some of these options. If you switch on the 'auto_config' Config option,
+    pages can do this.
+
+    A page can set options using a specially crafted <meta> tag:
+
+      <meta name="http://search.cpan.org/dist/RDF-RDFa-Parser/#auto_config"
+         content="xhtml_lang=1&amp;xml_lang=0" />
+
+    Note that the "content" attribute is an
+    application/x-www-form-urlencoded string (which must then be
+    HTML-escaped of course). Semicolons may be used instead of ampersands,
+    as these tend to look nicer:
+
+      <meta name="http://search.cpan.org/dist/RDF-RDFa-Parser/#auto_config"
+         content="xhtml_lang=1;xml_lang=0" />
+
+    It's possible to use auto config outside XHTML (e.g. in Atom or SVG)
+    using namespaces:
+
+      <xhtml:meta xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         name="http://search.cpan.org/dist/RDF-RDFa-Parser/#auto_config"
+         content="xhtml_lang=0;xml_base=2;atom_elements=1" />
+
+    Any Config option may be given using auto config, except 'use_rtnlx',
+    'dom_parser', and of course 'auto_config' itself.
+
+  Profiles
+    Support for Profiles (an experimental RDFa 1.1 feature) was added in
+    version 1.09_00, but dropped after version 1.096, because the feature
+    was removed from draft specs.
+
+BUGS
+    RDF::RDFa::Parser 0.21 passed all approved tests in the XHTML+RDFa test
+    suite at the time of its release.
+
+    RDF::RDFa::Parser 0.22 (used in conjunction with HTML::HTML5::Parser
+    0.01 and HTML::HTML5::Sanity 0.01) additionally passes all approved
+    tests in the HTML4+RDFa and HTML5+RDFa test suites at the time of its
+    release; except test cases 0113 and 0121, which the author of this
+    module believes mandate incorrect HTML parsing.
+
+    RDF::RDFa::Parser 1.096_01 passes all approved tests on the default
+    graph (not the processor graph) in the RDFa 1.1 test suite for language
+    versions 1.0 and host languages xhtml1, html4 and html5, with the
+    following exceptions which are skipped:
+
+    *   0140 - wilful violation, pending proof that the test is backed up by
+        the spec.
+
+    *   0198 - an XML canonicalisation test that may be dropped in the
+        future.
+
+    *   0212 - wilful violation, as passing this test would require
+        regressing on the old RDFa 1.0 test suite.
+
+    *   0251 to 0256 pass with RDFa 1.1 and are skipped in RDFa 1.0 because
+        they use RDFa-1.1-specific syntax.
+
+    *   0256 is additionally skipped in HTML4 mode, as the author believes
+        xml:lang should be ignored in HTML versions prior to HTML5.
+
+    *   0303 - wilful violation, as this feature is simply awful.
+
+    Please report any bugs to <http://rt.cpan.org/>.
+
+    Common gotchas:
+
+    *       Are you using the XML catalogue?
+
+            RDF::RDFa::Parser maintains a locally cached version of the
+            XHTML+RDFa DTD. This will normally be within your Perl module
+            directory, in a subdirectory named
+            "auto/share/dist/RDF-RDFa-Parser/catalogue/". If this is
+            missing, the parser should still work, but will be very slow.
+
+SEE ALSO
+    RDF::TrineX::Parser::RDFa provides a saner interface for this module.
+
+    RDF::RDFa::Parser::Config.
+
+    XML::LibXML, RDF::Trine, HTML::HTML5::Parser, HTML::HTML5::Sanity,
+    RDF::RDFa::Generator, RDF::RDFa::Linter.
+
+    <http://www.perlrdf.org/>, <http://rdfa.info>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+ACKNOWLEDGEMENTS
+    Kjetil Kjernsmo <kjetilk@cpan.org> wrote much of the stuff for building
+    RDF::Trine models. Neubert Joachim taught me to use XML catalogues,
+    which massively speeds up parsing of XHTML files that have DTDs.
+
+COPYRIGHT AND LICENCE
+    Copyright 2008-2012 Toby Inkster
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

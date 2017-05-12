@@ -1,0 +1,349 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/74592>, <http://purl.org/NET/cpan-uri/rt/ticket/75676>;
+	doap-deps:runtime-recommendation [ doap-deps:on "HTTP::LRDD"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "HTTP::Request"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine 0.133"^^doap-deps:CpanId ], [ doap-deps:on "URI::Escape"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::clean 0.20"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [
+		doap-deps:on "Test::RequiresInternet"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Query-Client>;
+	doap:category        [ rdfs:label "REST" ], [ rdfs:label "SPARQL" ], [ rdfs:label "RDF" ], [ rdfs:label "Query" ], [ rdfs:label "Protocol" ], [ rdfs:label "HTTP" ];
+	doap:created         "2009-11-10"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/RDF-Query-Client>;
+	doap:homepage        <https://metacpan.org/release/RDF-Query-Client>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "RDF-Query-Client";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-01>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-02>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-03>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-04>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-05>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-101>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-102>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-103>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-104>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-105>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-106>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-107>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-108>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-109>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-110>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-111>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-112>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-113>, <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-114>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rdf-query-client>;
+	];
+	doap:shortdesc       "get data from W3C SPARQL Protocol 1.0 servers"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-01>
+	a                    doap:Version;
+	dc:issued            "2009-11-10"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string;
+	rdfs:comment         "Original version"@en.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-02>
+	a                    doap:Version;
+	dc:issued            "2009-11-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support for HTTP Basic Auth";
+		], [ rdfs:label "Add security notes to documentation" ], [
+			a doap-changeset:Addition;
+			rdfs:label "Implement get() method";
+		], [ rdfs:label "lib/RDF/Query/Client.pm: use 5.006" ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-01>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-03>
+	a                    doap:Version;
+	dc:issued            "2009-12-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Makefile.PL compatibility with earlier Perl versions.";
+		], [
+			rdfs:label "Remove documentation for RDF::Query-compatible stub functions; issue warnings when they're called.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-02>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.03.tar.gz>;
+	doap:revision        "0.03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-04>
+	a                    doap:Version;
+	dc:issued            "2010-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use my new build system.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-03>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-05>
+	a                    doap:Version;
+	dc:issued            "2010-03-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Test script now checks HTTP connectivity to sparql.org before using it for tests.";
+		], [ rdfs:label "Minor documentation improvements." ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-04>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.05.tar.gz>;
+	doap:revision        "0.05"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-100>
+	a                    doap:Version;
+	dc:issued            "2010-06-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Automatic endpoint discovery."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-05>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-101>
+	a                    doap:Version;
+	dc:issued            "2010-07-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Possibly this will fix some cpan-tester fails, though I'm not entirely sure."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-100>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-102>
+	a                    doap:Version;
+	dc:issued            "2010-07-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Construct HTTP::LRDD object just in time."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-101>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-103>
+	a                    doap:Version;
+	dc:issued            "2010-07-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "use Scalar::Util qw'blessed'"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-102>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-104>
+	a                    doap:Version;
+	dc:issued            "2011-02-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Accept (and prefer) JSON results format."@en;
+		], [ rdfs:label "Clean up media-type handling."@en ], [
+			rdfs:label "Delegate media-type-to-parser mapping to RDF::Trine."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-103>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.104.tar.gz>;
+	doap:revision        "0.104"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-105>
+	a                    doap:Version;
+	dc:issued            "2011-03-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Fix annoying warning message."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-104>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.105.tar.gz>;
+	doap:revision        "0.105"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-106>
+	a                    doap:Version;
+	dc:issued            "2011-11-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Support 'Content-Type: application/sparql-(query|update)'."@en;
+		], [ rdfs:label "Support HTTP 'PATCH' method."@en ], [ rdfs:label "General tidy-up."@en ], [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010"@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-105>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.106.tar.gz>;
+	doap:revision        "0.106"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-107>
+	a                    doap:Version;
+	dc:issued            "2011-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Update to newer Module::Package::RDF"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-106>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.107.tar.gz>;
+	doap:revision        "0.107"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-108>
+	a                    doap:Version;
+	dc:issued            "2012-02-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Stop using deprecated UNIVERSAL::AUTHORITY."@en;
+			doap-changeset:blame [ foaf:name "Jonas Smedegaard" ];
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-107>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.108.tar.gz>;
+	doap:revision        "0.108"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-109>
+	a                    doap:Version;
+	dc:issued            "2012-02-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ a doap-changeset:Bugfix, doap-changeset:Packaging ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-108>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.109.tar.gz>;
+	doap:revision        "0.109"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-110>
+	a                    doap:Version;
+	dc:issued            "2012-03-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "sparql.org changed some URIs, breaking our tests."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/75676>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-109>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.110.tar.gz>;
+	doap:revision        "0.110"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-111>
+	a                    doap:Version;
+	dc:issued            "2013-07-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Stop bundling old version of Scalar::Util in 'inc'."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/86568>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-110>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.111.tar.gz>;
+	doap:revision        "0.111"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-112>
+	a                    doap:Version;
+	dc:issued            "2013-07-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Prefer SPARQL results in XML over JSON. (This partially rolls back a change from 0.104.)"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-111>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.112.tar.gz>;
+	doap:revision        "0.112"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-113>
+	a                    doap:Version;
+	dc:identifier        "RDF-Query-Client-0.113"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.113.tar.gz>;
+	doap:revision        "0.113"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/v_0-114>
+	a                    doap:Version;
+	dc:identifier        "RDF-Query-Client-0.114"^^xsd:string;
+	dc:issued            "2014-09-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Drop dependency on Role::Commons.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Use Test::RequiresInternet.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "General tidy up.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Query-Client-0.114.tar.gz>;
+	doap:revision        "0.114"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/74592>
+	a                    doap-bugs:Issue;
+	rdfs:label           "accepted ContentType does not include sparql-results+xml";
+	dc:created           "2012-02-01T16:52:08"^^xsd:dateTime;
+	dc:modified          "2012-02-07T09:56:40"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "74592"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=74592>;
+	doap-bugs:reporter   [
+		a foaf:Agent;
+		foaf:mbox <mailto:jerven.bolleman@isb-sib.ch>;
+	];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/75676>
+	a                    doap-bugs:Issue;
+	rdfs:label           "test failure due to change in sparql resource location";
+	dc:created           "2012-03-10T19:30:54"^^xsd:dateTime;
+	dc:modified          "2012-03-13T17:24:24"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "75676"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=75676>;
+	doap-bugs:reporter   [
+		a foaf:Agent;
+		foaf:mbox <mailto:fschlich@zedat.fu-berlin.de>;
+	];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+_:B1
+	a                    foaf:Agent;
+	foaf:nick            "TOBYINK".
+

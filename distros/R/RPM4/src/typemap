@@ -1,0 +1,21 @@
+TYPEMAP
+Header                  O_OBJECT
+rpmSpec                 O_OBJECT
+rpmts                   O_OBJECT
+rpmds                   O_OBJECT
+rpmfi                   O_OBJECT
+rpmte                   O_OBJECT
+rpmps                   O_OBJECT
+
+INPUT
+O_OBJECT
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT
+        sv_setref_pv( $arg, (char *)CLASS, (void*)$var );

@@ -1,0 +1,38 @@
+RPC::ExtDirect::Server
+======================
+
+    This module implements a minimal Ext.Direct capable server in pure Perl.
+    Its main purpose is to be used as a lightweight drop-in replacement for
+    more complex production environments like Plack or Apache/mod_perl, e.g.
+    for testing and mockups.
+
+    It can also be used successfully as the basis for production application
+    servers when feature richness is not a requirement, or when backwards
+    compatibility is the primary concern. Another possible application for
+    RPC::ExtDirect::Server is embedded systems; due to its small footprint
+    and pure Perl dependencies it can be used easily in resource constrained
+    platforms.
+
+    Finally, many legacy computing systems can be retrofitted with modern
+    HTML5 Web interface applications with Ext.Direct back end built on top
+    of RPC::ExtDirect::Server; it is compatible with (and is tested
+    against!) Perl 5.6 and newer.
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make && make test
+        make install
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2012-2016 Alex Tokarev <tokarev@cpan.org>.
+
+    Portions of the code that were taken from HTTP::Date are copyright (c)
+    1995-1999, Gisle Aas.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

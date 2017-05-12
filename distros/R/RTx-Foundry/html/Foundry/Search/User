@@ -1,0 +1,38 @@
+%# You know if they ever find a way to harness sarcasm as an energy source,
+%# you people are all going to owe me big.
+%#                 -- Bill Paul
+<%INIT>
+# first, look to see if something already matchs the User Id.
+my $UserObj = RT::User->new($session{CurrentUser});
+$UserObj->Load( $Query );
+return $m->comp(
+    '/Foundry/Elements/Redirect',
+    URL => '/Foundry/User/?SearchType=User&User=' . $UserObj->Id
+) if $UserObj->Id and !$UserObj->Disabled;
+
+# otherwise, it's a name search (XXX - what about RealName?)
+my $List = RT::Users->new($session{CurrentUser});
+$List->Limit(
+    FIELD => 'Name',
+    VALUE => $Query,
+    OPERATOR => 'LIKE',
+    CASESENSITIVE => 0,
+);
+$List->LimitToEnabled;
+$List->LimitToPrivileged;
+my $count = $List->Count or return;
+
+# final chance -- if only one thing matches, jump to it
+if ( $count == 1 ) {
+    return $m->comp(
+	'/Foundry/Elements/Redirect',
+	URL => '/Foundry/User/?SearchType=User&User=' . $List->First->Id
+    );
+}
+
+# okay, we really have a list.
+return $List;
+</%INIT>
+<%ARGS>
+$Query
+</%ARGS>

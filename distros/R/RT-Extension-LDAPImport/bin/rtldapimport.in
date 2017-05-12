@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+$|++;
+
+BEGIN {
+### after:     use lib qw(@RT_LIB_PATH@);
+use lib '/opt/rt3/local/lib /opt/rt3/lib';
+use RT;
+RT::LoadConfig;
+
+if (RT->can('Config')) {
+    # Avoid extra user canonicalization calls by disabling
+    # RT::Authen::ExternalAuth while we import users from LDAP
+    RT->Config->Set(
+        'Plugins',
+        grep { $_ ne 'RT::Authen::ExternalAuth' }
+             RT->Config->Get('Plugins')
+    );
+}
+
+RT::Init;
+}
+
+use RT::Extension::LDAPImport;
+
+my %OPT = (
+    users  => 1,
+    groups => 1,
+);
+use Getopt::Long;
+GetOptions(
+    \%OPT,
+    'debug', 'help',
+    'import', 'users!', 'groups!',
+);
+if ($OPT{help}) {
+   print <<USAGE;
+$0: [--debug] [--import] [--help]
+     --help           This usage statement.
+     --debug          Enable debugging.
+     --import         Do the import.
+     --no-users       Skip users.
+     --no-groups      Skip groups.
+USAGE
+   exit 0;
+}
+
+my $importer = RT::Extension::LDAPImport->new;
+$importer->screendebug(1) if $OPT{debug};
+
+if ($OPT{import}) {
+    if ($OPT{users}) {
+        print "Starting import\n";
+        $importer->import_users(import => 1);
+    }
+    if ($OPT{groups}) {
+        print "Starting group import\n";
+        $importer->import_groups(import => 1);
+    }
+    print "Finished import\n";
+} else {
+    print <<TESTING;
+Running test import, no data will be changed
+Rerun command with --import to perform the import
+Rerun command with --debug for more information
+TESTING
+    $importer->import_users if $OPT{users};
+    if ($OPT{groups}) {
+        print "Testing group import\n";
+        $importer->import_groups();
+    }
+    print "Finished test\n";
+}

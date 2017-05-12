@@ -1,0 +1,189 @@
+Revision history for Redis::CappedCollection module
+
+1.10  Fri Feb  24 2017
+    CHANGES:
+    - max_list_items added.
+    - Needs Redis server version 2.8 or higher.
+    - Attempt to protect against used_memory > maxmemory.
+    FIXES:
+    - Obey 'connection_timeout', 'operation_timeout' attributes of redis connection hash.
+    - Tests refined.
+
+1.09  Tue Jun  14 2016
+    CHANGES:
+    - Now we use 'croak' instead 'confess'.
+    - 'min_cleanup_bytes' and 'min_cleanup_items' renamed to
+      'cleanup_bytes' and 'cleanup_items'.
+    - $DEFAULT_MIN_CLEANUP_BYTES, $DEFAULT_MIN_CLEANUP_ITEMS renamed to
+      $DEFAULT_CLEANUP_BYTES, $DEFAULT_CLEANUP_ITEMS .
+    BUGFIXES:
+    - Data::Dumper 'Sparseseen' method not used now.
+
+1.08  Fri May  06 2016
+    FIXES:
+    - Tests corrected.
+
+1.07  Tue May  03 2016
+    FIXES:
+    - Makefile.PL corrected.
+    - Tests corrected.
+
+1.06  Thu Apr  28 2016
+    CHANGES:
+    - Ability to force re-connection with Redis on error ('reconnect_on_error' attribute).
+    - $DEFAULT_CONNECTION_TIMEOUT, $DEFAULT_OPERATION_TIMEOUT,
+      $DEFAULT_ADVANCE_CLEANUP_NUM constants added.
+    - connection_timeout, operation_timeout attributes added.
+    - Revised error codes.
+    - Better handling of errors when running out of memory.
+    - Arguments control improved.
+    - Added the service module Redis::CappedCollection::Util.
+    - Avoid "cache stampede" effect during advanced memory cleanup.
+    - Attributes 'advance_cleanup_bytes' and 'advance_cleanup_num' renamed to
+      'min_cleanup_bytes' and 'min_cleanup_items'.
+    - $DEFAULT_ADVANCED_CLEANUP_BYTES, $DEFAULT_ADVANCE_CLEANUP_NUM renamed to
+      $DEFAULT_MIN_CLEANUP_BYTES, $DEFAULT_MIN_CLEANUP_ITEMS .
+    FIXES:
+    - Argument 'redis' may have Redis::CappedCollection type in function
+      collection_info, collection_exists, drop_collection, redis_config_ok,
+      resize calls.
+    - Tests corrected.
+
+1.05  Tue Jan  14 2016
+    FIXES:
+    - Error on update/upsert without $data_time in some cases (e.g. after pop_oldest).
+
+1.04  Tue Jan  12 2016
+    CHANGES:
+    - Added 'upsert' method.
+
+1.03  Thu Jan  07 2016
+    CHANGES:
+    - Works with a Redis server 'maxmemory-policy' setting 'noeviction' only.
+    - Added 'redis_config_ok' method.
+    - $E_REDIS_DID_NOT_RETURN_DATA, $E_UNKNOWN_ERROR errors added.
+    - Updated version of the data structure.
+    FIXES:
+    - Incorrect analysis an error related to not enough memory.
+
+1.02  Thu Sep  03 2015
+    CHANGES:
+    - Redis::CappedCollection does not close connection to redis server (including '->quit' method)
+      if it was provided by user.
+    - More convenient error codes naming.
+    FIXES:
+    - Fixes of test plans.
+
+1.01  Tue Jul  07 2015
+    CHANGES:
+    - Updated behaviour of 'older_allowed' attribute that controls adding an element that's
+      older than the last element removed from collection.
+    - Added 'clear_collection' method.
+    FIXES:
+    - Small correction in destruction procedure.
+    - Fixes of documentation and MANIFEST.
+
+1.00  Mon Jun  15 2015
+
+    !!! This is a major upgrade that changes API. It's strongly advised to study
+    revised documentation and update your code where necessary !!!
+
+    !!! Data structures created on the server by previous versions of the module
+    are incompatible with this release. Existing collections must be recreated
+    after updating to this release. !!!
+
+    CHANGES:
+    - Redis::CappedCollection->new() is deprecated and will be removed in future.
+      Please use either create() or open() instead.
+    - In the parameters of the methods 'redis' may be either a Redis object
+      or a hash reference of parameters to create a Redis object.
+    - Changed the order of the arguments of the 'insert' method.
+    - The list ID and data ID arguments are mandatory for 'insert' method.
+    - Added 'data time' argument for 'update' method.
+    - Method 'info' renamed to 'list_info'.
+    - Method 'exists' renamed to 'list_exists'.
+    - Method 'drop' renamed to 'drop_list'.
+    - Constructor parameter 'big_data_threshold' was removed.
+    - 'last_removed_time' information attribute was removed.
+    - Added constructor argument 'memory_reserve'.
+    - Added 'oldest_time' method.
+    - Use Const::Fast for values exported by the module.
+    - Attributes 'advance_cleanup_bytes' and 'advance_cleanup_num' are stored
+      on the Redis server and can be changed only by 'resize' method.
+    - $MIN_MEMORY_RESERVE, $MAX_MEMORY_RESERVE constants added.
+    - $ENONEXISTENTDATAID, $EINCOMPDATAVERSION errors added.
+    - Redis server version 2.8 or higher is required.
+    - We strongly recommend setting 'maxmemory' option in the redis.conf file.
+    - Added utilities to dump and restore the collection: dump_collection,
+      restore_collection .
+    FIXES:
+    - 'open' method fixed.
+    - Tests fixed.
+
+0.17  Thu Apr  23 2015
+    CHANGES:
+    - Added 'create', 'open' constructors.
+    - Added 'collection_exists', 'resize' methods.
+    - 'open', 'collection_info', 'collection_exists', 'resize', 'drop_collection'
+      may be used as functions.
+    - Redis::CappedCollection->new() is deprecated and will be removed in future.
+      Please use either create() or open() instead.
+    - The 'quit' method does not close connection to Redis during
+      global destruction phase (Perl version 5.14 and above).
+
+0.16  Tue May  27 2014
+    CHANGES:
+    - Added argument 'check_maxmemory' to the Redis::CappedCollection->new .
+
+0.13 - 0.15  Wed Apr  02 2014
+    CHANGES:
+    - Small test improvement.
+
+0.12  Fri Mar  14 2014
+    CHANGES:
+    - Change the port used for testing.
+
+0.11  Fri Nov  15 2013
+    CHANGES:
+    - Adjust Redis server connection parameters.
+      (Starting with version 1.963, Redis module doesn't support encoding)
+
+0.10  Fri Oct  25 2013
+    FIXES:
+    - Fix runtime loading of Test::*
+
+0.09  Fri Sep  27 2013
+    FIXES:
+    - Tests fine-tuned to the correct execution of 32-bit systems.
+
+0.08  Wed Sep  18 2013
+    CHANGES:
+    - Use Try::Tiny for proper preservation of $@ .
+
+0.07  Thu Mar  14 2013
+    CHANGES:
+    - Account for Redis memory overhead when checking collection size:
+    use package variable $REDIS_MEMORY_OVERHEAD to adjust overhead estimate
+
+0.06  Thu Mar  14 2013
+    CHANGES:
+    - Use Redis maxmemory setting to set 'size' if not provided in constructor
+
+0.05  Fri Mar  08 2013
+    CHANGES:
+    - The tests are executed even if the installed Redis server is not running
+
+0.04  Fri Mar  08 2013
+    CHANGES:
+    - Added method 'ping'
+
+0.03  Wed Feb  13 2013
+    CHANGES:
+    - 'new' indirectly detects no connection to the Redis server
+
+0.02  Tue Dec  18 2012
+    CHANGES:
+    - Checking Perl version in Makefile.PL
+
+0.01  Wed Oct  17 2012
+    - Original version

@@ -1,0 +1,171 @@
+#!/usr/local/bin/perl -Tw
+
+=head1 NAME
+
+radius-user - extract information from a RADIUS users file
+
+=head1 SYNOPSIS
+
+B<radius-user> [B<--file> I<file>] [B<--attrib> I<attribute>] I<user> ...
+
+B<radius-user> B<--help>
+
+B<radius-user> B<--man>
+
+B<radius-user> B<--version>
+
+=head1 DESCRIPTION
+
+B<radius-user> reads in RADIUS user files and prints out information
+on the specified user or users.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--file> I<file>
+
+Specify a RADIUS users file to load instead of the default.  More than one
+file can be specified by using multiple B<--file> options.
+
+=item B<--attrib> I<attribute>
+
+Specify an attribute to report.  More than one attribute can be reported
+by using multiple B<--attrib> options.
+
+=item B<--help>
+
+Print help information and exit.
+
+=item B<--man>
+
+Print the man page and exit.
+
+=item B<--version>
+
+Print the version number and exit.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item /etc/raddb/users
+
+Default RADIUS users file, loaded at runtime if a different one isn't
+specified with the B<-f> option.
+
+=back
+
+=head1 REQUIRES
+
+Perl 5.004, Getopt::Long, Pod::Usage, RADIUS::UserFile
+
+=head1 SEE ALSO
+
+L<RADIUS::UserFile>
+
+=head1 AUTHOR
+
+Copyright 2000 O'Shaughnessy Evans, oevans@acm.org.  All rights reserved.
+
+=cut
+
+my $VERSION = do { my @r=(q$Revision: 1.2 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r }; 
+
+use 5.004;
+use strict;
+#use blib '..';
+
+use RADIUS::UserFile 0.90;
+use Getopt::Long;
+use Pod::Usage;
+
+
+BEGIN {
+    # Since we're probably running setuid root, give ourselves a reasonable
+    # name (instead of /dev/fd/3, or something neat like that).
+    #$0 = '/usr/local/sbin/radius-user';
+
+    $ENV{PATH} = '/usr/local/bin:/usr/bin:/usr/sbin';
+}
+
+
+my $RU;             # RADIUS::UserFile object.
+my %Opts;           # command-line options.
+my @Users;          # list of users we're processing.
+my @Attribs;        # attributes to report on.
+
+my $DEF_USERS_FILE = './users';
+
+Parse_Args();
+Main();
+
+exit 0;
+
+sub Parse_Args
+{
+    # Initialize options
+    GetOptions(\%Opts, 'man', 'help', 'version', 'file=s@', 'attrib=s@') or 
+     pod2usage(VERBOSE => 0);
+
+    # Handle options
+    $Opts{man} and pod2usage(VERBOSE => 2);     # print man page and exit.
+    $Opts{help} and pod2usage(VERBOSE => 1);    # print help info and exit.
+    $Opts{version} and print("$0 version $VERSION\n"), exit 0;
+
+    @Users = @ARGV;                             # who we'll be working with.
+    @ARGV or pod2usage(VERBOSE => 0);           # if no users were specified,
+                                                # print usage info and exit.
+
+    @Attribs = sort @{$Opts{attrib}} if defined $Opts{attrib};
+    my @files = defined $Opts{file} ? @{$Opts{file}} : $DEF_USERS_FILE;
+    $RU = new RADIUS::UserFile(File => $files[0], Who => \@Users) or do {
+        print STDERR "Apparently $files[0] isn't a valid RADIUS users file.\n";
+        $RU = new RADIUS::UserFile(Who => \@Users);
+    };
+
+    foreach my $f (@files[1..$#files]) {
+        $RU->load(File => $f, Who => \@Users) or
+         print STDERR "Couldn't load $f: $!\n";
+    }
+
+    unless (defined $RU->users()) {
+        print STDERR "No users found.\n";
+        exit 0;
+    }
+}
+
+
+sub Main
+{
+    foreach my $who (@Users) {
+        $who =~ /^(.*)$/ and $who = quotemeta $1;
+
+        unless (defined $RU->user($who)) {
+            print "There is no information about `$who'.\n";
+            next;
+        }
+
+        if (scalar @Attribs) {
+            print "RADIUS user $who:\n";
+            foreach my $a (@Attribs) {
+                if (!defined $RU->values($who, $a)) {
+                    printf "  %-31s => undefined\n", $a;
+                }
+                else {
+                    foreach my $v ($RU->values($who, $a)) {
+                          printf "  %-31s => %s\n", $a, $v;
+                    }
+                }
+            }
+        }
+        else {
+            print $RU->format($who);
+        }
+
+        print "\n";
+    }
+}
+

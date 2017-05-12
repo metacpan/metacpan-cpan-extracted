@@ -1,0 +1,16 @@
+<%init>
+return unless $ARGS{'Queue'} =~ /^(Incidents|Incident Reports|Investigations)$/i;
+return unless ($ARGS{'Incident'} || $ARGS{'Child'} || $ARGS{'Parent'});
+
+my $ticket = RT::Ticket->new($session{'CurrentUser'});
+
+my $tid = $ARGS{'Incident'} || $ARGS{'Child'} || $ARGS{'Parent'};
+$ticket->Load($tid);
+
+$ARGSRef->{Content} = $ticket->IODEF();
+$ARGSRef->{Subject} = $ticket->Subject();
+
+</%init>
+<%args>
+$ARGSRef	=> {}
+</%args>

@@ -1,0 +1,5 @@
+{ 
+    "_id": "http://example.org/posts#TripToWestVirginia",
+    "a": "http://schema.org/BlogPosting",
+    "dct_modified": "2010-05-29T14:17:39+02:00^xsd_dateTime"
+}

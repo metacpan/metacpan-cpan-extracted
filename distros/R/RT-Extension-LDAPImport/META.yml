@@ -1,0 +1,33 @@
+---
+abstract: 'Import Users from an LDAP store'
+author:
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-LDAPImport
+no_index:
+  directory:
+    - inc
+    - xt
+recommends:
+  Net::LDAP::Server::Test: 0
+requires:
+  Class::Accessor: 0
+  Net::LDAP: 0
+  Net::LDAP::Server::Test: 0
+  Test::More: 0
+  perl: 5.8.3
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.36'
+x_module_install_rtx_version: '0.36'
+x_requires_rt: 4.0.0

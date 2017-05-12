@@ -1,0 +1,14 @@
+1.04: Tue Jul 30 14:26:00 2013 +0800
+	Update for CPAN to address a minor packaging error
+
+1.03: Fri Jun 21 11:11:22 2013 +0800
+	Allow per-action override of notification phone filter function
+
+1.02: 
+	Notify RT owner when SMSes fail to send with hookable function
+
+1.01: Wed Mar 13 16:51:22 2013 +0800
+	Support for filtering phone numbers through a custom function
+
+1.00: Wed Mar 13 11:33:31 2013 +0800
+	Initial release

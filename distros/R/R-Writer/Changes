@@ -1,0 +1,10 @@
+Changes
+=======
+
+0.00001 Mar 01 2008
+  - Restructure modules, internal structure
+  - Remove singleton-ness
+  - Add buncha docs
+
+0.00001_01  Feb 26 2008
+  - Initial release.

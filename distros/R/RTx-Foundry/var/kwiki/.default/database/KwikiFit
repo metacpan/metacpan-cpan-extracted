@@ -1,0 +1,3 @@
+*Due next release or so*
+
+CGI::Kwiki can be made to write Test::FIT test files directly into a Perl modules test harness. Eventually this will be a popular way of module testing in Perl. (Just you wait and see!)

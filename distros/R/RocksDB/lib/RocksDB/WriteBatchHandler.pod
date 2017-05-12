@@ -1,0 +1,54 @@
+=head1 NAME
+
+RocksDB::WriteBatchHandler - rocksdb::WriteBatchHandler object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $batch = RocksDB::WriteBatch->new;
+  $batch->put(foo => 'bar');
+  $batch->delete('bar');
+  $batch->put_log_data(time());
+
+  my $handler = MyWriteBatchHandler->new;
+  $batch->iterate(RocksDB::WriteBatchHandler->new($handler));
+
+=head1 DESCRIPTION
+
+B<RocksDB::WriteBatchHandler> is a rocksdb::WriteBatchHandler object.
+
+=head1 CONSTRUCTOR
+
+=head2 C<< RocksDB::WriteBatchHandler->new($handler :Object) :RocksDB::WriteBatchHandler >>
+
+Create and return a new RocksDB::WriteBatchHandler object.
+
+The $handler must respond to 'put', 'merge', 'delete', 'log_data', 'continue'.
+
+See 'HANDLER METHODS' section for more details.
+
+=head1 HANDLER METHODS
+
+=head2 C<< $handler->put($key :Str, $value :Str) :Undef >>
+
+=head2 C<< $handler->merge($key :Str, $value :Str) :Undef >>
+
+=head2 C<< $handler->delete($key :Str) :Undef >>
+
+=head2 C<< $handler->log_data($blob :Str) :Undef >>
+
+=head2 C<< $handler->continue() :Bool >>
+
+If it returns false, iteration is halted.
+Otherwise, it continues iterating.
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::WriteBatch>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

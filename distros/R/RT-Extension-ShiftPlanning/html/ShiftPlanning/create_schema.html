@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<%perl>
+$m->comp('/Elements/Header', Title=>loc("Test"), SkipDoctype => 1 );
+</%perl>
+
+<%init>
+
+# Only let superusers run the schema creation
+unless ( $self->CurrentUser->HasRight(Right => 'SuperUser', Object => $RT::System) ) {
+    return ( 0, $self->loc('Permission Denied') );
+}
+
+use DBIx::SearchBuilder::SchemaGenerator;
+use RT::Extension::2ndQuadrantSupport::ShiftPlanning::Onnow;
+use RT::Extension::2ndQuadrantSupport::ShiftPlanning::Location;
+use RT::Extension::2ndQuadrantSupport::ShiftPlanning::Schedule;
+my $schemagenerator = DBIx::SearchBuilder::SchemaGenerator->new( $RT::Handle );
+$schemagenerator->AddModel( RT::Extension::2ndQuadrantSupport::ShiftPlanning::Onnow->new( $RT::Handle ) );
+$schemagenerator->AddModel( RT::Extension::2ndQuadrantSupport::ShiftPlanning::Location->new( $RT::Handle ) );
+$schemagenerator->AddModel( RT::Extension::2ndQuadrantSupport::ShiftPlanning::Schedule->new( $RT::Handle ) );
+print($RT::Handle->SimpleQuery($schemagenerator->CreateTableSQLText()));
+</%init>

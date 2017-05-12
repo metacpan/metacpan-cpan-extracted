@@ -1,0 +1,1764 @@
+#!/usr/bin/perl
+# [[[ HEADER ]]]
+use strict;
+use warnings;
+use RPerl;
+use RPerl;
+#use RPerl::AfterSubclass;
+
+# DEV NOTE, CORRELATION #rp016: CPAN's underscore-is-beta (NOT RPerl's underscore-is-comma) numbering scheme utilized here, to preserve trailing zeros
+our $VERSION = '2.600000';
+
+#our $VERSION = 20170416;    # NON-RELEASE VERSION NUMBER, OFFICIAL LONGDATE
+#our $VERSION = 2017.106;    # NON-RELEASE VERSION NUMBER, OFFICIAL STARDATE
+
+# [[[ CRITICS ]]]
+## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
+## no critic qw(ProhibitExplicitStdin)  # USER DEFAULT 4: allow <STDIN>
+## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
+## no critic qw(ProhibitBooleanGrep)  # SYSTEM SPECIAL 1: allow grep
+## no critic qw(RequireCarping)  # SYSTEM SPECIAL 13: allow die instead of croak
+
+# [[[ INCLUDES ]]]
+use RPerl::Parser;    # includes Perl::Critic
+use RPerl::Generator;
+use RPerl::Compiler;    # includes Inline
+use RPerl::DataType::Number;  # number_to_string()
+use rperloptions;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use File::Path qw(remove_tree);
+use Config qw(config_re);
+
+# [[[ SUBROUTINES ]]]
+
+# [[[ ACCEPT, CHECK, REPORT COMMAND-LINE ARGUMENTS (aka OPTIONS)) ]]]
+# [[[ ACCEPT, CHECK, REPORT COMMAND-LINE ARGUMENTS (aka OPTIONS)) ]]]
+# [[[ ACCEPT, CHECK, REPORT COMMAND-LINE ARGUMENTS (aka OPTIONS)) ]]]
+
+sub accept_and_verify_input_files {
+    ( my string_arrayref $input_file_names, my string_arrayref $input_file_names_unlabeled, my string_hashref $modes ) = @_;
+
+    #    RPerl::diag( 'in rperl::accept_and_verify_input_files(), received $input_file_names = ' . Dumper($input_file_names) . "\n" );
+    #    RPerl::diag( 'in rperl::accept_and_verify_input_files(), received $input_file_names_unlabeled = ' . Dumper($input_file_names_unlabeled) . "\n" );
+
+    RPerl::diag("\n\n");    # move output away from initial Inline compiler output
+    RPerl::diag( 'in rperl, have $RPerl::DEBUG = ' . $RPerl::DEBUG . "\n" );
+    RPerl::diag( 'in rperl, have $RPerl::VERBOSE = ' . $RPerl::VERBOSE . "\n" );
+
+    # accept unlabeled input file name(s) if no labeled values specified
+    if ( ( scalar @{$input_file_names_unlabeled} ) > 0 ) {
+        if ( ( scalar @{$input_file_names} ) == 0 ) {
+            $input_file_names = $input_file_names_unlabeled;
+        }
+        else {
+            die 'ERROR EAR08: Both labeled & unlabeled RPerl source code input file argument(s) specified, dying' . "\n";
+        }
+    }
+
+    if ( ( scalar @{$input_file_names} ) == 0 ) {
+        die 'ERROR EAR01: No RPerl source code input file(s) specified, dying' . "\n";
+#        print {*STDERR} 'ERROR EAR01: No RPerl source code input file(s) specified, aborting' . "\n";
+#        return $input_file_names;  # allow require of this file
+    }
+
+    # verify input file(s)
+    my $input_files_count = scalar @{$input_file_names};
+
+    # DEV NOTE: Perl::Critic BUG!  'integer' triggers false positive RequireFinalReturn
+    #    for my integer $i ( 0 .. ( $input_files_count - 1 ) ) {
+    for my $i ( 0 .. ( $input_files_count - 1 ) ) {
+        my string $input_file_name = $input_file_names->[$i];
+
+#    RPerl::diag('in rperl, top of file verifying loop ' . $i . ' of ' . $input_files_count . ", have \$input_file_names->[$i] = '" . $input_file_name . "'\n");
+
+        if ( $input_file_name =~ m/\s/xms ) {
+
+#            RPerl::diag('in rperl, in file verifying loop ' . $i . ' of ' . $input_files_count . ", have \$input_file_name with spaces = '" . $input_file_name . "'\n");
+            my string_arrayref $input_file_name_and_args = [ split /[ ]/xms, $input_file_name ];
+
+#            RPerl::diag('in rperl, in file verifying loop ' . $i . ' of ' . $input_files_count . ", have \$input_file_name_and_args = '" . Dumper($input_file_name_and_args) . "'\n");
+            $input_file_name = shift @{$input_file_name_and_args};
+            $input_file_names->[$i] = $input_file_name;
+
+   #            RPerl::diag('in rperl, in file verifying loop ' . $i . ' of ' . $input_files_count . ", have \$input_file_name = '" . $input_file_name . "'\n");
+            $modes->{arguments} = $input_file_name_and_args;
+
+            #            RPerl::diag('in rperl, in file verifying loop ' . $i . ' of ' . $input_files_count . ", have \$modes = '" . Dumper($modes) . "'\n");
+        }
+
+        if ( not( -e $input_file_name ) ) {    ## no critic qw(ProhibitCascadingIfElse)  # SYSTEM DEFAULT 2: allow argument-handling logic
+            die 'ERROR EAR02: Specified RPerl source code input file ' . q{'} . $input_file_name . q{'} . ' does not exist, dying' . "\n";
+        }
+        elsif ( not( -r $input_file_name ) ) {
+            die 'ERROR EAR03: Specified RPerl source code input file ' . q{'} . $input_file_name . q{'} . ' is not readable, dying' . "\n";
+        }
+        elsif ( not( -f $input_file_name ) ) {
+            die 'ERROR EAR04: Specified RPerl source code input file ' . q{'} . $input_file_name . q{'} . ' is not a plain file, dying' . "\n";
+        }
+        elsif ( ( $input_file_name !~ /[.]pm$/xms )
+            and ( $input_file_name !~ /[.]pl$/xms ) )
+        {
+            die 'ERROR EAR05: Specified RPerl source code input file ' . q{'}
+                . $input_file_name . q{'}
+                . ' is not a Perl program ending in ' . q{'} . '.pl' . q{'}
+                . ' or module ending in  ' . q{'} . '.pm' . q{'}
+                . ', dying' . "\n";
+        }
+
+    }
+    return $input_file_names;
+}
+
+sub verify_and_default_modes {
+    (   my string_hashref $modes,
+        my string_hashref $modes_default,
+        my arrayref_hashref $modes_supported,
+        my integer $magic_low_flag,
+        my integer $magic_medium_flag,
+        my integer $magic_high_flag,
+        my integer $dependencies_flag,
+        my integer $uncompile_flag,
+        my integer $compile_flag,
+        my integer $subcompile_assemble_flag,
+        my integer $subcompile_archive_flag,
+        my integer $subcompile_shared_flag,
+        my integer $subcompile_static_flag,
+        my integer $subcompile_CXX,
+        my integer $parallel_flag,
+        my integer $num_cores,
+        my integer $execute_flag,
+        my integer $test_flag,
+        my string_arrayref $input_file_names
+    ) = @_;
+
+    if ( defined $dependencies_flag ) {
+        if ($dependencies_flag) {
+            $modes->{dependencies} = 'ON';
+        }
+        else {
+            $modes->{dependencies} = 'OFF';
+        }
+    }
+
+    if ( defined $magic_low_flag ) {
+        if ( $magic_low_flag ) {
+            if ( ( defined $magic_medium_flag ) and $magic_medium_flag ) {
+                die 'ERROR EAR18: Incompatible command-line argument flags provided, both --low and --medium, dying' . "\n";
+            }
+            if ( ( defined $magic_high_flag ) and $magic_high_flag ) {
+                die 'ERROR EAR18: Incompatible command-line argument flags provided, both --low and --high, dying' . "\n";
+            }
+            $modes->{magic} = 'LOW';
+        }
+    }
+
+    if ( defined $magic_medium_flag ) {
+        if ( $magic_medium_flag ) {
+            if ( ( defined $magic_high_flag ) and $magic_high_flag ) {
+                die 'ERROR EAR19: Incompatible command-line argument flags provided, both --medium and --high, dying' . "\n";
+            }
+            $modes->{magic} = 'MEDIUM';
+        }
+    }
+
+    if ( defined $magic_high_flag ) {
+        if ( $magic_high_flag ) {
+            $modes->{magic} = 'HIGH';
+        }
+    }
+
+    if ( defined $uncompile_flag ) {
+        if ($uncompile_flag) {
+            if ( ( defined $compile_flag ) and $compile_flag ) {
+                die 'ERROR EAR09: Incompatible command-line argument flags provided, both --uncompile and --compile, dying' . "\n";
+            }
+            # subcompile mode is used in Compiler::generate_output_file_names() to determine which files to delete, allow flags to set subcompile mode
+#            if ( ( defined $subcompile_assemble_flag ) and $subcompile_assemble_flag ) {
+#                die 'ERROR EAR09: Incompatible command-line argument flags provided, both --uncompile and --assemble, dying' . "\n";
+#            }
+#            if ( ( defined $subcompile_archive_flag ) and $subcompile_archive_flag ) {
+#                die 'ERROR EAR09: Incompatible command-line argument flags provided, both --uncompile and --archive, dying' . "\n";
+#            }
+#            if ( ( defined $subcompile_shared_flag ) and $subcompile_shared_flag ) {
+#                die 'ERROR EAR09: Incompatible command-line argument flags provided, both --uncompile and --shared, dying' . "\n";
+#            }
+#            if ( ( defined $subcompile_static_flag ) and $subcompile_static_flag ) {
+#                die 'ERROR EAR09: Incompatible command-line argument flags provided, both --uncompile and --static, dying' . "\n";
+#            }
+            if ( ( defined $execute_flag ) and $execute_flag ) {
+                die 'ERROR EAR09: Incompatible command-line argument flags provided, both --uncompile and --execute, dying' . "\n";
+            }
+            if ( ( defined $test_flag ) and $test_flag ) {
+                die 'ERROR EAR09: Incompatible command-line argument flags provided, both --uncompile and --test, dying' . "\n";
+            }
+            if ($uncompile_flag == 1) { $modes->{uncompile} = 'SOURCE'; }
+            if ($uncompile_flag == 2) { $modes->{uncompile} = 'SOURCE_BINARY'; }
+            if ($uncompile_flag == 3) { $modes->{uncompile} = 'SOURCE_BINARY_INLINE'; }
+            # subcompile mode is used in Compiler::generate_output_file_names() to determine which files to delete,
+            # leave compile mode in tact to leave subcompile mode in tact from "can't subcompile if we don't subcompile" at bottom of this subroutine
+#            $modes->{compile}   = 'OFF';
+            $modes->{execute}   = 'OFF';
+        }
+        else {
+            $modes->{uncompile} = 'OFF';
+        }
+    }
+
+    if ( defined $compile_flag ) {
+        if ($compile_flag) {
+            $modes->{compile} = 'SUBCOMPILE';  # already default, does nothing
+        }
+        else {    # --nocompile command-line argument disables SAVE & SUBCOMPILE steps, PARSE & GENERATE remain enabled
+            if (( defined $subcompile_assemble_flag ) and $subcompile_assemble_flag ) {
+                die 'ERROR EAR10: Incompatible command-line argument flags provided, both --nocompile and --assemble, dying' . "\n";
+            }
+            if ( ( defined $subcompile_archive_flag ) and $subcompile_archive_flag ) {
+                die 'ERROR EAR10: Incompatible command-line argument flags provided, both --nocompile and --archive, dying' . "\n";
+            }
+            if ( ( defined $subcompile_shared_flag ) and $subcompile_shared_flag ) {
+                die 'ERROR EAR10: Incompatible command-line argument flags provided, both --nocompile and --shared, dying' . "\n";
+            }
+            if ( ( defined $subcompile_static_flag ) and $subcompile_static_flag ) {
+                die 'ERROR EAR10: Incompatible command-line argument flags provided, both --nocompile and --static, dying' . "\n";
+            }
+            $modes->{compile} = 'GENERATE';
+        }
+    }
+
+    # assemble mode is CPPOPS_CPPTYPES_SUBCOMPILE_ASSEMBLE; flag ignored if false
+    if (( defined $subcompile_assemble_flag ) and $subcompile_assemble_flag ) {
+        if ( ( defined $subcompile_archive_flag ) and $subcompile_archive_flag ) {
+            die 'ERROR EAR11: Incompatible command-line argument flags provided, both --assemble and --archive, dying' . "\n";
+        }
+        if ( ( defined $subcompile_shared_flag ) and $subcompile_shared_flag ) {
+            die 'ERROR EAR11: Incompatible command-line argument flags provided, both --assemble and --shared, dying' . "\n";
+        }
+        if ( ( defined $subcompile_static_flag ) and $subcompile_static_flag ) {
+            die 'ERROR EAR11: Incompatible command-line argument flags provided, both --assemble and --static, dying' . "\n";
+        }
+        if ( ( defined $execute_flag ) and $execute_flag ) {
+            die 'ERROR EAR11: Incompatible command-line argument flags provided, both --assemble and --execute, dying' . "\n";
+        }
+        if ( ( defined $test_flag ) and $test_flag ) {
+            die 'ERROR EAR11: Incompatible command-line argument flags provided, both --assemble and --test, dying' . "\n";
+        }
+        $modes->{compile}   = 'SUBCOMPILE';
+        $modes->{subcompile} = 'ASSEMBLE';
+        $modes->{execute}   = 'OFF';
+    }
+
+    # archive mode is CPPOPS_CPPTYPES_SUBCOMPILE_ARCHIVE; flag ignored if false
+    if (( defined $subcompile_archive_flag ) and $subcompile_archive_flag ) {
+        if ( ( defined $subcompile_shared_flag ) and $subcompile_shared_flag ) {
+            die 'ERROR EAR12: Incompatible command-line argument flags provided, both --archive and --shared, dying' . "\n";
+        }
+        if ( ( defined $subcompile_static_flag ) and $subcompile_static_flag ) {
+            die 'ERROR EAR12: Incompatible command-line argument flags provided, both --archive and --static, dying' . "\n";
+        }
+        if ( ( defined $execute_flag ) and $execute_flag ) {
+            die 'ERROR EAR12: Incompatible command-line argument flags provided, both --archive and --execute, dying' . "\n";
+        }
+        if ( ( defined $test_flag ) and $test_flag ) {
+            die 'ERROR EAR12: Incompatible command-line argument flags provided, both --archive and --test, dying' . "\n";
+        }
+        $modes->{compile}   = 'SUBCOMPILE';
+        $modes->{subcompile} = 'ARCHIVE';
+        $modes->{execute}   = 'OFF';
+    }
+
+    # shared mode is CPPOPS_CPPTYPES_SUBCOMPILE_SHARED; flag ignored if false
+    if (( defined $subcompile_shared_flag ) and $subcompile_shared_flag ) {
+        if ( ( defined $subcompile_static_flag ) and $subcompile_static_flag ) {
+            die 'ERROR EAR13: Incompatible command-line argument flags provided, both --shared and --static, dying' . "\n";
+        }
+        if ( ( defined $execute_flag ) and $execute_flag ) {
+            die 'ERROR EAR13: Incompatible command-line argument flags provided, both --shared and --execute, dying' . "\n";
+        }
+        if ( ( defined $test_flag ) and $test_flag ) {
+            die 'ERROR EAR13: Incompatible command-line argument flags provided, both --shared and --test, dying' . "\n";
+        }
+        $modes->{compile}   = 'SUBCOMPILE';
+        $modes->{subcompile} = 'SHARED';
+        $modes->{execute}   = 'OFF';
+    }
+
+    # static mode is CPPOPS_CPPTYPES_SUBCOMPILE_STATIC; negated is dynamic mode is CPPOPS_CPPTYPES_SUBCOMPILE_DYNAMIC
+    if (( defined $subcompile_static_flag ) and $subcompile_static_flag ) {
+        if ($subcompile_static_flag) {
+            if ( ( defined $test_flag ) and $test_flag ) {
+                die 'ERROR EAR14: Incompatible command-line argument flags provided, both --static and --test, dying' . "\n";
+            }
+            foreach my string $input_file_name (@{$input_file_names}) {
+                if ( $input_file_name =~ /[.]pm$/xms ) {
+                    die 'ERROR EAR15: Incompatible command-line arguments provided, both --static subcompile mode flag and *.pm Perl module input file(s), dying' . "\n";
+                }
+            }
+            $modes->{compile}   = 'SUBCOMPILE';
+            $modes->{subcompile} = 'STATIC';
+        }
+        else {
+            $modes->{compile}   = 'SUBCOMPILE';
+            $modes->{subcompile} = 'DYNAMIC';
+        }
+    }
+    
+    if (defined $subcompile_CXX) {
+        if ($subcompile_CXX =~ m/^\s*$/gxms) {
+            die 'ERROR EAR16: Undefined, empty, or all-whitespace CXX command-line argument provided, dying' . "\n";
+        }
+        else {
+            $modes->{CXX} = $subcompile_CXX;
+        }
+    }
+
+    if ( defined $parallel_flag ) {
+        if ($parallel_flag) {
+            $modes->{parallel} = 'OPENMP';
+        }
+        else {
+            $modes->{parallel} = 'OFF';
+        }
+    }
+    
+    if (defined $num_cores) {
+        if ($num_cores =~ m/^\s*$/gxms) {
+            die 'ERROR EAR17: Undefined, empty, or all-whitespace CXX command-line argument provided, dying' . "\n";
+        }
+        else {
+            $modes->{num_cores} = $num_cores;
+        }
+    }
+
+    if ( defined $execute_flag ) {
+        if ($execute_flag) {
+            $modes->{execute} = 'ON';
+        }
+        else {
+            $modes->{execute} = 'OFF';
+        }
+    }
+
+    # test mode is PERLOPS_PERLTYPES_GENERATE, do not save files to disk; test mode flag ignored if false
+    if (( defined $test_flag ) and $test_flag ) {
+        $modes->{ops}     = 'PERL';
+        $modes->{types}   = 'PERL';
+        $modes->{compile} = 'GENERATE';
+    }
+
+    # must put Perl variables into environmental variables for the values to be properly utilized,
+    # do not simply overwrite values, check for applicability first
+
+    # DEV NOTE, CORRELATION #rp017: default to off; if either variable is set to true, then do emit messages
+    if ($RPerl::DEBUG) {
+        $ENV{RPERL_DEBUG} = $RPerl::DEBUG;
+    }
+    if ($RPerl::VERBOSE) {
+        $ENV{RPERL_VERBOSE} = $RPerl::VERBOSE;
+    }
+
+    # verify modes
+    foreach my string $mode_key ( keys %{$modes} ) {
+        if ( not( exists $modes_supported->{$mode_key} ) ) {
+            die "ERROR EAR06: Unsupported or invalid mode category '$mode_key' specified, supported categories are ("
+                . join( ', ', sort keys %{$modes_supported} )
+                . '), dying' . "\n";
+        }
+        elsif ( ( defined $modes_supported->{$mode_key} ) and not( grep { $_ eq $modes->{$mode_key} } @{ $modes_supported->{$mode_key} } ) ) {
+            die 'ERROR EAR07: Unsupported or invalid mode ' . q{'}
+                . $modes->{$mode_key} . q{'}
+                . ' in mode category ' . q{'}
+                . $mode_key . q{'}
+                . ' specified, supported modes are ('
+                . join( ', ', sort @{ $modes_supported->{$mode_key} } )
+                . '), dying' . "\n";
+        }
+    }
+
+    # initialize empty symbol table, to be populated during GENERATE phase
+#    $modes->{_symbol_table} = { _namespace => 'main::', _subroutine => q{} };  # NEED REMOVE, DEPRECATED
+    $modes->{_symbol_table} = { _namespace => q{}, _subroutine => q{} };
+
+    # defaults when mode(s) not provided
+    foreach my string $mode_default_key ( keys %{$modes_default} ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
+        if ( not( exists $modes->{$mode_default_key} ) ) {
+            $modes->{$mode_default_key} = $modes_default->{$mode_default_key};
+        }
+    }
+
+    # can't subcompile if we don't subcompile
+    if ($modes->{compile} ne 'SUBCOMPILE') {
+        $modes->{subcompile} = 'OFF';
+    }
+
+    1;    # DEV NOTE: Perl::Critic BUG!  must have this '1;' to avoid false positive ProhibitPostfixControls & RequireFinalReturn
+
+    return $modes;
+}
+
+sub verbose_versions {
+    RPerl::verbose( 'RPERL VERBOSE VERSIONS & OTHER CONFIG INFO' . "\n\n" );
+
+    RPerl::verbose( q{$RPerl::VERSION using  CPAN's underscore-is-beta  numbering scheme    } . $RPerl::VERSION . "\n" );
+    RPerl::verbose( q{$RPerl::VERSION using RPerl's underscore-is-comma numbering scheme    } . RPerl::DataType::Number::number_to_string(RPerl::DataType::String::string_to_number($RPerl::VERSION)) . "\n" );
+    RPerl::verbose( q{ rperl $VERSION using  CPAN's underscore-is-beta  numbering scheme    } . $VERSION . "\n" );
+    RPerl::verbose( q{ rperl $VERSION using RPerl's underscore-is-comma numbering scheme    } . RPerl::DataType::Number::number_to_string(RPerl::DataType::String::string_to_number($VERSION)) . "\n\n" );
+
+    my string $ccflags = [ config_re('ccflags') ]->[0];
+    substr $ccflags, 0,  9, q{};                 # remove leading ccflags='
+    substr $ccflags, -1, 1, q{};                 # remove trailing '
+    RPerl::verbose(q{  Perl config_re('ccflags')       } . $ccflags . "\n" );
+    
+    my string $cccdlflags = [ config_re('cccdlflags') ]->[0];
+    substr $cccdlflags, 0,  12, q{};                                             # remove leading cccdlflags='
+    substr $cccdlflags, -1, 1,  q{};                                             # remove trailing '
+    RPerl::verbose(q{  Perl config_re('cccdlflags')    } . $cccdlflags . "\n" );
+
+    RPerl::verbose( '$RPerl::Inline::CCFLAGSEX         ' . $RPerl::Inline::CCFLAGSEX . "\n" );
+    RPerl::verbose( '$RPerl::Inline::ARGS{optimize}    ' . $RPerl::Inline::ARGS{optimize} . "\n\n" );
+
+    RPerl::verbose( '$RPerl::CHECK           ' . $RPerl::CHECK . "\n" );
+    RPerl::verbose( '$RPerl::DEBUG           ' . $RPerl::DEBUG . "\n" );
+    RPerl::verbose( '$ENV{RPERL_DEBUG}       ' . ($ENV{RPERL_DEBUG} or '[ NOT SET ]') . "\n" );
+    RPerl::verbose( '$RPerl::VERBOSE         ' . $RPerl::VERBOSE . "\n" );
+    RPerl::verbose( '$ENV{RPERL_VERBOSE}     ' . ($ENV{RPERL_VERBOSE} or '[ NOT SET ]') . "\n" );
+    RPerl::verbose( '$RPerl::WARNINGS        ' . $RPerl::WARNINGS . "\n" );
+    RPerl::verbose( '$ENV{RPERL_WARNINGS}    ' . ($ENV{RPERL_WARNINGS} or '[ NOT SET ]') . "\n" );
+    RPerl::verbose( '$RPerl::TYPES_CCFLAG    ' . $RPerl::TYPES_CCFLAG . '  [ HARD-CODED DEFAULT ]' . "\n" );
+    RPerl::verbose( '$RPerl::BASE_PATH       ' . $RPerl::BASE_PATH . "\n" );
+    RPerl::verbose( '$RPerl::INCLUDE_PATH    ' . $RPerl::INCLUDE_PATH . "\n" );
+    RPerl::verbose( '$RPerl::SCRIPT_PATH     ' . $RPerl::SCRIPT_PATH . "\n" );
+    RPerl::verbose( '$RPerl::CORE_PATH       ' . $RPerl::CORE_PATH . "\n" );
+
+#    RPerl::verbose( 'FOOOOOO' . "\n    " . $BAAAAAAR . "\n" );
+    return;
+}
+
+sub verbose_multi_file_settings {
+    ( my string_arrayref $input_file_names, my hashref_arrayref $output_file_name_groups, my integer $input_files_count, my hashref_hashref $filename_suffixes_supported, my string_hashref $modes ) = @_;
+    if ( $input_files_count > 1 ) {
+        RPerl::verbose( multi_file_settings( $input_file_names, $output_file_name_groups, $input_files_count, $filename_suffixes_supported, $modes ) );
+        RPerl::verbose_pause( "\n" . 'PRESS <ENTER> TO CONTINUE' . "\n" );
+    }
+    return;
+}
+
+sub diag_multi_file_settings {
+    ( my string_arrayref $input_file_names, my hashref_arrayref $output_file_name_groups, my integer $input_files_count, my hashref_hashref $filename_suffixes_supported, my string_hashref $modes ) = @_;
+    if ( $input_files_count > 1 ) {
+        RPerl::diag( multi_file_settings( $input_file_names, $output_file_name_groups, $input_files_count, $filename_suffixes_supported, $modes ) );
+        RPerl::diag_pause( "\n" . 'PRESS <ENTER> TO CONTINUE' . "\n" );
+    }
+    return;
+}
+
+sub multi_file_settings {
+    ( my string_arrayref $input_file_names, my hashref_arrayref $output_file_name_groups, my integer $input_files_count, my hashref_hashref $filename_suffixes_supported, my string_hashref $modes ) = @_;
+    my string $retval = q{};
+
+    $retval .= 'Input File(s):' . "\n";
+    foreach my string $input_file_name ( @{$input_file_names} ) {
+        $retval .= q{    } . $input_file_name . "\n";
+    }
+    $retval .= 'Output File(s):' . "\n";
+    foreach my string_hashref $output_file_name_group ( @{$output_file_name_groups} ) {
+        $retval .= q{    } . stringify_output_file_name_group($output_file_name_group, $filename_suffixes_supported) . "\n";
+    }
+    $retval .= 'Modes:' . "\n";
+    foreach my string $mode_key ( sort keys %{$modes} ) {
+        $retval .= q{    } . $mode_key . ' => ' . $modes->{$mode_key} . "\n";
+    }
+    return $retval;
+}
+
+# allow omission of "-infile" on command-line
+#our void $store_unlabeled_arguments = sub {  # NEED FIX: can't define RPerl-style subroutines here?
+sub store_unlabeled_arguments {
+    ( my unknown $argument ) = @_;
+    push @{$::input_file_names_unlabeled}, $argument;
+    return;
+}
+
+# print value of argument flags
+sub verbose_flags {
+        my integer $magic_low_flag,
+        my integer $magic_medium_flag,
+        my integer $magic_high_flag,
+    (   my integer $dependencies_flag,
+        my integer $uncompile_flag,
+        my integer $compile_flag,
+        my integer $subcompile_assemble_flag,
+        my integer $subcompile_archive_flag,
+        my integer $subcompile_shared_flag,
+        my integer $subcompile_static_flag,
+        my integer $parallel_flag,
+        my integer $execute_flag,
+        my integer $test_flag
+    ) = @_;
+
+    RPerl::verbose( 'Verbose Flag......... ' . $RPerl::VERBOSE . "\n" );
+    RPerl::verbose( 'Debug Flag........... ' . $RPerl::DEBUG . "\n" );
+    if ( defined $dependencies_flag ) {
+        RPerl::verbose( 'Dependencies Flag.... ' . $dependencies_flag . "\n" );
+    }
+    if ( defined $magic_low_flag ) {
+        RPerl::verbose( 'Low Magic Flag....... ' . $magic_low_flag . "\n" );
+    }
+    if ( defined $magic_medium_flag ) {
+        RPerl::verbose( 'Medium Magic Flag.... ' . $magic_medium_flag . "\n" );
+    }
+    if ( defined $magic_high_flag ) {
+        RPerl::verbose( 'High Magic Flag...... ' . $magic_high_flag . "\n" );
+    }
+    if ( defined $uncompile_flag ) {
+        RPerl::verbose( 'Uncompile Flag....... ' . $uncompile_flag . "\n" );
+    }
+    if ( defined $compile_flag ) {
+        RPerl::verbose( 'Compile Flag......... ' . $compile_flag . "\n" );
+    }
+    if ( defined $subcompile_archive_flag ) {
+        RPerl::verbose( 'Archive Flag......... ' . $subcompile_archive_flag . "\n" );
+    }
+    if ( defined $subcompile_assemble_flag ) {
+        RPerl::verbose( 'Assemble Flag........ ' . $subcompile_assemble_flag . "\n" );
+    }
+    if ( defined $subcompile_shared_flag ) {
+        RPerl::verbose( 'Shared Flag.......... ' . $subcompile_shared_flag . "\n" );
+    }
+    if ( defined $subcompile_static_flag ) {
+        RPerl::verbose( 'Static Flag.......... ' . $subcompile_static_flag . "\n" );
+    }
+    if ( defined $parallel_flag ) {
+        RPerl::verbose( 'Parallel Flag........ ' . $parallel_flag . "\n" );
+    }
+    if ( defined $execute_flag ) {
+        RPerl::verbose( 'Execute Flag......... ' . $execute_flag . "\n" );
+    }
+    if ( defined $test_flag ) {
+        RPerl::verbose( 'Test Flag............ ' . $test_flag . "\n" );
+    }
+}
+
+sub stringify_output_file_name_group {
+    ( my string_hashref $output_file_name_group, my hashref_hashref $filename_suffixes_supported ) = @_;
+
+    my string $output_file_names = q{};
+    foreach my string $suffix_key (sort @{[keys %{$filename_suffixes_supported->{OUTPUT_SOURCE}}, keys %{$filename_suffixes_supported->{OUTPUT_BINARY}}]}) {
+        if ( exists $output_file_name_group->{$suffix_key} ) {
+            $output_file_names .= $output_file_name_group->{$suffix_key};
+            if ( exists $output_file_name_group->{ '_' . $suffix_key . '_label' } ) {
+                $output_file_names .= $output_file_name_group->{ '_' . $suffix_key . '_label' };
+            }
+            $output_file_names .= q{  };
+        }
+    }
+    if ( ( length $output_file_names ) > 55 ) {
+        my @output_file_names_split = split q{  }, $output_file_names;
+        my boolean $is_first = 1;
+        foreach my string $output_file_name (@output_file_names_split) {
+            if ($is_first) {
+                $output_file_names = $output_file_name;
+                $is_first          = 0;
+            }
+            else {
+                $output_file_names .= "\n" . ( q{ } x 20 ) . $output_file_name;
+            }
+        }
+    }
+    return $output_file_names;
+}
+
+# [[[ UNCOMPILER ]]]
+# [[[ UNCOMPILER ]]]
+# [[[ UNCOMPILER ]]]
+
+sub depends_delete {
+    (   my string_arrayref $input_file_names,
+        my hashref_arrayref $output_file_name_groups,
+        my string_arrayref $output_file_name_prefixes,
+        my integer $input_files_count,
+        my hashref_hashref $filename_suffixes_supported,
+        my string_hashref $modes
+    ) = @_;
+
+    # [[[ OUTER UNCOMPILE LOOP, USER-SPECIFIED INPUT FILES ]]]
+    # NEED FIX: Perl::Critic BUG!  'integer' triggers false positive RequireFinalReturn
+    #    for my integer $i ( 0 .. ( $input_files_count - 1 ) ) {
+    for my $i ( 0 .. ( $input_files_count - 1 ) ) {
+        my string $input_file_name                = $input_file_names->[$i];
+        my string_hashref $output_file_name_group = $output_file_name_groups->[$i];
+
+        if ( $input_files_count > 1 ) {
+            RPerl::verbose_clear_screen();
+            RPerl::verbose( 'Input File Number:  ' . ( $i + 1 ) . ' of ' . $input_files_count . "\n" );
+        }
+
+        RPerl::verbose( 'Input File:         ' . $input_file_name . "\n" );
+        RPerl::verbose( 'Output File(s):     ' . stringify_output_file_name_group($output_file_name_group, $filename_suffixes_supported) . "\n" );
+        RPerl::verbose( 'Modes:              magic => '
+                . $modes->{magic}
+                . ', code => '
+                . $modes->{code}
+                . ', ops => '
+                . $modes->{ops}
+                . ', check => '
+                . $modes->{types}
+                . ', check => '
+                . $modes->{check}
+                . ', uncompile => '
+                . $modes->{uncompile}
+                . ', compile => '
+                . $modes->{compile}
+                . ', subcompile => '
+                . $modes->{subcompile}
+                . ', parallel => '
+                . $modes->{parallel}
+                . ', execute => '
+                . $modes->{execute}
+                . ', label => '
+                . $modes->{label}
+                . "\n\n" );
+
+        my string_arrayref $input_file_name_deps = [$input_file_name];
+        my integer $input_file_and_deps_count;
+        my integer $input_file_deps_count                = 0;
+        my hashref_arrayref $output_file_name_dep_groups = [$output_file_name_group];
+
+        if ( $modes->{dependencies} eq 'ON' ) {
+            $input_file_name_deps = find_dependencies( $input_file_name, 1, $modes );  # second argument set to 1 for true value of $find_subdependencies_recurse
+            RPerl::verbose('DEPENDENCIES:       Follow & find all deps... ');
+            if ( exists $input_file_name_deps->[0] ) {
+                $input_file_name_deps = accept_and_verify_input_files( $input_file_name_deps, [], $modes );    # verify deps input files
+#                if ( ( scalar @{$input_file_name_deps} ) == 0 ) { return; }  # allow require of this file
+            }
+            $input_file_name_deps      = [ @{$input_file_name_deps}, $input_file_name ];                       # append input file to deps list
+            $input_file_and_deps_count = scalar @{$input_file_name_deps};
+            $input_file_deps_count     = $input_file_and_deps_count - 1;
+            $output_file_name_dep_groups
+                = generate_output_file_names( $input_file_name_deps, $output_file_name_prefixes, $input_file_and_deps_count, $modes ); # generate deps output file names
+            RPerl::verbose( sprintf( "%4d", $input_file_deps_count ) . ' found.' . "\n" );
+            diag_multi_file_settings( $input_file_name_deps, $output_file_name_dep_groups, $input_file_and_deps_count, $filename_suffixes_supported, $modes );
+        }
+
+        # potentially delete OUTPUT_SOURCE and OUTPUT_BINARY files (not _Inline/);
+        # skip if INLINE only mode; or *.pm Perl Module input file and DYNAMIC subcompile mode (generates _Inline/ only) and not any SOURCE uncompile modes
+        if (not (($modes->{uncompile} eq 'INLINE') or (($input_file_name =~ /[.]pm$/xms) and ($modes->{subcompile} eq 'DYNAMIC') and ($modes->{uncompile} !~ m/SOURCE/gxms)) )) {
+            # [[[ INNER UNCOMPILE LOOP, 1 INPUT FILE & ITS DEPENDENCIES ]]]
+            for my $j ( 0 .. $input_file_deps_count ) {
+                my string $input_file_name_dep                = $input_file_name_deps->[$j];
+                my string_hashref $output_file_name_dep_group = $output_file_name_dep_groups->[$j];
+    
+                if ( $j < $input_file_deps_count ) {
+                    RPerl::verbose( "\n" . 'Dep Output File(s): ' . stringify_output_file_name_group($output_file_name_dep_group, $filename_suffixes_supported) . "\n" );
+                }
+                elsif ($input_file_deps_count > 1) { 
+                    RPerl::verbose( "\n" . 'Output File(s):     ' . stringify_output_file_name_group($output_file_name_dep_group, $filename_suffixes_supported) . "\n" );
+                }
+                RPerl::verbose('UNLINK PHASE 0:     Delete files from disk...');
+#                RPerl::diag( 'in depends_delete(), have ( keys %{$output_file_name_dep_group} ) = ' . "\n" . Dumper(keys %{$output_file_name_dep_group}) . "\n" );
+                foreach my string $output_file_name_key ( keys %{$output_file_name_dep_group} ) {
+                    if ((substr $output_file_name_key, 0, 1) eq '_') { next; }
+                    if  (($modes->{uncompile} eq 'SOURCE_BINARY_INLINE') or 
+                         ($modes->{uncompile} eq 'SOURCE_BINARY') or 
+                        (($modes->{uncompile} eq 'SOURCE') and (exists $filename_suffixes_supported->{OUTPUT_SOURCE}->{$output_file_name_key})) or
+                        (($modes->{uncompile} eq 'BINARY') and (exists $filename_suffixes_supported->{OUTPUT_BINARY}->{$output_file_name_key}))) {
+                        my string $output_file_name = $output_file_name_dep_group->{$output_file_name_key};
+                        if ( -f $output_file_name ) {
+                            unlink $output_file_name
+                                or die "\nERROR EUNFI00, UNCOMPILER, FILE SYSTEM: Cannot delete existing file '$output_file_name',\ndying: $OS_ERROR";
+                        }
+                    }
+                }
+                RPerl::verbose( '    done.' . "\n" );
+            }
+        }
+
+        # delete _Inline/ if (any INLINE mode or (*.pm Perl module input file and DYNAMIC subcompile mode and any BINARY uncompile mode)) and _Inline/ exists
+        if (    (    ($modes->{uncompile} =~ m/INLINE/gxms) or 
+                     (($input_file_name =~ /[.]pm$/xms) and ($modes->{subcompile} eq 'DYNAMIC') and ($modes->{uncompile} =~ m/BINARY/gxms))
+                ) and 
+                ( -d '_Inline' )) {
+            RPerl::verbose( ( "\n" x ( $input_files_count - 1 ) ) . 'UNLINK PHASE 1:     Delete _Inline/ from disk...' );
+            remove_tree( '_Inline', { error => \my $error_hashes } );
+            if ( @{$error_hashes} ) {
+                foreach my string_hashref $error_hash ( @{$error_hashes} ) {
+                    my ( $file_name, $error_message ) = %{$error_hash};
+                    if ( $file_name eq '' ) {
+                        die "\nERROR EUNFI01, UNCOMPILER, FILE SYSTEM: Cannot delete folder '_Inline', general error, \ndying: $error_message";
+                    }
+                    else {
+                        die "\nERROR EUNFI01, UNCOMPILER, FILE SYSTEM: Cannot delete folder '_Inline', error deleting file '$file_name', \ndying: $error_message";
+                    }
+                }
+            }
+            RPerl::verbose( ' done.' . "\n" );
+        }
+
+        if ( ( $input_files_count > 1 ) and ( $i < ( $input_files_count - 1 ) ) ) {
+            RPerl::verbose_pause("\nPRESS <ENTER> TO CONTINUE\n");
+        }
+    }
+
+    return;
+}
+
+# [[[ CALL COMPILER ]]]
+# [[[ CALL COMPILER ]]]
+# [[[ CALL COMPILER ]]]
+
+sub depends_parse_generate_save_subcompile_execute {
+    (   my string_arrayref $input_file_names,
+        my hashref_arrayref $output_file_name_groups,
+        my string_arrayref $output_file_name_prefixes,
+        my integer $input_files_count,
+        my hashref_hashref $filename_suffixes_supported,
+        my string_hashref $modes
+    ) = @_;
+
+#    RPerl::diag('in depends_parse_generate_save_subcompile_execute(), received $output_file_name_groups = ' . "\n" . Dumper($output_file_name_groups) . "\n");
+#    RPerl::diag('in depends_parse_generate_save_subcompile_execute(), received $output_file_name_prefixes = ' . "\n" . Dumper($output_file_name_prefixes) . "\n");
+
+    if ( $modes->{ops} eq 'PERL' ) {
+
+        # PERL ops does not actually SUBCOMPILE, set compile mode to SAVE instead
+        if ( $modes->{compile} eq 'SUBCOMPILE' ) {
+            $modes->{compile} = 'SAVE';
+        }
+
+        # PERL ops does not have CPP types, set types mode to PERL instead
+        if ( $modes->{types} eq 'CPP' ) { $modes->{types} = 'PERL'; }
+    }
+
+    # only execute single *.pl program files, executing multiple files may cause unexpected behavior
+    if ( $input_files_count > 1 ) {
+        $modes->{execute} = 'OFF';
+    }
+
+    # [[[ OUTER COMPILE LOOP, USER-SPECIFIED INPUT FILES ]]]
+    # NEED FIX: Perl::Critic BUG!  'integer' triggers false positive RequireFinalReturn
+    #    for my integer $i ( 0 .. ( $input_files_count - 1 ) ) {
+    for my $i ( 0 .. ( $input_files_count - 1 ) ) {
+        my string $input_file_name                = $input_file_names->[$i];
+        my string_hashref $output_file_name_group = $output_file_name_groups->[$i];
+
+        # program files (*.pl) need to know their own input file name to create the proper C++ #ifdef version preprocessor directives;
+        # RPerl::Compiler needs to know if it should perform program or module post-processing
+        $modes->{_input_file_name} = $input_file_name;
+
+        # clear symtab before each input file, use automatic dependencies mode (enabled by default) to compile multiple files within a single symtab
+#        $modes->{_symbol_table} = {};  # NEED REMOVE, DEPRECATED
+        $modes->{_symbol_table} = { _namespace => q{}, _subroutine => q{} };
+
+        # only execute *.pl program files, executing *.pm module files causes useless additional subcompile to occur
+        if ( ( $modes->{execute} eq 'ON' ) and ( $input_file_name !~ /[.]pl$/xms ) ) {
+            $modes->{execute} = 'OFF';
+        }
+
+        if ( $input_files_count > 1 ) {
+            RPerl::verbose_clear_screen();
+            RPerl::verbose( 'Input File Number:  ' . ( $i + 1 ) . ' of ' . $input_files_count . "\n" );
+        }
+
+        RPerl::verbose( 'Input File:         ' . $input_file_name . "\n" );
+        RPerl::verbose( 'Output File(s):     ' . stringify_output_file_name_group($output_file_name_group, $filename_suffixes_supported) . "\n" );
+        RPerl::verbose( 'Modes:              magic => '
+                . $modes->{magic}
+                . ', code => '
+                . $modes->{code}
+                . ', ops => '
+                . $modes->{ops}
+                . ', types => '
+                . $modes->{types}
+                . ', check => '
+                . $modes->{check}
+                . ', uncompile => '
+                . $modes->{uncompile}
+                . ', compile => '
+                . $modes->{compile}
+                . ', subcompile => '
+                . $modes->{subcompile}
+                . ', parallel => '
+                . $modes->{parallel}
+                . ', execute => '
+                . $modes->{execute}
+                . ', label => '
+                . $modes->{label}
+                . "\n\n" );
+
+        my string_arrayref $input_file_name_deps = [$input_file_name];
+        my integer $input_file_and_deps_count;
+        my integer $input_file_deps_count                = 0;
+        my hashref_arrayref $output_file_name_dep_groups = [$output_file_name_group];
+        my hashref_arrayref $source_dep_groups           = [];
+
+        if ( $modes->{dependencies} eq 'ON' ) {
+            $input_file_name_deps = find_dependencies( $input_file_name, 1, $modes );  # second argument set to 1 for true value of $find_subdependencies_recurse
+            RPerl::verbose('DEPENDENCIES:       Follow & find all deps... ');
+            if ( exists $input_file_name_deps->[0] ) {
+                $input_file_name_deps = accept_and_verify_input_files( $input_file_name_deps, [], $modes );    # verify deps input files
+#                if ( ( scalar @{$input_file_name_deps} ) == 0 ) { return; }  # allow require of this file
+            }
+            $input_file_name_deps      = [ @{$input_file_name_deps}, $input_file_name ];                       # append input file to deps list
+            $input_file_and_deps_count = scalar @{$input_file_name_deps};
+            $input_file_deps_count     = $input_file_and_deps_count - 1;
+            $output_file_name_dep_groups
+                = generate_output_file_names( $input_file_name_deps, $output_file_name_prefixes, $input_file_and_deps_count, $modes ); # generate deps output file names
+            RPerl::verbose( sprintf( "%4d", $input_file_deps_count ) . ' found.' . "\n" );
+            diag_multi_file_settings( $input_file_name_deps, $output_file_name_dep_groups, $input_file_and_deps_count, $filename_suffixes_supported, $modes );
+        }
+
+        if ( ( $input_file_deps_count > 0 ) and ( $modes->{compile} ne 'PARSE' ) ) {
+            $modes->{_compile_saved} = $modes->{compile};
+            $modes->{compile}        = 'GENERATE';
+        }
+
+        # [[[ FIRST INNER COMPILE LOOP, 1 INPUT FILE & ITS DEPENDENCIES, DEFER SAVE & SUBCOMPILE IF DEPENDENCIES EXIST ]]]
+        for my $j ( 0 .. $input_file_deps_count ) {
+            my string $input_file_name_dep                = $input_file_name_deps->[$j];
+            my string_hashref $output_file_name_dep_group = $output_file_name_dep_groups->[$j];
+
+            if ( $input_file_deps_count > 0 ) {
+                if ( $j < $input_file_deps_count ) {
+                    RPerl::verbose( "\n" . 'Dep Input File:     ' . $input_file_name_dep . "\n" );
+                }
+                else {
+                    RPerl::verbose( "\n" . 'Input File:         ' . $input_file_name_dep . "\n" );
+                }
+            }
+
+            if ( $modes->{ops} eq 'PERL' ) {
+                $source_dep_groups->[$j] = RPerl::Compiler::rperl_to_rperl__parse_generate( $input_file_name_dep, $output_file_name_dep_group, {}, $modes );
+            }
+            elsif ( $modes->{ops} eq 'CPP' ) {
+
+                # use eval to trap C++ compiler errors
+                my integer $eval_retval = eval {
+                    $source_dep_groups->[$j]
+                        = RPerl::Compiler::rperl_to_xsbinary__parse_generate_compile( $input_file_name_dep, $output_file_name_dep_group, {}, $modes ); # returns void
+                    1;    # return true
+                };
+                if ( not defined $eval_retval ) {
+                    print $EVAL_ERROR;
+#                    die 'Encountered eval-trapped dependency error, dying' . "\n";
+
+                    # force-disable everything except code generation if an error is trapped in eval() above,
+                    # that we we continue seeing errors but we never save any files to disk
+                    $modes->{compile} = 'GENERATE';
+                    $modes->{_compile_saved} = 'GENERATE';
+                    $modes->{subcompile} = 'OFF';
+                    $modes->{execute} = 'OFF';
+                    $modes->{_bailout_message} = "\n" . 'BAILING OUT:        One or more problems encountered, see error messages above for details, dying' . "\n";
+                }
+            }
+        }
+
+        if (    ( $input_file_deps_count > 0 )
+            and ( $modes->{compile} ne 'PARSE' )
+            and ( ( $modes->{_compile_saved} eq 'SAVE' ) or ( $modes->{_compile_saved} eq 'SUBCOMPILE' ) ) )
+        {
+            RPerl::verbose( "\n" . 'DEPENDENCIES:       Complete deferred actions...' . "\n" );
+#            RPerl::diag( "\n" . 'have $modes = ' . Dumper($modes) . "\n" );
+
+            # [[[ SECOND INNER COMPILE LOOP, 1 INPUT FILE & ITS DEPENDENCIES, DEFERRED SAVE & SUBCOMPILE ]]]
+            for my $j ( 0 .. $input_file_deps_count ) {
+                $modes->{compile} = $modes->{_compile_saved} . '_DEFERRED';
+                my string $input_file_name_dep                = $input_file_name_deps->[$j];
+                my string_hashref $output_file_name_dep_group = $output_file_name_dep_groups->[$j];
+                my string_hashref $source_dep_group           = $source_dep_groups->[$j];
+
+                if ( $j < $input_file_deps_count ) {
+                    RPerl::verbose( "\n" . 'Dep Output File(s): ' . stringify_output_file_name_group($output_file_name_dep_group, $filename_suffixes_supported) . "\n" );
+                }
+                else {
+                    RPerl::verbose( "\n" . 'Output File(s):     ' . stringify_output_file_name_group($output_file_name_dep_group, $filename_suffixes_supported) . "\n" );
+                }
+
+                if ( $modes->{ops} eq 'PERL' ) {
+                    RPerl::Compiler::rperl_to_rperl__parse_generate( $input_file_name_dep, $output_file_name_dep_group, $source_dep_group, $modes );
+                }
+                elsif ( $modes->{ops} eq 'CPP' ) {
+
+#                RPerl::diag( 'in depends_parse_generate_save_subcompile_execute(), have $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n" );
+
+                    # do not subcompile deps
+                    if ( ( $j < $input_file_deps_count ) and ( $modes->{compile} eq 'SUBCOMPILE_DEFERRED' ) ) {
+                        $modes->{compile} = 'SAVE_DEFERRED';
+                    }
+
+                    # use eval to trap C++ compiler errors
+                    my integer $eval_retval = eval {
+                        RPerl::Compiler::rperl_to_xsbinary__parse_generate_compile( $input_file_name_dep, $output_file_name_dep_group, $source_dep_group,
+                            $modes );    # returns void
+                        1;               # return true
+                    };
+                    if ( not defined $eval_retval ) {
+                        print $EVAL_ERROR;
+
+                        # force-disable execution if an error is trapped in eval() above
+                        $modes->{execute} = 'OFF';
+                    }
+                }
+            }
+        }
+
+        if ( $modes->{execute} eq 'ON' ) {
+            RPerl::verbose( 'EXECUTE:            Run code...' . "\n" );
+            RPerl::verbose("\n");
+#            RPerl::diag('in rperl depends_parse_generate_save_subcompile_execute(), have \$modes = ' . Dumper($modes) . "'\n");
+
+            # if subcompiled C++, then run binary executable instead of original interpreted source code
+            if (($modes->{ops} eq 'CPP') and ($modes->{compile} eq 'SUBCOMPILE')) {
+                my $execute_file_name = $output_file_name_group->{EXE};
+#                RPerl::diag('in rperl depends_parse_generate_save_subcompile_execute(), have $execute_file_name = ' . $execute_file_name . "\n");
+                if ( defined $modes->{arguments} ) {
+                    my integer $execute_retval = system( $execute_file_name, @{ $modes->{arguments} } );
+                }
+                else {
+                    my integer $execute_retval = system( $execute_file_name );
+                }
+            }
+            else {
+                if ( defined $modes->{arguments} ) {
+                    my integer $execute_retval = system( $EXECUTABLE_NAME, $input_file_name, @{ $modes->{arguments} } );
+                }
+                else {
+                    my integer $execute_retval = system( $EXECUTABLE_NAME, $input_file_name );
+                }
+            }
+
+        }
+
+ #        RPerl::diag( 'in depends_parse_generate_save_subcompile_execute(), have $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n" );
+
+        if (    ( $input_files_count > 1 )
+            and ( $i < ( $input_files_count - 1 ) ) )
+        {
+            RPerl::verbose_pause("\nPRESS <ENTER> TO CONTINUE\n");
+        }
+    }
+
+    if ((exists $modes->{_bailout_message}) and (defined $modes->{_bailout_message}) and ($modes->{_bailout_message} ne q{})) {
+        die $modes->{_bailout_message};
+    }
+
+    return;
+}
+
+# [[[ OPERATIONS ]]]
+
+# [[[ ACTUALLY RUN CODE ]]]
+# [[[ ACTUALLY RUN CODE ]]]
+# [[[ ACTUALLY RUN CODE ]]]
+
+my hashref_hashref $filename_suffixes_supported = $RPerl::Compiler::filename_suffixes_supported;
+my integer $input_files_count = 0;
+
+GetOptions(%{$::rperl_options}) or die "ERROR EAR00: Failure processing command-line arguments, dying\n";
+
+if ($::help_flag) { pod2usage( -verbose => 1, -width => 80, -exitval => 0 ); exit; }
+if ($::vversions_flag) { $RPerl::VERBOSE = 1; verbose_versions(); exit; }
+if ($::version_flag) {
+
+    # NEED UPDATE: automatically generate version info
+
+    # DEV NOTE, CORRELATION #rp016: numbering schemes mentioned below
+    my $version_message = <<EOL;
+This is RPerl version 2.600_000, Long Date 20170416, Star Date 2017.106
+v2.600_000 using RPerl's underscore-is-comma numbering scheme
+v2.600000  using  CPAN's underscore-is-beta  numbering scheme
+
+Copyright © 2013, 2014, 2015, 2016, 2017, William N. Braswell, Jr..  All Rights Reserved.
+RPerl is part of the RPerl Family of software and documentation.
+This work is Free & Open Source; you can redistribute it and/or modify it 
+under the same terms as Perl 5.24.0.
+
+Perl may be copied only under the terms of either the Artistic License or the
+GNU General Public License, which may be found in the Perl 5 source kit.
+For licensing details, please see http://dev.perl.org/licenses/
+
+Complete documentation for RPerl, including FAQ lists, should be found on 
+this system using `man rperl` or `perldoc rperl` or `perldoc RPerl::Learning`.  
+If you have access to the Internet, point your browser at the RPerl Home Page.
+http://www.rperl.org/
+
+EOL
+    print $version_message;
+    exit;
+}
+
+# pre-aggregate values of uncompile mode flags
+if (defined $::uncompile_source_flag) { if ($::uncompile_source_flag) { $::uncompile_flag = 1; } else { $::uncompile_flag = 0; } }
+if (defined $::uncompile_source_binary_flag) { if ($::uncompile_source_binary_flag) { $::uncompile_flag = 2; } else { $::uncompile_flag = 0; } }
+if (defined $::uncompile_source_binary_inline_flag) { if ($::uncompile_source_binary_inline_flag) { $::uncompile_flag = 3; } else { $::uncompile_flag = 0; } }
+
+verbose_flags(
+    $::magic_low_flag, $::magic_medium_flag, $::magic_high_flag, $::dependencies_flag, $::uncompile_flag, $::compile_flag, $::subcompile_assemble_flag,
+    $::subcompile_archive_flag,      $::subcompile_shared_flag,           $::subcompile_static_flag, $::parallel_flag,        $::execute_flag, $::test_flag
+);
+
+use rperloptions;
+$::input_file_names  = accept_and_verify_input_files( $::input_file_names, $::input_file_names_unlabeled, $::modes );
+
+#if ( ( scalar @{$::input_file_names} ) == 0 ) { return 1; }  # allow require of this file
+$input_files_count = scalar @{$::input_file_names};
+$::modes             = verify_and_default_modes(
+    $::modes,              $::modes_default, $::modes_supported, 
+    $::magic_low_flag, $::magic_medium_flag, $::magic_high_flag, 
+    $::dependencies_flag, $::uncompile_flag, $::compile_flag,  
+    $::subcompile_assemble_flag,   $::subcompile_archive_flag,      $::subcompile_shared_flag,
+    $::subcompile_static_flag, $::subcompile_CXX, $::parallel_flag, $::num_cores, $::execute_flag,  $::test_flag, $::input_file_names
+);
+$::output_file_name_groups = generate_output_file_names( $::input_file_names, $::output_file_name_prefixes, $input_files_count, $::modes );
+verbose_multi_file_settings( $::input_file_names, $::output_file_name_groups, $input_files_count, $filename_suffixes_supported, $::modes );
+if ( $::modes->{uncompile} ne 'OFF' ) { depends_delete( $::input_file_names, $::output_file_name_groups, $::output_file_name_prefixes, $input_files_count, $filename_suffixes_supported, $::modes ); }
+else { depends_parse_generate_save_subcompile_execute( $::input_file_names, $::output_file_name_groups, $::output_file_name_prefixes, $input_files_count, $filename_suffixes_supported, $::modes ); }
+
+#1;  # allow require of this file
+
+__END__
+=head1 NAME
+
+rperl Front-End Program
+
+Restricted Perl, The Optimizing Perl 5 Compiler
+
+=head1 SYNOPSIS
+
+        rperl [ARGUMENTS] input_program_0.pl [input_program_1.pl input_program_2.pl ...]
+        rperl [ARGUMENTS] MyClassFoo.pm [MyClassBar.pm MyClassBat.pm ...]
+        rperl [ARGUMENTS] input_program_0.pl MyClassFoo.pm [input_program_1.pl ... MyClassBar.pm ...]
+
+=for DEV NOTE, CORRELATION #rp029: all updates to `rperl` command-line arguments must be documented in script/rperl and 2 places in lib/RPerl/Learning.pm
+
+=head1 ARGUMENTS
+
+=for comment head2 B.1: Help
+
+=over
+
+=item B<--help ...OR... -h ...OR... -?>
+
+=for rperl X<noncode>
+
+    Print this (relatively) brief help message for command-line usage.
+    For additional explanations, run the command `perldoc RPerl::Learning` and see Appendix B.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.2: Version
+
+=over
+
+=item B<--version ...OR... -v>
+
+=item B<--vversion ...OR... -vv>
+
+=for rperl X<noncode>
+
+    Print version number and copyright information.
+    Repeat as 'vv' for more technical information, similar to `perl -V` configuration summary argument.
+    Lowercase 'v' not to be confused with uppercase 'V' in 'Verbose' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.3: Input Files
+
+=over
+
+=item B<--infile=MyFile.pm ...OR... -i=MyFile.pm>
+
+=for rperl X<noncode>
+
+    Specify input file, may be repeated for multiple input files.
+    Argument prefix '--infile' may be entirely omitted.
+    Argument prefix MUST be omitted to specify wildcard for multiple input files.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.4: Output Files
+
+=over
+
+=item B<--outfile=MyCompiledModule ...OR... -o=MyCompiledModule>
+
+=item B<--outfile=my_compiled_program ...OR... -o=my_compiled_program>
+
+=for rperl X<noncode>
+
+    Specify output file prefix, may be repeated for multiple output files.
+    RPerl *.pm input file with PERL ops will create MyCompiledModule.pmc output file.
+    RPerl *.pl input file with PERL ops will create my_compiled_program (or my_compiled_program.exe on Windows) output file.
+    RPerl *.pm input file with CPP  ops will create MyCompiledModule.pmc, MyCompiledModule.cpp, & MyCompiledModule.h output files.
+    RPerl *.pl input file with CPP  ops will create my_compiled_program (or my_compiled_program.exe on Windows) & my_compiled_program.cpp output files.
+    Argument may be entirely omitted, foo.* input file will default to foo.* output file(s).
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.5: C++ Compiler
+
+=over
+
+=item B<--CXX=/path/to/compiler>
+
+=for rperl X<noncode>
+
+    Specify path to C++ compiler for use in subcompile modes, equivalent to '--mode CXX=/path/to/compiler' or 'CXX' manual Makefile argument, 'g++' by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.6: Modes, Magic
+
+=over
+
+=item B<--mode magic=LOW ...OR... -m magic=LOW>
+
+=item B<--mode magic=MEDIUM ...OR... -m magic=MEDIUM>
+
+=item B<--mode magic=HIGH ...OR... -m magic=HIGH>
+
+=for rperl X<noncode>
+
+    Specify magic mode, LOW by default.
+    If set to LOW, accept low-magic (static) Perl source code in the source code input file(s).
+    If set to MEDIUM, accept medium-magic (mostly static) Perl source code in the source code input file(s).
+    If set to HIGH, accept high-magic (dynamic) Perl source code in the source code input file(s).
+    Because only low-magic mode is supported at this time, this option does not currently have any effect.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.7: Modes, Code
+
+=over
+
+=item B<--mode code=PERL ...OR... -m code=PERL>
+
+=item B<--mode code=CPP ...OR... -m code=CPP>
+
+=for rperl X<noncode>
+
+    Specify source code mode, CPP by default.
+    If set to PERL, generate Perl source code in the source code output file(s).
+    If set to CPP, generate C++ source code in the source code output file(s).
+    PERL operations mode forces PERL code mode; CPP operations mode forces CPP code mode.
+    Because code mode is dependent upon operations mode, this option does not currently have any effect.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.8: Modes, Operations
+
+=over
+
+=item B<--mode ops=PERL ...OR... -m ops=PERL>
+
+=item B<--mode ops=CPP ...OR... -m ops=CPP>
+
+=for rperl X<noncode>
+
+    Specify operations mode, CPP by default.
+    If set to PERL, generate Perl operations in the source code output file(s).
+    If set to CPP, generate C++ operations in the source code output file(s).
+    PERL ops mode forces PERL types mode & PARSE or GENERATE compile mode; PERLOPS_PERLTYPES is test mode, does not actually compile.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.9: Modes, Types
+
+=over
+
+=item B<--mode types=PERL ...OR... -m types=PERL>
+
+=item B<--mode types=CPP ...OR... -m types=CPP>
+
+=item B<--mode types=DUAL ...OR... -m types=DUAL>
+
+=for rperl X<noncode>
+
+    Specify data types mode, CPP by default.
+    If set to PERL, generate Perl data types in the source code output file(s).
+    If set to CPP, generate C++ data types in the source code output file(s).
+    If set to DUAL, generate both Perl and C++ data types in the source code output file(s).
+    DUAL mode allows generate-once-compile-many types, selected by '#define __FOO__TYPES' in lib/rperltypes_mode.h or `gcc -D__FOO__TYPES` manual subcompile argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.10: Modes, Integer Type
+
+=over
+
+=item B<--mode type_integer=LONG ...OR... -m type_integer=LONG>
+
+=item B<--mode type_integer=LONG__LONG ...OR... -m type_integer=LONG__LONG>
+
+=for rperl X<noncode>
+
+    Specify native C++ integer data type, same as internal Perl type by default.
+    If set to LONG, utilize 'long' as native type for 'integer', at least 32 bits;
+    If set to LONG__LONG, utilize 'long long' as native type for 'integer', at least 64 bits.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.11: Modes, Number Type
+
+=over
+
+=item B<--mode type_number=DOUBLE ...OR... -m type_number=DOUBLE>
+
+=item B<--mode type_number=LONG__DOUBLE ...OR... -m type_number=LONG__DOUBLE>
+
+=for rperl X<noncode>
+
+    Specify native C++ number data type, same as internal Perl type by default.
+    If set to DOUBLE, utilize 'double' as native type for 'number', usually at least 32 bits, but not guaranteed;
+    If set to LONG__DOUBLE, utilize 'long double' as native type for 'number', usually at least 64 bits, but not guaranteed.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.12: Modes, Type Checking
+
+=over
+
+=item B<--mode check=OFF ...OR... -m check=OFF>
+
+=item B<--mode check=ON ...OR... -m check=ON>
+
+=item B<--mode check=TRACE ...OR... -m check=TRACE>
+
+=for rperl X<noncode>
+
+    Specify data type checking mode, TRACE by default.
+    If set to OFF, do not perform dynamic type checking, only built-in C++ static type checking.
+    If set to ON, perform dynamic type checking in addition to built-in C++ static type checking.
+    If set to TRACE, perform dynamic type checking in addition to built-in C++ static type checking, with subroutine-and-variable trace information.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.13: Modes, Dependencies
+
+=over
+
+=item B<--mode dependencies=OFF ...OR... -m dependencies=OFF>
+
+=item B<--mode dependencies=ON ...OR... -m dependencies=ON>
+
+=for rperl X<noncode>
+
+    Specify dependencies mode, ON by default.
+    If set to OFF, do not search for or compile dependencies.
+    If set to ON, recursively search for dependencies and subdependencies, include as additional input file(s).
+    WARNING: Disabling dependencies will likely cause errors or undefined behavior.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.14: Modes, Uncompile
+
+=over
+
+=item B<--mode uncompile=OFF ...OR... -m uncompile=OFF>
+
+=item B<--mode uncompile=SOURCE ...OR... -m uncompile=SOURCE>
+
+=item B<--mode uncompile=BINARY ...OR... -m uncompile=BINARY>
+
+=item B<--mode uncompile=INLINE ...OR... -m uncompile=INLINE>
+
+=item B<--mode uncompile=SOURCE_BINARY ...OR... -m uncompile=SOURCE_BINARY>
+
+=item B<--mode uncompile=SOURCE_BINARY_INLINE ...OR... -m uncompile=SOURCE_BINARY_INLINE>
+
+=for rperl X<noncode>
+
+    Specify uncompile mode, OFF by default.
+    If set to SOURCE, delete all generated C++ output source code (not subcompiled) files: *.cpp, *.h, *.pmc
+    If set to BINARY, delete all generated C++ output binary (subcompiled) files: *.o, *.a, *.so, *.exe, non-suffixed executables
+    If set to INLINE, delete all generated C++ output Inline::CPP files: _Inline/ directory
+    If set to SOURCE_BINARY, delete both SOURCE and BINARY files.
+    If set to SOURCE_BINARY_INLINE, delete SOURCE, BINARY, and INLINE files.
+    For *.pm Perl module input files, BINARY and INLINE are equivalent.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.15: Modes, Compile
+
+=over
+
+=item B<--mode compile=OFF ...OR... -m compile=OFF>
+
+=item B<--mode compile=PARSE ...OR... -m compile=PARSE>
+
+=item B<--mode compile=GENERATE ...OR... -m compile=GENERATE>
+
+=item B<--mode compile=SAVE ...OR... -m compile=SAVE>
+
+=item B<--mode compile=SUBCOMPILE ...OR... -m compile=SUBCOMPILE>
+
+=for rperl X<noncode>
+
+    Specify compile mode, SUBCOMPILE by default.
+    If set to PARSE, begin with RPerl input source code file(s), and end with RPerl abstract syntax tree output data structure.
+    If set to GENERATE, begin with RPerl input source code file(s), and end with RPerl and/or C++ output source code in memory.
+    If set to SAVE, begin with RPerl input source code file(s), and end with RPerl and/or C++ output source code file(s) saved to disk.
+    If set to SUBCOMPILE, begin with RPerl input source code file(s), and end with C++ output binary file(s).
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.16: Modes, Subcompile
+
+=over
+
+=item B<--mode subcompile=OFF ...OR... -m subcompile=OFF>
+
+=item B<--mode subcompile=ASSEMBLE ...OR... -m subcompile=ASSEMBLE>
+
+=item B<--mode subcompile=ARCHIVE ...OR... -m subcompile=ARCHIVE>
+
+=item B<--mode subcompile=SHARED ...OR... -m subcompile=SHARED>
+
+=item B<--mode subcompile=STATIC ...OR... -m subcompile=STATIC>
+
+=item B<--mode subcompile=DYNAMIC ...OR... -m subcompile=DYNAMIC>
+
+=for rperl X<noncode>
+
+    Specify subcompile mode, DYNAMIC by default.
+    If set to ASSEMBLE, generate *.o object binary output file(s).
+    If set to ARCHIVE, generate *.a object archive binary output file(s).
+    If set to SHARED, generate *.so shared object binary output file(s).
+    If set to STATIC, generate statically-linked *.exe or non-suffixed executable binary output file(s).
+    If set to DYNAMIC, generate dynamically-linked *.exe or non-suffixed executable binary output file(s).
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.17: Modes, C++ Compiler
+
+=over
+
+=item B<--mode CXX=/path/to/compiler ...OR... -m CXX=/path/to/compiler>
+
+=for rperl X<noncode>
+
+    Specify path to C++ compiler for use in subcompile modes, equivalent to '--CXX=/path/to/compiler' or 'CXX' manual Makefile argument, 'g++' by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.18: Modes, Parallelize
+
+=over
+
+=item B<--mode parallel=OFF ...OR... -m parallel=OFF>
+
+=item B<--mode parallel=OPENMP ...OR... -m parallel=OPENMP>
+
+=item B<--mode parallel=MPI ...OR... -m parallel=MPI>  ((( COMING SOON!!! )))
+
+=item B<--mode parallel=OPENCL ...OR... -m parallel=OPENCL>  ((( COMING SOON!!! )))
+
+=for rperl X<noncode>
+
+    Specify automatic parallelization mode, OFF by default.
+    If set to OFF, do not automatically parallelize any input files.
+    If set to OPENMP, automatically parallelize all eligible input files for use on shared-memory OpenMP systems.
+    If set to MPI (COMING SOON), automatically parallelize all eligible input files for use on distributed-memory MPI systems.
+    If set to OPENCL (COMING SOON), automatically parallelize all eligible input files for use on heterogeneous or GPU systems.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.19: Modes, Parallelize, Number Of Cores
+
+=over
+
+=item B<--mode num_cores=2 ...OR... -m num_cores=2 ...OR... --num_cores=2 ...OR... -num=2>
+
+=item B<--mode num_cores=4 ...OR... -m num_cores=4 ...OR... --num_cores=4 ...OR... -num=4>
+
+=item B<--mode num_cores=8 ...OR... -m num_cores=8 ...OR... --num_cores=8 ...OR... -num=8>
+
+=item B<...ETC...>
+
+=for rperl X<noncode>
+
+    Specify number of CPU cores to utilize for OPENMP automatic parallelization mode, 4 by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.20: Modes, Execute
+
+=over
+
+=item B<--mode execute=OFF ...OR... -m execute=OFF>
+
+=item B<--mode execute=ON ...OR... -m execute=ON>
+
+=for rperl X<noncode>
+
+    Specify execute mode, ON by default.
+    If set to OFF, do not load or run any user-supplied program(s).
+    If set to ON with one *.pl Perl program input file, load and run the program.
+    If set to ON with more than one *.pl Perl program input file, do not load or run any programs.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.21: Modes, Source Code Labels
+
+=over
+
+=item B<--mode label=OFF ...OR... -m label=OFF>
+
+=item B<--mode label=ON ...OR... -m label=ON>
+
+=for rperl X<noncode>
+
+    Specify source section label mode, ON by default.
+    If set to OFF, generate minimal output source code, may save disk space.
+    If set to ON, generate some informative labels in output source code, may be more human-readable.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.22: Flags, Verbose
+
+=over
+
+=item B<--Verbose ...OR... -V>
+
+=item B<--noVerbose ...OR... -noV>
+
+=for rperl X<noncode>
+
+    Include additional user information in output, or not.
+    If enabled, equivalent to `export RPERL_VERBOSE=1` shell command.
+    Disabled by default.
+    Uppercase 'V' not to be confused with lowercase 'v' in 'version' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.23: Flags, Debug
+
+=over
+
+=item B<--Debug ...OR... -D>
+
+=item B<--noDebug ...OR... -noD>
+
+=for rperl X<noncode>
+
+    Include debugging & system diagnostic information in output, or not.
+    If enabled, equivalent to `export RPERL_DEBUG=1` shell command.
+    Disabled by default.
+    Uppercase 'D' not to be confused with lowercase 'd' in 'dependencies' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.24: Flags, Warnings
+
+=over
+
+=item B<--Warnings ...OR... -W>
+
+=item B<--noWarnings ...OR... -noW>
+
+=for rperl X<noncode>
+
+    Include system warnings in output, or not.
+    If disabled, equivalent to `export RPERL_WARNINGS=0` shell command.
+    Enabled by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.25: Flags, Test
+
+=over
+
+=item B<--test ...OR... -t>
+
+=for rperl X<noncode>
+
+    Test mode: Perl ops, Perl types, Parse & Generate (no Save or Compile)
+    If enabled, equivalent to '--mode ops=PERL --mode types=PERL --mode compile=GENERATE' arguments.
+    Disabled by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.26: Flags, Low Magic
+
+=over
+
+=item B<--low ...OR... -l>
+
+=for rperl X<noncode>
+
+    Accept low-magic (static) Perl source code in the source code input file(s).
+    Enabled by default, equivalent to '--mode magic=LOW' argument.
+    Because only low-magic mode is supported at this time, this option does not currently have any effect.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.27: Flags, Medium Magic
+
+=over
+
+=item B<--medium>
+
+=for rperl X<noncode>
+
+    Accept medium-magic (mostly static) Perl source code in the source code input file(s).
+    Disabled by default, equivalent to '--mode magic=MEDIUM' argument.
+    Because only low-magic mode is supported at this time, this option does not currently have any effect.
+    Shorthand '-m' used for '--mode' argument, not '--medium' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.28: Flags, High Magic
+
+=over
+
+=item B<--high>
+
+=for rperl X<noncode>
+
+    Accept high-magic (dynamic) Perl source code in the source code input file(s).
+    Disabled by default, equivalent to '--mode magic=HIGH' argument.
+    Because only low-magic mode is supported at this time, this option does not currently have any effect.
+    Shorthand '-h' used for '--help' argument, not '--high' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.29: Flags, Dependencies
+
+=over
+
+=item B<--dependencies ...OR... -d>
+
+=item B<--nodependencies ...OR... -nod>
+
+=for rperl X<noncode>
+
+    Follow and compile dependencies, or not.
+    Enabled by default, equivalent to '--mode dependencies=ON' argument.
+    Lowercase 'd' not to be confused with uppercase 'D' in 'Debug' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.30: Flags, Uncompile
+
+=over
+
+=item B<--uncompile ...OR... -u>
+
+=item B<--nouncompile ...OR... -nou>
+
+=item B<--uuncompile ...OR... -uu>
+
+=item B<--nouuncompile ...OR... -nouu>
+
+=item B<--uuuncompile ...OR... -uuu>
+
+=item B<--nouuncompile ...OR... -nouuu>
+
+=for rperl X<noncode>
+
+    Uncompile (delete C++ source code and/or binary output files), or not.
+    Repeat as 'uu' and 'uuu' for more thorough file removal.
+    Do not confuse uncompile with decompile (recreate RPerl source code from C++ source code or binary output files), which does not currently exist.
+    '-u' equivalent to '--mode uncompile=SOURCE --mode compile=OFF --mode execute=OFF' arguments.
+    '-uu' equivalent to '--mode uncompile=SOURCE_BINARY --mode compile=OFF --mode execute=OFF' arguments.
+    '-uuu' equivalent to '--mode uncompile=SOURCE_BINARY_INLINE --mode compile=OFF --mode execute=OFF' arguments.
+    Disabled by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.31: Flags, Compile
+
+=over
+
+=item B<--compile ...OR... -c>
+
+=item B<--nocompile ...OR... -noc>
+
+=for rperl X<noncode>
+
+    Generate & subcompile C++ source code, or not.
+    Enabled by default, equivalent to '--mode compile=SUBCOMPILE' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.32: Flags, Subcompile, Assemble
+
+=over
+
+=item B<--assemble>
+
+=for rperl X<noncode>
+
+    Assemble subcompile mode, output *.o object file(s).
+    If enabled, equivalent to '--mode subcompile=ASSEMBLE' argument or `gcc -c` manual subcompile argument.
+    Disabled by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.33: Flags, Subcompile, Archive
+
+=over
+
+=item B<--archive>
+
+=for rperl X<noncode>
+
+    Archive subcompile mode, output *.a object archive file(s).
+    If enabled, equivalent to '--mode subcompile=ARCHIVE' argument or `gcc -c` followed by `ar` manual subcompile command.
+    Disabled by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.34: Flags, Subcompile, Shared Object
+
+=over
+
+=item B<--shared>
+
+=for rperl X<noncode>
+
+    Shared subcompile mode, output *.so shared object file(s).
+    If enabled, equivalent to '--mode subcompile=SHARED' argument or `gcc -shared` manual subcompile command.
+    Disabled by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.35: Flags, Subcompile, Static
+
+=over
+
+=item B<--static>
+
+=item B<--nostatic>
+
+=for rperl X<noncode>
+
+    Static subcompile mode, output *.exe or non-suffixed statically-linked executable file(s).
+    If disabled, equivalent to '--mode subcompile=DYNAMIC' argument or `gcc` manual subcompile command.
+    If enabled, equivalent to '--mode subcompile=STATIC' argument or `gcc -static` manual subcompile command.
+    Disabled by default.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.36: Flags, Parallelize
+
+=over
+
+=item B<--parallel ...OR... -p>
+
+=item B<--noparallel ...OR... -nop>
+
+=for rperl X<noncode>
+
+    Automatically parallelize input code, or not.
+    Disabled by default.
+    Equivalent to '--mode parallel=OPENMP' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=for comment head2 B.37: Flags, Execute
+
+=over
+
+=item B<--execute ...OR... -e>
+
+=item B<--noexecute ...OR... -noe>
+
+=for rperl X<noncode>
+
+    Run input code after argumental compile, or not.
+    Enabled by default for *.pl program input files, always disabled for *.pm module input files or multiple input files.
+    Equivalent to '--mode execute=ON' argument.
+
+=for rperl X</noncode>
+
+=back
+
+=head1 DESCRIPTION
+
+B<RPerl> is a compiler.  For more info:
+
+L<https://github.com/wbraswell/rperl/blob/master/README.md>
+
+=head1 SEE ALSO
+
+L<RPerl>
+
+=head1 AUTHOR
+
+B<William N. Braswell, Jr.>
+
+L<mailto:wbraswell@NOSPAM.cpan.org>
+
+=cut

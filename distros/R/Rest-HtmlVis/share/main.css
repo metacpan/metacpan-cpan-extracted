@@ -1,0 +1,129 @@
+/*  ### !!! if edit main.css edit also inline css in else branch */
+
+body {
+  padding: 0px;
+  margin: 0px;
+  font: 14px/1 Helvetica, Verdana, sans-serif;
+}
+
+/* Bootstrap */
+.row {
+  margin: 10px 0px 0px 0px;
+}
+
+/* Header styles */
+.header {
+  background-color: #eee;
+  display: inline-block;
+  width: 100%;
+  min-height: 38px;
+  padding: 6px 0px 5px 0px;
+  border: 1px solid #ddd
+}
+
+/* Header title style */
+.header .title {
+  margin: 9px;
+  display:inline;  
+  text-decoration: none;
+  color: #aaa;
+  font-size: 24px;
+}
+
+.title .project {
+  color: #ccc;
+}
+
+/* Format styles */
+.format {
+  float:right;
+  list-style-type: none;
+  margin: 5px 10px 0px 0px;
+  padding: 0px;
+}
+
+.format li {
+  float:left;
+  border-right: 1px solid #fff;
+  padding: 0px 7px 0px 7px;
+}
+
+.format li:last-child {
+  border-right: none;
+}
+
+.format li a {
+  margin-top: 1px;
+  text-decoration: none;
+  color: #ccc;
+  text-transform: uppercase;
+ 
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+ 
+.format li a:hover {
+  color: #666;
+}
+ 
+.format li.active a {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Links ul */
+.links {
+  list-style-type: none;
+  margin: 5px 0px 0px 10px;
+  padding: 0px;
+}
+
+.links li {
+  padding-bottom: 1px;
+}
+
+.links li a {
+  margin-top: 1px;
+  text-decoration: none;
+  color: #23527c;
+ 
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+ 
+.links li a:hover {
+  color: #666;
+}
+ 
+.links li.active a {
+  font-weight: bold;
+  color: #333;
+}
+
+.method-form {
+  margin: 7px 0px 5px 0px;
+}
+
+.links span {
+  color: #aaa;
+}
+
+/* pretty print */
+pre.prettyprint {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.kwd {
+  color: #23527c;
+}
+
+a {
+  color: #23527c;
+}

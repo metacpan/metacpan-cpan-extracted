@@ -1,0 +1,66 @@
+2007-01-16 - diablo
+- pod
+  + updated pod for Rsync::Config
+- 0.3.1 released
+
+
+2007-01-03 - diablo
+- tests
+  + added tests for new methods
+  + added tests for Rsync::Config::Parser
+- pod
+  + updated pod on Rsync::Config::Parser
+
+
+2007-01-02 - diablo
+- Rsync::Config::Parser
+  + works with the latest modules
+  + changed to the other modules layout
+
+
+2006-12-31 - altblue
+- Rsync::Config::Renderer hacks/refactorization:
+  + moved options validation into private methods;
+  + default options have their private method;
+  + accessors may be called as class methods;
+  + dropped dependency on Scalar::Util;
+  + added "render" method;
+  + documentation edit;
+- refactorized "atoms" into "Blank", "Comment" and "Atom"
+  ("Comment" and "Atom" inherit from "Blank");
+- dropped ::Exceptions (switched to "in place" Exceptions for each module);
+- random hacking (simplification, tweaks, fixes, etc):
+  + dropped method chaining for add_* (returning the created object is more
+  useful);
+  + atoms may store "0" as name/value;
+  + modules have an "indent_step" parameter (not so useful currently);
+  + ...
+- rewrote all tests (code coverage: 100%!)
+- Makefile.PL: dropped Test::*, added ABSTRACT;
+- renamed "standard" files to their better name (CHANGES, AUTHORS)
+- dropped HISTORY
+- version 0.2.1
+
+
+2006-12-29 - diablo
+- added possibility to indent the config as you wish
+- added more tests
+- version 0.2
+
+
+2006-12-28 - diablo
+- added Rsync::Config::Renderer
+
+
+2006-12-27 - diablo
+- blessed() is now && with $self->isa($CLASS) - better checks
+- Rsync::Config inherits from Rsync::Config::Module
+- add_blank, add_comment, add_atom now returns $self
+- added new dependency: CLASS
+- added TODO
+- version set to 0.2
+
+
+2006-12-26 - diablo
+- documentation
+- version set to 0.1

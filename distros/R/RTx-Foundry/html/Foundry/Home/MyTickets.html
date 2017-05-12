@@ -1,0 +1,52 @@
+%# Never call a man a fool; borrow from him.
+
+<& /Foundry/Elements/Header, Title => 'My Page' &>
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td><& /Foundry/Elements/Tabs, Text => 'Overview' &></td>
+  </tr>
+  <tr> 
+    <td valign="top"> 
+      <table border="0" cellspacing="0" cellpadding="4" class="poptable" width="100%">
+        <tr> 
+          <td valign="top"> 
+<a href="/Foundry/Home/"><&|/l&>Overview</&></a>
+&gt;&gt;
+<strong><&|/l&>Tickets I own</&></strong>
+
+<p><&|/l&>Status</&>: <& /Foundry/Project/Tracker/FilterStatus, Status => $Status &><input type="image" border="0" name="Action-Search" src="/img/Go.png" width="23" height="19" align="middle"></p>
+
+<& /Foundry/Project/Tracker/List, List => $List, Begin => $Begin, URL => '/Foundry/Project/Tracker/Display.html', Hide => 'Owner', ARGS => \%ARGS &>
+
+
+	  </td>
+        </tr>
+      </table>
+    </table>
+  <br>
+<& /Foundry/Elements/Footer &>
+<%INIT>
+$session{'WorkPage'} = '/Foundry/Project/Home/MyTickets.html';
+
+my $List = RT::Tickets->new($session{'CurrentUser'});
+$List->LimitOwner(VALUE => $session{'CurrentUser'}->Id);
+if ($Status eq 'unresolved') {
+    $List->LimitStatus(VALUE => $_) for RT::Queue->ActiveStatusArray;
+}
+elsif ($Status eq 'resolved') {
+    $List->LimitStatus(VALUE => $_) for
+    	grep !/deleted/, RT::Queue->InactiveStatusArray;
+}
+$List->OrderBy(FIELD => 'Id', ORDER => 'DESC');
+$List = [ grep { ($_ and !$_->QueueObj->Disabled) } @{$List->ItemsArrayRef||[]} ];
+
+</%INIT>
+<%ARGS>
+$Begin	    => 0
+$Category   => ''
+$Action	    => ''
+$Type	    => ''
+$Subject    => ''
+$Status	    => ''
+</%ARGS>

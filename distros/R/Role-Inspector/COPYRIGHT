@@ -1,0 +1,75 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Role-Inspector
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Role-Inspector
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/lib/Local/CustomRole.pm
+ t/lib/Local/MooClass.pm
+ t/lib/Local/MooClass2.pm
+ t/lib/Local/MooRole.pm
+ t/lib/Local/MooRole2.pm
+ t/lib/Local/MooRole3.pm
+ t/lib/Local/MooseClass.pm
+ t/lib/Local/MooseClass2.pm
+ t/lib/Local/MooseRole.pm
+ t/lib/Local/MooseRole2.pm
+ t/lib/Local/MooseRole3.pm
+ t/lib/Local/MopRole.pm
+ t/lib/Local/MouseClass.pm
+ t/lib/Local/MouseRole.pm
+ t/lib/Local/MouseRole2.pm
+ t/lib/Local/RoleBasic.pm
+ t/lib/Local/RoleBasic2.pm
+ t/lib/Local/RoleTiny.pm
+ t/lib/Local/RoleTiny2.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Role/Inspector.pm
+ t/01basic.t
+ t/02mooserole.t
+ t/03mouserole.t
+ t/04moorole.t
+ t/05roletiny.t
+ t/06rolebasic.t
+ t/07moprole.t
+ t/08customrole.t
+ t/09mooplusmoose.t
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

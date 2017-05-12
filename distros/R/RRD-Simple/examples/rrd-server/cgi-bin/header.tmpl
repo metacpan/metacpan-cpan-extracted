@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <title>RRD::Simple Monitoring: <TMPL_IF HOST><TMPL_VAR HOST><TMPL_ELSE><TMPL_VAR title></TMPL_IF><TMPL_IF GRAPH> &gt; <TMPL_VAR GRAPH><TMPL_ELSE><TMPL_IF LIKE> &gt; Like <TMPL_VAR LIKE></TMPL_IF></TMPL_IF></title>
+    <meta http-equiv="refresh" content="240">
+    <!-- <meta name="viewport" content="width=device-width" /> -->
+    <meta name="viewport" content="width=665" />
+    <link rel="shortcut icon" href="/favicon.ico" >
+    <link media="screen" rel="stylesheet" type="text/css" href="<TMPL_VAR rrd_url>/css/main.css" />
+    <link media="screen" rel="stylesheet" type="text/css" href="<TMPL_VAR rrd_url>/css/by_host.css" />
+    <!-- <link media="screen" rel="stylesheet" type="text/css" href="<TMPL_VAR rrd_url>/css/common.css" />
+    <link media="screen" rel="stylesheet" type="text/css" href="<TMPL_VAR rrd_url>/css/status.css" /> -->
+    <link media="only screen and (max-device-width: 480px)" rel="stylesheet" type="text/css" href="<TMPL_VAR rrd_url>/css/iphone.css" />
+  </head>
+  <body class="status">

@@ -1,0 +1,428 @@
+<graph misc_qproc_(\S+)>
+	extended_legend         Yes
+	Title                   "IPC::DirQueue [$1]"
+	vertical_label          "files" 
+	sources                 "queue data active tmp"
+	source_drawtypes        "AREA LINE1 LINE1 LINE1"
+	source_colours          "ffcc00 cc9900 ff0000 bb00bb"
+</graph>
+
+<graph weather_dewPoint_(.+)>
+	title "Dew Point at $1"
+	vertical_label  "Celsius"
+</graph>
+
+<graph weather_relativeHumidity_(.+)>
+	title "Humidity at $1"
+	vertical_label  "%"
+</graph>
+
+<graph weather_temperature_(.+)>
+	title "Temperature at $1"
+	vertical_label "Celsius"
+</graph> 
+
+<graph weather_visibilityMiles_(.+)>
+	title "Visibility at $1"
+	vertical_label   "Miles"
+</graph>
+
+<graph weather_windSpeed_(.+)>
+	title "Wind Speed at $1"
+	vertical_label "Miles per Hour"
+</graph> 
+
+<graph gametrust_shockwavecom_game>
+	vertical_label          "Users"
+	extended_legend         Yes
+	title                   "Shockwave Game Usage"
+</graph>
+
+<graph gametrust_miniclipcom_game>
+	vertical_label          "Users"
+	extended_legend         Yes
+	title                   "MiniClip Game Usage"
+</graph>
+
+<graph gametrust_standardcluster_game>
+	vertical_label          "Users"
+	extended_legend         Yes
+	title                   "Cluster Game Usage"
+</graph>
+
+<graph natgrid_demand>
+	title                   "Electricity Demand"
+	vertical_label          "Watts"
+	source_drawtypes        "AREA"
+</graph>
+
+<graph natgrid_freq>
+	title                   "Supply Frequency"
+	vertical_label          "Hertz"
+	upper_limit             51
+	lower_limit             49
+	rigid
+</graph>
+
+<graph cpu_interrupts>
+	extended_legend         Yes
+	title                   "CPU Interrupts"
+	vertical_label          "interrupts/sec"
+	source_drawtypes        "AREA"
+	source_colors           "ff0000"
+	lower_limit		0
+	rigid
+</graph>
+
+<graph hw_irq_interrupts_cpu\d+>
+	extended_legend         Yes
+	title                   "IRQ Interrupts for $1"
+	vertical_label          "interrupts/sec"
+	lower_limit		0
+	rigid
+</graph>
+
+<graph cpu_utilisation>
+	title                   "CPU Utilisation"
+	vertical_label          "% percent"
+	upper_limit             100
+	lower_limit             0
+	rigid
+	extended_legend         Yes
+	sources                 "System User IO_Wait Idle"
+	source_drawtypes        "AREA STACK STACK STACK"
+	source_colors           "ff0000 00ff00 0000ff ffffff"
+#	CDEF			"mycdef1=User,100,*"
+#	CDEF			"mycdef2=User,2,*"
+#	CDEF			"mycdef3=User,300,*"
+#	LINE1			"mycdef2\#00ff00:MyCDef2"
+#	PRINT			"mycdef2:MIN:mycdef2 min %1.2lf"
+#	PRINT			"mycdef2:MAX:mycdef2 max %1.2lf"
+#	PRINT			"mycdef2:LAST:mycdef2 last %1.2lf"
+#	GPRINT			"mycdef2:MIN:   min\:%10.2lf\g"
+#	GPRINT			"mycdef2:MAX:   max\:%10.2lf\g"
+#	GPRINT			"mycdef2:LAST:   last\:%10.2lf\l"
+</graph>
+
+<graph nagios_perfdata_(?:host|service)_.+>
+	title                   "Nagios PerfData: $1"
+	vertical_label          "Seconds"
+	sources			latency execution
+	source_drawtypes        "AREA STACK"
+	source_labels           "Latency Execution"
+</graph>
+
+<graph db_mysql_replication>
+	title                   "MySQL Database Replication"
+	vertical_label          "sec behind master"
+	source_drawtypes        "AREA"
+	source_labels           "Seconds"
+</graph>
+
+<graph db_mysql_activity>
+	title                   "MySQL Database Activity"
+	vertical_label          "queries/sec"
+	source_drawtypes        "AREA"
+	sources                 "Questions"
+	source_labels           "Queries"
+</graph>
+
+<graph db_mysql_activity_com>
+	title                   "MySQL Database Command Activity"
+	vertical_label          "queries/sec"
+	source_drawtypes        "AREA STACK STACK STACK STACK"
+	sources                 "Com_select Com_insert Com_update Com_replace Com_delete"
+	source_labels           "SELECT INSERT UPDATE REPLACE DELETE"
+</graph>
+
+<graph mail_sendmail_queue>
+	title                   "Sendmail Mail Queue"
+	vertical_label          "Messages"
+	source_drawtypes        "AREA"
+</graph>
+
+<graph mail_exim_queue>
+	title                   "Exim Mail Queue"
+	vertical_label          "Messages"
+	source_drawtypes        "AREA"
+</graph>
+
+<graph mail_postfix_queue>
+	title                   "Postfix Mail Queue"
+	vertical_label          "Messages"
+	source_drawtypes        "AREA"
+	extended_legend         Yes
+</graph>
+
+<graph mail_traffic>
+	title                   "MTA Traffic"
+	vertical_label          "messages/min"
+	source_drawtypes        "AREA STACK STACK STACK STACK STACK"
+	sources                 "sent received rejected bounced virus spam"
+	source_labels           "Sent","Received","Rejected","Bounced", "Virus", "Spam Email"
+	source_colours          "000099 009900 AA0000 000000 DDBB00 999999"
+	extended_legend         Yes
+</graph>
+
+<graph mail_postfix_traffic>
+	title                   "Postfix Traffic"
+	vertical_label          "messages/min"
+	source_drawtypes        "AREA LINE1 AREA AREA"
+	sources                 "sent received rejected bounced"
+	source_labels           "Sent Received Rejected Bounced"
+	source_colours          "bbbbff 008800 990000 000000"
+	extended_legend         Yes
+</graph>
+
+<graph misc_crs_reviews>
+	extended_legend         Yes
+	Title                   "CRS Reviews per Hour"
+	vertical_label          "reviews/hour"
+	sources                 "S P H U"
+	source_labels           "Spam Phish Ham Unknown"
+	source_drawtypes        "AREA STACK LINE1 LINE1"
+	source_colours          "ffaaaa cc7777 0000aa bb00bb"
+</graph>
+
+<graph misc_entropy>
+	extended_legend         Yes
+	title                   "Available Entropy"
+	vertical_label          "Entropy"
+	extended_legend         Yes
+	sources			"entropy_avail"
+	source_labels		"Entropy"
+</graph>
+
+<graph misc_ipmi_temp>
+	extended_legend         Yes
+	title                   "IPMI Temperature Probes"
+	vertical_label          "Celsius"
+	lower_limit             10
+	upper_limit             80
+	rigid
+</graph>
+
+<graph misc_fan_rpm>
+	extended_legend         Yes
+	title                   "Fan RPM"
+	vertical_label          "RPM"
+</graph>
+
+<graph hdd_temp_f>
+	extended_legend         Yes
+	title                   "Hard Disk Temperature"
+	vertical_label          "Fahrenheit"
+	lower_limit             60
+	upper_limit             140
+	rigid
+</graph>
+
+<graph hdd_temp(_c)?>
+	extended_legend         Yes
+	title                   "Hard Disk Temperature"
+	vertical_label          "Celsius"
+	lower_limit             15
+	upper_limit             60
+	rigid
+</graph>
+
+<graph hdd_capacity>
+	extended_legend         Yes
+	title                   "Disk Capacity"
+	line_thickness          2
+	vertical_label          "% used"
+	units_exponent          0
+	upper_limit             100
+	lower_limit             0
+	rigid
+</graph>
+
+<graph hdd_capacity_inodes>
+	extended_legend         Yes
+	title                   "Disk Inode Capacity"
+	line_thickness          2
+	vertical_label          "% used"
+	units_exponent          0
+	upper_limit             100
+</graph>
+
+<graph cpu_loadavg>
+	extended_legend		Yes
+	title				"Load Average"
+	vertical_label		"Load"
+	sources				"1min 5min 15min"
+	source_colors		"ffbb00 cc0000 0000cc"
+	source_drawtypes	"AREA LINE1 LINE1"
+</graph>
+
+<graph proc_filehandles>
+	extended_legend		Yes
+	title				"File Handles"
+	vertical_label		"Handles"
+	sources				"Maximum Allocated Used Free"
+	source_drawtypes	"LINE2 AREA LINE1 LINE1"
+</graph>
+
+<graph proc_threads>
+	extended_legend		Yes
+	title				"Threads"
+	vertical_label		"n"
+	sources				"Threads Processes MultiThreadProcs"
+	source_labels		"Threads Processes ThreadProcs"
+	source_drawtypes	"AREA LINE1 LINE1"
+	source_colours		"9999ff 007700 cc0000"
+</graph>
+
+<graph proc_state>
+	extended_legend		Yes
+	title				"Processes"
+	vertical_label		"Processes"
+	sources				"Run Sleep IO_Wait Paging Stopped Zombie Dead"
+	source_drawtypes	"AREA STACK STACK STACK STACK STACK STACK"
+</graph>
+
+<graph apache_logs>
+	title				"Apache Log Activity"
+	vertical_label		"bytes logged/sec"
+</graph>
+
+<graph cpu_temp>
+	extended_legend	Yes
+	title				"CPU Temperature"
+	vertical_label		"Celsius"
+</graph>
+
+<graph apache_status_scoreboard>
+	title				"Apache Scoreboard"
+	vertical_label		"children"
+</graph>
+
+<graph apache_status>
+	extended_legend		Yes
+	title				"Apache Activity"
+	vertical_label		"bytes/hits per sec"
+	sources				"BytesPerSec BytesPerReq ReqPerSec"
+</graph>
+
+<graph mem_proc_largest>
+	title				"Largest Process"
+	base				1024
+	vertical_label		"bytes"
+	source_drawtypes 	AREA
+	source_colors		0000cc
+	lower_limit			0
+	rigid
+</graph>
+
+<graph mem_usage>
+	title				"Memory Usage"
+	base				1024
+	vertical_label		"bytes"
+	sources				"Buffers Cached Used Free Total"
+	source_drawtypes 	"AREA STACK STACK STACK LINE1"
+	source_colors		"0000ff 00dddd ffcc00 ffffff ff0000"
+	lower_limit			0
+	rigid
+</graph>
+
+<graph mem_usage_swap>
+	title				"Swap Usage"
+	base				1024
+	vertical_label		"bytes"
+	sources				"Used Free Total"
+	source_drawtypes 	"AREA STACK LINE1"
+	source_colours		"ffcc00 ffffff ff0000"
+	lower_limit			0
+	rigid
+</graph>
+
+<graph misc_users>
+	title			"Users Logged In"
+	sources			"Users Unique"
+	source_drawtypes	"AREA LINE1"
+	source_colours		"00ee00 0000aa"
+	vertical_label		"Users"
+	line_thickness		1
+	lower_limit		0
+	rigid
+</graph>
+
+<graph misc_uptime>
+	title				"Server Uptime"
+	vertical_label		"Days"
+	line_thickness		2
+</graph>
+
+<graph "net_ping_host_(.+)">
+	extended_legend		Yes
+	title				"Ping: $1"
+	vertical_label		"ms / loss %"
+</graph>
+
+<graph net_connections_ports>
+	extended_legend		Yes
+	title				"Service Connections"
+	vertical_label		"Connections"
+	lower_limit			0
+	rigid
+</graph net_connections>
+
+<graph net_connections>
+	extended_legend		Yes
+	title				"Network Connections"
+	vertical_label		"Connections"
+	sources				"LISTEN ESTABLISHED TIME_WAIT CLOSED CLOSE_WAIT CLOSING LAST_ACK SYN_RECV SYN_SENT"
+	source_drawtypes	"AREA STACK STACK STACK STACK STACK STACK STACK STACK STACK STACK"
+	lower_limit			0
+	rigid
+</graph net_connections>
+
+<graph "mem_swap_activity">
+	extended_legend	Yes
+	title				"Swap Activity"
+	sources				"Swap_Out Swap_In"
+	source_drawtypes	"AREA LINE1"
+	source_colors		"00ee00 dd0000"
+	vertical_label		"kb/sec"
+</graph>
+
+<graph "(?:win_)?hdd_io_[^_]+">
+	title				"Hard Disk I/O: $1"
+	sources				"Read Write"
+	source_drawtypes	"AREA LINE1"
+	source_colors		"00ee00 dd0000"
+	vertical_label		"bytes/sec"
+</graph>
+
+<graph "(?:win_)?net_traffic_[^_]+">
+	extended_legend		Yes
+	title				"Network Traffic: $1"
+	vertical_label		"bytes/sec"
+	sources				"Transmit Receive"
+	source_drawtypes	"AREA LINE"
+	source_colors		"00dd00 0000dd"
+</graph>
+
+<graph "switch_traffic(?:_([^_]+))?">
+    extended_legend     Yes
+    title               "Network Traffic: $1"
+    vertical_label      "bits/sec"
+    sources             "ifOutOctets ifInOctets"
+    source_drawtypes    "AREA LINE"
+    source_colors       "00dd00 0000dd"
+</graph>
+
+<graph "net_lvs_ipvsadm_connections_inactive_(\S+)">
+    extended_legend     Yes
+    title               "Inactive LVS Connections for $1"
+    vertical_label      "Connections"
+</graph>
+
+<graph "net_lvs_ipvsadm_connections_active_(\S+)">
+    extended_legend     Yes
+    title               "Active LVS Connections for $1"
+    vertical_label      "Connections"
+</graph>
+
+
+

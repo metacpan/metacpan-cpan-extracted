@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use Runops::Recorder::Viewer::Exceptions;
+use Runops::Recorder::Reader;
+
+unless (@ARGV == 1) {
+    print "Usage: rr-subs DIR\n";
+    exit -1;
+}
+
+my $viewer = Runops::Recorder::Viewer::Exceptions->new;
+my $reader = Runops::Recorder::Reader->new(
+    shift, 
+    { handler => $viewer, skip_keyframes => 1 }
+);
+
+$reader->read_all;

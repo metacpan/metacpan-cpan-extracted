@@ -1,0 +1,58 @@
+<!-- $Id: jumptable.html,v 1.4 2000/11/12 20:23:52 aigan Exp $ -->
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "dtd/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      The RDF::Service jumptables
+    </title>
+  </head>
+  <body>
+
+    <h1>The RDF::Service jumptables</h1>
+
+    <p>Every Interface has a hash tree that says, for each namespace and
+      type, what methods it support.</p>
+
+    <p>Each node node has a customized jumptable selectd from a
+      jumpjumptable of jumptables.  The jumptable connects each method
+      name with a list of subroutine reference collected from the
+      connected interfaces.  The key used in the selection of a jumptable
+      consists of three parts:</p>
+
+    <ol>
+      <li>A orderd list of connected interfaces; the IDS</li>
+      <li>A orderd list of domain prefixes</li>
+      <li>A orderd list of types</li>
+    </ol>
+
+    <p>A jumptable that doesn't exist gets created on demand.  Nodes not
+      used for method calls never needs a jumptable.</p>
+
+
+
+    <h2>Circular dependencies</h2>
+
+    <p>The jumptable depends on the list of types. But in order to
+      determine the list of types for a specific Resource, you have to
+      call init_types(), which will be called from the jumptable.  This
+      situation is resolved by temporary setting the Resource type list to
+      RDFS:Resouce.  A temporary jumptable gets created and init_types
+      gets called.  The jumptable will at least know which interfaces that
+      handles the specific resource, based on its URI.  The init_types()
+      must be located in the RDFS:Resouce section.  After the types has
+      been initiated, the original call will be dispatched.</p>
+    
+    <p>The internal method declare_add_types() (that is called by the
+      interfaces implementations of init_types()) will need to call
+      init_props() (that initialize all the nodes properties) for each
+      class in order to find subClassOf properties.  That will lead to
+      infinite recursions for some top classes. RDFS:Resource never gets a
+      chanse to define it's types since init_types() calls init_props()
+      for itself.  this has been resolved by skipping the subClassOf calls
+      for RDFS:Literal, RDFS:Resource and RDF:Statement; ie all the type
+      of nodes that are created by the init_props() process.  (I not yet
+      fully understands what happens here.)</p>
+
+  </body>
+</html>

@@ -1,0 +1,6 @@
+<%ARGS>
+$DisplayHeaders
+</%ARGS>
+<%INIT>
+push @$DisplayHeaders, 'RT-Send-To';
+</%INIT>

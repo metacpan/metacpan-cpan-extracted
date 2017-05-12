@@ -1,0 +1,15 @@
+Source: libregexp-log-progress-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7), perl
+Maintainer: kevin l. esteb <kesteb@wsipc.org>
+Standards-Version: 3.9.1
+Homepage: http://search.cpan.org/dist/Regexp-Log-Progress/
+
+Package: libregexp-log-progress-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: Regex's to parse Progress OpenEdge log files
+ .
+This module provides a set of regex's to parse Progress OpenEdge log
+files.

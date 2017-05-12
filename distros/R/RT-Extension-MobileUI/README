@@ -1,0 +1,31 @@
+NAME
+    RT::Extension::MobileUI - DEPRECATED A phone friendly web interface for
+    RT
+
+DEPRECATED
+    A version of this module was integrated into RT in 4.0.0. RT will
+    automatically serve a mobile-friendly web interface on 4.0.0 or greater.
+
+DESCRIPTION
+    This RT extension adds a mobile interface for RT.
+
+INSTALLATION
+        # perl Makefile.PL
+        # make
+        # make install
+
+        Add RT::Extension::MobileUI to your /opt/rt3/etc/RT_SiteConfig.pm file
+        Set(@Plugins, qw(RT::Extension::MobileUI));
+
+        If you have more than one Plugin enabled, you must enable them as one 
+        Set(@Plugins, qw(Foo Bar)); command
+
+        # clear mason cache
+        # restart apache
+
+AUTHOR
+    Jesse Vincent <jesse@bestpractical.com>
+
+LICENSE
+    GPL version 2.
+

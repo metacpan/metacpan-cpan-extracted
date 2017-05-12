@@ -1,0 +1,20 @@
+%# Stay away from flying saucers today.
+<& /Foundry/Elements/Header, Title => 'Site Admin', Method => $Method &>
+<& 104Buttons, Buttons => $Buttons &>
+<%INIT>
+unless ($RT::Nothing) {
+    $RT::Nothing = bless(\(my $x), 'NOTHING');
+    *NOTHING::AUTOLOAD = sub {''};
+}
+
+$Action =~ s!//+!/!g;
+
+</%INIT>
+<%ARGS>
+$Title	    => ''
+$Method	    => 'Get'
+$Action	    => $r->uri
+$Enctype    => ''
+$OnLoad	    => ''
+$Buttons    => []
+</%ARGS>

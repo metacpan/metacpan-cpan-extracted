@@ -1,0 +1,23 @@
+---
+abstract: 'Provide a consistent, high-level API for working with RDF with Perl'
+author:
+  - 'Kip Hampton <khampton@totalcinema.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RDF-Helper
+requires:
+  Class::Load: 0.20
+  Data::UUID: 0
+  Moose: 1.09
+  MooseX::Aliases: 0
+  RDF::Query: 2.905
+  Test::Simple: 0.88
+  URI: 0
+version: 2.01

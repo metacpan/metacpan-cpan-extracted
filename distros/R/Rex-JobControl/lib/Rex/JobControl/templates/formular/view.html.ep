@@ -1,0 +1,98 @@
+% layout 'formular';
+% title "Project " . $project->name . " / Formular " . $formular->name;
+
+<div class="container">
+  <h2><%= $formular->name %></h2>
+  <p><%== $formular->description %></p>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="col-xs-12">
+
+<a href="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/execute?form_step=0" class="btn btn-sm btn-success">Execute</a>
+<a href="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/edit" class="btn btn-sm btn-warning">Edit</a>
+<button
+  href="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/delete"
+  formular_name="<%= $formular->name %>"
+  class="delete-formular-button btn btn-sm btn-danger">Remove</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">Options</div>
+  <div class="panel-body">
+    <div>
+      <div class="col-xs-2">
+        Name
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= $formular->name %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-xs-2">
+        Description
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%== $formular->description || "&nbsp;" %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-xs-2">
+        Job
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= $formular->job->name %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-xs-2">
+        Servers
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= join(", ", @{ $formular->servers }) %>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div>
+      <div class="col-xs-2">
+        Public
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= $formular->public %>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+
+
+<script>
+$(document).ready(function() {
+  $(".delete-formular-button").click(function() {
+    delete_formular("Remove " + $(this).attr("formular_name") + "?", $(this).attr("href"));
+  });
+} );
+</script>
+

@@ -1,0 +1,25 @@
+v0.02    2008-04-09    Mike Peachey <zordrak@cpan.org>
+
+    * html/Callbacks/CookieAuth/autohandler/Auth
+
+        Deprecated $user_autocreated. It was being used to prevent a call
+        to RT::User::UpdateFromExternal in User_Vendor.pm because it was
+        deemed an unecessary expense to set the user's info and then look
+        it up again straight after. However, I have since realised that
+        UpdateFromExternal is the only code doing a check to see if the
+        user has been disabled in the external source and so bypassing
+        it when users are created allows new users to log in once even
+        if they have not been "enabled". 
+
+        I will be doing a small rewrite of this code in the future to
+        abstract the External disable-lookup code from UpdateFromExternal
+        and perhaps remove the function altogether, but for now everything
+        will work fine.
+
+    * lib/RT/Authen/CookieAuth.pm
+
+        Version updated to 0.02
+
+v0.01    2008-03-13    Mike Peachey <zordrak@cpan.org>
+
+    * Initial Release

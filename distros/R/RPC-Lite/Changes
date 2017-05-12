@@ -1,0 +1,23 @@
+Change log for Perl extension RPC::Lite
+
+0.20    2010-01-13
+----
+- update JSON serializer to use latest JSON module
+
+0.10    2006-08-01
+----
+- Implement a Session-based server system
+  - Allows for use of different serializers by clients
+  - Automatically load serializers as necessary
+- Add a great deal of documentation in preparation for release
+- Make clients and servers initialize connections immediately,
+  rather than lazily
+  - However, the client can be told to let the user call Connect
+    manually
+- Add a Transport base class to begin to give guidance to others
+  on how to implement a Transport layer
+- Make the client default to JSON for serialization
+
+0.04    ???
+----
+- strip termination characters from data read by the TCP transport 

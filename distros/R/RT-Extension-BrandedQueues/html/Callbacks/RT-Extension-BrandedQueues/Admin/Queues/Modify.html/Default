@@ -1,0 +1,15 @@
+</td>
+</tr>
+<tr>
+<td align="right"><&|/l&>Custom branding</&>:</td>
+<td><input type="text" name="BrandedSubjectTag" value="<%$branded_tag%>"/>
+</td>
+</tr>
+<%init>
+my $branded_tag = "";
+my $tag_attr = $QueueObj->FirstAttribute('BrandedSubjectTag');
+if ($tag_attr) { $branded_tag = $tag_attr->Content; }
+</%init>
+<%args>
+$QueueObj => undef
+</%args>

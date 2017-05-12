@@ -1,0 +1,88 @@
+%# One way to stop a runaway horse is to bet on him.
+
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	    <tr> 
+		<td><& /Edit/Elements/Tabs, Map => $Map, URL => $url &></td>
+              </tr>
+              <tr> 
+                <td class="tableEmboss">
+<!--
+                  <table width="100%" border="0" cellspacing="0" cellpadding="4">
+                    <tr> 
+                      <td bgcolor="#82D1EC" class="poptable" valign="bottom" > 
+% if ($ARGS{id} eq 'new' or $ARGS{'Action-New.x'} or $ARGS{'Action-New'}) {
+			  <&|/l&>Add</&><% loc($Type || 'Ticket') %>
+% } else {
+                          <&|/l&>Project Name</&>: <% $QueueObj->Name %>
+% }
+		      </td>
+                    </tr>
+-->
+                    <tr> 
+                      <td bgcolor="#A3DEF1"> 
+                        <table border="0" cellspacing="0" cellpadding="0" align="center" width="100%">
+			  <tr> 
+			    <td class="poptable" bgcolor="#C4E1F0">
+% $m->print($out);
+			    </td>
+			  </tr>
+			</table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+<%INIT>
+$m->notes('NewTicketId', undef);
+$m->notes('QueueObj', undef);
+my $out = $m->scomp($m->fetch_next, @{$m->current_args});
+$ARGS{id} = $m->notes('NewTicketId') || $ARGS{id};
+$QueueObj = $m->notes('QueueObj') || $QueueObj;
+
+foreach my $type (qw(defect patch task feature enhancement)) {
+    $RT::TypeCache{$QueueObj->Id}{$type} = 0; next; # XXX
+    my $MyTickets = RT::Tickets->new($session{'CurrentUser'});
+    $MyTickets->LimitQueue(VALUE => $QueueObj->Id);
+    $MyTickets->LimitStatus(VALUE => $_) for RT::Queue->ActiveStatusArray;
+    $MyTickets->LimitCustomField(CUSTOMFIELD => 'Type', VALUE => $type);
+    $RT::TypeCache{$QueueObj->Id}{$type} = $MyTickets->Count;
+}
+
+my $prefix = '/Foundry/Project/Tracker/';
+my $Map = [
+    ''			    => 'Queue=' . $QueueObj->Id,
+    $prefix		    => 'Overview',		# loc
+    map {
+	$prefix . "?Type=$_",
+	(exists $RT::TypeCache{$QueueObj->Id}{$_}
+	    ? loc($_) # (loc($_) . " (" . ($RT::TypeCache{$QueueObj->Id}{$_} || 0) . ")")
+	    : $_),
+    } qw(defect patch task feature enhancement)
+];
+
+push @$Map, (
+    "${prefix}Display.html?id=$ARGS{id}" => (
+	($ARGS{id} eq 'new')
+	    ? loc("New ticket")
+	    : loc("Ticket #[_1]", $ARGS{id}),
+    )
+) if $ARGS{id};
+
+my $url = $r->uri;
+if ($ARGS{id}) {
+    $url = "${prefix}Display.html?id=$ARGS{id}";
+}
+else {
+    $url =~ s!\w+\.html$!!;
+    $url .= "?Type=$Type" if $Type;
+}
+
+</%INIT>
+<%ATTR>
+Tab2	=> 'Tracker'
+</%ATTR>
+<%ARGS>
+$QueueObj
+$Type	=> ''
+</%ARGS>

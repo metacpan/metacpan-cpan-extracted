@@ -1,0 +1,39 @@
+Not in any order:
+
+  - concept matching facilities
+  - collections
+  - follow all property subsumptions from the reference
+  - follow all the entailments from the reference (note -> all notes, label -> all labels)
+  - skos:semanticRelation
+
+  - boolean support: is_narrower, ....
+  - dct:subject via a method (necessary for the TM mapping)
+
+  - read/write API with constructors
+
+  - OeNACE: optimize
+
+> Prinzipiell sollte sowas möglich
+> sein:
+>
+> $c = new SKOS::Concept; # blank node
+> $c = new SKOS::Concept( 'my:uri' );
+
+Richtig. Nur muss man nur noch unterbringen, dass das Konzept in einem
+SKOS zuhause ist. Sonst braucht man noch eine grausliche ->add Methode.
+
+> $c->prefLabel( 'en' => 'house', 'de' => 'Haus', '' => 'house' ); # setter
+> $l = $c->prefLabel('de'); # getter
+>
+> $c->prefNotation( 'http://my.schema/' => 'KX17' );
+
+Momentan hab ich nur read access, aber sowas wie du schreibst schaut
+bequem und natuerlich aus.
+
+> $s = new SKOS::ConceptScheme;
+> $s->add( $c );
+>
+> $c2 = new SKOS::Concept( ... );
+> $c->broader( $c2 );
+
+Hmmm.

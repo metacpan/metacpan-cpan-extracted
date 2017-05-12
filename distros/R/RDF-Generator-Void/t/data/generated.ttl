@@ -1,0 +1,4035 @@
+@base <http://example.org/subjects/> .
+
+@prefix rel: <http://purl.org/vocab/relationship/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+_:b10081 a dc:Text ;
+	rdfs:label "l64145" .
+_:b10178 a dc:Event ;
+	foaf:name "l23146" .
+_:b10356 dc:language "l2807" ;
+	a dc:Event .
+_:b10550 dc:title "l44028" ;
+	a foaf:Person .
+_:b11327 a foaf:Organization ;
+	rdfs:comment "l77171" .
+_:b11367 a dc:Event ;
+	foaf:name "l96100" .
+_:b12066 a dc:Text ;
+	foaf:name "l42638" .
+_:b12118 dc:title "l51831" ;
+	a foaf:Organization .
+_:b12169 a dc:Sound ;
+	rdfs:comment "l67484" .
+_:b13497 a foaf:Person ;
+	foaf:name "l7796" .
+_:b14045 a dc:Sound ;
+	rdfs:comment "l32048" .
+_:b14174 a dc:Event ;
+	rdfs:label "l82387" .
+_:b14414 a foaf:Person ;
+	foaf:name "l857" .
+_:b1514 a dc:Sound ;
+	rdfs:label "l83631" .
+_:b1533 a dc:Sound ;
+	foaf:name "l33951" .
+_:b15736 a dc:Text ;
+	rdfs:label "l32890" .
+_:b1585 a dc:Text ;
+	rdfs:label "l47059" .
+_:b1646 a foaf:Person ;
+	rdfs:label "l25615" .
+_:b17140 a dc:Text ;
+	rdfs:label "l23274" .
+_:b18177 a foaf:Agent ;
+	rdfs:comment "l38683" .
+_:b18255 dc:language "l36253" ;
+	a foaf:Person .
+_:b18281 dc:language "l65416" ;
+	a dc:Text .
+_:b18450 a foaf:Organization ;
+	foaf:name "l8047" .
+_:b18847 a foaf:Organization ;
+	foaf:name "l45607" .
+_:b19124 a dc:Sound ;
+	foaf:name "l64945" .
+_:b199 dc:title "l16762" ;
+	a dc:Event .
+_:b19953 a foaf:Organization ;
+	rdfs:label "l54642" .
+_:b201 a foaf:Organization ;
+	foaf:name "l4832" .
+_:b20636 a dc:Text ;
+	rdfs:label "l750" .
+_:b21139 dc:language "l34971" ;
+	a foaf:Organization .
+_:b21371 dc:language "l54125" ;
+	a dc:Sound .
+_:b22281 dc:language "l55929" ;
+	a foaf:Agent .
+_:b22344 a foaf:Person ;
+	rdfs:comment "l73409" .
+_:b22892 a dc:Sound ;
+	foaf:name "l80281" .
+_:b23096 dc:title "l95383" ;
+	a foaf:Person .
+_:b23636 dc:language "l22697" ;
+	a foaf:Organization .
+_:b23711 a dc:Event ;
+	rdfs:comment "l2258" .
+_:b24092 a dc:Event ;
+	rdfs:comment "l29121" .
+_:b24818 a dc:Event ;
+	rdfs:label "l60856" .
+_:b24926 a dc:Event ;
+	rdfs:label "l85585" .
+_:b25046 dc:title "l79135" ;
+	a foaf:Agent .
+_:b2521 a foaf:Organization ;
+	rdfs:comment "l74142" .
+_:b25367 a dc:Text ;
+	rdfs:label "l85338" .
+_:b25593 dc:language "l50233" ;
+	a dc:Sound .
+_:b25745 dc:language "l89401" ;
+	a foaf:Person .
+_:b25783 dc:language "l4580" ;
+	a dc:Text .
+_:b25884 a dc:Sound ;
+	rdfs:comment "l47972" .
+_:b26370 a dc:Text ;
+	foaf:name "l6560" .
+_:b26563 a foaf:Organization ;
+	rdfs:comment "l59049" .
+_:b26664 a foaf:Organization ;
+	rdfs:label "l45752" .
+_:b27884 a dc:Text ;
+	rdfs:label "l98000" .
+_:b28677 dc:language "l65794" ;
+	a foaf:Person .
+_:b28801 dc:language "l87399" ;
+	a dc:Sound .
+_:b29144 a foaf:Agent ;
+	rdfs:comment "l36881" .
+_:b30200 a foaf:Person ;
+	rdfs:label "l22184" .
+_:b30317 a dc:Sound ;
+	foaf:name "l80858" .
+_:b30938 dc:language "l56298" ;
+	a foaf:Organization .
+_:b31550 dc:language "l28706" ;
+	a dc:Text .
+_:b32667 dc:language "l59471" ;
+	a foaf:Person .
+_:b34125 a dc:Event ;
+	rdfs:comment "l21009" .
+_:b34895 a foaf:Agent ;
+	rdfs:comment "l34365" .
+_:b35024 dc:title "l34183" ;
+	a dc:Event .
+_:b35876 a dc:Event ;
+	rdfs:comment "l27515" .
+_:b35882 dc:language "l80458" ;
+	a foaf:Person .
+_:b36177 a foaf:Person ;
+	foaf:name "l20983" .
+_:b36462 a foaf:Person ;
+	foaf:name "l58872" .
+_:b36988 dc:language "l19953" ;
+	a dc:Sound .
+_:b37251 a dc:Text ;
+	foaf:name "l76662" .
+_:b37861 a foaf:Agent ;
+	foaf:name "l29685" .
+_:b3817 a dc:Sound ;
+	rdfs:comment "l56155" .
+_:b39227 a dc:Event ;
+	rdfs:comment "l92358" .
+_:b39567 a dc:Event ;
+	foaf:name "l21418" .
+_:b39643 a dc:Sound ;
+	rdfs:label "l67767" .
+_:b39990 a dc:Event ;
+	rdfs:comment "l20425" .
+_:b40256 a foaf:Organization ;
+	foaf:name "l69382" .
+_:b40821 dc:title "l7436" ;
+	a foaf:Organization .
+_:b41321 dc:title "l48645" ;
+	a dc:Sound .
+_:b4169 a dc:Text ;
+	rdfs:label "l16386" .
+_:b4239 dc:language "l95360" ;
+	a foaf:Person .
+_:b42984 dc:title "l94946" ;
+	a foaf:Person .
+_:b43439 dc:title "l23426" ;
+	a dc:Sound .
+_:b43908 dc:language "l73613" ;
+	a dc:Sound .
+_:b4417 a dc:Sound ;
+	rdfs:comment "l39032" .
+_:b44747 dc:title "l47275" ;
+	a dc:Text .
+_:b44972 a foaf:Person ;
+	foaf:name "l53428" .
+_:b45669 a foaf:Agent ;
+	rdfs:label "l13129" .
+_:b46267 a dc:Text ;
+	rdfs:comment "l64636" .
+_:b46490 a foaf:Person ;
+	rdfs:comment "l95848" .
+_:b47280 a dc:Event ;
+	rdfs:label "l35605" .
+_:b47413 a foaf:Person ;
+	foaf:name "l41826" .
+_:b47463 a dc:Text ;
+	rdfs:comment "l2249" .
+_:b48358 dc:title "l47202" ;
+	a foaf:Agent .
+_:b4880 a dc:Event ;
+	rdfs:label "l43885" .
+_:b49417 a foaf:Agent ;
+	foaf:name "l16540" .
+_:b49968 a dc:Event ;
+	rdfs:label "l91461" .
+_:b50777 a dc:Sound ;
+	rdfs:label "l78882" .
+_:b50938 dc:title "l52582" ;
+	a dc:Event .
+_:b51150 a foaf:Agent ;
+	rdfs:comment "l34224" .
+_:b51433 a foaf:Person ;
+	rdfs:label "l85276" .
+_:b5240 a dc:Sound ;
+	rdfs:label "l12210" .
+_:b52529 a foaf:Agent ;
+	rdfs:comment "l16815" .
+_:b52889 dc:title "l56713" ;
+	a foaf:Agent .
+_:b53065 a dc:Sound ;
+	rdfs:comment "l38912" .
+_:b54250 dc:language "l19805" ;
+	a foaf:Person .
+_:b54450 dc:title "l13606" ;
+	a dc:Text .
+_:b546 dc:title "l90673" ;
+	a foaf:Person .
+_:b54632 a foaf:Person ;
+	rdfs:label "l73171" .
+_:b55168 a dc:Text ;
+	rdfs:label "l58151" .
+_:b55397 a foaf:Organization ;
+	foaf:name "l58892" .
+_:b5558 dc:title "l54879" ;
+	a foaf:Person .
+_:b55957 a foaf:Person ;
+	rdfs:label "l93702" .
+_:b56124 a dc:Event ;
+	rdfs:label "l9896" .
+_:b56450 a foaf:Person ;
+	rdfs:comment "l93574" .
+_:b57501 a foaf:Agent ;
+	rdfs:comment "l96772" .
+_:b58057 a foaf:Agent ;
+	rdfs:comment "l65591" .
+_:b58450 dc:title "l51201" ;
+	a foaf:Person .
+_:b58759 a foaf:Person ;
+	rdfs:comment "l90641" .
+_:b58870 a foaf:Organization ;
+	rdfs:label "l76808" .
+_:b60256 dc:title "l21085" ;
+	a foaf:Agent .
+_:b61490 dc:language "l71605" ;
+	a dc:Text .
+_:b62347 dc:title "l47519" ;
+	a dc:Event .
+_:b62439 dc:title "l54674" ;
+	a dc:Text .
+_:b63561 a dc:Event ;
+	foaf:name "l67785" .
+_:b63896 dc:language "l38787" ;
+	a foaf:Agent .
+_:b64788 a dc:Text ;
+	rdfs:comment "l91726" .
+_:b65245 a dc:Event ;
+	rdfs:comment "l99465" .
+_:b65549 dc:title "l68981" ;
+	a dc:Sound .
+_:b65744 dc:title "l13755" ;
+	a dc:Sound .
+_:b66057 a foaf:Organization ;
+	rdfs:label "l45348" .
+_:b66530 a foaf:Person ;
+	foaf:name "l3816" .
+_:b6657 dc:language "l66716" ;
+	a dc:Text .
+_:b6725 a foaf:Agent ;
+	foaf:name "l57472" .
+_:b67731 dc:language "l59464" ;
+	a dc:Text .
+_:b67774 dc:language "l79292" ;
+	a dc:Text .
+_:b69162 a foaf:Organization ;
+	rdfs:comment "l8713" .
+_:b69269 a foaf:Organization ;
+	foaf:name "l35347" .
+_:b70786 dc:title "l64762" ;
+	a dc:Event .
+_:b71317 a foaf:Organization ;
+	foaf:name "l93693" .
+_:b71435 dc:language "l92607" ;
+	a foaf:Organization .
+_:b71985 a foaf:Agent ;
+	rdfs:label "l97770" .
+_:b72072 a foaf:Agent ;
+	rdfs:label "l84881" .
+_:b72405 a dc:Sound ;
+	rdfs:comment "l55736" .
+_:b7284 dc:language "l65413" ;
+	a dc:Text .
+_:b73657 a foaf:Agent ;
+	rdfs:comment "l45277" .
+_:b747 dc:title "l13472" ;
+	a foaf:Person .
+_:b74805 dc:title "l5155" ;
+	a dc:Event .
+_:b74926 dc:language "l89137" ;
+	a foaf:Organization .
+_:b7535 dc:language "l74434" ;
+	a foaf:Organization .
+_:b75427 a dc:Sound ;
+	foaf:name "l74716" .
+_:b7574 a foaf:Organization ;
+	rdfs:comment "l38420" .
+_:b76844 a foaf:Person ;
+	rdfs:label "l99831" .
+_:b76964 dc:language "l6754" ;
+	a foaf:Organization .
+_:b77192 a dc:Event ;
+	rdfs:label "l50926" .
+_:b78176 a foaf:Person ;
+	rdfs:label "l73377" .
+_:b7942 dc:language "l36075" ;
+	a dc:Sound .
+_:b79710 a dc:Text ;
+	foaf:name "l29652" .
+_:b80392 dc:language "l69856" ;
+	a foaf:Agent .
+_:b812 a foaf:Person ;
+	rdfs:label "l14641" .
+_:b82228 a foaf:Agent ;
+	rdfs:label "l9410" .
+_:b83042 dc:title "l82481" ;
+	a dc:Text .
+_:b83641 dc:language "l33921" ;
+	a foaf:Organization .
+_:b83691 dc:title "l74489" ;
+	a dc:Text .
+_:b83743 dc:title "l49139" ;
+	a foaf:Agent .
+_:b83944 dc:title "l37813" ;
+	a foaf:Organization .
+_:b8436 dc:title "l99474" ;
+	a foaf:Organization .
+_:b84373 a dc:Text ;
+	rdfs:comment "l29982" .
+_:b84598 dc:title "l94235" ;
+	a dc:Text .
+_:b85489 a dc:Event ;
+	rdfs:comment "l93268" .
+_:b85537 a foaf:Agent ;
+	foaf:name "l96769" .
+_:b85717 a dc:Sound ;
+	rdfs:comment "l41297" .
+_:b85959 a foaf:Person ;
+	rdfs:comment "l17817" .
+_:b86524 a dc:Text ;
+	rdfs:comment "l66156" .
+_:b86998 a foaf:Organization ;
+	foaf:name "l21930" .
+_:b87016 a dc:Event ;
+	foaf:name "l68275" .
+_:b87787 dc:language "l56950" ;
+	a dc:Event .
+_:b88443 a dc:Text ;
+	foaf:name "l40468" .
+_:b89121 a foaf:Person ;
+	foaf:name "l90725" .
+_:b89557 dc:language "l12336" ;
+	a foaf:Person .
+_:b89561 a dc:Event ;
+	rdfs:comment "l88111" .
+_:b89803 a foaf:Person ;
+	rdfs:label "l91926" .
+_:b90218 dc:language "l23624" ;
+	a foaf:Agent .
+_:b90947 dc:title "l32632" ;
+	a dc:Sound .
+_:b91020 a dc:Text ;
+	rdfs:comment "l4111" .
+_:b91134 a dc:Event ;
+	rdfs:label "l96548" .
+_:b91463 a foaf:Organization ;
+	rdfs:label "l65440" .
+_:b91819 a foaf:Agent ;
+	rdfs:comment "l23641" .
+_:b9232 dc:title "l14533" ;
+	a dc:Text .
+_:b92344 a dc:Text ;
+	rdfs:comment "l91796" .
+_:b9266 a dc:Sound ;
+	rdfs:comment "l9737" .
+_:b92781 dc:title "l15617" ;
+	a foaf:Organization .
+_:b92945 a dc:Event ;
+	foaf:name "l29588" .
+_:b92972 dc:language "l53294" ;
+	a dc:Event .
+_:b95240 a foaf:Agent ;
+	foaf:name "l89357" .
+_:b95551 a dc:Text ;
+	rdfs:comment "l25349" .
+_:b95828 a foaf:Organization ;
+	rdfs:comment "l50098" .
+_:b98512 a foaf:Person ;
+	rdfs:comment "l48930" .
+_:b99734 a foaf:Agent ;
+	foaf:name "l31729" .
+_:b99774 a dc:Text ;
+	foaf:name "l88163" .
+<10000742> dc:date "1987-01-29"^^xsd:date ;
+	a dc:Text ;
+	rdfs:comment "vY1LRMb" .
+<10096842> dc:date "1988-04-24"^^xsd:date ;
+	rel:apprenticeTo <19781770> ;
+	a foaf:Agent ;
+	rdfs:comment "zwFg a9OKNb9" ;
+	foaf:knows _:b8436 .
+<10196760> dc:date "1977-03-22"^^xsd:date ;
+	dc:language "J4ZSbZ4n87ZWV " ;
+	rel:friendOf <12320178> ;
+	a foaf:Person .
+<1020933> dc:issued "1997-02-23"^^xsd:date ;
+	a foaf:Person ;
+	rdfs:comment "9A2ypFJpVuOCSGAxy2" .
+<10279668> dc:date "1968-09-26"^^xsd:date ;
+	rel:apprenticeTo <31353576>, <5405756> ;
+	rel:friendOf <http://example.com/subjects/85254> ;
+	rel:hasMet <5538079> ;
+	a foaf:Agent ;
+	rdfs:comment "EeDEwG", "FLFNseEGOz1tK5xRQ6f9", "d8ifASkITmCyK9Gop" ;
+	owl:sameAs <http://example.net/subjects/40634> ;
+	foaf:knows <http://example.com/subjects/13524>, <http://example.com/subjects/85244> ;
+	foaf:name "GLMa8Fx89OEby49z9K2EcE" .
+<10721588> dc:issued "2009-01-15"^^xsd:date ;
+	dc:language "mT Fuxn0D3Sg W6SVMTL" ;
+	rel:friendOf _:b91134 ;
+	rel:hasMet <http://example.com/subjects/15098>, <http://example.com/subjects/77585>, <16127717> ;
+	a dc:Text ;
+	foaf:homepage <http://example.com/subjects/26781>, <41709642> ;
+	foaf:name "MP53Cq40hPeBrm 7" .
+<10860621> dc:date "1976-08-28"^^xsd:date ;
+	dc:language "jTUP7XsJ" ;
+	dc:subject <8072961> ;
+	rel:ancestorOf _:b7535 ;
+	rel:childOf <http://example.com/subjects/99719> ;
+	rel:friendOf <http://example.com/subjects/69844>, <16782269>, <42683870> ;
+	a foaf:Person ;
+	rdfs:label "uHainyBgG4AaTB64" .
+<1113118> dc:issued "1999-04-18"^^xsd:date ;
+	dc:language "s3f15PxJr i21B" ;
+	dc:title "Q51ij OnYguMuW8" ;
+	rel:friendOf <46192602> ;
+	a dc:Sound ;
+	rdfs:comment "BsqmZlGxV" ;
+	rdfs:label "WGJPu oPEN0G TK0ALVm6H9" .
+<11140929> dc:date "2008-04-26"^^xsd:date ;
+	dc:language "9m508LFfkVQuJ4s1gu" ;
+	dc:title "O7eY4PHjvLSFZ0" ;
+	a foaf:Person ;
+	rdfs:label "jBIOxJ3D7", "yUKtg4yUpk3ZQ6" .
+<11245518> dc:date "2007-09-16"^^xsd:date ;
+	dc:subject _:b74926 ;
+	rel:ancestorOf <http://example.com/subjects/10882> ;
+	rel:apprenticeTo <http://example.com/subjects/67345> ;
+	rel:childOf <http://example.com/subjects/21812> ;
+	owl:sameAs <http://example.net/subjects/51520> ;
+	foaf:name "fWiPYGho8e2O0TVhXcBon", "g wFM1sbJIRjzq4J" .
+<11261144> dc:issued "2001-07-18"^^xsd:date ;
+	dc:language "anmVrFUleVxArsdUkNmHTNU" ;
+	a foaf:Person ;
+	rdfs:label "O1xbn4sARttHTtR" ;
+	foaf:name "Z6ILhPUrrwwoSYf" .
+<11304288> dc:issued "1977-03-18"^^xsd:date ;
+	dc:subject <6543615> ;
+	rel:hasMet _:b812 ;
+	a dc:Text ;
+	rdfs:label "7G0W7ioa2d1W", "ErGd 8F0qPi8Tujh3PWHy", "vMUNwXgk62w" .
+<11356083> dc:date "2001-02-22"^^xsd:date ;
+	rel:apprenticeTo _:b4169 ;
+	a dc:Sound ;
+	rdfs:comment "THolyvmn6BYPRXoW" ;
+	foaf:homepage <23829100> .
+<11544048> dc:date "1963-07-14"^^xsd:date ;
+	dc:subject <http://example.com/subjects/48478> ;
+	rel:friendOf <http://example.com/subjects/82157>, <8241852> ;
+	rel:hasMet <http://example.com/subjects/64165>, <3898608> ;
+	a foaf:Person ;
+	rdfs:label "8NGVeMSVOsl", "8ujZ4V4pHzWZ" ;
+	foaf:homepage <http://example.com/subjects/20893> ;
+	foaf:knows _:b63896 ;
+	foaf:name "XncExTMNe32CniWAIGLzpT6Wq", "m7bW6EZ4PkvdjjRS" .
+<11570074> dc:issued "1963-08-13"^^xsd:date ;
+	dc:subject <http://example.com/subjects/27619> ;
+	rel:friendOf <3256090> ;
+	rel:hasMet _:b6725 ;
+	a dc:Text ;
+	rdfs:comment "F4onhbR5loQuxtbkkA" ;
+	foaf:homepage <http://example.com/subjects/16925>, <18374987>, <47992126> .
+<11571439> dc:date "1970-04-28"^^xsd:date ;
+	dc:language "otYkRviUN9lU8uL9Ybmwe" ;
+	rel:ancestorOf <http://example.com/subjects/98153> ;
+	a dc:Sound .
+<11597804> dc:issued "2011-02-16"^^xsd:date ;
+	dc:title "ZiIqQVu" ;
+	rel:ancestorOf <18374987>, <37536441> ;
+	rdfs:label "0A6rc3epx" ;
+	owl:sameAs <http://example.net/subjects/79775> .
+<11623255> dc:date "2001-09-22"^^xsd:date ;
+	dc:language "FyOo7Q2jgS" ;
+	rel:apprenticeTo <44447148> ;
+	rdfs:comment "eJbgYAklLldVDU83z3Zl3Xea" ;
+	rdfs:label "1n6zuJHzPYIeD6dU", "67GejD76COP256pyY" ;
+	foaf:homepage <18374987> .
+<11696293> dc:issued "2003-01-25"^^xsd:date ;
+	dc:subject _:b48358 ;
+	a foaf:Organization, foaf:Person ;
+	rdfs:label "zbeGr0u4HOrPlHEin" ;
+	foaf:homepage <http://example.com/subjects/78481> ;
+	foaf:knows <45453326>, <49366850> ;
+	foaf:name "ua2jrceUgbABulpn" .
+<11928954> dc:date "1965-02-19"^^xsd:date ;
+	rel:hasMet <44813405> ;
+	a dc:Text ;
+	rdfs:label "NBz0FLaQFInYCGoP7n q1", "s9trMi0" ;
+	foaf:name " 5YLRaDa eIkP" .
+<11959445> dc:date "2002-06-18"^^xsd:date ;
+	dc:title "uKcTFgpoqfgdHP" ;
+	rdfs:label "CI3o 2Zx2", "Ve1bKH1OvybSMgriJl0zVDg" ;
+	foaf:name "nuRETs" .
+<12320178> dc:issued "1968-02-12"^^xsd:date ;
+	dc:language "vIagvEMyGSWlSx8" ;
+	rel:childOf <http://example.com/subjects/46128>, <30811413> ;
+	rel:friendOf <http://example.com/subjects/80428>, <http://example.com/subjects/85838> ;
+	rel:hasMet <http://example.com/subjects/21471>, <47490055> ;
+	a foaf:Person ;
+	foaf:knows <http://example.com/subjects/96198>, <11570074> .
+<12324215> dc:date "1980-01-11"^^xsd:date ;
+	dc:language "aGGeZLSu" ;
+	rel:hasMet <4503602> ;
+	foaf:homepage <27415947> ;
+	foaf:name "82yTYjB1tW7erKARnpRENGwy", "u5ln HB3X" .
+<12607451> dc:issued "2001-04-27"^^xsd:date ;
+	a foaf:Organization ;
+	rdfs:label "00DQiNfV5t", "O1wK1zwIuue4skB2aslBQ" ;
+	owl:sameAs <http://example.net/subjects/12870> ;
+	foaf:homepage <50716036> ;
+	foaf:knows _:b4239 .
+<12628540> dc:issued "2003-08-20"^^xsd:date ;
+	rel:hasMet _:b69269 ;
+	a dc:Sound ;
+	rdfs:comment "cT45mrqFVvThocMYgCvzqH8q" ;
+	rdfs:label "GsxEDv5 q1WFSVo6E" ;
+	owl:sameAs <http://example.net/subjects/68082> .
+<12665221> dc:date "1982-06-26"^^xsd:date ;
+	dc:language "NEqYy8TTQkkD8aDJPZ83XA" ;
+	dc:subject <http://example.com/subjects/81241> ;
+	dc:title "1jrQuczF5NnPnbEGmQc", "5zz1wITn6SJ 7bGv" ;
+	rel:childOf <http://example.com/subjects/1809> ;
+	rel:friendOf <http://example.com/subjects/3048> ;
+	a dc:Event ;
+	rdfs:label "pwKNvYpeEQ" ;
+	foaf:homepage <http://example.com/subjects/91397> ;
+	foaf:knows <44395621> .
+<12730128> dc:date "1978-07-21"^^xsd:date ;
+	dc:language "pA3EkV2nGQKgGsk" ;
+	rel:friendOf <23601346> ;
+	a dc:Event ;
+	rdfs:comment "GcFEu2SVqK" ;
+	rdfs:label "UWHFpb0KUwzap8HP01ep" ;
+	foaf:name "Mfneg9tDs" .
+<13005504> dc:date "1975-04-20"^^xsd:date ;
+	dc:language "vxtMXrMAU" ;
+	dc:subject _:b87787 ;
+	rel:friendOf <13926857> ;
+	a dc:Event ;
+	rdfs:comment "cHwrBO2O GtJZOhHoeOIexxi" ;
+	owl:sameAs <http://example.net/subjects/22834> ;
+	foaf:knows <4296451>, <49435227> ;
+	foaf:name "LzDf3NuoBrGq2kp0olMN", "dRW2 2ir" .
+<13060713> dc:issued "2007-08-21"^^xsd:date ;
+	dc:language "QpblvnSIOc ovQH991X" ;
+	dc:subject <http://example.com/subjects/86029>, <http://example.com/subjects/87596> ;
+	rel:friendOf <http://example.com/subjects/112> ;
+	rdfs:comment "7RZxGy", "GXzXxGh8LHxS0th91aW" ;
+	foaf:homepage <http://example.com/subjects/39913>, <20792726> .
+<13185753> dc:issued "1995-02-27"^^xsd:date ;
+	dc:title " 2tli7rijYDeJoz 1jZUCbrd" ;
+	rel:apprenticeTo <8009625> ;
+	rel:friendOf <http://example.com/subjects/67124> ;
+	rel:hasMet <http://example.com/subjects/54320> ;
+	a foaf:Person ;
+	rdfs:comment "3JAFxzvR5aTv491fg3JSry" ;
+	foaf:homepage <22578451> ;
+	foaf:knows <http://example.com/subjects/56012> .
+<1326862> dc:date "1990-07-30"^^xsd:date ;
+	dc:language "WFHifQ9u" ;
+	dc:subject _:b58450, <http://example.com/subjects/86110> ;
+	rel:apprenticeTo <http://example.com/subjects/80092> ;
+	rel:hasMet <http://example.com/subjects/55853> ;
+	a dc:Event ;
+	owl:sameAs <http://example.net/subjects/31220> .
+<13348460> dc:date "2003-05-23"^^xsd:date ;
+	rel:ancestorOf <47992126> ;
+	rel:childOf <49366850> ;
+	rel:friendOf <http://example.com/subjects/86303> ;
+	rel:hasMet <http://example.com/subjects/1600> ;
+	a foaf:Agent ;
+	rdfs:comment "QbQLyeSmELA", "dwT8qZdwj" ;
+	rdfs:label "zZjsjouOxPvC" ;
+	foaf:homepage <http://example.com/subjects/68866>, <20679191> ;
+	foaf:name "jpNJntRixRqGLF" .
+<13410692> dc:date "1998-09-20"^^xsd:date ;
+	dc:language "aJhnlp3" ;
+	rel:ancestorOf <27837695> ;
+	a dc:Sound ;
+	rdfs:label "e5V5xMjlk" ;
+	foaf:name "LUs8nQznZ8b2zSx8F3SDJT", "fHNsnA" .
+<13481034> dc:date "1973-02-14"^^xsd:date ;
+	dc:title "HkmHvqFMg3if" ;
+	rel:friendOf <21226414> ;
+	a dc:Sound ;
+	foaf:homepage _:b18847, <51698487> .
+<13597542> dc:date "1974-08-12"^^xsd:date ;
+	dc:language "jejeSBPHhbofv0MKy5Tdc4pBq" ;
+	a foaf:Person .
+<13702518> dc:date "1990-03-18"^^xsd:date ;
+	dc:language "EMdZ4QYrs76BnaLCkqMTvPt", "EX7FFkOIv jS5WtZE2" ;
+	dc:subject <23601346> ;
+	rel:hasMet <14074716>, <25322683> ;
+	rdfs:label "XP7EOlwRJEXM" .
+<13787244> dc:date "1970-06-27"^^xsd:date ;
+	dc:language "AvLxsAArnVR" ;
+	dc:subject <54774920> ;
+	dc:title "4I3CnZ2OGYqoQQRd F6vTlqG" ;
+	rel:childOf _:b28677 ;
+	a foaf:Agent ;
+	foaf:homepage <14149364> ;
+	foaf:knows <38868447> .
+<13829176> dc:date "2005-01-25"^^xsd:date ;
+	dc:title "UqGPSPerBXfPxlZ7D7gbC0" ;
+	rel:childOf _:b17140 ;
+	a foaf:Agent ;
+	rdfs:comment "WxgXPcdBU80VWXEzZW" ;
+	rdfs:label "VFWQgAnamG" ;
+	owl:sameAs <http://example.net/subjects/74844> ;
+	foaf:knows <33671857> .
+<13926857> dc:date "2005-04-29"^^xsd:date ;
+	dc:title "SOM0XzhYXlJp3cIM9" ;
+	a foaf:Agent ;
+	rdfs:comment "1JObDQU HM85Z" ;
+	rdfs:label "m7ViHwOhzqIesuImTr 8Mavf" ;
+	owl:sameAs <http://example.net/subjects/35665> .
+<14003570> dc:date "2000-07-25"^^xsd:date ;
+	dc:title "uirbYI1TCjwiMPDu T6s" ;
+	rel:apprenticeTo _:b83691 ;
+	a foaf:Agent ;
+	rdfs:comment "kpDs5x" ;
+	rdfs:label "gKNzytNFKnt5sDxI8UtBJTgus" ;
+	foaf:homepage <14074716>, <19888047> ;
+	foaf:knows <32397802> .
+<14015303> dc:date "1963-06-25"^^xsd:date ;
+	dc:title "W xlG2S" ;
+	rel:friendOf <38896985> ;
+	a dc:Event ;
+	rdfs:label "jXihzTom0rxeg4ciGCFEniyZR" ;
+	foaf:name "oNuR0M" .
+<14040181> dc:issued "2000-08-15"^^xsd:date ;
+	dc:title "2ZPK6n6JSZGK0H2nlTIr8v" ;
+	rel:apprenticeTo <12665221> ;
+	rel:hasMet <26035485> ;
+	a foaf:Agent ;
+	rdfs:comment "IXVYD1y" ;
+	foaf:homepage <33736764> ;
+	foaf:name "nJJT 0kgMpS2LTcKJ" .
+<14074716> dc:issued "2000-06-27"^^xsd:date ;
+	dc:language "aps1qz3ZWfjpB" ;
+	dc:subject <http://example.com/subjects/2516> ;
+	rel:apprenticeTo <http://example.com/subjects/16105>, <http://example.com/subjects/57290> ;
+	rel:friendOf _:b87016 ;
+	rdfs:label "Pny2Qo " ;
+	foaf:homepage <http://example.com/subjects/17784>, <35248827> .
+<14149364> dc:issued "2010-09-28"^^xsd:date ;
+	dc:subject _:b37861 ;
+	rel:ancestorOf <http://example.com/subjects/34947>, <3019576> ;
+	rel:friendOf <http://example.com/subjects/69174> ;
+	rdfs:label "JQTtxmh" ;
+	foaf:homepage <http://example.com/subjects/58528>, <http://example.com/subjects/62505>, <45101038> ;
+	foaf:knows <http://example.com/subjects/71793>, <28525666> .
+<14315852> dc:date "2006-02-26"^^xsd:date ;
+	dc:subject <http://example.com/subjects/34977> ;
+	rel:ancestorOf <http://example.com/subjects/38349>, <http://example.com/subjects/521> ;
+	rel:friendOf <http://example.com/subjects/52393> ;
+	rel:hasMet <http://example.com/subjects/31288> ;
+	rdfs:comment "XL67Erd9ggiyjnh5SM" .
+<14620832> dc:date "1999-04-28"^^xsd:date ;
+	dc:title "ueHYApJ8O7jQMfQ" ;
+	rel:ancestorOf <14315852>, <9063476> ;
+	rel:childOf <49441140> ;
+	a dc:Sound ;
+	foaf:homepage <http://example.com/subjects/39926> .
+<14624847> dc:date "1993-07-15"^^xsd:date ;
+	dc:language "X77xmUJEesK" ;
+	rel:apprenticeTo <http://example.com/subjects/48649>, <http://example.com/subjects/51959> ;
+	rel:friendOf <http://example.com/subjects/22472> ;
+	a foaf:Agent ;
+	rdfs:comment "KGGOtkYSKhlqms" ;
+	foaf:knows <http://example.com/subjects/1277>, <http://example.com/subjects/30406> .
+<14814304> dc:date "1974-07-21"^^xsd:date ;
+	dc:subject <25322683>, <45076615> ;
+	dc:title "OjwKdxj0ir8qho548anF" ;
+	rel:apprenticeTo _:b34125 ;
+	a dc:Text ;
+	rdfs:comment "D7gLldEQ" ;
+	rdfs:label "RzpePHEB" ;
+	owl:sameAs <http://example.net/subjects/9531> ;
+	foaf:name "aj2GJM6DYayvo" .
+<15104036> dc:date "1980-02-22"^^xsd:date ;
+	dc:title "eH6PPpqjrwxR" ;
+	rel:ancestorOf <http://example.com/subjects/57315> ;
+	rel:apprenticeTo <12607451> ;
+	a foaf:Person ;
+	foaf:homepage _:b42984, <3708972> .
+<15160422> dc:issued "2002-02-19"^^xsd:date ;
+	dc:language "AoCOHCK0vvwpNydrcPt", "LXu3wG1r" ;
+	a dc:Text ;
+	rdfs:comment "K7iPiV3LCZmxi" ;
+	owl:sameAs <http://example.net/subjects/86971> ;
+	foaf:knows _:b35882 .
+<15191417> dc:date "1999-02-21"^^xsd:date ;
+	dc:subject <21244207> ;
+	dc:title "2YgGffhKauu" ;
+	rel:ancestorOf <http://example.com/subjects/33498> ;
+	rel:childOf <13702518>, <27341215> ;
+	rdfs:label "xQIyENO6 ialn87EmIXzthC" ;
+	foaf:knows <http://example.com/subjects/5948> .
+<15456034> dc:issued "2006-03-14"^^xsd:date ;
+	dc:title "k28q66C koynEvT" ;
+	rel:ancestorOf <52619328> ;
+	a dc:Text ;
+	rdfs:comment "XcZcbsiVhtd0PJCwj mlENB" ;
+	rdfs:label "jnQAbdaB3xcArhgDx0lqU" ;
+	foaf:name "mQNRkthaBbJTqrqZEP" .
+<15667633> dc:issued "1994-04-21"^^xsd:date ;
+	dc:subject <28717006> ;
+	rel:childOf _:b22344 ;
+	rel:friendOf <31881290> ;
+	a foaf:Person ;
+	rdfs:comment "CA 0brvZuBbLmem" ;
+	owl:sameAs <http://example.net/subjects/95964> ;
+	foaf:name "ObwXUAjB9EiYJRgP7WnudazkZ" .
+<15902715> dc:date "2008-02-19"^^xsd:date ;
+	dc:language "CZfALsPlbdZjN4KlILqD" ;
+	dc:title "ilMgJy6i" ;
+	rel:hasMet <41161142> ;
+	rdfs:label "R84KBi08co10saMJY" ;
+	foaf:name "jYXnPjXobaqodtJ qd8qLUZv" .
+<15917521> dc:issued "2000-09-15"^^xsd:date ;
+	dc:title "XtUrqJohEpYeuI" ;
+	rel:ancestorOf <50716036> ;
+	rel:childOf <http://example.com/subjects/25342> ;
+	rel:friendOf <http://example.com/subjects/93985>, <35421031> ;
+	a dc:Event ;
+	rdfs:comment "4vamqRa28" ;
+	foaf:homepage <3708972> ;
+	foaf:knows <http://example.com/subjects/43123> ;
+	foaf:name "cB181bPCyg4T" .
+<15933588> dc:date "1979-07-16"^^xsd:date ;
+	dc:subject <http://example.com/subjects/27397> ;
+	dc:title "neZvle2niISSzrGnKGENcWHP" ;
+	rel:childOf <19374930> ;
+	rel:friendOf _:b25046 ;
+	rel:hasMet <11571439> ;
+	a foaf:Agent ;
+	rdfs:comment "kbNP2ocDHgNysCCu" ;
+	rdfs:label "jZ0dvOeVa" ;
+	foaf:homepage <25670425> ;
+	foaf:name "iRU1s3fav3oL6LFI9PxfEtGlS" .
+<15961665> dc:issued "1971-04-23"^^xsd:date ;
+	dc:subject <http://example.com/subjects/75265>, <36844794> ;
+	dc:title "W2weum5kUGP7u", "ggwj1WLc73i2", "iS7pMtrt6nTybvEU5q wO9" ;
+	rel:childOf <2821181> ;
+	rel:friendOf <http://example.com/subjects/78353> ;
+	rel:hasMet <http://example.com/subjects/14311> ;
+	a dc:Sound ;
+	rdfs:comment "64Mzn59" ;
+	foaf:knows _:b71985, <748772> .
+<15996133> dc:date "1997-06-19"^^xsd:date ;
+	dc:language "WMPle1zFAGcFL" ;
+	rel:ancestorOf <http://example.com/subjects/91976> ;
+	rel:apprenticeTo <21226414> ;
+	rel:friendOf _:b86998 ;
+	rel:hasMet <25788660>, <34552018> ;
+	a foaf:Agent ;
+	rdfs:comment "dzbHL4vl 7Ww0DW9Klp" ;
+	owl:sameAs <http://example.net/subjects/50267> ;
+	foaf:name "uPpKIpMpNpxjK" .
+<16127717> dc:issued "1998-01-19"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/28908> ;
+	rel:hasMet <http://example.com/subjects/78288> ;
+	a foaf:Person ;
+	rdfs:label "4P pBbwHyN5BYBE5XgRTL7OaY" .
+<16135659> dc:date "1978-08-28"^^xsd:date ;
+	dc:language "gmP2yzskUAGMIdnlgeA94B6Y" ;
+	dc:subject <http://example.com/subjects/60710> ;
+	rel:childOf <http://example.com/subjects/15170>, <http://example.com/subjects/22175> ;
+	rel:hasMet <http://example.com/subjects/66067>, <http://example.com/subjects/82358> ;
+	a dc:Text .
+<16148143> dc:date "2006-02-24"^^xsd:date ;
+	dc:title "Dhf 8dgttcWBFsLYgk6lZwX" ;
+	rel:ancestorOf <6176283> ;
+	rel:friendOf <51017561> ;
+	a dc:Text, foaf:Person ;
+	rdfs:label "YWjOB1aeZlewktkGzmGkt3hi" ;
+	foaf:name "RrqY0CAs8FUHLiGBQMR1C" .
+<16226926> dc:date "2000-08-17"^^xsd:date ;
+	dc:language "LiFRGP", "LuCORR1Lq" ;
+	rel:friendOf <http://example.com/subjects/11021> ;
+	a dc:Event ;
+	foaf:name "g3wxZucA6X97fAsXzWSZFkW" .
+<16259467> dc:date "1999-03-13"^^xsd:date ;
+	dc:language "uOxUkUI" ;
+	rel:ancestorOf <41709642> ;
+	rel:childOf _:b39643 ;
+	a dc:Text ;
+	rdfs:comment "DxPfQLwkyWd0FGUx5t0tNl" ;
+	owl:sameAs <http://example.net/subjects/16609> ;
+	foaf:knows <25322683> ;
+	foaf:name "5vIbR3OG3gPqA9Nrn" .
+<16514209> dc:issued "1981-02-20"^^xsd:date ;
+	dc:subject <http://example.com/subjects/21231> ;
+	rel:childOf _:b67774, <http://example.com/subjects/89198> ;
+	rel:hasMet <http://example.com/subjects/76127> ;
+	a foaf:Agent ;
+	rdfs:label "xgVbWaRAaT5hmzCBwN" .
+<16562590> dc:date "1974-07-12"^^xsd:date ;
+	rel:ancestorOf <13185753>, <48542915> ;
+	rel:friendOf <2660487> ;
+	a foaf:Agent ;
+	rdfs:label "Hm98NQm43hmraNYf" ;
+	foaf:homepage <http://example.com/subjects/58085> .
+<16630283> dc:date "1989-01-19"^^xsd:date ;
+	dc:language "MyOR3WQyPfXFlA" ;
+	dc:subject <http://example.com/subjects/75929> ;
+	rel:apprenticeTo <22929277> ;
+	rel:childOf <http://example.com/subjects/96860> ;
+	rel:friendOf <39888730>, <53081318> ;
+	a foaf:Agent ;
+	foaf:homepage <http://example.com/subjects/19778> ;
+	foaf:name "S79dcS2Ugv13g3OPSNJA1rP" .
+<16782269> dc:date "1986-04-30"^^xsd:date ;
+	dc:title "Ssj3ku5nqm0gc06" ;
+	rel:apprenticeTo <34908812> ;
+	foaf:name "x4LkAAMqsLOqCRPByU" .
+<16810983> dc:date "2004-01-18"^^xsd:date ;
+	dc:language "Hctv8AKQXQfppvoZC oNqOzu" ;
+	rel:ancestorOf <13829176>, <8865933> ;
+	rel:apprenticeTo <http://example.com/subjects/64417> ;
+	rel:childOf <http://example.com/subjects/48124>, <http://example.com/subjects/99181> ;
+	a dc:Text ;
+	foaf:homepage <21447658> ;
+	foaf:knows <http://example.com/subjects/14090>, <http://example.com/subjects/30957> ;
+	foaf:name "1ZYMLQ prz8FmI" .
+<16894327> dc:date "2010-06-11"^^xsd:date ;
+	rel:childOf <2660487>, <41260802> ;
+	a foaf:Organization ;
+	foaf:name "5xhfTQP6FGX0e01" .
+<17253078> dc:issued "1993-07-20"^^xsd:date ;
+	dc:language "a 39PyQvlTKx3jk0NjjGpT4" ;
+	rel:apprenticeTo <http://example.com/subjects/42197> ;
+	rel:friendOf <http://example.com/subjects/42631>, <http://example.com/subjects/76177>, <20748810>, <53063096> ;
+	rel:hasMet <33850890> ;
+	owl:sameAs <http://example.net/subjects/34180> .
+<17317910> dc:issued "1962-04-24"^^xsd:date ;
+	dc:language "mkpTDgOG" ;
+	rel:ancestorOf _:b199 ;
+	rdfs:comment "EIrOb2OTZ9N2" ;
+	rdfs:label "lAJKs9rf0MIbUCLjUh" ;
+	foaf:knows <19906251> ;
+	foaf:name "kr2pmveJQEi2aa0jfBF4cjsO" .
+<17450567> dc:issued "2004-07-23"^^xsd:date ;
+	dc:language "xKM bGDNkZw5h fHoR 11KaB1" ;
+	rel:apprenticeTo <http://example.com/subjects/29789> ;
+	rel:childOf <http://example.com/subjects/61107> ;
+	rel:hasMet <http://example.com/subjects/79579>, <http://example.com/subjects/92467> ;
+	a foaf:Organization ;
+	rdfs:comment "iUtLt9Ta6W7" ;
+	rdfs:label "LkCrFtgwJu" ;
+	owl:sameAs <http://example.net/subjects/64765> ;
+	foaf:homepage <http://example.com/subjects/53799> ;
+	foaf:name "Bs9WRwVid7KK2" .
+<17606584> dc:date "1989-02-19"^^xsd:date ;
+	rdfs:comment "qAnwaU4HEwuaas8QPGPg" ;
+	rdfs:label "pxD9Saehm57YUlSU" .
+<1773869> dc:issued "1971-07-18"^^xsd:date ;
+	dc:title "C3C3DdZ0BmiOk90" ;
+	rel:childOf <34944858> ;
+	rel:friendOf <6297302> ;
+	a dc:Sound ;
+	rdfs:comment "RYCJWm1bXs3OpU2fnol" ;
+	rdfs:label "xhXqzSvbdFm2RX2C8farwpK" .
+<17757280> dc:date "1967-06-25"^^xsd:date ;
+	dc:title "Ypfb3LJfQromxvfM5ZFN" ;
+	rel:ancestorOf <34074020> ;
+	rel:apprenticeTo <http://example.com/subjects/81718> ;
+	rel:childOf <3174725> ;
+	a dc:Event ;
+	foaf:name "yGqKKjCMuYdKuu" .
+<18209511> dc:date "1975-08-20"^^xsd:date ;
+	dc:language "i8ltFDAIrI3 sownB0" ;
+	dc:subject <http://example.com/subjects/16187>, <http://example.com/subjects/76531>, <54624346> ;
+	rel:ancestorOf <43511234> ;
+	a foaf:Organization, foaf:Person ;
+	rdfs:comment "9kgEZi " ;
+	foaf:knows <http://example.com/subjects/17468>, <http://example.com/subjects/98001> .
+<18254678> dc:issued "1995-09-28"^^xsd:date ;
+	dc:language "7bpciQzfw pJ" ;
+	dc:subject _:b84598, <473415> ;
+	dc:title "31dOwC4" ;
+	rel:childOf <http://example.com/subjects/96189> ;
+	rel:friendOf <8808745> ;
+	rel:hasMet <15104036> ;
+	a foaf:Person ;
+	rdfs:comment "OtWnGCnSGIu" ;
+	foaf:knows <http://example.com/subjects/55526>, <http://example.com/subjects/69439> .
+<18374987> dc:date "2006-07-18"^^xsd:date ;
+	dc:subject <http://example.com/subjects/34565> ;
+	dc:title "LiyGZB" ;
+	rel:ancestorOf <http://example.com/subjects/23445> ;
+	rel:apprenticeTo _:b71317, <http://example.com/subjects/74208> ;
+	rel:friendOf <11571439> ;
+	rel:hasMet <http://example.com/subjects/43155> ;
+	rdfs:label "3lzN5gIR2gSJ5GihMe" ;
+	owl:sameAs <http://example.net/subjects/27954> ;
+	foaf:knows <37536441> .
+<18721037> dc:date "1986-05-22"^^xsd:date ;
+	dc:language "iWqFhxjhffseoIE9raXl3t" ;
+	rel:apprenticeTo <http://example.com/subjects/40101> ;
+	a foaf:Agent ;
+	rdfs:label "23aMWMHH2zckpF4" ;
+	foaf:homepage <http://example.com/subjects/39902>, <http://example.com/subjects/41691>, <2085455> .
+<18889772> dc:issued "1990-02-14"^^xsd:date ;
+	dc:subject <42482287> ;
+	dc:title "1xDQozFbGFDHe1pDkPO6W" ;
+	rel:childOf <16810983> ;
+	a foaf:Person ;
+	rdfs:comment "Qr4M Aq8SOiV6P5GdN", "ZH6IW5KgJXX9" ;
+	foaf:homepage <4367842> .
+<18892808> dc:issued "1997-06-27"^^xsd:date ;
+	dc:subject <http://example.com/subjects/17673> ;
+	rel:ancestorOf <http://example.com/subjects/64622>, <40740264> ;
+	rel:apprenticeTo <31353576> ;
+	rel:childOf <http://example.com/subjects/25031> ;
+	a dc:Event ;
+	rdfs:label "6s5v9vGI17S2BMSKDgdd1uS" ;
+	foaf:homepage <8009625> ;
+	foaf:knows <http://example.com/subjects/21654>, <http://example.com/subjects/91158> .
+<18903362> dc:issued "1971-09-22"^^xsd:date ;
+	rel:ancestorOf _:b46490, <23601346>, <38936945> ;
+	rel:apprenticeTo <53183106> ;
+	rel:hasMet <http://example.com/subjects/86588> ;
+	rdfs:comment "MHUvUlIk" ;
+	rdfs:label "2t3CRQvoAmPQ5zBC4QuF", "ijXSKl074nPZt8FATT" ;
+	foaf:knows <http://example.com/subjects/26107> ;
+	foaf:name "t2h9E02Eo72j6kb" .
+<18910124> dc:date "1981-03-28"^^xsd:date ;
+	dc:language "TQpaMQpvyzu" ;
+	dc:subject _:b35876 ;
+	dc:title "nkTkpj" ;
+	foaf:name "BxW1a1yLHkYMm0BRoHVb", "YX78stmcFdEAitbcbe7xFlyX" .
+<19075001> dc:issued "2008-06-14"^^xsd:date ;
+	dc:language "gSILttr47rE7bh03i6c", "x9IVAkJ" ;
+	dc:title "OH RNag" ;
+	rel:ancestorOf <http://example.com/subjects/9658> ;
+	rel:apprenticeTo _:b23096 ;
+	rel:friendOf <47277715> ;
+	rel:hasMet <36920663> ;
+	a foaf:Agent .
+<19305721> dc:date "1984-05-25"^^xsd:date ;
+	a dc:Text ;
+	owl:sameAs <http://example.net/subjects/47603> ;
+	foaf:knows _:b49417 ;
+	foaf:name "z2iwEeYe1dqd7dGmA918l 9" .
+<19374930> dc:date "2002-08-18"^^xsd:date ;
+	dc:language "7Z3obpykp4A3", "9kX0E8r" ;
+	rel:friendOf <32397802> ;
+	a dc:Sound ;
+	rdfs:label "Eo97Gq bvoFCSwiSKJJR" ;
+	owl:sameAs <http://example.net/subjects/94493> ;
+	foaf:homepage <http://example.com/subjects/7578>, <23831367> ;
+	foaf:knows <49366850> .
+<19516931> dc:issued "1989-05-23"^^xsd:date ;
+	a foaf:Agent ;
+	rdfs:label "hglERokNiCbNDn1s" ;
+	owl:sameAs <http://example.net/subjects/3281> .
+<19538114> dc:date "2001-05-19"^^xsd:date ;
+	dc:title "drS1mIjE", "pgibUMehY" ;
+	a foaf:Person .
+<19675167> dc:issued "2002-02-18"^^xsd:date ;
+	dc:title "yJBGERJ7W3k8a" ;
+	rel:ancestorOf <http://example.com/subjects/86946>, <11570074>, <3323982> ;
+	rel:childOf <50153122> ;
+	a dc:Text, foaf:Organization ;
+	rdfs:comment " gZVryf4INLhzoBPVGQncG" ;
+	foaf:name "xmWcvpvuTGW55vPYsu2Ol" .
+<19781770> dc:date "1986-08-20"^^xsd:date ;
+	dc:language "N 2iJ2TufwnMz YQqfJSqARA" ;
+	dc:title "byluaEj" ;
+	rel:hasMet <4378406> ;
+	a dc:Text .
+<19888047> dc:date "1993-07-20"^^xsd:date ;
+	dc:subject <http://example.com/subjects/85087>, <35248827> ;
+	dc:title "LazrG5vH97" ;
+	a foaf:Organization ;
+	rdfs:comment "CcD1gL9n0riCxbYPIxZQ2y" ;
+	foaf:knows <45076615> .
+<19906251> dc:issued "1968-09-14"^^xsd:date ;
+	rel:ancestorOf <44395621> ;
+	rel:apprenticeTo <http://example.com/subjects/67104>, <http://example.com/subjects/83047> ;
+	rel:hasMet <http://example.com/subjects/48571>, <http://example.com/subjects/62166> ;
+	a foaf:Organization ;
+	rdfs:comment "ePejpA6LR0thOEv" ;
+	rdfs:label "OHtiAF04Cp5i7AC8UN" ;
+	foaf:knows _:b70786, <http://example.com/subjects/77577>, <33387629> .
+<20358818> dc:issued "1979-04-28"^^xsd:date ;
+	dc:subject _:b67731 ;
+	rel:ancestorOf <25617830>, <31353576> ;
+	rel:apprenticeTo <14074716> ;
+	a dc:Text ;
+	rdfs:comment "khc0YUSz8DRN9qT" .
+<20679191> dc:issued "1983-09-13"^^xsd:date ;
+	dc:title "jeRc6tBtjm9LMUW1Q" ;
+	a foaf:Organization ;
+	rdfs:comment "fUn3o98Kc" ;
+	rdfs:label "LNeIhKnY7TaWJ0cid1QSRHpbw" ;
+	foaf:name "7EN2eA1biuPMt" .
+<20748810> dc:date "1964-01-21"^^xsd:date ;
+	dc:language "16kqsh9TFD", "6oSVrEm5mzU0nlQYMo " ;
+	dc:title "EltUMI7C9fhWqxk", "XWfzqfIvyG FO2RstQ" .
+<20792726> dc:date "2004-06-23"^^xsd:date ;
+	dc:title "U6pnfIQu01pfDhFemPqu" ;
+	rel:childOf <http://example.com/subjects/52233> ;
+	rel:friendOf <http://example.com/subjects/72125> ;
+	a dc:Sound ;
+	rdfs:comment "WvoRaLRxcDTLVpNsN3GetM" .
+<20799058> dc:date "1977-07-25"^^xsd:date ;
+	dc:title "P34SQtWuk8Eo5" ;
+	a dc:Event ;
+	rdfs:label "WUeD3Jw9eW", "Wz3bipUhVhjWV" ;
+	foaf:knows <13702518> ;
+	foaf:name "vsFfYJ4jgpJxDJp5jFmeW" .
+<20835075> dc:issued "1978-04-13"^^xsd:date ;
+	dc:language "Y68alRFMVCSwLuKqfgcgRe" ;
+	a dc:Text ;
+	rdfs:comment "bg1ZXfMvJA9hXoQJD4lfwKty" .
+<2085455> dc:date "1975-06-18"^^xsd:date ;
+	dc:language "pnL6zVeVAaW0 XenUXnp" ;
+	dc:title "KMnHV9pxcbdQ6" ;
+	a dc:Sound, foaf:Agent ;
+	rdfs:label "Ek06kp" ;
+	foaf:knows <46179345> .
+<20935753> dc:date "1983-01-26"^^xsd:date ;
+	dc:title "6TYmlzAW72ZPa1O5o" ;
+	rel:ancestorOf <49366850> ;
+	rel:childOf <14074716> ;
+	a foaf:Organization .
+<20985848> dc:issued "1984-02-18"^^xsd:date ;
+	dc:language "B62HYGzXCng7GfgrGe" ;
+	dc:title "eF6AmL88SpjLeg2zzGdQCQfS" ;
+	rel:hasMet <45055305> ;
+	a foaf:Organization ;
+	rdfs:comment "uNE6VST0tOgyYKQ0M763k1YRx" ;
+	foaf:knows <26765995> ;
+	foaf:name "oHOcC0Qrp3ySyu8lw6063" .
+<21081264> dc:issued "1979-08-29"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/35394>, <3720815> ;
+	rel:apprenticeTo <http://example.com/subjects/12615> ;
+	rel:childOf <http://example.com/subjects/82501>, <2821181> ;
+	rel:friendOf <http://example.com/subjects/41322>, <http://example.com/subjects/44925> ;
+	rel:hasMet <7819326> ;
+	a dc:Text ;
+	rdfs:label "OC TRrgkPFugXu" ;
+	owl:sameAs <http://example.net/subjects/3438> ;
+	foaf:name "7LJMQCK9cN", "DC3x1fqhDdFRXJKf", "pGXywfU" .
+<21092338> dc:issued "1997-08-26"^^xsd:date ;
+	rel:hasMet <http://example.com/subjects/9691> ;
+	a dc:Event ;
+	rdfs:comment "uTWkHgjYiAoYKNaYgZ" ;
+	rdfs:label "UhphC 07Z" ;
+	foaf:knows <http://example.com/subjects/11223>, <http://example.com/subjects/43038> ;
+	foaf:name "Lrz3btU7Nh1S", "xTLJ n4bM09uUbFjw2Th" .
+<2109259> dc:issued "1983-03-29"^^xsd:date ;
+	dc:language "NMNSTml7S70C3pRH8kMYFOXl" ;
+	dc:subject <http://example.com/subjects/51532>, <31881290> ;
+	rel:apprenticeTo <53343358> ;
+	rel:friendOf <http://example.com/subjects/25376>, <http://example.com/subjects/34856>, <http://example.com/subjects/86922> ;
+	rel:hasMet <http://example.com/subjects/9830>, <28717006> ;
+	a dc:Sound ;
+	rdfs:label "SyoPw7XAobg6uymweqSc" ;
+	foaf:name "E4dqGS DwPbfJ dsxB4Sl" .
+<21100566> dc:date "1971-02-16"^^xsd:date ;
+	dc:title "HsBZ37PTHMmL6zSmxstp5", "KLHW53JBy" ;
+	rel:apprenticeTo <25322683> ;
+	a foaf:Organization ;
+	rdfs:label "zo6QDHB ZYdK" ;
+	foaf:knows <41709642> .
+<21224974> dc:date "2001-08-17"^^xsd:date ;
+	dc:language "yMfgY8gxXELzyfBH7QejOJgo" ;
+	rel:childOf <26035485> ;
+	a foaf:Organization ;
+	rdfs:label "n2WHl7sutKCfu6iDcFkHzo" ;
+	foaf:knows _:b201 ;
+	foaf:name "7xvrr FuU5SvUoo oIGj", "db1YxKa8a9uvUXkDRXSt" .
+<21226414> dc:date "2010-03-15"^^xsd:date ;
+	dc:subject <49560042> ;
+	rel:apprenticeTo <23221906> ;
+	rel:childOf <http://example.com/subjects/97100> ;
+	rel:friendOf <http://example.com/subjects/34538> ;
+	a foaf:Organization ;
+	rdfs:comment "SOm4CBs" ;
+	foaf:homepage <http://example.com/subjects/84705> ;
+	foaf:name "qjazG7tRd8J6ZPsUMbQ" .
+<21244207> dc:date "1999-04-22"^^xsd:date ;
+	dc:subject <http://example.com/subjects/55854> ;
+	rel:ancestorOf <http://example.com/subjects/68744>, <37262259> ;
+	rel:childOf <354108> ;
+	rel:hasMet _:b62347 ;
+	rdfs:label "4X9Ecf", "WdXA OLNdd4SsVHSqvW" ;
+	foaf:name "NboqXyMy0Mswh" .
+<2135277> dc:issued "1986-04-20"^^xsd:date ;
+	rel:ancestorOf <21226414> ;
+	rel:childOf _:b44972 ;
+	a foaf:Organization ;
+	rdfs:comment "BEgKz9lDoB7QC3BkJUu ", "oDhlZEq" ;
+	rdfs:label "A1R56nJelZbWpaj" ;
+	foaf:knows <32896487> ;
+	foaf:name "bYNXXAdTy1Z7Jwvj" .
+<21362436> dc:date "1967-04-17"^^xsd:date ;
+	dc:subject <9829168> ;
+	rel:hasMet <http://example.com/subjects/60114>, <http://example.com/subjects/88677> ;
+	a dc:Sound ;
+	rdfs:comment "TR1KyYmuzNSCzp29hIXkpyP" ;
+	rdfs:label "AE7k PeqK3" ;
+	foaf:homepage <http://example.com/subjects/36289>, <54506536>, <54624346> .
+<21447658> dc:date "2002-05-17"^^xsd:date ;
+	dc:subject <http://example.com/subjects/31541>, <8009625> ;
+	dc:title "WPj1EQQSUDZl6UVl" ;
+	rel:ancestorOf <http://example.com/subjects/25644> ;
+	rel:friendOf <37145852>, <51515132> ;
+	a dc:Text ;
+	rdfs:comment "0nh1uO3xJEdq" ;
+	owl:sameAs <http://example.net/subjects/3109> ;
+	foaf:homepage <http://example.com/subjects/33296> .
+<21540905> dc:issued "1992-04-25"^^xsd:date ;
+	dc:subject <http://example.com/subjects/95178> ;
+	dc:title "4RC aYnzWQNcGUg", "nu8lJ u J3  fztYCEne2TchL" ;
+	rel:childOf <http://example.com/subjects/89229> ;
+	a foaf:Person ;
+	foaf:knows <http://example.com/subjects/74764> .
+<21640645> dc:issued "1975-01-22"^^xsd:date ;
+	dc:subject <http://example.com/subjects/51286> ;
+	dc:title "VIykBn7xQmABiZH61fi860S" ;
+	rel:apprenticeTo _:b12118 ;
+	rel:childOf <http://example.com/subjects/27244> ;
+	rel:friendOf <13185753> ;
+	a foaf:Agent ;
+	rdfs:comment "gtNh6g5C9ZQHOvUpFX3iEAsO " ;
+	owl:sameAs <http://example.net/subjects/10049> ;
+	foaf:homepage <http://example.com/subjects/51910> ;
+	foaf:knows <http://example.com/subjects/56945>, <http://example.com/subjects/8974> .
+<21958823> dc:issued "1984-01-15"^^xsd:date ;
+	dc:subject _:b14174 ;
+	a dc:Text ;
+	foaf:name "TDeeAX8k9nPLjBcV8F9GbtSxl" .
+<22075355> dc:issued "2011-05-14"^^xsd:date ;
+	dc:language "bwjIDqkTVaFT3h" ;
+	dc:subject <33386477>, <473415> ;
+	rel:apprenticeTo <http://example.com/subjects/39337> ;
+	rel:hasMet <http://example.com/subjects/84088>, <http://example.com/subjects/85222> ;
+	a foaf:Person ;
+	rdfs:label "6NsWYK1", "s3cPnp1hD" ;
+	foaf:knows <http://example.com/subjects/93393>, <40259490> .
+<22239173> dc:date "1981-07-25"^^xsd:date ;
+	dc:subject _:b1646 ;
+	a foaf:Person ;
+	foaf:knows <http://example.com/subjects/95630> ;
+	foaf:name " EyElexSIk2nfHqM8", "2VtW jmLIMqcpve3dYeR9" .
+<22347984> dc:date "1966-02-23"^^xsd:date ;
+	dc:language "boJR1ut9yI29LF2zCFPfYzA" ;
+	rel:ancestorOf <http://example.com/subjects/33253>, <http://example.com/subjects/69453> ;
+	rel:apprenticeTo <36844794> ;
+	rel:childOf <http://example.com/subjects/66165> ;
+	rel:friendOf <http://example.com/subjects/44951> ;
+	rel:hasMet <21447658> ;
+	rdfs:label "QPUnEpD1UPPfqoGEjJ3hdZa", "Z2dNKdAHR63Ns" ;
+	foaf:homepage <http://example.com/subjects/20725> ;
+	foaf:knows <50716036> .
+<22388465> dc:date "1990-06-20"^^xsd:date ;
+	rel:apprenticeTo _:b83743, <16514209> ;
+	a foaf:Agent ;
+	rdfs:comment "2U YXUDAMgc4hKQNz6jiM8q0" ;
+	rdfs:label "F2GT5iQ" ;
+	foaf:name "VMT6O4mmMF7kZN58IG" .
+<22405271> dc:date "1994-05-30"^^xsd:date ;
+	rel:apprenticeTo <47992126> ;
+	rel:friendOf <13829176> ;
+	rdfs:label "QMC8dH JV68XL9LyDIj" ;
+	foaf:homepage <19888047> .
+<22578451> dc:date "1986-09-19"^^xsd:date ;
+	dc:title "1sH7lX6G4C4m lDrcHarY" ;
+	rel:ancestorOf <http://example.com/subjects/5221> ;
+	rel:apprenticeTo <http://example.com/subjects/43711> ;
+	rel:childOf <http://example.com/subjects/76743>, <44395621> ;
+	rel:friendOf <7819326> ;
+	a dc:Event, dc:Sound ;
+	foaf:homepage <http://example.com/subjects/17843>, <http://example.com/subjects/67772> ;
+	foaf:name "wsEDMHYKul77O8Afs63IF" .
+<22681127> dc:date "1974-04-20"^^xsd:date ;
+	dc:subject <http://example.com/subjects/79909> ;
+	dc:title "HLp4wRCfP3eOztF8HLVEWQRcf" ;
+	rel:childOf <8009625> ;
+	rel:friendOf <http://example.com/subjects/33036> ;
+	rel:hasMet <http://example.com/subjects/7212>, <http://example.com/subjects/78140> ;
+	a foaf:Person ;
+	rdfs:comment "Xbwdr8XZj7l83Y0" ;
+	foaf:knows <http://example.com/subjects/52242> .
+<22929277> dc:date "2005-05-12"^^xsd:date ;
+	dc:title "NicGR2BsRb913Gaw4s" ;
+	rel:ancestorOf <http://example.com/subjects/22431>, <http://example.com/subjects/95237>, <23829100> ;
+	rel:apprenticeTo _:b50777, <http://example.com/subjects/57854>, <4378406> ;
+	rel:hasMet <http://example.com/subjects/25636>, <http://example.com/subjects/66126>, <21362436> ;
+	a foaf:Agent ;
+	rdfs:label "TuYLFwSen oc9U " .
+<22942006> dc:date "1972-04-26"^^xsd:date ;
+	dc:title "ZUWSEWntlaigtWzP" ;
+	rel:ancestorOf _:b32667 ;
+	rel:friendOf <36498833> ;
+	a dc:Text, foaf:Organization ;
+	rdfs:label "89rYotTua7I", "xgq5N0bI2BzhFQKSjlfXef9S" .
+<23167506> dc:issued "1989-06-21"^^xsd:date ;
+	dc:title "Wu89gQmItV", "qejaNUXDr4zMuk2jH1Ob8C4uo", "wirajOlR1R90cmwHcp7r" ;
+	rel:childOf <473415>, <54273385> ;
+	rel:hasMet <53183106> ;
+	foaf:name "9ds9M5V5" .
+<23212550> dc:date "1985-07-15"^^xsd:date ;
+	dc:language "ahVNMT2COphOGt HTpR", "rfmmF0gT8whBCjXzQ2q" ;
+	dc:subject <http://example.com/subjects/4569>, <26482168> ;
+	rel:ancestorOf <http://example.com/subjects/4770> ;
+	rel:apprenticeTo <http://example.com/subjects/56708>, <http://example.com/subjects/61844> ;
+	foaf:homepage <22347984> ;
+	foaf:knows <http://example.com/subjects/64647> ;
+	foaf:name "s1dBnbUgsRr4Mg hmoJWKb8Vq" .
+<23221906> dc:issued "2006-09-13"^^xsd:date ;
+	dc:language "Zv0gHUV1A0Mc57ixHk8q" ;
+	dc:title "MpjDjklBIgExiG4P" ;
+	rel:ancestorOf <44521357> ;
+	a foaf:Agent ;
+	rdfs:comment "a3DmcK" ;
+	owl:sameAs <http://example.net/subjects/68647> ;
+	foaf:name "t2LTrCYE2jCEOMJfcKcgQKLJY" .
+<233956> dc:issued "1977-09-14"^^xsd:date ;
+	dc:subject <25322683> ;
+	dc:title "0srXpbq KhK" ;
+	rel:childOf <http://example.com/subjects/657> ;
+	rel:friendOf <656505> ;
+	a dc:Sound, foaf:Person ;
+	rdfs:comment "lrPnRS" ;
+	rdfs:label "w1woyKNyTYK7Adz" ;
+	owl:sameAs <http://example.net/subjects/67592> ;
+	foaf:homepage <5271210> ;
+	foaf:knows <http://example.com/subjects/96082> .
+<23483322> dc:date "2005-05-11"^^xsd:date ;
+	dc:title "UToPznV C1PWJe7gGkis", "nCUjL5qtOB5h3JI0FoGXx" ;
+	rel:friendOf <26765995> ;
+	a foaf:Agent ;
+	rdfs:comment "EjLKd3dUFUqBIHp8hGdkMTG3o" ;
+	rdfs:label "MqVRgelQB" ;
+	foaf:knows <45014599> .
+<23601346> dc:issued "1986-02-20"^^xsd:date ;
+	rel:hasMet <http://example.com/subjects/69030> ;
+	a foaf:Organization ;
+	rdfs:comment "tMaBAz3CXeIrHttb862DmL4K" .
+<23680252> dc:issued "1990-08-19"^^xsd:date ;
+	dc:language "MgLjbhjDycmtZ" ;
+	rel:childOf <23167506> ;
+	a dc:Sound ;
+	rdfs:comment "MAfv0BJxV9Bi h4ZSdQ" ;
+	foaf:homepage <15961665> ;
+	foaf:name "Hgcd6kDToop8j" .
+<23819886> dc:issued "1987-05-23"^^xsd:date ;
+	dc:language "TfsKV8EoA" ;
+	dc:subject <49256337> ;
+	dc:title "m9hjDQSg2CUExyPmG" ;
+	rel:childOf _:b54632 ;
+	rel:friendOf <30738016> ;
+	a dc:Event, foaf:Agent ;
+	rdfs:comment "Eb5HCS" ;
+	rdfs:label "sPsab2kbd48pFu 0rTTv3l" ;
+	foaf:homepage <13348460> .
+<23829100> dc:issued "1965-09-28"^^xsd:date ;
+	dc:language "n6oaVUY" ;
+	a dc:Event ;
+	rdfs:comment "PZnkUBNmnG9aotgiR" ;
+	rdfs:label "uzuH6YT431KiyGx", "wyx HPoAiPm1OaMApy" .
+<23831367> dc:date "1995-07-27"^^xsd:date ;
+	dc:language "lv4cyGXv4E" ;
+	rel:ancestorOf <14074716> ;
+	rel:apprenticeTo <49111497> ;
+	a foaf:Agent ;
+	foaf:knows <26295562> .
+<23849258> dc:date "1979-01-19"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/80872>, <http://example.com/subjects/99038> ;
+	rel:friendOf _:b15736, <37393773> ;
+	rel:hasMet <http://example.com/subjects/34936>, <http://example.com/subjects/72549> ;
+	a foaf:Agent, foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/24560> ;
+	foaf:knows <http://example.com/subjects/11859> ;
+	foaf:name "AVgu25JHzSL " .
+<23864> dc:issued "2006-01-12"^^xsd:date ;
+	dc:language "16JHvbpvoaHEtk9t 1sC5WRWO", "xkKospUhEdVhVwsPVxml" ;
+	dc:subject _:b2521 ;
+	dc:title "PWT5o3RoS", "zCY8TwM9V" ;
+	rel:ancestorOf <49435227> ;
+	foaf:homepage <25670425> ;
+	foaf:knows <16226926> .
+<24031379> dc:date "1963-09-11"^^xsd:date ;
+	dc:subject _:b21139 ;
+	dc:title "Vx2fUmu112JOD75Ov", "xH7YSnpW" ;
+	rel:apprenticeTo <http://example.com/subjects/14125> ;
+	rel:friendOf <http://example.com/subjects/40182> ;
+	rdfs:comment "B8UFah9bOu5xd" ;
+	foaf:homepage <30811413> .
+<24260530> dc:issued "1974-08-22"^^xsd:date ;
+	dc:title "3ls7eh3d4ZdWS3f4" ;
+	a foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/90639> ;
+	foaf:name "MqXSNhQj6p7wFpxu4sypaN8e" .
+<24263993> dc:date "2009-08-16"^^xsd:date ;
+	rel:ancestorOf <3720815> ;
+	rel:childOf <http://example.com/subjects/53471>, <43982477> ;
+	a dc:Text ;
+	rdfs:label "pNw8CalSUwi0tsI2kQul" ;
+	foaf:homepage <23601346> ;
+	foaf:knows <http://example.com/subjects/29042>, <http://example.com/subjects/59355> .
+<24284400> dc:issued "1998-07-18"^^xsd:date ;
+	dc:title "D8rPevBpi7h0eQBH7R" ;
+	rel:ancestorOf <48094898> ;
+	rel:childOf <25705033> ;
+	a dc:Text ;
+	rdfs:comment " tMY3okKhw8TEh2pvt8jc", "L3UDi1HY" ;
+	owl:sameAs <http://example.net/subjects/28202> ;
+	foaf:knows <16259467> .
+<24294755> dc:issued "1965-04-25"^^xsd:date ;
+	dc:subject <51085400> ;
+	rel:childOf <50669084> ;
+	rel:friendOf _:b72072, <http://example.com/subjects/26736> ;
+	rel:hasMet <http://example.com/subjects/64545> ;
+	a foaf:Organization ;
+	rdfs:comment "DKI1PZXW36OOOXiK", "WcFR11d" ;
+	foaf:homepage <http://example.com/subjects/6530> ;
+	foaf:knows <35379508> ;
+	foaf:name "PW3 DQX5Erj3HNvKeci74UmGO" .
+<24509379> dc:date "1962-06-15"^^xsd:date ;
+	dc:language "IBHYYA7ahPUR61QfNALk" ;
+	dc:subject _:b3817 ;
+	dc:title "ZELIy7dy hVN8p2rvBtBq" ;
+	a foaf:Organization ;
+	foaf:knows <26035485> .
+<24525908> dc:date "2004-06-23"^^xsd:date ;
+	dc:subject <51515132> ;
+	rel:ancestorOf <21224974> ;
+	a foaf:Agent ;
+	rdfs:comment "ehc bftwr " ;
+	foaf:homepage <36445928> ;
+	foaf:name "Md9xgUAlkQutpsUl" .
+<24716583> dc:issued "1995-08-25"^^xsd:date ;
+	rel:ancestorOf _:b13497 ;
+	rel:friendOf <45120722> ;
+	a dc:Event, foaf:Organization ;
+	rdfs:label " VgXv17OL" .
+<24803119> dc:date "1963-07-15"^^xsd:date ;
+	dc:title "RMIKhvi73mtBns3tKUazt", "zSotoHiOGoRCkZ7XLwB" ;
+	rel:apprenticeTo <http://example.com/subjects/21914> ;
+	a dc:Event ;
+	rdfs:comment "LvpeXx" ;
+	foaf:name "319h8BCNM3" .
+<24905367> dc:date "2005-01-15"^^xsd:date ;
+	dc:language "sHU3zpgYb" ;
+	dc:title "Kt2SzI" ;
+	rdfs:comment "ffwiMBO6vgxo" .
+<25214003> dc:date "1967-08-29"^^xsd:date ;
+	dc:language "YJHTWUnkkr Wt 0NKH" ;
+	dc:subject <http://example.com/subjects/93235>, <23212550> ;
+	rel:friendOf <46192602> ;
+	foaf:homepage _:b24092 ;
+	foaf:knows <http://example.com/subjects/31893>, <19516931> ;
+	foaf:name "AK7B9uuqlZqWnTgYusJml9kxj", "iM5fsRCyLvVl" .
+<25322683> dc:issued "1970-02-29"^^xsd:date ;
+	dc:language "AGnAWT3OtPeT6X5OiUfy" ;
+	dc:subject <50716036>, <9466608> ;
+	dc:title "qCgO7U " ;
+	rel:childOf <44395621> ;
+	a foaf:Agent ;
+	rdfs:comment "VWHhpXQwAALm7Z332LRedaw" ;
+	rdfs:label "OZUXmZVIfH1pQZta1Ffy2" ;
+	owl:sameAs <http://example.net/subjects/89326> ;
+	foaf:knows _:b25745 .
+<2542957> dc:issued "1993-02-14"^^xsd:date ;
+	dc:language "hDeEzXuRHFB4XhOru8RQZDIQ" ;
+	dc:title "ll6nZFfk" ;
+	a foaf:Agent, foaf:Person .
+<25503137> dc:issued "1967-09-16"^^xsd:date ;
+	dc:language "0KIRqJIM0IE5JhJeGZPQdyc" ;
+	rel:hasMet <20985848> ;
+	rdfs:label "FvhUSfYFEXjn5 7I8FIJ" ;
+	foaf:homepage <30846763> ;
+	foaf:name "dPik9gQGDx5rgS" .
+<25583363> dc:date "1997-06-22"^^xsd:date ;
+	a dc:Event ;
+	rdfs:label "AisqzwQy" ;
+	foaf:name "YkEgpk2" .
+<25617830> dc:date "1963-07-18"^^xsd:date ;
+	rdfs:label "ya6blGtWcScrbXvXB" ;
+	foaf:name "iB4F tFVRQEpI" .
+<25670425> dc:date "1978-04-22"^^xsd:date ;
+	dc:language "TvJ7CiH4VHI" ;
+	rel:friendOf <http://example.com/subjects/54564> ;
+	rdfs:comment "5Wd1xx9HeukGH3lkDm" ;
+	foaf:name "UBDyotnwr GMO zzr0BIE" .
+<25705033> dc:issued "1968-02-20"^^xsd:date ;
+	dc:language "byTzwU9O5 ZibAe0x", "kXVmapvq5j9EIuj7 MHa6Np" ;
+	dc:subject _:b85959 ;
+	rel:childOf <28421301> ;
+	a dc:Event ;
+	rdfs:label "9P65H874MKr" .
+<25749144> dc:issued "1993-06-22"^^xsd:date ;
+	dc:title "RhTW52giQTYYbjcG" ;
+	rel:childOf <16127717>, <42683870> ;
+	a dc:Sound ;
+	rdfs:label "16Swhj6Xi3ZFZ" ;
+	foaf:homepage <http://example.com/subjects/29128> ;
+	foaf:knows <30769833> .
+<25788660> dc:date "1964-02-19"^^xsd:date ;
+	rel:apprenticeTo <36669361> ;
+	rel:hasMet <19888047> ;
+	rdfs:comment "s9iGCxBOKuwF66VuNQAwj" ;
+	rdfs:label "X9Q2Kf" ;
+	owl:sameAs <http://example.net/subjects/41151> ;
+	foaf:name "DBmu2cQd5d7" .
+<25795133> dc:issued "1980-05-23"^^xsd:date ;
+	rel:childOf <5338797> ;
+	a dc:Text ;
+	rdfs:comment "02XIVA1hg" ;
+	owl:sameAs <http://example.net/subjects/70831> ;
+	foaf:name "26O1HmeIiY" .
+<25875462> dc:issued "2011-03-11"^^xsd:date ;
+	rel:ancestorOf <17606584> ;
+	a dc:Sound ;
+	rdfs:label "IxpqKhEgUGkcrNxuEc9P" ;
+	foaf:homepage <38447045> ;
+	foaf:name "IP9dYWV6JBBaAO3m5Sek", "rLL5J6" .
+<26035485> dc:issued "1972-03-17"^^xsd:date ;
+	dc:subject <3708972> ;
+	rel:friendOf _:b25593 ;
+	rel:hasMet <7819326> ;
+	rdfs:comment "WBWzjUOP32oXY1PMVe2ur9p" ;
+	owl:sameAs <http://example.net/subjects/84625> .
+<260424> dc:date "1974-07-29"^^xsd:date ;
+	rel:ancestorOf <27485216> ;
+	rel:childOf <40049267> ;
+	a foaf:Organization ;
+	rdfs:comment "zYMfCGFE2p1wwcJEBI" ;
+	foaf:name "KR6PR8DqTp" .
+<26159826> dc:date "1966-05-17"^^xsd:date ;
+	dc:language "RnJDztUKJ3tMxQPzl4xboi", "wKQxaCqjYPH4yX" ;
+	dc:subject <42683870> ;
+	rel:ancestorOf <http://example.com/subjects/26200> ;
+	rel:apprenticeTo <http://example.com/subjects/91324> ;
+	rel:childOf <http://example.com/subjects/61633>, <http://example.com/subjects/71843> ;
+	a dc:Sound ;
+	rdfs:label "ChEtQ4EdlxWLhjlajHZMaUe" .
+<26295562> dc:date "1991-06-22"^^xsd:date ;
+	dc:language "SDLaxvlq5y1pM3n" ;
+	rel:ancestorOf <http://example.com/subjects/62722>, <http://example.com/subjects/66978>, <19888047> ;
+	rel:apprenticeTo <26035485> ;
+	rel:childOf <http://example.com/subjects/51289>, <http://example.com/subjects/6579> ;
+	rel:friendOf <26035485> ;
+	rel:hasMet <http://example.com/subjects/58400> ;
+	a dc:Text ;
+	rdfs:comment "42Pxe7px" ;
+	rdfs:label "ygldkBsgI" ;
+	foaf:name "hBafgR9MAobXSw0tGnh" .
+<26482168> dc:date "1972-01-30"^^xsd:date ;
+	dc:language "FfZbUWar" ;
+	a foaf:Agent ;
+	rdfs:label "z5dNVIyYp" .
+<26573953> dc:issued "1985-08-18"^^xsd:date ;
+	dc:title "V4enVpdbce1tgF", "lG7yf 7w23k" ;
+	rel:apprenticeTo _:b39567 ;
+	a foaf:Agent ;
+	rdfs:comment "2O2uT6Lgp tEbtAzzHdTt7UY" ;
+	owl:sameAs <http://example.net/subjects/24976> ;
+	foaf:homepage <44528325> .
+<26575062> dc:issued "2004-05-12"^^xsd:date ;
+	dc:language "I6AHap7uCGH", "eAruvIF OKovek4iKUi6atq D" ;
+	dc:title "H0rrQKKXPObu7bhbHwPpx", "mRGhzzdo9G8N4J4jollv " ;
+	a dc:Event .
+<2660487> dc:date "1979-07-24"^^xsd:date ;
+	dc:language "2NbeD0CNCMR", "rhfJkvHQkaqmVulj0HdWFF" ;
+	a dc:Event ;
+	owl:sameAs <http://example.net/subjects/55470> .
+<2666353> dc:date "2003-02-28"^^xsd:date ;
+	rel:childOf _:b45669 ;
+	rdfs:comment "9q27JLELJYMoXotY" ;
+	foaf:name "OjcPDkCC yIrHdI", "jDemwoBA2" .
+<26765995> dc:date "1983-05-17"^^xsd:date ;
+	dc:language "YVzXagQ" ;
+	a dc:Event ;
+	rdfs:label "4BNlrU1ViDmj Rxw", "YWyihhfEhUb0BEQ6xfv44oD" ;
+	owl:sameAs <http://example.net/subjects/44715> .
+<26780092> dc:date "1971-08-11"^^xsd:date ;
+	dc:title "crzyhZOoyaH" ;
+	rel:childOf <13926857>, <41485602> ;
+	rel:friendOf _:b4417 ;
+	rel:hasMet <6297302> .
+<27121390> dc:issued "1969-05-19"^^xsd:date ;
+	dc:title "DjSR YhOSSQuA gxzJD", "HYoe0e90iP R6LCpc0FtKq3 " ;
+	rel:friendOf <19906251>, <54273385>, <7228331> ;
+	a foaf:Organization ;
+	rdfs:label "QWl9QMqzMLU9mMkce5lw" ;
+	foaf:name "ti0T3 0zlLBBik6DEqhK" .
+<27226412> dc:date "1993-04-27"^^xsd:date ;
+	dc:title "qNiYDvsZQ7j2O8Mb QmG5htQ" ;
+	rel:apprenticeTo <http://example.com/subjects/2358> ;
+	rel:hasMet <http://example.com/subjects/85668> ;
+	a dc:Sound ;
+	foaf:knows <http://example.com/subjects/52564>, <http://example.com/subjects/68993> .
+<27232479> dc:issued "1963-03-21"^^xsd:date ;
+	dc:title "oQ RZCPoLijk" ;
+	rel:ancestorOf _:b20636, <http://example.com/subjects/748> ;
+	rel:apprenticeTo <http://example.com/subjects/25714>, <http://example.com/subjects/43612> ;
+	a foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/96035> ;
+	foaf:homepage <http://example.com/subjects/55175> .
+<27341215> dc:issued "1984-04-12"^^xsd:date ;
+	rel:childOf <http://example.com/subjects/70742> ;
+	rel:hasMet <http://example.com/subjects/46613>, <http://example.com/subjects/82208> ;
+	a dc:Text ;
+	rdfs:label "y96SboCFj x5w5eZWni" ;
+	foaf:homepage <http://example.com/subjects/21060> ;
+	foaf:knows <http://example.com/subjects/62336> ;
+	foaf:name "f14nMNuyG6E4kB Ct31" .
+<27415947> dc:issued "1965-05-26"^^xsd:date ;
+	dc:language "3Z5FF1xJtK7OR1FGtbK" ;
+	dc:title "zZs3wzi0JrYVoSkw79A" ;
+	rel:childOf <31881290> ;
+	a foaf:Organization ;
+	rdfs:comment "kmqq942OY" ;
+	foaf:name "tlXgA5Fj" .
+<27416750> dc:date "2004-01-14"^^xsd:date ;
+	a dc:Event ;
+	rdfs:label "GPz9LqVcPUSX6w" ;
+	foaf:name "7VTNCqriz4U6" .
+<27485216> dc:date "1982-09-17"^^xsd:date ;
+	dc:subject <http://example.com/subjects/58784> ;
+	dc:title "M1juhY" ;
+	rel:ancestorOf <28621475> ;
+	rel:hasMet _:b52529, <40675680> ;
+	a dc:Text ;
+	rdfs:comment "JdVKDIYpg8dNDJl9", "hEP3aN0nBHhcPl3" ;
+	foaf:homepage <http://example.com/subjects/12675> .
+<27565682> dc:date "1971-06-13"^^xsd:date ;
+	dc:language "upi1i3ztHLDSeVjsxW" ;
+	rel:ancestorOf _:b39990 ;
+	a foaf:Organization ;
+	rdfs:label "vy DaXSb", "ySmyeHEtYGV N3kw" ;
+	foaf:name "KI1mkh7 I3A" .
+<27756573> dc:issued "1995-07-25"^^xsd:date ;
+	dc:subject <http://example.com/subjects/49123> ;
+	dc:title "Y7 B AS8hfFpyfb1Q" ;
+	rel:apprenticeTo <http://example.com/subjects/18989>, <http://example.com/subjects/91435> ;
+	rel:friendOf <44521357> ;
+	rel:hasMet _:b47280 ;
+	a foaf:Organization ;
+	foaf:homepage <http://example.com/subjects/72224> ;
+	foaf:name "zQKlT6V4HT h7Lr" .
+<27837695> dc:issued "1989-07-13"^^xsd:date ;
+	dc:language "5rcaai8cr70jwKks86" ;
+	dc:subject <26035485> ;
+	dc:title "E7Jyrv" ;
+	rel:childOf _:b92945 ;
+	rel:friendOf <50669084> ;
+	a dc:Text ;
+	rdfs:label "IU0j lub3LKLxTz4WM6I3tY" ;
+	foaf:knows <43486928> .
+<27924394> dc:issued "1970-07-16"^^xsd:date ;
+	dc:subject <http://example.com/subjects/70102> ;
+	dc:title "qQ7Ho2fxr9N" ;
+	rel:apprenticeTo <http://example.com/subjects/36798> ;
+	rel:friendOf _:b92781 ;
+	rel:hasMet <http://example.com/subjects/82578> ;
+	a dc:Event ;
+	rdfs:comment "vPxkXb3VD8c" ;
+	foaf:homepage <http://example.com/subjects/29538> .
+<2802822> dc:date "1982-04-16"^^xsd:date ;
+	dc:language "knZ1p0PK" ;
+	rel:ancestorOf <http://example.com/subjects/63210>, <http://example.com/subjects/78726> ;
+	rel:apprenticeTo <http://example.com/subjects/30621> ;
+	rel:friendOf _:b26664 ;
+	rel:hasMet <http://example.com/subjects/64755> ;
+	a foaf:Agent ;
+	foaf:knows <http://example.com/subjects/3509> ;
+	foaf:name "dfzWkHn7QijMLG9KyjIr" .
+<28126210> dc:date "1985-03-14"^^xsd:date ;
+	a dc:Event ;
+	rdfs:comment "yDBGvuE4oOqJnfV32" .
+<2821181> dc:issued "1970-06-15"^^xsd:date ;
+	dc:title "5mVjSbB", "DDyzZGJWKuX" ;
+	rel:apprenticeTo <33671857> ;
+	a foaf:Organization ;
+	rdfs:comment "OmhZaMaB" ;
+	rdfs:label "pldeY7kXq" ;
+	owl:sameAs <http://example.net/subjects/24227> .
+<2829419> dc:issued "2008-07-28"^^xsd:date ;
+	dc:language "iE1knO5GKMwMQK0kayb522" ;
+	rel:apprenticeTo _:b61490 ;
+	rdfs:comment "aZ8I7ggYdvtGul5P" ;
+	foaf:name "eqD20HuC8" .
+<28421301> dc:date "1996-05-23"^^xsd:date ;
+	dc:subject _:b25884 ;
+	rel:apprenticeTo <http://example.com/subjects/42842> ;
+	rel:hasMet <37536441>, <6543615> ;
+	a dc:Sound ;
+	rdfs:label " MpOnOo0CCng", "8gINZVyWET34Qipw" ;
+	foaf:knows <http://example.com/subjects/7818> .
+<28454116> dc:date "1965-04-15"^^xsd:date ;
+	dc:language "aT944RySd5ZoZ1VFq", "nZvEPOzdUAiDM5CzopeY" ;
+	dc:subject <http://example.com/subjects/48231> ;
+	rel:childOf <39060936> ;
+	rel:hasMet <49366850> ;
+	a foaf:Agent ;
+	rdfs:comment "42sFkT5skAm6" ;
+	foaf:homepage <48876200> ;
+	foaf:name "ORZXui" .
+<28525666> dc:issued "1976-03-14"^^xsd:date ;
+	dc:language "EeU2mJX" ;
+	dc:subject <http://example.com/subjects/8729> ;
+	rel:ancestorOf <http://example.com/subjects/37076> ;
+	rel:childOf <http://example.com/subjects/54785> ;
+	rel:hasMet <http://example.com/subjects/30616> ;
+	a dc:Text ;
+	rdfs:comment "53maMwhao6v0eFI6Cf", "WKJYkopa3AkTp" ;
+	owl:sameAs <http://example.net/subjects/37247> ;
+	foaf:homepage <http://example.com/subjects/41618> ;
+	foaf:name "uaYSj4isTuJ5sre5aXfK0jA5" .
+<28621475> dc:date "1996-06-19"^^xsd:date ;
+	dc:language "ASPA 5MIbyAZFpIM" ;
+	dc:title "5fuhDZ6S4hqnK28fE" ;
+	rel:apprenticeTo <3197310>, <49560042> ;
+	a foaf:Agent ;
+	foaf:name "2Q4ELHhO74QIzEQr5XcyK" .
+<28630030> dc:issued "1967-05-26"^^xsd:date ;
+	dc:subject _:b90218, <http://example.com/subjects/30376>, <http://example.com/subjects/30650>, <http://example.com/subjects/79119> ;
+	dc:title "qtJ0iQ" ;
+	rel:ancestorOf <http://example.com/subjects/35800> ;
+	a foaf:Organization ;
+	foaf:knows <http://example.com/subjects/36239> .
+<28667850> dc:date "1973-05-27"^^xsd:date ;
+	dc:title "bt2aUeE0M2yC9JKh0", "nQt7QH43v6cIg7" ;
+	rel:ancestorOf <11623255>, <54506536> ;
+	rel:childOf <19075001> ;
+	rel:friendOf <http://example.com/subjects/40654> ;
+	a foaf:Agent ;
+	rdfs:comment "SxjIkZNvQi13zctuJgz0IaH", "hkASOBhCc5Tvrj4Cfvk" .
+<28688005> dc:date "1987-08-15"^^xsd:date ;
+	dc:language "XOUykuu9tHaxCbaueINRaIAW" ;
+	rel:ancestorOf <49256337> ;
+	rel:apprenticeTo <http://example.com/subjects/70640> ;
+	owl:sameAs <http://example.net/subjects/69538> ;
+	foaf:homepage <20799058> .
+<28717006> dc:issued "2008-04-13"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/74900> ;
+	rel:childOf <http://example.com/subjects/39492> ;
+	rdfs:label "y0LQ40H1IleE5DHY" .
+<28727524> dc:date "1990-04-16"^^xsd:date ;
+	dc:language "jQoVrvohzN1w 1U9ks" ;
+	dc:subject _:b9232 ;
+	rel:ancestorOf <http://example.com/subjects/50619>, <http://example.com/subjects/64853> ;
+	rel:childOf <8009625> ;
+	rel:hasMet <16894327> ;
+	a dc:Sound ;
+	rdfs:comment "JzfcMdU67KKy6 j8MbEy", "qNwGf0Cgzvb9I" ;
+	foaf:name "XFohNHrk" .
+<28782882> dc:date "1987-03-27"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/14641> ;
+	rel:apprenticeTo <32615047> ;
+	rel:childOf <http://example.com/subjects/71469> ;
+	rel:hasMet _:b18450, <http://example.com/subjects/72947> ;
+	a foaf:Agent ;
+	rdfs:comment "SE2OPgxfLN3" ;
+	owl:sameAs <http://example.net/subjects/22526> ;
+	foaf:homepage <44404782> ;
+	foaf:knows <473415> .
+<28798496> dc:issued "2010-05-16"^^xsd:date ;
+	dc:language "RnjjXbUm2DlEsOUup9LEHS" ;
+	dc:title "MWaX26BhOBy3H3xzjAuFNu5Ak" ;
+	rel:friendOf <18721037> ;
+	rel:hasMet <13348460>, <27924394> ;
+	a dc:Text ;
+	rdfs:label "G5h33P0eSIu" .
+<2884736> dc:date "1986-02-22"^^xsd:date ;
+	rel:ancestorOf <49761190> ;
+	a foaf:Organization ;
+	rdfs:comment "ew0aXYltTHwj4Laipjwg", "ki5GAyxEZ0lWcA1pvpp3rG" ;
+	rdfs:label "eXCoiG9i" ;
+	foaf:knows <42683870> ;
+	foaf:name "UhltLDjpVu5GyVl66D" .
+<28852570> dc:issued "1963-04-14"^^xsd:date ;
+	dc:language "finsIHcEu6oUPrAcXP36Lw6l" ;
+	rel:ancestorOf <36445928> ;
+	rel:apprenticeTo <http://example.com/subjects/6923> ;
+	rel:friendOf _:b58057, <http://example.com/subjects/70145> ;
+	rel:hasMet <40838410> ;
+	rdfs:comment "TobpqltkKQkW2taaMEH" ;
+	rdfs:label "nK6F9sNGQ" ;
+	owl:sameAs <http://example.net/subjects/87923> ;
+	foaf:homepage <http://example.com/subjects/22736>, <14040181> ;
+	foaf:name "P3Ah0UY5xtw8" .
+<2909089> dc:issued "1970-05-28"^^xsd:date ;
+	rel:childOf <http://example.com/subjects/99509> ;
+	rel:friendOf _:b27884 ;
+	a dc:Event ;
+	rdfs:comment "UXmlge0c6KHJ14apRM6XE3Lez" .
+<29255023> dc:issued "1968-06-26"^^xsd:date ;
+	dc:title "PyeFq1PyuSy1" ;
+	a foaf:Agent ;
+	rdfs:label "33 5NcTb1wrfLXwZObE" .
+<29274802> dc:date "1964-01-30"^^xsd:date ;
+	dc:subject <17757280> ;
+	dc:title "0cQ8gVsWRF3RFnmK" ;
+	rel:childOf <http://example.com/subjects/64217> ;
+	a foaf:Organization .
+<29550770> dc:date "1962-02-30"^^xsd:date ;
+	dc:language "VT2YovT0Xmf" ;
+	dc:title "74tGPKj37LadLQb Kpi j3uy", "lDtji6XjkJ2dhTtaA" ;
+	rel:ancestorOf <http://example.com/subjects/1623> ;
+	rel:childOf <http://example.com/subjects/62336> ;
+	rel:hasMet <http://example.com/subjects/26928> ;
+	a dc:Text ;
+	foaf:knows <http://example.com/subjects/19459> ;
+	foaf:name "Qny7pmIXLfg9lGpn" .
+<29619270> dc:date "1970-02-23"^^xsd:date ;
+	dc:subject <http://example.com/subjects/36655>, <http://example.com/subjects/57891>, <http://example.com/subjects/69554> ;
+	rel:ancestorOf <http://example.com/subjects/7762> ;
+	rel:apprenticeTo <14003570> ;
+	rel:hasMet <http://example.com/subjects/42097> ;
+	rdfs:label "grn2J68WrvB9zR9EJLgY" .
+<29916639> dc:date "2010-06-15"^^xsd:date ;
+	dc:title "PZPjSCh8V3U8" ;
+	rel:ancestorOf <http://example.com/subjects/45027>, <http://example.com/subjects/71256> ;
+	rel:friendOf <http://example.com/subjects/34280>, <http://example.com/subjects/66877> ;
+	rel:hasMet <35011800> ;
+	a foaf:Agent ;
+	foaf:knows <http://example.com/subjects/40477> .
+<29943596> dc:issued "1972-08-28"^^xsd:date ;
+	dc:subject <19781770> ;
+	dc:title "OXy3vt" ;
+	rel:apprenticeTo <19888047> ;
+	a foaf:Organization ;
+	rdfs:comment "GcUohtt5UjzhqtkWtKpu" .
+<3019576> dc:issued "1993-02-13"^^xsd:date ;
+	rel:ancestorOf _:b26370 ;
+	rel:hasMet <18254678> ;
+	a dc:Sound ;
+	foaf:name "Uw8DkxB3SMgphXad58", "mAHLUzrgj67ZVA u" .
+<30260367> dc:date "1981-01-15"^^xsd:date ;
+	dc:title "w3Bic9LA9pRV2zsVewqhD7", "x7 DoJQxgIfV" ;
+	a foaf:Organization ;
+	rdfs:label "FltpD7xZxLXL5q1gGXCY", "tURQsPJHB4jWXTl7Rs OEGMKA" .
+<30347199> dc:issued "1965-07-22"^^xsd:date ;
+	dc:language "GOrMeGARf", "PNtSZ16uEBN5jWc5" ;
+	rel:childOf <31453457> ;
+	a foaf:Person ;
+	rdfs:comment "ULZCy3IS3gtN1ebwWJgnFO8Kz" ;
+	foaf:knows <26159826>, <36435288> ;
+	foaf:name "XM06V8" .
+<30366437> dc:issued "1980-02-25"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/24764>, <16135659>, <18374987>, <4378406> ;
+	rel:childOf _:b82228 ;
+	a dc:Event ;
+	rdfs:comment "jLK7wanM0y8Q6gPcKgO2", "rt7XlNoj" ;
+	rdfs:label "ekkcJg6yU" ;
+	foaf:knows <http://example.com/subjects/97880> ;
+	foaf:name "zdT1dIUKsc63phu6ikaX691" .
+<30420487> dc:date "1987-01-30"^^xsd:date ;
+	dc:language "8wxMvbxdHri2jvO8Id" ;
+	dc:subject <http://example.com/subjects/14534>, <http://example.com/subjects/56527>, <http://example.com/subjects/64885> ;
+	rel:ancestorOf <http://example.com/subjects/48831>, <13829176>, <18892808> ;
+	a foaf:Agent, foaf:Person ;
+	rdfs:label "WzzMMg81hvb2D2EGOeJ" .
+<30545096> dc:issued "2008-07-11"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/50876> ;
+	rel:childOf <http://example.com/subjects/21082>, <http://example.com/subjects/54690>, <http://example.com/subjects/69914> ;
+	rel:friendOf <http://example.com/subjects/95279> ;
+	rel:hasMet _:b18281 ;
+	rdfs:comment "rhUH8Z" ;
+	owl:sameAs <http://example.net/subjects/53795> .
+<30546103> dc:issued "1975-07-26"^^xsd:date ;
+	dc:language "SR0l494e2mRpC9Cl8UvwOyx", "cslTn9WrB qRlv" ;
+	rel:apprenticeTo <5405756> ;
+	a dc:Event ;
+	rdfs:label "aSMVXK5q" ;
+	foaf:knows <http://example.com/subjects/94520> .
+<3071326> dc:date "1987-08-23"^^xsd:date ;
+	dc:subject <5749972>, <8865933> ;
+	rel:ancestorOf _:b47463, <http://example.com/subjects/43906> ;
+	rel:apprenticeTo <473415> ;
+	rel:hasMet <http://example.com/subjects/59725> ;
+	a dc:Sound, foaf:Organization ;
+	rdfs:label "8jq0A2eTmZHrro2meABMz" ;
+	foaf:homepage <http://example.com/subjects/24645>, <http://example.com/subjects/9024> ;
+	foaf:knows <http://example.com/subjects/65102> ;
+	foaf:name "FwqtAqBlq4a", "YK4kpKEY9Df" .
+<30713396> dc:issued "2011-09-14"^^xsd:date ;
+	dc:language "pkJ5KsJ5vgakzA" ;
+	dc:subject <22578451> ;
+	dc:title "mtduSBs GUtembe" ;
+	rel:apprenticeTo <http://example.com/subjects/26380>, <http://example.com/subjects/31085> ;
+	rel:childOf <http://example.com/subjects/68633> ;
+	rel:friendOf <22578451> ;
+	foaf:knows <http://example.com/subjects/1135> ;
+	foaf:name "Vfqb8A" .
+<30738016> dc:issued "1980-08-23"^^xsd:date ;
+	dc:language "bxwoNcWX4eXOMwIwtN43S" ;
+	rel:ancestorOf <http://example.com/subjects/90375> ;
+	rel:apprenticeTo <http://example.com/subjects/73113> ;
+	rel:friendOf <http://example.com/subjects/2263> ;
+	rel:hasMet <http://example.com/subjects/63189> ;
+	a dc:Text ;
+	foaf:homepage <http://example.com/subjects/87462> .
+<30769833> dc:date "1970-09-25"^^xsd:date ;
+	dc:language "5yCZZGFKxP", "c qJIVv06VXiaeOTk " ;
+	rel:hasMet _:b23636 ;
+	a foaf:Agent ;
+	rdfs:comment "RnoW1CKtKgG" ;
+	owl:sameAs <http://example.net/subjects/20465> .
+<30811413> dc:date "2009-07-12"^^xsd:date ;
+	rel:ancestorOf <3256090> ;
+	a dc:Event ;
+	rdfs:comment "CzLm0LvmHCjDRMLBp" .
+<30846763> dc:issued "1983-06-20"^^xsd:date ;
+	dc:language "L kIwS77q", "fmf3lweb 6ReuQqGvibwW4" ;
+	dc:subject <20679191> ;
+	rel:ancestorOf <580311> ;
+	rel:apprenticeTo <44161233> ;
+	a dc:Text ;
+	foaf:name "j5ktLu", "u2P7XU2W9EBR8Pq" .
+<30883758> dc:issued "2006-09-25"^^xsd:date ;
+	dc:title "llSLTrKFOA98kIHha" ;
+	rel:apprenticeTo <55427828> ;
+	rel:childOf <http://example.com/subjects/28284>, <http://example.com/subjects/44013> ;
+	rel:friendOf <http://example.com/subjects/47535> ;
+	rel:hasMet _:b75427, <http://example.com/subjects/97562> ;
+	a foaf:Organization ;
+	foaf:homepage <http://example.com/subjects/69072>, <37536441> ;
+	foaf:name "nncFVd" .
+<31082727> dc:date "2005-04-25"^^xsd:date ;
+	dc:subject _:b56124 ;
+	dc:title "RivmNRXrr" ;
+	a foaf:Person ;
+	foaf:name "pRFtieZmTZH wwlK" .
+<31285371> dc:issued "1966-05-11"^^xsd:date ;
+	dc:title "rqtx7AWY7iP0kM6" ;
+	rel:apprenticeTo <54273385>, <8808745> ;
+	a dc:Text ;
+	rdfs:comment "EM40RDwDEQIvb Jtj7a" ;
+	rdfs:label "PddhNwE" .
+<31353576> dc:date "1974-06-15"^^xsd:date ;
+	dc:title "f7AfHpk3igLZGaMexAx0M" ;
+	rel:friendOf _:b43439, <49111497> ;
+	a foaf:Organization ;
+	foaf:knows <8009625> ;
+	foaf:name "Y2frT5ceeRwErOPVjJyHU5" .
+<31453457> dc:date "1992-08-27"^^xsd:date ;
+	dc:subject <http://example.com/subjects/11227>, <http://example.com/subjects/24292>, <http://example.com/subjects/90169> ;
+	rel:apprenticeTo <http://example.com/subjects/12787> ;
+	rel:hasMet <http://example.com/subjects/60658> ;
+	a foaf:Agent ;
+	rdfs:label "zmhlgSzMfGA85iJcJU9N" .
+<3147747> dc:issued "2007-09-22"^^xsd:date ;
+	rel:friendOf <http://example.com/subjects/88089> ;
+	a foaf:Organization ;
+	rdfs:comment "Fbjp7 Jv", "fpksR8jz5Py0b" ;
+	foaf:homepage <http://example.com/subjects/39748>, <http://example.com/subjects/97916> ;
+	foaf:knows <http://example.com/subjects/87387>, <http://example.com/subjects/93480> ;
+	foaf:name "b2qPCGMBJxTVqilxd4p" .
+<31585142> dc:issued "2004-06-27"^^xsd:date ;
+	rel:apprenticeTo <30545096> ;
+	rel:childOf <44447151>, <8865933> ;
+	a foaf:Organization ;
+	rdfs:comment "66Xl6SSVnfGYM3KZl9", "bNueos0RWUhGWWTVmV" ;
+	rdfs:label "iya5ZiuzJHLKMmYrcXXCxxVCO" ;
+	foaf:name "0NY7r1bPB" .
+<3174725> dc:issued "2010-09-30"^^xsd:date ;
+	dc:subject <http://example.com/subjects/21057> ;
+	dc:title "sB8xCtejIsnuNe2d7NjN53" ;
+	a foaf:Person ;
+	rdfs:comment "4fKg bz", "ZYDxZg3hs o33oCIL ABI" ;
+	foaf:knows <http://example.com/subjects/6848>, <http://example.com/subjects/98131> .
+<31881290> dc:date "1990-04-18"^^xsd:date ;
+	rel:childOf <41288858> ;
+	a dc:Event ;
+	rdfs:label "3pLcpTn5tBc2uy" ;
+	foaf:name "WCjvXhaBLhVX" .
+<3197310> dc:date "2011-02-15"^^xsd:date ;
+	dc:title "FTZXmpeiw2X" ;
+	a foaf:Agent ;
+	rdfs:comment "7v1L8e4M7i0L9e6hbOI" ;
+	rdfs:label "gASNcefHMy6Z0Iw3OtERU" ;
+	owl:sameAs <http://example.net/subjects/87236> .
+<32397802> dc:date "1983-08-28"^^xsd:date ;
+	dc:language "dOILIfiPYCUQswuch6k" ;
+	dc:subject <50716036> ;
+	dc:title "R24ujutajG5SB0NGfQY0Wau0h" ;
+	rel:ancestorOf <9466608> ;
+	rel:apprenticeTo <14814304> ;
+	a dc:Sound ;
+	foaf:name "2Uzy74qa42L E", "Gx1sSgbipByqxRC" .
+<3251840> dc:issued "1964-04-28"^^xsd:date ;
+	dc:subject <48013074> ;
+	rel:apprenticeTo <http://example.com/subjects/37626> ;
+	rel:childOf <http://example.com/subjects/44816> ;
+	a dc:Event ;
+	rdfs:comment " StDFsY", "l3sYNeaBIKOn" ;
+	owl:sameAs <http://example.net/subjects/29700> ;
+	foaf:homepage <36498833> .
+<3256090> dc:date "2000-01-26"^^xsd:date ;
+	rel:ancestorOf <19888047> ;
+	rel:apprenticeTo <21224974> ;
+	a foaf:Agent ;
+	rdfs:label "MF9B561fIlavi9j9bf1bHZaI", "V3Dj4eHtav3Xp5ojjmGdCs", "t1cnTuVUy9BQqBTw" ;
+	owl:sameAs <http://example.net/subjects/37719> ;
+	foaf:homepage <3960668> .
+<32611720> dc:issued "2004-04-26"^^xsd:date ;
+	dc:title "aSfxZ6cv38GR3K" ;
+	foaf:knows _:b55168 ;
+	foaf:name "ayY4drdFV0vSQGL9yW3q " .
+<32615047> dc:issued "1996-08-26"^^xsd:date ;
+	dc:language "bm7EeW" ;
+	a dc:Text ;
+	rdfs:comment "2rPcviKX" ;
+	rdfs:label "R4uVToTAwCSr6n", "pdolUBkwp" ;
+	owl:sameAs <http://example.net/subjects/9533> .
+<32812874> dc:issued "2002-08-29"^^xsd:date ;
+	dc:title "FVMrbZeUZRJL47DSFfe", "xk3B2 vFxe5Jpn5EXwFWP" ;
+	rel:ancestorOf <http://example.com/subjects/6868> ;
+	rel:apprenticeTo _:b65549 ;
+	rel:friendOf <http://example.com/subjects/17844> ;
+	rel:hasMet <http://example.com/subjects/69772> ;
+	a foaf:Person ;
+	rdfs:comment "w5FtLYLq" .
+<32818319> dc:date "1981-03-16"^^xsd:date ;
+	dc:language "RbyKWKvOHTwUyzgN7Sk4 ", "j9fM E7gwDkFtGHViE" ;
+	a dc:Text ;
+	foaf:knows _:b7284 .
+<32896487> dc:issued "1964-08-12"^^xsd:date ;
+	dc:subject <http://example.com/subjects/84138> ;
+	dc:title "Mie09t9vtMBz3cu" ;
+	rel:apprenticeTo <http://example.com/subjects/35257> ;
+	a foaf:Organization ;
+	rdfs:comment "As3dA9Adsh2lMXpE8puX9n", "GME jgRqukBDFOal4" .
+<33079664> dc:date "1993-02-28"^^xsd:date ;
+	rel:ancestorOf <626859> ;
+	rel:apprenticeTo <http://example.com/subjects/21588> ;
+	rel:childOf <http://example.com/subjects/41457> ;
+	rel:friendOf <http://example.com/subjects/13506>, <http://example.com/subjects/73215> ;
+	rel:hasMet <43511234> ;
+	a dc:Text, foaf:Agent ;
+	rdfs:label "If4NkAjLS" ;
+	foaf:homepage <27565682> .
+<33112767> dc:issued "1998-07-22"^^xsd:date ;
+	a foaf:Organization ;
+	rdfs:comment "XsqnpZVZLzXEBWQ6V7eXAxii8" ;
+	rdfs:label "McSVv6MsJTvn", "dXAEwMk9RLLqumaL" ;
+	foaf:knows <18910124> .
+<33198240> dc:date "1986-07-20"^^xsd:date ;
+	a dc:Text ;
+	rdfs:label "zcu0yQE" .
+<33199768> dc:date "2004-04-23"^^xsd:date ;
+	dc:title "KJwxNPowAnoFIsn bB", "m4Cup5Z" ;
+	rel:apprenticeTo <41709642>, <53081318> ;
+	rel:friendOf <8731418> ;
+	a dc:Sound, foaf:Organization .
+<3323982> dc:issued "2007-05-11"^^xsd:date ;
+	a foaf:Organization ;
+	rdfs:comment "fbWV2NxTJ8ivqCheO2" ;
+	foaf:homepage _:b91463 .
+<33380074> dc:date "1979-04-15"^^xsd:date ;
+	dc:language "IZst2kact9tIGbKvv9C50rH", "KvpsVjIjJcb5Q4p", "OeQ9vD7KfgLcYbnDobFODjV" ;
+	rel:hasMet <14015303> ;
+	a dc:Sound .
+<3338224> dc:issued "1977-02-11"^^xsd:date ;
+	rel:ancestorOf <8865933> ;
+	a foaf:Organization ;
+	foaf:name "1hPTjOGvjLFRXs3 " .
+<33386477> dc:date "1975-09-18"^^xsd:date ;
+	rel:hasMet <35011800> ;
+	a dc:Text ;
+	foaf:knows <50716036> ;
+	foaf:name "BHJPZV2RHqt53xd2duccyTA", "w0PcNbcjAMWFc S" .
+<33387629> dc:issued "2002-06-27"^^xsd:date ;
+	dc:subject <http://example.com/subjects/8290> ;
+	dc:title "Vp09vWNr", "zh7NbFlPR5bVb" ;
+	rel:apprenticeTo <http://example.com/subjects/36751> ;
+	rel:friendOf <http://example.com/subjects/36323> ;
+	a foaf:Agent ;
+	rdfs:comment "0VPG0rxu79tOS" ;
+	foaf:knows <http://example.com/subjects/64968> .
+<33671857> dc:date "1980-03-18"^^xsd:date ;
+	dc:title "SsQU9f" ;
+	a dc:Event ;
+	rdfs:comment "ClmrCmN8Ac W5C8wJP74" ;
+	foaf:name "O4BugzE4lzfDsuUNV" .
+<33736764> dc:issued "1981-04-30"^^xsd:date ;
+	dc:language "tU1KCcnPxeldrX XWLZV3nu" ;
+	dc:title "3eIORRDpVq4Syp", "S83j4Ys1IrwNhfz5DiBTq" ;
+	rel:hasMet _:b83944 ;
+	a dc:Text ;
+	owl:sameAs <http://example.net/subjects/3424> ;
+	foaf:homepage <38936945> .
+<33746762> dc:issued "1997-09-21"^^xsd:date ;
+	a dc:Text, foaf:Organization ;
+	rdfs:comment "OETSeJYZG", "bnewW97E MrROm906", "xI8Hd4zkKk" ;
+	rdfs:label "OMvhPHCi8ks0x0TEvaVjHM" .
+<33786529> dc:date "1982-09-25"^^xsd:date ;
+	dc:title "qlAtP8" ;
+	rel:ancestorOf <http://example.com/subjects/41134>, <http://example.com/subjects/53370> ;
+	rel:apprenticeTo <http://example.com/subjects/10284> ;
+	rel:childOf <http://example.com/subjects/57533> ;
+	rel:hasMet <http://example.com/subjects/43395> ;
+	a foaf:Agent ;
+	rdfs:comment "BHEMiOzw2P6T7Z6lRoSPjOYVX" ;
+	foaf:name "3lzeBOmiK", "po9 mDQjAUFNBE" .
+<33787129> dc:date "1988-01-29"^^xsd:date ;
+	rel:apprenticeTo <36865053> ;
+	a dc:Event ;
+	rdfs:comment "M0Mi2pE4T5kVU" ;
+	rdfs:label "5KqlnhT" ;
+	foaf:name "U57586DL85" .
+<33850890> dc:issued "1988-09-27"^^xsd:date ;
+	dc:subject <37874084>, <45213527> ;
+	dc:title "hKitGxQYpw dH" ;
+	rel:childOf <3323982> ;
+	a foaf:Organization .
+<3390785> dc:issued "1963-01-24"^^xsd:date ;
+	dc:subject <http://example.com/subjects/56294>, <3960668> ;
+	dc:title "NurU5wPyPJF85SRhv", "kKempyYG" ;
+	rel:childOf <http://example.com/subjects/33208> ;
+	rel:friendOf <http://example.com/subjects/6970> ;
+	rel:hasMet <http://example.com/subjects/96372> ;
+	a foaf:Agent ;
+	foaf:knows <26295562>, <46179345> ;
+	foaf:name "7 8nqEnUKT o0gNCxv0hSCsfy", "aXlvbPvwG 7r8xPvd" .
+<34074020> dc:date "2009-06-24"^^xsd:date ;
+	rdfs:comment "0Uv61KxJz830U9aU1t" ;
+	foaf:name "Hy3q1RjZ2R" .
+<34175928> dc:issued "1995-04-20"^^xsd:date ;
+	dc:subject _:b10178 ;
+	rel:friendOf <5271210> ;
+	rdfs:comment "gmJLvqjGnoiUSNUxBnNA " ;
+	foaf:name "Z0ON3UbsccoLrbgKkOb" .
+<34251577> dc:issued "1978-04-29"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/92309> ;
+	rel:friendOf <http://example.com/subjects/91355> ;
+	a dc:Sound ;
+	foaf:name "RrhKRLmTKfn0JlT6a", "TP6XDwcRyWMRSMprs7vUBs", "gGjBHWXhO1YJlPuD" .
+<34379298> dc:date "1972-06-19"^^xsd:date ;
+	dc:language "pRPF8R" ;
+	rel:ancestorOf <http://example.com/subjects/59065>, <http://example.com/subjects/80321> ;
+	rel:childOf <http://example.com/subjects/102> ;
+	rel:hasMet <http://example.com/subjects/57686>, <http://example.com/subjects/78253> ;
+	a dc:Sound ;
+	rdfs:comment "s4qwuoXPw37PmaNBkhI" ;
+	rdfs:label "eLHf6nnTi" .
+<34552018> dc:date "1992-05-11"^^xsd:date ;
+	dc:language "i8UgxJeMl5H7c" ;
+	rel:hasMet <3960668> ;
+	a dc:Event ;
+	rdfs:comment "BCPQk6" ;
+	rdfs:label "N9FMX2V4uvVa429cPUeC" ;
+	foaf:name "nb3fNmFhekaUTAbyW65U" .
+<34780106> dc:date "1988-05-23"^^xsd:date ;
+	dc:language "cz7jwtv7qPaIF2ubg7x" ;
+	dc:subject <39888730> ;
+	rel:friendOf <36844794> ;
+	a dc:Event ;
+	foaf:homepage <http://example.com/subjects/91080>, <33387629> .
+<34908812> dc:date "1964-06-21"^^xsd:date ;
+	dc:language "sZqmzyBF5Le4CiowAXrsX" ;
+	dc:title "PYA8JmMMJSFjpRVxuO63s" ;
+	rel:ancestorOf <55312655> ;
+	rel:hasMet _:b6657 ;
+	a dc:Event ;
+	rdfs:comment "NR44I4VJQ 7jOeFpJ" ;
+	rdfs:label "Xsi8R3JaT0 Qo" ;
+	foaf:homepage <3960668> .
+<34944858> dc:issued "2009-08-24"^^xsd:date ;
+	dc:language "leWMLGxhxFOVkyEgQc" ;
+	a dc:Text ;
+	rdfs:comment " flA9HX1q2gdzWhFT4", "f7mh 2NPdknl2dLJs1O6W64Zl", "l1fFywyUIW s4" ;
+	foaf:homepage _:b28801 .
+<35011800> dc:date "2003-04-12"^^xsd:date ;
+	dc:language "YG2eQ1z7EOIg" ;
+	rel:ancestorOf _:b65744 ;
+	a dc:Event, dc:Text ;
+	rdfs:comment "AGlLhEbmqcEOpKXjGeUP", "gBP0t4 iWYWI4l5" .
+<35248827> dc:date "1967-04-22"^^xsd:date ;
+	dc:title "YbEOUjO1R8WN2CDzvz" ;
+	a dc:Sound ;
+	foaf:name "2F6lZNwv9hPHUivchALp1VQSE", "kwk3agXHCrt" .
+<35379508> dc:issued "1998-05-16"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/36255> ;
+	rel:hasMet <42482287> ;
+	a dc:Sound ;
+	rdfs:comment "AYLSIhIFG8H", "ffx1cX48M" ;
+	foaf:homepage <http://example.com/subjects/31863> .
+<354108> dc:date "2009-07-21"^^xsd:date ;
+	dc:language "hKoWADuIDLiO5j" ;
+	rel:ancestorOf _:b7942 ;
+	rel:hasMet <13185753> ;
+	a dc:Text ;
+	rdfs:label "Bb7FoO6hO73wRIX", "PV7m2vABAQlr7sY" ;
+	foaf:name "RwZCj8" .
+<35421031> dc:date "1985-09-19"^^xsd:date ;
+	dc:language "ddkUn8J0mkOTXoy05foza" ;
+	dc:subject <41485602>, <43050205> ;
+	rel:friendOf <21540905> ;
+	a foaf:Organization ;
+	rdfs:label "8bdOY4qP0W773WdHiKntohib" ;
+	foaf:homepage _:b65245 .
+<35729087> dc:issued "1988-08-19"^^xsd:date ;
+	rel:childOf <http://example.com/subjects/3209>, <http://example.com/subjects/84129> ;
+	rel:friendOf <15104036>, <21958823> ;
+	a dc:Text, foaf:Organization ;
+	rdfs:comment "g3JCunox9yZG" ;
+	foaf:knows <656505> .
+<36196031> dc:issued "1990-07-19"^^xsd:date ;
+	rel:friendOf <http://example.com/subjects/48788> ;
+	a dc:Text ;
+	rdfs:comment "13LHSWUhBJZ8DS", "ZRU1QBVV0zBAU8EUFoqK1l" .
+<36380470> dc:date "1993-04-11"^^xsd:date ;
+	rel:childOf <http://example.com/subjects/89305> ;
+	rel:friendOf <http://example.com/subjects/79921>, <http://example.com/subjects/88432> ;
+	rel:hasMet <http://example.com/subjects/48798> ;
+	owl:sameAs <http://example.net/subjects/56361> ;
+	foaf:homepage <http://example.com/subjects/12535> ;
+	foaf:name "iPghrR" .
+<36435288> dc:date "1964-01-16"^^xsd:date ;
+	dc:language "nItzd5xc2EgM" ;
+	rel:ancestorOf <51085400> ;
+	rel:friendOf <8731418> ;
+	rel:hasMet <11245518> ;
+	a foaf:Organization ;
+	rdfs:comment "jndlqQ8PcQcLKJXq6V4btKD2o", "v5LcIBwhICqy22gpElSJiYZ" ;
+	foaf:name "klWtOMdheZ4wkASLDxNR" .
+<36445928> dc:date "2008-04-21"^^xsd:date ;
+	dc:language "bO csZ2UAephHFbG0crAJZD" ;
+	dc:subject <49560042> ;
+	rel:ancestorOf <http://example.com/subjects/53427>, <http://example.com/subjects/9642>, <15104036> ;
+	rel:childOf <http://example.com/subjects/14342> ;
+	rel:friendOf <http://example.com/subjects/45023> ;
+	a foaf:Organization ;
+	rdfs:label "K7udM62qksW8KbPaff0jC" ;
+	foaf:knows <3898608> ;
+	foaf:name "aVt7pn9npqNQ4pp7lYocV6Cm" .
+<36498833> dc:issued "1976-08-21"^^xsd:date ;
+	dc:language "gN0Dxfgjp5tEeE" ;
+	dc:title "2fAcOCtImj sGR6k" ;
+	rel:ancestorOf _:b30938 ;
+	a foaf:Agent ;
+	rdfs:comment "zVLBKk25a" ;
+	foaf:knows <7736129> .
+<36527385> dc:date "1965-06-19"^^xsd:date ;
+	dc:subject <48013074> ;
+	dc:title "9NCM8Fwf2SzCRRn", "iijOC1Ig8" ;
+	rel:childOf _:b92344 ;
+	rel:friendOf <39060936> ;
+	a foaf:Agent .
+<36653491> dc:issued "1968-05-22"^^xsd:date ;
+	dc:subject _:b4880 ;
+	a foaf:Organization ;
+	rdfs:label "hx0DI42" .
+<36669361> dc:issued "1989-01-15"^^xsd:date ;
+	dc:title "6sHuND6FzWXP33P5g6al" ;
+	rel:childOf <http://example.com/subjects/66399> ;
+	rel:friendOf <http://example.com/subjects/16487> ;
+	a foaf:Organization ;
+	rdfs:label "M5GrIZOA" ;
+	owl:sameAs <http://example.net/subjects/9925> ;
+	foaf:knows <http://example.com/subjects/72787> ;
+	foaf:name "8WvXpch7" .
+<36728278> dc:date "2002-02-17"^^xsd:date ;
+	dc:language "L3xpxTy" ;
+	dc:title "aX6ugOK6fFrvqFeyPjW" ;
+	rel:ancestorOf <http://example.com/subjects/64702> ;
+	rel:childOf _:b36462 ;
+	a foaf:Organization ;
+	rdfs:label "HLQQVw9P8ZdvOTBhvwg" ;
+	foaf:homepage <http://example.com/subjects/33469>, <http://example.com/subjects/55849>, <http://example.com/subjects/70034> .
+<36732841> dc:issued "1983-03-22"^^xsd:date ;
+	a foaf:Organization ;
+	rdfs:comment "yZ4qs2dZV0ton" .
+<3682788> dc:date "1996-07-22"^^xsd:date ;
+	rdfs:comment "JWX1jlI7C8dB" ;
+	rdfs:label "ZSHjszUdpDx6GBSXnWAmY7" ;
+	foaf:knows _:b40256 .
+<36844794> dc:issued "1997-02-20"^^xsd:date ;
+	dc:language "A5lPyq0lMO9yPPrCg6SH " ;
+	dc:subject <http://example.com/subjects/43524>, <http://example.com/subjects/43796> ;
+	rel:apprenticeTo <12607451>, <21100566> ;
+	rel:hasMet <http://example.com/subjects/81968> ;
+	a dc:Event ;
+	rdfs:label "AD24HM7NA" ;
+	foaf:homepage <http://example.com/subjects/13089> ;
+	foaf:knows <http://example.com/subjects/54299>, <54506536> ;
+	foaf:name "ZlYyw2sOJcFjBx", "mbiaM0vodES8rUyxKugUkDfs" .
+<36865053> dc:issued "2011-02-16"^^xsd:date ;
+	dc:language "QvUt2RZ2", "Yl0VaOm5J" ;
+	dc:title "ZHXBUbvqb" ;
+	rel:childOf <13185753> ;
+	rel:friendOf <49435227> ;
+	a dc:Text ;
+	rdfs:label "6PnIzj5Dw6" .
+<36920663> dc:issued "1985-06-28"^^xsd:date ;
+	dc:language "u1pw8MQHmEi1P7 WJuu5" ;
+	dc:subject <http://example.com/subjects/67574>, <http://example.com/subjects/97281> ;
+	rel:apprenticeTo <http://example.com/subjects/53833>, <30713396> ;
+	rel:hasMet <http://example.com/subjects/97857>, <33736764> ;
+	a foaf:Agent ;
+	rdfs:label "Kk5SpyrMbGi3PS1veg7c9Qy", "dCqFKAiIyEzqGXgmplH", "wvNuXLBF9oXTZVgEylaZ" ;
+	foaf:homepage <http://example.com/subjects/77547>, <13348460> .
+<3708972> dc:date "2007-05-12"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/79243> ;
+	rel:apprenticeTo <http://example.com/subjects/79305> ;
+	rel:friendOf _:b11327, <http://example.com/subjects/10466> ;
+	rel:hasMet <http://example.com/subjects/75367> ;
+	a foaf:Agent ;
+	rdfs:comment "mVPfRxj9BrzE0CZo1n" ;
+	foaf:knows <http://example.com/subjects/6761> .
+<37096643> dc:date "2010-01-17"^^xsd:date ;
+	dc:language "ZWlYOE13hE7fbRD0KkZbm" ;
+	rel:apprenticeTo <2821181> ;
+	a dc:Sound, foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/30770> .
+<37145852> dc:issued "1970-07-21"^^xsd:date ;
+	dc:language "8rvmrscwaY g " ;
+	rel:ancestorOf _:b18255 ;
+	rel:childOf <25322683> ;
+	a foaf:Agent ;
+	rdfs:label "ANQgrLTCi3", "tGOSsJ04" ;
+	foaf:homepage <25322683> ;
+	foaf:name "6SsSMXyvxodlUXBFB" .
+<3719791> dc:date "1992-05-17"^^xsd:date ;
+	dc:language "QJtvraV2AsKQBNI9uM4js9" ;
+	dc:title "7o4fbaKYU1ifxO0xAhSP9 cn" ;
+	rel:childOf <33746762> ;
+	a dc:Sound ;
+	rdfs:label "YStmYVuG6" ;
+	foaf:knows <http://example.com/subjects/41280>, <43050205> ;
+	foaf:name "PrIdV1dacArXhouieY" .
+<3720815> dc:issued "1973-02-21"^^xsd:date ;
+	dc:subject <http://example.com/subjects/81444> ;
+	rel:ancestorOf <http://example.com/subjects/98816> ;
+	rel:childOf _:b89557 ;
+	rel:friendOf <http://example.com/subjects/377>, <http://example.com/subjects/42654> ;
+	rel:hasMet <http://example.com/subjects/29477> ;
+	a foaf:Organization ;
+	rdfs:label "XvQ9s4rsF9s" ;
+	foaf:name "jJgjBGIQaOlGd0" .
+<37219747> dc:date "1976-06-18"^^xsd:date ;
+	rel:friendOf <41709642> ;
+	a dc:Text ;
+	rdfs:comment "ufFyvEcuuOCdmPE7EhUwXwc4" ;
+	rdfs:label "rW9nD49pLtLhqQswiyWV" ;
+	foaf:knows <http://example.com/subjects/53057>, <52313001> .
+<37244206> dc:date "1986-01-14"^^xsd:date ;
+	dc:language "BxwgHl" ;
+	rel:friendOf <40675680> ;
+	a foaf:Organization ;
+	foaf:homepage <45566867>, <928081> .
+<37262259> dc:date "1970-09-25"^^xsd:date ;
+	dc:subject <http://example.com/subjects/22254>, <http://example.com/subjects/74235> ;
+	rel:ancestorOf <http://example.com/subjects/87440> ;
+	rel:childOf _:b66057 ;
+	rel:friendOf <http://example.com/subjects/84538> ;
+	rel:hasMet <http://example.com/subjects/49307> ;
+	a dc:Sound ;
+	rdfs:label "yGIFW1IRZJG" ;
+	foaf:name "QaZm jQ", "yMVU7I" .
+<37322474> dc:issued "1991-04-21"^^xsd:date ;
+	dc:title "RW11iY1fvT7NhGqBR3V", "nwacAYjTkcKJwHvm0Yn" ;
+	rel:hasMet <3147747> ;
+	a foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/65040> .
+<37393773> dc:date "1997-02-24"^^xsd:date ;
+	dc:subject <45076615> ;
+	rel:ancestorOf <51515132> ;
+	rel:apprenticeTo _:b91020 ;
+	a foaf:Organization ;
+	rdfs:label "HdQPNxxL4lemGt" ;
+	owl:sameAs <http://example.net/subjects/78425> ;
+	foaf:homepage <7860292> .
+<3748158> dc:issued "1978-05-30"^^xsd:date ;
+	dc:subject _:b47413 ;
+	rdfs:label "sL8kKojOX9j9q5Xhs51AyXcmJ", "wDNA5I0J" .
+<37536441> dc:issued "1984-09-16"^^xsd:date ;
+	rel:ancestorOf <45076615> ;
+	rel:apprenticeTo _:b77192 ;
+	rel:childOf <28525666>, <7819326> ;
+	rel:friendOf <http://example.com/subjects/87511> ;
+	a dc:Sound ;
+	rdfs:comment "I215hnNST8aPTImiYYXvGI" ;
+	owl:sameAs <http://example.net/subjects/18935> .
+<37615783> dc:date "1994-06-22"^^xsd:date ;
+	dc:language "LsyCUjCy7ep1DomFMo" ;
+	foaf:knows <8998946> .
+<37789368> dc:issued "2005-05-26"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/49865>, <http://example.com/subjects/57496> ;
+	rel:childOf <http://example.com/subjects/71582> ;
+	rel:friendOf <http://example.com/subjects/96957> ;
+	rdfs:label "GjDoVVtkQW" ;
+	foaf:homepage <http://example.com/subjects/16425> .
+<37869631> dc:date "2009-06-13"^^xsd:date ;
+	dc:language "pFOsWUSi7yGppu8XsqZ" ;
+	dc:title "1wbuL 2SNV4xohAsrGvKASg8" ;
+	rel:ancestorOf <13005504> ;
+	rel:apprenticeTo <45696659> ;
+	a dc:Event ;
+	rdfs:label "TtNxRBXtrX3tz" ;
+	owl:sameAs <http://example.net/subjects/95273> ;
+	foaf:homepage <http://example.com/subjects/51476> ;
+	foaf:knows <44447148> .
+<37874084> dc:issued "1998-07-17"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/25418> ;
+	rel:friendOf <http://example.com/subjects/26289> ;
+	rel:hasMet <http://example.com/subjects/67570>, <5749972> ;
+	a dc:Event ;
+	rdfs:label "5oghhrJsSJ00RACmxb8BQnu" ;
+	foaf:knows <http://example.com/subjects/64949> .
+<3796819> dc:issued "2001-09-14"^^xsd:date ;
+	dc:language "3zkzkIIy ewGRJVDtIJtbp8fi" ;
+	dc:title "xTmgSJ3BUN" ;
+	rel:childOf <http://example.com/subjects/5731> ;
+	a foaf:Organization ;
+	rdfs:comment "vIgnrnVpCO" ;
+	foaf:homepage <http://example.com/subjects/50331> .
+<37995536> dc:issued "1998-03-13"^^xsd:date ;
+	dc:language "5znRz8" ;
+	dc:subject <http://example.com/subjects/53649> ;
+	rel:ancestorOf <http://example.com/subjects/98958> ;
+	rel:apprenticeTo <13829176> ;
+	foaf:homepage <http://example.com/subjects/12895> .
+<38004116> dc:date "1999-05-29"^^xsd:date ;
+	dc:language "9GTQHh sYMga", "Q09k XGId3yxyz2awaTP" ;
+	rel:ancestorOf <http://example.com/subjects/31023> ;
+	rel:apprenticeTo <http://example.com/subjects/96827>, <46195595> ;
+	rel:hasMet _:b95240 ;
+	a dc:Sound ;
+	rdfs:comment "U5RpdZTi00" ;
+	rdfs:label "jxFIiR9J" ;
+	foaf:homepage <http://example.com/subjects/24034>, <20985848> .
+<3815293> dc:issued "1972-08-21"^^xsd:date ;
+	rel:childOf <28525666> ;
+	rel:friendOf _:b10081 ;
+	a dc:Text, foaf:Agent ;
+	rdfs:comment "LDfv13evq" ;
+	rdfs:label "x0pj6PNu2jzqy" ;
+	foaf:homepage <54273385> .
+<38216153> dc:issued "1986-06-14"^^xsd:date ;
+	dc:subject <http://example.com/subjects/54791> ;
+	dc:title "OfAKdJBeDpC8JUWewaiFbqv" ;
+	rel:childOf <44161233> ;
+	rel:friendOf <6543615> ;
+	a foaf:Person ;
+	rdfs:label "aXpLnuHK UQSn3qS4JjT" ;
+	foaf:homepage <http://example.com/subjects/94293>, <3251840> ;
+	foaf:knows <http://example.com/subjects/27417> .
+<38310303> dc:issued "2005-09-18"^^xsd:date ;
+	dc:subject <11245518> ;
+	dc:title "0FRU5EqMt7hyXb", "B17HVn" ;
+	a foaf:Organization ;
+	rdfs:label "NWQxZklt62Zwk90ZZeR1QxGZb" ;
+	foaf:knows _:b78176 .
+<38382455> dc:date "1981-01-19"^^xsd:date ;
+	dc:subject <19888047> ;
+	dc:title "9p7TkIJ" ;
+	rel:childOf _:b37251 ;
+	a dc:Text ;
+	rdfs:comment "cEpn Q42YX8WJ3EIjjAt", "sx49SubHNE5ST14AG" ;
+	rdfs:label "MrmOfSzd0A7GQY4uVCKtpr" .
+<38447045> dc:issued "1981-07-11"^^xsd:date ;
+	rel:hasMet <45076615> ;
+	a dc:Text ;
+	rdfs:label "8IBKZud" ;
+	foaf:knows <19906251>, <31453457> ;
+	foaf:name "3jxgkVLJk4BnX0DBD9K" .
+<38530135> dc:issued "1966-02-23"^^xsd:date ;
+	dc:title "DEfLVDz6fo6YAERH" ;
+	rel:ancestorOf <http://example.com/subjects/89553> ;
+	rel:apprenticeTo <http://example.com/subjects/2695>, <52206731> ;
+	a dc:Event ;
+	owl:sameAs <http://example.net/subjects/94763> ;
+	foaf:homepage _:b1585, <http://example.com/subjects/76831> ;
+	foaf:knows <http://example.com/subjects/98409> ;
+	foaf:name "be0NOGuLJOkY22tN2" .
+<38868447> dc:issued "1966-01-25"^^xsd:date ;
+	a foaf:Agent ;
+	rdfs:label "k9MJCS 808yee" ;
+	foaf:homepage _:b54450, <3719791> .
+<38876602> dc:issued "1995-02-17"^^xsd:date ;
+	a dc:Event ;
+	owl:sameAs <http://example.net/subjects/3647> ;
+	foaf:knows _:b41321 ;
+	foaf:name "a6GLhmRzxiupbJqQv9JJYx7" .
+<38896985> dc:date "1996-03-16"^^xsd:date ;
+	dc:language "UlQuZrGuuM4TCJ4", "jQLpWuO1COcMaKWLvMYUw ", "uRVoNwRnhO3JKB" ;
+	rel:ancestorOf <33671857>, <8808745> ;
+	rel:apprenticeTo <http://example.com/subjects/82871> ;
+	rel:childOf <http://example.com/subjects/7566>, <http://example.com/subjects/9683> ;
+	a foaf:Person ;
+	rdfs:comment "asPV2t1vaIMY" ;
+	foaf:knows <18374987> .
+<38936945> dc:issued "1997-04-28"^^xsd:date ;
+	dc:language "1XS2CAcGZeCD5c", "fhMxidiVHz3SrF91" ;
+	a dc:Sound ;
+	rdfs:comment "Jk w35wwjOVTvHw" ;
+	foaf:name "1A2Uyff WzZ77Jbp8pgoOxtu" .
+<3898608> dc:issued "1985-01-26"^^xsd:date ;
+	dc:language "GxKYI4aRm8YVY" ;
+	rel:apprenticeTo <38936945> ;
+	rel:childOf _:b22281 ;
+	a dc:Sound ;
+	rdfs:comment "p2FH314bgHJA3GHeE7guBibmY", "weMEO KRLjXdS3ZjhZFFYUgB" ;
+	owl:sameAs <http://example.net/subjects/32407> .
+<39060936> dc:date "1976-09-12"^^xsd:date ;
+	dc:title "O9ELtr4xO7 qi" ;
+	rel:childOf <http://example.com/subjects/44369> ;
+	rdfs:label "v3OBlqQ1y", "wGAT2N" ;
+	foaf:homepage <http://example.com/subjects/44904> ;
+	foaf:knows <http://example.com/subjects/76772>, <7854240> .
+<39428090> dc:date "1973-04-22"^^xsd:date ;
+	dc:language "6tjlIzyicp fjCrcKfdprXw" ;
+	dc:title "2MjYdDTSSm4kWaE " ;
+	a foaf:Person ;
+	rdfs:comment "LDPIUiRVEhojbAtNjqOB" ;
+	foaf:name "MbAlI4lG8HXUBJBLvH" .
+<39582099> dc:date "2010-06-20"^^xsd:date ;
+	dc:subject <21640645> ;
+	dc:title "vtUu3yiA9ezF160BFAA" ;
+	rel:ancestorOf _:b53065 ;
+	rel:apprenticeTo <20679191> ;
+	rel:hasMet <http://example.com/subjects/79865>, <http://example.com/subjects/89733> ;
+	foaf:homepage <http://example.com/subjects/72300> ;
+	foaf:knows <http://example.com/subjects/74381> ;
+	foaf:name "TebKVR8IzQGoo16bQyhP", "qOLsLokG0sWSAwFM" .
+<3960668> dc:date "1984-02-11"^^xsd:date ;
+	dc:language "CVvE W 2Ql9Milm", "pQ25ElU29BBo83tIl" ;
+	dc:subject <8865933> ;
+	rel:childOf _:b14045 ;
+	a foaf:Agent ;
+	owl:sameAs <http://example.net/subjects/37089> ;
+	foaf:name "QRFrhsWFC5wMg VJcE" .
+<39610480> dc:issued "1980-01-30"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/32004>, <http://example.com/subjects/7467> ;
+	rel:apprenticeTo <32812874> ;
+	rel:childOf _:b60256, <http://example.com/subjects/16169> ;
+	rel:friendOf <http://example.com/subjects/59581> ;
+	rdfs:comment "RYILUTQC1bCPfNdES" ;
+	rdfs:label "k sQEx8L" ;
+	foaf:homepage <http://example.com/subjects/72795> ;
+	foaf:name "HrSsnXDy78d3pV3VMr" .
+<39706636> dc:date "2001-06-28"^^xsd:date ;
+	dc:language "OPifPawUtxWBF9D", "W ygoJuONphLMZZCUd0RJu u", "t86LGz0C2F5h" ;
+	rel:apprenticeTo <http://example.com/subjects/26773> ;
+	rel:hasMet _:b24818, <48013074> ;
+	a dc:Text ;
+	owl:sameAs <http://example.net/subjects/16800> ;
+	foaf:homepage <40838410> ;
+	foaf:name "3oLIWqw9igrlzw3A" .
+<39791324> dc:date "1978-09-25"^^xsd:date ;
+	dc:subject <http://example.com/subjects/99948> ;
+	rel:apprenticeTo <41410087> ;
+	rel:childOf <http://example.com/subjects/64682>, <http://example.com/subjects/74556> ;
+	rdfs:comment "tdKRE9fJSVXbTkA5trwWv8pRs" ;
+	foaf:homepage _:b44747, <http://example.com/subjects/93174>, <http://example.com/subjects/98944> ;
+	foaf:name "IrumUx NJzYkOEpbZKEUYA3", "pvMJ1Iqv0EGayV" .
+<39888730> dc:date "2004-04-27"^^xsd:date ;
+	dc:language "28QkhaTvP5nC ", "6Dpv8DtjtJuFkl3MaJE7", "gJUrqtCwKj5x1KHDNRWk" ;
+	dc:title "LhfC1twILN" ;
+	rel:childOf <45076615> ;
+	rel:friendOf _:b98512 ;
+	a foaf:Person ;
+	foaf:homepage <23221906> .
+<39919359> dc:issued "1965-07-12"^^xsd:date ;
+	dc:language "XK4HHAYM9Yq", "or0Gr9rEAxfXtA" ;
+	rel:childOf <http://example.com/subjects/38471> ;
+	a foaf:Agent ;
+	rdfs:label "vOERTD2" ;
+	foaf:knows <http://example.com/subjects/51422> .
+<39921421> dc:date "1968-05-19"^^xsd:date ;
+	dc:language "HSnYrDNzD81XT5ztV4" ;
+	dc:subject _:b5240 ;
+	rel:hasMet <9829168> ;
+	rdfs:comment "FNsSFOZ" ;
+	owl:sameAs <http://example.net/subjects/75746> ;
+	foaf:homepage <http://example.com/subjects/95541> ;
+	foaf:knows <http://example.com/subjects/34617> .
+<40049267> dc:issued "1971-01-29"^^xsd:date ;
+	dc:language "ouODhX" ;
+	dc:title "Zu23fkLIPwUOwwbNrJFNqFagQ" ;
+	rel:apprenticeTo <34944858> ;
+	rel:friendOf _:b88443 ;
+	rel:hasMet <25788660>, <36196031> ;
+	a dc:Sound, foaf:Organization ;
+	rdfs:comment "1RKiO2ciYai", "sp63uIFZ2N2QMju R Oey8vG6" .
+<4008595> dc:issued "1977-01-29"^^xsd:date ;
+	rel:ancestorOf _:b89803 ;
+	rel:friendOf <22942006>, <37244206> ;
+	a dc:Event, foaf:Organization ;
+	rdfs:comment "7uQTqC9OfPa" .
+<40213900> dc:date "1990-02-22"^^xsd:date ;
+	dc:title "hc0dF3Fjtz0X84nUEgDSn" ;
+	rel:ancestorOf <http://example.com/subjects/45543>, <http://example.com/subjects/57315> ;
+	rel:friendOf <http://example.com/subjects/3999> ;
+	rel:hasMet <http://example.com/subjects/30868> ;
+	a dc:Event ;
+	rdfs:comment "GLzR6UBTNv7OfVCDR", "UtA99SkJbTE15CB54b83iAQ3g" ;
+	foaf:homepage <http://example.com/subjects/69896> ;
+	foaf:name "p8chHxBna7dJ" .
+<40259490> dc:issued "1982-02-21"^^xsd:date ;
+	dc:title "7Z2XoQWtO" ;
+	a dc:Text ;
+	rdfs:comment "oGOc1V39rr" ;
+	rdfs:label "Zm7I6WlwQd17G1n9jhcK" ;
+	foaf:homepage <13702518> ;
+	foaf:name "6UxFtalWW" .
+<40399505> dc:issued "1986-02-28"^^xsd:date ;
+	dc:language "9zbdQDgUjfORvgx" ;
+	rel:ancestorOf <8998946> ;
+	rel:friendOf <6152551> ;
+	foaf:knows <48013074> ;
+	foaf:name "JFVn0OIr9u8ZmcH7JbFNv4Bj" .
+<40410639> dc:issued "1987-06-29"^^xsd:date ;
+	dc:language "0t8xtQZWQui uvf" ;
+	dc:subject <19516931>, <21958823> ;
+	rel:apprenticeTo <http://example.com/subjects/55766> ;
+	rel:childOf <http://example.com/subjects/33191> ;
+	rel:hasMet <http://example.com/subjects/47971> ;
+	a dc:Text ;
+	rdfs:label "LgYukwrIKyyNjyzrV9 g5tiK", "p0Xp8UagFUcju" ;
+	owl:sameAs <http://example.net/subjects/86115> ;
+	foaf:homepage <http://example.com/subjects/63386>, <11570074> ;
+	foaf:name "QFqjBCDr5Kn" .
+<40675680> dc:issued "1980-04-17"^^xsd:date ;
+	dc:title "Fx6aVd" ;
+	rel:apprenticeTo _:b5558 ;
+	a foaf:Person ;
+	rdfs:label "UgquPKrZkvoh3RTFM0" ;
+	owl:sameAs <http://example.net/subjects/28982> ;
+	foaf:name "1mh8I0v0PBMvsnquHmk" .
+<40732280> dc:issued "2007-01-24"^^xsd:date ;
+	rel:friendOf <36498833> ;
+	rel:hasMet <http://example.com/subjects/83044> ;
+	a foaf:Organization ;
+	foaf:name "UwnL3aBX fs" .
+<40740264> dc:issued "1982-04-26"^^xsd:date ;
+	dc:title "YzoM0hXAFnv4", "qLh4jwVhR1d" ;
+	a foaf:Agent ;
+	rdfs:label "in9hERzdesN" ;
+	foaf:knows <24525908>, <36865053> .
+<40838410> dc:date "1975-03-28"^^xsd:date ;
+	dc:language "zybmXg " ;
+	rel:ancestorOf <http://example.com/subjects/1918> ;
+	rel:apprenticeTo <17317910> ;
+	rel:childOf <http://example.com/subjects/21010> ;
+	rel:hasMet <http://example.com/subjects/79340> ;
+	a foaf:Person ;
+	foaf:knows <http://example.com/subjects/63958>, <28421301> .
+<41014318> dc:issued "1975-06-18"^^xsd:date ;
+	dc:title "5Eg1o2FhpcWlVsADky3LHW4" ;
+	rel:ancestorOf <33387629>, <7150043> ;
+	rel:childOf <13410692> ;
+	a dc:Text ;
+	rdfs:label "S21DfmW5", "dhN1SPltBJ3L03tD45A1" .
+<41146446> dc:date "1997-08-17"^^xsd:date ;
+	dc:language "WFUl08rRRgzF9wp", "hHcV9xhsYBXU1" ;
+	rel:childOf <4503602> ;
+	a foaf:Organization ;
+	rdfs:label "sGs7zx9V2zHhBtiSZVy" ;
+	foaf:homepage <28852570> ;
+	foaf:knows <8655072> .
+<41161142> dc:date "1995-03-21"^^xsd:date ;
+	dc:title "PZ6TFjMTEiN2mRfSOsna" ;
+	rel:ancestorOf <14074716> ;
+	rel:apprenticeTo <19888047> ;
+	rel:childOf <9466608> ;
+	a foaf:Organization ;
+	rdfs:comment "9YV3CjYbGrFKDan38Rj1v", "KepctJ", "pUz7IF2gt 3s1FRO8x9Q" .
+<41260802> dc:date "1993-06-20"^^xsd:date ;
+	dc:language "EimCElg2aJ1kgIIlUdooPN" ;
+	rel:apprenticeTo <http://example.com/subjects/30294>, <http://example.com/subjects/88847> ;
+	rel:childOf <http://example.com/subjects/76877> ;
+	a dc:Sound, dc:Text ;
+	rdfs:comment "UMi56G75cAV2uug" ;
+	foaf:name "y7jjEyGF" .
+<41288858> dc:issued "1966-09-20"^^xsd:date ;
+	a dc:Event ;
+	rdfs:comment "n 1NmvUh" ;
+	foaf:homepage <27341215> .
+<41372729> dc:issued "1979-05-18"^^xsd:date ;
+	dc:title "aftNDyVs4ul3nIq2xh2" ;
+	rel:apprenticeTo _:b7574 .
+<41410087> dc:date "1966-02-30"^^xsd:date ;
+	dc:language "pvUjEpndmL" ;
+	dc:subject <http://example.com/subjects/83600> ;
+	a foaf:Organization ;
+	rdfs:label "vtBq MlPzOQBkBK7yyBi" ;
+	foaf:knows <http://example.com/subjects/58392>, <21640645> .
+<41433700> dc:date "1972-08-14"^^xsd:date ;
+	dc:language "U793MwybLK" ;
+	rel:childOf _:b40821 ;
+	a foaf:Agent ;
+	foaf:name "gNM697RXOqO t" .
+<41485602> dc:date "1981-05-23"^^xsd:date ;
+	dc:title "zh3wV1L4oG6xu" ;
+	rel:childOf <51515132> ;
+	rel:friendOf <8731418> ;
+	rdfs:comment "k2TMDNrmEa9iFQkqKignadxN" ;
+	rdfs:label "8pF4G9", "uKA2 2BWAf9f" .
+<41610951> dc:date "1968-02-29"^^xsd:date ;
+	dc:language "048LVfGXatfKe08W6nl8Je", "t vwdeXNacyD" ;
+	rel:ancestorOf <8865933> ;
+	a dc:Text .
+<4162989> dc:date "2009-01-23"^^xsd:date ;
+	dc:subject <52313001> ;
+	rel:friendOf <49435227> ;
+	a dc:Event ;
+	foaf:name "cRlQzlvN6BOzVrL3k" .
+<41709642> dc:issued "1968-02-11"^^xsd:date ;
+	dc:title "C23z qsW0dEtskzy9CUNuytK" ;
+	a foaf:Agent ;
+	owl:sameAs <http://example.net/subjects/36967> .
+<42339847> dc:date "2007-01-21"^^xsd:date ;
+	dc:language "IFuiabJZc9MLAVVqq" ;
+	dc:subject <53793323> ;
+	rel:apprenticeTo <http://example.com/subjects/24856> ;
+	rel:childOf <http://example.com/subjects/50805> ;
+	rel:friendOf <http://example.com/subjects/22835> ;
+	rel:hasMet <32818319> ;
+	rdfs:comment "CjufSanbxqRGRtnwuFHUkhY7t", "vRUcLk" ;
+	foaf:knows <46028730> .
+<42348746> dc:date "2011-05-12"^^xsd:date ;
+	rel:apprenticeTo <53907827> ;
+	rel:childOf <http://example.com/subjects/50434> ;
+	rel:hasMet <http://example.com/subjects/16596>, <2821181>, <34944858> ;
+	a foaf:Person ;
+	rdfs:comment "9jtDFUf3pTbEFrQGZE5E" ;
+	foaf:homepage <http://example.com/subjects/95047> ;
+	foaf:knows <http://example.com/subjects/76955>, <http://example.com/subjects/80194> .
+<42482287> dc:issued "1998-09-23"^^xsd:date ;
+	dc:subject <7854240> ;
+	rel:apprenticeTo <http://example.com/subjects/3764> ;
+	rel:friendOf <http://example.com/subjects/24220> ;
+	rel:hasMet <http://example.com/subjects/39315>, <http://example.com/subjects/50276> ;
+	a dc:Text, foaf:Organization ;
+	rdfs:comment "5XMjgGjDvw2q4dmxj" ;
+	foaf:knows <http://example.com/subjects/89963> .
+<42527535> dc:issued "2005-07-30"^^xsd:date ;
+	dc:language "odWzE4VVaxHASnhU2izyWhd" ;
+	rel:childOf _:b14414 ;
+	rdfs:comment "jT9o9zQcA8DSgadm0J2jmIV" ;
+	rdfs:label "gt9Mk6fLpIc9gzajUZbv" ;
+	owl:sameAs <http://example.net/subjects/10253> ;
+	foaf:name "lmkAdMmeTDh0utnSg4uSDnA" .
+<42683870> dc:date "1984-07-20"^^xsd:date ;
+	a foaf:Person ;
+	rdfs:comment "It8R4P", "Y6Ce FE" .
+<4282607> dc:date "1975-09-22"^^xsd:date ;
+	dc:subject <http://example.com/subjects/35199>, <http://example.com/subjects/67391> ;
+	rel:friendOf <http://example.com/subjects/69597> ;
+	a foaf:Agent ;
+	rdfs:comment "ufPG8aaKhmpQn" ;
+	owl:sameAs <http://example.net/subjects/93219> ;
+	foaf:knows <http://example.com/subjects/98725> ;
+	foaf:name "raVdAuzchbyZwv" .
+<4292071> dc:issued "1963-08-16"^^xsd:date ;
+	dc:title "Uh3BlUXpBeaUyds229Ku", "eLKeLFeiMRYzO7igequ AXWDi" ;
+	rel:ancestorOf <49366850>, <9170762> ;
+	a foaf:Organization ;
+	rdfs:comment "DGFAWIRym9S mqb7W4j2CxS" ;
+	foaf:homepage _:b43908 ;
+	foaf:name "FaABmZAUQAz486w" .
+<4296451> dc:date "1974-04-11"^^xsd:date ;
+	dc:language "3YRX3Wb Y4wopbrUiSuD4c" ;
+	dc:subject <http://example.com/subjects/33624>, <49560042> ;
+	dc:title "biCH0qppJuamTAARWM" ;
+	rel:ancestorOf <35421031> ;
+	rel:apprenticeTo <http://example.com/subjects/72780> ;
+	rel:childOf <8808745> ;
+	rel:friendOf <http://example.com/subjects/87626> ;
+	a foaf:Person ;
+	foaf:knows <http://example.com/subjects/70217> .
+<43050205> dc:issued "1978-04-21"^^xsd:date ;
+	rel:ancestorOf <8865933> ;
+	rdfs:comment "UesPRe2cmrGdNYKA 4HpyDWny", "iFCRK i" ;
+	rdfs:label "O68e4rJu WO5wUXSTqagG" ;
+	owl:sameAs <http://example.net/subjects/78971> .
+<43092764> dc:date "1969-05-26"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/23479> ;
+	rel:friendOf <6817806> ;
+	rel:hasMet <http://example.com/subjects/26377>, <http://example.com/subjects/57564> ;
+	a dc:Text ;
+	rdfs:comment "pwospTK3" ;
+	foaf:homepage <http://example.com/subjects/90254> ;
+	foaf:knows _:b85489, <2829419>, <33671857> .
+<43376378> dc:issued "1982-09-24"^^xsd:date ;
+	dc:language "cgNuT9gOMZ9X" ;
+	dc:title "UvcM0PUQmH2EC D8fjHTgPL" ;
+	rdfs:comment "PFPuewiRgXPmh6BCv" ;
+	foaf:homepage <20679191> ;
+	foaf:knows <2821181> ;
+	foaf:name "aRmo fD" .
+<43486928> dc:issued "1982-01-21"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/20177>, <http://example.com/subjects/41879>, <37393773> ;
+	rel:hasMet <http://example.com/subjects/7003>, <http://example.com/subjects/75322> ;
+	a foaf:Organization ;
+	foaf:homepage <http://example.com/subjects/82588> ;
+	foaf:name "CYyC7cHq6BLyNZRd", "hdaTCWZuT" .
+<43511234> dc:date "1983-06-22"^^xsd:date ;
+	rel:apprenticeTo <38876602> ;
+	rdfs:comment "QtBwJzMLG0Q3DEgvx1l qtT" ;
+	owl:sameAs <http://example.net/subjects/68114> ;
+	foaf:homepage _:b99734 ;
+	foaf:name "CtqyA3OU6Mja" .
+<43636985> dc:issued "2008-05-28"^^xsd:date ;
+	rel:friendOf <7860292> ;
+	a dc:Sound ;
+	foaf:name "9qoUvBJd5g", "F8lee8vipypmFQfST" .
+<4367842> dc:issued "1979-03-29"^^xsd:date ;
+	dc:title "NiWJ9duksQHnTod" ;
+	rel:apprenticeTo _:b23711 ;
+	a foaf:Person .
+<4378406> dc:issued "1974-06-16"^^xsd:date ;
+	dc:language "YwfN0HcgbQZoflnmal" ;
+	dc:title "pv5NXyJKipR6" ;
+	a dc:Text ;
+	rdfs:comment "Gb8GaGMbdD69WV88ZjEf" .
+<43846513> dc:date "1967-06-11"^^xsd:date ;
+	dc:title "1n3yB1u6GNQwUqR6BT" ;
+	a foaf:Agent, foaf:Organization ;
+	rdfs:label "Mz0a69GIPg dZ4oqmJWWLJGTG" ;
+	foaf:homepage _:b71435 ;
+	foaf:name "0kfbzok" .
+<438557> dc:date "2008-03-27"^^xsd:date ;
+	a dc:Event ;
+	rdfs:comment "PKE2dnHbmo gClyA" ;
+	owl:sameAs <http://example.net/subjects/73835> .
+<4394345> dc:date "1996-02-27"^^xsd:date ;
+	dc:subject <http://example.com/subjects/31589>, <http://example.com/subjects/58301> ;
+	rel:ancestorOf <42482287> ;
+	rel:childOf <http://example.com/subjects/60997>, <28454116> ;
+	rel:friendOf <http://example.com/subjects/49072>, <http://example.com/subjects/82031> ;
+	a dc:Event ;
+	rdfs:comment "5unGH8p88Vj7HlQKNZ" ;
+	foaf:name "gi IQWNK4oci6Gn" .
+<43982477> dc:issued "1997-05-20"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/72469> ;
+	rel:childOf <44521357> ;
+	rel:hasMet <http://example.com/subjects/2342> ;
+	a foaf:Person ;
+	rdfs:label "9VJhOUgXFE5" ;
+	foaf:homepage <http://example.com/subjects/14313>, <http://example.com/subjects/90326> .
+<44117096> dc:date "1967-07-22"^^xsd:date ;
+	dc:title "UxlN2dRZ" ;
+	a dc:Event ;
+	foaf:homepage <8731418> .
+<44137390> dc:date "1972-03-29"^^xsd:date ;
+	dc:title "NZm dQhQoNem2Tf", "avIss1m9DxfEKkKWWgHhFKCgf" ;
+	rel:ancestorOf <44521357> ;
+	rel:apprenticeTo <http://example.com/subjects/84989> ;
+	rel:childOf <40838410> ;
+	rel:hasMet <http://example.com/subjects/76517>, <41709642> ;
+	foaf:name "amhe35WeEa4" .
+<44161233> dc:date "2005-05-21"^^xsd:date ;
+	dc:language "YG5z2k2wC2noxkxfuvZ9" ;
+	dc:subject <http://example.com/subjects/16822>, <8808745> ;
+	rel:apprenticeTo <http://example.com/subjects/95470> ;
+	rel:friendOf <http://example.com/subjects/44612> ;
+	rel:hasMet <http://example.com/subjects/46424> ;
+	a foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/62> ;
+	foaf:homepage <http://example.com/subjects/62748>, <49761190> ;
+	foaf:knows _:b546 .
+<44189642> dc:issued "1993-09-23"^^xsd:date ;
+	dc:language "uY4BgTcg0Hw P0Q" ;
+	dc:title "6Mm0OF60xEVlQW7ynI" ;
+	rel:ancestorOf _:b29144 ;
+	rel:apprenticeTo <54171102> ;
+	a foaf:Person ;
+	owl:sameAs <http://example.net/subjects/75117> ;
+	foaf:name "lNw3tSkbucwM2YeV9OD506Oh", "tWlvWMWvp9B" .
+<44395621> dc:issued "1985-09-11"^^xsd:date ;
+	dc:language "0QuHQgXBR4j" ;
+	dc:subject <http://example.com/subjects/46271> ;
+	rel:ancestorOf <http://example.com/subjects/98878> ;
+	rel:apprenticeTo <http://example.com/subjects/34088> ;
+	a dc:Event, dc:Sound ;
+	foaf:homepage <http://example.com/subjects/43433>, <6543615> .
+<44404782> dc:issued "1974-05-22"^^xsd:date ;
+	dc:language "suLsQfxlt" ;
+	dc:title "kSkoQ2Cyoc7NbezkCK8e", "sv9BIIS3LP4J" ;
+	rdfs:comment "vd1uw0a" ;
+	foaf:knows _:b79710 .
+<44447148> dc:date "1990-05-12"^^xsd:date ;
+	dc:language "4FqFwfPXpqC3" ;
+	a dc:Sound ;
+	rdfs:comment "5CZpp2D81D8yCtDiE1t" ;
+	rdfs:label "Eo6l6ceBe l" ;
+	foaf:name "SHZXcQXreg6znQz3OGrcVF" .
+<44447151> dc:issued "2006-02-30"^^xsd:date ;
+	dc:title "VRZxy9" ;
+	rel:childOf <53081318> ;
+	rel:hasMet _:b92972 ;
+	a dc:Text ;
+	foaf:homepage <54273385> ;
+	foaf:knows <7819326> ;
+	foaf:name "tQEIt39LkuZmyKxxC3", "xDVNl " .
+<44521357> dc:date "1975-08-19"^^xsd:date ;
+	dc:language "HXjKG2h8ih5R T7wEWH" ;
+	dc:title "h3pS9c" ;
+	rel:ancestorOf <38936945> ;
+	a foaf:Organization ;
+	rdfs:comment "ApSyvwk3AsGK ", "BvSAKYaa72X9vOoufKAPdF" .
+<44528325> dc:date "1967-03-26"^^xsd:date ;
+	dc:language "Xt1vPVemM xZGLFy6A5a" ;
+	dc:title "MEnWCTGsTgH0Ui8Jekre", "vEmz8QGq5lZ" ;
+	a foaf:Organization ;
+	rdfs:comment "j2VOIbZw4DNLvW6p" .
+<44534623> dc:issued "1968-03-22"^^xsd:date ;
+	dc:language "8iAXZga" ;
+	dc:subject <928081> ;
+	dc:title "WC5mjtp3CqJfPB9yM1", "qYSaUdkMcU8" ;
+	rel:apprenticeTo <7819326> ;
+	rel:childOf <23601346> ;
+	a dc:Event ;
+	rdfs:label "2jyBWGDJHakc 2" .
+<44734003> dc:issued "1990-04-16"^^xsd:date ;
+	dc:language "6cVnHdl sIMvIH" ;
+	rel:childOf <http://example.com/subjects/61984>, <http://example.com/subjects/80593> ;
+	rel:friendOf <http://example.com/subjects/78420> ;
+	a dc:Text ;
+	rdfs:label "Y3nFy9mFS8" ;
+	foaf:homepage <http://example.com/subjects/83294> ;
+	foaf:name "JiFexGq8jl8YNTCcW3hMN", "xOcaP9lk3pNe" .
+<44813405> dc:date "1993-09-19"^^xsd:date ;
+	dc:language "5I7OHUsQrnLH1nlCAzc3FN" ;
+	rel:childOf _:b54250 ;
+	a foaf:Agent ;
+	rdfs:comment "l305tNTr35nj2E" ;
+	rdfs:label "D6i5LCt74ULtMBqQ6I G621" ;
+	owl:sameAs <http://example.net/subjects/50044> ;
+	foaf:name "vceMeuM3CzTTK02" .
+<44880911> dc:date "1997-09-24"^^xsd:date ;
+	dc:language "lWKS3sXS1QsnkekN", "qTEpDUKNzvHg" ;
+	rel:apprenticeTo <http://example.com/subjects/64012> ;
+	a dc:Sound ;
+	foaf:knows <http://example.com/subjects/15779> .
+<44888907> dc:date "1973-01-17"^^xsd:date ;
+	rel:ancestorOf _:b10356 ;
+	rel:apprenticeTo <28525666> ;
+	rel:childOf <21226414>, <42527535> ;
+	a dc:Text ;
+	rdfs:comment "upTLa8FbDUmKrYZESX" ;
+	foaf:name "bRZ0G0MvN2uH", "hdHVfN6 9BAzPMBvofFt31" .
+<45014599> dc:issued "2010-01-25"^^xsd:date ;
+	dc:language "lLHuhJCaNfGUuIAlNe" ;
+	dc:title "hADGb7m91XwY2rMA" ;
+	rel:friendOf <19888047> ;
+	rel:hasMet <32397802> ;
+	rdfs:comment "f8V9aK80luE65maW" ;
+	rdfs:label "yHgisbc3w" ;
+	foaf:knows <6543615> .
+<4503602> dc:date "1990-09-30"^^xsd:date ;
+	dc:language "b5IdXo1eCjfq9UbpjhXOI6Ox", "fZtTgZVnxkoGaorXIi", "g8 4siWOH92SMEkxx" ;
+	rel:childOf <52690688> ;
+	rel:hasMet _:b34895 ;
+	a dc:Sound ;
+	foaf:homepage <14003570>, <4162989> ;
+	foaf:name "326RA5m84OOGWxtpFTKBlPm6" .
+<45055305> dc:issued "1964-02-22"^^xsd:date ;
+	dc:language "u5IlUra2jRpKSHrm" ;
+	dc:title "a8h4Ums" ;
+	rel:ancestorOf <http://example.com/subjects/14030> ;
+	a dc:Text ;
+	rdfs:comment "5GwFSljRdnDqVbtRcxYJJIA2" ;
+	foaf:homepage _:b12066, <http://example.com/subjects/44319> ;
+	foaf:name "9qH6MMdp4ddksD8x" .
+<45076615> dc:date "1980-04-20"^^xsd:date ;
+	dc:title "W00A9feMeXK", "l2vQi3tEg1rmxhV" ;
+	rel:apprenticeTo <44395621> ;
+	rel:hasMet <6543615> ;
+	a foaf:Agent ;
+	rdfs:comment "NLG4ZEZGjX2wa" .
+<45101038> dc:date "1996-06-11"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/35726>, <36920663>, <49366850> ;
+	rel:childOf <55312655> ;
+	rel:hasMet <http://example.com/subjects/49505> ;
+	a dc:Text ;
+	rdfs:comment " LEhfyVCP" ;
+	foaf:name "bsVVVzJ8PW" .
+<45120722> dc:date "1984-09-22"^^xsd:date ;
+	dc:title "M5Wjut" ;
+	rel:ancestorOf <6942245>, <7228331> ;
+	rel:apprenticeTo <32896487> ;
+	a dc:Sound ;
+	rdfs:comment "z1OGHqxkOcoa0vdNS2c" ;
+	foaf:knows _:b73657 ;
+	foaf:name "EdBQqt815PLyi" .
+<45213527> dc:date "1975-03-14"^^xsd:date ;
+	rel:friendOf _:b747 ;
+	a dc:Sound ;
+	rdfs:comment "9jAR3S5EE", "XGBVkJ4e5M054QADydHM" ;
+	foaf:name "TI2Zou" .
+<45453326> dc:issued "1975-02-14"^^xsd:date ;
+	dc:language "HIF9GabSETgBUpjQu" ;
+	rel:ancestorOf <14003570> ;
+	rel:childOf <http://example.com/subjects/2814> ;
+	rel:friendOf <http://example.com/subjects/44624>, <46179345> ;
+	rel:hasMet <http://example.com/subjects/33444>, <http://example.com/subjects/66683> ;
+	a foaf:Person ;
+	rdfs:comment "wD2owvxE5cS" ;
+	rdfs:label "sicftTum rumDDrb", "swOgKk7N3mU1" ;
+	foaf:homepage <http://example.com/subjects/44606> ;
+	foaf:knows <18374987> .
+<45566867> dc:date "1998-02-20"^^xsd:date ;
+	dc:subject <http://example.com/subjects/36284> ;
+	dc:title "93UGfs3PaKGknm" ;
+	rel:ancestorOf <41260802> ;
+	rel:apprenticeTo <http://example.com/subjects/77613> ;
+	rel:hasMet <28717006> ;
+	a dc:Text ;
+	rdfs:label "6cpP3Ixo2KOIJV5O6sy" ;
+	foaf:knows <6152551> .
+<45586581> dc:date "1979-08-27"^^xsd:date ;
+	dc:subject <http://example.com/subjects/21739> ;
+	rdfs:label "htN tUmdeuGF0l gGdYTUD" ;
+	foaf:knows <http://example.com/subjects/90694> .
+<45696659> dc:date "2010-05-13"^^xsd:date ;
+	dc:subject <24294755> ;
+	rel:ancestorOf <15917521> ;
+	rel:apprenticeTo <49366850> ;
+	rdfs:comment "8wnqru8sDQ1W" .
+<45736275> dc:date "1970-04-28"^^xsd:date ;
+	dc:language "w8GzkzBDL1JxOmpsFuW2" ;
+	dc:title "74dSKEeuVSM", "zG5DUJpnMUAzojYem" ;
+	rel:childOf <http://example.com/subjects/54481> ;
+	rel:friendOf <http://example.com/subjects/21944>, <http://example.com/subjects/25757> ;
+	rel:hasMet <13702518> ;
+	a foaf:Agent ;
+	rdfs:comment "WnFBml" ;
+	owl:sameAs <http://example.net/subjects/85325> ;
+	foaf:homepage <16810983> ;
+	foaf:knows <1773869> .
+<45831682> dc:date "1981-02-15"^^xsd:date ;
+	dc:subject <38896985> ;
+	dc:title "JOFlNDvqbq9" ;
+	a foaf:Organization ;
+	foaf:homepage _:b56450 ;
+	foaf:name "zWSYD5" .
+<46028730> dc:date "1978-09-25"^^xsd:date ;
+	dc:subject _:b21371 ;
+	dc:title "KbNLIYqAst4kHXWsu" ;
+	rel:apprenticeTo <http://example.com/subjects/69570> ;
+	rel:childOf <47490055> ;
+	rel:friendOf <http://example.com/subjects/69689> ;
+	rel:hasMet <http://example.com/subjects/96504>, <43511234> ;
+	a dc:Text ;
+	rdfs:comment "1be2YW09drnDYQ", "RIgthyqO79xagS0" ;
+	foaf:knows <http://example.com/subjects/16124>, <23601346> ;
+	foaf:name "oZRRB0qJ5JQYr7Qz" .
+<46151312> dc:date "1963-07-23"^^xsd:date ;
+	dc:language "3maf8RVx5PIIPr1" ;
+	dc:title "RQ8IklsbEr9nVfFYYX15ct" ;
+	rel:childOf <34908812> ;
+	a foaf:Agent ;
+	rdfs:label "EI44 lecUt7wWp3wyppQ" ;
+	foaf:homepage <38876602> .
+<46179345> dc:date "1992-01-22"^^xsd:date ;
+	rel:ancestorOf <33387629> ;
+	a foaf:Person ;
+	rdfs:comment "TS7TeUgnWOFTDux3gB" ;
+	owl:sameAs <http://example.net/subjects/26470> .
+<46192602> dc:date "1995-08-15"^^xsd:date ;
+	dc:subject <45213527> ;
+	rel:friendOf <39706636> ;
+	rel:hasMet <9466608> ;
+	a dc:Sound ;
+	foaf:name "k1P3I6rmItbH9y" .
+<46195595> dc:date "2007-04-14"^^xsd:date ;
+	dc:title "ZwQ2TfjMWTD3el" ;
+	rel:ancestorOf <39921421> ;
+	a foaf:Agent ;
+	rdfs:label "kzwtwXZ" .
+<46560412> dc:issued "1970-06-24"^^xsd:date ;
+	dc:language "GdLqJVfVUh AceCU1n1UTP" ;
+	rel:childOf <9423322> ;
+	a foaf:Person ;
+	owl:sameAs <http://example.net/subjects/81578> ;
+	foaf:knows <21640645> .
+<46574643> dc:issued "1990-09-16"^^xsd:date ;
+	dc:title "D37rvIBR0clCWOHl" ;
+	rel:hasMet _:b46267 ;
+	rdfs:label "R6YRZi7AcFMmduMs52stsudmM", "v7pKa94iifW7SVg7SU" .
+<46807817> dc:issued "1976-07-19"^^xsd:date ;
+	dc:title "eC0ppQAMlJVxKarC" ;
+	rdfs:label "N4jvXIb1c0U8Gk5" ;
+	owl:sameAs <http://example.net/subjects/24841> ;
+	foaf:name "WUtdFsk" .
+<46845836> dc:issued "2006-09-20"^^xsd:date ;
+	dc:language "fKblye1Om5CObKl0qUH9Jt" ;
+	dc:subject <http://example.com/subjects/42528> ;
+	dc:title "20mSjK jfg" ;
+	rel:apprenticeTo <http://example.com/subjects/16994>, <http://example.com/subjects/19818> ;
+	rel:friendOf <http://example.com/subjects/40882> ;
+	a dc:Sound ;
+	rdfs:label "LAR9vdx4K7" ;
+	owl:sameAs <http://example.net/subjects/51240> ;
+	foaf:homepage <14149364> .
+<47110093> dc:issued "1967-08-25"^^xsd:date ;
+	dc:language "5nEdG5Q2v", "brA1oW3WI26ibzSZzY" ;
+	dc:title "OXIeEBugKBDHU" ;
+	rel:ancestorOf <32611720> ;
+	rel:friendOf <http://example.com/subjects/73171> ;
+	owl:sameAs <http://example.net/subjects/58296> ;
+	foaf:homepage <23829100> .
+<47145470> dc:issued "2001-03-14"^^xsd:date ;
+	dc:subject <http://example.com/subjects/14785>, <http://example.com/subjects/28095> ;
+	rel:hasMet <http://example.com/subjects/7695> ;
+	a dc:Text ;
+	rdfs:comment "mGukhHrP4g9jCv J1tM" ;
+	foaf:name "KhqOyECdlLSXbq" .
+<47227537> dc:date "1981-04-25"^^xsd:date ;
+	a dc:Event ;
+	rdfs:comment "Lc0vLJpd Rgb25IKAYv9m5" ;
+	rdfs:label "q3SVAFaT" ;
+	foaf:knows <54785742> .
+<47277715> dc:issued "1978-01-28"^^xsd:date ;
+	rel:hasMet <18903362> ;
+	rdfs:label "kty4uK" ;
+	foaf:homepage <19888047> ;
+	foaf:name "unfAi ivNgUrThu" .
+<473415> dc:date "2009-02-11"^^xsd:date ;
+	dc:language "AJ1XwOdta", "kjkj TK" ;
+	rel:apprenticeTo <32397802> ;
+	a foaf:Organization ;
+	rdfs:label "WY4No8bgRa8wjW0Mb924a" ;
+	foaf:name "Xf3I DXlk87Veaw" .
+<47343668> dc:issued "2001-03-24"^^xsd:date ;
+	dc:title "4U0U7TDKNWdK" ;
+	rel:ancestorOf <44161233> ;
+	a foaf:Person ;
+	foaf:knows _:b25783, <http://example.com/subjects/35772>, <http://example.com/subjects/4144> .
+<47351998> dc:issued "1995-08-11"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/78691> ;
+	rel:friendOf _:b99774 ;
+	a dc:Sound, foaf:Organization ;
+	rdfs:comment "3j7XzqZN764WMH3TVa pA" ;
+	rdfs:label "FIGRSeU1bXFnZU", "YVoMAWTTgxk", "Z2mOeLWXpx6NqqmkXPFn1k" ;
+	foaf:knows <4503602> .
+<4737133> dc:date "1983-03-28"^^xsd:date ;
+	dc:language "k9ishgKGei" ;
+	dc:title "FHDjlJY4JQ" ;
+	rel:ancestorOf <http://example.com/subjects/99784>, <13185753> ;
+	rel:apprenticeTo <http://example.com/subjects/53637> ;
+	rel:childOf <http://example.com/subjects/2610> ;
+	rel:hasMet _:b80392 ;
+	a foaf:Agent ;
+	foaf:homepage <36435288> ;
+	foaf:name "zAJwbxKloDaDyOWR1r " .
+<47490055> dc:issued "1989-09-30"^^xsd:date ;
+	dc:subject <31285371> ;
+	dc:title "CuKyy4QgJvFE" ;
+	rel:childOf <52690688> ;
+	a foaf:Agent .
+<47821407> dc:date "2009-03-30"^^xsd:date ;
+	dc:title "iDNkDvz1NjmW6yg" ;
+	rel:ancestorOf <http://example.com/subjects/26454> ;
+	rel:apprenticeTo <http://example.com/subjects/37375>, <http://example.com/subjects/79718> ;
+	a dc:Text ;
+	rdfs:label "3D5eWWWPsQBpdkVQHnwgeSSN0" ;
+	foaf:knows <http://example.com/subjects/42297> .
+<47992126> dc:date "1980-09-18"^^xsd:date ;
+	rel:childOf <28421301> ;
+	rdfs:label "Rq9jqFE" ;
+	foaf:homepage <53081318> ;
+	foaf:name "EgRuxJ0cBMcO0HkpRYzC", "Oo2bo2", "lz7wrTHsxcAhEqY" .
+<47997650> dc:issued "1975-03-12"^^xsd:date ;
+	dc:language "9cXlcVK" ;
+	rel:hasMet _:b72405 ;
+	a dc:Text .
+<48013074> dc:issued "1974-02-19"^^xsd:date ;
+	rel:ancestorOf <23601346> ;
+	rdfs:label "QOpF4xQ1mugT26iEFh5FA4ZVH" ;
+	foaf:homepage <33671857> .
+<48094898> dc:issued "1997-05-21"^^xsd:date ;
+	dc:subject <http://example.com/subjects/19178> ;
+	rel:apprenticeTo <http://example.com/subjects/88447> ;
+	rel:friendOf <http://example.com/subjects/29882> ;
+	rel:hasMet <http://example.com/subjects/78931> ;
+	a dc:Text ;
+	rdfs:comment "R 3o93Mm" ;
+	rdfs:label "fhHf6akznJxMc51O4yva" .
+<48184174> dc:date "2000-08-26"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/2580> ;
+	rel:apprenticeTo <http://example.com/subjects/19509> ;
+	rel:hasMet <http://example.com/subjects/87129> ;
+	a dc:Event ;
+	owl:sameAs <http://example.net/subjects/99380> ;
+	foaf:homepage _:b30200 ;
+	foaf:name "XB84N8ll2r" .
+<48237860> dc:issued "2007-02-11"^^xsd:date ;
+	dc:title "xsiAPL" ;
+	rel:friendOf <45453326> ;
+	a dc:Event ;
+	rdfs:comment "BSZdQJoqpVkCr7v", "lyciCK5yfrsumD4i" ;
+	foaf:homepage _:b49968 .
+<4842468> dc:issued "1980-03-23"^^xsd:date ;
+	dc:language "lMVqrULm8ILNfOGiO0SF2" ;
+	rel:ancestorOf <http://example.com/subjects/57821> ;
+	rel:childOf <http://example.com/subjects/39738>, <http://example.com/subjects/77531>, <33736764> ;
+	rel:friendOf <http://example.com/subjects/30216>, <15917521> ;
+	a dc:Event ;
+	foaf:homepage <51696273> .
+<48426737> dc:issued "1967-06-29"^^xsd:date ;
+	dc:title "Qx8bC6H5gT5nRenwQA" ;
+	rel:friendOf <22239173> ;
+	a dc:Text, foaf:Person ;
+	rdfs:comment "5B47iFx 72nbDzoM5M G5v" ;
+	rdfs:label "pC5Qde2t ga6IgwsCNL" ;
+	foaf:knows <23819886> .
+<48542915> dc:date "2007-08-25"^^xsd:date ;
+	dc:subject <31285371>, <7736129> ;
+	dc:title "vBs4CIJ3ILbfu9KDAq0qbCYkH" ;
+	rdfs:comment "d rrgqID1op10NSB8kx8" ;
+	foaf:name "9w24fBsg fz", "TyZupfXyiV" .
+<48642089> dc:issued "1999-03-12"^^xsd:date ;
+	dc:language "FczfQc6QTXuIug" ;
+	dc:title "hcOjTvkBtZkIpU" ;
+	rel:ancestorOf <http://example.com/subjects/71999>, <http://example.com/subjects/93749> ;
+	rel:apprenticeTo <http://example.com/subjects/75912> ;
+	rel:childOf <31353576> ;
+	rel:hasMet <http://example.com/subjects/12633> ;
+	a dc:Text .
+<48693567> dc:issued "2010-02-21"^^xsd:date ;
+	dc:language "emfsyI6z", "hmAosSTII1", "i33mO1jrG" ;
+	dc:title "xyGoFxYEuXY0kkTiHLOC7hjdN" ;
+	a foaf:Organization ;
+	foaf:knows _:b25367 .
+<48745228> dc:date "1993-02-25"^^xsd:date ;
+	dc:subject <http://example.com/subjects/47981> ;
+	dc:title "q2l3x6FeMEkbzoQL2pTZTMB" ;
+	rel:friendOf <http://example.com/subjects/18505>, <45453326> ;
+	rel:hasMet <http://example.com/subjects/72839>, <47145470> ;
+	a dc:Sound ;
+	rdfs:label "73rSEEv" ;
+	foaf:homepage <http://example.com/subjects/28105>, <http://example.com/subjects/39745> ;
+	foaf:name "lEKcBxfqw4UCgXnMc2f" .
+<4883573> dc:issued "1992-03-24"^^xsd:date ;
+	dc:subject <http://example.com/subjects/18907> ;
+	dc:title "KEeGPBijip41kY1b" ;
+	rel:ancestorOf <http://example.com/subjects/4922> ;
+	rel:friendOf <35011800> ;
+	a foaf:Agent ;
+	rdfs:comment "LRV6KGN8HIzC mQvG2F" ;
+	owl:sameAs <http://example.net/subjects/67851> ;
+	foaf:homepage <http://example.com/subjects/90480> ;
+	foaf:knows <http://example.com/subjects/9337> ;
+	foaf:name "7en4coZt" .
+<48876200> dc:issued "1975-02-19"^^xsd:date ;
+	rdfs:comment "S3y1stFLslGMSrdebc88M", "bt6lH5wkPrLxhdnIj0T7MWR8" ;
+	foaf:homepage <43486928> ;
+	foaf:knows _:b85537 .
+<48887207> dc:date "1966-07-16"^^xsd:date ;
+	a dc:Event ;
+	rdfs:label "OMWg01Y" .
+<4905471> dc:date "2001-08-30"^^xsd:date ;
+	dc:language "pKFO4wlSb" ;
+	dc:title "rO0tXqX M" ;
+	rel:apprenticeTo <27341215> ;
+	rel:childOf <http://example.com/subjects/48546>, <http://example.com/subjects/70263> ;
+	rel:hasMet <22239173> ;
+	rdfs:comment "hP4TKHTYwQ" ;
+	foaf:name "ZWkfHaq6Vcum3" .
+<49111497> dc:issued "2009-04-19"^^xsd:date ;
+	dc:language "bwch6wqunvKwzMnrzIdhPN" ;
+	dc:subject _:b36177, <21447658> ;
+	rel:ancestorOf <http://example.com/subjects/31212>, <14814304> ;
+	rel:childOf <http://example.com/subjects/30382> ;
+	rel:hasMet <7736129> ;
+	a foaf:Agent, foaf:Organization ;
+	rdfs:comment " OiklxxfAOc6DRPYWwjGLXP" ;
+	rdfs:label " TVNJEi8M7BK7klibBf56gUK" .
+<49178796> dc:issued "2007-05-18"^^xsd:date ;
+	dc:subject <http://example.com/subjects/4656>, <http://example.com/subjects/8276> ;
+	dc:title "Nz9Ea7Z81 imHDSJAZZyPE" ;
+	rel:apprenticeTo <http://example.com/subjects/77018> ;
+	a dc:Event ;
+	rdfs:comment "6na4epHdsLr" ;
+	owl:sameAs <http://example.net/subjects/25240> ;
+	foaf:homepage <http://example.com/subjects/25463> ;
+	foaf:name "80u5D0erG71ZAgjc8hXO" .
+<49251448> dc:date "1986-07-16"^^xsd:date ;
+	dc:title "VfZqBi9HV qLsUM3" ;
+	rel:hasMet <http://example.com/subjects/32137> ;
+	a foaf:Organization ;
+	rdfs:comment "h4xUXVfxo2rfSpljpXfY9yw " ;
+	owl:sameAs <http://example.net/subjects/81665> .
+<49256337> dc:date "1985-05-19"^^xsd:date ;
+	dc:title "3exBJmQLOMrRQL" ;
+	rel:hasMet _:b1533, <4883573> ;
+	a dc:Sound ;
+	rdfs:label "dv L R" ;
+	foaf:homepage <21081264>, <30713396> ;
+	foaf:name "iLeMn1Nmjtw9YDvaVOq8TwiO", "mfYiozgeVS39t7QKtyBcEQH" .
+<49366850> dc:date "2006-02-18"^^xsd:date ;
+	dc:title "SNZ CLE3zCAmuWHg4b08" ;
+	rel:friendOf <21447658> ;
+	rel:hasMet <23483322> ;
+	a foaf:Organization ;
+	rdfs:label "RyxIOzDCNtoxp0HBm0t2N " ;
+	foaf:name " JqxNZuMJJk9", "sPvRZ2rxe" .
+<49435227> dc:date "1977-02-26"^^xsd:date ;
+	dc:title "aV4tg1spf5jshoiR" ;
+	rel:friendOf _:b84373 ;
+	a foaf:Person ;
+	owl:sameAs <http://example.net/subjects/64962> .
+<49441140> dc:date "2008-02-11"^^xsd:date ;
+	dc:subject <45014599> ;
+	dc:title "lP88YPhXr6EFvmbO7kJzoLS" ;
+	rel:ancestorOf _:b86524, <16810983> ;
+	foaf:knows <http://example.com/subjects/75164>, <http://example.com/subjects/75441> ;
+	foaf:name "Nu9sboeRJZoosEU", "XpAwvPH" .
+<49529076> dc:issued "1966-07-17"^^xsd:date ;
+	dc:subject _:b69162 ;
+	rel:ancestorOf <44528325> ;
+	rel:apprenticeTo <49435227> ;
+	a dc:Sound ;
+	rdfs:label "S7JiZuCXik zRUr4" ;
+	foaf:homepage <3708972> .
+<49560042> dc:issued "2004-08-14"^^xsd:date ;
+	dc:subject <14074716>, <35248827> ;
+	rel:ancestorOf <http://example.com/subjects/60198>, <http://example.com/subjects/88691>, <11304288> ;
+	rel:apprenticeTo <http://example.com/subjects/9589> ;
+	rel:friendOf <http://example.com/subjects/58378> ;
+	a foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/50279> ;
+	foaf:name "jG3PuSHfhLesvNz", "ozyEevIckD6" .
+<49638627> dc:date "1988-05-27"^^xsd:date ;
+	dc:language "y22H2dg3dNE2" ;
+	dc:title "fu20hvgQ" ;
+	a dc:Sound .
+<49682304> dc:issued "1987-01-20"^^xsd:date ;
+	dc:language "kl631BI6w7S4BJecNJEJ" ;
+	rel:childOf <30420487>, <3174725> ;
+	a foaf:Organization ;
+	rdfs:label "1IVVYimFxCHDv4HHJpSc" ;
+	foaf:name "YytRTYnxAG" .
+<49761190> dc:date "1973-03-26"^^xsd:date ;
+	dc:subject <http://example.com/subjects/3570> ;
+	dc:title "EyGoj65Z8OjKVG78Zxn" ;
+	rel:apprenticeTo <http://example.com/subjects/71514> ;
+	rel:childOf <http://example.com/subjects/41436>, <http://example.com/subjects/707>, <50409807> ;
+	rel:hasMet <32818319> ;
+	a dc:Event, dc:Sound ;
+	rdfs:comment "62aGF1pyDaC" ;
+	owl:sameAs <http://example.net/subjects/21664> ;
+	foaf:homepage <44117096> ;
+	foaf:knows <http://example.com/subjects/45137> ;
+	foaf:name "hM8vpjXg32bP6rgSQyEK0", "hWlc2z31ARSJmn" .
+<49995399> dc:issued "2008-07-18"^^xsd:date ;
+	dc:subject <http://example.com/subjects/56226>, <9423322> ;
+	rel:ancestorOf <http://example.com/subjects/15002>, <http://example.com/subjects/54997> ;
+	a dc:Sound ;
+	rdfs:comment "nQ WjUh" ;
+	foaf:knows <http://example.com/subjects/80026> .
+<50070758> dc:issued "1967-03-19"^^xsd:date ;
+	dc:subject <25617830> ;
+	rel:friendOf <http://example.com/subjects/90414> ;
+	rdfs:label "7CciU 5eN" ;
+	foaf:homepage <38896985> ;
+	foaf:knows <http://example.com/subjects/33681> .
+<50086416> dc:date "2009-09-12"^^xsd:date ;
+	dc:title "23D2seG0VKxbg17 G9Um", "pv0uQldZnzGWv" ;
+	rel:ancestorOf <9423322> ;
+	rel:hasMet <16810983> ;
+	foaf:homepage <26035485> .
+<50113152> dc:issued "1980-08-14"^^xsd:date ;
+	dc:title "CMb6sNpyp8C", "vNvWXzKSn40vkmPD5" ;
+	rel:ancestorOf <http://example.com/subjects/38946> ;
+	rel:friendOf <http://example.com/subjects/97348> ;
+	rel:hasMet _:b31550 ;
+	a dc:Sound ;
+	rdfs:label "bg11yJmyExPtUJU49dyB7nmd" ;
+	foaf:homepage <20985848> ;
+	foaf:knows <18374987> ;
+	foaf:name "VBY QXSW5c" .
+<50153122> dc:date "1989-08-21"^^xsd:date ;
+	dc:title "G3fXHqSPlM1jceCxKFn" ;
+	a foaf:Agent ;
+	rdfs:comment "gd n9uokcJ7e6LOyq" ;
+	rdfs:label "Oxc54fW1PdhjgLagH93Ke8zh" .
+<50209807> dc:date "1996-08-17"^^xsd:date ;
+	dc:language "cSvxmfpOs1250wkA2" ;
+	dc:title "CAUlGDm1CkLRRv e" ;
+	rel:apprenticeTo <http://example.com/subjects/76725> ;
+	rel:childOf <http://example.com/subjects/21719> ;
+	a foaf:Organization ;
+	rdfs:label "HD8HUkPDmY6rJ" ;
+	foaf:name " r7NgSI253U" .
+<50372571> dc:date "2001-02-14"^^xsd:date ;
+	dc:language "JUkgkoHbyN" ;
+	rel:ancestorOf <http://example.com/subjects/41926> ;
+	rel:childOf <http://example.com/subjects/10859>, <http://example.com/subjects/3660> ;
+	rel:friendOf <http://example.com/subjects/94870>, <37536441> ;
+	rel:hasMet _:b22892 ;
+	foaf:knows <http://example.com/subjects/66782> .
+<50409807> dc:date "1969-01-18"^^xsd:date ;
+	a foaf:Agent ;
+	rdfs:comment "o24IuqgMPz4" ;
+	rdfs:label "Mdbv2pdBEAo", "aTxPlAmm 5yFwdOIi" ;
+	owl:sameAs <http://example.net/subjects/20210> .
+<50669084> dc:date "1994-04-29"^^xsd:date ;
+	dc:language "eR0KvMf3k" ;
+	dc:title " HpQx6lJmuN" ;
+	a dc:Event ;
+	rdfs:label "5cVvi2vkzp433929mh6E37v7" .
+<50705374> dc:issued "1963-06-15"^^xsd:date ;
+	dc:subject <http://example.com/subjects/77205> ;
+	rel:childOf <http://example.com/subjects/98795>, <30545096> ;
+	a dc:Event ;
+	rdfs:comment "CbH0oY41gU8TdqbWLO4B9" ;
+	foaf:homepage <http://example.com/subjects/79483> .
+<50716036> dc:date "1966-05-20"^^xsd:date ;
+	rel:childOf <6543615> ;
+	a foaf:Person ;
+	rdfs:label "lyF52Ndh3EleccYb4RkZD" ;
+	foaf:knows _:b35024, <6543615> .
+<50843426> dc:issued "1995-03-16"^^xsd:date ;
+	dc:title "I4JCU 5S" ;
+	rel:ancestorOf _:b10550, <http://example.com/subjects/14798> ;
+	rel:apprenticeTo <http://example.com/subjects/39027> ;
+	rel:childOf <http://example.com/subjects/49308> ;
+	rel:friendOf <http://example.com/subjects/40573> ;
+	a dc:Text ;
+	rdfs:label "6U2GEOpGMH0Az", "yFxw1 " ;
+	owl:sameAs <http://example.net/subjects/51869> ;
+	foaf:knows <http://example.com/subjects/75928> ;
+	foaf:name "xft89mkXZG l2lBAg" .
+<50962766> dc:issued "1977-01-20"^^xsd:date ;
+	rel:ancestorOf <14624847> ;
+	rel:childOf <22239173> ;
+	rel:hasMet _:b19953 ;
+	a foaf:Organization ;
+	rdfs:comment "ZOxglwHTHZw" ;
+	owl:sameAs <http://example.net/subjects/74636> .
+<51017561> dc:issued "1999-05-13"^^xsd:date ;
+	dc:subject <http://example.com/subjects/32393>, <32812874> ;
+	a dc:Event ;
+	rdfs:comment "RmchppO8ReF5fZTtf1megB8" ;
+	rdfs:label "Kcz1ILocfKb4icrY5b" ;
+	foaf:homepage <53793323> ;
+	foaf:name "cUuOe9VAFaob9KzD7ytHul5dN", "gW9iW77QEf9yB" .
+<5104916> dc:date "1972-06-22"^^xsd:date ;
+	dc:language "GTe7YSA7nWfSveN1494GwZBi", "q6UIRY15Tz" ;
+	dc:title "4HpCg5GWRFm4w" ;
+	a foaf:Organization ;
+	rdfs:comment "sMMdQKZ8xebjVxKrkejGgVDC" .
+<51068228> dc:issued "1965-03-24"^^xsd:date ;
+	dc:language "2PGHvG cOaiNOStlrAM2" ;
+	dc:subject <25617830> ;
+	rel:apprenticeTo <http://example.com/subjects/50175> ;
+	rel:hasMet <http://example.com/subjects/1468>, <http://example.com/subjects/77353> ;
+	a dc:Sound ;
+	foaf:knows <http://example.com/subjects/98151> ;
+	foaf:name "PcJzBSXj", "rilaFLoxQF" .
+<51085400> dc:date "2001-01-17"^^xsd:date ;
+	dc:language "vrrYDeDVQ" ;
+	dc:subject <http://example.com/subjects/52200> ;
+	rel:apprenticeTo <http://example.com/subjects/83170> ;
+	a dc:Event ;
+	rdfs:label "73HPMwVYl53FAur2", "wIC1i3Rh4WmihQpLXAKo1H" ;
+	owl:sameAs <http://example.net/subjects/5675> .
+<51128354> dc:date "1981-05-20"^^xsd:date ;
+	dc:language "yZfvhFR12jGta2RPC18" ;
+	dc:title "frhBXCB9NpDoKJ7d6z" ;
+	rel:hasMet <http://example.com/subjects/17407> ;
+	a foaf:Organization ;
+	rdfs:comment "v0UvOtofinioW8i9TtWfqXS" ;
+	rdfs:label "0GROppkVE0x uhPXqwyEZw8WO" ;
+	foaf:knows <http://example.com/subjects/86566> .
+<51128719> dc:issued "1962-03-25"^^xsd:date ;
+	a foaf:Person ;
+	rdfs:comment "EiM KxHl86y9Q1hb", "c6JEqDpm6" ;
+	rdfs:label "nO noF6XTlrpLrhgc" .
+<5120789> dc:issued "1973-01-11"^^xsd:date ;
+	dc:language "WX1PB3EqV2YFxKuDf3 5p6" ;
+	dc:title "S01PLUbuDUWbKt", "fwpavXnIFwLFAi" ;
+	a foaf:Agent ;
+	rdfs:label "jAkm9PefPpfTCwEQ" ;
+	foaf:knows <22405271> .
+<5136802> dc:date "1969-04-21"^^xsd:date ;
+	rel:ancestorOf <28621475> ;
+	rel:apprenticeTo <21226414> ;
+	rel:childOf _:b85717 ;
+	a dc:Sound ;
+	rdfs:label "RSRvbv5g1ZMf8842a" ;
+	foaf:knows <24260530> .
+<51469353> dc:issued "1972-08-30"^^xsd:date ;
+	rel:childOf <http://example.com/subjects/16930> ;
+	rdfs:comment "jqIpBqzHSg9xIS2uiL" ;
+	rdfs:label "4wfLNn7K1pO8D6qbQTSHO" ;
+	foaf:homepage <37219747> .
+<51515132> dc:date "1972-03-13"^^xsd:date ;
+	rel:ancestorOf _:b26563 ;
+	a dc:Sound ;
+	foaf:name "YGj8zCiR" .
+<5156690> dc:issued "2004-08-19"^^xsd:date ;
+	dc:language "p3bTd9V" ;
+	dc:title "X0GCVbPJEnG3GYb6CtxdMm" ;
+	rel:ancestorOf _:b64788 ;
+	rel:childOf <45101038> ;
+	rdfs:label "dv2SJSL5S", "hrUjalxsyLXxIh" .
+<51696273> dc:date "1984-08-14"^^xsd:date ;
+	dc:language "V0X 4aJ", "g H4yJMwX lLi " ;
+	dc:subject <36865053> ;
+	rel:hasMet _:b1514 ;
+	a dc:Event .
+<51698487> dc:issued "1980-05-13"^^xsd:date ;
+	a dc:Sound, foaf:Person ;
+	rdfs:label "JbhN7P5", "aMFYaY5VC" .
+<51726165> dc:date "2008-09-29"^^xsd:date ;
+	rel:ancestorOf <http://example.com/subjects/7163> ;
+	rel:childOf <http://example.com/subjects/75166> ;
+	rel:friendOf <http://example.com/subjects/70718>, <http://example.com/subjects/84755> ;
+	rel:hasMet _:b58759, <http://example.com/subjects/93691> ;
+	a foaf:Person ;
+	rdfs:comment "ZjF3a8aJma7VEY5R42jZ5aMXC" ;
+	foaf:name "MroYmfLmf7jzJoqfJmQHZGUN" .
+<51727425> dc:issued "2008-04-17"^^xsd:date ;
+	dc:subject <http://example.com/subjects/42293> ;
+	rel:ancestorOf <http://example.com/subjects/92773>, <44534623> ;
+	rel:apprenticeTo <29274802> ;
+	rel:childOf _:b30317 ;
+	rel:friendOf <34074020> ;
+	a dc:Event, dc:Sound ;
+	owl:sameAs <http://example.net/subjects/32055> ;
+	foaf:name "aFexxopLj0qGOm1FMbmpogea" .
+<5208699> dc:date "1977-07-28"^^xsd:date ;
+	dc:language "YaVEeDfUdLEi4Ng", "mkBRFWGN9hRardw" ;
+	a dc:Sound ;
+	owl:sameAs <http://example.net/subjects/17432> ;
+	foaf:name "6P67F6ZbaLRKjM8" .
+<52206731> dc:date "1979-02-11"^^xsd:date ;
+	dc:subject <36844794> ;
+	rel:apprenticeTo <41610951> ;
+	a dc:Text ;
+	rdfs:comment "CvjJtu4L" ;
+	foaf:homepage <http://example.com/subjects/48992> .
+<52313001> dc:issued "1988-04-21"^^xsd:date ;
+	dc:language "Fwej1GYEf4L3Vx3geMLlBAabS" ;
+	dc:subject <3708972> ;
+	dc:title "dYOUFUz9eMhJBd8a" ;
+	a dc:Text .
+<52470702> dc:date "2011-08-14"^^xsd:date ;
+	rel:hasMet <6419179> ;
+	foaf:knows <13060713> ;
+	foaf:name "wa8YTxSc7Ygu4fOK" .
+<52619328> dc:issued "1975-08-15"^^xsd:date ;
+	dc:title "OhK3oUctah" ;
+	a foaf:Agent ;
+	foaf:knows <http://example.com/subjects/11419> .
+<52690688> dc:date "1992-08-22"^^xsd:date ;
+	dc:title "Pi72xDD Nk9uRO9Yptq" ;
+	rel:childOf <21447658> ;
+	rel:hasMet <23221906> ;
+	a dc:Text ;
+	rdfs:comment "OqiohGHOoeBjOU51dnpWPJ", "au5ZB5boHOBqeNKhfOjQeWR" .
+<5271210> dc:issued "1991-05-29"^^xsd:date ;
+	dc:language "w8Q81tvZjufhi Ew" ;
+	rel:hasMet <3960668> ;
+	a dc:Sound ;
+	rdfs:comment " 5YksTobzLyxiMyd9Va 8raZR" ;
+	rdfs:label "BB6XrSB" ;
+	foaf:knows _:b55957 ;
+	foaf:name "F2W4ZzfsgnXhRvvgEOS8y" .
+<52720914> dc:date "1995-09-26"^^xsd:date ;
+	dc:subject <53793323> ;
+	rel:friendOf <http://example.com/subjects/45014> ;
+	rdfs:comment "qGSFBOBKufg0l1" ;
+	rdfs:label "7 o4W7BUWiqqf" ;
+	foaf:homepage <25583363>, <48013074> ;
+	foaf:knows <http://example.com/subjects/94031>, <http://example.com/subjects/96105> .
+<52800494> dc:date "1966-06-28"^^xsd:date ;
+	dc:language "DkuLt877vWTVyWbmI1qIYj" ;
+	dc:subject <13829176> ;
+	rel:friendOf <19781770> ;
+	a foaf:Agent ;
+	rdfs:comment "eiadXN6jPCCA" ;
+	foaf:knows <44189642> ;
+	foaf:name "C31S4wT", "XEgl022MxhU" .
+<52939645> dc:date "1964-06-18"^^xsd:date ;
+	dc:subject <http://example.com/subjects/26762> ;
+	rel:ancestorOf _:b58870 ;
+	rel:childOf <http://example.com/subjects/3065> ;
+	rel:friendOf <http://example.com/subjects/91413> ;
+	rdfs:label "HCqTP1ETFbB8tuw" ;
+	foaf:homepage <http://example.com/subjects/24837> .
+<53054452> dc:date "1989-03-14"^^xsd:date ;
+	a dc:Sound ;
+	foaf:homepage <37536441>, <54400717> ;
+	foaf:name "eVB4E8QWZdv33tVBOtrFNXlGJ" .
+<53063096> dc:date "2004-03-25"^^xsd:date ;
+	dc:subject <http://example.com/subjects/83554> ;
+	dc:title "G6xwSh5ON4FHq" ;
+	rel:childOf <http://example.com/subjects/11641>, <http://example.com/subjects/9721> ;
+	rel:friendOf <http://example.com/subjects/34629> ;
+	a dc:Text ;
+	rdfs:comment "CDPqICvxfYaQQnU7V" ;
+	foaf:homepage _:b9266, <http://example.com/subjects/19011>, <48013074> .
+<53081318> dc:issued "1967-06-21"^^xsd:date ;
+	a foaf:Agent ;
+	rdfs:comment "ddmZAA" .
+<53183106> dc:date "1971-06-24"^^xsd:date ;
+	dc:language "E87BXLIMBvEqaIPaRF9O5aDmi" ;
+	rel:apprenticeTo <http://example.com/subjects/29241>, <7860292> ;
+	rel:childOf <http://example.com/subjects/18758> ;
+	rel:friendOf <http://example.com/subjects/75557> ;
+	rel:hasMet <http://example.com/subjects/93383> ;
+	rdfs:comment "N4EuYHCQWCbQllgHpP4fs", "htp7vyut NQ2IucRfSinX3nvv" ;
+	foaf:knows <http://example.com/subjects/70836> .
+<53191821> dc:issued "1998-02-20"^^xsd:date ;
+	dc:title "KmFD5w0eWJ2TtUlN", "nYLx9OnPIAwdlna7undtT", "viuMlvKFwTMVnZB aNr" ;
+	rel:ancestorOf _:b19124 ;
+	rel:hasMet <3720815> ;
+	a foaf:Organization ;
+	foaf:homepage <52313001> ;
+	foaf:knows <33671857> .
+<53223774> dc:issued "1974-02-26"^^xsd:date ;
+	dc:title "S9cTS0uxdsbDPx" ;
+	rel:hasMet <22405271>, <32615047>, <49761190> ;
+	a foaf:Organization .
+<53343358> dc:date "1969-09-12"^^xsd:date ;
+	dc:language "SVGwU5SgK" ;
+	dc:title "UE2hgHEe9JynPfrp3S" ;
+	rel:ancestorOf <4162989> ;
+	rel:childOf _:b83641, <20679191> ;
+	a dc:Sound ;
+	rdfs:comment "MyXSL16NaQ" ;
+	foaf:knows <49256337> ;
+	foaf:name "CKU4dEupfAKIUr9gT" .
+<53370619> dc:date "1963-03-13"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/77515> ;
+	rel:childOf <10000742> ;
+	rel:friendOf <19781770> ;
+	rdfs:label "sMiaArg1gEGHk" ;
+	foaf:name "YP0Rq Cef90XJXI" .
+<5338797> dc:issued "1996-06-17"^^xsd:date ;
+	dc:subject _:b18177 ;
+	a dc:Event ;
+	foaf:knows <26295562> ;
+	foaf:name "diYGbLQ1F4" .
+<53531347> dc:issued "1977-08-11"^^xsd:date ;
+	dc:language "JRgdcN" ;
+	dc:title "9613d0Y", "Nnvrrf2Ub0 fUiLPn7BE" ;
+	rel:apprenticeTo <29619270> ;
+	a dc:Event ;
+	rdfs:label "eZ9JKNaRcK wg" .
+<53721714> dc:date "1977-04-20"^^xsd:date ;
+	rel:childOf <33736764> ;
+	a dc:Event ;
+	rdfs:comment "BwmxnbSNflFYsvPzv4ak5o", "ubKoNSZjX7kIyRr" ;
+	foaf:name "RCt9EG W7 LotwQnXeKhH", "o1yHnzqwZGeCOwjBMhGWpP" .
+<53773757> dc:date "1989-08-20"^^xsd:date ;
+	dc:title "aZ1K0NpP" ;
+	rel:hasMet <http://example.com/subjects/29786>, <http://example.com/subjects/93784> ;
+	a foaf:Agent ;
+	rdfs:label "i9eJ5STZJ2Uef", "zHa1Om4L6cJ0Q0I" ;
+	foaf:homepage <http://example.com/subjects/94626> ;
+	foaf:name "2su0UwRJAPEjSZaA4XQDx4E" .
+<53793323> dc:date "2005-02-19"^^xsd:date ;
+	dc:language "o7Uq7V bPkt15NG5fn", "uACvpluNEni1SIYIXuhgl3O" ;
+	dc:subject <15104036> ;
+	rel:apprenticeTo <http://example.com/subjects/27535> ;
+	a foaf:Person ;
+	rdfs:label "FFOqhYzlkHZP " .
+<53907827> dc:issued "1972-08-11"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/94016> ;
+	rel:childOf <http://example.com/subjects/94067> ;
+	rel:friendOf <http://example.com/subjects/22184>, <14814304>, <26035485> ;
+	rel:hasMet <http://example.com/subjects/35669> ;
+	a foaf:Person ;
+	rdfs:label "aGDwIYVhoeT0WiRIhDw" .
+<5405756> dc:issued "1973-04-12"^^xsd:date ;
+	dc:language "PvUpOSk8wVw5ll7r4ab" ;
+	dc:title "5X5gsNrJQSTxTdL9GI" ;
+	a dc:Text ;
+	rdfs:label "HThIFDVWHGWM1IJ5O", "ON2OyvYohy" .
+<54171102> dc:date "1969-04-30"^^xsd:date ;
+	dc:language "LPHz2hKTaB2xsnKHq9QNlmD" ;
+	dc:subject _:b91819 ;
+	rel:childOf <http://example.com/subjects/27198>, <53191821> ;
+	a foaf:Person ;
+	foaf:homepage <http://example.com/subjects/38681>, <http://example.com/subjects/57456>, <http://example.com/subjects/91543> .
+<54273385> dc:date "1992-06-25"^^xsd:date ;
+	rel:apprenticeTo <21447658> ;
+	rel:friendOf _:b95828 ;
+	a dc:Sound ;
+	rdfs:comment "dRu733L63o" .
+<5435933> dc:issued "1962-03-30"^^xsd:date ;
+	dc:title "ruAQRtFDD2" ;
+	rel:apprenticeTo <48542915> ;
+	rel:hasMet <3815293> ;
+	a foaf:Person ;
+	owl:sameAs <http://example.net/subjects/76314> ;
+	foaf:homepage _:b50938, <37145852> ;
+	foaf:name "sonpQS21NsaUdJ6MJ1" .
+<54400717> dc:date "1967-04-14"^^xsd:date ;
+	rel:hasMet <8865933> ;
+	foaf:name "EYs9vGze9eCaK2ZC7E2J7", "uABCoMlBFE2hnhZDB49dR" .
+<54506536> dc:date "1990-04-17"^^xsd:date ;
+	dc:language "s43pUKf", "s6KsoZMhKn1nO9aXL" ;
+	dc:subject <28421301> ;
+	rel:ancestorOf _:b90947 ;
+	rel:childOf <15104036> ;
+	a foaf:Person ;
+	rdfs:comment "CnOkgds2NbHCXwO8tSaGrwP", "WUzlsT1KEIJahbz" ;
+	foaf:homepage <28525666> .
+<54553602> dc:issued "2005-06-11"^^xsd:date ;
+	dc:language "pKwrrTM nGgvXuCZaT2", "qwny d" ;
+	rel:apprenticeTo <27837695> ;
+	a dc:Sound ;
+	foaf:knows <54273385> ;
+	foaf:name "DWOeoojil", "uwQC 5RnAZGpukSPVwDjsD2B" .
+<54567345> dc:issued "1965-04-23"^^xsd:date ;
+	rel:ancestorOf <7228331> ;
+	rel:apprenticeTo <21100566> ;
+	a foaf:Organization ;
+	rdfs:comment "bs5o2euZSR" ;
+	rdfs:label "7MFmwEAJYiGhc" .
+<54624346> dc:issued "1965-01-15"^^xsd:date ;
+	rel:friendOf <24525908> ;
+	a foaf:Organization ;
+	rdfs:comment "GTtPtVcquxHieGcsR4B" ;
+	rdfs:label "HsfG4Q62WXdFfNGa2" ;
+	foaf:homepage <41709642> ;
+	foaf:knows <36920663> .
+<54774920> dc:date "2001-04-21"^^xsd:date ;
+	dc:language "JbUP4xA0FUAezVG9RIBjovqa" ;
+	dc:subject _:b76844 ;
+	rel:childOf <44521357>, <52313001> ;
+	a dc:Sound ;
+	rdfs:comment "SmGudtLnaNCsrbuPGeef" ;
+	owl:sameAs <http://example.net/subjects/54243> .
+<54785742> dc:issued "1962-02-21"^^xsd:date ;
+	rel:ancestorOf <47277715> ;
+	owl:sameAs <http://example.net/subjects/56334> ;
+	foaf:name "wH2tPdccoRD" .
+<55178288> dc:issued "1980-08-19"^^xsd:date ;
+	a foaf:Agent ;
+	rdfs:comment "nM6Zbvzghl", "zsIXOLmB" ;
+	foaf:homepage _:b63561 ;
+	foaf:name "3ccNOgy00dIaYSw V" .
+<55312655> dc:date "1973-08-18"^^xsd:date ;
+	dc:title "dG5laq9cJe2tIro4P" ;
+	a foaf:Agent ;
+	rdfs:comment "Eh804SV2SXvD7CF604tpc", "w0ywhsV76dwL B" ;
+	foaf:name "NBoqsg" .
+<5538079> dc:date "1993-04-17"^^xsd:date ;
+	dc:language "mY3d8k4amzXezUR2TCKeqPh" ;
+	dc:title "N9zOtMJkt jz" ;
+	a dc:Text ;
+	rdfs:comment "zjivDn8Q0W9A" ;
+	foaf:knows _:b39227 .
+<55427828> dc:date "1996-06-28"^^xsd:date ;
+	dc:language "ESR6put eRBDfb5rSJasPuJoq" ;
+	dc:subject <http://example.com/subjects/18775> ;
+	rel:friendOf <http://example.com/subjects/60636>, <11245518> ;
+	rel:hasMet <33112767> ;
+	a dc:Sound ;
+	rdfs:comment "343aIc5" ;
+	rdfs:label "KdVu3E5Pj" ;
+	foaf:name "af9Ph87Qmr3w " .
+<55590893> dc:issued "1983-03-25"^^xsd:date ;
+	dc:language "lCW2E8AcA0pu9aPZHwxo6AXM", "yVg3umgZo1RNG1iqjne" ;
+	dc:subject <21092338> ;
+	dc:title "YZz8l2sk" ;
+	rel:apprenticeTo <4737133>, <7868150> ;
+	foaf:name "xhkkEYN9G" .
+<5749972> dc:issued "1987-05-27"^^xsd:date ;
+	dc:subject <12607451> ;
+	rel:ancestorOf _:b95551 ;
+	rel:friendOf <53081318> ;
+	a dc:Event ;
+	rdfs:label "WXfTaG8bMG7W1GJSVr" ;
+	foaf:homepage <37145852> .
+<580311> dc:date "1981-01-29"^^xsd:date ;
+	rel:apprenticeTo <http://example.com/subjects/54741> ;
+	a foaf:Organization ;
+	rdfs:comment "baGXuoeBmxjRXG" ;
+	foaf:homepage <http://example.com/subjects/66121>, <23483322> .
+<5882599> dc:issued "2000-08-26"^^xsd:date ;
+	dc:language "ihB4h4jVU" ;
+	dc:subject <53191821> ;
+	rdfs:label "yieDCxuntoFNafjR37CR9FYlN" ;
+	foaf:name "DTKkjsBbnjmSxAeDsQ42Q", "OvJVsyc" .
+<5992721> dc:issued "1989-01-22"^^xsd:date ;
+	rel:ancestorOf <33386477> ;
+	a foaf:Organization ;
+	rdfs:comment "Y7JPcEiFGmPCph1K7SnievvPl", "uatMZUY" ;
+	foaf:knows <52690688> .
+<6152551> dc:issued "1984-04-17"^^xsd:date ;
+	dc:language "kDi4iwnVpU03cWGN" ;
+	dc:subject <5749972> ;
+	dc:title "KPDm46CpRFISFVbWl2R0z" ;
+	a dc:Event, dc:Text ;
+	foaf:knows <7228331> ;
+	foaf:name "hSMmj7znnKS4Waqq" .
+<6176283> dc:date "1979-08-24"^^xsd:date ;
+	dc:title "NHdMgZqVf7ez1KEUGdDOlVJg" ;
+	a foaf:Organization ;
+	rdfs:comment "WGY T2NroHa53dUxm1ysFm" ;
+	rdfs:label "XqIOop80SuuM" ;
+	owl:sameAs <http://example.net/subjects/23434> ;
+	foaf:name "qr5zZonMd72X5e7 pgaqbfST" .
+<626859> dc:date "1975-04-26"^^xsd:date ;
+	rel:friendOf _:b62439 ;
+	rdfs:comment "hSHfmYez1KXrtgyYIBoe" .
+<6297302> dc:date "1987-09-16"^^xsd:date ;
+	dc:language "kG29J8YAsjt5NsTlENm", "pAxpbU2mO LoaSPHZPaX nxd" ;
+	rel:friendOf _:b83042 ;
+	a dc:Event, foaf:Person ;
+	rdfs:comment "DoWrxV6K93CCad" .
+<6419179> dc:issued "1978-01-17"^^xsd:date ;
+	dc:title "DLqp1BZtqlpvK5grjqG" ;
+	rel:childOf _:b55397 ;
+	a foaf:Agent ;
+	rdfs:comment "3WVTKe38LEAx81fnNRUt5" .
+<6527358> dc:date "2003-08-23"^^xsd:date ;
+	dc:language "PVrTsau8ITYuOoo1xO" ;
+	dc:subject <54506536> ;
+	rel:childOf _:b76964, <http://example.com/subjects/97239> ;
+	rel:hasMet <928081> ;
+	a dc:Text ;
+	foaf:homepage <http://example.com/subjects/31882>, <http://example.com/subjects/74902> .
+<6543615> dc:issued "2001-07-16"^^xsd:date ;
+	dc:language "QKz51YKb0rRSw" ;
+	a foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/45844> ;
+	foaf:homepage <http://example.com/subjects/6841> ;
+	foaf:name "iYonsrUs0cX1NAOnz8e" .
+<656505> dc:date "1999-08-21"^^xsd:date ;
+	dc:language " J0bqlr", "7F7RPGsR5WTf5", "xATVuS4Hm4DxrtYM" ;
+	rel:ancestorOf <49366850> ;
+	rel:hasMet <49441140> ;
+	a dc:Text .
+<6817806> dc:date "1995-01-30"^^xsd:date ;
+	dc:language "1TX7wp1SzmP3fTMnixkgj9awm" ;
+	dc:subject <40838410> ;
+	dc:title "6Sw32buvcDSkA4hlXyUX27GR" ;
+	rel:ancestorOf _:b24926 ;
+	a dc:Sound .
+<6887093> dc:date "1984-01-27"^^xsd:date ;
+	dc:language " ru5kT9q7", "ta2KfmNV2xjews" ;
+	dc:subject <34074020> ;
+	dc:title "HO9VMIP7mt6Boqy1lbpaXL9rI" ;
+	rel:ancestorOf <36920663> ;
+	a foaf:Agent ;
+	rdfs:label "niIi6UoL" ;
+	foaf:homepage <8731418> .
+<6909822> dc:issued "1985-05-12"^^xsd:date ;
+	rel:ancestorOf <16782269> ;
+	rel:childOf <http://example.com/subjects/24529> ;
+	rel:hasMet <http://example.com/subjects/13270> ;
+	a foaf:Person ;
+	rdfs:comment "NeiYpuB6mH52x4" .
+<6942245> dc:issued "2000-05-25"^^xsd:date ;
+	rdfs:comment "P2aKCZxxaDIDx2OJh1FbNig4" ;
+	foaf:homepage <37874084> ;
+	foaf:knows <22347984> .
+<7048697> dc:issued "1991-04-28"^^xsd:date ;
+	dc:subject <16810983> ;
+	dc:title "FBpgwblI5" ;
+	a dc:Text ;
+	rdfs:comment "soChLwk7FQTy1bqNDDZc", "zKh5Ss02uj" ;
+	owl:sameAs <http://example.net/subjects/41452> ;
+	foaf:homepage <11304288> .
+<7150043> dc:issued "2003-01-13"^^xsd:date ;
+	dc:language "FRhfXH38sO1lmLim" ;
+	dc:title "Q YhTe40jg" ;
+	rel:ancestorOf <55312655> ;
+	rdfs:label "a2mriP1IRZDn5ZF" ;
+	foaf:homepage _:b57501 .
+<7154877> dc:date "2007-03-21"^^xsd:date ;
+	rel:childOf <1773869>, <3960668> ;
+	rel:friendOf <36865053> ;
+	a foaf:Agent ;
+	rdfs:comment "k D8DtweR5G" ;
+	foaf:name "3GP5Yw6M" .
+<7228331> dc:issued "2000-04-29"^^xsd:date ;
+	dc:language "BM4vM jeth3zuF1qeeD", "a2OzshONb1pQaxKegqO", "cF279NWt" ;
+	rel:ancestorOf <12607451> ;
+	a dc:Event ;
+	foaf:knows <8731418> .
+<748772> dc:date "1969-01-15"^^xsd:date ;
+	dc:language "IdpC 5rUVe4KvLn580C" ;
+	dc:subject <http://example.com/subjects/42759> ;
+	rel:ancestorOf <3682788>, <3720815> ;
+	rel:apprenticeTo <http://example.com/subjects/84489> ;
+	rel:friendOf <http://example.com/subjects/9408> ;
+	rel:hasMet _:b51433 ;
+	a dc:Event ;
+	foaf:homepage <http://example.com/subjects/39875> ;
+	foaf:name "HbLALASO3ga", "lU5 Sl N jo2fiKFCgSHn" .
+<7572959> dc:date "1971-02-20"^^xsd:date ;
+	dc:title "tl5fdLzEAYb0" ;
+	a dc:Text ;
+	rdfs:comment "dwl 7ciqmSRWEjoO7Nh8bI" ;
+	rdfs:label "lD0w9tIM6MPQMT" ;
+	foaf:name "lopXIgSItRZ0BuPR7" .
+<7736129> dc:issued "1985-03-15"^^xsd:date ;
+	dc:language "ylxysheObX" ;
+	rel:friendOf _:b89121, <12607451> ;
+	rel:hasMet <37145852>, <37536441> ;
+	a foaf:Agent ;
+	rdfs:comment "jtwN4s83e" ;
+	rdfs:label "X5QwuTP" .
+<773837> dc:date "2004-02-15"^^xsd:date ;
+	dc:language "Eo0e 25hSq 3M5M7LpS3HS7O", "KPW42IDe" ;
+	rel:childOf <http://example.com/subjects/56363> ;
+	rel:hasMet <http://example.com/subjects/85340> ;
+	a foaf:Person ;
+	rdfs:comment "KFCz uzXzmJc7rdO" ;
+	rdfs:label "YbViVK2V3dCIQ3" ;
+	foaf:homepage <http://example.com/subjects/41360>, <51696273> .
+<7819326> dc:issued "1983-06-27"^^xsd:date ;
+	dc:language "GPeaMzM7zjcWx" ;
+	dc:title "XXfscsycvEQMLO7O34 " ;
+	a dc:Event, dc:Text ;
+	rdfs:label "60lQBgGgbJ" .
+<7854240> dc:issued "1983-07-20"^^xsd:date ;
+	dc:language "yewnwSyd6PPRRNC5g8" ;
+	rel:apprenticeTo <21447658>, <3019576> ;
+	rdfs:label "Kw5l71U6Sm" ;
+	foaf:knows <http://example.com/subjects/24229> ;
+	foaf:name "Oyo M2QyM4he" .
+<7860292> dc:issued "1999-07-15"^^xsd:date ;
+	dc:language "pkVDYqdhDO8cbF DlLr Mb2" ;
+	owl:sameAs <http://example.net/subjects/53484> .
+<7867583> dc:date "2001-07-25"^^xsd:date ;
+	dc:title "NPRzypNFoMXB4v8np3m" ;
+	rel:friendOf <14074716> ;
+	rel:hasMet <22578451> ;
+	a dc:Sound ;
+	rdfs:label "ybdwaF6rALpDt lf8k0Ju6Gc" ;
+	foaf:homepage <8998946> .
+<7868150> dc:issued "1962-05-23"^^xsd:date ;
+	dc:title "D WOr666fCjZ3ng9ZfwFpn" ;
+	a dc:Event ;
+	rdfs:label "er4FEbnNFnR" ;
+	foaf:name "egg3G Vtj7Pkmg4k", "qnFUZp wWy" .
+<7955132> dc:date "1996-08-24"^^xsd:date ;
+	dc:title "HT9ieXFcUghf2gu" ;
+	rel:childOf <http://example.com/subjects/80749> ;
+	rdfs:label "QrtKRYLB0zcF" ;
+	owl:sameAs <http://example.net/subjects/7237> .
+<8009625> dc:date "1980-06-29"^^xsd:date ;
+	dc:title "4tPL6r gyRnV", "woCApLbXFSdaKC6P7wd9zBU" ;
+	rel:hasMet <50716036> ;
+	a dc:Event ;
+	rdfs:comment "mj7  cKSyHWq386GVg" ;
+	foaf:homepage <http://example.com/subjects/73435>, <6543615> ;
+	foaf:knows <8731418> ;
+	foaf:name "zY7VvKTaje117A3oCe" .
+<8021779> dc:issued "2000-07-12"^^xsd:date ;
+	dc:title "0lFas7AyVStFHOpSZqwmq" ;
+	rel:apprenticeTo <28688005> ;
+	rel:friendOf <47277715> ;
+	a dc:Text ;
+	rdfs:label "A7qkVWW4ruvQOI", "wr bxDWWfUq" ;
+	foaf:homepage <49256337> ;
+	foaf:name "63Tv0q" .
+<8072961> dc:issued "1964-04-24"^^xsd:date ;
+	rel:apprenticeTo _:b74805 ;
+	rel:childOf <656505> ;
+	rel:hasMet <http://example.com/subjects/93903>, <28717006> ;
+	a dc:Text ;
+	rdfs:comment "oFrgAMhPU0Pp97hQIOPdb" .
+<8241852> dc:issued "2003-04-14"^^xsd:date ;
+	dc:language "Ohd mUObwrw5fiRPJAMO9Rfp", "nXL4GQXsuOeJRjSO" ;
+	dc:title "MaXsAKEIgiOFWnd4EguhM0ou" ;
+	rel:childOf <48094898> ;
+	foaf:homepage _:b11367 .
+<8275836> dc:date "2010-06-23"^^xsd:date ;
+	dc:language "ezk4Y8z460oCTIZ37CZ6i" ;
+	dc:subject <http://example.com/subjects/24984>, <http://example.com/subjects/84432> ;
+	rel:apprenticeTo <http://example.com/subjects/23211> ;
+	rel:friendOf <7736129> ;
+	rel:hasMet <http://example.com/subjects/71461> ;
+	a foaf:Person ;
+	owl:sameAs <http://example.net/subjects/73578> ;
+	foaf:homepage <9170762> .
+<8429945> dc:date "2004-05-21"^^xsd:date ;
+	dc:language "THN0mg", "jMpKbw" ;
+	rel:ancestorOf <5405756> ;
+	a foaf:Person ;
+	foaf:knows <23831367> ;
+	foaf:name "9xZFJ6Xq8ZgBFTwDj7ZYL", "jgwQ3 Q" .
+<8655072> dc:date "2001-04-28"^^xsd:date ;
+	a dc:Sound ;
+	rdfs:label "2vZ8gwgWRcu2R2HdR0U", "HqlR4tt8AX30Sg4rKE5U", "i3QYbkw8DDD9J2PT" ;
+	owl:sameAs <http://example.net/subjects/27582> ;
+	foaf:name "SZeuljmlm" .
+<8731418> dc:date "1963-06-19"^^xsd:date ;
+	rel:hasMet <http://example.com/subjects/24050>, <http://example.com/subjects/52100>, <http://example.com/subjects/79531> ;
+	rdfs:label "bthXGHFDKaOQVU1" ;
+	owl:sameAs <http://example.net/subjects/42068> ;
+	foaf:knows <19888047> .
+<8808745> dc:issued "1991-04-20"^^xsd:date ;
+	dc:language "3b03KcTy5MUSagSzd82FoYCs" ;
+	dc:subject <15104036> ;
+	rel:friendOf _:b51150 ;
+	a dc:Sound ;
+	foaf:homepage <28421301> .
+<8865933> dc:date "1967-07-22"^^xsd:date ;
+	dc:title "JkWgtK4TqlXITb3R", "bryZl7UnY6yhq2aNSJrpv" ;
+	rel:apprenticeTo <32397802> ;
+	a dc:Text ;
+	rdfs:comment "N44sSMqEyBYhToU", "aX6Y 8paKrOStUvsGIsx" .
+<8883361> dc:date "1986-04-28"^^xsd:date ;
+	dc:title "7vXfLNiuLayiK38dAkSsS5MoH" ;
+	a dc:Event ;
+	owl:sameAs <http://example.net/subjects/11812> .
+<8906137> dc:issued "2009-07-20"^^xsd:date ;
+	dc:title "YPvMnfWBHMqD5Fweeul", "dEsIX ohdIztd" ;
+	rel:apprenticeTo <http://example.com/subjects/24321> ;
+	rel:friendOf <http://example.com/subjects/54003> ;
+	a dc:Event ;
+	rdfs:label "NPW90RtYI" ;
+	owl:sameAs <http://example.net/subjects/35798> ;
+	foaf:homepage <http://example.com/subjects/52854>, <http://example.com/subjects/75309> ;
+	foaf:name "ve5nTluc33iFNgz" .
+<891617> dc:date "2008-06-29"^^xsd:date ;
+	rel:apprenticeTo <39921421> ;
+	rel:childOf <14015303> ;
+	rdfs:label "QDUoqdKwaWUePuKyb" ;
+	owl:sameAs <http://example.net/subjects/37270> ;
+	foaf:knows <54171102> ;
+	foaf:name "MJI0kUzVjt", "gFXcAqbhgtABmwANf" .
+<8998946> dc:issued "2004-03-23"^^xsd:date ;
+	dc:language "ZnesdPpC uvDw9Hz5A" ;
+	dc:subject <http://example.com/subjects/27550>, <35011800> ;
+	rel:apprenticeTo <http://example.com/subjects/94292> ;
+	rel:friendOf <http://example.com/subjects/39308>, <http://example.com/subjects/79632> ;
+	rel:hasMet <http://example.com/subjects/28414>, <52313001>, <9539171> ;
+	a dc:Sound ;
+	owl:sameAs <http://example.net/subjects/64485> .
+<9063476> dc:date "1966-09-20"^^xsd:date ;
+	dc:language "rhVNdKQ2QqRMBrY" ;
+	rel:ancestorOf _:b89561 ;
+	rel:hasMet <http://example.com/subjects/77360> ;
+	rdfs:label "thcXK81" .
+<9170762> dc:issued "2009-09-27"^^xsd:date ;
+	dc:title "x5NaGfP8m7G dvrov" ;
+	rel:ancestorOf _:b66530 ;
+	a dc:Event ;
+	foaf:homepage <http://example.com/subjects/16072> .
+<928081> dc:date "1962-07-12"^^xsd:date ;
+	dc:title "Oh 0M4Al", "aiUGgN3qY28o" ;
+	rel:ancestorOf <http://example.com/subjects/48563> ;
+	rel:hasMet <54774920> ;
+	a foaf:Agent ;
+	foaf:homepage <http://example.com/subjects/83958> .
+<9328593> dc:issued "1984-09-21"^^xsd:date ;
+	dc:subject <http://example.com/subjects/60034> ;
+	rel:ancestorOf _:b52889, <17450567> ;
+	rel:apprenticeTo <18892808> ;
+	rel:friendOf <http://example.com/subjects/21498>, <45453326> ;
+	rel:hasMet <http://example.com/subjects/90865> ;
+	a dc:Event ;
+	rdfs:label "YLmwZslcy" ;
+	owl:sameAs <http://example.net/subjects/46021> ;
+	foaf:homepage <http://example.com/subjects/17290> .
+<9364622> dc:issued "1972-06-17"^^xsd:date ;
+	dc:title "Y7wgdWAHRixduk7nOWto9P" ;
+	rel:friendOf <16148143> ;
+	a dc:Event ;
+	rdfs:label "04LFrHDY7AE1l", "a2BhURsdcLDb2e29DUjV6Z" ;
+	foaf:homepage _:b12169, <38004116> ;
+	foaf:name "xFCZb0QC" .
+<9423322> dc:issued "1969-05-17"^^xsd:date ;
+	dc:title "1xOLK0SmTEASU0", "5xwb2y7VgZ8Ou5oAsFL", "kHjqpOeUnZ XdAIt2aHUK" ;
+	rel:hasMet _:b36988, <2821181> ;
+	a foaf:Organization ;
+	owl:sameAs <http://example.net/subjects/67478> ;
+	foaf:name "nYzruCt0BP7gKs7WaWXhxyv" .
+<9466608> dc:issued "1996-08-24"^^xsd:date ;
+	dc:title "Uizakju3oCmF2hB" ;
+	a foaf:Agent ;
+	rdfs:comment "XL XNbtFjFXBgO" ;
+	rdfs:label "FqcVlMGajgyf8lj19O6uTB7Gq" ;
+	foaf:name "ZnBBYwsUAGindU" .
+<9539171> dc:date "1970-06-23"^^xsd:date ;
+	rel:apprenticeTo <30713396> ;
+	rel:friendOf <http://example.com/subjects/7575> ;
+	rel:hasMet <http://example.com/subjects/82739> ;
+	a foaf:Organization ;
+	foaf:name "TsBf8ykhVRl", "xcwCIC5cJ2Z lPMVBIZ" .
+<958536> dc:date "2009-02-28"^^xsd:date ;
+	dc:title "qJORfgx702XpztsTO" ;
+	rel:ancestorOf <21244207> ;
+	foaf:name "0bBDV0fkJMQam4FWs" .
+<9829168> dc:date "2010-09-25"^^xsd:date ;
+	rel:childOf <32896487>, <53183106> ;
+	a dc:Sound ;
+	rdfs:label "wHzTfhjuW0qqeTTpxLE0" ;
+	foaf:homepage <16127717> .
+<9872888> dc:issued "1968-07-14"^^xsd:date ;
+	dc:title "RaHjZUA6NluAj8X2TJu1" ;
+	a dc:Sound ;
+	foaf:knows <40838410> .

@@ -1,0 +1,43 @@
+April 16, 2002
+	Original perl module released, based on my (also CPAN contributed)
+	script "make_rpm.pl".  Works well on RedHat 6.* and RedHat 7.* and
+	is compatible with both rpm version 3.* and rpm version 4.*.
+
+May 16, 2002
+	Fixing a bug in Make.pm to allow customization of the RPM group
+	(such as Utilities/System or Applications/Editors).
+	Minor improvements throughout the module.  Documenting
+	subroutines more clearly.  Supporting multiple smaller steps in 
+	test.pl.  Support handling of different architectures other than
+	i386.
+
+June 17, 2002
+	Fixing several bugs:  no more duplication of $group variable name;
+	no more hardcoding of RPM release number; accommodating rpm
+	version >4.0.2 command-line syntax; fixing pre example in
+	POD synopsis.  The 'clean' target now cleans up rpms made during
+	testing as well as TempBuildLoc.
+
+June 30, 2002
+	Changing e-mail address to sharrison@users.sourceforge.net.
+	Testing for rpm command in Makefile.PL so as to test successfully
+	against multiple architectures.
+
+July 3, 2002
+	Fine-tuning the documentation.
+
+September 11, 2002
+	Supporting dashes inside RPM name (previously, only alphanumeric
+	characters were supported).
+
+October 2, 2002
+	POD fix (incorporating an =back statement to correspond with
+	the =over statements).  Making backwards compatible with GNU
+	find 4.1.6 or earlier by replacing -prune argument with
+	-maxdepth 0 argument.
+
+December 18, 2002
+	Now accommodating >4.1 command-line syntax (requires the rpmbuild
+	command).  Also, more expansive character set, such as with '++'
+	(which was being eaten up by regular expressions).
+	

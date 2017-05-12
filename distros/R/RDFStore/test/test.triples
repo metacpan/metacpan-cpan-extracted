@@ -1,0 +1,4 @@
+<http://www.w3.org/Home/Lassila/Creator1> <http://description.org/schema/Creator> "Ora Lassila 1"
+<http://www.w3.org/Home/Lassila/Creator2> <http://description.org/schema/Creator> "Ora Lassila 2"
+<http://www.w3.org/Home/Lassila/Creator3> <http://description.org/schema/Creator> <mailto:foo@bar.com>
+<http://www.w3.org/Home/Lassila/Creator4> <http://description.org/schema/Creator> "Ora Lassila 4"

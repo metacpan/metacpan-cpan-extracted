@@ -1,0 +1,677 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename;
+use Getopt::Long;
+use RackMan;
+use RackMan::Config;
+use Term::ANSIColor;
+
+
+$::PROGRAM = "RackManager";
+$::VERSION = RackMan->VERSION;
+$::COMMAND = basename($0);
+
+
+#
+# main
+#
+MAIN: {
+    if (not caller()) {
+        run();
+        exit RackMan->status;
+    }
+}
+
+
+#
+# run()
+# ---
+sub run {
+    # detect if stdout is connected to a terminal
+    (-t STDOUT ? $Term::ANSIColor::AUTORESET : $ENV{ANSI_COLORS_DISABLED}) = 1;
+    $|++;
+
+    # default options
+    my %options = (
+        config  => "/etc/rack.conf",
+        scm     => 1,
+    );
+
+    # parse options
+    Getopt::Long::Configure(qw< no_auto_abbrev no_ignore_case >);
+    GetOptions(\%options, qw{
+        help|usage|h!  man!  version|V!
+        verbose|v!  config|c=s  scm|S!
+        formats|F=s  only_formats|only-formats|G=s
+        no_write_dev_cfg|no-write-device-config
+        device_login|device-login=s  device_password|device-password=s
+        read_community|read-community=s  write_community|write-community=s
+        template|t=s  output|o=s
+        dhcp_template|dhcp-template=s
+        kickstart_template|kickstart-template|ks=s
+        pxe_template|pxe-template=s
+    }) or pod2usage(0);
+
+    # handle --version, --usage and --help
+    $options{man}       and pod2usage(2);
+    $options{help}      and pod2usage(1);
+    $options{version}   and print "$::PROGRAM v$::VERSION\n" and exit;
+
+    # if there's no argument, print the usage
+    pod2usage(1) if @ARGV == 0;
+
+    # handle some specific options
+    if ($options{only_formats}) {
+        $options{formats} = $options{only_formats};
+        $options{no_write_dev_cfg} = 1;
+    }
+
+    # read configuration file
+    my $config = RackMan::Config->new(-file => $options{config});
+
+    # instanciate the backend object
+    my $rackman = RackMan->new({ options => \%options, config => $config });
+
+    # process the command
+    $rackman->process(@ARGV);
+}
+
+
+#
+# pod2usage()
+# ---------
+sub pod2usage {
+    my ($n) = @_;
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ -exitval => 0, -verbose => $n, -noperldoc => 1 });
+}
+
+
+1
+
+__END__
+
+=head1 NAME
+
+rack - Fetch information and generate config files for RackObjects
+
+=head1 SYNOPSIS
+
+    rack [--config /etc/rack.conf] <action> <action options> <object>
+    rack { --help | --man | --version }
+
+
+=head1 OPTIONS
+
+=head2 Standard options
+
+=over
+
+=item B<-c>, B<--config> I<path>
+
+Specify the path to the configuration file. Default to F</etc/rack.conf>
+
+=item B<-v>, B<--verbose>
+
+Run the program in verbose mode.
+
+=back
+
+=head2 Program options
+
+=over
+
+=item B<--device-login> I<username>
+
+Specify an alternate login for connecting onto the device.
+
+=item B<--device-password> I<password>
+
+Specify an alternate password for connecting onto the device.
+
+=item B<--dhcp-template> I<path>
+
+Specify an alternate template path for RackMan::Format::DHCP.
+
+=item B<-F>, B<--formats> I<list of formats>
+
+Specify a comma-separated list of formats, overriding the corresponding
+C<[device:*]/formats> parameters in F<rack.conf>
+
+=item B<--ks>, B<--kickstart-template> I<path>
+
+Specify an alternate template path for RackMan::Format::Kickstart.
+
+=item B<--no-write-device-config>
+
+Do not write the device specific file of the given RackObject.
+
+=item B<-G>, B<--only-formats> I<list of formats>
+
+Alias for the C<--formats> and C<--no-write-device-config> options.
+
+=item B<-o>, B<--output> I<path>
+
+Specify the path of the output file for the Generic format.
+
+=item B<--pxe-template> I<path>
+
+Specify an alternate template path for RackMan::Format::PXE.
+
+=item B<--read-community> I<community>
+
+Specify an alternate SNMP read community.
+
+=item B<-S>, B<--scm>
+
+Use a SCM program to version generated files.
+Enabled by default (use C<--no-scm> to disable).
+
+=item B<-t>, B<--template> I<path>
+
+Specify the path of the template file for the Generic format.
+
+=item B<--write-community> I<community>
+
+Specify an alternate SNMP write community.
+
+=back
+
+=head2 Help options
+
+=over
+
+=item B<-h>, B<--help>
+
+Print a short usage description, then exit.
+
+=item B<--man>
+
+Print the manual page of the program, then exit.
+
+=item B<-V>, B<--version>
+
+Print the program name and version, then exit.
+
+=back
+
+
+=head1 ARGUMENTS
+
+Arguments are expected to be:
+
+=over
+
+=item *
+
+the action name: diff, dump, info, list, push, write
+
+=item *
+
+optional action options
+
+=item *
+
+the RackObject name
+
+=back
+
+
+=head1 DESCRIPTION
+
+B<rack> is a command for fetching information from a RackTables
+database about selected RackObjects, generate the corresponding
+configuration files and talk with the corresponding devices to
+set them up accordingly.
+
+
+=head1 ACTIONS
+
+=over
+
+=item list
+
+Print the list of RackObjects of the given type (C<server>, C<pdu>,
+C<switch> or C<all>)
+
+B<Options>
+
+=over
+
+=item *
+
+C<as> - specify the format: C<ldif>, C<simple> (default)
+
+=back
+
+
+=item info
+
+Print information about the RackObject
+
+
+=item dump
+
+Print the structure of the RackObject
+
+B<Options>
+
+=over
+
+=item *
+
+C<as> - specify the format: C<json>, C<ldif>, C<perl>, C<yaml> (default)
+
+=back
+
+
+=item diff
+
+Print the differences between the actual and expected configuration
+of the device. Set exit status to 1 if there are differences, 0 otherwise.
+
+
+=item write
+
+Generate and write the configuration files corresponding to the RackObject
+
+
+=item push
+
+Push the configuration to the device corresponding to the RackObject.
+
+=back
+
+
+=head1 EXAMPLES
+
+List all the PDUs:
+
+    rack list pdu
+
+List all the servers in LDIF format:
+
+    rack list servers as ldif
+
+Print information about "front01.example.com" in default format (YAML):
+
+    rack info front01.example.com
+
+Dump information about "front01.example.com" in JSON format:
+
+    rack dump as json front01.example.com
+    rack dump front01.example.com as json
+
+Write all the configuration files for "front01.example.com":
+
+    rack write frontal01.example.com
+
+Only write the DHCP file for "front01.example.com":
+
+    rack write -G DHCP frontal01.example.com
+
+Process the template F<input.tmpl> with the information about
+"front01.example.com" and print the result on screen:
+
+    rack write -G Generic -t input.tmpl frontal01.example.com
+
+Process the template F<input.tmpl> with the information about
+"front01.example.com" and write the result on disk, in a file
+named after the device:
+
+    rack write -G Generic -t input.tmpl -o %name%.conf frontal01.example.com
+
+
+=head1 CONFIGURATION
+
+The configuration file is expected to be in the C<.INI> format, with the
+following sections and parameters.
+
+All parameters can be overridden in a per-device file named 
+F<rack.local.conf>, read from C<[general]/path> (read below).
+
+Parameters can contain placeholders that will be replaced with values
+corresponding to the given RackObjet:
+
+=over
+
+=item *
+
+C<%name%> - name of the RackObject, or C<"unknown"> if it is undefined
+
+=back
+
+
+=head2 Section [general]
+
+=over
+
+=item *
+
+C<default_scm> - specify the default SCM program
+
+=item *
+
+C<dns_servers> - specify the list of default DNS servers (space separated)
+
+=item *
+
+C<mail_server> - specify the default SMTP server
+
+=item *
+
+C<management_interfaces> - specify the regular expression which matches the
+names of management interfaces. Default is C</(areca|ilo|ipmi)/>
+
+=item *
+
+C<nagios_url> - specify the URL of the Nagios web application
+
+=item *
+
+C<ntp_servers> - specify the list of default NTP servers (space separated)
+
+=item *
+
+C<path> - I<(mandatory)> specify the path for device-specific
+configuration files, including F<rack.local.conf>; it is therefore
+strongly suggested to use the C<%name%> placeholder somewhere in
+the value
+
+=item *
+
+C<racktables_url> - specify the URL of the RackTables web application
+
+=item *
+
+C<timezone> - specify the default timezone
+
+=item *
+
+C<virtual_interfaces> - specify the regular expression which matches the
+names of virtual interfaces. Default is C</(carp|lagg|vlan)\d+/>
+
+=back
+
+
+=head2 Section [database]
+
+=over
+
+=item *
+
+C<dsn> - DBI data source name (e.g.: C<dbi:mysql:racktables>)
+
+=item *
+
+C<user> - database user name
+
+=item *
+
+C<password> - database password
+
+=back
+
+
+=head2 Section [device:pdu]
+
+=over
+
+=item *
+
+C<formats> - specify the formats associated with a PDU object as a
+space seperated list. Default is C<"Cacti Nagios">
+
+=back
+
+
+=head2 Section [device:pdu:apc_rackpdu]
+
+=over
+
+=item *
+
+C<ftp_login> - specify the FTP login; can be overridden with the
+C<--device-login> option
+
+=item *
+
+C<ftp_password> - specify the FTP password; can be overridden with the
+C<--device-password> option
+
+=item *
+
+C<mail_address> - specify the contact address for the device
+
+=item *
+
+C<write_community> - specify the SNMP write community (needed to restart
+the device); can be overridden with the C<--write-community> option
+
+=back
+
+
+=head2 Section [device:server]
+
+=over
+
+=item *
+
+C<formats> - specify the formats associated with a Server object as a
+space seperated list. Default is C<"DHCP PXE Kickstart Cacti Nagios Bacula">
+
+=back
+
+
+=head2 Section [device:server:hp_proliant]
+
+=over
+
+=item *
+
+C<admin_password> - I<(mandatory)> specify the iLO password for the
+custom account "admin"; can be overridden with the
+C<--device-password> option
+
+=item *
+
+C<ilo_password> - I<(mandatory)> specify the iLO password for the
+factory account "Administrator"
+
+=item *
+
+C<license_key> - specify the license key
+
+=item *
+
+C<serial_cli_speed> - specify the serial CLI speed; the value can
+be one of the following: 1 (9,600 bps), 2 (19,200 bps), 3 (38,400 bps),
+4 (57,600 bps), 5 (115,200 bps).
+
+=back
+
+
+=head2 Section [device:switch]
+
+=over
+
+=item *
+
+C<formats> - specify the formats associated with a Switch object as a
+space seperated list. Default is C<"Cacti Nagios">
+
+=back
+
+
+=head2 Section [device:switch:cisco_catalyst]
+
+=over
+
+=item *
+
+C<ios_password> - specify the IOS access password; can be overridden
+with the C<--device-password> option
+
+=item *
+
+C<enable_password> - specify the IOS admin password
+
+=back
+
+
+=head2 Section [format:bacula]
+
+=over
+
+=item *
+
+C<password> - specify Bacula password
+
+=item *
+
+C<path> - specify the location to store the generated files
+
+=back
+
+
+=head2 Section [format:cacti]
+
+=over
+
+=item *
+
+C<path> - specify the location of Cacti CLI programs
+
+=item *
+
+C<php> - specify the path of the php(1) CLI interpreter
+
+=item *
+
+C<sudo_as> - specify an optional user account to execute the Cacti
+programs under, using sudo(8)
+
+=back
+
+
+=head2 Section [format:dhcp]
+
+=over
+
+=item *
+
+C<path> - specify the location to store the generated files
+
+=item *
+
+C<template> - specify the path of the template.
+See L<RackMan::Template/"TEMPLATE PARAMETERS"> for the supported parameters.
+
+=back
+
+
+=head2 Section [format:kickstart]
+
+=over
+
+=item *
+
+C<path> - specify the location to store the generated files
+
+=item *
+
+C<template> - specify the path of the template.
+See L<RackMan::Template/"TEMPLATE PARAMETERS"> for the supported parameters.
+
+=back
+
+
+=head2 Section [format:ldap]
+
+=over
+
+=item *
+
+C<path> - specify the location to store the generated files
+
+=back
+
+
+=head2 Section [format:nagios]
+
+=over
+
+=item *
+
+C<path> - specify the location to store the generated files
+
+=back
+
+
+=head2 Section [format:pxe]
+
+=over
+
+=item *
+
+C<path> - specify the location to store the generated files
+
+=item *
+
+C<template> - specify the path of the template.
+See L<RackMan::Template/"TEMPLATE PARAMETERS"> for the supported parameters.
+
+=back
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Sys::Syslog
+
+You can also look for information at:
+
+=over
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/RackMan>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/RackMan/>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/RackMan>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/RackMan>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=RackMan>
+
+=back
+
+The source code is available on Git Hub:
+L<https://github.com/maddingue/RackMan/>
+
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 3 or
+later: L<http://www.fsf.org/licensing/licenses/gpl.txt>
+
+
+=head1 AUTHOR
+
+Sebastien Aperghis-Tramoni (sebastien@aperghis.net)
+
+=cut
+

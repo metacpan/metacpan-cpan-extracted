@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 71c4af939ac915c35fe0117e7bc32ed522a4bcce Changes
+SHA1 d53a0f9a3ecfa4d3a6f0464496295e03e2f5f0bb MANIFEST
+SHA1 ca4c17a61238a1c962e872cb45670f39b4a49761 META.yml
+SHA1 ed8beae289e48d294548fae3824e1656e2392d99 Makefile.PL
+SHA1 b8664f985ee289a19f59c6bc696f5fe2f5086e19 README
+SHA1 11a8862166bef84e5e952291e22b14b7c6d825af inc/Module/Install.pm
+SHA1 019bccc5b2e364447c6e6e150d049ca2a216598e inc/Module/Install/Base.pm
+SHA1 e2547371d0317abbfa3d56b0d20bba909885d7db inc/Module/Install/MakeMaker.pm
+SHA1 522105594969a3beb356867514a8b9d09c25c4aa inc/Module/Install/Makefile.pm
+SHA1 64b42b1eeed32bde22bfecfe7a9e101dc3eff86e inc/Module/Install/Metadata.pm
+SHA1 bbc705b7a05f64cc6e21fd4a9053914587cef3d2 lib/RDF/Simple/Parser/YAML.pm
+SHA1 81b7f9548248b0fb0010af0eb40041b36a4b6eed lib/RDF/Simple/Serialiser/YAML.pm
+SHA1 f256ba3ea1f6b3b106721231b5de88c4c23feb2e lib/RDF/YAML.pm
+SHA1 849add1fc7bceb1c4fb0323ed558d88f652a0c72 t/0-signature.t
+SHA1 35f9c03cfef2d8c39ea2d698ce4a5a9502ab418b t/1-basic.t
+SHA1 3fe0ee46c4f5d6f8d60df1a665e0d486210ce288 t/sample.yml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (FreeBSD)
+
+iD8DBQE/lhQvtLPdNzw1AaARAncZAKCfBvh4KepIt2EJI2tX1QXhsZiB8wCaA+V6
+WvNGlJXcTuc2Ha5Sll/MkKQ=
+=lqfL
+-----END PGP SIGNATURE-----

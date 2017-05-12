@@ -1,0 +1,26 @@
+diff --git a/html/RTIR/Update.html b/html/RTIR/Update.html
+index 4847cef..05736d9 100644
+--- a/html/RTIR/Update.html
++++ b/html/RTIR/Update.html
+@@ -109,6 +109,8 @@
+     ],
+ &>
+ 
++% $m->callback( %ARGS, CallbackName => 'AfterWorked', Ticket => $Ticket );
++
+ <& /Ticket/Elements/EditTransactionCustomFields,
+     %ARGS, TicketObj => $Ticket, InTable => 1,
+ &>
+diff --git a/html/RTIR/Incident/Reply/index.html b/html/RTIR/Incident/Reply/index.html
+index cec521e..a69ec45 100644
+--- a/html/RTIR/Incident/Reply/index.html
++++ b/html/RTIR/Incident/Reply/index.html
+@@ -64,6 +64,8 @@
+ <input type="hidden" name="All" value="<% $All %>" />
+ <input type="hidden" name="Query" value="<% $Query %>" />
+ 
++% $m->callback(CallbackName => 'AfterHidden', Ticket => $IncidentObj );
++
+ <& /Elements/Crypt/SignEncryptWidget:ShowIssues, self => $gnupg_widget &>
+ 
+ <h2><&|/l&>Reporters</&></h2>

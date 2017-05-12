@@ -1,0 +1,78 @@
+NAME
+    RT-Extension-Assets-AppleGSX - Apple GSX for RT Assets
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        Only run this the first time you install this module; this will
+        create several custom fields for assets. If you already have custom
+        fields for serial numbers and warantee information, this step is
+        unnecessary.
+
+        Running "make initdb" twice will cause duplicate custom fields.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Set(@Plugins, qw(RT::Extension::Assets::AppleGSX));
+
+        or add "RT::Extension::Assets::AppleGSX" to your existing @Plugins
+        line.
+
+    Add additional configuration options
+        You must configure the authentication information used to connect to
+        GSX via the web UI, at Tools -> Configuration -> Assets -> Apple
+        GSX. This menu option is only available to SuperUsers.
+
+        Additionally, if you are not using the supplied custom fields, you
+        may wish to Set one or more of the following in your
+        RT_SiteConfig.pm (their defaults are shown):
+
+            # Name of custom field containing serial number
+            Set( $AppleGSXSerialCF => "Serial Number" )
+
+            # CFs to import from GSX, and their names there
+            Set( %AppleGSXMap,
+                'Warranty Status'     => 'warrantyStatus',
+                'Warranty Start Date' => 'coverageStartDate',
+                'Warranty End Date'   => 'coverageEndDate',
+            );
+
+            # Only attempt to import data from GSX for assets matching the
+            # following CF values:
+            Set( %AppleGSXChecks,
+                'Trademark' => qr/\bApple(Care)?\b/i,
+            );
+
+    Run
+    /opt/rt4-assets/local/plugins/RT-Extension-Assets-AppleGSX/bin/rt-apple-
+    gsx-set-warranty
+        You will likely wish to configure this script to run regularly, via
+        a cron job.
+
+AUTHOR
+    sunnavy <sunnavy@bestpractical.com>
+
+BUGS
+    All bugs should be reported via
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Assets-Ap
+    pleGSX> or bug-RT-Extension-Assets-AppleGSX@rt.cpan.org.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2013 by Best Practical Solutions
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 209:
+        You forgot a '=back' before '=head1'
+

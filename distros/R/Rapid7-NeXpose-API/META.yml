@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Rapid7-NeXpose-API
+version:            0.03
+abstract:           Communicate with NeXpose via XML NeXpose API v1.1
+author:
+    - Vlatko Kosturjak <kost@linux.hr>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTTP::Request::Common:  0
+    LWP::UserAgent:       0
+    Test::More:           0
+    XML::Simple:          0
+resources:
+    bugtracker:  https://rt.cpan.org/Public/Bug/Report.html?Queue=Rapid7-NeXpose-API
+    repository:  https://github.com/kost/rapid7-nexpose-api-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,25 @@
+---
+abstract: 'Date and time regexps.'
+author:
+  - 'Eric J. Roode <eroode@barrack.com>'
+build_requires:
+  Test::More: '0.40'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-Common-time
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  POSIX: '0'
+  Regexp::Common: '0'
+resources:
+  repository: git://github.com/szabgab/Regexp-Common-time.git
+version: '0.07'

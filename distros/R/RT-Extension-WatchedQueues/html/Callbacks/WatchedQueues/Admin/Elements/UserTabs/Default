@@ -1,0 +1,12 @@
+<%INIT>
+if ($id && $tabs) {
+    $tabs->{'this'}{'subtabs'}{'WatchedQueues'} = {
+        title => loc('Watched queues'),
+        path  => "Admin/Users/WatchedQueues.html?id=".$id,
+    };
+}
+</%INIT>
+<%ARGS>
+$tabs => undef
+$id => undef
+</%ARGS>

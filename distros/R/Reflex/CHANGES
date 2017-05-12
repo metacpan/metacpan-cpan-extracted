@@ -1,0 +1,86 @@
+==================================================
+Changes from 2016-04-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.100 at 2017-04-02 21:55:05 +0000
+------------------------------------------
+
+  Change: ab82e0b0eb8beafc5121ade4fba17a31c11a51d2
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2017-04-02 17:50:52 +0000
+
+    Remove redundant repository line. 
+
+  Change: 69071c4171b2250e41e6b0f1cc024c0a25cf601b
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2017-04-02 17:42:30 +0000
+
+    Merge pull request #6 from sergeyromanov/patch-1
+
+    Change PWP::Encoding to PWP::SingleEncoding 
+
+  Change: 20717e80fcc35b2a01b6142b70fb1160380c910f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2017-04-02 17:25:58 +0000
+
+    Resolve "no blank line for $VERSION after package" warnings. 
+
+  Change: 7fd44cd6e36b6bbaa74932189f68f7417a80336b
+  Author: Baldur Kristinsson <baldur.kristinsson@gmail.com>
+  Date : 2015-12-22 12:38:06 +0000
+
+    Minimal fixes to quiet Pod::Coverage and Pod::Syntax test errors 
+
+  Change: a3fee8a7d240c536d399222cabbb612c8583f9fb
+  Author: Baldur Kristinsson <baldur.kristinsson@gmail.com>
+  Date : 2015-12-22 12:36:53 +0000
+
+    Ignore .build directory 
+
+  Change: cdb152738b39a245411e93ea83fa8ec01b7dddfd
+  Author: Baldur Kristinsson <baldur.kristinsson@gmail.com>
+  Date : 2015-12-22 12:36:34 +0000
+
+    Workaround for 'Expected to find web repository link but it is
+    missing in the metadata' error (from [PodWeaver] [Support]) 
+
+  Change: 2bdc920dc12acf27ff225fafa0bd6bb7dc193569
+  Author: Baldur Kristinsson <baldur.kristinsson@gmail.com>
+  Date : 2015-12-22 12:30:45 +0000
+
+    Fix typo: pacakage -> package 
+
+  Change: e4775165376c6474604b9fe782e70824dc257c82
+  Author: Ð¡ÐµÑÐ³ÐµÐ¹ Ð Ð¾Ð¼Ð°Ð½Ð¾Ð² <sromanov-dev@yandex.ru>
+  Date : 2014-10-24 11:53:57 +0000
+
+    Change PWP::Encoding to PWP::SingleEncoding 
+
+  Change: e58f283c8f2484e458fd5f2e47aa44e6dfed558c
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-05 00:11:58 +0000
+
+    I'm told that "=for comment" is better than "=for author". 
+
+  Change: e696d6c1c07f2d3ed569f1041d42fe088785f66e
+  Author: Kartik Thakore <thakore.kartik@gmail.com>
+  Date : 2013-04-23 19:42:14 +0000
+
+    Cleaned spacing for the code sections
+
+    Cleaned up spacing for code sections and added for author tag in
+    front of TODO. Not sure if the TODO is needed. 
+
+  Change: cffa0174cefcaf09c676a55923b03371ad92a76b
+  Author: Kartik Thakore <thakore.kartik@gmail.com>
+  Date : 2013-04-23 19:39:36 +0000
+
+    Update intro.pod
+
+    Trying space so the first lines of this code is not missing when
+    rendered on cpan/metacpan/github. 
+
+=================================================
+Plus 22 releases after 2016-04-02 00:00:00 +0000.
+=================================================

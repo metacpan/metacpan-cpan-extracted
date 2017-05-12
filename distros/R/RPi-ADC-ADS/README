@@ -1,0 +1,479 @@
+NAME
+    RPi::ADC::ADS - Interface to ADS 1xxx series analog to digital
+    converters (ADC) on Raspberry Pi
+
+SYNOPSIS
+        use RPi::ADC::ADS;
+
+        # instantiation of the object, shown with optional parameters
+        # with their defaults if you don't specify them
+
+        my $adc = RPi::ADC::ADS->new(
+            model    => 'ADS1015',
+            addr     => 0x48,
+            device   => '/dev/i2c-1',
+            channel  => 0,
+            gain     => 1,
+            mode     => 1,
+            rate     => 0,
+            polarity => 0,
+            queue    => 3,
+        );
+
+        my $volts   = $adc->volts;
+        my $percent = $adc->percent;
+        my $int     = $adc->raw;
+
+        # all retrieval methods allow you to specify the channel (0..3) in the call
+        # instead of using the default, or the one set in new()
+
+        my $percent = $adc->percent(3);
+        ...
+
+DESCRIPTION
+    Perl interface to the Texas Instruments/Adafruit ADS 1xxx series Analog
+    to Digital Converters (ADC) on the Raspberry Pi.
+
+    Provides access via the i2c bus to all four input channels on each ADC,
+    while performing correct bit-shifting between the 12-bit and 16-bit
+    resolution on the differing models.
+
+PHYSICAL SETUP
+    List of pinout connections between the ADC and the Raspberry Pi.
+
+        ADC     Pi
+        -----------
+        VDD     Vcc
+        GND     Gnd
+        SCL     SCL
+        SDA     SDA
+        ADDR    Gnd (see below for more info)
+        ALRT    NC  (no connect)
+
+    Pinouts `A0' through `A3' on the ADC are the analog pins used to connect
+    to external peripherals (specified in this software as `0' through `3').
+
+    The `ADDR' pin specifies the memory address of the ADC unit. Four ADCs
+    can be connected to the i2c bus at any one time. By default, this
+    software uses address `0x48', which is the address when the `ADDR' pin
+    is connected to `Gnd' on the Raspberry Pi. Here are the addresses for
+    the four Pi pins:
+
+        Pin     Address
+        ---------------
+        Gnd     0x48
+        VDD     0x49
+        SDA     0x4A
+        SCL     0x4B
+
+OBJECT METHODS
+  new
+    Instantiates a new RPi::ADC::ADS object. All parameters are optional,
+    and are all sent in as a single hash.
+
+    Parameters:
+
+        model => $string
+
+    Optional. The model number of the ADC. If not specified, we use
+    `ADS1015'. Models that start with `ADS11' have 16-bit accuracy
+    resolution, and models that start with `ADS10' have 12-bit resolution.
+
+        addr => $hex
+
+    Optional. The hex location of the ADC. If the pinout in PHYSICAL SETUP
+    is used, this will be `0x48' (which is the default if not supplied).
+
+        device => $string
+
+    Optional. The filesystem path to the i2c device file. Defaults to
+    `/dev/i2c-1'
+
+        channel => $int
+
+    Optional. See INPUT CHANNELS for parameter values and details.
+
+        gain => $int
+
+    Optional. See GAIN AMPLIFIER for parameter values and details.
+
+        mode => $int
+
+    Optional. See OPERATION MODE for parameter values and details.
+
+        rate => $int
+
+    Optional. See DATA RATE for parameter values and details.
+
+        polarity => $int
+
+    Optional. See COMPARATOR POLARITY for parameter values and details.
+
+        queue => $int
+
+    Optional. See COMPARATOR QUEUE for parameter values and details.
+
+  addr
+    Sets/gets the ADC memory address. After object instantiation, this
+    method should only be used to get (ie. don't send in any parameters).
+
+    Parameters:
+
+        $hex
+
+    Optional: A memory address in the form `0xNN'. See PHYSICAL SETUP for
+    full details.
+
+  device
+    Sets/gets the file path information for the i2c device. This shouldn't
+    be used as a setter after object instantiation. It defaults to
+    `/dev/i2c-1' if not set in the `new()' call (or with this method
+    thereafter).
+
+    Parameters:
+
+        $dev
+
+    Optional: String, the full path of the i2c device in use. Defaults to
+    `/dev/i2c-1'.
+
+  model
+    Sets/gets the model of the ADC chip that we're connected to. This
+    shouldn't be set after object instantiation. Defaults to `ADS1015' if
+    not set in the `new()' call, or later with this method.
+
+    Parameters:
+
+        $model
+
+    Optional: String, the model name of the ADC unit. Defaults to `ADS1015'.
+    Valid values are `/ADS1[01]1[3458]/'.
+
+  channel
+    Sets/gets the currently registered ADC input channel within the object.
+    Both single-ended and differential operation mode are available.
+
+    Parameters:
+
+        $channel
+
+    Optional: See INPUT CHANNELS for the parameter values and details.
+
+  gain
+    Sets/gets the programmable gain amplifier.
+
+    Parameters:
+
+        $int
+
+    Optional: See GAIN AMPLIFIER for the parameter values and details.
+
+  mode
+    Sets/gets the conversion operation mode, either single conversion or
+    continuous conversion.
+
+    Parameters:
+
+        $int
+
+    Optional: See OPERATION MODE for the parameter values and details.
+
+  rate
+    Sets/gets the data rate.
+
+    Parameters:
+
+        $int
+
+    Optional: See DATA RATE for the parameter values and details.
+
+  polarity
+    Sets/gets the comparitor polarity.
+
+    Parameters:
+
+        $int
+
+    Optional: See COMPARATOR POLARITY for the parameter values and details.
+
+  queue
+    Sets/gets the comparator queue configuration.
+
+    Parameters:
+
+        $int
+
+    Optional: See COMPARATOR QUEUE for the parameter values and details.
+
+OPERATIONAL METHODS
+    These methods are for core operation, but are left public as they may be
+    of use for those who want to tinker with the innards.
+
+  bits
+    Separates the 16-bit wide configuration register and returns an array
+    containing the Most Significant Byte as the first element, and the Least
+    Significant Byte as the second element.
+
+    Parameters: None
+
+    Return: Array of two elements (MSB, LSB).
+
+  register
+    Sets/gets the ADC's config register. This has been left public for
+    convenience for those who understand the hardware very well. It really
+    shouldn't be used otherwise.
+
+    Parameters:
+
+        $msb, $lsb
+
+    Optional: If one is sent in, both must be sent in. `$msb' is the most
+    significant byte of the config register, an integer between 0-255.
+    `$lsb' is the least significant byte of the config register, and must be
+    in the same format as the `$msb'.
+
+    Return: Array with two elements. First element is the MSB, and the
+    second element is the LSB.
+
+DATA RETRIEVAL METHODS
+  volts
+    Retrieves the voltage level of the channel.
+
+    Parameters:
+
+        $channel
+
+    Optional: See INPUT CHANNELS for parameter values and details. Specifies
+    the ADC input channel to read from. Setting this parameter allows you to
+    read all four channels without changing the default set in the object.
+
+    Return: A floating point number between `0' and the maximum voltage
+    output by the Pi's GPIO pins.
+
+  percent
+    Retrieves the ADC channel's input value by percentage of maximum input.
+
+    Parameters: See `$channel' in volts.
+
+  raw
+    Retrieves the raw value of the ADC channel's input value.
+
+    Parameters: See `$channel' in volts.
+
+C FUNCTIONS
+    The following C functions aren't meant to be called directly. Rather,
+    use the corresponding Perl object methods instead.
+
+  fetch
+    Fetches the raw data from the channel specified.
+
+    Implemented as:
+
+        int
+        fetch (addr, dev, wbuf1, wbuf2, res)
+            int addr
+            char * dev
+            char * wbuf1
+            char * wbuf2
+            int resolution
+
+    `wbuf1' is the most significant byte (bits 15-8) for the configuration
+    register, `wbuf2' being the least significant byte (bits 7-0).
+
+  voltage_c
+    Fetches the ADC input and returns it as the actual voltage.
+
+    Implemented as:
+
+        float
+        voltage_c (addr, dev, wbuf1, wbuf2, res)
+            int addr
+            char * dev
+            char * wbuf1
+            char * wbuf2
+            int resolution
+
+    See fetch for details on the `wbuf' arguments.
+
+  raw_c
+    Fetches the ADC input and returns it in its raw form.
+
+    Implemented as:
+
+        int
+        raw_c (addr, dev, wbuf1, wbuf2, res)
+            int addr
+            char * dev
+            char * wbuf1
+            char * wbuf2
+            int resolution
+
+    See fetch for details on the `wbuf' arguments.
+
+  percent_c
+    Fetches the ADC input value as a floating point percentage between
+    minimum and maximum input values.
+
+    Implemented as:
+
+        float
+        percent_c (addr, dev, wbuf1, wbuf2, res)
+            int addr
+            char * dev
+            char * wbuf1
+            char * wbuf2
+            int resolution
+
+    See fetch for details on the `wbuf' arguments.
+
+TECHNICAL DATA
+  REGISTERS
+    Both the conversion and configuration registers are 16-bits wide.
+
+    The write buffer for the config register consists of an array with three
+    elements. Element `0' is the register pointer, which allows you to
+    select the register to use. Value `0' for the conversion register and
+    `1' for the configuration register.
+
+    Element `1' is a byte long, and represents the most significant bits
+    (15-8) of each 16-bit register, while element `2' represents the least
+    significant bits, 7-0.
+
+    It is advised that you don't change any of these except for the input
+    channels unless you know how the hardware works, and you have a good
+    understanding of the specific configuration register options.
+
+  CONFIG REGISTER
+    CONVERSATION BIT
+    Bit: 15
+
+    This bit should always be set to `1' when writing. This initiates a
+    conversation with the ADC. When reading, this bit will read `1' if a
+    conversion is currently occuring, and `0' if the current conversion is
+    complete.
+
+    INPUT CHANNELS
+    Bit: 14-12
+
+    Represents the ADC input channel, as well as either a single-ended
+    (difference between a single input channel and GRD) or differential mode
+    (difference between two input channels).
+
+    Single mode configuration:
+
+        Param   Value   Input
+        ---------------------
+
+        0       100     A0 (default)
+        1       101     A1
+        2       110     A2
+        3       111     A3
+
+    Differential mode configuration:
+
+        Param   Value   Diff between
+        ----------------------------
+
+        4       000     A0 <-> A1
+        5       001     A0 <-> A3
+        6       010     A1 <-> A3
+        7       011     A2 <-> A3
+
+    GAIN AMPLIFIER
+    Bit: 11-9
+
+    Represents the programmable gain amplifier. This software uses `1' or
+    +/-4.096V to cover the Pi's 3.3V output.
+
+        Param   Value   Gain
+        --------------------
+
+        0       000     +/-6.144V
+        1       001     +/-4.096V (default)
+        2       010     +/-2.048V
+        3       011     +/-2.024V
+        4       100     +/-0.512V
+        5       101     +/-0.256V
+        6       110     +/-0.256V
+        7       111     +/-0.256V
+
+    OPERATION MODE
+    Bit: 8
+
+    Represents the conversion operation mode. We use the single conversion
+    hardware default.
+
+        Param/Value   Mode
+        ------------------
+
+        0             continuous conversion
+        1             single conversion (default)
+
+    DATA RATE
+    Bit: 7-5
+
+    Represent the data rate. We use 128SPS (128 Samples Per Second) by
+    default:
+
+        Param   Value   Rate
+        --------------------
+
+        0       000     128SPS (default)
+        1       001     250SPS
+        2       010     490SPS
+        3       011     920SPS
+        4       100     1600SPS
+        5       101     2400SPS
+        6       110     3300SPS
+        7       111     3300SPS
+
+    COMPARATOR POLARITY
+    Bit: 3
+
+    Represents the comparator polarity. We use `0' (active low) by default.
+
+        Param/Value   Polarity
+        ----------------------
+
+        0             Active Low (default)
+        1             Active High
+
+    COMPARATOR QUEUE
+    Bit: 1-0
+
+    Represents the comparator queue. We use `3' (disabled) by default.
+
+        Param   Value   Queue
+        ---------------------
+
+        0       00  Assert after one conversion
+        1       01  Assert after two conversions
+        2       10  Assert after four conversions
+        3       11  Disable comparator (default)
+
+READING DATA
+    Each channel has a conversion register (that contains the actual analog
+    input). This register is 16 bits wide. With that said, the most
+    significant bit is used to identify whether the number is positive or
+    negative, so technically, for the ADC11xx series ADCs, the width is
+    actually 15 bits, and the ADC10xx units are 11 bits wide (as the
+    resolution on these models are only 12-bit as opposed to 16-bit).
+
+    See the ADC's datasheet for further information.
+
+NOTES
+    Bit 4 and 2 of the configuration register are currently unused.
+
+SEE ALSO
+    WiringPi::API, RPi::WiringPi, RPi::DHT11
+
+AUTHOR
+    Steve Bertrand, <steveb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2017 by Steve Bertrand
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.22.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

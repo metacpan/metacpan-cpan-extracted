@@ -1,0 +1,104 @@
+NAME
+    RDF::Query::Functions::Buzzword::GB - plugin for buzzword.org.uk British
+    locale-specific functions
+
+SYNOPSIS
+      use RDF::Query;
+      use RDF::TrineX::Functions -shortcuts;
+
+      my $data = rdf_parse(<<'TURTLE', type=>'turtle', base=>$baseuri);
+      @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+      @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+      <http://tobyinkster.co.uk/#i>
+        foaf:name "Toby Inkster" ;
+        foaf:phone "01234567890x1234";
+        foaf:postcode "bn71rs" .
+      TURTLE
+
+      my $query = RDF::Query->new(<<'SPARQL');
+      PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+      PREFIX sparql: <sparql:>
+      PREFIX gb: <http://buzzword.org.uk/2011/functions/gb#>
+      PREFIX util: <http://buzzword.org.uk/2011/functions/util#>
+      SELECT
+        ?name
+        ?phone
+        ?postcode
+        (gb:postcode_format(?postcode) AS ?pcfmt)
+        (gb:telephone_std(?phone) AS ?phonestd)
+        (gb:telephone_local(?phone) AS ?phonelocal)
+        (gb:telephone_extension(?phone) AS ?phoneext)
+        (gb:telephone_uri(?phone) AS ?phoneuri)
+      WHERE
+      {
+        ?person foaf:name ?name ; foaf:phone ?phone ; foaf:postcode ?postcode .
+      }
+      SPARQL
+
+      print $query->execute($data)->as_xml;
+
+DESCRIPTION
+    This is a plugin for RDF::Query providing a number of extension
+    functions.
+
+    *   http://buzzword.org.uk/2011/functions/gb#postcode_valid
+
+        Given a literal, returns a boolean indicating whether it seems to be
+        a syntactically valid UK postcode.
+
+    *   http://buzzword.org.uk/2011/functions/gb#postcode_format
+
+        Given a literal, if it seems to be a valid UK postcode,
+        canonicalises the formatting; otherwise returns the literal
+        unscathed.
+
+    *   http://buzzword.org.uk/2011/functions/gb#telephone_valid
+
+        Given a literal, returns a boolean indicating whether it seems to be
+        a number that could be dialed from a UK phone.
+
+        Only the digits '0' to '9', letter 'x' (extension) and '+'
+        (international dialing code) are expected. Other characters are
+        stripped out before any checks.
+
+    *   http://buzzword.org.uk/2011/functions/gb#telephone_format
+
+        Canonicalises the formatting of a phone number that is valid. Should
+        return invalid phone numbers unscathed.
+
+    *   http://buzzword.org.uk/2011/functions/gb#telephone_std
+
+        Returns the STD code for a phone number, if it could be extracted;
+        the empty string otherwise.
+
+    *   http://buzzword.org.uk/2011/functions/gb#telephone_local
+
+        Returns the local part of a phone number, if it could be extracted;
+        the empty string otherwise.
+
+    *   http://buzzword.org.uk/2011/functions/gb#telephone_extension
+
+        Returns the extension from a phone number, if it could be extracted;
+        the empty string otherwise.
+
+    *   http://buzzword.org.uk/2011/functions/gb#telephone_uri
+
+        Returns a phone number as a <tel:> URI.
+
+        An existing <tel:> URI should pass through unscathed.
+
+SEE ALSO
+    RDF::Query.
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2004-2012 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

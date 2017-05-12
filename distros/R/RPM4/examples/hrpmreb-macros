@@ -1,0 +1,31 @@
+# $id$
+
+%media contrib
+%basedistrib /home/root/mandrake/mdk/Mandrakelinux/
+
+# A way to install dependancies, with this you need a sudo
+%installdep 1
+%installdepcmd sudo -H /usr/sbin/urpmi --auto --no-verify-rpm
+
+# I have script to upload, made it
+%upload 0
+%uploadcmd /home/users/olivier/bin/upload -d %media
+
+# Where are source
+%srcdir %basedistrib/devel/cooker/SRPMS/%media
+
+# Where are binary
+%checkbinary 1
+%bindir %basedistrib/devel/cooker/%_target_cpu/media/%media
+
+# Where to put log
+%keepalllog 0
+%logdir ./%{_target_cpu}-%{media}-log
+
+# for speed up
+%_sourcedir /tmp/
+
+# If you want the build process to be niced
+# %nice 10
+
+%_signature %nil

@@ -1,0 +1,13 @@
+Revision history for Vin
+
+1.01	2015-12-03 00::18 Australia/Sydney
+		Initial release
+
+
+1.02_01	2015-12-21 20::30 Australia/Sydney
+		The class contanined a hashref, 'foreach keys hashref' caused an error 'Experimental keys on scalar is now forbidden'
+		on later versions of perl. This now fixed by 'foreach keys %{hashref}' - beta testing
+
+1.03	2015-12-22 20::30 Australia/Sydney
+		The class contanined a hashref, 'foreach keys hashref' caused an error 'Experimental keys on scalar is now forbidden'
+		on later versions of perl. This now fixed by 'foreach keys %{hashref}' 

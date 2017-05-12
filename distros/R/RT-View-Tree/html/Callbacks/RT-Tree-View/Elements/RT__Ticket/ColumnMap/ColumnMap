@@ -1,0 +1,12 @@
+<%ARGS>
+$COLUMN_MAP => undef
+</%ARGS>
+<%init>
+$COLUMN_MAP->{'_RT_TreeView_Indent'} = {
+    value => sub {
+	my $ticket = shift;
+	my $depth = shift;
+	return \("&nbsp;&nbsp;"x$depth);
+    }
+};
+</%init>

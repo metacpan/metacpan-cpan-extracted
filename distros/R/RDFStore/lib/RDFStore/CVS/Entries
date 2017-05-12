@@ -1,0 +1,16 @@
+D/Digest////
+D/Parser////
+D/Serializer////
+D/Util////
+D/Vocabulary////
+/Literal.pm/1.8/Mon Jun 19 10:00:51 2006//
+/Model.pm/1.32/Mon Jun 19 10:00:51 2006//
+/NodeFactory.pm/1.12/Mon Jun 19 10:00:51 2006//
+/Object.pm/1.6/Mon Jun 19 10:00:51 2006//
+/Parser.pm/1.9/Mon Jun 19 10:00:51 2006//
+/RDFNode.pm/1.6/Mon Jun 19 10:00:51 2006//
+/Resource.pm/1.7/Mon Jun 19 10:00:51 2006//
+/SchemaModel.pm/1.7/Mon Jun 19 10:00:51 2006//
+/Serializer.pm/1.10/Mon Jun 19 10:00:51 2006//
+/Statement.pm/1.7/Mon Jun 19 10:00:51 2006//
+/VirtualModel.pm/1.3/Mon Jun 19 10:00:51 2006//

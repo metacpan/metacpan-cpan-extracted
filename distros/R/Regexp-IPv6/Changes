@@ -1,0 +1,18 @@
+Revision history for Perl extension Regexp::IPv6.
+
+0.03  Feb 5, 2010
+      - some work done in maximizing matches
+      - addresses like xxx::xxxx: were not being rejected (bug report
+        by Michael Erickson)
+      - addresses like x:x:x:x:x:x:x.x.x.x were not being accepted
+        (bug report by Michael Erickson)
+      - more tests (contributed by Michael G. Schwern and Michael
+        Erickson)
+
+0.02  Jan 24, 2009
+      - clean up companion files
+
+0.01  Sat Jan 24 13:03:13 2009
+	- original version; created by h2xs 1.23 with options
+		-AXn Regexp::IPv6
+

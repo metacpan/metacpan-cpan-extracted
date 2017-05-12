@@ -1,0 +1,43 @@
+---
+abstract: 'simple way to turn URIs into QNames'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::10 version , CPAN::Meta::Converter version 2.140640'
+keywords:
+  - Namespace
+  - Namespaces
+  - Prefix
+  - Prefixes
+  - RDF
+  - xmlns
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RDF-Prefixes
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  RDF::Prefixes:
+    file: lib/RDF/Prefixes.pm
+    version: '0.005'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-Prefixes
+  homepage: https://metacpan.org/release/RDF-Prefixes
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-rdf-prefixes.git
+version: '0.005'

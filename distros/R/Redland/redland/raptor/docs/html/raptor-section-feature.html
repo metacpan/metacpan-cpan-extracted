@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Features</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Raptor RDF Syntax Parsing and Serializing Library Manual">
+<link rel="up" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="prev" href="raptor-section-constants.html" title="Constants">
+<link rel="next" href="raptor-section-iostream.html" title="I/O Stream">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="introduction.html" title="Raptor Overview">
+<link rel="part" href="tutorial.html" title="Part&#160;I.&#160;Raptor Tutorial">
+<link rel="chapter" href="tutorial-initialising-finishing.html" title="Initialising and Finishing using the Library">
+<link rel="chapter" href="tutorial-querying-functionality.html" title="Listing built-in functionality">
+<link rel="chapter" href="tutorial-parsing.html" title="Parsing syntaxes to RDF Triples">
+<link rel="chapter" href="tutorial-serializing.html" title="Serializing RDF triples to a syntax">
+<link rel="part" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="chapter" href="raptor-parsers.html" title="Parsers in Raptor (syntax to triples)">
+<link rel="chapter" href="raptor-serializers.html" title="Serializers in Raptor (triples to syntax)">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="raptor-section-constants.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference-manual.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Raptor RDF Syntax Parsing and Serializing Library Manual</th>
+<td><a accesskey="n" href="raptor-section-iostream.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2562165" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2608834" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="raptor-section-feature"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2562165"></a><span class="refentrytitle">Features</span>
+</h2>
+<p>Features &#8212; Parser and Serializer features</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+enum        <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a>;
+unsigned int <a href="raptor-section-feature.html#raptor-get-feature-count">raptor_get_feature_count</a>       (void);
+int         <a href="raptor-section-feature.html#raptor-features-enumerate">raptor_features_enumerate</a>       (const <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature,
+                                             const char **name,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> **uri,
+                                             const char **label);
+<a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> <a href="raptor-section-feature.html#raptor-feature-from-uri">raptor_feature_from_uri</a>      (<a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri);
+int         <a href="raptor-section-feature.html#raptor-feature-value-type">raptor_feature_value_type</a>       (const <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2608834"></a><h2>Description</h2>
+<p>
+Optional parameters for <a href="raptor-section-parser.html#raptor-parser"><span class="type">raptor_parser</span></a> and <a href="raptor-section-serializer.html#raptor-serializer"><span class="type">raptor_serializer</span></a>
+objects that can be get and set.  Utility functions also exist
+to enumerate them, their description and the parameter type
+taken.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2608866"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2608877"></a><h3>
+<a name="raptor-feature"></a>enum raptor_feature</h3>
+<a class="indexterm" name="id2608889"></a><pre class="programlisting">typedef enum {
+  RAPTOR_FEATURE_SCANNING,
+  RAPTOR_FEATURE_ASSUME_IS_RDF,
+  RAPTOR_FEATURE_ALLOW_NON_NS_ATTRIBUTES,
+  RAPTOR_FEATURE_ALLOW_OTHER_PARSETYPES,
+  RAPTOR_FEATURE_ALLOW_BAGID,
+  RAPTOR_FEATURE_ALLOW_RDF_TYPE_RDF_LIST,
+  RAPTOR_FEATURE_NORMALIZE_LANGUAGE,
+  RAPTOR_FEATURE_NON_NFC_FATAL,
+  RAPTOR_FEATURE_WARN_OTHER_PARSETYPES,
+  RAPTOR_FEATURE_CHECK_RDF_ID,
+  RAPTOR_FEATURE_RELATIVE_URIS,
+  RAPTOR_FEATURE_START_URI,
+  RAPTOR_FEATURE_WRITER_AUTO_INDENT,
+  RAPTOR_FEATURE_WRITER_AUTO_EMPTY,
+  RAPTOR_FEATURE_WRITER_INDENT_WIDTH,
+  RAPTOR_FEATURE_WRITER_XML_VERSION,
+  RAPTOR_FEATURE_WRITER_XML_DECLARATION,
+  RAPTOR_FEATURE_NO_NET,
+  RAPTOR_FEATURE_LAST=RAPTOR_FEATURE_NO_NET
+} raptor_feature;
+</pre>
+<p>
+Raptor parser, serializer or XML writer features.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-SCANNING:CAPS"></a><code class="literal">RAPTOR_FEATURE_SCANNING</code></span></td>
+<td> If true (default false), the RDF/XML
+  parser will look for embedded rdf:RDF elements inside the XML
+  content, and not require that the XML start with an rdf:RDF root
+  element.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-ASSUME-IS-RDF:CAPS"></a><code class="literal">RAPTOR_FEATURE_ASSUME_IS_RDF</code></span></td>
+<td> If true (default false) then the
+  RDF/XML parser will assume the content is RDF/XML, not require
+  that rdf:RDF root element, and immediately interpret the content
+  as RDF/XML.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-ALLOW-NON-NS-ATTRIBUTES:CAPS"></a><code class="literal">RAPTOR_FEATURE_ALLOW_NON_NS_ATTRIBUTES</code></span></td>
+<td> If true (default true)
+  then the RDF/XML parser will allow non-XML namespaced attributes
+  to be accepted as well as rdf: namespaced ones.  For example,
+  'about' and 'ID' will be interpreted as if they were rdf:about
+  and rdf:ID respectively.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-ALLOW-OTHER-PARSETYPES:CAPS"></a><code class="literal">RAPTOR_FEATURE_ALLOW_OTHER_PARSETYPES</code></span></td>
+<td> If true (default true)
+  then the RDF/XML parser will allow unknown parsetypes to be
+  present and will pass them on to the user.  Unimplemented at
+  present.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-ALLOW-BAGID:CAPS"></a><code class="literal">RAPTOR_FEATURE_ALLOW_BAGID</code></span></td>
+<td> If true (default true) then the
+  RDF/XML parser will support the rdf:bagID attribute that was
+  removed from the RDF/XML language when it was revised.  This
+  support may be removed in future.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-ALLOW-RDF-TYPE-RDF-LIST:CAPS"></a><code class="literal">RAPTOR_FEATURE_ALLOW_RDF_TYPE_RDF_LIST</code></span></td>
+<td> If true (default false)
+  then the RDF/XML parser will generate the idList rdf:type
+  rdf:List triple in the handling of rdf:parseType="Collection".
+  This triple was removed during the revising of RDF/XML after
+  collections were initially added.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-NORMALIZE-LANGUAGE:CAPS"></a><code class="literal">RAPTOR_FEATURE_NORMALIZE_LANGUAGE</code></span></td>
+<td> If true (default true) then
+  XML language values such as from xml:lang will be normalized to
+  lowercase.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-NON-NFC-FATAL:CAPS"></a><code class="literal">RAPTOR_FEATURE_NON_NFC_FATAL</code></span></td>
+<td> If true (default false) then
+ illegal Unicode Normal Form C in literals will give a fatal
+ error, otherwise just a warning.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-WARN-OTHER-PARSETYPES:CAPS"></a><code class="literal">RAPTOR_FEATURE_WARN_OTHER_PARSETYPES</code></span></td>
+<td> If true (default true) then 
+  the RDF/XML parser will warn about unknown rdf:parseType values.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-CHECK-RDF-ID:CAPS"></a><code class="literal">RAPTOR_FEATURE_CHECK_RDF_ID</code></span></td>
+<td> If true (default true) then the
+  RDF/XML will check rdf:ID attribute values for duplicates and
+  cause an error if any are found.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-RELATIVE-URIS:CAPS"></a><code class="literal">RAPTOR_FEATURE_RELATIVE_URIS</code></span></td>
+<td> If true (default true) then
+  relative URIs will be used wherever possible when serializing.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-START-URI:CAPS"></a><code class="literal">RAPTOR_FEATURE_START_URI</code></span></td>
+<td> Set the start URI for serlalizing to use.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-WRITER-AUTO-INDENT:CAPS"></a><code class="literal">RAPTOR_FEATURE_WRITER_AUTO_INDENT</code></span></td>
+<td> Automatically indent elements when
+  seriailizing.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-WRITER-AUTO-EMPTY:CAPS"></a><code class="literal">RAPTOR_FEATURE_WRITER_AUTO_EMPTY</code></span></td>
+<td> Automatically detect and
+  abbreviate empty elements when serializing.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-WRITER-INDENT-WIDTH:CAPS"></a><code class="literal">RAPTOR_FEATURE_WRITER_INDENT_WIDTH</code></span></td>
+<td> Integer number of spaces to use
+  for each indent level when serializing with auto indent.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-WRITER-XML-VERSION:CAPS"></a><code class="literal">RAPTOR_FEATURE_WRITER_XML_VERSION</code></span></td>
+<td> Integer XML version XML 1.0 (10) or XML 1.1 (11)
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-WRITER-XML-DECLARATION:CAPS"></a><code class="literal">RAPTOR_FEATURE_WRITER_XML_DECLARATION</code></span></td>
+<td> Write XML 1.0 or 1.1 declaration.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-NO-NET:CAPS"></a><code class="literal">RAPTOR_FEATURE_NO_NET</code></span></td>
+<td> Deny network requests
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-FEATURE-LAST:CAPS"></a><code class="literal">RAPTOR_FEATURE_LAST</code></span></td>
+<td> Internal
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2558347"></a><h3>
+<a name="raptor-get-feature-count"></a>raptor_get_feature_count ()</h3>
+<a class="indexterm" name="id2584063"></a><pre class="programlisting">unsigned int raptor_get_feature_count       (void);</pre>
+<p>
+Get the count of features defined.
+</p>
+<p>
+This is prefered to the compile time-only symbol <a href="raptor-section-feature.html#RAPTOR-FEATURE-LAST:CAPS"><span class="type">RAPTOR_FEATURE_LAST</span></a>
+and returns a count of the number of features which is
+<a href="raptor-section-feature.html#RAPTOR-FEATURE-LAST:CAPS"><span class="type">RAPTOR_FEATURE_LAST</span></a>+1.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> count of features in the <a href="raptor-section-feature.html#raptor-feature"><span class="type">raptor_feature</span></a> enumeration
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2584131"></a><h3>
+<a name="raptor-features-enumerate"></a>raptor_features_enumerate ()</h3>
+<a class="indexterm" name="id2584143"></a><pre class="programlisting">int         raptor_features_enumerate       (const <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature,
+                                             const char **name,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> **uri,
+                                             const char **label);</pre>
+<p>
+Get list of syntax features.
+</p>
+<p>
+If uri is not NULL, a pointer toa new raptor_uri is returned
+that must be freed by the caller with <a href="raptor-section-uri.html#raptor-free-uri"><code class="function">raptor_free_uri()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>feature</code></em>&#160;:</span></td>
+<td> feature enumeration (0+)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> pointer to store feature short name (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> pointer to store feature URI (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>label</code></em>&#160;:</span></td>
+<td> pointer to feature label (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> 0 on success, &lt;0 on failure, &gt;0 if feature is unknown
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2584284"></a><h3>
+<a name="raptor-feature-from-uri"></a>raptor_feature_from_uri ()</h3>
+<a class="indexterm" name="id2584295"></a><pre class="programlisting"><a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> raptor_feature_from_uri      (<a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri);</pre>
+<p>
+Turn a feature URI into an feature enum.
+</p>
+<p>
+The allowed feature URIs are available via <a href="raptor-section-feature.html#raptor-features-enumerate"><code class="function">raptor_features_enumerate()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> feature URI
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> &lt; 0 if the feature is unknown
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2559092"></a><h3>
+<a name="raptor-feature-value-type"></a>raptor_feature_value_type ()</h3>
+<a class="indexterm" name="id2559103"></a><pre class="programlisting">int         raptor_feature_value_type       (const <a href="raptor-section-feature.html#raptor-feature">raptor_feature</a> feature);</pre>
+<p>
+Get the type of a features.
+</p>
+<p>
+The type of the <em class="parameter"><code>feature</code></em> is 0=integer , 1=string.  Other values are
+undefined.  Most features are integer values and use
+raptor_set_feature and <a href="raptor-section-parser.html#raptor-get-feature"><code class="function">raptor_get_feature()</code></a>
+( raptor_serializer_set_feature <a href="raptor-section-serializer.html#raptor-serializer-get-feature"><code class="function">raptor_serializer_get_feature()</code></a> )
+</p>
+<p>
+String value features use <a href="raptor-section-parser.html#raptor-parser-set-feature-string"><code class="function">raptor_parser_set_feature_string()</code></a> and
+<a href="raptor-section-parser.html#raptor-parser-get-feature-string"><code class="function">raptor_parser_get_feature_string()</code></a>
+( <a href="raptor-section-serializer.html#raptor-serializer-set-feature-string"><code class="function">raptor_serializer_set_feature_string()</code></a>
+and <a href="raptor-section-serializer.html#raptor-serializer-get-feature-string"><code class="function">raptor_serializer_get_feature_string()</code></a> )</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>feature</code></em>&#160;:</span></td>
+<td> raptor serializer or parser feature
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the type of the feature or &lt;0 if <em class="parameter"><code>feature</code></em> is unknown
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

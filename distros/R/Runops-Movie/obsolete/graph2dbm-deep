@@ -1,0 +1,67 @@
+#!perl
+use strict;
+use warnings;
+use feature ':5.10';
+use Storable qw( retrieve );
+use DBM::Deep;
+
+use File::Basename qw( dirname );
+use lib dirname(__FILE__);
+use TM qw( size );
+
+my $in_edge   = "$ARGV[0].edge";
+my $in_vertex = "$ARGV[0].size";
+#my $in_type   = "$ARGV[0].type";
+my $out_tree  = "$ARGV[0].tree";
+
+say STDERR "Read $in_edge (@{[ size( -s $in_edge ) ]})";
+my $edge = retrieve( $in_edge );
+
+say STDERR "Read $in_vertex (@{[ size( -s $in_vertex ) ]})";
+my $vertex_size = retrieve( $in_vertex );
+
+#say STDERR "Read $in_type (@{[ size( -s $in_type ) ]})";
+# my $type = retrieve( $in_type );
+my $type = {};
+
+my %color = (
+    0 => '#cccccc',
+);
+
+my $db = DBM::Deep->new( file => $out_tree );
+my $no_edges = keys %$edge;
+pt( $db, 'root' );
+
+
+sub indent {
+    my $cx = 0;
+    1 while caller ++$cx;
+    return $_[0] x $cx;
+}
+use constant GRAPH => 0;
+use constant VERTEX => 1;
+# use constant INDENT => 2;
+
+sub pt {
+    say indent('>'), " $_[VERTEX] ", scalar keys %$edge;
+    if ( $vertex_size->{$_[VERTEX]} ) {
+        my $g = $_[GRAPH]{$_[VERTEX]} = {
+            name => "$_[VERTEX]",
+            colour => "$color{$type->{$_[VERTEX]}//'0'}",
+            size => 0+$vertex_size->{$_[VERTEX]},
+        };
+
+        if ( $edge->{$_[VERTEX]} && keys %{$edge->{$_[VERTEX]}} ) {
+            $g->{children} = [
+                map { pt( $g, $_ ) }
+                keys %{ delete $edge->{$_[VERTEX]} }
+            ];
+        };
+
+        return $g;
+    }
+    else {
+        return ();
+    }
+}
+

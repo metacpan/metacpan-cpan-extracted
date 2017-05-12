@@ -1,0 +1,56 @@
+NAME
+    RT::Extension::Gravatar - Displays Gravatar images within RT
+
+DESCRIPTION
+    This Plugin displays Gravatar image on the following pages:
+
+    More about the requestors widget
+    Modify user page
+    About me (Preferences)
+    User Summary
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::Gravatar');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::Gravatar));
+
+        or add RT::Extension::Gravatar to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj/*
+
+    Restart your webserver
+
+METHODS ADDED TO OTHER CLASSES
+  RT::User
+   GravatarUrl
+    Return the gravatar image url of the user.
+
+   HasGravatar
+    Return true if the user has an gravatar image.
+
+AUTHOR
+    Christian Loos <cloos@netsandbox.de>
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (C) 2010-2016, Christian Loos.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+
+SEE ALSO
+    <http://bestpractical.com/rt/>
+
+    <http://gravatar.com/>
+

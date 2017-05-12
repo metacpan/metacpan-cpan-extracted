@@ -1,0 +1,22 @@
+<%init>
+for my $header ( @$headers ) {
+    if ( $header->{Tag} eq 'Date' && $header->{Value} ) {
+        $header->{Value} =~ s!^\s+!!;
+        $header->{Value} =~ s!\s+$!!;
+        my $date = RT::Date->new($session{CurrentUser});
+        $date->Set(
+            Format   => 'unknown',
+            Value    => $header->{Value},
+            Timezone => 'UTC',
+        );
+
+        if ( $date->Unix && $header->{Value} ne $date->RFC2822(Timezone => 'user') ) {
+            $header->{Value} = $date->RFC2822(Timezone => 'user') . qq! <span style="color:grey">($header->{Value})</span>!;
+        }
+    }
+}
+</%init>
+
+<%args>
+$headers
+</%args>

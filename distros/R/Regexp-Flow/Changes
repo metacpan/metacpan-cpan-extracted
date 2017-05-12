@@ -1,0 +1,8 @@
+Unreleased Changes
+		None
+
+0.002	2014-06-29
+		re_matches now works with no /g flag
+
+0.001	2014-06-28
+		First Release!

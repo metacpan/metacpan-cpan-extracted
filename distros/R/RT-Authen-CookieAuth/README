@@ -1,0 +1,54 @@
+RT-Authen-CookieAuth
+
+This module provides the ability to seamlessly integrate
+RT with a website that uses browser cookies to keep users
+authenticated once they have logged in.
+
+This module requires the RT-Authen-ExternalAuth extension,
+although if you do not wish to install the full extension,
+you may simply provide a valid ExternalSettings variable
+containing a database configuration as documented in the
+RT_SiteConfig.pm distributed with RT-Authen-ExternalAuth.
+
+This module is designed to read the value of a browser
+cookie and check it against a database table containing
+stored cookie values and userIDs and a users table matching 
+userIDs to usernames.
+
+If the stored cookie value matches a valid userID, then
+the username associated with it will be automatically
+authenticated in RT.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make install
+
+Once installed, you should view the file:
+
+    $RTHOME/local/etc/CookieAuth/RT_SiteConfig.pm
+
+Then use the example provided to prepare your own custom
+configuration which should reside in
+$RTHOME/etc/RT_SiteConfig.pm
+
+Alternatively, you may alter the provided example directly
+and then include the extra directives by including the
+example file's path at the end of your RT_SiteConfig.pm
+
+AUTHOR
+        Mike Peachey
+        Jennic Ltd.
+        zordrak@cpan.org
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Jennic Ltd.
+
+This software is released under version 2 of the GNU 
+General Public License. The license is distributed with
+this package in the LICENSE file found in the directory 
+root.

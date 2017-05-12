@@ -1,0 +1,90 @@
+<span id="toggle-ticket-spam-<% $id %>">
+% my $url = RT->Config->Get("WebPath") ."/Helpers/Toggle/TicketSpam?id=". $id;
+<a align="right" href="<% $url %>" onclick="ahah(<% $url |j %>, 'toggle-ticket-spam-'+<% $id |j %>); return false;" title="<% $reported ? loc("Not Spam") : loc("Report Spam") %>">
+% if ( $reported ) {
+<img src="<% RT->Config->Get("WebPath") %>/<% $image_path %>/images/spam.png" alt="<% loc('Not Spam') %>" style="border-style: none;" />
+% } else {
+<img src="<% RT->Config->Get("WebPath") %>/<% $image_path %>/images/empty_spam.png" alt="<% loc('Report Spam') %>" style="border-style: none;" />
+% }
+</a>
+</span>
+<%ARGS>
+$id
+$Toggle => 0
+</%ARGS>
+<%INIT>
+my $image_path = defined $RT::StaticPath ? 'static' : 'NoAuth';
+my $uid = $session{'CurrentUser'}->id;
+
+my $ticket = RT::Ticket->new( $session{'CurrentUser'} );
+$ticket->Load( $id );
+return unless $id = $ticket->id;
+
+my $reports = $ticket->FirstAttribute('SpamReports');
+$reports = $reports->Content if $reports;
+$reports ||= [];
+
+my $reported = grep $_ == $uid, @$reports;
+my $autodelete = RT->Config->Get("SpamAutoDeleteThreshold") || 0;
+
+if ( $Toggle ) {
+    if ( $reported ) {
+        @$reports = grep $_ != $uid, @$reports;
+    } else {
+        push @$reports, $uid;
+    }
+    if ( @$reports ) {
+        if (lc $ticket->Status ne 'deleted' and $ticket->CurrentUserHasRight('DeleteTicket')) {
+            my ($status, $msg) = $ticket->SetStatus('deleted');
+            RT->Logger->error("Couldn't delete ticket: $msg")
+                unless $status;
+        }
+        elsif ($autodelete) {
+            # Automatically delete or re-open depending on current report count
+            my $status = @$reports >= $autodelete ? 'deleted' : $ticket->FirstActiveStatus;
+
+            if (lc $ticket->Status ne lc $status) {
+                RT->Logger->debug(scalar @$reports . " spam reports for ticket @{[$ticket->id]}; automatically setting status to $status");
+
+                my $as_system = RT::Ticket->new( RT->SystemUser );
+                $as_system->Load($ticket->id);
+
+                my ($ok, $msg) = $as_system->SetStatus($status);
+                RT->Logger->error("Couldn't set ticket status to $status as system: $msg")
+                    unless $ok;
+            }
+        }
+        my ($status, $msg) = $ticket->SetAttribute(
+            Name    => 'SpamReports',
+            Content => $reports,
+        );
+        RT->Logger->error("Couldn't set attribute: $msg")
+            unless $status;
+    } else {
+        if (lc $ticket->Status eq 'deleted') {
+            if ($ticket->CurrentUserHasRight('ModifyTicket')) {
+                my ($status, $msg) = $ticket->SetStatus($ticket->FirstActiveStatus);
+                RT->Logger->error("Couldn't undelete ticket: $msg")
+                    unless $status;
+            }
+            elsif ($autodelete) {
+                # Autodelete is enabled, but there are no reports so we should always re-open
+                RT->Logger->debug("No more spam reports for ticket @{[$ticket->id]}; automatically undeleting ticket");
+
+                my $as_system = RT::Ticket->new( RT->SystemUser );
+                $as_system->Load($ticket->id);
+
+                my ($ok, $msg) = $as_system->SetStatus($ticket->FirstActiveStatus);
+                RT->Logger->error("Couldn't undelete ticket as system: $msg")
+                    unless $ok;
+            }
+        }
+        my ($status, $msg) = $ticket->DeleteAttribute(
+            'SpamReports'
+        );
+        RT->Logger->error("Couldn't delete attribute: $msg")
+            unless $status;
+    }
+    $reported = !$reported;
+}
+</%INIT>

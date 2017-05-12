@@ -1,0 +1,84 @@
+NAME
+    RT-Extension-PermissiveHTMLMail - Allows a greater range of HTML in RT,
+    at the cost of security
+
+RT VERSION
+    Works with RT 4.0 and RT 4.2.
+
+SUMMARY
+    By default, RT displays HTML mail; however, due to security concerns, by
+    default it does not allow the full range of HTML to be used.
+    Specifically, it prevents:
+
+    Tables
+        Because RT cannot ensure that HTML in email is balanced, malicious
+        email messages can use tables to mimic or mask parts of the standard
+        RT UI. This opens RT to a broad range of "phishing attacks," wherein
+        the user believes they are clicking a benign RT link, which actually
+        is controlled by the originator of the email. This can allow
+        attackers to steal passwords and compromise RT, and possibly other
+        servers.
+
+    Many text styles
+        CSS is a powerful tool; it can also be used to mimic or mask parts
+        of the standard RT UI. By default, RT thus only allows a small
+        subset of CSS properties, which are sufficient for simple styling.
+        Allowing arbitrary styles could lead to effective "phishing
+        attacks," compromising passwords.
+
+    Installing this extension loosens the above restrictions; this should be
+    sufficient for most needs. However, RT will still only allow HTML tags
+    that it recognizes.
+
+    Installing this extension also additionally provides a
+    $AllowDangerousHTML configuration option. Setting this alters RT from
+    using a whitelist (allowing only HTML tags and attributes which it knows
+    to be safe) to using a blacklist (skip tags and attributes which are
+    unsafe). This is unsafe and dangerous, as there are guaranteedly further
+    unsafe tags which RT does not know to prevent. Enabling this feature
+    allows your RT account to be compromised by a malicious email. Do not
+    enable it (via Set( $AllowDangerousHTML, 1 )) unless you understand the
+    consequences.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::PermissiveHTMLMail');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::PermissiveHTMLMail));
+
+        or add RT::Extension::PermissiveHTMLMail to your existing @Plugins
+        line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-PermissiveHTMLMail@rt.cpan.org|mailto:bug-RT-Extension-PermissiveHTMLMail@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-PermissiveHTMLMail>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2014 by Best Practical Solutions
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

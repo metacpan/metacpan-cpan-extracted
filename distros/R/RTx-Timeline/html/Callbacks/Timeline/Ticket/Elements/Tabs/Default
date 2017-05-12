@@ -1,0 +1,23 @@
+<%init>
+my $args;
+$args= "?" . $m->comp(
+    '/Elements/QueryString',
+    Query   => $ARGS{'Query'}   || $session{'CurrentSearchHash'}->{'Query'},
+    Format  => $ARGS{'Format'}  || $session{'CurrentSearchHash'}->{'Format'},
+    OrderBy => $ARGS{'OrderBy'} || $session{'CurrentSearchHash'}->{'OrderBy'},
+    Order   => $ARGS{'Order'}   || $session{'CurrentSearchHash'}->{'Order'},
+    Page   => $ARGS{'Page'}   || $session{'CurrentSearchHash'}->{'Page'},
+    Rows    => $ARGS{'Rows'},
+  ) if ($ARGS{'Query'} or $session{'CurrentSearchHash'}->{'Query'});
+$args ||= '';
+
+#if ($args and $m->request_comp->name ne 'Timeline.html' ) {
+  $tabs->{"j"} = { path      => "Search/Timeline.html$args",
+                   title     => loc('Timeline'),
+                   separator => 1,
+                 };
+#}
+</%init>
+<%args>
+$tabs
+</%args>

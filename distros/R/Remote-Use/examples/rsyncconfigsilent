@@ -1,0 +1,25 @@
+package rsyncconfigsilent;
+
+sub getarg {
+  my ($class, $self) = @_;
+
+  return (
+    host => 'orion:',
+    prefix => '/tmp/perl5lib/',
+    command => 'rsync -aue ssh',
+    ppmdf => '/tmp/perl5lib/.orion.installed.modules',
+  );
+}
+
+# Store executable in current directory
+sub prebin {
+  my ($package, $url, $file, $self) = @_;
+
+  # Remove path
+  print "downloading $url. Default place: $file ";
+  $file =~ s{.*/}{};
+  print "final place: $file\n";
+  $file;
+}
+
+1;

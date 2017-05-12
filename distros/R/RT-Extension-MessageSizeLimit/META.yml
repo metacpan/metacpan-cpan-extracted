@@ -1,0 +1,29 @@
+---
+abstract: 'Force web message size limit on ticket create/update'
+author:
+  - 'Emmanuel Lacour <elacour@home-dn.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: gplv2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-MessageSizeLimit
+no_index:
+  directory:
+    - html
+    - lib
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.home-dn.net/manu/RT-Extension-MessageSizeLimit.git
+version: 0.02
+provides:
+    RT::Extension::MessageSizeLimit:
+      file: lib/RT/Extension/MessageSizeLimit.pm
+      version: 0.02

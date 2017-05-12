@@ -1,0 +1,6 @@
+#. ($cf->Name, $ARGSRef->{Status})
+#. ($label, $ARGSRef->{Status})
+#: lib/RT/Extension/MandatoryOnTransition.pm:363 lib/RT/Extension/MandatoryOnTransition.pm:411
+msgid "%1 is required when changing Status to %2"
+msgstr ""
+

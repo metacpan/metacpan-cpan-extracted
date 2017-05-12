@@ -1,0 +1,49 @@
+{
+   "abstract" : "Simple, correct readonly values",
+   "author" : [
+      "Ben Morrow <ben@morrow.me.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Readonly-Tiny",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::Exports" : "0",
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "Readonly::Tiny" : {
+         "file" : "lib/Readonly/Tiny.pm",
+         "version" : "4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Readonly-Tiny"
+      },
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mauzo/Readonly-Tiny"
+      }
+   },
+   "version" : "4"
+}

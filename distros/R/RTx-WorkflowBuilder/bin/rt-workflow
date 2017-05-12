@@ -1,0 +1,162 @@
+#!perl -w
+use strict;
+use warnings;
+use Getopt::Long;
+use RTx::WorkflowBuilder;
+
+=head1 NAME
+
+rt-workflow - helper for configuring approval workflow in RT
+
+=head1 SYNOPSIS
+
+In your RT_SiteConfig.pm:
+
+  Set( $WorkflowBuilderStages,
+       { 'Manager approval' =>
+         { content => '.....',
+           subject => 'Manager Approval for PO: {$Approving->Id} - {$Approving->Subject}',
+
+           owner => q!{{
+    Fire                => "moss",
+    IT                  => "roy",
+    Marketing           => "jen"}->{ $Approving->FirstCustomFieldValue('Department') }}! },
+         'Finance approval' =>
+         { content => '... ',
+           owner => 'CFO',
+         },
+         'CEO approval' =>
+         { content => '..........',
+           owner => 'CEO',
+         }});
+
+  Set( $WorkflowBuilderRules,
+  { 'PO-Approval' => [ 'Manager approval' => 'Finance approval' => 'CEO approval'],
+    'Vacation-Approval' => [ 'Manager approval' => 'CEO approval']
+ }
+);
+
+# to enable the workflow rules described in "PO-Approval" for the PO queue:
+% bin/rt-workflow PO PO-Approval --create
+
+# to update the workflow associated with the PO queue once you changed
+# the configuration
+% bin/rt-workflow PO PO-Approval
+
+=head1 DESCRIPTION
+
+This module allows you to define approval stages and approval rules in
+your F<RT_SiteConfig.pm> and builds the appropriate scrips for you.
+
+=over
+
+=item $WorkflowBuilderStages
+
+The config value should be a hashref, with keys being the name of the
+approval stage, and values being a hashref of the approval
+specification, which can include the usual fields for ticket such as
+owner, subject.  note that the values can be interpolated just like
+normal RT Template (escaped with C<{}>), and you can access the ticket to
+be approved with the variable C<$Approving>.
+
+=item $WorkflowBuilderRules
+
+The config value should be a hashref, with keys being the name of the
+approval rule, and the values being arrayref denoting the stages of
+the approval in the suitable order.
+
+A stage with parallel approvals where any of them can move the
+approval workflow to next stage, can be represented as another
+arrayref in the approval chain.  For example:
+
+  ['Manager approval' => 'Financial approval' => 'CEO approval']
+
+implies a monotonous approval chain that goes from manager to
+financial, and finally to CEO.
+
+  ['Manager approval' => ['HR', 'VP'] => 'CEO approval']
+
+implies after manager approval, either one of HR or VP approval will
+make it go to CEO approval.
+
+=back
+
+=cut
+
+my %opts;
+GetOptions( \%opts, "create", "help" );
+
+if ($opts{help}) {
+    system("perldoc", $0);
+    exit;
+}
+
+my ($queue, $wf_name) = @ARGV or die "Usage: $0 queue workflowname\n";
+
+use RT::Interface::CLI qw(CleanEnv
+                          GetCurrentUser GetMessageContent);
+CleanEnv();
+
+#Load etc/config.pm and drop privs
+RT::LoadConfig();
+RT::Init();
+
+my $q = RT::Queue->new($RT::SystemUser);
+$q->Load($queue) or die "Can't load queue: $queue";
+
+my $stages = RT::Config->Get('WorkflowBuilderStages');
+
+my $workflows = RT::Config->Get('WorkflowBuilderRules');
+
+my $scrips = RT::Scrips->new($RT::SystemUser);
+$scrips->Limit( FIELD => 'Queue',
+                VALUE => $q->Id );
+
+my $workflow_script;
+
+die "no workflow named $wf_name found" unless $workflows->{$wf_name};
+
+# XXX: ensure all stages exist
+
+while (my $scrip = $scrips->Next) {
+    # XXX: make sure it's *our* scrip
+    #    next unless .....
+
+    if ($workflow_script) {
+        die "two scrips exist for queue @{[ $q->Name ]} workflow: ";
+    }
+    $workflow_script = $scrip;
+}
+
+my $approval_template = RTx::WorkflowBuilder->new
+    ({ stages => $stages,
+       rule   => $workflows->{$wf_name} })
+    ->compile_template;
+
+if (!$workflow_script) {
+    die "no workflow found, use --create" unless $opts{create};
+
+    my $scrip = RT::Scrip->new($RT::SystemUser);
+
+    my $apptemp = RT::Template->new($RT::SystemUser);
+    $apptemp->Create( Content => $approval_template,
+                      Name => $wf_name, Queue => $q->Id);
+
+    my ($sval, $smsg) = $scrip->Create( ScripCondition => 'On Create',
+                                        ScripAction => 'Create Tickets',
+                                        Template => $apptemp->Id,
+                                        Queue => $q->Id);
+}
+else {
+    die "workflow already exists" if $opts{create};
+    warn "updating... $wf_name for @{[ $q->Name ]}";
+
+    warn "template name changed"
+        if $workflow_script->TemplateObj->Name ne $wf_name;
+    $workflow_script->TemplateObj->SetContent($approval_template);
+    $workflow_script->TemplateObj->SetName($wf_name);
+}
+
+
+1;
+

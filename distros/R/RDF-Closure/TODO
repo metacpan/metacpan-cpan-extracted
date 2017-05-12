@@ -1,0 +1,17 @@
+TODO:
+
+* Restricted datatypes (Ivan's RDFClosure/RestrictedDatatype.py)
+
+I don't plan on writing the following myself but would accept patches for:
+
+* Manchester syntax parser
+* OWL/XML parser
+* OwlFn, Manchester, OWL/XML serialisers
+	- OwlFn serialiser is now in OWL::DirectSemantics.
+
+Ideas for separate packages:
+
+* OWL API
+* Wrappers for external reasoning tools
+* A log:implies engine and perhaps some other parts of Notation 3 logic.
+

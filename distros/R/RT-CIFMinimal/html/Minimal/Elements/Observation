@@ -1,0 +1,235 @@
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function isIp(val) {
+   var filter = /[a-z0-9.-]+\.[a-z]{2,5}|(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)/;
+    if(filter.test(val.value)){
+        filter = /^https?/;
+        if(filter.test(val.value)){
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+function hide(obj) {
+    obj1 = document.getElementById(obj);
+    obj1.style.visibility = 'hidden';
+}
+function show(obj) {
+      obj1 = document.getElementById(obj);
+      obj1.style.visibility = 'visible';
+}
+
+function show_me(optionValue) {
+    if(isIp(optionValue)){
+        show('portlist');
+        show('protocol');
+    } else {
+        hide('portlist');
+        hide('protocol');
+    }
+}
+function hide_me() {
+    hide('portlist');
+    hide('protocol');
+}
+
+window.onload = hide_me;
+// -->
+</SCRIPT>
+<h3>Getting Started</h3>
+<ul>
+    <li>Group similar data-types (eg: IP, URL, FQDN, etc..) together when doing multiple-entries (csv)</li>
+    <li>Information in the '<i>Raw Information</i>' section <b>is not shared externally</b></li>
+    <li>Don't get stuck on where the data might end up</li>
+    <li>Extra context can always go in the "details" box</li>
+    <li>Let the system handle the rest, we're just documenting observations here</li>
+</ul>
+<hr>
+<h3>Document the Observation</h3>
+<h4>General Details</h4>
+<table>
+<form method="post" enctype="multipart/form-data" action="Submission.html">
+<input type="hidden" name="assessment" value="<% $assessment %>">
+    <tr>
+        <td><b>Data</b></td>
+        <td>
+            <input onBlur=show_me(this) type='text' size=80 name="data" value="<%$data%>" title="ip's, domains, urls"/><br>
+            <i>multiple datapoints (<b>server-max: <%$max_submissions%></b>) can be entered using csv as long as they're both <b><% $assessment %></b> related<br>
+            and of the same data-type (eg: 192.168.1.1,192.168.1.2 OR example1.com,example2.com etc)</i>
+                
+        </td>
+    </tr>
+    <tr>
+        <td><b>Tags</b></td>
+        <td>
+        <input title="short one-word descriptions work best" name='description' type='text' size=80 value="<% $description %>" name="Object-RT::Ticket--CustomField-<% $cf %>-Values" id="Object-RT::Ticket--CustomField-<%$
+cf%>-Values" /><div id
+="Object-RT::Ticket--CustomField-<%$cf%>-Choices" class="autocomplete"></div>
+    <script type="text/javascript">
+    new Ajax.Autocompleter(
+        "Object-RT::Ticket--CustomField-<%$cf%>-Values",
+            "Object-RT::Ticket--CustomField-<%$cf%>-Choices",
+                "<% RT->Config->Get('WebPath')%>/Helpers/Autocomplete/CustomFieldValues",
+                    { tokens: [ '\s' ] }
+                    );
+                    </script>
+        <br><i>eg: torpig zeus spyeye paypal<br>space delimited and <b>1-2, no more than 2</b></i>
+        </td>
+    </tr>
+    <tr>
+        <td><b>Confidence</b></td>
+        <td>
+            <select name='confidence'>
+% foreach my $c (@confidence_sorted){
+                <option value='<% $confidence{$c}->{value} %>'><% $c %></option>
+% }
+            </select></br>
+            <i>best estimate, eg: would you put "boots on the ground" based on this observation?</i>
+        </td>
+    </tr>
+<tr id="portlist">
+        <td>Portlist</td>
+        <td>
+            <input title="the entire list will be tagged against each data entered" type='text' size=80 name='portlist' value="<%$portlist%>">
+            <br><i>eg: 21,22,80-89</i>
+        </td>
+    </tr>
+    <tr id="protocol">
+        <td>Protocol</td>
+        <td>
+            <input type='text' size=80 name='protocol' value="<% $protocol %>">
+            <br><i>eg: tcp/udp/other</i>
+        </td>
+    </tr>
+</table>
+<h3>Sharing Information</h3>
+<table>
+    <tr>
+        <td><b>Group</b></td>
+        <td>
+            <select name='group'>
+% foreach(@sorted){
+% my $selected = ($sorted[0] eq $_) ? " selected='selected'" : '';
+                <option value='<% $_ %>'<% $selected %>><% $_ %></option>
+% }
+            </select>
+        </td>
+    <tr>
+        <td><b>Restriction</b></td>
+        <td>
+        <select name='restriction'>
+% my $d_restriction = uc($rmap->{'default'});
+% foreach my $restriction (keys %$rmap){
+% $restriction = uc($restriction);
+% next if($restriction eq 'DEFAULT');
+% my $selected = '';
+% if($restriction eq $d_restriction){ $selected = " selected='selected'"; }
+            <option value='<%$rmap->{lc($restriction)}%>'<%$selected%>><%$restriction%></option>
+% }
+        </select>
+        <i>details about the <a href="<%$sharing_policy%>" target=_blank><i>Sharing Policy</i></a><br/>
+    </td>
+    </tr>
+
+    <tr>
+        <td><b>Permission<br>to share</b></td>
+        <td>
+% foreach (keys %$share_with){
+% my $checked = ($share_with->{$_}->{'checked'}) ? ' checked="checked"' : '';
+            <input type="checkbox" name="sharewith" value="<% $_ %>"<% $checked %>" /><% $share_with->{$_}->{'description'} %><br/>
+% }
+        </td>
+    </tr>
+</table>
+<hr>
+<table>
+<h4>Raw Information</h4>
+    <tr>
+        <td>
+            details
+        </td>
+        <td>
+            <& /Elements/MessageBox, Default => $ARGS{'ReferenceDescription'}, Name => 'ReferenceDescription' &>
+            <br><i>e.g. full message headers, analysis, etc... <b>not-shared</b></i>
+        </td>
+    </tr>
+    <tr>
+        <td>attachment</td>
+        <td><input name="Attach" type="file"/>
+            <br><i>any supporting doc, reports, pdf's, binaries, etc... <b>not-shared</b></i>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><& /Elements/Submit, Label => loc("Submit")&></td>
+    </tr>
+
+</table>
+</form>
+
+<%INIT>
+my $max_submissions = RT->Config->Get('CIFMinimal_MaxSubmissions') || 15;
+use RT::CustomField;
+my $cf = RT::CustomField->new($session{'CurrentUser'});
+$cf->Load('ReportDescription');
+$cf = $cf->Id();
+
+my $rmap = RT->Config->Get('CIFMinimal_RestrictionMapping');
+unless($rmap){
+    $rmap = {
+        'default'         => 'private',
+        'need-to-know'    => 'need-to-know',
+        'private'         => 'private',
+        'public'          => 'public',
+    };
+}
+
+my %assessments = RT->Config->Get('CIFMinimal_Assessments');
+my @assessments_sorted = sort { $assessments{$a}->{'order'} <=> $assessments{$b}->{'order'} } keys(%assessments);
+my $d_assessment = RT->Config->Get('CIFMinimal_DefaultAssesment') || 'botnet';
+
+my %confidence = RT->Config->Get('CIFMinimal_ConfidenceMapping');
+my @confidence_sorted = sort { $confidence{$a}->{'order'} <=> $confidence{$b}->{'order'} } keys (%confidence);
+
+my $sharing_policy = RT->Config->Get('CIFMinimal_DefaultSharingPolicy') || 'http://en.wikipedia.org/wiki/Traffic_Light_Protocol';
+
+my $user = $session{'CurrentUser'}->UserObj();
+my $g = $user->OwnGroups();
+my $groups;
+while(my $grp = $g->Next()){
+    $grp->Name() =~ m/^DutyTeam (\S+)/;
+    next unless($1);
+    my $guid = lc($1);
+    my $priority        = $grp->FirstCustomFieldValue('CIFGroupPriority');
+    $groups->{$guid}    = $priority;
+}
+
+foreach(keys %$groups){
+    unless(defined($groups->{$_})){
+        $groups->{$_} = 100;
+    }
+}
+my @sorted = sort { $groups->{$a} <=> $groups->{$b} } keys %$groups;
+
+my $share_with = RT->Config->Get('CIFMinimal_ShareWith') || {
+    leo         => {
+        description => 'Anonymized with Trusted Law Enforcement',
+        checked     => 1,
+    },
+    partners    => {
+        description => 'Anonymized with Trusted Mitigation Partners',
+        checked     => 1,
+    }
+};
+</%INIT>
+<%ARGS>
+$portlist => ''
+$data => ''
+$description => ''
+$protocol => ''
+@results => ''
+$restriction => ''
+$assessment => undef
+</%ARGS>

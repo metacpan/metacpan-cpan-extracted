@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Rosetta
+version:      v0.724.0
+version_from: lib/Rosetta.pm
+installdirs:  site
+requires:
+    Class::Std:                    8e-06
+    Class::Std::Utils:             2e-06
+    Locale::KeyedText:             1.072
+    only:                          0
+    Parse::RecDescent:             1.94
+    Readonly:                      1.03
+    Scalar::Util:                  0
+    Test::More:                    0
+    version:                       0.57
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

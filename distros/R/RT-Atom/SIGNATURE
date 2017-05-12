@@ -1,0 +1,68 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 238ac333dd49234fc66bb645fae45386ee466764 Changes
+SHA1 ed4befbffae142bbb6476f40073630fd6709261b MANIFEST
+SHA1 b7524ca4e6a108b8042c0ab9de009eb9afc356d9 META.yml
+SHA1 c959478cfe4c5658579bcedda01d0e8652cbecaf Makefile.PL
+SHA1 f7baee87fe002845dd972c1100eee31c3cfb5bdb README
+SHA1 04a21176dccaef4ec177615330585013c7356e91 html/Atom/0.3/Add/index
+SHA1 eb0fcdc8866eed13ea3f86456c26a2d99682d425 html/Atom/0.3/Describe/Container
+SHA1 8d2094a7a117bc568ba205682dd779f5ec6f2ef6 html/Atom/0.3/Describe/Object
+SHA1 2263e302d14a24ebe5ff41005f32c56b47426f37 html/Atom/0.3/Describe/index
+SHA1 d71b6440d28ac23f81c5abdc1ef650c2bd472105 html/Atom/0.3/Elements/Entry
+SHA1 3d3231726cc3393d206ed7046e86aab57b1a1ded html/Atom/0.3/Elements/Error
+SHA1 20b8df0de5c2da7cf40d8035c9322ce880d2fef4 html/Atom/0.3/Elements/Introspect
+SHA1 ab7ff9e0ef08d9859bcc29b474f693a24ea41d01 html/Atom/0.3/Elements/Link
+SHA1 1c07ae9c210a4241c4008cc34bcd9c34a1ce8ccc html/Atom/0.3/Elements/SetProperty
+SHA1 aa231d32bcf1319d7a42f771febd0c9b0ea9fe09 html/Atom/0.3/Get/Object
+SHA1 1ba06aa9c24d0bdf4cb866e575c28bb162104536 html/Atom/0.3/Get/Property
+SHA1 e497df381689bdbb665e0ab7699cdebd3481d111 html/Atom/0.3/Get/index
+SHA1 bc471de8fd28dca5c5d460d49c3e66d4108f3ea9 html/Atom/0.3/NoAuth/autohandler
+SHA1 f6279531310ce12f2e8899c2fd57552d525afc33 html/Atom/0.3/NoAuth/feed.css
+SHA1 3cedd814dc90be6d9ee96c1b2e4692ae28342caa html/Atom/0.3/NoAuth/pod.css
+SHA1 9f907b99fab6d12754668aa16ce0371c96272145 html/Atom/0.3/NoAuth/spec.html
+SHA1 f81b18793c70edfa8bbaf5ec9fe2989e780facc5 html/Atom/0.3/Remove/index
+SHA1 3a24f382268364180d9417ea653baad519def593 html/Atom/0.3/Search/index
+SHA1 df1a3581c6f3ceb2463ec5614dff86d24b30b148 html/Atom/0.3/Set/Property
+SHA1 39b8d27fd51de0a9f6d0ae19495b7f1338a0e635 html/Atom/0.3/Set/index
+SHA1 d044e9c9358e0640c8a0b307808f902f342d334a html/Atom/0.3/Update/index
+SHA1 2fcb98f8f879f72fb9337ea67fe82ab4c9ebfb33 html/Atom/0.3/autohandler
+SHA1 659e89e7f275ae8c096a5d9c911f5bc1042154be html/Atom/0.3/dhandler
+SHA1 6d8667e5deaaa47e9bcda155df62820acce7f001 html/Atom/0.3/index
+SHA1 9762987f26b26b592caf06b2fb4979687cf69daa html/Atom/0.3/index.html
+SHA1 2d1c7da96132fce5aab190c7f29961a74246f5ce html/Atom/dhandler
+SHA1 860197d0436985e2c26117b1d247536be8e80fb6 html/Atom/index.html
+SHA1 46ff42e7e02b856e15106163cd77b1a55fc08fb9 inc/ExtUtils/AutoInstall.pm
+SHA1 b26ac27e5a57677aa210c0e908b28ff3ba28f03b inc/Module/Install.pm
+SHA1 947ab0384bbdeaa591bbfa6f82deb4f367822b54 inc/Module/Install/AutoInstall.pm
+SHA1 fd56d5c793014bccac2cd1e61926c4da8538ef99 inc/Module/Install/Base.pm
+SHA1 7023c3cdd07f5042c31b6cdae926d75865cf3cdf inc/Module/Install/Include.pm
+SHA1 aabcd47178e4e7b27e340ff5273269c93697c9c1 inc/Module/Install/Makefile.pm
+SHA1 207dfa13341a374fc78325fbeb99bc36659aef2d inc/Module/Install/Metadata.pm
+SHA1 771c92b6962b2d410115638d3218e84034436d9d inc/Module/Install/RTx.pm
+SHA1 8e0d347ca21bc18b380d9d1aa5910b8d078a76b7 inc/Module/Install/WriteAll.pm
+SHA1 c4d2cbb50159c04b6d66117c1f4959ae236f6ac5 lib/RT/Atom.pm
+SHA1 480b12961e4101f1c3aaf40bc1768964d1fcd7cf lib/RT/Atom.pod
+SHA1 63c7ea0cfdd7643aa113c260eec9c9bf0a6ee8a0 t/0-signature.t
+SHA1 8ae7127857b78bfe00802772a0f2e33be1d0cb21 t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (FreeBSD)
+
+iD8DBQFBLMoGtLPdNzw1AaARAhNTAJwIQdzahgn6l2spduiTn1IpmwKHZACgp74Z
+zLCWf0wdcxNReim28peC2NI=
+=JxPY
+-----END PGP SIGNATURE-----

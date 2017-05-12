@@ -1,0 +1,11 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Custom field %1 does not exist."
+msgstr "Benutzerdefiniertes Feld %1 existiert nicht."
+
+msgid "Unconfigured priority"
+msgstr "Unkonfigurierte Priorität"

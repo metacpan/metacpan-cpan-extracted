@@ -1,0 +1,6 @@
+Regexp::Log::BlueCoat
+---------------------
+
+This module simplifies the process of writing regular
+expressions for parsing BlueCoat log files.
+

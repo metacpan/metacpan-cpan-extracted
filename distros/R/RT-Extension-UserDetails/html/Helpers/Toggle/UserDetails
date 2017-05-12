@@ -1,0 +1,8 @@
+<%init>
+$m->comp('/Elements/ShowUserDetails', id => $id, Toggle => $Toggle);
+$m->abort();
+</%init>
+<%args>
+$id => undef
+$Toggle => 1
+</%args>

@@ -1,0 +1,9 @@
+Revision history for Perl extension Rinchi::CPlusPlus::Preprocessor.
+
+0.01  Mon Mar  3 05:23:00 2008
+	- original version; created by h2xs 1.23 with options
+		-A -n Rinchi::CPlusPlus::Preprocessor
+
+0.02  Wed Mar 19 05:39:59 2008
+	- Provided alternative to GNU extension strndup.
+

@@ -1,0 +1,139 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "RDF::Prefixes 0.003"^^doap-deps:CpanId;
+	], [ doap-deps:on "RDF::Trine 1.000"^^doap-deps:CpanId ], [ doap-deps:on "Sort::Key 0"^^doap-deps:CpanId ], [ doap-deps:on "match::smart"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "JSON 2.00"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-TrineX-Serializer-MockTurtleSoup>;
+	doap:created         "2013-03-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/RDF-TrineX-Serializer-MockTurtleSoup>;
+	doap:homepage        <https://metacpan.org/release/RDF-TrineX-Serializer-MockTurtleSoup>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "RDF-TrineX-Serializer-MockTurtleSoup";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rdf-trinex-serializer-mockturtlesoup>;
+	];
+	doap:shortdesc       "he's a bit slow, but he's sure good lookin'".
+
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "RDF-TrineX-Serializer-MockTurtleSoup-0.001"^^xsd:string;
+	dc:issued            "2013-03-15"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-TrineX-Serializer-MockTurtleSoup-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "RDF-TrineX-Serializer-MockTurtleSoup-0.002"^^xsd:string;
+	dc:issued            "2013-05-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "'encoding' option.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "'apostrophe' option.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Nicer output of literals.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor fixes/improvements.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-TrineX-Serializer-MockTurtleSoup-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "RDF-TrineX-Serializer-MockTurtleSoup-0.003"^^xsd:string;
+	dc:issued            "2013-05-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix t/02ser.t test case in RDF::Trine 1.004+, where parsers expect chars (not bytes).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-TrineX-Serializer-MockTurtleSoup-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "RDF-TrineX-Serializer-MockTurtleSoup-0.004"^^xsd:string;
+	dc:issued            "2013-07-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Update test cases for RDF::Prefixes 0.004.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Drop usage of smartmatch operator.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-TrineX-Serializer-MockTurtleSoup-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "RDF-TrineX-Serializer-MockTurtleSoup-0.005"^^xsd:string;
+	dc:issued            "2013-07-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Fix dependencies.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/jonass>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-TrineX-Serializer-MockTurtleSoup-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "RDF-TrineX-Serializer-MockTurtleSoup-0.006"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-TrineX-Serializer-MockTurtleSoup-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/jonass>
+	a                    foaf:Person;
+	foaf:name            "Jonas Smedegaard";
+	foaf:nick            "JONASS";
+	foaf:page            <https://metacpan.org/author/JONASS>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

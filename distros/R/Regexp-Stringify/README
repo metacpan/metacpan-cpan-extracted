@@ -1,0 +1,10 @@
+SYNOPSIS
+
+    Assuming this runs on Perl 5.14 or newer.
+
+     use Regexp::Stringify qw(stringify_regexp);
+     $str = stringify_regexp(regexp=>qr/a/i);                       # '(^i:a)'
+     $str = stringify_regexp(regexp=>qr/a/i, with_qr=>1);           # 'qr(a)i'
+     $str = stringify_regexp(regexp=>qr/a/i, plver=>5.010);         # '(?:(?i-)a)'
+     $str = stringify_regexp(regexp=>qr/a/ui, plver=>5.010);        # '(?:(?i-)a)'
+

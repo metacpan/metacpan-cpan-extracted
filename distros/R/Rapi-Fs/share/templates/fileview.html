@@ -1,0 +1,90 @@
+[%- SET 
+  File     = c.stash.RapiFsFile
+  created  = File.ctime_dt.strftime('%b %e, %Y &nbsp; <span class="grey">%l:%M %p</span>') 
+  modified = File.mtime_dt.strftime('%b %e, %Y &nbsp; <span class="grey">%l:%M %p</span>') 
+  accessed = File.atime_dt.strftime('%b %e, %Y &nbsp; <span class="grey">%l:%M %p</span>') 
+-%]
+
+<title class="[% File.iconCls %]">[% File.name %]</title>
+
+<div class="rapi-fs-fileview" style="font-size:12px;">
+
+  <h4>
+    <span class="bigger">[% File.name %]</span>&nbsp;
+    <i><span class="grey">([% File.bytes_human %])</span></i>&nbsp;
+    [% IF File.download_url %]
+      <a 
+        class="with-icon ra-icon-bullet-disk download"
+        href="[% File.download_url %]"
+        target="_self"
+      >Save As...</a>
+    [% END %]
+  </h4>
+
+  <table class="r-simple-table">
+    <tr>
+      <th>Folder</th>
+      <td colspan=4>
+        <a 
+          class="with-icon ra-icon-folder-up bigger"
+          href="#![% File.parent.view_url %]"
+        >[% File.parent.name %]</a>&nbsp;&nbsp;
+        <span class="grey">([% File.driver.name _ '/' _ File.parent.path %])</span>
+      </td>
+    </tr>
+    <tr>
+      <th>File</th>
+      <td colspan=4>
+        [% IF File.download_url %]
+          <a 
+            class="with-icon [% File.iconCls %]"
+            href="[% File.download_url %]"
+            target="_self"
+            alt="Save File"
+          >[% File.name %]</a>&nbsp;&nbsp;
+        [% ELSE %]
+          <span class="with-icon [% File.iconCls %]">[% File.name %]</a>&nbsp;&nbsp;
+        [% END %]
+        <span class="ra-hex-string grey">[% File.content_type %]</span>
+      </td>
+    </tr>
+    
+    [% IF File.is_link %]
+      <tr>
+        <th>Symlink</th>
+        <td colspan=4>
+          <div class="node-link-target">
+            &nbsp;<span class="arrow">&rArr;</span>
+            <span class="txt">[% File.link_target %]</span>
+            
+          </div>
+        </td>
+      </tr>
+    [% END %]
+    
+    
+    <tr class="vert"><td></td><th>Size                  </th><th>Created      </th><th>Modified      </th><th>Accessed      </th></tr>
+    <tr class="vert"><td></td><td>[% File.bytes %] bytes</td><td>[% created %]</td><td>[% modified %]</td><td>[% accessed %]</td></tr>
+
+    
+  </table>
+  
+  [% IF File.open_url %]
+    <h5 style="padding-top:8px;">Preview:</h5>
+    <div class="file-content">
+  
+    [% IF File.mime_type == 'image' %]
+      <div class="img-wrap">
+        <img src="[% File.open_url %]">
+      </div>
+    [% ELSE %]
+      <iframe 
+        class="ux-mif" 
+        frameborder="0"
+        src="[% File.source_url || File.open_url %]"
+      ></iframe>
+    [% END %]
+    </div>
+  [% END %]
+  
+</div>

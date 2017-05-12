@@ -1,0 +1,190 @@
+<HTML>
+<HEAD>
+<TITLE>RDF::Core - An object oriented Perl module to supprt RDF.</TITLE>
+<LINK REV="made" HREF="mailto:bhcompile@stripples.devel.redhat.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#release">RELEASE NOTE</A></LI>
+	<LI><A HREF="#modules">MODULES</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>RDF::Core - An object oriented Perl module to support RDF.</P>
+<P>
+<HR>
+<H1><A NAME="release">RELEASE NOTE</A></H1>
+
+RDF::Core is a pure perl implementation of RDF storage, parser and serializer.
+The storage's functionality is basic - store, delete, query statements, 
+where query means ask about existence or count or retrieve statements 
+conforming given mask of (subject, predicate, object). Three storages are 
+available - in memory, file (DB_File) and DBMS (PostgreSQL). The parser 
+supports full RDF/XML syntax including aboutEach attribute. The serializer 
+tries to preserve anonymous nodes and to compact xml a bit by grouping 
+statements with common subject. 
+
+<P>
+
+Besides the basic querying, there is a query language implemented. The
+query language is focused on resource, not statement and the typical
+pattern is me->neighbor->child->age to express neighbour's children's
+age, not (me,neighbour, him) && (him, child, it) && (it, age,
+value). It contains some shortcuts to express things, that are
+(possibly) expressed often, like object->rdf:type = someClass. Functions are 
+another enhancement of the language. They can be used instead of
+resource or property. Functions are implemented in a separated
+library, so that it's easy to create new or modify existing ones.
+
+<P>
+
+We focus on acceptable and clean interface between parts of the module. 
+Typically a storage should have it's interface on a 'statement level' 
+(add statement, get statement) rather then on data elements level (add this 
+value into hash_one and that into hash_two), which comes with interface based 
+on lower level base.
+<P>
+<HR>
+<H1><A NAME="modules">MODULES</A></H1>
+<P>RDF::Core includes the following modules. See documentation for particular 
+modules for details:</P>
+<UL>
+
+<LI><A HREF="RDF/Core/Model.pm.html"><STRONG>RDF::Core::Model</STRONG></A><BR>
+Model provides interface to store RDF statements, ask about them (in a very simple manner yet) and retrieve them back.
+<P></P>
+
+<UL>
+
+<LI><A HREF="RDF/Core/Model/Parser.pm.html"><STRONG>RDF::Core::Model::Parser</STRONG></A><BR>
+Model::Parser is a simple interface object to a parser. It's purpose is to provide a prototype of object accomodating any other parser.
+<P></P>
+
+<LI><A HREF="RDF/Core/Model/Serializer.pm.html"><STRONG>RDF::Core::Model::Serializer</STRONG></A><BR>
+Model::Serializer is an interface object for serializer.
+<P></P>
+
+</UL>
+
+
+<LI><A HREF="RDF/Core/ModelSet.pm.html"><STRONG>RDF::Core::ModelSet</STRONG></A><BR>
+An RDF model set.
+<P></P>
+
+<LI><A HREF="RDF/Core/Parser.pm.html"><STRONG>RDF::Core::Parser</STRONG></A><BR>
+Generates statements from an RDF XML document.
+<P></P>
+
+<LI><A HREF="RDF/Core/Schema.pm.html"><STRONG>RDF::Core::Schema</STRONG></A><BR>
+The RDF Schema access.
+<P></P>
+
+<LI><A HREF="RDF/Core/Serializer.pm.html"><STRONG>RDF::Core::Serializer</STRONG></A><BR>
+Serializes RDF Model into XML.
+<P></P>
+
+<LI><A HREF="RDF/Core/Storage.pm.html"><STRONG>RDF::Core::Storage</STRONG></A><BR>
+An object for storing statements. There are several implementations of Storage - in memory, in a BerkeleyDB 1.x (DB_File) files and PostgreSQL database.
+<P></P>
+
+<UL>
+
+<LI><A HREF="RDF/Core/Storage/DB_File.pm.html"><STRONG>RDF::Core::Storage::DB_File</STRONG></A><BR>
+Berkeley DB 1.x implementation of RDF::Core::Storage.
+<P></P>
+
+<LI><A HREF="RDF/Core/Storage/Memory.pm.html"><STRONG>RDF::Core::Storage::Memory</STRONG></A><BR>
+An in-memory implementation of RDF::Core::Storage.
+<P></P>
+
+<LI><A HREF="RDF/Core/Storage/Postgres.pm.html"><STRONG>RDF::Core::Storage::Postgres</STRONG></A><BR>
+PostgreSQL implementation of RDF::Core::Storage.
+<P></P>
+
+</UL>
+
+<LI><A HREF="RDF/Core/Enumerator.pm.html"><STRONG>RDF::Core::Enumerator</STRONG></A><BR>
+Enumerator is a result set of statements retrieved from Model
+<P></P>
+
+<UL>
+
+<LI><A HREF="RDF/Core/Enumerator/DB_File.pm.html"><STRONG>RDF::Core::Enumerator::DB_File</STRONG></A><BR>
+Enumerator that can be used with the DB_File storage.
+<P></P>
+
+<LI><A HREF="RDF/Core/Enumerator/Memory.pm.html"><STRONG>RDF::Core::Enumerator::Memory</STRONG></A><BR>
+Enumerator that can be used with the Memory storage.
+<P></P>
+
+<LI><A HREF="RDF/Core/Enumerator/Postgres.pm.html"><STRONG>RDF::Core::Enumerator::Postgres</STRONG></A><BR>
+Enumerator that can be used with the PostgreSQL storage.
+<P></P>
+
+</UL>
+
+<LI><A HREF="RDF/Core/Query.pm.html"><STRONG>RDF::Core::Query</STRONG></A><BR>
+Implementation of query language
+<P></P>
+
+<LI><A HREF="RDF/Core/Evaluator.pm.html"><STRONG>RDF::Core::Evaluator</STRONG></A><BR>
+Evaluator gets a query object that RDF::Core::Query parsed and evaluates the query. 
+<P></P>
+
+<LI><A HREF="RDF/Core/Function.pm.html"><STRONG>RDF::Core::Function</STRONG></A><BR>
+A package of functions for query language.
+<P></P>
+
+<LI><STRONG>Basic elements</STRONG><BR>
+<P></P>
+
+<UL>
+
+<LI><A HREF="RDF/Core/NodeFactory.pm.html"><STRONG>RDF::Core::NodeFactory</STRONG></A><BR>
+Produces literals and resources, generates URI for anonymous resources.
+<P></P>
+
+<LI><A HREF="RDF/Core/Node.pm.html"><STRONG>RDF::Core::Node</STRONG></A><BR>
+An ancestor of RDF::Core::Resource and RDF::Core::Literal.
+<P></P>
+
+<LI><A HREF="RDF/Core/Resource.pm.html"><STRONG>RDF::Core::Resource</STRONG></A><BR>
+A resource for RDF statement.
+<P></P>
+
+<LI><A HREF="RDF/Core/Literal.pm.html"><STRONG>RDF::Core::Literal</STRONG></A><BR>
+A literal value for RDF statement.
+<P></P>
+
+<LI><A HREF="RDF/Core/Statement.pm.html"><STRONG>RDF::Core::Statement</STRONG></A><BR>
+An RDF statement.
+<P></P>
+
+</UL>
+
+</UL>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>This package is subject to the MPL (or the GPL alternatively).</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Ginger Alliance, <A HREF="mailto:rdf@gingerall.cz">rdf@gingerall.cz</A></P>
+<P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,68 @@
+---
+name: RDF-AllegroGraph-Easy
+version: 0.08
+author:
+  - 'Robert Barta <rho@devc.at>'
+abstract: Simplistic Interface to AllegroGraph HTTP server
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  DateTime: 0
+  JSON: 0
+  LWP: 0
+  Regexp::Common: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Pod::Coverage: 0
+  Time::HiRes: 0
+  URI::Escape: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  LWP::UserAgent::AG:
+    file: lib/RDF/AllegroGraph/Server.pm
+  RDF::AllegroGraph:
+    file: lib/RDF/AllegroGraph.pm
+    version: 0.04
+  RDF::AllegroGraph::Catalog:
+    file: lib/RDF/AllegroGraph/Catalog.pm
+    version: 0.06
+  RDF::AllegroGraph::Catalog3:
+    file: lib/RDF/AllegroGraph/Catalog3.pm
+    version: 0.04
+  RDF::AllegroGraph::Catalog4:
+    file: lib/RDF/AllegroGraph/Catalog4.pm
+    version: 0.04
+  RDF::AllegroGraph::Easy:
+    file: lib/RDF/AllegroGraph/Easy.pm
+    version: 0.08
+  RDF::AllegroGraph::Repository:
+    file: lib/RDF/AllegroGraph/Repository.pm
+    version: 0.03
+  RDF::AllegroGraph::Repository3:
+    file: lib/RDF/AllegroGraph/Repository3.pm
+    version: 0.04
+  RDF::AllegroGraph::Repository4:
+    file: lib/RDF/AllegroGraph/Repository4.pm
+    version: 0.07
+  RDF::AllegroGraph::Server:
+    file: lib/RDF/AllegroGraph/Server.pm
+    version: 0.04
+  RDF::AllegroGraph::Server3:
+    file: lib/RDF/AllegroGraph/Server3.pm
+    version: 0.02
+  RDF::AllegroGraph::Server4:
+    file: lib/RDF/AllegroGraph/Server4.pm
+    version: 0.03
+  RDF::AllegroGraph::Session4:
+    file: lib/RDF/AllegroGraph/Session4.pm
+    version: 0.03
+  RDF::AllegroGraph::Transaction4:
+    file: lib/RDF/AllegroGraph/Transaction4.pm
+  RDF::AllegroGraph::Utils:
+    file: lib/RDF/AllegroGraph/Utils.pm
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

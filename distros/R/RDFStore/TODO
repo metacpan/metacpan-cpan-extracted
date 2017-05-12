@@ -1,0 +1,36 @@
+RDFStore - TODO list - Tue Nov 23 01:27:36 CET 2004
+----------------------------------------------------
+
+RDFStore indexing and searching
+
+* provide rdfstore, rdfstoredump and rdfstoreadmin style of utilities
+* Jena, JRDF, PHP APIs
+* simple GEO point/box operators
+
+SPARQL
+
+* rewrite SPARQL parser
+* update SPARQL engine to latest SPARQL RC
+* fix rdf:datatype matching ( ?x dc:val "22"^^<http://www.w3.org/2001/XMLSchema#integer> )
+* align parser to latest proposal
+* SPARQL joining and constraints; get it n*logn complex (get the properties hash codes)
+* add regex library for the SPARQL constraints part
+* ordering for basic XSD subset and SPARQL operations
+
+RDF Parsers
+
+* write pure C SAX/SAX2 C parser BSD licensed
+* write pure C N-Triples, Turtle, N3 parser BSD licensed
+
+RDF API
+
+* TIE interface over the whole RDFStore packages --> partially doen with RDFStore::Object
+* intergate SchemaModel support into native store
+* model versioning and change tracking
+* better context/provenance tracking (use RDF Merge instead quads?)
+
+Misc
+
+* Joseki interface ( see also Apache::SPARQL )
+* misc utils/ to insert, remove and update database
+* Dav style module to HTTP GET/POST RDFStore API and RDQL (also look at Joseki)

@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel;
+use Ravenel::Document;
+
+my $res = Ravenel::Document->render( {
+	'file'    => "$FindBin::Bin/test.html",
+	'prefix'  => 'r:',
+	'dynamic' => 0,
+} );
+
+print $res . "\n" if ( $ARGV[2] );
+
+eval $res;
+print $@ if ( $@ );
+print test->get_html_content() . "\n";

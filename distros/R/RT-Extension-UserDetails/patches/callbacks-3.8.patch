@@ -1,0 +1,30 @@
+diff --git a/share/html/Ticket/Elements/ShowGroupMembers b/share/html/Ticket/Elements/ShowGroupMembers
+index a15f850..6597cc5 100644
+--- a/share/html/Ticket/Elements/ShowGroupMembers
++++ b/share/html/Ticket/Elements/ShowGroupMembers
+@@ -50,7 +50,9 @@
+ % my $Users = $Group->UserMembersObj( Recursively => $Recursively );
+ % while ( my $user = $Users->Next ) {
+ <& /Elements/ShowUser, User => $user, Ticket => $Ticket &>
+-<& /Elements/ShowUserEmailFrequency, User => $user, Ticket => $Ticket &><br />
++<& /Elements/ShowUserEmailFrequency, User => $user, Ticket => $Ticket &>
++% $m->callback( User => $user, Ticket => $Ticket, %ARGS, CallbackName => 'AboutThisUser' );
++<br />
+ % }
+ % my $Groups = $Group->GroupMembersObj( Recursively => $Recursively );
+ % $Groups->LimitToUserDefinedGroups;
+diff --git a/share/html/Ticket/Elements/ShowPeople b/share/html/Ticket/Elements/ShowPeople
+index ddd2e3c..1f0e531 100755
+--- a/share/html/Ticket/Elements/ShowPeople
++++ b/share/html/Ticket/Elements/ShowPeople
+@@ -50,7 +50,9 @@
+     <td class="label"><&|/l&>Owner</&>:</td>
+ % my $owner = $Ticket->OwnerObj;
+     <td class="value"><& /Elements/ShowUser, User => $owner, Ticket => $Ticket &>
+-    <& /Elements/ShowUserEmailFrequency, User => $owner, Ticket => $Ticket &></td>
++    <& /Elements/ShowUserEmailFrequency, User => $owner, Ticket => $Ticket &>
++% $m->callback( User => $owner, Ticket => $Ticket, %ARGS, CallbackName => 'AboutThisUser' );
++    </td>
+   </tr>
+   <tr>
+     <td class="labeltop"><&|/l&>Requestors</&>:</td>

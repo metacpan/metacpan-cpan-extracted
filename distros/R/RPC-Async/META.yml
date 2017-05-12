@@ -1,0 +1,38 @@
+---
+name: RPC-Async
+version: 1.05
+author:
+  - 'Jonas Jensen <jonas@infopro.dk>,Troels Liebe Bentsen <troels@infopro.dk>'
+abstract: Asynchronous RPC framework
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::Basename: 0
+  IO::EventMux: 1.0
+  Privileges::Drop: 0
+build_requires:
+  Test::More: 0
+provides:
+  RPC::Async:
+    file: lib/RPC/Async.pm
+    version: 1.05
+  RPC::Async::Client:
+    file: lib/RPC/Async/Client.pm
+    version: 1.05
+  RPC::Async::Coderef:
+    file: lib/RPC/Async/Coderef.pm
+    version: 1.05
+  RPC::Async::Server:
+    file: lib/RPC/Async/Server.pm
+    version: 1.05
+  RPC::Async::URL:
+    file: lib/RPC/Async/URL.pm
+    version: 1.05
+  RPC::Async::Util:
+    file: lib/RPC/Async/Util.pm
+    version: 1.05
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,63 @@
+%# Never call a man a fool; borrow from him.
+
+% if ($verbatim) {
+% $m->print($foo);
+% } else {
+<% $foo %>
+% }
+
+<%INIT>
+use Encode::Guess qw(utf8 big5);
+require WWW::Mechanize;
+require URI::Escape;
+my $ua = WWW::Mechanize->new;
+my $p4web = "$RT::WebBaseURL:5000";
+$URL =~ s,cd=/(?!/depot),cd=/depot/,g;
+$URL =~ s,\@/(?!/depot),\@/depot/,g;
+$URL =~ s,//depot//depot,//depot,g;
+$ua->get($URL || "$p4web/depot/" . $QueueObj->OriginObj->CustomFieldValue('UnixName') . '/' . $Base);
+my $foo = $ua->content;
+my $verbatim = 1;
+if ($URL =~ /sr=1/) {
+    $m->print('<pre>');
+    $foo = Encode::decode('Guess', $foo);
+    $verbatim = 0;
+}
+elsif ($URL =~ /ac=64/) {
+    $foo =~ s/&#(\d+);/chr($1)/eg;
+    $foo = Encode::decode('Guess', $foo);
+}
+my $base = $1 if $foo =~ /<BASE HREF="([^"]+)">/;
+$foo =~ s/.*<!-- END MENU BAR PANE -->//s;
+$foo =~ s!<FORM.*</TABLE>!!s;
+$foo =~ s!</FORM>!!;
+$foo =~ s/  <HR WIDTH="100%" SIZE="1">.*//s;
+$foo =~ s!<A [^>]+>//</A>!!g;
+$foo =~ s!<A [^>]+>depot</A>!!g;
+$foo =~ s!//depot!!g;
+$foo =~ s!\((<A [^>]+>)\w+</A>\)!"($1".loc("Content")."</A>)"!eg;
+$foo =~ s!<b>Type:</b> \w+&nbsp; &nbsp;!!;
+$foo =~ s!<b>Client:</b> //.*!!;
+$foo =~ s!<BR><BR>!!g;
+$foo =~ s!<TR>\s+<TD><B>Client:</B></TD>\s+<TD>\w+</TD>\s+</TR>!!g;
+$foo =~ s!<[Bb]>([ \w]+):</[Bb]>!"<b>".loc($1).":</b>"!eg;
+$foo =~ s!(#\d+ )(add|delete|edit|branch|integrate)!$1.'('.loc(ucfirst($2)).')'!eg;
+$foo =~ s!<FONT SIZE="-1">Showing.*:</FONT><BR>!!;
+$foo =~ s/<IMG SRC="([^"]+)"/<IMG SRC="$p4web$1"/g;
+$foo =~ s/ALT="">/ALT=" ">/g;
+$foo =~ s{<A HREF="([^"]+)"}{
+    '<A HREF="' .
+    ( (index($1, 'ac=43') > -1) or (index($1, 'ac=10') > -1) ?
+	'/Foundry/Project/Source/Changes/' :
+	'/Foundry/Project/Source/'
+    ) .
+    '?Queue=' . $QueueObj->Id . '&URL=' . URI::Escape::uri_escape(
+	((substr($1, 0, 1) eq '/') ? "$p4web" : $base)
+    . $1) . '"'
+}eg;
+</%INIT>
+<%ARGS>
+$URL => ''
+$Base => ""
+$QueueObj
+</%ARGS>

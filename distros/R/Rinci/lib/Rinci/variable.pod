@@ -1,0 +1,83 @@
+package Rinci::variable; # just to make PodWeaver happy
+
+# VERSION
+
+1;
+# ABSTRACT: Metadata for your variables
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Rinci::variable - Metadata for your variables
+
+=head1 VERSION
+
+This document describes version 1.1.84 of Rinci::variable (from Perl distribution Rinci), released on 2016-12-28.
+
+=head1 SPECIFICATION VERSION
+
+ 1.1
+
+=head1 INTRODUCTION
+
+This document describes metadata for variables. This specification is part of
+L<Rinci>. Please do a read up on it first, if you have not already done so.
+
+=head1 SPECIFICATION
+
+There is currently no metadata properties specific to variables.
+
+=head2 Property: schema => SCHEMA
+
+Specify the Sah schema that the variable's value must validate to. This can be
+used by a variable wrapper (getter/setter generator) tool to make sure that
+variable always contains valid values.
+
+Example:
+
+ # metadata for variable $Meaning_Of_Life
+ {
+     ...
+     summary => 'The meaning of life',
+     schema => [int => {between => [1, 100]},
+ }
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Rinci>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Rinci>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Rinci>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Rinci>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

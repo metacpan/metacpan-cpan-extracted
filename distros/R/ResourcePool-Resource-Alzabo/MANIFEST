@@ -1,0 +1,10 @@
+MANIFEST			This list of files
+Makefile.PL
+README
+lib/ResourcePool/Factory/Alzabo.pm
+lib/ResourcePool/Factory/Alzabo.pod
+lib/ResourcePool/Resource/Alzabo.pm
+lib/ResourcePool/Resource/Alzabo.pod
+t/02FactorySingleton.t
+t/03ResourcePoolSingleton.t
+t/30Alzabo.t

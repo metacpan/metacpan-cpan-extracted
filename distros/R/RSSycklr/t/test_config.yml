@@ -1,0 +1,16 @@
+---
+excerpt_length: 200
+hours_back: 24
+max_display: 2
+title_only: 1
+timeout: 1
+feeds:
+  - uri: http://green.yahoo.com/rss/news
+    title_only: ~
+  - uri: http://green.yahoo.com/rss/blogs/all
+    max_display: 5
+    hours_back: 1000
+  - uri: "http://news.google.com/news?rls=en-us&oe=UTF-8&um=1&tab=wn&hl=en&q=Environmental&ie=UTF-8&output=atom"
+    title_only: 1
+    max_display: 25
+

@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 943fffe9aa1b7978329b007d30dfef315a50d296 Changes
+SHA1 e158a15ddb3d7d0af85d57fa946afd171bf15cd7 MANIFEST
+SHA1 7228f2ff5ff65a24999c292dc76f0b8143d1780e META.yml
+SHA1 59f6e08f5bf5ba00cf22026db29997827a05dd3a Makefile.PL
+SHA1 df9b97fb17ec83f386776ab0be7087b58e8f06bf README
+SHA1 d86b0343c51f5cec9082334ea1524d01ebdcaf41 html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Create.html/AfterRequestors
+SHA1 3f4e8b9a62acaa0bb40ded7ffd9b593fe8ffcdf3 html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Create.html/BeforeDisplay
+SHA1 0bde7307238a2299afc5ac6faaf9bb74cf7f5665 html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Display.html/BeforeActionList
+SHA1 1e818fa22d02f831d6a7b8dcbe5937af1583c00f html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Incident/Create.html/AfterHidden
+SHA1 bbeeb4d0d466baf70a05f9a480f8310327f6bb75 html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Incident/Create.html/ProcessArguments
+SHA1 eebd11b99b9fb02e0b1debc95f3d72bcf206875a html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Incident/Reply/index.html/AfterHidden
+SHA1 527bac251a11af6628821a5cc5411ec4ef077085 html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Incident/Reply/index.html/BeforeDisplay
+SHA1 eebd11b99b9fb02e0b1debc95f3d72bcf206875a html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Update.html/AfterWorked
+SHA1 527bac251a11af6628821a5cc5411ec4ef077085 html/Callbacks/RT-Extension-TimeTracking-Automatic/RTIR/Update.html/BeforeDisplay
+SHA1 d86b0343c51f5cec9082334ea1524d01ebdcaf41 html/Callbacks/RT-Extension-TimeTracking-Automatic/Ticket/Create.html/FormStart
+SHA1 bbeeb4d0d466baf70a05f9a480f8310327f6bb75 html/Callbacks/RT-Extension-TimeTracking-Automatic/Ticket/Display.html/Initial
+SHA1 f13a45fec3b808d4fb270da9b17ffe9c1c189ff8 html/Callbacks/RT-Extension-TimeTracking-Automatic/Ticket/Update.html/AfterWorked
+SHA1 527bac251a11af6628821a5cc5411ec4ef077085 html/Callbacks/RT-Extension-TimeTracking-Automatic/Ticket/Update.html/BeforeDisplay
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 8697f35080a155607024d6d745a80783af958c1a lib/RT/Extension/TimeTracking/Automatic.pm
+SHA1 21708d6bdbb87dfffaa690998e8c0d7f9d1f01f7 patches/incident_create_callback.patch
+SHA1 77eda807c600f96f3df45dbdb4a560bba8cf4624 patches/patch-rtir-3.2.patch
+SHA1 f415e54331735ee6dcdc16a8330ab574fbf2cf70 t/basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJX9qkaAAoJEBXncVGnZqUUf+wH/0CiIJw8embAlpQm/9ilWG6w
+C2Z4TOyO3uTF9qaO4ca8hQeIEEcyotl9tvQIjN2IG5CfBAMwnDBNkrpWb9jBfM/f
+zl1LLv2BU5FEuehrRAg6l5taZf8jZD2D0ppJXdRcg9fzCOkmKN+CUKkqAj5WFwhz
+6oGszBL8nwMsPUoCPxI4Sa5XoK7erGZRBcCY1bpE8XtK4scbApRPAG25edyq67NE
+ljQ+/DjDFsX63rrB5+VOxbQ2MMJuHdi5M1XNU3KOD8pVsc2yVKc4dmByjcVLUy7m
+Or25OBrsu9Qb6jRqHFGzwqySxFRprLzaLcKlsTpT841XBVZVJZT6q5pMZN5Rza4=
+=VdxX
+-----END PGP SIGNATURE-----

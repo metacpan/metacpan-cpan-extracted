@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Triples Source</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Rasqal RDF Query Library Manual">
+<link rel="up" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="prev" href="rasqal-section-triple.html" title="Triples">
+<link rel="next" href="rasqal-section-variable.html" title="Variables">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="rasqal.html" title="Rasqal Overview">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="rasqal-section-triple.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt01.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Rasqal RDF Query Library Manual</th>
+<td><a accesskey="n" href="rasqal-section-variable.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2613282" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2572026" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="rasqal-section-triples-source"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2613282"></a><span class="refentrytitle">Triples Source</span>
+</h2>
+<p>Triples Source &#8212; Source of matches to a triple pattern.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="rasqal-section-triples-source.html#rasqal-triples-match">rasqal_triples_match</a>;
+typedef     <a href="rasqal-section-triples-source.html#rasqal-triples-source">rasqal_triples_source</a>;
+            <a href="rasqal-section-triples-source.html#rasqal-triples-source-factory">rasqal_triples_source_factory</a>;
+void        <a href="rasqal-section-triples-source.html#rasqal-set-triples-source-factory">rasqal_set_triples_source_factory</a>
+                                            (void (*register_fn) (rasqal_triples_source_factory *factory),
+                                             void *user_data);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2572026"></a><h2>Description</h2>
+<p>
+A factory that provides the raw triple matches for a triple pattern
+against some RDF graph.  The <a href="rasqal-section-triples-source.html#rasqal-triples-source-factory"><span class="type">rasqal_triples_source_factory</span></a>
+must create use a new <a href="rasqal-section-triples-source.html#rasqal-triples-source"><span class="type">rasqal_triples_source</span></a> that can be used
+to initialise and build a <a href="rasqal-section-triples-source.html#rasqal-triples-match"><span class="type">rasqal_triples_match</span></a> for some
+<a href="rasqal-section-triple.html#rasqal-triple"><span class="type">rasqal_triple</span></a> (subject, predicate, object, origin URI).
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2572070"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2572080"></a><h3>
+<a name="rasqal-triples-match"></a>rasqal_triples_match</h3>
+<a class="indexterm" name="id2572091"></a><pre class="programlisting">typedef struct rasqal_triples_match_s rasqal_triples_match;
+</pre>
+<p>
+Triples match structure as initialised by <a href="rasqal-section-triples-source.html#rasqal-triples-source"><span class="type">rasqal_triples_source</span></a>
+method init_triples_match.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2572116"></a><h3>
+<a name="rasqal-triples-source"></a>rasqal_triples_source</h3>
+<a class="indexterm" name="id2607359"></a><pre class="programlisting">typedef struct rasqal_triples_source_s rasqal_triples_source;
+</pre>
+<p>
+Triples source as initialised by a <a href="rasqal-section-triples-source.html#rasqal-triples-source-factory"><span class="type">rasqal_triples_source_factory</span></a>.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2607385"></a><h3>
+<a name="rasqal-triples-source-factory"></a>rasqal_triples_source_factory</h3>
+<a class="indexterm" name="id2607396"></a><pre class="programlisting">typedef struct {
+  void *user_data;
+  size_t user_data_size;
+
+  int (*new_triples_source)(rasqal_query* query, void *factory_user_data, void *user_data, rasqal_triples_source* rts);
+} rasqal_triples_source_factory;
+</pre>
+<p>
+A factory that initialises <a href="rasqal-section-triples-source.html#rasqal-triples-source"><span class="type">rasqal_triples_source</span></a> structures
+to returning matches to a triple pattern.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term">void&#160;*<em class="structfield"><code>user_data</code></em>;</span></td>
+<td> User data for triples_source_factory.
+</td>
+</tr>
+<tr>
+<td><span class="term">size_t&#160;<em class="structfield"><code>user_data_size</code></em>;</span></td>
+<td> Size Of <em class="parameter"><code>user_data</code></em> for new_triples_source.
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="structfield"><code>new_triples_source</code></em>&#160;()</span></td>
+<td> Create a new triples source - returns non-zero on failure &lt; 0 is a 'no rdf data error', &gt; 0 is an unspecified error..
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2555996"></a><h3>
+<a name="rasqal-set-triples-source-factory"></a>rasqal_set_triples_source_factory ()</h3>
+<a class="indexterm" name="id2556008"></a><pre class="programlisting">void        rasqal_set_triples_source_factory
+                                            (void (*register_fn) (rasqal_triples_source_factory *factory),
+                                             void *user_data);</pre>
+<p>
+Register the factory to return triple sources.
+</p>
+<p>
+Registers the factory that returns triples sources.  Note that
+there is only one of these per runtime. 
+</p>
+<p>
+The rasqal_triples_source_factory factory method new_triples_source is
+called with the user data for some query and rasqal_triples_source.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>register_fn</code></em>&#160;:</span></td>
+<td> registration function
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data for registration
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

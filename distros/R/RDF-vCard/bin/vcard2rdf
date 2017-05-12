@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+use strict;
+
+BEGIN
+{
+	print STDERR "Reading vCard input from STDIN.\n"
+		unless @ARGV;
+}
+
+use RDF::vCard;
+use RDF::Trine;
+
+my $importer = RDF::vCard::Importer->new;
+
+unless (@ARGV)
+{
+	my ($lang) = split /\./, $ENV{LANG};
+	$lang =~ s/_/-/g;
+
+	local $/ = undef;
+	my $input = <>;
+	
+	$importer->import_string($input, lang => $lang);
+}
+
+while (my $input = shift @ARGV)
+{
+	if ($input =~ /^(ftp|http|https|file):/i)
+	{
+		$importer->import_url($input);
+	}
+	else
+	{
+		$importer->import_file($input);
+	}
+}
+
+my $ser = RDF::Trine::Serializer::Turtle->new(
+	namespaces => {
+		v     => 'http://www.w3.org/2006/vcard/ns#',
+		vx    => 'http://buzzword.org.uk/rdf/vcardx#',
+		},
+	);
+print $ser->serialize_model_to_string($importer->model);

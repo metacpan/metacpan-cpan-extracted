@@ -1,0 +1,422 @@
+=head1 NAME
+
+REST::Google::Apps::Provisioning - A Perl library to Google's RESTful Apps
+Provisioning API
+
+=head1 SYNOPSIS
+
+  use REST::Google::Apps::Provisioning
+
+  $google = REST::Google::Apps::Provisioning->new(
+      domain   => 'company.com',
+      username => 'admin',
+      password => 'g00gl34pp5!'
+  );
+
+  $user->{'jsmith'} = $google->getUser( username => 'jsmith' );
+
+=head1 DESCRIPTION
+
+REST::Google::Apps::Provisioning provides a Perl interface to Google's
+RESTful Apps API.
+
+=head1 CONSTRUCTOR
+
+=head2 new ( DOMAIN, USERNAME, PASSWORD )
+
+Creates a new B<REST::Google::Apps::Provisioning> object.  A domain parameter
+is required.
+
+Supplying authentication information to the constructor is optional, but needs
+to happen either here or with a call to the B<authenticate> method.
+
+B<Example>
+
+  $google = REST::Google::Apps::Provisioning->new(
+      domain   => 'company.com',
+      username => 'admin',
+      password => 'g00gl34pp5!'
+  );
+
+=head1 METHODS
+
+=head2 authenticate ( USERNAME, PASSWORD )
+
+Authenticate a session.
+
+B<Example>
+
+  $google->authenticate(
+      username => 'admin',
+      password => 'g00gl34pp5!'
+  )
+  || die "Could not authenticate";
+
+=head2 createUser ( USERNAME, GIVENNAME, FAMILYNAME, PASSWORD, PASSWORDHASHFUNCTION, ADMIN )
+
+Create a new user.
+
+The following parameters are required:
+
+=over 4
+
+=item username
+
+The username associated with the account being created.
+
+=item givenName
+
+The user's given (first) name.
+
+=item familyName
+
+The user's family (last) name.
+
+=item password
+
+The user's password.
+
+=back
+
+The following parameters are optional:
+
+=over 4
+
+=item passwordHashFunction
+
+The format of the value in the B<password> attribute.  Currently, the only
+valid values for this parameter are "SHA-1" and "MD5".
+
+=item admin
+
+Can be 'true' or 'false', representing whether or not the user should be
+granted administrator access.
+
+=back
+
+B<Example>
+
+  $user->{'jsmith'} = $google->createUser(
+      username   => 'jsmith',
+      givenName  => 'Joseph',
+      familyName => 'Smith',
+      password   => 'j5m1thp455w0rd!'
+  )
+  || die "Could not create user";
+
+=head2 deleteUser ( USERNAME )
+
+Delete a user.
+
+B<Example>
+
+  delete $user->{'jsmith'} if $google->deleteUser( username => 'jsmith' );
+
+=head2 renameUser ( USERNAME, NEWNAME )
+
+Rename a user.
+
+B<Example>
+
+  $google->renameUser(
+      username => 'jsmith',
+      newname  => 'josephsmith'
+  )
+  || die "Could not rename user";
+
+=head2 updateUser ( USERNAME, ATTR )
+
+Update a user's attributes.  See the B<createUser> function for a list of
+valid attributes.
+
+B<Example>
+
+  $google->updateUser(
+      username => 'jsmith',
+      givenName => 'Joey'
+  )
+  || die "Could not update user";
+
+=head2 getUser ( USER )
+
+Retrieve a hash containing a user's account information.
+
+B<Example>
+
+  $user->{'jsmith'} = $google->getUser( username => 'jsmith' );
+
+B<Hash>
+
+Using the above example, the returned hash is:
+
+  'jsmith' => {
+      'admin' => 'false',
+      'ipWhitelisted' => 'false',
+      'suspended' => 'false',
+      'limit' => '7168',
+      'username' => 'jsmith`',
+      'changePasswordAtNextLogin' => 'false',
+      'givenName' => 'Joseph',
+      'familyName' => 'Smith',
+      'agreedToTerms' => 'false'
+  }
+
+=head2 getAllUsers
+
+Retrieve a list of all users.
+
+B<Example>
+
+  $users = $google->getAllUsers();
+
+=head2 createGroup ( GROUP, DESCRIPTION, PERMISSION )
+
+Create a new group.
+
+The following parameters are required:
+
+=over 4
+
+=item group
+
+The group name.
+
+=back
+
+The following parameters are optional:
+
+=over 4
+
+=item description
+
+A longer description of the group.
+
+=item permission
+
+The permission level of the group.  Valid values are:
+
+=over 4
+
+=item owner
+
+Owners of the group.
+
+=item member
+
+Members of the group.
+
+=item domain
+
+Any user who belongs to the same domain as the group.
+
+=item anyone
+
+Any user.
+
+=back
+
+=back
+
+B<Example>
+
+  $google->createGroup(
+      group => 'finance',
+      description => 'Finance Department'
+  )
+  || die "Could not create group";
+
+=head2 deleteGroup ( GROUP )
+
+Delete a group.
+
+B<Example>
+
+  delete $group->{'finance'} if $google->deleteGroup( group => 'finance' );
+
+=head2 updateGroup ( GROUP, ... )
+
+Not yet implemented.
+
+=head2 getGroup ( GROUP )
+
+Retrieve a hash containing group information.
+
+B<Example>
+
+  $group->{'finance'} = $google->getGroup( group => 'finance' );
+
+B<Hash>
+
+Using the above example, the returned hash is:
+
+  'finance' => {
+      'emailPermission' => 'Anyone',
+      'groupId' => 'finance@company.com',
+      'updated' => '2009-09-16T21:05:15.697Z',
+      'groupName' => 'finance',
+      'description' => 'Finance Department'
+  }
+
+=head2 getAllGroups
+
+Retrieve a list of all groups.
+
+B<Example>
+
+  $groups = $google->getAllGroups();
+
+=head2 addGroupMember ( GROUP, MEMBER )
+
+Add a member to a group.
+
+B<Example>
+
+  $google->addGroupMember(
+      group  => 'finance',
+      member => 'jsmith'
+  )
+  || die "Could not add group member";
+
+=head2 deleteGroupMember ( GROUP, MEMBER )
+
+Remove a member from a group.
+
+B<Example>
+
+  $google->deleteGroupMember(
+      group  => 'finance',
+      member => 'jsmith'
+  )
+  || die "Could not delete group member";
+
+=head2 getGroupMembers ( GROUP )
+
+Retrieve a list of group members.
+
+B<Example>
+
+  $group->{'finance'}->{'members'} = $google->getGroupMembers( group => 'finance' );
+
+B<Hash>
+
+Using the above example, the returned hash is:
+
+  'members' => {
+      'jsmith' => {
+          'memberType' => 'User',
+          'directMember' => 'true',
+          'memberId' => 'jsmith@company.com'
+      },
+      'sschneid' => {
+          'memberType' => 'User',
+          'directMember' => 'true',
+          'memberId' => 'sschneid@company.com'
+      }
+  }
+
+=head2 addGroupOwner ( GROUP, OWNER )
+
+Add an owner to a group.
+
+B<Example>
+
+  $google->addGroupOwner(
+      group => 'finance',
+      owner => 'jsmith'
+  )
+  || die "Could not add group owner";
+
+=head2 deleteGroupOwner ( GROUP, OWNER )
+
+Remove an owner from a group.
+
+B<Example>
+
+  $google->deleteGroupOwner(
+      group => 'finance',
+      owner => 'jsmith'
+  )
+  || die "Could not delete group owner";
+
+=head2 getGroupOwner ( GROUP, OWNER )
+
+Not yet implemented.
+
+=head2 getGroupOwners ( GROUP )
+
+Retrieve a list of group owners.
+
+B<Example>
+
+  $group->{'finance'}->{'owners'} = $google->getGroupOwners( group => 'finance' );
+
+B<Hash>
+
+Using the above example, the returned hash is:
+
+  'owners' => {
+      'jsmith' => {
+          'email' => 'jsmith@company.com',
+          'type' => 'User'
+      },
+      'sschneid' => {
+          'email' => 'sschneid@company.com',
+          'type' => 'User'
+      }
+  }
+
+=head2 createNickname ( USERNAME, NICKNAME )
+
+Create a nickname (e-mail alias).
+
+B<Example>
+
+  $google->createNickname(
+      username => 'jsmith',
+      nickname => 'joe'
+  )
+  || die "Could not create nickname";
+
+=head2 deleteNickname ( NICKNAME )
+
+Delete a nickname (e-mail alias).
+
+B<Example>
+
+  $google->deleteNickname( nickname => 'joe' );
+
+=head2 getNickname ( NICKNAME )
+
+Retrieve a nickname.
+
+B<Example>
+
+  $nickname->{'frank'} = $google->getNickname( nickname => 'frank' );
+
+B<Hash>
+
+Using the above example, the returned hash is:
+
+  'frank' => {
+      'name' => 'frank',
+      'username' => 'jsmith'
+  }
+
+=head2 getUserNicknames ( USERNAME )
+
+Retrieve a list of a user's nicknames.
+
+B<Example>
+
+  $user->{'jsmith'}->{'nicknames'} = $google->getUserNicknames( username => 'jsmith' );
+
+=head2 getAllNicknames
+
+Retrieve a list of all nicknames.
+
+=head1 AUTHOR
+
+Scott Schneider <sschneid@gmail.com>
+
+=cut
+

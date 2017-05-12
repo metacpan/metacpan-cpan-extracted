@@ -1,0 +1,12 @@
+Revision history for Perl extension Remote::Use.
+
+0.01  Fri Jul  4 07:46:38 2008
+	- original version; created by h2xs 1.23 with options
+		-XA -n Remote::Use
+
+0.02 Fri Ago  8 11:35:49 WEST 2008
+  - First truly operative version
+
+0.04 Thur Ago 21 10:17:15 WEST 2008
+   Now modules and pods go in the files subdirectory
+   Tests: most of them are developer tests

@@ -1,0 +1,42 @@
+Problem
+	Some utilities quickly need
+	to get a value from the DBMS.
+
+	However setting up a tcp
+	scoket, having de dbmsd
+	pass it of to a handler
+	and a teardown is relatively
+	expensive for just a get.
+
+Solution
+	a proxy which bundles the
+	requests.
+
+A simple 'GET' based proxy which
+is contineously connected to a
+specific DBMS backend and table.
+
+Locally it exposes a unix domain
+socket; to which applications 
+can quickly and efficiently connect,
+get a value, and disconnect.
+
+Usage
+---
+
+for testing:
+	./dbmsproxy -U -X dbms://localhost/test100
+or in the background:
+	./dbmsproxy -p /var/tmp/test100.sock dbms://localhost/test100
+
+Put some data in the db
+
+	vi test.pl
+	perl test.pl
+
+And fetch it
+
+	./dbmsget -d /var/tmp/test100.sock
+or
+	echo foo bar | ./dbmsget
+

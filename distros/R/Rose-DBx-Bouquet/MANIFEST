@@ -1,0 +1,16 @@
+bin/rose.app.gen.pl
+Build.PL
+Changelog.ini
+CHANGES
+lib/Rose/DBx/Bouquet.pm
+lib/Rose/DBx/Bouquet/.htrose.bouquet.conf
+lib/Rose/DBx/Bouquet/Config.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/pod.t
+t/test.t
+templates/form.pm.tmpl
+templates/generator.pl.tmpl
+templates/manager.pm.tmpl

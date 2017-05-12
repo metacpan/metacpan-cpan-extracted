@@ -1,0 +1,30 @@
+Revision history for RT-Extension-ArticleTemplates
+
+1.01 2016-10-21
+ - Update documentation
+
+1.00 2014-12-16
+ - Packaging and documentation updates
+
+0.07 2012-12-06
+ - Fix RT::FM::Article -> RT::Article in the no_index
+
+0.06 2012-12-06
+ - Generate a README from the pod and don't index RT::Article
+
+0.05 2011-12-07
+ - Optionally pass in request arguments to the article template
+
+0.04 2011-09-07
+ - Support for processing subject overrides
+
+0.03 2011-05-20
+ - Renamed to RT-Extension-ArticleTemplates and made compatible with RT
+   4.0.0
+
+0.02 2008-09-15
+ - Update installer.
+
+0.01 2008-05-13
+ - Initial release.
+

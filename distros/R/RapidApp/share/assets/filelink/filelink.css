@@ -1,0 +1,123 @@
+
+
+.filelink {
+	padding-left: 16px;
+	background-image: url(document_14x14.png) !important;
+	background-repeat:no-repeat;
+	background-position: left top;
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+/* if being used as the iconCls in a tab, set the position 'left center'
+   which is slightly lower than the ExtJs default '0 3' which is optimized
+   for 16x16 icons (filelink icons are 14x14)                                */
+.x-tab-strip-inner .filelink {
+  background-position: left center !important;
+}
+
+a.filelink {
+	text-decoration: none !important;
+	cursor: pointer !important;
+	border-bottom-style: dotted;
+	border-bottom-width: 1px;
+	border-color: blue;
+}
+
+
+/* new div version designed to work with Ext.ux.RapidApp.renderCasLink */
+div.filelink {
+  color: darkgreen;
+  font-size: 0.8em !important;
+  padding-top: 1px;
+}
+
+
+.filelink.txt, .filelink.css, .filelink.text, .filelink.sql {
+	background-image: url(page_white_text_14x14.png) !important;
+}
+
+.filelink.pl, .filelink.pm, .filelink.ry, .filelink.rb, .filelink.py, .filelink.sh, .filelink.c, .filelink.h, .filelink.au3, .filelink.xml, .filelink.js {
+	background-image: url(page_code_14x14.png) !important;
+}
+
+.filelink.ini, .filelink.cnf, .filelink.conf {
+	background-image: url(page_white_wrench_14x14.png) !important;
+}
+
+.filelink.doc {
+	background-image: url(page_white_word_14x14.png) !important;
+}
+
+.filelink.docx {
+	background-image: url(page_word_14x14.png) !important;
+}
+
+.filelink.xls {
+	background-image: url(page_white_excel_14x14.png) !important;
+}
+
+.filelink.xlsx {
+	background-image: url(page_excel_14x14.png) !important;
+}
+
+.filelink.ppt, .filelink.pptx {
+	background-image: url(page_white_powerpoint_14x14.png) !important;
+}
+
+.filelink.pdf {
+	background-image: url(page_white_acrobat_14x14.png) !important;
+}
+
+.filelink.png, .filelink.jpg, .filelink.jpeg, .filelink.gif, .filelink.tiff, .filelink.tif, .filelink.jpe, .filelink.bmp, .filelink.psd {
+	background-image: url(picture_14x14.png) !important;
+}
+
+.filelink.avi, .filelink.mpg, .filelink.mpeg, .filelink.mp4, .filelink.mov, .filelink.wmv, .filelink.m4v, .filelink.asf {
+	background-image: url(film_14x14.png) !important;
+}
+
+.filelink.mp3, .filelink.wav, .filelink.ogg {
+	background-image: url(music_14x14.png) !important;
+}
+
+.filelink.msg, .filelink.email {
+	background-image: url(email_14x14.png) !important;
+}
+
+.filelink.iso {
+	background-image: url(page_white_dvd_14x14.png) !important;
+}
+
+.filelink.exe, .filelink.com, .filelink.bat {
+	background-image: url(application_14x14.png) !important;
+}
+
+.filelink.html, .filelink.htm {
+	background-image: url(page_white_world_14x14.png) !important;
+}
+
+.filelink.mhtml, .filelink.mht {
+	background-image: url(page_world_14x14.png) !important;
+}
+
+.filelink.vcard, .filelink.vcs {
+	background-image: url(vcard_14x14.png) !important;
+}
+
+.filelink.ical, .filelink.ics {
+	background-image: url(date_14x14.png) !important;
+}
+
+.filelink.zip, .filelink.zipx  {
+	background-image: url(page_white_compressed_14x14.png) !important;
+}
+
+.filelink.bz2, .filelink.tgz, .filelink.gz, .filelink.pkg  {
+	background-image: url(page_white_zip_14x14.png) !important;
+}
+
+.filelink.db {
+	background-image: url(page_white_database_14x14.png) !important;
+}

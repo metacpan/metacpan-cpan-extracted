@@ -1,0 +1,11 @@
+=for layout widget
+
+[% image %]
+
+=for layout has_image
+
+<img src="[% uri %]">
+
+=for layout no_image
+
+=cut

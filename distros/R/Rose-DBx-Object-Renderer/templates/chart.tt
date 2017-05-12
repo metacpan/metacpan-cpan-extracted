@@ -1,0 +1,9 @@
+[% IF no_head %][% PROCESS chart %][% ELSE %][% doctype %]<html><head><title>[% title %]</title>[% html_head %]</head><body>[% PROCESS chart %]</body></html>[% END %]
+
+[% BLOCK chart %]
+	<div>
+		<h1>[% title %]</h1>
+		[% IF description %]<p>[% description %]</p>[% END %]
+		<img src="[% chart %]" alt="[% title %]"/>
+	</div>
+[% END %]

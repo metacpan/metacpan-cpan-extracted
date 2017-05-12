@@ -1,0 +1,27 @@
+<%args>
+$Ticket
+</%args>
+<%init>
+my ($core, $cfs) = RT::Extension::MandatoryOnTransition->RequiredFields(
+    Ticket  => $Ticket,
+    To      => $ARGS{'Status'} || $ARGS{'DefaultStatus'},
+);
+return unless @$cfs;
+
+my $comp = '/Elements/EditCustomFields';
+my %obj_args = ( Object => $Ticket );
+
+# Handle location in 4.0 and 4.2
+if (!$m->comp_exists('/Elements/EditCustomFields')) {
+    $comp = '/Ticket/Elements/EditCustomFields';
+    %obj_args = ( TicketObj => $Ticket );
+}
+
+</%init>
+%# 'Named' is handled by this extension in the MassageCustomFields callback
+<& $comp,
+    %ARGS,
+    %obj_args,
+    InTable     => 1,
+    Named       => $cfs,
+    &>

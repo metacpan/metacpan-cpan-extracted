@@ -1,0 +1,114 @@
+=head1 NAME
+
+ResourcePool::BigPicture - ResourcePool introduction
+
+=head1 DESCRIPTION
+
+
+The ResourcePool package consists of three major parts: 
+
+=over 4
+
+=item * 
+ResourcePool 
+
+=item * 
+LoadBalancer 
+
+=item * 
+Command framework 
+
+=back
+The overview of this three parts will be described in this document.
+
+=head1 ResourcePool
+
+
+The L<ResourcePool|ResourcePool> is used to manage a pool of persistent connections (or more generally "resources"). Every resource in a pool is exactly equivalent to the others since all of them are created through the same factory.
+
+If you want to make a pool of different resources (e.g. connections to different databases) you have to use the L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer>.
+
+The L<ResourcePool|ResourcePool> uses two other classes to operate:
+
+
+=over 4
+
+=item ResourcePool::Factory
+
+used to create resources
+
+=item ResourcePool::Resource
+
+used as wrapper to implement a unique interface to all resources
+
+=back
+
+To create a L<ResourcePool|ResourcePool> you need a L<ResourcePool::Factory|ResourcePool::Factory> which is able to create the L<ResourcePool::Resource's|ResourcePool::Resource> you want to use. The L<ResourcePool|ResourcePool> will then use this factory to create L<ResourcePool::Resource|ResourcePool::Resource> objects as required.
+
+The L<ResourcePool::Resource|ResourcePool::Resource> itself creates the finally interesting objects like L<DBI|DBI> or L<Net::LDAP|Net::LDAP> and provides a standard way to perform the common operations required by L<ResourcePool|ResourcePool> to work with this resource.
+
+The L<ResourcePool::Factory|ResourcePool::Factory> and L<ResourcePool::Resource|ResourcePool::Resource> classes are base classes to inherit the specialized classes for your resource from. The classes to handle L<DBI|DBI> and L<Net::LDAP|Net::LDAP> resources are available as separate distributions on CPAN.
+
+After creating a L<ResourcePool|ResourcePool> you can use the L<get()|ResourcePool/get> method to obtain a resource. The L<get()|ResourcePool/get> method will return the L<DBI|DBI> or L<Net::LDAP|Net::LDAP> object which can be used as usually. Afterwards you have to hand the resource back into the pool by calling the L<free()|ResourcePool/free> method.
+
+Please have a look to the L<ResourcePool documentation|ResourcePool> for further details.
+
+=head1 ResourcePool::LoadBalancer
+
+
+A L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> can be used to configure a failover and/or loadbalancing behavior for L<ResourcePool|ResourcePool> users.
+
+To construct a L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> you need one or more L<ResourcePools|ResourcePool>. After construction a L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> behaves like a L<ResourcePool|ResourcePool>, so you can call the L<get()|ResourcePool/get> method to obtain a resource and can use the L<Command|/Command framework> strategy.
+
+The L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> can be configured to use a different L<ResourcePool|ResourcePool> every time you call the L<get()|ResourcePool/get> method. The L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> can also detect a problem with a L<ResourcePool|ResourcePool> (e.g. because the related server is down) and will hide such problems from you.
+
+There are currently three "Policies" which change the way the L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> uses the configured resources: 
+
+=over 4
+
+=item * 
+RoundRobin 
+
+=item * 
+LeastUsage 
+
+=item * 
+FailBack 
+
+=item * 
+FailOver 
+
+=back
+
+=head1 Command framework
+
+
+The L<ResourcePool|ResourcePool> package includes a framework which can be used to execute commands like described in the GOF book "Design Patterns". You can use this pattern to avoid manual use of the L<get()|ResourcePool/get>, L<free()|ResourcePool/free> and L<fail()|ResourcePool/fail> methods. The common code used to work with L<ResourcePool|ResourcePool> or L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> (get resource, use it, return it to the pool) has been encapsulated into the L<execute()|ResourcePool/execute> method.
+
+The Command framework will it make easier to handle errors, and is capable of re-trying the complete work if an error occured. Using this pattern can help you to forget (nearly) about error handling since everything is handled in L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer>. More details how to use this pattern can be found in the L<ResourcePool::Command::Execute|ResourcePool::Command::Execute> documentation.
+
+This pattern does also allow to use L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> for a complete new type of resources like L<SOAP::Lite|SOAP::Lite>. In that case you can use L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> to spread load and handle failover for SOAP RPC calls. Have a look at L<ResourcePool::Command::SOAP::Lite::Call|ResourcePool::Command::SOAP::Lite::Call> for details about this approach.
+
+=head1 Learn More
+
+
+You should have the big picture of L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> now, time to go into the details at the L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> documentation. If you loose track of all these modules consult the L<ResourcePool::UML|ResourcePool::UML> diagram.
+
+The best entry point for the Command pattern is the L<ResourcePool::Command::Execute|ResourcePool::Command::Execute> documentation. Have a look at the L<ResourcePool::Command::DBI::Execute|ResourcePool::Command::DBI::Execute> documentation for a database related example or L<ResourcePool::Command::SOAP::Lite::Call|ResourcePool::Command::SOAP::Lite::Call> documentation for a SOAP RPC example.
+
+To learn more about how to implement your own resource extensions have a look to the L<ResourcePool::ExtensionGuide|ResourcePool::ExtensionGuide>.
+
+=head1 SEE ALSO
+
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer>,
+L<ResourcePool::UML|ResourcePool::UML>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

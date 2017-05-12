@@ -1,0 +1,4 @@
+Any templates that you modify should be copied to a "local/template/"
+directory first. This will keep them from being clobbered by upgrades to
+CGI::Kwiki. CGI::Kwiki automatically looks for templates in the
+local/template/ directory before searching the template/ directory.

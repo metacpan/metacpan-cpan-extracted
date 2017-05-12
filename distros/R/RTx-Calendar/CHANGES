@@ -1,0 +1,85 @@
+1.01
+ - Provide a default search format when one isn't passed
+
+1.00
+ - Packaging and documentation updates
+ - Drop ical support, as it is in core RT
+ - Add documentation to Calendar.html
+
+0.20
+ - Packaging fixes only (0.19 failed to update CHANGES)
+
+0.19
+ - Fix double-encoding of previous/next month chevrons
+
+0.18
+ - RT 4.2 compatibility
+ - UI updates from Ivan Kohler
+
+0.17
+ - Re-released after resolving PAUSE permissions; no changes since 0.16
+
+0.16 Never indexed by PAUSE
+ - Remove dependency on Date::ICal and use RT::Date's support instead
+
+0.15
+ - Switch to Digest::SHA from Digest::SHA1 to appease Debian
+
+0.14
+ - Guard the modern stylesheets call on older RTs
+
+0.13
+ - Serve CSS the modern way on recent RT's
+ - Namespace our CSS to avoid styling the RT core UI
+
+0.12
+ - Copyright updates
+
+0.11
+ - fixes for characters that were breaking 3.8
+
+0.10
+ - packaging tweak
+
+0.09
+ - RT 4 compatibility
+
+0.08
+ - make sure the last date of a search is displayed (Shawn M Moore)
+   [rt.cpan.org #63469]
+
+0.07
+ - add documentation on how to enable plugin in rt 3.8 and later
+ - add configuration to show owner in calendar (Shawn M Moore)
+ - make the popup display fields configurable (Shawn M Moore)
+ - tickets and reminders types (todo/event) are configurable in ical feed
+
+0.06
+ - rt 3.8 compatibility
+
+0.05
+ - fix a bug in ics feeds when showing reminders
+ - use Module::Install::RTx 0.21
+
+0.04
+ - should work with rt 3.6.0 and seems to work with 3.7.2
+ - display Starts date by default
+ - you can use Format to display dates you want (Created, Started, Due,
+   Starts, ...)
+ - if a saved search is named "calendar", use it for the default
+   Calendar.html and for the portlet
+ - fix a bug in Prefs
+
+0.03
+ - now uses Query Builder to find tickets
+ - ics (ICal) feeds available for each personal search with magic number
+   authentication method
+ - default calendars and feeds show reminders
+ - Calendar.html move in Search
+ - MyCalendar links to your own tickets and Nobody's tickets for the
+   current month
+ - fix a problem with localtime and gmtime
+
+0.02
+ - First release
+

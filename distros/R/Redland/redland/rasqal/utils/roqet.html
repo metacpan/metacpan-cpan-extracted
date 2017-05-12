@@ -1,0 +1,330 @@
+<!-- Creator     : groff version 1.18.1 -->
+<!-- CreationDate: Sun Nov  5 09:05:32 2006 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Rasqal RDF Query Library - Rasqal RDF parser utility</title>
+</head>
+<body>
+<h1>Rasqal RDF Query Library - Rasqal RDF parser utility</h1>
+<hr />
+<a name="NAME"></a>
+<h2>NAME</h2>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p>roqet &#8722; Rasqal RDF query utility</p>
+</td>
+</tr>
+</table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>roqet</b> [<b>OPTIONS</b>] <i>&lt;query-URI&gt; [base-URI]</i><b><br />
+roqet</b> [<b>OPTIONS</b>]<b>--exec</b> <i>query-string [base-URI]</i></p>
+</td>
+</tr>
+</table>
+<a name="EXAMPLE"></a>
+<h2>EXAMPLE</h2>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<pre>
+<b>roqet example.rdql
+roqet -q -i rdql x.rdql http://example.org/base/
+roqet -i sparql -r xml http://example.org/query.rq
+
+</b>
+</pre></td>
+</tr>
+</table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p>The <b>roqet</b> utility allows querying of RDF content using the <b>Rasqal</b> RDF query library, printing the results in variable bindings, RDF graph or boolean format. The query is read from <i>query-URI</i> and the optional <i>base-URI</i> is used as the base URI of the query if present.</p>
+</td>
+</tr>
+</table>
+<a name="OPTIONS"></a>
+<h2>OPTIONS</h2>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p>roqet uses the usual GNU command line syntax, with long options starting with two dashes (&#8216;-&#8217;) if supported by the getopt_long function. Otherwise only the short options are available.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;h, &#8722;&#8722;help</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Show a summary of the options. <b>&#8722;i, &#8722;&#8722;input LANGUAGE</b> Set the input query <i>LANGUAGE</i> to one of&#8217;sparql&#8217; (SPARQL Query Language for RDF, default) or &#8217;rdql&#8217; (RDF Data Query Language). The list of supported languages is given in the help summary given by &#8722;h.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;r, &#8722;&#8722;results FORMAT</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Set the query results format.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="79%">
+<p>For variable bindings, the values of <i>FORMAT</i> are &#8217;simple&#8217; for a simple text format (default), &#8217;xml&#8217; for the SPARQL Query Results XML format, &#8217;xml-v2&#8217; for the version of the 2005-05-27 working draft, and &#8217;json&#8217; for a JSON version of the results. The older xml formats may be removed in future releases.</p>
+<!-- INDENTATION -->
+<p>For RDF graph results, the values of <i>FORMAT</i> are &#8217;ntriples&#8217; (N-Triples, default), &#8217;rdfxml-abbrev&#8217; (RDF/XML Abbreviated), &#8217;rdfxml&#8217; (RDF/XML), or &#8217;rss-1.0&#8217; (RSS 1.0, also an RDF/XML syntax).</p>
+<!-- INDENTATION -->
+<p>The exact list of formats depends on what libraptor(3) was built with but is given correct in the usage message with &#8722;h.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;c, &#8722;&#8722;count</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Only count the triples and produce no other output.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;d, &#8722;&#8722;dump&#8722;query FORMAT</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Print the parsed query out in a given <i>FORMAT</i> one of &#8217;debug&#8217;, &#8217;structure&#8217; or &#8217;sparql&#8217;</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;e, &#8722;&#8722;exec QUERY</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Execute the query in the argument <i>QUERY</i> instead of reading the query from a URI.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;f, &#8722;&#8722;feature NAME(=VALUE)</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Set query feature <i>NAME</i> to the <i>VALUE</i> or integer 1 if omitted. The known features can be shown with <b>-f help</b> or <b>--feature help</b>.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;n, &#8722;&#8722;dryrun</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Prepare the query but do not execute it.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;q, &#8722;&#8722;quiet</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>No extra information messages.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;s, &#8722;&#8722;source URI</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Query against RDF data at source <i>URI</i> by adding it to the list of query data source URIs. <i>FORMAT</i> to &#8217;simple&#8217; (default) or &#8217;xml&#8217; (an experimental XML format)</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;v, &#8722;&#8722;version</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Print the rasqal library version and exit.</p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>&#8722;w, &#8722;&#8722;walk-query</b></p>
+</td>
+</tr>
+</table>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td>
+<td width="77%">
+<p>Walk the query and display it using the API.</p>
+</td>
+</tr>
+</table>
+<a name="CONFORMING_TO"></a>
+<h2>CONFORMING TO</h2>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><i>SPARQL Query Language for RDF</i>, Eric Prud&#8217;hommeaux and Andy Seaborne (eds), W3C Candidate Recommendation, 6 April 2006. http://www.w3.org/TR/2006/CR-rdf-sparql-query-20060406/</p>
+<!-- INDENTATION -->
+<p><i>SPARQL Query Results XML Format</i>, Jeen Broekstra and Dave Beckett (eds), W3C Candidate Recommendation, 6 April 2006. http://www.w3.org/TR/2006/CR-rdf-sparql-XMLres-20060406/</p>
+<!-- INDENTATION -->
+<p><i>SPARQL Query Results XML Format</i>, Edited by Dave Beckett, W3C Working Draft, 27 May 2005. Work in progress. http://www.w3.org/TR/2005/WD-rdf-sparql-XMLres-20050527/</p>
+<!-- INDENTATION -->
+<p><i>SPARQL Variable Binding Results XML Format</i>, Edited by Dave Beckett, W3C Working Draft, 21 December 2004. Work in progress. http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/</p>
+<!-- INDENTATION -->
+<p><i>RDQL - A Query Language for RDF</i>, Andy Seaborne, W3C Member Submission 9 January 2004 http://www.w3.org/Submission/2004/SUBM-RDQL-20040109/</p>
+</td>
+</tr>
+</table>
+<a name="SEE_ALSO"></a>
+<h2>SEE ALSO</h2>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><b>librasqal(3),</b>rasqal-config(1),<b>libraptor(3)</b></p>
+</td>
+</tr>
+</table>
+<a name="CHANGES"></a>
+<h2>CHANGES</h2>
+<a name="AUTHOR"></a>
+<h2>AUTHOR</h2>
+<!-- INDENTATION -->
+<table width="100%" border="0" rules="none" frame="void" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="89%">
+<p><a href="http://purl.org/net/dajobe/">Dave Beckett</a></p>
+</td>
+</tr>
+</table>
+<hr />
+
+<p>Copyright 2002-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a><br />2002-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>

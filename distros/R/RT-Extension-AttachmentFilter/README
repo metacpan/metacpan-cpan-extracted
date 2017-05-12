@@ -1,0 +1,83 @@
+NAME
+    RT-Extension-AttachmentFilter - Set forbidden attachments file names or
+    extensions
+
+DESCRIPTION
+    Ses RT extension allows to forbid some files names or extensions from
+    web attachment upload.
+
+    It's use may be to match an existing mail policy.
+
+    The filter can be defined per queue so queues that do not have outgoing
+    emails configured can have less restrictions.
+
+    See the configuration example under "INSTALLATION".
+
+INSTALLATION
+    "perl Makefile.PL"
+    "make"
+    "make install"
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::AttachmentFilter');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::AttachmentFilter));
+
+        or add "RT::Extension::AttachmentFilter" to your existing @Plugins
+        line.
+
+        Then configure the limits using the $AttachmentFilter config option.
+        This option takes the generic form of:
+
+            Set( $AttachmentFilter, 
+                '*'    => 'regexp',
+                queue1 => 'regexp',
+            );
+
+        which allows to set limit per queue. '*' means for all queues that
+        do not have a specific filter.
+
+        'regexp' is a perl regular expression against the filename.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+IMPLEMENTATION DETAILS
+  Methods
+   CheckAttachmentName
+    This is the main routine, it takes an attachment file name and an
+    optional queue (name, id or object) and validate it against RT
+    $AttachmentFilter configuration.
+
+    Returns undef if allowed, (1, error message) else.
+
+TODO
+    Dynamic enforcement using javascript
+
+AUTHOR
+    Emmanuel Lacour, <elacour@home-dn.net>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-AttachmentFilter@rt.cpan.org|mailto:bug-RT-Extension-AttachmentFilter@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AttachmentFilter>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2016 by Emmanuel Lacour
+    <elacour@home-dn.net>
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

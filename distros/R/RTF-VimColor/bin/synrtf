@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+# PODNAME: synrtf
+# ABSTRACT: generate colorized RTF using Vim's syntax highlighting
+
+use Getopt::Long::Descriptive;
+use RTF::VimColor;
+
+#pod =head1 USAGE
+#pod
+#pod   synrtf [-cFfhZ] [long options...] <filename>
+#pod
+#pod     -h --help            display this message
+#pod     -f --ft --filetype   filetype; Vim guesses by default
+#pod     -F --font-face       font face to use; defaults to Courier New
+#pod     -Z --font-size       font size to use, in points; defaults to 14
+#pod     -c --colorscheme     color scheme; path to a .vim file
+#pod     --bg --background    default background color
+#pod     --fg --foreground    default foreground color
+#pod
+#pod =cut
+
+my ($opt, $usage) = describe_options(
+  '%c %o <filename>',
+  [ 'help|h',          'display this message' ],
+  [ 'filetype|ft|f=s', 'filetype; Vim guesses by default' ],
+  [ 'font-face|F=s',   'font face to use; defaults to Courier New',
+                       { default => 'Courier New' } ],
+  [ 'font-size|Z=i',   'font size to use, in points; defaults to 14',
+                       { default => 14 } ],
+  [ 'colorscheme|c=s', 'color scheme; path to a .vim file' ],
+
+  [ 'background|bg=s', 'default background color' ],
+  [ 'foreground|fg=s', 'default foreground color' ],
+);
+
+$usage->die if $opt->{help} or @ARGV != 1;
+
+sub maybe { return($opt->{$_[0]} ? (($_[1] || $_[0]) => $opt->{$_[0]}) : ()) }
+
+my $rtf = RTF::VimColor->new->rtf_for_file(
+  $ARGV[0],
+  {
+    filetype  => $opt->filetype,
+    font_face => $opt->font_face,
+    font_size => $opt->font_size,
+    maybe('colorscheme'),
+    maybe('background', 'default_bg'),
+    maybe('foreground', 'default_fg'),
+  },
+);
+
+print $$rtf;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+synrtf - generate colorized RTF using Vim's syntax highlighting
+
+=head1 VERSION
+
+version 0.001
+
+=head1 USAGE
+
+  synrtf [-cFfhZ] [long options...] <filename>
+
+    -h --help            display this message
+    -f --ft --filetype   filetype; Vim guesses by default
+    -F --font-face       font face to use; defaults to Courier New
+    -Z --font-size       font size to use, in points; defaults to 14
+    -c --colorscheme     color scheme; path to a .vim file
+    --bg --background    default background color
+    --fg --foreground    default foreground color
+
+=head1 AUTHOR
+
+Ricardo Signes <rjbs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Ricardo Signes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

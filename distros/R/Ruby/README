@@ -1,0 +1,45 @@
+NAME
+
+	Ruby - Perl interface to Ruby interpreter
+
+SYNOPSIS
+
+	use Ruby;
+
+	puts "Hello, world!";
+
+DEPENDENCIES
+
+	Perl 5.8.1 or later.
+
+	Ruby 1.8.6 or 1.8.7 (not 1.9.x)
+
+INSTALLATION
+
+	To install this module, run the following commands.
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+	or with a option like this:
+
+		perl Makefile.PL --ruby=/path/to/ruby
+
+WARNINGS
+
+	This is a unstable module.
+
+	DO NOT USE THIS MODULE FOR ANYTHING SERIOUS.
+
+BUGS
+
+	There are a lot of bugs.
+
+COPYRIGHT AND LICENCE
+
+	Copyright(c) 2008 Goro Fuji, Some rights reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.

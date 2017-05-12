@@ -1,0 +1,35 @@
+﻿[% WRAPPER templates/rapidapp/ext_page.tt %]
+
+<!-- Fields required for history management -->
+<form id="history-form" class="x-hidden">
+    <input type="hidden" id="x-history-field" />
+    <iframe id="x-history-frame"></iframe>
+</form>
+
+<script type="text/javascript">
+
+  Ext.onReady(function(){
+    var opt = {};
+    opt.config_url = [% IF config_url %] '[% config_url %]' [% ELSE %] '' [% END %] ;
+    opt.config_params = [% IF config_params %] [% config_params %] [% ELSE %] {} [% END %] ;
+    opt.panel_cfg = [% IF panel_cfg %] [% panel_cfg %] [% ELSE %] null [% END %] ;
+    Ext.ux.RapidApp.MainViewportInit(opt);
+  });
+
+</script>
+
+[% IF precache_imgs %]
+<!-- 
+ Hidden prefetch images: (Github Issue #24)
+ These images are used in the basic elements of the interface and
+ so we're preloading them upfront so the UI will always display
+ correctly, even if the server becomes slow or busy
+-->
+<div style="display:none;">
+  [%- FOREACH url IN precache_imgs %]
+    <img src="[% url %]">
+  [%- END %]
+</div>
+[%- END -%]
+
+[%- END -%]

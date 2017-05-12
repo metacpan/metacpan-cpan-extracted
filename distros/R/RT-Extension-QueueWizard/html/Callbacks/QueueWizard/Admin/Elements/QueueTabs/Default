@@ -1,0 +1,9 @@
+<%args>
+$tabs => undef
+</%args>
+<%init>
+
+$tabs->{'AA_QueueWizard'}  = { title => loc('New queue (quick)'),
+                            path => 'QueueWizard/Admin/index.html' };
+return;
+</%init>

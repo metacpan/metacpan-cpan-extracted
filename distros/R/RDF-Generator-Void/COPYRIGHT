@@ -1,0 +1,62 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDF-Generator-Void
+Upstream-Contact: Kjetil Kjernsmo <kjetilk@cpan.org>
+Source: https://metacpan.org/module/RDF::Generator::Void
+
+Files: lib/App/perlrdf/Command/Void.pm
+ lib/RDF/Generator/Void/Meta/Attribute/ObjectList.pm
+ lib/RDF/Generator/Void/Stats.pm
+ t/00-load.t
+ t/basic.t
+ t/extended.t
+ t/levels.t
+Copyright: Copyright 2014 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/perlrdfapp.t
+Copyright: Copyright 2016 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ t/data/basic-expected.ttl
+ t/data/basic.ttl
+ t/data/generated-expected.ttl
+ t/data/generated.ttl
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/RDF/Generator/Void.pm
+Copyright: Copyright 2012 Toby Inkster.
+ Copyright 2012,2013,2016 Kjetil Kjernsmo.
+License: GPL-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2016 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2016 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

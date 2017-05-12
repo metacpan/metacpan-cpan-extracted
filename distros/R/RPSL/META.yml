@@ -1,0 +1,19 @@
+---
+name: RPSL
+version: 0.27
+author:
+  - 'Luis Motta Campos, E<lt>lmc@cpan.org<gt>'
+abstract: Router Policy Specification Language
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::Pod: undef
+provides:
+  RPSL:
+    file: lib/RPSL.pm
+    version: 0.27
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

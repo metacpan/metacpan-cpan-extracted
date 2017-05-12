@@ -1,0 +1,15 @@
+package myworld;
+use base 'Games::Roguelike::World';
+
+$r = myworld->new(w=>80,h=>50,dispw=>40,disph=>18);     # creates a world with specified width/height & map display width/height
+$r->area(new Games::Roguelike::Area(name=>'1'));                     # create a new area in this world called "1"
+$r->area->genmaze2();                                   # make a cavelike maze
+$char = Games::Roguelike::Mob->new($r->area, sym=>'@', pov=>8);      # add a mobile object with symbol '@'
+$r->setvp($char);                                       # set viewpoint to be from $char's perspective
+$r->drawmap();                                          # draw the active area map from the current perspective
+while (!((my $c = $r->getch()) eq 'q')) {
+        $char->kbdmove($c);
+        $r->drawmap();
+}
+
+

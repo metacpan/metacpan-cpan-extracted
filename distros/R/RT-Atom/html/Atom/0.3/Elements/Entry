@@ -1,0 +1,51 @@
+%# Draw entry content for an object
+    <title mode="escaped"><% $entry{Name} ||= "#$entry{Id}" %></title>
+% if ($IsChild) {
+    <& $ShowLink, Relation => "service.edit", URI => "$FeedURI/$entry{Id}", Id => $entry{Id}, Title => $entry{Name}, IsChild => $IsChild &>
+% } elsif ("$BaseURI/$Path" =~ m{^(.+)/}) {
+    <& $ShowLink, Relation => "service.feed", URI => "$1?", Id => "_up", Title => "Up" &>
+% }
+% if ($entry{HTML_URI}) {
+    <& $ShowLink, Type => 'text/html', URI => "$RT::WebURL$entry{HTML_URI}", Id => $entry{Id}, Title => $entry{Name} &>
+% }
+    <summary mode="escaped"><% $entry{Subject} || $entry{Description} %></summary>
+    <issued><% $entry{Created} %></issued>
+    <modified><% $entry{LastUpdated} %></modified>
+    <id><% $entry{URI} %></id>
+<%INIT>
+my %URI = qw(
+    RT-Tickets      Ticket/Display.html?id=
+    RT-Templates    Admin/Global/Template.html?Template=
+    RT-Scrips       Admin/Global/Scrip.html?id=
+    RT-Queues       Admin/Queues/Modify.html?id=
+    RT-Users        Admin/Users/Modify.html?id=
+    RT-Groups       Admin/Groups/Modify.html?id=
+);
+
+my %entry = map { $_ => eval { $Object->$_ } || '' } qw(Id Name Description Subject URI);
+$entry{Created} = eval { $Object->CreatedObj->W3CDTF }
+    || eval { $Object->PrincipalObj->CreatedObj->W3CDTF };
+$entry{LastUpdated} = eval { $Object->LastUpdatedObj->W3CDTF }
+    || eval { $Object->PrincipalObj->LastUpdatedObj->W3CDTF };
+
+if ($URI{$Type}) {
+    $entry{HTML_URI} = $URI{$Type} . $entry{Id};
+    if (my $queue = eval { $Object->Queue } ) {
+	$entry{HTML_URI} =~ s/Global/Queues/;
+	$entry{Params} .= "&Queue=$queue";
+    }
+}
+</%INIT>
+<%ARGS>
+$Path
+$BaseURI
+$Now
+$ShowLink
+$ShowEntry
+$Type
+$CollectionClass
+$FeedURI
+
+$Object
+$IsChild
+</%ARGS>

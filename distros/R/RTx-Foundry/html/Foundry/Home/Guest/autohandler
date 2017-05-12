@@ -1,0 +1,57 @@
+%# One way to stop a runaway horse is to bet on him.
+
+<& /Foundry/Elements/Header, Title => $m->base_comp->attr('Tab1'), Method => $m->base_comp->attr('Method') &>
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td><& /Foundry/Elements/Tabs, Text => $m->base_comp->attr('Tab2') &></td>
+  </tr>
+  <tr> 
+    <td valign="top"> 
+      <table border="0" cellspacing="0" cellpadding="4" class="poptable" width="100%">
+        <tr> 
+          <td valign="top"> 
+            <table width="100%" border="0" cellspacing="0" cellpadding="10">
+% my $out = $m->scomp($m->fetch_next, %ARGS);
+% if (my $error = $m->notes('error')) {
+              <tr><td style="color: red">
+%   foreach my $item (@{ ref($error) ? $error : [ $error ] }) {
+%       if ($item eq loc("Your username or password is incorrect")) {
+%           my $user = RT::User->new($RT::SystemUser);
+%           my $flag = 0;
+%           foreach my $arg ($m->request_args) {
+%               if ($flag) { $user->Load($arg); last }
+%               $flag++ if $arg eq 'user';
+%           }
+%           $item = loc("Unverified account.  Please verify your account first.") unless $user->Id;
+%       }
+		&nbsp;* <font color="red"><% $item %></font><br>
+%   }
+	      </td></tr>
+% }
+% $m->print($out);
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<br>
+</TD></TR>
+</TABLE>
+
+<%ATTR>
+Method	=> 'Post'
+Tab1	=> 'Member Login'
+Tab2	=> 'Login'
+</%ATTR>
+<%INIT>
+return $m->comp('../index.html', %ARGS) unless $RT::Guest;
+
+@RT::Tabs = (
+    'Login'	    => '/Foundry/Home/Guest/',
+    'Register'	    => '/Foundry/Home/Guest/Register.html',
+    'Password Reminder' => '/Foundry/Home/Guest/Reminder.html',
+);
+</%INIT>

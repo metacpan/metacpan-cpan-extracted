@@ -1,0 +1,112 @@
+=head1 NAME
+
+ResourcePool::Command::Execute - The implementation of the Command design pattern with L<ResourcePool|ResourcePool>.
+
+=head1 SYNOPSIS
+
+
+ 
+ package Command;
+ 
+ use ResourcePool::Command;
+ use vars qw(@ISA);
+ 
+ push @ISA, qw(ResourcePool::Command);
+ 
+ sub new($) {
+   my $proto = shift;
+   my $class = ref($proto) || $proto;
+   my $self = {};
+   bless($self, $class);
+   return $self;
+ }
+ 
+ sub execute($$) {
+   my ($self, $resource) = @_;
+   return "The quick brown fox jumps over the lazy dog";
+ }
+ 
+ package main;
+ 
+ my $pool; # imagine this is a ResourcePool 
+           # or LoadBalancer instance
+ my $cmd = Command->new();
+ 
+ print $pool->execute($cmd);
+ # prints "The quick brown fox jumps over the lazy dog"
+
+=head1 DESCRIPTION
+
+
+The ResourcePool::Command class builds a base for commands like described in the GoF book "Design Patterns".
+
+This makes it possible to use L<ResourcePool|ResourcePool> in a very different way, without manually calling the L<get()|ResourcePool/get>, L<free()|ResourcePool/free> or L<fail()|ResourcePool/fail> methods. This common structure is encapsulated into this class.
+
+The functionality can be accessed by using the L<execute()|ResourcePool/execute> methods of L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> like shown above.
+
+=head2 S<$pool-E<gt>execute($command)>
+
+Executes the command with a resource from the supplied pool.
+
+The execute method will obtain a resource from the pool using it's L<get()|ResourcePool/get> method, will then call the L<execute() method of the command|ResourcePool::Command/execute> passing the resource as argument. On success the resource will be handed back to the pool using it's L<free()|ResourcePool/free> method and the return value of the command's L<execute()|ResourcePool::Command/execute> method will be passed to the caller. On failure the resource will be marked as broken (using the L<fail()|ResourcePool/fail> method) and the procedure will be tried until the L<MaxExecTry|ResourcePool> value of the pool has been reached. In that case the error from the last attempt to execute the operation will be reported to the caller.
+
+The error conditions are explained in the L<ERROR CONDITIONS|/ERROR CONDITIONS> in this document.
+
+=over 4
+
+=item $command
+
+An object derived from L<ResourcePool::Command|ResourcePool::Command>.
+
+=back
+B<Returns:> 
+
+=head1 ERROR CONDITIONS
+
+
+There is only one way how a command can propagate an error execution environment in order to trigger it's retry mechanism. This is to die() in some way. For example you can just call "die" directly, or use on of the Exception modules which will then die.
+
+Each time the L<execute() method of a command|ResourcePool::Command/execute> is terminated by using die, the L<execute() method of the pool|ResourcePool/execute> will catch this and try again until the L<MaxExecTry value of the pool|ResourcePool> has been reached.
+
+If the MaxExecTry value was reached, the last error will be propagated to the caller by using die. Therefore you still have to enclose the call to execute() into a eval block or some other exception catching block.
+
+There is only one exception to this, this are the so called L<|ResourcePool::Command::NoFailoverException>. This are Exceptions which are functional failures which should not cause a fail over but do still indicate a failure. An example for this is an insert into a database table with a primary key that already exists. In this case it makes no sense to try the operation again, but it does still indicate an error condition which must be propagated to the caller.
+
+A command can throw an L<|ResourcePool::Command::NoFailoverException> by calling die() with a L<|ResourcePool::Command::NoFailoverException> or an object derived from it, as argument.
+
+The most convenient way is to throw directly a L<ResourcePool::Command::NoFailoverException|ResourcePool::Command::NoFailoverException> for this reason it is possible to carry another exception (the root cause, the constraint violation in our example) with the L<ResourcePool::Command::NoFailoverException|ResourcePool::Command::NoFailoverException>. The following example illustrates this:
+
+ 
+ # snipplet from the Command
+ sub execute($$) {
+     my ($self, $resource) = @_;
+     eval {
+         # something
+     }
+     if (failover_required) {
+         die $@;
+     } else {
+         die ResourcePool::Command::NoFailoverException($@);
+     }
+ }
+ 
+ # snipplet from the caller
+ 
+ eval {
+     $pool->execute($cmd);
+ }
+ if ($@->isa('ResourcePool::Command::NoFailoverException')) {
+     print "Logical exception: " . $@->exception() . "\n";
+ } else {
+     print "Technical exception: " . $@ 
+         . "(failover done, but without success)\n";
+ }
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

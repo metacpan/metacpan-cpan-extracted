@@ -1,0 +1,34 @@
+protocol: HTTP
+semantic: Atom
+interface: REST
+renderers:
+  xml: Atom
+  json: JSON
+  rdf: RDF
+port: 2080
+address: 127.0.0.1
+pidfile: /tmp/rdf-server.pid
+default_renderer: Atom
+foreground: 1
+handler: 
+  type: workspace
+  path_prefix: /
+  title: Workspace
+  collections:
+      -
+        path_prefix: /foo/
+        categories:
+          - scheme: 2
+            term: 1
+          - scheme: b
+            term: a
+        model:
+          class: RDFCore
+          namespace: http://www.example.com/ns/
+        title: Foo
+      -
+        path_prefix: /bar/
+        title: Bar
+        model:
+          class: RDFCore
+          namespace: http://www.example.com/bar/

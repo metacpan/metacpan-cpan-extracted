@@ -1,0 +1,11 @@
+abstract: Enforce users to fill the requestor when creating a ticket
+author: 'Emmanuel Lacour <elacour@home-dn.net>'
+distribution_type: module
+generated_by: Module::Install version 0.77
+license: perl
+name: RT-Extension-MandatoryRequestor
+no_index:
+  directory:
+    - html
+    - inc
+version: 0.02

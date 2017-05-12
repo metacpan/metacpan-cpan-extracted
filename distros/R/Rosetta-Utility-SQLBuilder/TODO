@@ -1,0 +1,15 @@
+TODO
+
+* Convert all class objects to be of the inside-out variety rather than
+hash-based, so to gain rigorous protection against external code directly
+accessing our object attributes, and to avoid related maintenance problems.
+
+* Once the above are done, announce Rosetta Developer Release #4.
+
+* Update the list of 'standard routines' in SQLBuilder (and Rosetta::Model)
+to more closely reflect the SQL:2003 standard, fill other gaps.
+
+* Any further improvements will be implemented over time as they are
+needed. See the separately released "Rosetta-Engine-Generic" and
+"Rosetta-Emulator-DBI" distributions for a clue as they are the initial
+main dependents of the Rosetta::Utility::SQLBuilder.

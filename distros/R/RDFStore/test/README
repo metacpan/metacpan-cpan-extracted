@@ -1,0 +1,26 @@
+README
+	This file
+mytest.c
+	Flat store/retrive test either for in-memory, local or remote BDB
+
+	to compile it:
+
+	( cd .. ; make ; cc -I /usr/local/BerkeleyDB-4.0.14/include/ -I /usr/include/ -I /usr/local/include/ -I ../dbms/include -I ../dbms/client -I ../include -g -pipe -pipe -fno-common -no-cpp-precomp -flat_namespace -DHAS_TELLDIR_PROTOTYPE -fno-strict-aliasing -O3 -DVERSION=\"0.50\" -DXS_VERSION=\"0.50\" -I/System/Library/Perl/darwin/CORE -D_NOT_CORE -DSTATIC_BUFF -DSTATIC_CS_BUFF -DSTATIC_SC_BUFF ../dbms/libdbms/libdbms.o ../rdfstore_flat_store.o ../rdfstore_kernel.o ../rdfstore_bits.o ../rdfstore_utf8.o ../rdfstore_digest.o ../ap_sha1.o ../rdfstore_compress.o ../rdfstore_log.o ../rdfstore_iterator.o -L/usr/local/BerkeleyDB-4.0.14/lib/ -ldb -o mytest mytest.c )
+
+mytest1.c
+	RDF store/retrieve test
+
+	to compile it:
+
+	( cd .. ; make ; cc -I /usr/local/BerkeleyDB-4.0.14/include/ -I /usr/include/ -I /usr/local/include/ -I ../dbms/include -I ../dbms/client -I ../include -g -pipe -pipe -fno-common -no-cpp-precomp -flat_namespace -DHAS_TELLDIR_PROTOTYPE -fno-strict-aliasing -O3 -DVERSION=\"0.50\" -DXS_VERSION=\"0.50\" -I/System/Library/Perl/darwin/CORE -D_NOT_CORE -DSTATIC_BUFF -DSTATIC_CS_BUFF -DSTATIC_SC_BUFF ../dbms/libdbms/libdbms.o ../rdfstore_flat_store.o ../rdfstore_kernel.o ../rdfstore_bits.o ../rdfstore_utf8.o ../rdfstore_digest.o ../ap_sha1.o ../rdfstore_compress.o ../rdfstore_log.o ../rdfstore_iterator.o ../rdfstore_serializer.o -L/usr/local/BerkeleyDB-4.0.14/lib/ -ldb -o mytest1 mytest1.c )
+
+utftest.c
+	UTF8 case folding test
+bittest.c
+	Test routines used during development.
+	Compile with
+		gcc -o bittest bittest.c ../bits.o
+	Run as
+		./bittest |more
+
+$Id: README,v 1.8 2003/05/05 17:57:46 areggiori Exp $

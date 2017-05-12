@@ -1,0 +1,140 @@
+=pod
+
+=head1 NAME
+
+RPC::ExtDirect::API::Action - Ext.Direct Action object
+
+=head1 DESCRIPTION
+
+This package implements an Ext.Direct L<Action|RPC::ExtDirect::Intro/Action>
+object that holds Action's properties, and a set of
+L<Methods|RPC::ExtDirect::Intro/Method>. You can subclass this package to
+change its behavior.
+
+This document does not provide an overview of an Action. For that information,
+see L<RPC::ExtDirect::API/"ACTIONS AND METHODS">.
+
+=head1 ACTION OBJECT INTERFACE
+
+L<RPC::ExtDirect::API::Action> provides several public methods:
+
+=over 4
+
+=item C<HOOK_TYPES>
+
+Class/instance method. Returns the list of supported hook types. See
+L<RPC::ExtDirect/HOOKS> for more information.
+
+=item C<new>
+
+Constructor. Returns a new L<RPC::ExtDirect::API::Action> object. Accepts
+named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<config>
+
+A L<RPC::ExtDirect::Config> instance to be used with this Action.
+
+This parameter is mandatory.
+
+=item C<action>
+
+The name for this Action.
+
+This parameter is mandatory.
+
+=item C<package>
+
+The package this Action represents, and which this Action's Methods
+belong to.
+
+This parameter is mandatory.
+
+=item C<methods>
+
+An arrayref of L<RPC::ExtDirect::API::Method> instances to be added
+to this Action, or L<RPC::ExtDirect::API::Method/new> parameters for
+the new Methods to be instantiated and added to the Action.
+
+=item C<before|instead|after>
+
+A L<RPC::ExtDirect::API::Hook> definitions to be set in the corresponding
+slot for this Action.
+
+=back
+
+=item C<merge>
+
+Instance method. Add Methods from a passed Action instance to this Action
+object. Accepts one ordered argument, the Action to copy Methods from.
+
+=item C<methods>
+
+Instance method. Return the list of names for the Methods in this Action.
+
+=item C<remoting_methods>
+
+Instance method. Return the list of names for the remoting Methods in
+this Action (see L<Remoting API|RPC::ExtDirect::Intro/"Remoting API">).
+
+=item C<polling_methods>
+
+Instance method. Return the list of names for the polling Methods in
+this Action (see L<Polling API|RPC::ExtDirect::Intro/"Polling API">).
+
+=item C<remoting_api>
+
+Instance method. Return the list of API definitions for this Action's
+Methods. See L<RPC::ExtDirect::API::Method/get_api_definition>.
+
+=item C<has_pollHandlers>
+
+Instance method. Return true if this Action has at least one
+L<Poll Handler method|RPC::ExtDirect::Intro/"Poll Handler Method">.
+
+=item C<add_method>
+
+Instance method. Add a Method object to this Action, or create a new
+Method object, and add it. Accepts one ordered argument, an
+L<RPC::ExtDirect::API::Method> instance or a hashref of
+L<RPC::ExtDirect::API::Method/new> parameters.
+
+=item C<method>
+
+Instance method. Return the corresponding Method object by its name.
+Accepts one ordered argument: Method name.
+
+=back
+
+=head1 ACCESSOR METHODS
+
+For L<RPC::ExtDirect::API::Action>, the following
+L<accessor methods|RPC::ExtDirect::Config/"ACCESSOR METHODS"> are
+provided:
+
+=over 4
+
+=item C<config>
+
+Return the L<RPC::ExtDirect::Config> instance assigned to this Action
+object.
+
+=item C<name>
+
+Return this Action's name.
+
+=item C<package>
+
+Return this Action's package.
+
+=item C<before|instead|after>
+
+Return the L<Hook|RPC::ExtDirect::API::Hook> object for the corresponding
+hook slot assigned to this Action.
+
+=back
+
+=cut

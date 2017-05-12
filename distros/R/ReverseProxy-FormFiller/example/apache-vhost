@@ -1,0 +1,24 @@
+# ReverseProxy::FormFiller apache2 vhost example
+# Put this file into /etc/apache2/sites-available/ and adapt it
+
+<VirtualHost *>
+  ServerName myauth.example.com
+
+  ProxyPass        / http://auth.example.com/
+  ProxyPassReverse / http://auth.example.com/
+
+  # previous directives are not linked to ReverseProxy::FormFiller
+  # following directives are specific to ReverseProxy::FormFiller
+
+  PerlModule ReverseProxy::FormFiller
+  PerlSetVar FormFillerParamFile "/etc/apache2/FormFiller/example"
+
+  <Location /login.php>
+    RequestHeader unset Accept-Encoding
+    PerlOutputFilterHandler ReverseProxy::FormFiller::output
+  </Location>
+
+  <Location /login/>
+    PerlInputFilterHandler  ReverseProxy::FormFiller::input
+  </Location>
+</VirtualHost>

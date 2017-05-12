@@ -1,0 +1,31 @@
+{
+    "base_uri"  : "http://localhost",
+    "store" : {
+	"storetype"	: "Memory",
+	"sources" : [ { 
+	    "file" : "t/data/basic.ttl",
+	    "syntax" : "turtle"
+	} ]
+	
+    },
+    "endpoint": {
+	"html": {
+	    "resource_links": true
+	}
+    },
+
+    "fragments" : { 
+    	"fragments_path" : "/fragments" , 
+    	"allow_dump_dataset" : 0
+    },
+
+    "namespaces" : { "rdfs" : "http://www.w3.org/2000/01/rdf-schema#", 
+	             "dc" : "http://purl.org/dc/terms/" },
+    "void": {
+        "pagetitle": "VoID Description for my dataset",
+	"titles": [ [ "This is a title", "en" ], [ "Dette er en tittel", "no" ]],
+	"add_void": { "file": "t/data/add.ttl", "syntax": "turtle" }
+    }
+
+		   
+}

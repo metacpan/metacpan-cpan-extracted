@@ -1,0 +1,17 @@
+RDF-NS-Curated
+==============
+
+Created:      2015-07-27
+Home page:    <https://metacpan.org/release/RDF-NS-Curated>
+Bug tracker:  <https://github.com/kjetilk/p5-rdf-ns-curated/issues>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.005	2017-01-23	Correct duv prefix.
+
+0.004	2017-01-23	Remove duv prefix, spec unreliable.
+
+0.003	2017-01-16	Add more prefixes.
+
+0.002	2015-09-01	Trivial bug fixes
+
+0.001	2015-07-27	Initial release

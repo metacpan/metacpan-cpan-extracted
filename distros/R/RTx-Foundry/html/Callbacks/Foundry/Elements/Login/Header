@@ -1,0 +1,11 @@
+%# Machine-Independent, adj.:
+%#	Does not run on any existing machine.
+<%INIT>
+$m->subexec(
+    '/Foundry/Home/Guest/index.html',
+    map(Encode::encode_utf8($_), %ARGS),
+    user => '',
+    pass => '',
+) unless $m->is_subrequest;
+$m->abort;
+</%INIT>

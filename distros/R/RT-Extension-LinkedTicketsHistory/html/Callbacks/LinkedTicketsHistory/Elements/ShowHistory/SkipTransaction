@@ -1,0 +1,14 @@
+<%INIT>
+
+return unless $DECODED_ARGS->{LinkedTicketsHistory};
+my %allowed_type = map { $_ => 1 } grep { defined } RT->Config->Get('LinkedTicketsHistoryTransactionTypes');
+if ( scalar %allowed_type ) {
+    $$skip = 1 unless $allowed_type{$Transaction->Type};
+}
+
+</%INIT>
+
+<%ARGS>
+$Transaction
+$skip
+</%ARGS>

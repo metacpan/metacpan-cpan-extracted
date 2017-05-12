@@ -1,0 +1,39 @@
+Rinchi-XMLSchema version 0.02
+=============================
+
+This module parses XML Schema files and produces Perl objects representing 
+them. There is also the capability to compare objects to see if they are the 
+same (not necessarily equal). The intent of this module is to allow the 
+comparison of various schemas to find common constructs between them. A 
+module I intend to release later will allow the production of UML from
+schema files.
+  
+Note: Imports and includes are not performed as at this time that would be
+contrary to the purpose of the module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  XML::Parser
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Brian M. Ames
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

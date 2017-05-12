@@ -1,0 +1,84 @@
+=head1 NAME
+
+RocksDB::WriteBatch - rocksdb::WriteBatch object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $db = RocksDB->new('/path/to/db');
+  $db->update(sub {
+      my $batch = shift;
+      $batch->put(key => 'value');
+      $batch->delete('key');
+  });
+
+  my $batch = RocksDB::WriteBatch->new;
+  $batch->put(key => 'value');
+  $batch->clear;
+  $batch->delete('key');
+  $batch->put_log_data(time());
+  $db->write($batch);
+
+=head1 DESCRIPTION
+
+B<RocksDB::WriteBatch> is a rocksdb::WriteBatch object.
+
+=head1 CONSTRUCTOR
+
+=head2 C<< RocksDB::WriteBatch->new() :RocksDB::WriteBatch >>
+
+Create and return a new RocksDB::WriteBatch object.
+
+=head1 METHODS
+
+=head2 C<< $batch->put($key :Str, $value :Str) :Undef >>
+
+Store the mapping $key -> $value in the database.
+
+=head2 C<< $batch->delete($key :Str) :Undef >>
+
+If the database contains a mapping for $key, erase it.  Else do nothing.
+
+=head2 C<< $batch->put_log_data($blob :Str) :Undef >>
+
+Append a blob of arbitrary size to the records in this batch. The blob will
+be stored in the transaction log but not in any other file. In particular,
+it will not be persisted to the SST files. When iterating over this
+WriteBatch, WriteBatchHandler::log_data will be called with the contents
+of the blob as it is encountered. Blobs, puts, deletes, and merges will be
+encountered in the same order in thich they were inserted. The blob will
+NOT consume sequence number(s) and will NOT increase the count of the batch
+
+Example application: add timestamps to the transaction log for use in
+replication.
+
+See also L<RocksDB::WriteBatchHandler>.
+
+=head2 C<< $batch->clear() :Undef >>
+
+Clear all updates buffered in this batch.
+
+=head2 C<< $batch->count() :Int >>
+
+Returns the number of updates in the batch.
+
+=head2 C<< $batch->data() :Str >>
+
+Retrieve the serialized version of this batch.
+
+=head2 C<< $batch->iterate($handler :RocksDB::WriteBatchHandler) :Undef >>
+
+Support for iterating over the contents of a batch.
+
+See L<RocksDB::WriteBatchHandler>.
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::WriteBatchHandler>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

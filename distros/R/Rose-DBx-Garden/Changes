@@ -1,0 +1,102 @@
+Revision history for Rose-DBx-Garden
+
+0.193 10 July 2014
+ - fix whitespace regression bug introduced in 0.192. Reported
+   by Holger Rupprecht via f7c65ec.
+
+0.192 8 July 2014
+ - support Loader base_classes method in _schema_template().
+   Cf. https://rt.cpan.org/Ticket/Display.html?id=97043
+
+0.191 19 June 2014
+ - remove the DEVELOPMENT RELEASE caveat. after this many years, it is as
+   stable as it will ever be.
+ - mkpath(self->debug) instead of mkpath(1) [ https://rt.cpan.org/Ticket/Display.html?id=96552 ]
+
+0.190 15 May 2014
+ - switch to File::Slurp::Tiny
+
+0.18 23 March 2010
+ - tweek ->remarks check when mapping to description.
+
+0.17 20 Feb 2010
+ - fix a bug affecting generated postamble code in RDBO classes. Reported
+   by Adam Mackler.
+ - map RDBO column remarks() to RHTMLO field description().
+
+0.16 23 Jan 2009
+ - fix maxlength logic for text fields.
+ - minor pod fixes.
+ - add Enum column support (maps to Menu Field)
+
+0.15 11 Sept 2008
+ - added 'bigint' to field-column mapping
+ - add skip_map_class_forms boolean feature
+ - add include_autoinc_form_fields boolean feature 
+ - add serial field type
+
+0.14 12 June 2008
+ - add limit_to_schemas() option
+ - put field class use and map settings into base Form code template
+   instead of subclass template.
+
+0.13 22 May 2008
+ - fix (again) failing test to	indiscriminate nuking of Symbol table.
+
+0.12 21 May 2008
+ - fix failing test due to indiscriminate nuking of Symbol table.
+
+0.11 01 Feb 2008
+ - tweeked size check for column=>field code generation
+ - added numeric field generator method
+ - fix bug with textarea not being correctly generated
+ - add mysql test to MANIFEST
+
+0.10 08 Jan 2007
+ - added mysql test - no code changes
+
+0.09 12 Dec 2007
+ - change t/01 test to reflect correct rdbo version. Caught by xeeble3.
+
+0.08 11 Dec 2007
+ - fix bug when there are FKs spanning schemas. Now all classes are created
+   before any .pm files are written.
+
+0.07 10 Dec 2007
+ - change find_schemas() default to 0, since only majority of common dbs do
+   not yet support schemas.
+ - added debug() flag
+
+0.06 23 Nov 2007
+ - fix schema() use in Metadata where find_schemas() is false.
+ - use database name as pseudo schema when find_schemas() is false.
+
+0.05 19 Nov 2007
+ - custom object_from_form() and init_with_object() methods per recommended
+   convention.
+ - plant() now returns hash ref (RDBO => RHTMLO) instead of array ref
+ - 'class' attribute set on each field to original column type value.
+ - add garden_prefix() accessor in generated classes
+
+0.04 12 Nov 2007
+ - add missing Metadata subclass for schema support
+ - add missing init_db() to base class template, with detection for the
+   new_or_cached() method.
+ - clean up test files after tests
+
+0.03 9 Nov 2007
+ - added Rose::HTMLx::Form::Field::Boolean to req list
+
+0.02 9 Nov 2007
+ - added RHTMLO to the prereq list
+ - if base_code == 0, no base RDBO class is written
+ - added _*_field_maker methods
+ - some debugging help
+ - changed default column_to_field map: - added boolean - changed
+   'timestamp' to map to 'datetime'
+ - added text_field_size()
+ - make the garden_*_field() methods public.
+
+0.01 25 Oct 2007
+ - First version, released on an unsuspecting world.
+

@@ -1,0 +1,62 @@
+%# Ehrman's Commentary:
+%# 	(1) Things will get worse before they get better.
+%# 	(2) Who said things would get better?
+
+<& Elements/ShowRegister, Step => ($RT::Guest ? 3 : 4) &>
+
+% if ($RT::Guest) {
+
+<p>
+<input type="hidden" name="no_login" value="1">
+<input type="hidden" name="id" value="<% $id %>">
+<&|/l&>In order to complete your registration, login now. Your account will then be activated for normal logins.</&><& Elements/Login, MD5Auth => 0 &>
+
+% } else {
+
+<p>
+<&|/l, $RT::Organization &>You are now a registered user on [_1], the online development environment for Open Source projects.</&>
+<p>
+<&|/l, $RT::Organization &>As a registered user, you can participate fully in the activities on the site. You may now post messages to the project message forums, post bugs for software in [_1], sign on as a project developer, or even start your own project.</&>
+<p>
+<&|/l, $RT::Organization &>You should take some time to read through the Site Documentation so that you may take full advantage of [_1].</&>
+<p>
+<&|/l, $RT::Organization &>Enjoy the site, and please provide us with feedback on ways that we can improve [_1].</&>
+<p>
+<&|/l, $RT::Organization &>--the [_1] staff.</&>
+
+% }
+
+<%INIT>
+my $Ticket = RT::Ticket->new($RT::SystemUser);
+$Ticket->Load($id);
+$m->abort("Cannot load $id") unless $Ticket->Id;
+my $Name = $Ticket->CustomFieldValues('Name')->First->Content;
+my $Password = $Ticket->CustomFieldValues('Password')->First->Content;
+
+if ($no_login) {
+    # time of truth!
+    if ($Name eq $user and $Password eq $pass) {
+	$Ticket->SetStatus('resolved');
+	$session{'CurrentUser'} = RT::CurrentUser->new;
+	$session{'CurrentUser'}->Load($user);
+	$RT::Guest = 0;
+
+	$m->comp('/Foundry/Elements/CheckUser', User => $user);
+	$m->comp('/Foundry/Elements/CheckInvitations', User => $user);
+    }
+    else {
+	$m->notes( error => loc('Invalid login.') );
+    }
+}
+
+</%INIT>
+<%ATTR>
+Tab2	=> 'Register'
+</%ATTR>
+<%ARGS>
+$id => ""
+$user => ""
+$pass => undef
+$goto => undef
+$no_login => undef
+</%ARGS>

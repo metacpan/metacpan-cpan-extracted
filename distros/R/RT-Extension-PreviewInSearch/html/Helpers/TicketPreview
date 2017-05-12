@@ -1,0 +1,29 @@
+<%ARGS>
+$id
+</%ARGS>
+<%INIT>
+my $ticket = LoadTicket( $id );
+my $attachments = $ticket->Attachments;
+my $attachment_content = $ticket->TextAttachments;
+my $web_path = RT->Config->Get('WebPath');
+
+</%INIT>
+<div>
+<h2><a href="<% $web_path %>/Ticket/Display.html?id=<% $ticket->id %>">#<% $ticket->id %>: <% $ticket->Subject %></a></h2>
+</div>
+% $m->callback(CallbackName => 'BeforeHistory', ARGSRef => \%ARGS, Ticket => $ticket);
+<& /Elements/ShowHistory,
+    Object => $ticket,
+    ShowDisplayModes => 0,
+    Attachments => $attachments,
+    AttachmentContent => $attachment_content,
+    DisplayPath     => "$web_path/Ticket/Display.html",
+    AttachmentPath  => "$web_path/Ticket/Attachment",
+    UpdatePath      => "$web_path/Ticket/Update.html",
+    ForwardPath     => "$web_path/Ticket/Forward.html",
+    EmailRecordPath => "$web_path/Ticket/ShowEmailRecord.html",
+    EncryptionPath  => "$web_path/Ticket/Crypt.html",
+&>
+<script type="text/javascript">ReplaceUserReferences()</script>
+% $m->callback(CallbackName => 'AfterHistory', ARGSRef => \%ARGS, Ticket => $ticket);
+% $m->abort();

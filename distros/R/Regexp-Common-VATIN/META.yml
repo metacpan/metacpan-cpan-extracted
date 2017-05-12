@@ -1,0 +1,29 @@
+---
+abstract: 'Patterns for matching EU VAT Identification Numbers'
+author:
+  - 'Richard Simões <rsimoes AT cpan DOT org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.28
+  Test::More: 0
+  perl: 5.008
+configure_requires:
+  Module::Build: 0.28
+  perl: 5.008
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.142060'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Regexp-Common-VATIN
+requires:
+  Regexp::Common: 0
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/rsimoes/regexp-common-vatin/issues
+  homepage: https://metacpan.org/release/Regexp-Common-VATIN
+  repository: git://github.com/rsimoes/regexp-common-vatin.git
+version: v1.0

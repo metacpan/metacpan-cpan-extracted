@@ -1,0 +1,37 @@
+RPC::ExtDirect
+==============
+
+    RPC::ExtDirect suite of modules provides an easy, simple and robust way
+    to write Perl server side code that could be used with HTML5 Rich
+    Internet Applications based on JavaScript frameworks Ext JS and Sencha
+    Touch.
+
+    The suite consists of the core RPC::ExtDirect module that implements
+    Ext.Direct protocol and transport layer, several server
+    environment-specific peripheral gateways, a standalone pure Perl server,
+    two Perl clients, and even its own specialized testing scaffold! We've
+    got it covered front to back. :)
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make && make test
+        make install
+
+DEPENDENCIES
+
+    RPC::ExtDirect is dependent on the following modules:
+    Attribute::Handlers, JSON.
+
+    The oldest Perl version RPC::ExtDirect is routinely tested against is
+    5.6.2.
+
+LICENSE AND COPYRIGHT
+
+    Copyright (c) 2011-2016 by Alex Tokarev.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See "perlartistic".
+

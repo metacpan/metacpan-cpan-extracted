@@ -1,0 +1,37 @@
+%# Put service links to all actions and objects here
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="<% $BaseURI %>/NoAuth/feed.css"?>
+<feed version="0.3" xmlns="http://purl.org/atom/ns#" xmlns:html="http://www.w3.org/1999/xhtml">
+  <title><&|/l&>Homepage</&></title>
+  <author>
+    <name><% $RT::Organization %></name>
+    <url><% $RT::WebURL %></url>
+  </author>
+  <modified><% $Now->W3CDTF %></modified>
+  <& $ShowLink, Type => 'text/html', URI => $RT::WebURL, Title => "Homepage" &>
+  <generator url="http://www.bestpractical.com/rt/" version="<% $RT::VERSION %>"></generator>
+% foreach my $class (@{$m->comp('Elements/Introspect', Want => 'TopLevelCollections')}) {
+%    my $type = $class;
+%    $type =~ s/^.*:://;
+%    $class =~ s/::/-/g;
+  <entry>
+    <title><% loc($type) %></title>
+    <& $ShowLink, Relation => "service.feed", URI => "$BaseURI/$class?", Title => $type, IsChild => 1 &>
+    <& $ShowLink, Relation => 'service.post', URI => "$BaseURI/$class", Id => $type, Title => $type &>
+    <& $ShowLink, Type => "text/html", URI => $BaseURI, Title => $type &>
+%#  <id><% $RT::SystemUser->UserObj->URI %>/<% $class %></id>
+    <issued><% $RT::SystemUser->UserObj->CreatedObj->W3CDTF %></issued>
+    <modified><% $Now->W3CDTF %></modified>
+  </entry>
+% }
+  <info />
+% if (!$session{AtomClient}) {
+  <html:a class="poweredby" href="<% $BaseURI %>/NoAuth/spec.html" title="The RT-Atom Specification"><&|/l&>Powered by RT-Atom</&></html:a>
+% }
+</feed>
+<%ARGS>
+$Path
+$BaseURI
+$ShowLink
+$Now
+</%ARGS>

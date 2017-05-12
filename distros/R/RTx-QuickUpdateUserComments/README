@@ -1,0 +1,43 @@
+NAME
+    RTx::QuickUpdateUserComments - Adds a quick-update comments portlet for
+    the user summary and the rights ModifyUserComments and SeeUserComments
+
+INSTALLATION
+    "perl Makefile.PL"
+    "make"
+    "make install"
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add these lines:
+
+            Plugin("RTx::QuickUpdateUserComments");
+
+            # Adds the comment edit box to the default user info portlets
+            Set( @UserSummaryPortlets, qw/ExtraInfo EditComments CreateTicket ActiveTickets InactiveTickets/ );
+
+            # Grant folks ModifyUserComments and/or SeeUserComments
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Thomas Sibley <trsibley@uw.edu>
+
+BUGS
+    All bugs should be reported via email to
+    bug-RTx-QuickUpdateUserComments@rt.cpan.org
+    <mailto:bug-RTx-QuickUpdateUserComments@rt.cpan.org> or via the web at
+    rt.cpan.org
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=RTx-QuickUpdateUserCom
+    ments>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2014 by Thomas Sibley
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

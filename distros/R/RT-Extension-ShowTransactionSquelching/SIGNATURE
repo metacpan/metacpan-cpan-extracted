@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 31b07a0c6c577acc715c1a2611a338cb9a9f955c Changes
+SHA1 72246fd58b05dc087ff3820e737c5a7bc0796cf3 MANIFEST
+SHA1 0af16533b2f71213b779b25a4ae91641609bed11 META.yml
+SHA1 71a7876a882755f990aeabfcf0c958213c860537 Makefile.PL
+SHA1 6095cdfbd2d0069f3306d7f403eeaa3009e7644e README
+SHA1 77c130ffc2ac0849e52d38c9ca7c66039e8e0331 html/Callbacks/ShowTransactionSquelching/Elements/ShowMessageHeaders/Default
+SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
+SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
+SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
+SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
+SHA1 0c70de66cdd063352766d49db176e5f710f75fe7 inc/Module/Install/Include.pm
+SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
+SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
+SHA1 3b092ed8ce4fa9ed6667f681b54f4a624695e508 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
+SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 ee05a5f386f09f273f48e45a371aac4f39ec0137 lib/RT/Extension/ShowTransactionSquelching.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlQGQqcACgkQMflWJZZAbqA0NgCfb/lKVKdUgsp3+TVjJqn7WjKD
+WiMAn3J+yyZES4tuMQvA0vKqSdu/oGMn
+=gO6o
+-----END PGP SIGNATURE-----

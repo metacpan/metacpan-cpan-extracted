@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         RFID-EPC
+version:      0.002
+version_from: lib/RFID/EPC/Tag.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    constant:                      0
+    Exporter:                      0
+    RFID::Tag:                     0.002
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,139 @@
+这一页描述了快纪所使用的 Wiki 标记语言。
+----
+= 第一层标题 (H1) =
+  = 第一层标题 (H1) =
+----
+== 第二层标题 (H2) ==
+  == 第二层标题 (H2) ==
+----
+=== 第三层标题 (H3) ===
+  === 第三层标题 (H3) ===
+----
+==== 第四层标题 (H4)
+  ==== 第四层标题 (H4)
+----
+===== 第五层标题 (H5)
+  ===== 第五层标题 (H5)
+----
+====== 第六层标题 (H6)
+  ====== 第六层标题 (H6)
+----
+页面里所有的水平线都是由四个以上的破折号所做出来的：
+  ----
+----
+段落是以空白列来分开的。
+
+就像这样。这里就是另一段。
+  段落是以空白列来分开的。
+
+  就像这样。这里就是另一段。
+----
+*粗体字*、/斜体字/、_文字加底线_。
+  *粗体字*、/斜体字/、_文字加底线_。
+/*合并使用粗体跟斜体*/
+  /*合并使用粗体跟斜体*/
+内嵌程序码，像是 [=/etc/passwd] 或 [=CGI::Kwiki]
+  内嵌程序码，像是 [=/etc/passwd] 或 [=CGI::Kwiki]
+----
+WikiLinks 是由两个以上的 /大小写混写字/ 连写而成的。
+  WikiLinks 是由两个以上的 /大小写混写字/ 连写而成的。
+外部链接以 http:// 来开头，像是 http://www.freepan.org
+  外部链接以 http:// 来开头，像是 http://www.freepan.org
+强制的 Wiki [链接]是以方括号包住的字符串。
+  强制的 Wiki [链接]是以方括号包住的字符串。
+带有名称的 http 链接是把文字包进 http:// 链接里，像是 [FreePAN http://www.freepan.org 站台]
+  带有名称的 http 链接是把文字包进 http:// 链接里，像是 [FreePAN http://www.freepan.org 站台]
+在前面放上一个 '!' 就会使得像 !WordsShouldNotMakeAWikiLink 这样的东西不要被转换成链接。
+  在前面放上一个 '!' 就会使得像 !WordsShouldNotMakeAWikiLink 这样的东西不要被转换成链接。
+至于 !http://foobar.com 也一样
+  至于 !http://foobar.com 也一样
+邮寄链接就祇要写成像 foo@bar.com 这样的邮件地址即可。
+  邮寄链接就祇要写成像 foo@bar.com 这样的邮件地址即可。
+----
+指向图片的链接就会把图片显示出来：
+
+http://www.google.com/images/logo.gif
+  http://www.google.com/images/logo.gif
+----
+为编号的清单就以一个 '* ' 来开头。星号的数量会决定该项目的深度：
+* foo
+* bar
+** boom
+** bam
+* baz
+  * foo
+  * bar
+  ** boom
+  ** bam
+  * baz
+----
+编号的清单就以一个 '0 ' （零）作为开头：
+0 foo
+0 bar
+00 boom
+00 bam
+0 baz
+  0 foo
+  0 bar
+  00 boom
+  00 bam
+  0 baz
+----
+你也可以混用这两种清单：
+* 今天:
+00 吃冰
+00 赌马
+* 明天:
+00 吃更多冰
+00 赌另一匹马
+  * 今天:
+  00 吃冰
+  00 买马
+  * 明天:
+  00 吃更多冰
+  00 买更多马
+----
+任何不是从该列第一个字开始撰写的内容，都会被当作预先排版文字处理。
+      foo   bar
+       x     y
+       1     2
+----
+你可以把任何的 Wiki 文字变成批注，就祇需要让那一列以 '# ' 开头即可。这么一来就会把其后的文字通通转为 html 批注：
+# These lines have been 
+# commented out
+  # These lines have been 
+  # commented out
+----
+简单的表格：
+|        | Dick   | Jane |
+| 身高 | 72"    | 65"  |
+| 体重 | 130lbs | 150lbs |
+  |        | Dick   | Jane |
+  | 身高 | 72"    | 65"  |
+  | 体重 | 130lbs | 150lbs |
+----
+多列或含有复杂数据的表格：
+| <<END | <<END |
+这项数据是垂直的 | bars |
+END
+# 这是一些 Perl 程序码：
+sub foo {
+    print "我要快纪!\n"
+}
+END
+| foo | <<MSG |
+如你所见，我们正在使用
+Perl 的即席文件语法。
+MSG
+  | <<END | <<END |
+  这项数据是垂直的 | bars |
+  END
+  # 这是一些 Perl 程序码：
+  sub foo {
+      print "我要快纪!\n"
+  }
+  END
+  | foo | <<MSG |
+  如你所见，我们正在使用
+  Perl 的即席文件语法。
+  MSG

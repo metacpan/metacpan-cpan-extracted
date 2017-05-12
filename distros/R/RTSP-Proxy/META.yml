@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               RTSP-Proxy
+version:            0.07
+abstract:           Simple RTSP proxy server
+author:
+    - Mischa Spiegelmock <revmischa@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IO::Socket::INET:     ~
+    Moose:                ~
+    Net::RTP::Packet:     ~
+    Net::Server::PreFork:  ~
+    RTSP::Client:         0.03
+resources:
+    repository:  git://github.com/revmischa/rtsp-proxy.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

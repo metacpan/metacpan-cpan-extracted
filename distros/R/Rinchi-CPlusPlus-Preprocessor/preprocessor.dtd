@@ -1,0 +1,306 @@
+
+<!-- ASCII Control Characters -->
+<!ELEMENT nul EMPTY>  <!-- "\\000" -->
+<!ELEMENT soh EMPTY>  <!-- "\\001" -->
+<!ELEMENT stx EMPTY>  <!-- "\\002" -->
+<!ELEMENT etx EMPTY>  <!-- "\\003" -->
+<!ELEMENT eot EMPTY>  <!-- "\\004" -->
+<!ELEMENT enq EMPTY>  <!-- "\\005" -->
+<!ELEMENT ack EMPTY>  <!-- "\\006" -->
+<!ELEMENT bel EMPTY>  <!-- "\\007" -->
+<!ELEMENT bs  EMPTY>  <!-- "\\010" -->
+<!ELEMENT tab EMPTY>  <!-- "\\011" -->
+<!ELEMENT lf  EMPTY>  <!-- "\\012" -->
+<!ELEMENT vt  EMPTY>  <!-- "\\013" -->
+<!ELEMENT ff  EMPTY>  <!-- "\\014" -->
+<!ELEMENT cr  EMPTY>  <!-- "\\015" -->
+<!ELEMENT so  EMPTY>  <!-- "\\016" -->
+<!ELEMENT si  EMPTY>  <!-- "\\017" -->
+<!ELEMENT dle EMPTY>  <!-- "\\020" -->
+<!ELEMENT dc1 EMPTY>  <!-- "\\021" -->
+<!ELEMENT dc2 EMPTY>  <!-- "\\022" -->
+<!ELEMENT dc3 EMPTY>  <!-- "\\023" -->
+<!ELEMENT dc4 EMPTY>  <!-- "\\024" -->
+<!ELEMENT nak EMPTY>  <!-- "\\025" -->
+<!ELEMENT syn EMPTY>  <!-- "\\026" -->
+<!ELEMENT etb EMPTY>  <!-- "\\027" -->
+<!ELEMENT can EMPTY>  <!-- "\\030" -->
+<!ELEMENT em  EMPTY>  <!-- "\\031" -->
+<!ELEMENT sub EMPTY>  <!-- "\\032" -->
+<!ELEMENT esc EMPTY>  <!-- "\\033" -->
+<!ELEMENT is4 EMPTY>  <!-- "\\034" -->
+<!ELEMENT is3 EMPTY>  <!-- "\\035" -->
+<!ELEMENT is2 EMPTY>  <!-- "\\036" -->
+<!ELEMENT is1 EMPTY>  <!-- "\\037" -->
+
+<!-- Basic Source Character Set -->
+<!ELEMENT spc      EMPTY><!-- " " -->
+<!ELEMENT excl     EMPTY><!-- "!" -->
+<!ELEMENT quot     EMPTY><!-- "\042" -->
+<!ELEMENT hash     EMPTY><!-- "#", "%:" -->
+<!ELEMENT dollar   EMPTY><!-- "$" -->
+<!ELEMENT percent  EMPTY><!-- "%" -->
+<!ELEMENT amp      EMPTY><!-- "&" -->
+<!ELEMENT apos     EMPTY><!-- "\047" -->
+<!ELEMENT paren    ANY>  <!-- "(", ")" -->
+<!ELEMENT ast      EMPTY><!-- "*" -->
+<!ELEMENT plus     EMPTY><!-- "+" -->
+<!ELEMENT comma    EMPTY><!-- "," -->
+<!ELEMENT minus    EMPTY><!-- "-" -->
+<!ELEMENT period   EMPTY><!-- "." -->
+<!ELEMENT slash    EMPTY><!-- "/" -->
+<!ELEMENT dig0     EMPTY><!-- "0" -->
+<!ELEMENT dig1     EMPTY><!-- "1" -->
+<!ELEMENT dig2     EMPTY><!-- "2" -->
+<!ELEMENT dig3     EMPTY><!-- "3" -->
+<!ELEMENT dig4     EMPTY><!-- "4" -->
+<!ELEMENT dig5     EMPTY><!-- "5" -->
+<!ELEMENT dig6     EMPTY><!-- "6" -->
+<!ELEMENT dig7     EMPTY><!-- "7" -->
+<!ELEMENT dig8     EMPTY><!-- "8" -->
+<!ELEMENT dig9     EMPTY><!-- "9" -->
+<!ELEMENT colon    EMPTY><!-- ":" -->
+<!ELEMENT eos      EMPTY><!-- ";" -->
+<!ELEMENT lt       EMPTY><!-- "<" -->
+<!ELEMENT eq       EMPTY><!-- "=" -->
+<!ELEMENT gt       EMPTY><!-- ">" -->
+<!ELEMENT question EMPTY><!-- "?" -->
+<!ELEMENT at       EMPTY><!-- "@" -->
+<!ELEMENT A        EMPTY><!-- "A" -->
+<!ELEMENT B        EMPTY><!-- "B" -->
+<!ELEMENT C        EMPTY><!-- "C" -->
+<!ELEMENT D        EMPTY><!-- "D" -->
+<!ELEMENT E        EMPTY><!-- "E" -->
+<!ELEMENT F        EMPTY><!-- "F" -->
+<!ELEMENT G        EMPTY><!-- "G" -->
+<!ELEMENT H        EMPTY><!-- "H" -->
+<!ELEMENT I        EMPTY><!-- "I" -->
+<!ELEMENT J        EMPTY><!-- "J" -->
+<!ELEMENT K        EMPTY><!-- "K" -->
+<!ELEMENT L        EMPTY><!-- "L" -->
+<!ELEMENT M        EMPTY><!-- "M" -->
+<!ELEMENT N        EMPTY><!-- "N" -->
+<!ELEMENT U        EMPTY><!-- "O" -->
+<!ELEMENT P        EMPTY><!-- "P" -->
+<!ELEMENT Q        EMPTY><!-- "Q" -->
+<!ELEMENT R        EMPTY><!-- "R" -->
+<!ELEMENT S        EMPTY><!-- "S" -->
+<!ELEMENT T        EMPTY><!-- "T" -->
+<!ELEMENT U        EMPTY><!-- "U" -->
+<!ELEMENT V        EMPTY><!-- "V" -->
+<!ELEMENT W        EMPTY><!-- "W" -->
+<!ELEMENT X        EMPTY><!-- "X" -->
+<!ELEMENT Y        EMPTY><!-- "Y" -->
+<!ELEMENT Z        EMPTY><!-- "Z" -->
+<!ELEMENT bracket  ANY><!-- "[", "<:", "]",":>" -->
+<!ELEMENT bslash   EMPTY><!-- "\134" -->
+<!ELEMENT caret    EMPTY><!-- "^" -->
+<!ELEMENT under    EMPTY><!-- "_" -->
+<!ELEMENT a        EMPTY><!-- "a" -->
+<!ELEMENT b        EMPTY><!-- "b" -->
+<!ELEMENT c        EMPTY><!-- "c" -->
+<!ELEMENT d        EMPTY><!-- "d" -->
+<!ELEMENT e        EMPTY><!-- "e" -->
+<!ELEMENT f        EMPTY><!-- "f" -->
+<!ELEMENT g        EMPTY><!-- "g" -->
+<!ELEMENT h        EMPTY><!-- "h" -->
+<!ELEMENT i        EMPTY><!-- "i" -->
+<!ELEMENT j        EMPTY><!-- "j" -->
+<!ELEMENT k        EMPTY><!-- "k" -->
+<!ELEMENT l        EMPTY><!-- "l" -->
+<!ELEMENT m        EMPTY><!-- "," -->
+<!ELEMENT n        EMPTY><!-- "n" -->
+<!ELEMENT o        EMPTY><!-- "o" -->
+<!ELEMENT p        EMPTY><!-- "p" -->
+<!ELEMENT q        EMPTY><!-- "q" -->
+<!ELEMENT r        EMPTY><!-- "r" -->
+<!ELEMENT s        EMPTY><!-- "s" -->
+<!ELEMENT t        EMPTY><!-- "t" -->
+<!ELEMENT u        EMPTY><!-- "u" -->
+<!ELEMENT v        EMPTY><!-- "v" -->
+<!ELEMENT w        EMPTY><!-- "w" -->
+<!ELEMENT x        EMPTY><!-- "x" -->
+<!ELEMENT y        EMPTY><!-- "y" -->
+<!ELEMENT z        EMPTY><!-- "z" -->
+<!ELEMENT brace    ANY>  <!-- "{", "}", "<%", "%>" -->
+<!ELEMENT vbar     EMPTY><!-- "|" -->
+<!ELEMENT brace    EMPTY><!-- "}" -->
+<!ELEMENT tilde    EMPTY><!-- "~" -->
+<!ELEMENT del      EMPTY><!-- "\\177" -->
+
+<!-- Key Words -->
+<!ELEMENT asm              EMPTY>
+<!ELEMENT auto             EMPTY>
+<!ELEMENT bool             EMPTY>
+<!ELEMENT break            EMPTY>
+<!ELEMENT case             EMPTY>
+<!ELEMENT catch            EMPTY>
+<!ELEMENT char             EMPTY>
+<!ELEMENT class            EMPTY>
+<!ELEMENT const            EMPTY>
+<!ELEMENT const_cast       EMPTY>
+<!ELEMENT continue         EMPTY>
+<!ELEMENT default          EMPTY>
+<!ELEMENT delete           EMPTY>
+<!ELEMENT do               EMPTY>
+<!ELEMENT double           EMPTY>
+<!ELEMENT dynamic_cast     EMPTY>
+<!ELEMENT else             EMPTY>
+<!ELEMENT enum             EMPTY>
+<!ELEMENT explicit         EMPTY>
+<!ELEMENT export           EMPTY>
+<!ELEMENT extern           EMPTY>
+<!ELEMENT false            EMPTY>
+<!ELEMENT float            EMPTY>
+<!ELEMENT for              EMPTY>
+<!ELEMENT friend           EMPTY>
+<!ELEMENT goto             EMPTY>
+<!ELEMENT if               EMPTY>
+<!ELEMENT inline           EMPTY>
+<!ELEMENT int              EMPTY>
+<!ELEMENT long             EMPTY>
+<!ELEMENT mutable          EMPTY>
+<!ELEMENT namespace        EMPTY>
+<!ELEMENT new              EMPTY>
+<!ELEMENT operator         EMPTY>
+<!ELEMENT private          EMPTY>
+<!ELEMENT protected        EMPTY>
+<!ELEMENT public           EMPTY>
+<!ELEMENT register         EMPTY>
+<!ELEMENT reinterpret_cast EMPTY>
+<!ELEMENT return           EMPTY>
+<!ELEMENT short            EMPTY>
+<!ELEMENT signed           EMPTY>
+<!ELEMENT sizeof           EMPTY>
+<!ELEMENT static           EMPTY>
+<!ELEMENT static_cast      EMPTY>
+<!ELEMENT struct           EMPTY>
+<!ELEMENT switch           EMPTY>
+<!ELEMENT template         EMPTY>
+<!ELEMENT this             EMPTY>
+<!ELEMENT throw            EMPTY>
+<!ELEMENT true             EMPTY>
+<!ELEMENT try              EMPTY>
+<!ELEMENT typedef          EMPTY>
+<!ELEMENT typename         EMPTY>
+<!ELEMENT typeid           EMPTY>
+<!ELEMENT union            EMPTY>
+<!ELEMENT unsigned         EMPTY>
+<!ELEMENT using            EMPTY>
+<!ELEMENT virtual          EMPTY>
+<!ELEMENT void             EMPTY>
+<!ELEMENT volatile         EMPTY>
+<!ELEMENT wchar_t          EMPTY>
+<!ELEMENT while            EMPTY>
+
+<!-- Preprocessing directives -->
+<!ELEMENT ppd              EMPTY><!-- "#" -->
+<!ELEMENT ppd_define       ANY>  <!-- "#define" -->
+<!ELEMENT ppd_elif         ANY>  <!-- "#elif" -->
+<!ELEMENT ppd_else         ANY>  <!-- "#else" -->
+<!ELEMENT ppd_endif        ANY>  <!-- "#endif" -->
+<!ELEMENT ppd_error        ANY>  <!-- "#error" -->
+<!ELEMENT ppd_if           ANY>  <!-- "#if" -->
+<!ELEMENT ppd_ifdef        ANY>  <!-- "#ifdef" -->
+<!ELEMENT ppd_ifndef       ANY>  <!-- "#ifndef" -->
+<!ELEMENT ppd_include      ANY>  <!-- "#include" -->
+<!ELEMENT ppd_line         ANY>  <!-- "#line" -->
+<!ELEMENT ppd_pragma       ANY>  <!-- "#pragma" -->
+<!ELEMENT ppd_undef        ANY>  <!-- "#undef" -->
+
+<!-- Operators -->
+<!ELEMENT not       EMPTY><!-- "!", "not" -->
+<!ELEMENT not_eq    EMPTY><!-- "!=", "not_eq" -->
+<!ELEMENT stringize EMPTY><!-- "#" -->
+<!ELEMENT splice    EMPTY><!-- "##" -->
+<!ELEMENT mod       EMPTY><!-- "%" -->
+<!ELEMENT splice    EMPTY><!-- "%:%:" -->
+<!ELEMENT mod_eq    EMPTY><!-- "%=" -->
+<!ELEMENT bitand    EMPTY><!-- "&", "bitand" -->
+<!ELEMENT adr       EMPTY><!-- "&" -->
+<!ELEMENT and       EMPTY><!-- "&&", "and" -->
+<!ELEMENT and_eq    EMPTY><!-- "&=", "and_eq" -->
+<!ELEMENT deref     EMPTY><!-- "*" -->
+<!ELEMENT mult      EMPTY><!-- "*" -->
+<!ELEMENT mult_eq   EMPTY><!-- "*=" -->
+<!ELEMENT plus      EMPTY><!-- "+" -->
+<!ELEMENT uplus     EMPTY><!-- "+" -->
+<!ELEMENT incr      EMPTY><!-- "++" -->
+<!ELEMENT plus_eq   EMPTY><!-- "+=" -->
+<!ELEMENT comma_op  EMPTY><!-- "," -->
+<!ELEMENT minus     EMPTY><!-- "-" -->
+<!ELEMENT uminus    EMPTY><!-- "-" -->
+<!ELEMENT decr      EMPTY><!-- "--" -->
+<!ELEMENT minus_eq  EMPTY><!-- "-=" -->
+<!ELEMENT ptr_m     EMPTY><!-- "->" -->
+<!ELEMENT ptr_ptm   EMPTY><!-- "->*" -->
+<!ELEMENT obj_m     EMPTY><!-- "." -->
+<!ELEMENT obj_ptm   EMPTY><!-- ".*" -->
+<!ELEMENT div       EMPTY><!-- "/" -->
+<!ELEMENT div_eq    EMPTY><!-- "/=" -->
+<!ELEMENT else      EMPTY><!-- ":" -->
+<!ELEMENT scope     EMPTY><!-- "::" -->
+<!ELEMENT lt        EMPTY><!-- "<" -->
+<!ELEMENT lsl       EMPTY><!-- "<<" -->
+<!ELEMENT lsl_eq    EMPTY><!-- "<<=" -->
+<!ELEMENT le        EMPTY><!-- "<=" -->
+<!ELEMENT eq        EMPTY><!-- "=" -->
+<!ELEMENT equals    EMPTY><!-- "==" -->
+<!ELEMENT gt        EMPTY><!-- ">" -->
+<!ELEMENT ge        EMPTY><!-- ">=" -->
+<!ELEMENT lsr       EMPTY><!-- ">>" -->
+<!ELEMENT lsr_eq    EMPTY><!-- ">>=" -->
+<!ELEMENT cond      EMPTY><!-- "?" -->
+<!ELEMENT xor       EMPTY><!-- "^", "xor" -->
+<!ELEMENT xor_eq    EMPTY><!-- "^=", "xor_eq" -->
+<!ELEMENT bitor     EMPTY><!-- "|", "bitor" -->
+<!ELEMENT or_eq     EMPTY><!-- "|=", "or_eq" -->
+<!ELEMENT or        EMPTY><!-- "||", "or" -->
+<!ELEMENT compl     EMPTY><!-- "~", "compl" -->
+
+<!ELEMENT reference            EMPTY><!-- "&" -->
+<!ELEMENT pointer              EMPTY><!-- "*" -->
+<!ELEMENT ellipsis             EMPTY><!-- "..." -->
+
+<!ELEMENT system_header        ()>
+<!ELEMENT header               ()>
+<!ELEMENT char_lit             ()>
+<!ELEMENT lchar_lit            ()>
+<!ELEMENT str_lit              ()>
+<!ELEMENT lstr_lit             ()>
+<!ELEMENT int_lit              ()>
+<!ELEMENT oct_lit              ()>
+<!ELEMENT dec_lit              ()>
+<!ELEMENT hex_lit              ()>
+<!ELEMENT float_lit            ()>
+<!ELEMENT identifier           ()>
+<!ELEMENT replaced_identifier  ()>
+<!ELEMENT comment              ANY>
+<!ELEMENT block_comment        ANY>
+<!ELEMENT command_line         (include_directory | object_macro)*>
+<!ELEMENT predefined_macro     (object_macro*)>
+<!ELEMENT location             ()>
+<!ELEMENT include_directory    EMPTY>
+<!ATTLIST include_directory path CDATA #REQUIRED
+                            used (yes | no) #REQUIRED>
+
+<!ELEMENT use_on_code          ()>
+
+<!ELEMENT constant_expression  ()>
+<!ELEMENT elif_group           ()>
+<!ELEMENT else_group           ()>
+<!ELEMENT function_macro       ()>
+<!ELEMENT group_part           ()>
+<!ELEMENT if_section           ()>
+<!ELEMENT if_group             ()>
+
+<!ELEMENT object_macro         (str_lit)>
+<!ATTLIST object_macro identifier CDATA #REQUIRED>
+
+<!ELEMENT translation_unit    (predefined_macro, command_line, preprocessing_file)>
+<!ELEMENT preprocessing_file  ANY>
+<!ATTLIST preprocessing_file guarded (yes | no) #IMPLIED
+                             lines CDATA  #IMPLIED
+                             path CDATA #REQUIRED>
+<!ELEMENT replacement_list"    ANY>
+

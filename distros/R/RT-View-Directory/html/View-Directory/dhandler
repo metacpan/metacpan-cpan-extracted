@@ -1,0 +1,39 @@
+<%args>
+$Query => undef
+$Order => undef
+$OrderBy => undef 
+</%args>
+<%init>
+my $tix = RT::Tickets->new($session{'CurrentUser'});
+$tix->FromSQL($Query);
+if ($OrderBy =~ /\|/) {
+    # Multiple Sorts
+    my @OrderBy = split /\|/,$OrderBy;
+    my @Order = split /\|/,$Order;
+    $tix->OrderByCols(
+        map { { FIELD => $OrderBy[$_], ORDER => $Order[$_] } } ( 0 .. $#OrderBy ) );;
+} else {
+    $tix->OrderBy(FIELD => $OrderBy, ORDER => $Order);
+}
+
+my @tickets = @{$tix->ItemsArrayRef ||[]};
+my $title = loc("Show attachments");
+my $query_args = join(';',"Query=$Query","OrderBy=$OrderBy", "Order=$Order");
+</%init>
+<& /Elements/Header, Title => $title&>
+<& /Elements/Tabs, Title => $title &>
+<table width="100%" cellspacing="0">
+% foreach my $col (qw(id Subject Created Due))  {
+<th><%$col%></th>
+% }
+% my $i;
+% foreach my $ticket (@tickets) {
+% $i++;
+<tr class="<%$i % 2 ? 'oddline' : 'evenline' |n%>">
+<td><a href="Ticket/<%$ticket->id%>?<%$query_args|n%>"><%$ticket->id%></a></td>
+<td><a href="Ticket/<%$ticket->id%>?<%$query_args|n%>"><%$ticket->Subject%></a></td>
+<td><%$ticket->CreatedObj->AsString%></td>
+<td><%$ticket->DueObj->AsString%></td>
+</tr>
+% }
+</table>

@@ -1,0 +1,7 @@
+%# "I stayed up all night playing poker with tarot cards.  I got a full
+%# house and four people died."
+%# 		-- Steven Wright
+<input type="hidden" name="UserField" value="Name">
+<&|/l&>User Id</&>
+<& /Elements/SelectMatch, Name=> 'UserOp' &>
+<input size=8 name="UserString">

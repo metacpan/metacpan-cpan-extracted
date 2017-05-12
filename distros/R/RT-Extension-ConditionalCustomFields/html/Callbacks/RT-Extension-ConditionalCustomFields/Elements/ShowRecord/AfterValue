@@ -1,0 +1,11 @@
+% if ($attribute =~ /^CustomField.{([^}]+)}/) {
+%   my $cf = $Object->LoadCustomFieldByIdentifier($1);
+%   if ($cf && $cf->id) {
+<& /Elements/ShowConditionalCustomFields, CustomField => $cf, ParentSelector => 'class' &>
+%   }
+% }
+<%ARGS>
+$attribute
+$column
+$Object
+</%ARGS>

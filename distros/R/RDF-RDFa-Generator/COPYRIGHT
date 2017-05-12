@@ -1,0 +1,71 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDF-RDFa-Generator
+Upstream-Contact: <http://purl.org/NET/cpan-uri/person/tobyink>
+Source: https://metacpan.org/release/RDF-RDFa-Generator
+
+Files: COPYRIGHT
+Copyright: None
+License: public-domain
+Comment: This file! Automatically generated.
+
+Files: inc/Module/Install.pm
+Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Base.pm
+Copyright: Copyright 2003, 2004 by Audrey Tang <autrijus@autrijus.org>.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Include.pm
+Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Makefile.pm
+Copyright: Copyright 2002, 2003, 2004 Audrey Tang and Brian Ingerson.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Metadata.pm
+Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Package.pm
+Copyright: Copyright (c) 2011. Ingy doet Net.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/TrustMetaYml.pm
+Copyright: This software is copyright (c) 2011-2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Scalar/Util.pm
+Copyright: Copyright (c) 1997-2007 Graham Barr <gbarr@pobox.com>. All rights reserved. Copyright (c) 1999 Tuomas J. Lukka <lukka@iki.fi>. All rights reserved.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/YAML/Tiny.pm
+Copyright: Copyright 2006 - 2012 Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/unicore/Name.pm
+Copyright: 1993-2012, Larry Wall and others
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/utf8.pm
+Copyright: 1993-2012, Larry Wall and others
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/RDF/RDFa/Generator.pm
+Copyright: Copyright (C) 2010 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm
+Copyright: Copyright (C) 2010 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes HACKING LICENSE MANIFEST.SKIP Makefile.PL README TODO examples/example1-out.html examples/example1.css examples/example1.pl inc/Module/Package/Dist/RDF.pm lib/RDF/RDFa/Generator/HTML/Head.pm lib/RDF/RDFa/Generator/HTML/Hidden.pm lib/RDF/RDFa/Generator/HTML/Pretty.pm meta/changes.pret meta/doap.pret meta/makefile.pret t/01basic.t t/02_kk_namespaces.t
+Copyright: Unknown
+License: Unknown
+
+License: GPL-1.0+ or Artistic-1.0
+ This software is copyright (c) 2012 by the copyright holder(s).
+ 
+ This is free software; you can redistribute it and/or modify it under
+ the same terms as the Perl 5 programming language system itself.

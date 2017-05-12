@@ -1,0 +1,16 @@
+This simple extension for RT 3.x (Tested on 3.4 and newer) adds a dropdown
+of a user's queues into RT's menubar. Using a tiny bit of javascript,
+selecting one of these queues will automatically jump to a search showing
+new, open and stalled tickets in that queue.
+
+To install:
+
+    perl Makefile.PL
+    make install
+
+then add 'RT::Extension::MenubarSearches' to @Plugins in RT_SiteConfig.pm
+
+Copyright 2006-2008 Best Practical Solutions, LLC
+No warranty, so on and so forth. Enjoy. 
+
+For help, write to rt-users@lists.bestpractical.com.

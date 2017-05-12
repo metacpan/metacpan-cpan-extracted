@@ -1,0 +1,1386 @@
+                                  Rosetta
+---------------------------------------------------------------------------
+
+2006-04-13   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.724.0/0.724000 (SVN r1258).
+
+    * This release is primarily to correct or update some documentation,
+    mostly in Rosetta.pm and SeeAlso.pod, so errors don't confuse people; a
+    larger set of changes should be pending.
+
+    * New code file versions are: Rosetta.pm and Model.pm and Validator.pm
+    and Example.pm 0.724.0 and Shell.pm 0.1.2; unchanged code file versions
+    are: Rosetta/L/en.pm 0.210.1 and Model/L/en.pm 0.400.1 and
+    Validator/L/en.pm 0.160.1 and Example/L/en.pm 0.2.1 and Shell/L/en.pm
+    0.1.1.
+
+    * In Rosetta.pm, rewrote the middle half of the DESCRIPTION pod to add
+    emphasis on Rosetta D being an application programming language, and to
+    focus the nature of Rosetta.pm as being more on glue to that language
+    from Perl rather than being a virtual machine.  Also removed the
+    mis-placed example usage descriptions.  Also added emphasis on the use
+    of Genezzo as a favored back-end.
+
+    * In Language.pod, updated the 10,000 MILE VIEW opening paragraph to
+    better describe what type of language Rosetta D is, saying that it is
+    computationally complete with integrated database functionality.  Also
+    updated the DESCRIPTION regarding influences, to mention functional
+    languages like Haskell.
+
+    * In SeeAlso.pod, split and reorganized the project groups so we have
+    distinct categories for fully and partially TTM/D related projects; the
+    latter now contains Genezzo, Dataphor, and new entry Teradata.  Also
+    split up the entry for "The Third Manifesto" so the web site and book
+    are separate list items, expanding each one, and updated the links to
+    book chapter PDFs from the book so they are from the third edition
+    rather than the second edition.  Also added new entry Valentina to the
+    non-TTM and non-SQL category.  Also clarified what the list of Perl
+    modules was about.
+
+    * In Shell.pm, changed its dependency on 'Rosetta' so that any version
+    at or after 0.722.0 is fine, rather than only version 0.723.0 working.
+
+    * Updated the header of docs/OSCON2006SessionProposal.txt and the
+    comment about it in the README file to say the talk was not approved.
+
+2006-03-28   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.723.0/0.723000 (SVN r1239).
+
+    * New code file versions are: Rosetta.pm and Model.pm and Validator.pm
+    and Example.pm 0.723.0, Rosetta/L/en.pm 0.210.1 and Model/L/en.pm
+    0.400.1 and Validator/L/en.pm 0.160.1 and Example/L/en.pm 0.2.1 and
+    Shell.pm 0.1.1 and Shell/L/en.pm 0.1.1.
+
+    * Made a few small documentation fixes in Rosetta.pm and Language.pod
+    and TODO.pod.
+
+    * Fleshed out the SeeAlso.pod file, and consolidated there most
+    external links from other parts of the distribution.  Updated the SEE
+    ALSO pod of all other files so they refer to Rosetta.pm (except
+    Rosetta.pm) and SeeAlso.pod; this caused most 0.0.1 version increments.
+
+    * In Language.pod, rewrote half of the 10,000 MILE VIEW documentation
+    sub-section "States, Transactions and Concurrency"; transactions now
+    come in lexical scope bound varieties, and non-scope bound /
+    traditional transactions are now only allowed in anonymous /
+    directly-application-invoked routines.
+
+2006-03-20   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.722.0/0.722000 (SVN r1234).
+
+    * This release is a snapshot to show a particular mid-way point in the
+    middle of a large set of changes.  As a whole, the documentation is
+    internally inconsistent; however, you should be able to read the
+    DESCRIPTION of Rosetta.pm and the whole top half of Language.pod, which
+    are up to date and self-sufficient.
+
+    * As of this release, Rosetta is officially (intended to be) a full
+    implementation of Chris Date's and Hugh Darwen's "The Third Manifesto",
+    rather than simply using TTM as a source of ideas.  Moreover, Rosetta
+    is now officially (intended to be) a DBMS in its own right, rather than
+    just a client library or wrapper for such (but an implementation can
+    still choose to use an existing DBMS as its engine).
+
+    * Added new core modules Rosetta::Shell and Rosetta::Shell::L::en,
+    which implement a simple interactive command shell around Rosetta, with
+    which users can try out Rosetta using the least effort; it also is a
+    great vehicle to develop and test new features without necessitating
+    new testing code.  This initial version has a basic command loop
+    working, but the commands are not actually executed yet.
+
+    * Also added new file examples/shell.pl which uses the new module; it
+    can be invoked from the command line as an actual Rosetta application.
+
+    * New code file versions are: Rosetta.pm and Model.pm and Validator.pm
+    and Example.pm 0.722.0 and Shell.pm 0.1.0 and Shell/L/en.pm 0.1.0;
+    unchanged code file versions are: Rosetta/L/en.pm 0.210.0 and
+    Model/L/en.pm 0.400.0 and Validator/L/en.pm 0.160.0 and Example/L/en.pm
+    0.2.0.
+
+    * Updated external dependency on Class::Std to v0.0.8 from v0.0.4.
+
+    * In the Makefile.PL only, specified that the minimum required
+    'version' version is v0.57.
+
+    * In Model.pm, added missing _die_with_msg() private method to the
+    Document class.
+
+    * Split up Language.pod into itself and new lib/Rosetta/SeeAlso.pod;
+    the latter contains the entire SEE ALSO content of the former, but that
+    info is now in a more centrally accessable location.  Reformatted the
+    DESCRIPTION of Language.pod so that the hyperlinks would be interpreted
+    correctly by Pod2Html such as CPAN uses.
+
+    * In Rosetta.pm, rewrote the DESCRIPTION.  In Model.pm, removed the
+    DESCRIPTION; a new one will be added later.  In Language.pod and
+    Migration.pod, rewrote the first paragraph of the DESCRIPTION plus made
+    a few smaller changes.
+
+    * In Rosetta.pm, removed the Rosetta::Interface and Rosetta::Engine
+    classes, in their place adding Rosetta::Interface::[DBMS, Exception,
+    Command, Value, Variable]; the new classes are also mentioned in
+    Language.pod a few times.  Also added an initial BUILD() submethod to
+    ::DBMS so that the new Shell can invoke it properly.  In Rosetta.pm,
+    renamed the SYNOPSIS to OLD SYNOPSIS TO REWRITE, and added the start of
+    a new SYNOPSIS.
+
+    * In Language.pod, renamed the main pod section "10,000 MILE VIEW OF
+    ROSETTA D" to prepend "OLDER DOCUMENTATION TO REWRITE/REMOVE: ", and
+    wrote a brand new main pod section "10,000 MILE VIEW" above it; this is
+    true but that the opening paragraph from the older main section was
+    moved into the new one as its opener.  The brand new content is in the
+    4 sub-sections named: "Environment", "Command Structure and
+    Processing", "Named Users and Privileges", "States, Transactions and
+    Concurrency"; 2 empty sub-sections named "Data Types" and "Grammar and
+    Name Spaces" still need to be (re-)written.
+
+    * Note that the subsequent Rosetta release should feature the
+    completion of Language.pod's 10,000 mile view plus templates for the
+    other main sections, one of which will list Rosetta D's built-in
+    packages and data types with their operators, and one of which will
+    detail the schema of the Rosetta DBMS' system catalog relvars.
+
+2006-02-23   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.721.0/0.721000 (SVN r1220).
+
+    * This release is a snapshot to show a particular mid-way point in the
+    middle of a large set of changes.  You should not pay too much
+    attention to it yet as its documentation is internally inconsistent.
+
+    * This distribution is partly the result of merging the briefly
+    separate Rosetta-Engine-Native distribution into the core Rosetta
+    distribution.  The component modules were also renamed from Native.pm
+    to Example.pm, and Native/L/en.pm to Example/L/en.pm, which better
+    reflects what purpose they serve now.  As a result of this merger, a
+    logical circular dependency in the test suite is now resolved; the
+    Rosetta core can be completely tested without requiring an Engine from
+    a separate distribution.  The Example.pm version has been raised and
+    synchronized to match Rosetta.pm; the en.pm has simply been
+    incremented by 0.1.0 to reflect the name change.
+
+    * New code file versions are: Rosetta.pm and Model.pm and Validator.pm
+    and Example.pm 0.721.0 and Example/L/en.pm 0.2.0; unchanged code file
+    versions are: Rosetta/L/en.pm 0.210.0 and Model/L/en.pm 0.400.0 and
+    Validator/L/en.pm 0.160.0.
+
+    * Added new external dependency on Parse::RecDescent v1.94 as it will
+    be used by Model.pm in a near-subsequent release.  Possibly, the load
+    of this module may be made optional, but for now it always loads.
+
+    * Added a warning to Makefile.PL so that it requests users would ignore
+    test failures of the depended-on 'only' module.  Also removed the
+    warning about preferring the latest Perl 5.8.x version.
+
+    * Changed the prerequisites list in Makefile.PL so that all minimum
+    versions are specified as floating point numbers, and none as strings;
+    as a result, the prerequisites check by MakeMaker should work correctly
+    with installed modules that satisfy the requirements but don't match
+    the specific versions mentioned.
+
+    * This release is primarily for a rewrite of Language.pod, or rather, a
+    rewrite of the top portion of it, citing the snapshot.  As part of
+    this, the Rosetta native language "IRL" was renamed to "Rosetta D", and
+    Rosetta is now officially an implemenation of "The Third Manifesto";
+    some sections of the Rosetta documentation still need updating though.
+
+    * Changed the NAME pod of Language.pod from "Design document of the
+    Intermediate Relational Language" to "Design document of the Rosetta D
+    language".  Rewrote the main pod section DESCRIPTION.  Replaced the
+    main pod section "OPERATIONAL CONTEXT" with a new larger section
+    "10,000 MILE VIEW OF ROSETTA D".  Renamed the main pod section "DATA
+    TYPES AND VALUES" to prepend "OLDER DOCUMENTATION TO REWRITE/REMOVE: ".
+    Updated the main pod section SEE ALSO.
+
+    * Changed the NAME pod of Overview.pod from "10,000 mile view of
+    Rosetta" to "Rosetta compared to DBI".  Removed the 2 old main pod
+    sections [OLDER DOCUMENTATION TO REWRITE/REMOVE: HIGH LEVEL DATA
+    STRUCTURES, HIGH LEVEL ROSETTA INTERFACE CLASSES/ROLES], and emptied
+    the SEE ALSO section.  The file Overview.pod is now deprecated, with
+    its current content likely to move (with changes) to somewhere else.
+
+    * Changed the NAME pod of Model.pm from "Intermediate Relational
+    Language" to "Abstract syntax tree for the Rosetta D language".
+
+    * Updated all copyright notices to say "This file is part of the
+    Rosetta DBMS framework" instead of "This file is part of the Rosetta
+    database portability library".
+
+    * Added new file docs/OSCON2006SessionProposal.txt, which contains the
+    pristine text of my 2006 Feb 13th proposal (not yet approved) for a 45
+    minute conference session at OSCON 2006 this upcoming July.
+
+    * Updated the SEE ALSO pod of [Model.pm, Rosetta.pm, Validator.pm] to
+    remove mentions of Rosetta::Utility::SQL[Builder|Parser] and
+    Rosetta::Engine::Generic, since they won't be re-made any time soon.
+
+2006-02-01   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta-Engine-Native Release 0.1.0/0.001000 (SVN r1203).
+
+    * This release is concurrently available in both Perl 5 and Perl 6
+    versions.  The Perl 5 version is in the same distribution as this
+    Changes file.  The Perl 6 version is bundled with Pugs-6.2.11 (released
+    on 2006-02-01), in its ext/Rosetta-Engine-Native/ subdirectory.
+
+    * Initial code file versions are: Native.pm 0.1.0 and en.pm 0.1.0.
+
+    * Initial external dependencies are: 'version', 'only', 'Readonly'
+    1.03, Class::Std 0.0.4, Class::Std::Utils 0.0.2, Locale::KeyedText
+    1.72.0, 'Rosetta' 0.720.0, Test::More, Rosetta::Validator 0.720.0.
+
+    * This is the first release of the Rosetta-Engine-Native distribution.
+    This is the first release of any distribution to contain
+    Rosetta::Engine::Native.  This is the first release of any distribution
+    for which some of the existing work that became the
+    Rosetta-Engine-Native distribution was in the form of executable code,
+    and not just design documentation.
+
+    * This is the initial file manifest:
+
+        Changes
+        GPL
+        INSTALL
+        lib/Rosetta/Engine/Native.pm
+        lib/Rosetta/Engine/Native/L/en.pm
+        Makefile.PL
+        MANIFEST
+        META.yml
+        README
+        t/Rosetta_Engine_Native.t
+        TODO
+
+2006-02-01   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.720.0/0.720000 (SVN r1203).
+
+    * This release is concurrently available in both Perl 5 and Perl 6
+    versions.  The Perl 5 version is in the same distribution as this
+    Changes file.  The Perl 6 version is bundled with Pugs-6.2.11 (released
+    on 2006-02-01), in its ext/Rosetta/ subdirectory.
+
+    * This is the first CPAN release of the second major codebase of
+    Rosetta, which was written mainly between 2005-10 and later.
+
+    * Added "Changes" entry dated 2005-12-01, which should have been there
+    as of the previous release 0.71.0, but wasn't.
+
+    * The changes with this release, relative to the previous release which
+    was of the first major codebase, are all summed up by that almost
+    everything has been rewritten from scratch, code and documentation
+    alike, but that the higher-level design plans and framework structure
+    are the same as before, and any corresponding files and packages have
+    the same names.  The first and second major codebases of Rosetta are
+    definitely incompatible with each other, so any external code written
+    to work with any previous releases will have to be rewritten or at
+    least severely edited to work with this one.  Or rather, to work with
+    subsequent releases, since this one is almost entirely documentation
+    and doesn't have much working code to talk to yet.
+
+    * Here are the file manifest differences between the last release and
+    this one; the (-) and (+) respectively indicate files that were removed
+    and added, while those without a flag are in both releases and yet had
+    their contents mostly rewritten (but GPL and INSTALL are unchanged):
+
+          Changes
+        + docs/OSCON2005LightningTalk.txt
+          GPL
+          INSTALL
+          lib/Rosetta.pm
+        + lib/Rosetta/Copying.pod
+        - lib/Rosetta/EnumTypes.pod
+        + lib/Rosetta/FAQ.pod
+        - lib/Rosetta/Features.pod
+        - lib/Rosetta/Framework.pod
+          lib/Rosetta/L/en.pm
+          lib/Rosetta/Language.pod
+        + lib/Rosetta/Migration.pod
+          lib/Rosetta/Model.pm
+          lib/Rosetta/Model/L/en.pm
+        - lib/Rosetta/NodeTypes.pod
+        + lib/Rosetta/Overview.pod
+        + lib/Rosetta/TODO.pod
+          lib/Rosetta/Validator.pm
+          lib/Rosetta/Validator/L/en.pm
+          Makefile.PL
+          MANIFEST
+          META.yml
+        - ReadMe
+        + README
+        - t/lib/t_ROS_Abstract.pm
+        - t/lib/t_ROS_Synopsis.pm
+        - t/lib/t_ROS_Terse.pm
+        - t/lib/t_ROS_Util.pm
+        - t/lib/t_ROS_Verbose.pm
+          t/ROS_00_Compile.t
+        - t/ROS_10_Identity.t
+        - t/ROS_11_Circular.t
+        - t/ROS_40_Verbose.t
+        - t/ROS_41_Terse.t
+        - t/ROS_42_Abstract.t
+        - t/ROS_43_Synopsis.t
+        - t/ROS_50_Cloning.t
+          TODO
+
+    * Raised and multiplied the minor version number so that the current
+    X.Y.Z formatted version numbers are backwards compatible with the older
+    releases in X.0Y format, with respect to determing which version
+    numbers are larger or smaller.  The new version 0.720.0 is equivalent
+    to 0.72 under the old format, in which the last release was both 0.69
+    (SQL-Routine) and 0.47 (Rosetta).
+
+    * New code file versions are: Rosetta.pm and Model.pm and Validator.pm
+    0.720.0 and Rosetta/L/en.pm 0.210.0 and Model/L/en.pm 0.400.0 and
+    Validator/L/en.pm 0.160.0.
+
+    * All 3 of the above non-en.pm files are now void of any functions or
+    methods except Model.pm, which has a total of 4 public ones plus 7
+    private ones.  All 3 of the en.pm files are code-complete but that they
+    are void of any user text messages, but for Model's, which has 2.
+
+    * Updated external dependency on Locale::KeyedText to 1.72.0.
+
+    * Added new external dependencies on 'Readonly', Class::Std,
+    Class::Std::Utils.  Removed old external dependencies on List::Util and
+    List::MoreUtils (they may return if needed later).  Maintained external
+    dependencies on 'version', 'only', Scalar::Util, Test::More.
+
+    * Altered the license of the Rosetta framework in regards to the GPL's
+    default requirements of combined works based on Rosetta needing to be
+    GPL.  Previously, an exemption was given to linked components of any
+    license at all (letting those components retain their own licenses),
+    free or closed, if those components were fully functional independently
+    of Rosetta, meaning Rosetta's use was an optional feature of theirs.
+    Now instead, an exemption is given to any linked components whose own
+    licenses qualify as free software (according to the FSF), regardless of
+    whether their use of Rosetta is mandatory or optional.  This change
+    should make things a lot more fair and practical for everyone.  Other
+    free software developers won't have to maintain parallel functionality
+    just to keep their alternate licenses on a technicality.  I also added
+    an explicit statement offering alternate and proprietary licenses for
+    an additional fee, so non-free software developers can bundle Rosetta.
+
+    * Rosetta and Rosetta::Model are now implemented as inside-out objects,
+    so the privacy of their attributes is now enforced.  Also, Rosetta.pm
+    and Model.pm themselves now have BUILD() methods internally instead of
+    new() functions (Model.pm has them now, Rosetta.pm will later).  Also,
+    all private methods now use Class::Std's ": PRIVATE" trait, which
+    enforces their privacy.
+
+    * Updated all object argument validation to use Scalar::Util's
+    blessed() function plus the method form of UNIVERSAL's isa() rather
+    than the latter's functional form.  The changed version should work
+    more like Perl 6's does(), and should permit one to use mock objects
+    that claim to be of the expected types instead of genuine ones.
+
+    * The package Rosetta::Model::Container has been renamed to
+    Rosetta::Model::Document, while ::Node kept its old name.  The packages
+    ::ContainerStorage, ::NodeStorage, and ::Group were eliminated.
+
+    * "Rosetta" no longer has any functions and exists just as the namesake
+    of this distribution (and of its file); the 8 new_*_interface() wrapper
+    functions are gone.  You now just use the previously-wrapped
+    corresponding functions Rosetta::Interface::*->new() instead (they
+    still have yet to be rewritten, though).  Likewise, "Rosetta::Model" no
+    longer has any functions and exists just as the namesake of its file;
+    the new_container() and new_node() wrapper functions are gone.  You now
+    just use the previously-wrapped functions
+    Rosetta::Model::Document->new() and Rosetta::Model::Node->new()
+    instead (these 2 actually have been rewritten).
+
+    * All new() constructor functions now have named parameters instead of
+    positional ones (the ones that were rewritten anyway; the others simply
+    don't exist), which should make it easier to add functionality to
+    Rosetta and Rosetta::Model later if one wants to.  But all object
+    methods (that exist) still have positional parameters like before.
+
+    * Deleted the whole data dictionary in Rosetta::Model (%NODE_TYPES and
+    related constants); a new one will be made later.
+
+    * Merged the functionality of the Rosetta::Model's old build_*()
+    functions and methods into its new() constructor functions, so you can
+    now construct entire Node trees with a single invocation of new().  The
+    new Document constructor now has a single "root_nodes" array-ref
+    parameter, and the new Node constructor now has 5 parameters;
+    "document", "parent_node", "node_type", "attributes" (hash-ref),
+    "child_nodes" (array-ref); the "root_nodes" and "child_nodes"
+    parameters are the same.
+
+    * The new object Rosetta::Model methods export_as_hash() replace the
+    old get_all_properties() methods.  The related methods which produce
+    translated strings have not yet been rewritten.
+
+    * Any INTERFACE documentation now uses the word 'parameter' in many
+    places where the word 'argument' was used, which is more correct.
+
+    * Roughly speaking, the pod-only files were restructured as follows: 1.
+    EnumTypes and NodeTypes are merged into Language; 2. Framework is split
+    into Overview and TODO.pod and part of Copying; 3. Features will be
+    replaced later; 4. FAQ, Migration, and much of Copying is just new; 5.
+    pod from Model.pm and Rosetta.pm has been shuffled between the pod
+    files and vice-versa.
+
+    * Added new SYNOPSIS to Rosetta.pm, which had none before; also, the
+    SYNOPSIS of Model.pm and Validator.pm are gone, for now.
+
+    * Added new file docs/OSCON2005LightningTalk.txt, which has the
+    pristine text for a lightning talk I gave, and outlined in 5 minutes
+    what at-that-time Rosetta was and was to be.
+
+    * Removed the whole test suite but the compilation test; it will be
+    replaced later.  As such, the new modules have not yet been proven to
+    actually work (though most of their code isn't rewritten yet).
+
+    * Renamed the ReadMe file to README and chopped out all of its parts
+    that were redundant with Rosetta.pm's own POD.  All that remains now is
+    the PREFACE, KEEPING UP TO DATE (also rewritten), and SUPPORT sections.
+
+    * Updated the Makefile.PL to output a message saying this distro
+    prefers the latest Perl version (currently 5.8.8), if we aren't running
+    under it.  But the minimum hard dependency is unchanged at 5.8.1.
+
+    * Rewrote the TODO file to just reference lib/Rosetta/TODO.pod for now.
+
+    * Synchronized common headings for these files: Changes, README, TODO.
+
+    * There were many more changes that aren't enumerated here.
+
+2006-01-13   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.71.0/0.071000 (SVN r1184).
+
+    * This is a retroactive release, made on intended to help ease the
+    transition between the first and second major code bases of the Rosetta
+    database access framework.  (The first codebase was written mainly
+    between 2002-12 and 2005-09, while the second rewritten code base was
+    mainly between 2005-10 and later.)  While this release actually takes
+    place on January "Friday The Thirteenth" 2006 and is affected by recent
+    design decisions, it is for the most part as identical as possible to
+    the most recent (2005-09-28) other release of the first code base.
+    Think of this retroactive release as having been made on 2005-09-29, in
+    regards to its dependency versions, design decisions, documentation for
+    SVN repository location, TODO, etc.  Some of the details being
+    published now, like the SVN location, is already false (its actually at
+    http://svn.utsl.gen.nz/trunk/Rosetta-old/), but they are maintained as
+    they were for historical posterity.
+
+    * The changes with this release are all summed up by that there is no
+    longer a distinct "SQL::Routine" name space, and all packages that were
+    in that name space are now in the "Rosetta" name space.  There are no
+    actual functionality changes, just a shifting around of components;
+    your existing code that used the old packages will remain compatible
+    with just some renaming of your package references.
+
+    * For the first time since release 0.27 (2004-03-21), the entire inner
+    core of the Rosetta framework is now in a single distribution; the
+    "SQL-Routine" and "Rosetta" distributions have merged into "Rosetta";
+    "Rosetta-0.71.0" is the next version after both "SQL-Routine-0.70.3"
+    and "Rosetta-0.48.3".
+
+    * No previously "Rosetta" packages have been renamed, but all of the
+    previously "SQL-Routine" packages have been, as follows: SQL::Routine
+    -> Rosetta::Model, SQL::Routine::L::en -> Rosetta::Model::L::en,
+    SQL::Routine::Language -> Rosetta::Language, SQL::Routine::EnumTypes ->
+    Rosetta::EnumTypes, SQL::Routine::NodeTypes -> Rosetta::NodeTypes.
+
+    * All previously SQL-Routine t/* files have been renamed: t/SRT_*.t ->
+    t/ROS_*.t, t/lib/t_SRT_*.t -> t/lib/t_ROS_*.t; the 2 t/ROS_00_Compile.t
+    were then merged into one file.
+
+    * All of these corresponding files from each distribution were merged:
+    Changes, Makefile.PL, MANIFEST, META.yml, ReadMe, TODO, GPL, INSTALL;
+    the last 2 were already identical, so no changes; the first 6 all saw
+    changes from either of their originals, with Changes having the most.
+
+    * All versioned files had their versions incremented to the next Y of
+    X.Y.Z, regardless of any actual changes.  As exceptions to this,
+    "Rosetta" and "Rosetta::Validator" were further incremented to match
+    the incremented-once "Rosetta::Model", so that all 3 have now and
+    forever identical versions, which are the same as the "Rosetta"
+    distribution; currently all 4 are 0.71.0.  The other versioned files
+    now have these versions: Rosetta::L::en is 0.20.0,
+    Rosetta::Model::L::en is 0.39.0, Rosetta::Validator::L::en is 0.15.0.
+
+    * Renamed all Locale::KeyedText Message and Template keys from "SRT_*"
+    to "ROS_M_*".  Er, you may have to update your code to account for this
+    also, to avoid breakage.
+
+    * Updated 7 files to rename the data dictionary items
+    "SRT_NODE[|_LIST]" to "ROS_M_NODE[|_LIST]".  Er, you may have to update
+    your code to account for this also, to avoid breakage.
+
+    * In Rosetta.pm, renamed the 'srt_cont' property of Rosetta::Interface
+    to 'model_cont'.  Also renamed the get_srt_container() accessor method
+    to get_model_container(), plus calls to same in Validator.pm.  Er, you
+    may have to update your code to account for this also, to avoid
+    breakage.
+
+    * In EnumTypes.pod and Model.pm, renamed all 39 mentions of the
+    'exception_type' enumerated type values from 'SRTX_*' to 'ROSMX_*'.
+
+2006-01-07   Darren Duncan <perl@DarrenDuncan.net>
+
+    Record update in the PAUSE modules database:
+
+    mlstatus: [delete] was [list]
+
+    The entry used to be:
+
+    SQL::
+    ::Routine         adpOg Specify all database tasks with SQL routines DUNCAND
+
+2005-12-01   Darren Duncan <perl@DarrenDuncan.net>
+
+    Record update in the PAUSE modules database:
+
+    statd: [a] was [c]
+
+    The resulting entry will be:
+
+    Rosetta           adpOg Rigorous database portability                DUNCAND
+
+2005-09-28   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.70.3/0.070003 (SVN r878).
+
+    * New code file versions are: Routine.pm 0.70.3 and en.pm 0.38.2.
+
+    * From now on, any ordinary 'use [|only ]Foo' statements that appear
+    within *.pm files will be located in different places than before; the
+    'use' statements for modules that do not export anything, particularly
+    object oriented modules, will appear near the top of the file, above
+    all package declarations, but just below the use-pragma statements; the
+    'use' statements for modules whose exported functions we are using will
+    be placed just below the declarations of each package in which the
+    relevant exported functions are used.
+
+    * Removed any line-trailing whitespace from all distribution files.
+
+    * Reformatted all code by swapping various string quoting delimiters.
+
+    * Reformatted Routine.pm to un-cuddle all 'else' and 'elsif' blocks.
+
+    * Updated the _set_primary_parent_attribute() method in Routine.pm to
+    replace its postfix do-while loop with an equivalent code block
+    featuring an ordinary 'while' loop.  Likewise, updated the
+    _find_node_by_surrogate_id_remotely() method to replace its postfix
+    do-until loop with an equivalent code block featuring an ordinary
+    'while' loop.
+
+    * Updated Routine.pm and t_SRT_Util.pm to replace all of their 'unless'
+    conditionals with equivalent 'if' conditionals.
+
+    * Updated Routine.pm to rename all of its 'foreach' loops to 'for'.
+
+    * Updated Routine.pm to move its 2 for-loop labels upwards to their own
+    lines.
+
+    * Updated Routine.pm to reformat the 1 '|' delimited regular expression
+    as a '/' delimited one.
+
+    * Updated Routine.pm to reformat all 14 regular expressions so that
+    they use the /x flag.
+
+    * Reformatted all code to change any "if( ... ) {" to "if (...) {".
+
+    * Updated Routine.pm to reformat all 8 'while' like the 'if' were.
+
+    * Added named constants $EMPTY_STR and $INDENT to Routine.pm.
+
+    * Updated Routine.pm to add labels to all un-labeled [next|last|redo]
+    statements (22), and their innermost bounding loop controls (15).
+
+    * Reformatted all code so that any uses of the named unary operators
+    [defined|ref] no longer have parenthesis around their argument.
+
+    * Updated Routine.pm to reformat 14 uses of 'delete', and 16 uses of
+    'exists', and 7 uses of 'scalar', like with 'ref'.
+
+    * Removed 20 superfluous uses of 'scalar' in Routine.pm.
+
+    * Updated Routine.pm to replace 32 "<condition> and return ...;" each
+    with "return ... if <condition>;".
+
+    * Updated Routine.pm to replace 37 "<condition> or return ...;" each
+    with "return ... if <complement-condition>;".
+
+    * Updated Routine.pm to split up each of 11 "return if !(my $foo =
+    ...);" statements into 2, "my $foo = ...;" and "return if !$foo;".
+
+    * Updated Routine.pm to replace 17 "<condition> [and|or] [next|last]
+    ...;" with "[next|last] ... if ..." like with 'return'.
+
+    * Updated Routine.pm to replace every "<condition> [and|or]
+    $self->_throw ..." each with "$self->_throw ... if
+    [<condition>|<complement-condition>]".
+
+    * Updated Routine.pm to replace 17 "if ... return ..." with their
+    postfix-if equivalents; t_SRT_Util.pm also had 1 such change.
+
+    * Updated Routine.pm and SRT_11_Circular.t to rearrange (3,2)
+    conditional 'die' statements so they have postfix-if conditionals.
+
+    * Updated Routine.pm to rearrange 28 conditional '_throw...' statements
+    so they have postfix-if conditionals.
+
+    * Reformatted all code, in Routine.pm, so that any uses of the built-in
+    operators or functions named [bless|join|push|shift|splice|unshift] no
+    longer have parenthesis around their argument lists; either the parens
+    were just removed, or they were moved to surround both the
+    operator/function name and its arguments.
+
+    * Updated Routine.pm to reformat all 13 uses of the honorary built-in
+    function Scalar::Util::weaken() so it looks like a built-in; for each
+    use, the package-name qualifier was removed, as were the parenthesis
+    around its lone argument.  Since Scalar::Util exports nothing by
+    default, added a 'qw( weaken )' suffix to its 'use' statement.
+
+    * Added new external dependency on the honorary built-in function
+    List::Util::first() to Routine.pm.  Then rewrote 4 '(grep { $_ } @)[0]'
+    expressions as 'first { $_ } @', in the _build_node_is_child_or_not()
+    and valid_node_type_surrogate_id_attributes() functions.
+
+    * Added new external dependency on the honorary built-in function
+    List::MoreUtils::first_index() to Routine.pm.  Then rewrote the
+    _clear_node_ref_attribute() method to use this function rather than a
+    last-terminated for-loop when looking for a child Node in its parent's
+    child list.  Specifically, List::MoreUtils versions 0.12 and up are
+    required, since versions 0.11 and below didn't export some functions.
+
+    * In Routine.pm, updated the _assert_in_node_deferrable_constraints()
+    in several ways: 1. Added a new explicit test that a Node's "id" is
+    set, which while redundant now, won't be after a future update; 2. The
+    always-mandatory attribute validation test now reports a list of all
+    failing attributes, rather than just the first one encountered; 3.
+    Rewrote 3 other test blocks to be more concise, using grep statements
+    rather than for-with-push loops.  Related to the #2 changes, updated
+    en.pm to rename and reword the 'SRT_N_ASDC_MA_VAL_NO_SET' user text
+    message to 'SRT_N_ASDC_MA_VALS_NO_SET'; note that the en.pm message for
+    #1 was already in en.pm from when what will be was then so.
+
+    * Split up some long lines in en.pm.
+
+    * Updated any DEPENDENCIES documentation to reformat any indented
+    sections as paragraphs, and show version ranges like 'only' takes them.
+
+    * Reformatted all code so that every occurance of the string
+    concatenation operator (.) has a space between the operator and each of
+    its 2 arguments, rather than their all being in contact.  Also
+    reformatted any lines that are split on this operator so the operator
+    appears at the start of the second line, rather than the end of the
+    first line.
+
+    * Reformatted a few multi-line statements so that any [=|and|or] that
+    are split on appear at the start of a line rather than the end of one.
+
+    * Reformatted all of the code comments at the top of Routine.pm,
+    where its object property names, and constant values, are declared,
+    so that all comment lines don't exceed the 75 character line length.
+
+    * In Routine.pm, reformatted 4 cascading ternary statements into
+    aligned columns.
+
+    * Other miscellaneous code line alignments and splitting.
+
+2005-09-28   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.48.3/0.048003 (SVN r878).
+
+    * New code file versions are: Rosetta.pm and Validator.pm 0.48.3 and
+    Rosetta/L/en.pm 0.19.2 and Validator/L/en.pm 0.14.2.
+
+    * From now on, any ordinary 'use [|only ]Foo' statements that appear
+    within *.pm files will be located in different places than before; the
+    'use' statements for modules that do not export anything, particularly
+    object oriented modules, will appear near the top of the file, above
+    all package declarations, but just below the use-pragma statements; the
+    'use' statements for modules whose exported functions we are using will
+    be placed just below the declarations of each package in which the
+    relevant exported functions are used.
+
+    * Removed any line-trailing whitespace from all distribution files.
+
+    * Reformatted all code by swapping various string quoting delimiters.
+
+    * Reformatted Rosetta.pm and Validator.pm to un-cuddle all 'else' and
+    'elsif' blocks.
+
+    * Updated Rosetta.pm and Validator.pm and Framework.pod to replace all
+    of their 'unless' conditionals with equivalent 'if' conditionals.
+
+    * Updated Rosetta.pm and Validator.pm and Framework.pod to rename all
+    of their 'foreach' loops to 'for'.
+
+    * Updated Rosetta.pm and Validator.pm to move their collective 5 switch
+    statement labels upwards to their own lines.
+
+    * Updated Framework.pod to reformat all 3 regular expressions so that
+    they use the /x flag.
+
+    * Reformatted all code to change any "if( ... ) {" to "if (...) {".
+
+    * Updated Validator.pm to reformat all 4 'while' like the 'if' were.
+
+    * Added named constant $EMPTY_STR to Rosetta.pm and Validator.pm.
+
+    * In Framework.pod, removed redundant leading '&' from sub invocations.
+
+    * Updated Rosetta.pm, Validator.pm, Framework.pod to add labels to all
+    un-labeled [next|last|redo] statements (3,1,2), and their innermost
+    bounding loop controls (2,1,2).
+
+    * Reformatted all code so that any uses of the named unary operators
+    [defined|ref] no longer have parenthesis around their argument.
+
+    * Updated Rosetta.pm to reformat 2 uses of 'delete' like with 'ref';
+    likewise updated Framework.pod with 2 uses of 'hex'.
+
+    * Removed 1 superfluous use of 'scalar' in each of Validator.pm and
+    Framework.pod.
+
+    * In Validator.pm, split up 7 multi-statement lines so each statement
+    is on its own line.
+
+    * Updated Rosetta.pm to replace 5 "<condition> and return ...;" each
+    with "return ... if <condition>;".
+
+    * Updated Rosetta.pm to replace 3 "<condition> or return ...;" each
+    with "return ... if <complement-condition>;".  Likewise replaced 4 in
+    Validator.pm and 1 in Framework.pod.
+
+    * Updated Rosetta.pm and Validator.pm to replace (2,8) "<condition>
+    [and|or] [next|last] ...;" with "[next|last] ... if ..." like with
+    'return'.
+
+    * Updated Framework.pod to replace 10 "if ... return ..." with their
+    postfix-if equivalents; Validator.pm also had 1 such change.
+
+    * Updated Validator.pm to rearrange 8 conditional 'die' statements so
+    they have postfix-if conditionals.
+
+    * Updated Rosetta.pm to rearrange 29 conditional '_throw...' statements
+    so they have postfix-if conditionals.
+
+    * Reformatted all code, in Rosetta.pm and Validator.pm and
+    Framework.pod, so that any uses of the built-in operators or functions
+    named [bless|chomp|join|pack|push|read|shift|split] no longer have
+    parenthesis around their argument lists; either the parens were just
+    removed, or they were moved to surround both the operator/function name
+    and its arguments.
+
+    * Updated Rosetta.pm to reformat all 3 uses of the honorary built-in
+    function Scalar::Util::weaken() so it looks like a built-in; for each
+    use, the package-name qualifier was removed, as were the parenthesis
+    around its lone argument.  Since Scalar::Util exports nothing by
+    default, added a 'qw( weaken )' suffix to its 'use' statement.
+
+    * Added new external dependency on the honorary built-in function
+    List::Util::first() to Rosetta.pm.  Then replaced a last-terminated
+    for-loop in _prepare__call_engine() with an invocation of it.
+
+    * Added new external dependency on the honorary built-in function
+    Scalar::Util::openhandle() to both the set_trace_fh() method of
+    Rosetta.pm and the main() function of Validator.pm; both of these can
+    now reliably test if their [NEW|TRACE]_FH argument is a valid open file
+    handle, and they will now throw an exception if not.  Correspondingly,
+    added 'ROS_CLASS_METH_ARG_NO_FH' user text message to Rosetta/L/en.pm,
+    and 'ROS_VAL_V_MAIN_ARG_TRACE_NO_FH' to Validator/L/en.pm.  Also
+    updated the setup_[env|conn]() methods of Validator.pm to only
+    conditionally invoke set_trace_fh(), since passing it undef now results
+    in an exception toss by the latter.
+
+    * Split up some long lines in both en.pm.
+
+    * Updated any DEPENDENCIES documentation to reformat any indented
+    sections as paragraphs, and show version ranges like 'only' takes them.
+
+    * Reformatted all code so that every occurance of the string
+    concatenation operator (.) has a space between the operator and each of
+    its 2 arguments, rather than their all being in contact.  Also
+    reformatted any lines that are split on this operator so the operator
+    appears at the start of the second line, rather than the end of the
+    first line.
+
+    * Reformatted a few multi-line statements so that any [=|and|or] that
+    are split on appear at the start of a line rather than the end of one.
+
+    * Reformatted all of the code comments at the top of Rosetta.pm and
+    Validator.pm, where its object property names, and constant values, are
+    declared, so that all comment lines don't exceed the 75 character line
+    length.
+
+    * In Framework.pod, reformatted 1 cascading ternary statement into
+    aligned columns.
+
+    * Other miscellaneous code line alignments and splitting.
+
+2005-09-14   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.70.2/0.070002 (SVN r813).
+
+    * New code file versions are: Routine.pm 0.70.2.
+
+    * Merged Details.pod into Routine.pm:  The Routine.pm main
+    documentation section BRIEF FUNCTION AND METHOD LIST was deleted, and
+    all of the significant content of Details.pod was placed in the same
+    location.  These 17 main documentation sections were moved from
+    Details.pod to Routine.pm: MATTERS OF PORTABILITY AND FEATURES,
+    STRUCTURE, RELATING INTERFACE AND STORAGE CLASSES, ABOUT NODE GROUPS,
+    "FAULT TOLERANCE, DATA INTEGRITY, AND CONCURRENCY", NODE IDENTITY
+    ATTRIBUTES, CONSTRUCTOR WRAPPER FUNCTIONS, CONTAINER CONSTRUCTOR
+    FUNCTIONS, CONTAINER OBJECT METHODS, NODE CONSTRUCTOR FUNCTIONS, NODE
+    OBJECT METHODS, GROUP CONSTRUCTOR FUNCTIONS, GROUP OBJECT METHODS,
+    CONTAINER OR NODE METHODS FOR DEBUGGING, CONTAINER OR NODE FUNCTIONS
+    AND METHODS FOR RAPID DEVELOPMENT, INFORMATION FUNCTIONS, OLDER
+    DOCUMENTATION.  These 5 remaining Details.pod documentation sections
+    were redundant and simply deleted with their now superfluous file:
+    NAME, DESCRIPTION, SEE ALSO, AUTHOR, LICENSE AND COPYRIGHT.  Removed
+    all references to Details.pod in all other distribution files.
+
+    * Updated Routine.pm and Language.pod to remove all references to
+    possible versions of this library that are written in other languages,
+    such as C or Parrot/Pugs/Perl 6.  A C version is unlikely to ever
+    happen, or by that time these references would be severely out of date,
+    and either way they are clutter now.  The Perl 6 version is happening
+    now, but since that is a clone of the Perl 5 version, there's no point
+    for its documentation to refer to itself as a potential future project.
+    In Routine.pm, removed all the code comments for NodeStorage property
+    declarations that specify how they would be represented in a C version
+    of SQL::Routine.  In Routine.pm, removed the whole main documentation
+    section OLDER DOCUMENTATION, whose sole content was details about C
+    implementation, and mentions of Perl 6 etc.  In Language.pod, updated
+    the NODE ATTRIBUTE TYPES intro paragraph to remove the mention of C
+    versions, as well as the mention of there being separate accessor
+    methods for each attribute type (not true since r0.68).
+
+2005-09-14   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.48.2/0.048002 (SVN r813).
+
+    * New code file versions are: Rosetta.pm and Validator.pm 0.48.2.
+
+    * Merged Details.pod into Rosetta.pm:  The Rosetta.pm main
+    documentation section BRIEF FUNCTION AND METHOD LIST was deleted, and
+    all of the significant content of Details.pod was placed in the same
+    location.  These 23 main documentation sections were moved from
+    Details.pod to Rosetta.pm: STRUCTURE, FEATURE SUPPORT VALIDATION,
+    CONSTRUCTOR WRAPPER FUNCTIONS, INTERFACE OBJECT METHODS, INDIRECT
+    APPLICATION OBJECT METHODS, plus [* CONSTRUCTOR FUNCTIONS, * OBJECT
+    METHODS] where '*' is each of [APPLICATION, ENVIRONMENT, CONNECTION,
+    CURSOR, LITERAL, SUCCESS, PREPARATION, ERROR], ENGINE OBJECT FUNCTIONS
+    AND METHODS, DISPATCHER OBJECT FUNCTIONS AND METHODS.  These 5
+    remaining Details.pod documentation sections were redundant and simply
+    deleted with their now superfluous file: NAME, DESCRIPTION, SEE ALSO,
+    AUTHOR, LICENSE AND COPYRIGHT.  Removed all references to Details.pod
+    in all other distribution files.
+
+    * Updated the BRIEF MODULE LIST of Framework.pod to remove the
+    references to SQL::Routine::Details and Rosetta::Details, both of which
+    no longer exist.
+
+    * Updated Framework.pod to remove all references to possible versions
+    of this library that are written in other languages, such as C or
+    Parrot/Pugs/Perl 6.  A C version is unlikely to ever happen, or by that
+    time these references would be severely out of date, and either way
+    they are clutter now.  The Perl 6 version is happening now, but since
+    that is a clone of the Perl 5 version, there's no point for its
+    documentation to refer to itself as a potential future project. Removed
+    the last STRUCTURE paragraph, which specified details about a C
+    representation of Rosetta.  Removed the whole main documentation
+    section AN ALTERNATIVE SECOND VERSION, which mentioned Parrot etc.
+
+2005-09-12   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.70.1/0.070001 (SVN r808).
+
+    * New code file versions are: Routine.pm 0.70.1 and en.pm 0.38.1.
+
+    * Updated all POD-containing files to re-wrap any non-indented POD
+    paragraphs to a 75 character width, which is 5 less than the 80
+    character width they were wrapped to before.  This change should make
+    it easier to copy and paste a diff or patch of this documentation into
+    an email message, where it is quoted at least once, without any line
+    wrapping occurring.  Likewise, these standard documentation files were
+    re-wrapped to 75 characters: ReadMe, INSTALL, LGPL|GPL, Changes, TODO.
+
+    * Revised this Changes file to replace all detail entries for releases
+    0.59 thru 0.70.0 with a significant release list for the same period;
+    also added references to when all 'Rosetta developer release' (#s 1-3)
+    were.
+
+2005-09-12   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.48.1/0.048001 (SVN r808).
+
+    * New code file versions are: Rosetta.pm and Validator.pm 0.48.1 and
+    Rosetta/L/en.pm 0.19.1 and Validator/L/en.pm 0.14.1.
+
+    * Updated the BRIEF MODULE LIST of Framework.pod to reflect that
+    SQL::Routine, Rosetta::Engine::Generic gained a few inner classes
+    recently.
+
+    * Updated all POD-containing files to re-wrap any non-indented POD
+    paragraphs to a 75 character width, which is 5 less than the 80
+    character width they were wrapped to before.  This change should make
+    it easier to copy and paste a diff or patch of this documentation into
+    an email message, where it is quoted at least once, without any line
+    wrapping occurring.  Likewise, these standard documentation files were
+    re-wrapped to 75 characters: ReadMe, INSTALL, LGPL|GPL, Changes, TODO.
+
+    * Revised this Changes file to replace all detail entries for releases
+    0.44 thru 0.48.0 with a significant release list for the same period;
+    also added references to when all 'Rosetta developer release' (#s 1-3)
+    were.
+
+2005-09-08   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.70.0/0.070000 (SVN r787), containing
+    SQL::Routine 0.70.0, was released on CPAN.  This is the first release
+    of this distribution and its modules for which they had 3-part version
+    numbers, rather than floating point version numbers.
+
+    * Rosetta Release 0.48.0/0.048000 (SVN r787), containing Rosetta 0.48.0
+    and Rosetta::Validator 0.48.0, was released on CPAN.  This is the first
+    release of this distribution and its modules for which they had 3-part
+    version numbers, rather than floating point version numbers.
+
+    * These were the current versions cited by the public announcement for
+    Rosetta/SQL-Routine developer release #3.
+
+2005-09-01   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.69/0.690000, containing SQL::Routine 0.69, was
+    released on CPAN.  This is the last release of this distribution and
+    its modules for which they had floating point version numbers, rather
+    than 3-part version numbers.
+
+    * Rosetta Release 0.47/0.470000, containing Rosetta 0.47 and
+    Rosetta::Validator 0.47, was released on CPAN.  This is the first
+    release of Rosetta::Validator following its merger with
+    Rosetta::Utility::EasyBake.  This is the last release of this
+    distribution and its modules for which they had floating point version
+    numbers, rather than 3-part version numbers.
+
+2005-07-07   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.46, containing Rosetta 0.46 and Rosetta::Validator
+    0.46 and Rosetta::Utility::EasyBake 0.01, was released on CPAN.  This
+    is the first release of any distribution to contain
+    Rosetta::Utility::EasyBake, which was split off from Rosetta; this is
+    the first release of Rosetta following that split.  This is the last
+    release of Rosetta::Utility::EasyBake prior to its merger into
+    Rosetta::Validator.
+
+2005-05-13   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.45, containing Rosetta 0.45 and Rosetta::Validator
+    0.45, was released on CPAN.  This is the last release of Rosetta prior
+    to its split into itself and Rosetta::Utility::EasyBake.
+
+2005-04-03   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.58, containing SQL::Routine 0.58, was released
+    on CPAN.
+
+    * Rosetta Release 0.43, containing Rosetta 0.43 and Rosetta::Validator
+    0.43, was released on CPAN.
+
+    * These were the current versions cited by the public announcement for
+    SQL-Routine/Rosetta developer release #2.
+
+2005-03-06   Darren Duncan <perl@DarrenDuncan.net>
+
+    Record update in the PAUSE modules database:
+
+    statd: [a] was [c]
+
+    The resulting entry will be:
+
+    SQL::
+    ::Routine         adpOg Specify all database tasks with SQL routines DUNCAND
+
+2004-11-05   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.48, containing SQL::Routine 0.48, was released
+    on CPAN.  This is the first release of SQL::Routine following its
+    merger with SQL::Routine::SkipID.
+
+2004-11-02   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine-Castaways Release 0.33, containing SQL::Routine::SkipID
+    0.33, was released on CPAN; this is the last release of the
+    SQL-Routine-Castaways distribution.  This is the last release of
+    SQL::Routine::SkipID prior to its merger with SQL::Routine.
+
+2004-11-01   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.47, containing SQL::Routine 0.47, was released
+    on CPAN.  This is the last release of SQL::Routine prior to its merger
+    with SQL::Routine::SkipID.  This is the first release of SQL::Routine
+    following its merger with SQL::Routine::ByTree.
+
+2004-10-29   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.46, containing SQL::Routine 0.46, was released
+    on CPAN.  This is the last release of SQL::Routine prior to its merger
+    with SQL::Routine::ByTree.
+
+2004-10-26   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.37, containing Rosetta 0.37 and Rosetta::Validator
+    0.37, was released on CPAN.  This is the first release for this
+    distribution where Rosetta and Rosetta::Validator explicitly have
+    matching version numbers.
+
+2004-10-04   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine Release 0.43, containing SQL::Routine 0.43, was released
+    on CPAN; this is the first release of the SQL-Routine distribution.
+    This is the first release of any distribution to contain SQL::Routine,
+    which was renamed from SQL::SyntaxModel.  This is the first release of
+    this module following its official registration on the Perl 5 Module
+    List.
+
+    * SQL-Routine-Castaways Release 0.31, containing SQL::Routine::ByTree
+    0.31 and SQL::Routine::SkipID 0.31, was released on CPAN; this is the
+    first release of the SQL-Routine-Castaways distribution.  This is the
+    last release of SQL::Routine::ByTree prior to its merger with
+    SQL::Routine.  This is the first release of any distribution to contain
+    SQL::Routine::ByTree or SQL::Routine::SkipID; they were renamed from
+    SQL::SyntaxModel::ByTree and SQL::SyntaxModel::SkipID respectively.
+
+    * Rosetta Release 0.36, containing Rosetta 0.36 and Rosetta::Validator
+    0.06, was released on CPAN.  This is the last release for this
+    distribution where Rosetta and Rosetta::Validator do not explicitly
+    have matching version numbers.
+
+2004-10-04   Darren Duncan <perl@DarrenDuncan.net>
+
+    The next version of the Module List will list the following module:
+
+      modid:       SQL::Routine
+      DSLIP:       cdpOg
+      description: Specify all database tasks with SQL routines
+      userid:      DUNCAND (Darren Duncan)
+      chapterid:   11 (String_Lang_Text_Proc)
+      enteredby:   BDFOY (brian d foy)
+      enteredon:   Mon Oct  4 20:04:46 2004 GMT
+
+    The resulting entry will be:
+
+    SQL::
+    ::Routine         cdpOg Specify all database tasks with SQL routines DUNCAND
+
+2004-09-13   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-SyntaxModel Release 0.42, containing SQL::SyntaxModel 0.42, was
+    released on CPAN; this is the last release of the SQL-SyntaxModel
+    distribution.  This is the last release of any distribution to contain
+    SQL::SyntaxModel.  This is the last release of this module prior to its
+    official registration on the Perl 5 Module List.
+
+2004-09-01   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-SyntaxModel-ByTree Release 0.30, containing
+    SQL::SyntaxModel::ByTree 0.30, was released on CPAN; this is the last
+    release of the SQL-SyntaxModel-ByTree distribution.  This is the last
+    release of any distribution to contain SQL::SyntaxModel::ByTree.  This
+    is the first release for this distribution and module where they both
+    explicitly have matching version numbers.
+
+    * SQL-SyntaxModel-SkipID Release 0.30, containing
+    SQL::SyntaxModel::SkipID 0.30, was released on CPAN; this is the last
+    release of the SQL-SyntaxModel-SkipID distribution.  This is the last
+    release of any distribution to contain SQL::SyntaxModel::SkipID.  This
+    is the first release for this distribution and module where they both
+    explicitly have matching version numbers.
+
+2004-08-16   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-SyntaxModel Release 0.38, containing SQL::SyntaxModel 0.38, was
+    released on CPAN.  This is the first release for this distribution and
+    module where they both explicitly have matching version numbers.
+
+    * Rosetta Release 0.33, containing Rosetta 0.33 and Rosetta::Validator
+    0.03, was released on CPAN.  This is the first release for this
+    distribution and Rosetta module where they both explicitly have
+    matching version numbers, aside from the explicitly matched releases
+    0.01 thru 0.061.
+
+2004-08-12   Darren Duncan <perl@DarrenDuncan.net>
+
+    Record update in the PAUSE modules database:
+
+    description: [Rigorous database portability] was [Rigorous database portability framework]
+
+    The resulting entry will be:
+
+    Rosetta           cdpOg Rigorous database portability                DUNCAND
+
+2004-08-12   Darren Duncan <perl@DarrenDuncan.net>
+
+    Record update in the PAUSE modules database:
+
+    description: [Rigorous database portability framework] was [Framework for RDBMS-generic apps and schemas]
+
+    The resulting entry will be:
+
+    Rosetta           cdpOg Rigorous database portability framework      DUNCAND
+
+2004-08-06   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-SyntaxModel Release 0.37, containing SQL::SyntaxModel 0.24, was
+    released on CPAN.  This is the last release for this distribution and
+    module where they both do not explicitly have matching version numbers.
+
+    * Rosetta Release 0.32, containing Rosetta 0.16 and Rosetta::Validator
+    0.02, was released on CPAN.  This is the last release for this
+    distribution and Rosetta module where they both do not explicitly have
+    matching version numbers.
+
+    * These were the current versions cited by the public announcement for
+    Rosetta/SQL-SyntaxModel developer release #1.
+
+2004-07-07   Darren Duncan <perl@DarrenDuncan.net>
+
+    Record update in the PAUSE modules database:
+
+    statl: [p] was [h]
+
+    The resulting entry will be:
+
+    Rosetta           cdpOg Framework for RDBMS-generic apps and schemas DUNCAND
+
+2004-07-05   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.31, containing Rosetta 0.15 and Rosetta::Validator
+    0.01, was released on CPAN.  This is the first release of any
+    distribution to contain Rosetta::Validator.
+
+2004-06-29   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-SyntaxModel-ByTree Release 0.29, containing
+    SQL::SyntaxModel::ByTree 0.14, was released on CPAN.  This is the last
+    release for this distribution and module where they both do not
+    explicitly have matching version numbers.
+
+    * SQL-SyntaxModel-SkipID Release 0.29, containing
+    SQL::SyntaxModel::SkipID 0.14, was released on CPAN.  This is the last
+    release for this distribution and module where they both do not
+    explicitly have matching version numbers.
+
+2004-03-22   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-SyntaxModel Release 0.28, containing SQL::SyntaxModel 0.15, was
+    released on CPAN; this is the first release of the SQL-SyntaxModel
+    distribution.
+
+    * SQL-SyntaxModel-ByTree Release 0.28, containing
+    SQL::SyntaxModel::ByTree 0.13, was released on CPAN; this is the first
+    release of the SQL-SyntaxModel-ByTree distribution.
+
+    * SQL-SyntaxModel-SkipID Release 0.28, containing
+    SQL::SyntaxModel::SkipID 0.13, was released on CPAN; this is the first
+    release of the SQL-SyntaxModel-SkipID distribution.
+
+2004-03-21   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.27, containing SQL::SyntaxModel 0.14 and
+    SQL::SyntaxModel::ByTree 0.12 and SQL::SyntaxModel::SkipID 0.12, was
+    released on CPAN.  This is the last release of the Rosetta distribution
+    to contain any version of those 3 modules.
+
+2003-12-21   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.20, containing SQL::SyntaxModel 0.08 and
+    SQL::SyntaxModel::ByTree 0.08 and SQL::SyntaxModel::SkipID 0.08, was
+    released on CPAN.  This is the first release of any distribution to
+    contain SQL::SyntaxModel::ByTree, which was split off from
+    SQL::SyntaxModel; this is the first release of SQL::SyntaxModel
+    following that split.
+
+2003-12-18   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.19, containing SQL::SyntaxModel 0.07 and
+    SQL::SyntaxModel::SkipID 0.07, was released on CPAN.  This is the last
+    release of SQL::SyntaxModel prior to its split into itself and
+    SQL::SyntaxModel::ByTree.
+
+2003-09-26   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.18, containing SQL::SyntaxModel 0.06 and
+    SQL::SyntaxModel::SkipID 0.06, was released on CPAN.  This is the first
+    release of any distribution to contain either SQL::SyntaxModel or
+    SQL::SyntaxModel::SkipID, which are the results of splitting up the
+    renamed SQL::ObjectModel.
+
+2003-09-16   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.17, containing SQL::ObjectModel 0.05, was released
+    on CPAN.  This is the last release of any distribution to contain
+    SQL::ObjectModel; its subsequent release has it renamed and split in
+    two.
+
+2003-06-11   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.13, containing SQL::ObjectModel 0.01, was released
+    on CPAN.  This is the first release of any distribution to contain
+    SQL::ObjectModel; it is the result of merging 3 pre-existing and
+    renamed modules, Rosetta::Schema::DataType and Rosetta::Schema::Table
+    and Rosetta::Schema::View.
+
+2003-06-10   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.12, containing Rosetta::Schema::DataType 0.021 and
+    Rosetta::Schema::Table 0.011 and Rosetta::Schema::View 0.012, was
+    released on CPAN.  This is the last release of those 3 modules prior to
+    their three-way merger into SQL::ObjectModel.
+
+2003-04-27   Darren Duncan <perl@DarrenDuncan.net>
+
+    Record update in the PAUSE modules database:
+
+    statl: [h] was [p]
+
+    The resulting entry will be:
+
+    Rosetta           cdhOg Framework for RDBMS-generic apps and schemas DUNCAND
+
+2003-04-16   Darren Duncan <perl@DarrenDuncan.net>
+
+    Record update in the PAUSE modules database:
+
+    statp: [g] was [p]
+
+    The resulting entry will be:
+
+    Rosetta           cdpOg Framework for RDBMS-generic apps and schemas DUNCAND
+
+2003-04-15   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.07, containing Rosetta 0.062, was released on CPAN.
+    This is the first release for this distribution and Rosetta module
+    where they both do not explicitly have matching version numbers.
+
+2003-03-09   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.061, containing Rosetta 0.061, was released on
+    CPAN. This is the last release for this distribution and Rosetta module
+    where they both explicitly have matching version numbers, aside from
+    the explicitly matched releases 0.33 and later.
+
+2003-03-08   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.06, containing Rosetta::Schema::DataType 0.02 and
+    Rosetta::Schema::Table 0.01 and Rosetta::Schema::View 0.01, was
+    released on CPAN.  This is the first release of any distribution to
+    contain either Rosetta::Schema::Table or Rosetta::Schema::View.
+
+2003-03-04   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.05, containing Rosetta::Schema::DataType 0.01, was
+    released on CPAN.  This is the first release of any distribution to
+    contain Rosetta::Schema::DataType.  This is the first release of any
+    distribution for which some of the existing work that became the
+    SQL-Routine distribution was in the form of executable code, and not
+    just design documentation.
+
+2003-02-10   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.04 was released on CPAN.  This is the last release
+    of any distribution for which all of the existing work that became the
+    SQL-Routine distribution was purely in the form of design
+    documentation, without executable code of any kind.
+
+2003-01-27   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.02, containing Rosetta 0.02, was released on CPAN;
+    this is the first release of the Rosetta distribution, which was
+    renamed from DBIx-Portable.  This is the first release of any
+    distribution to contain Rosetta, which at this time contains no
+    executable code but for declaring a name and version.  Early versions
+    of the design documentation that became the Rosetta distribution were
+    included.
+
+2003-01-21   Darren Duncan <perl@DarrenDuncan.net>
+
+    The next version of the Module List will list the following module:
+
+      modid:       Rosetta
+      DSLIP:       cdpOp
+      description: Framework for RDBMS-generic apps and schemas
+      userid:      DUNCAND (Darren Duncan)
+      chapterid:    7 (Database_Interfaces)
+      enteredby:   ANDK (Andreas J. König)
+      enteredon:   Tue Jan 21 08:20:47 2003 GMT
+
+    The resulting entry will be:
+
+    Rosetta           cdpOp Framework for RDBMS-generic apps and schemas DUNCAND
+
+2003-01-05   Darren Duncan <perl@DarrenDuncan.net>
+
+    * DBIx-Portable Release 0.01, containing DBIx::Portable 0.01, was
+    released on CPAN; this is the only release of the DBIx-Portable
+    distribution, which was subsequently renamed to Rosetta.  This is the
+    only release of any distribution to contain DBIx::Portable, which at
+    this time contains no executable code but for declaring a name and
+    version.  This is the first release of any distribution to contain
+    design documentation that became the Rosetta distribution.
+
+2002-11-12   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Began development on the modules which became the Rosetta
+    distribution as their own entity that is separate from my application,
+    for open-source distribution on CPAN.  The modules were to comprise an
+    RDBMS-generic DB framework for any application to use.
+
+    * Modules based on a template created by h2xs 1.18.
+
+2002-07-28
+
+    * Posted the first significant update to the second prototype, which
+    added an index or cache for data that was expensive to calculate for
+    each page request, and involved rewriting about a fourth of the perl
+    code.
+
+2002-06-07
+
+    * Posted to my website the second public prototype demo of the new
+    self-proprietary database driven application, whose database schema,
+    user interface, feature set, and Perl application code was almost
+    completely rewritten. The new version explicitly had separate modules
+    for database communication and the web interface logic, with
+    MySQL-specific code and database generic or data dictionary code in
+    separate files, and separate files for parts of the web interface.  The
+    program used the same generic CPAN modules as in the first prototype,
+    DBI/MySQL and CGI::Portable.
+
+    * This is when I started writing self-contained code components that
+    were explicitly designed to enable external code that used them to work
+    seamlessly on multiple database products, and hence 2002 is the start
+    of my declared copyright date range for the Rosetta framework.
+
+2001-11-24
+
+    * Posted the last update to the first prototype.
+
+2001-07-12
+
+    * Posted to my website the first public prototype demo of a new
+    self-proprietary database driven application, which is like a cross
+    between a multimedia metadata catalogue and a repository for historical
+    or genealogical data.  This application contained the first prototypes
+    of code that ended up in these modules.  All of this application's
+    code, for database communication and web interface logic, was situated
+    in a single module, with the rest of the program being more generic
+    CPAN modules like DBI (and DBD for MySQL) and CGI::Portable.
+
+2000-05-17
+
+    * Requested MySQL database privileges on my web host so I have
+    something to start developing, testing and deploying database driven
+    applications on.

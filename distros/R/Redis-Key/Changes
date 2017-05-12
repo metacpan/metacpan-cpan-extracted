@@ -1,0 +1,12 @@
+Revision history for Perl extension Redis::Key
+
+0.03 2014-09-13T05:59:34Z
+        - add missing head name
+
+0.02 2013-12-27T15:33:07Z
+        - support SCAN command
+        - disable FLUSHALL, FLUSHDB, QUIT, SELECT, SHUTDOWN, SLAVEOF
+        - some commands pass through
+
+0.01 2013-10-18T14:13:06Z
+        - original version

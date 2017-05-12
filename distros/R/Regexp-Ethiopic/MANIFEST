@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+doc/index.html
+examples/overload.pl
+examples/asfunction.pl
+examples/multi.pl
+examples/utils.pl
+lib/Regexp/Ethiopic.pm
+lib/Regexp/Ethiopic/Amharic.pm
+lib/Regexp/Ethiopic/Geez.pm
+lib/Regexp/Ethiopic/Tigrigna.pm
+t/01re.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 79248819938758fe73dcd330b85a66153a9abc81 Changes
+SHA1 505d8d3505ece77a7a88a07bf7750f63fe08af5e MANIFEST
+SHA1 57e74069e8ad95e00fc8ba744c0f668df40c589b META.yml
+SHA1 8cf910877d52e40011d855185ccba141ef7cef42 Makefile.PL
+SHA1 e4cdadacd5b7f801fdc47742c527a10caa1b1bd2 README
+SHA1 90743497cb803fe49f7957262e0eaa732c30c6b9 etc/RT_ACNSConfig.pm
+SHA1 eabbff114ed29d23a36aea563ce52dca0fc08d25 etc/initialdata
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 6e010ba20a9d0ae23d8d0ff516868c1e571c2d44 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 97d224d59775d101a82fd3ca3841ba150c4e6526 lib/RT/Action/ParseACNS.pm
+SHA1 c0bb3e74dcb0d37be4b1cce6b7b67773f0278487 lib/RT/Condition/ACNSMessage.pm
+SHA1 3d886a04162e3d45df2b8feb2c8f183acf26d063 lib/RT/Extension/ACNS.pm
+SHA1 c5556ff9d745094d7239dd2849910a1f3004e4cb lib/RT/Extension/ACNS/Test.pm
+SHA1 5aa0fe1de0b2ba066054642867fa4d5a652d3bd8 t/basics.t
+SHA1 cb599b936b8b467d064eec3baa41fda529a360fd t/callbacks.t
+SHA1 c61fb7a66a6e1f1ea593e279f9a4d21ed300ae4f t/data/sample1.eml
+SHA1 3c14ca0fc367382c086572ca767da19a71338b5b t/data/sample2.eml
+SHA1 ad00208942df3551f887dd64c05433935912f2e2 t/samples.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSR/zMACgkQMflWJZZAbqB+TgCgnZhsTBBiHdUW8V5ML33qTcgk
+1tgAn1LEF0Hu71414EPlag2e3FPFNQlk
+=lT/E
+-----END PGP SIGNATURE-----

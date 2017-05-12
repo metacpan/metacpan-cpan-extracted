@@ -1,0 +1,22 @@
+Rose-HTMLx-Form-Field-PopUpMenuNumeric
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+ACKNOWLEDGEMENTS
+
+The Minnesota Supercomputing Institute http://www.msi.umn.edu/
+sponsored the development of this software.
+
+COPYRIGHT & LICENSE
+
+Copyright 2009 by the Regents of the University of Minnesota.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

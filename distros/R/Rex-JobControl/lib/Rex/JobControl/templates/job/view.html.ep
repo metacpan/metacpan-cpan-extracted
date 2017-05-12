@@ -1,0 +1,188 @@
+% use DateTime;
+% layout 'job';
+% title "Project " . $project->name . " / Job " . $job->name;
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h2><%= $job->name %></h2>
+      <p><%== $job->description %></p>
+    </div>
+    <div class="col-md-4" style="margin-bottom: 55px;">
+      <h4 style="margin-top: 30px; margin-left: 12px;">Statistics</h4>
+      <div>
+        <div class="col-xs-5">
+          Last execution
+        </div>
+        <div class="col-xs-7">
+          <%= $last_execution %>
+        </div>
+      </div>
+
+      <div>
+        <div class="col-xs-5">
+          Last status
+        </div>
+        <div class="col-xs-7">
+          <%= $last_status %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="col-xs-12">
+      <a href="/project/<%= $project->directory %>/job/<%= $job->directory %>/execute" class="btn btn-sm btn-success">Execute</a>
+      <a href="/project/<%= $project->directory %>/job/<%= $job->directory %>/edit" class="btn btn-sm btn-warning">Edit</a>
+      <button
+        href="/project/<%= $project->directory %>/job/<%= $job->directory %>/delete"
+        job_name="<%= $job->name %>"
+        class="delete-job-button btn btn-sm btn-danger">Remove</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">Options</div>
+  <div class="panel-body">
+    <div>
+      <div class="col-xs-2">
+        Environment
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= $job->environment || "default" %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-xs-2">
+        Fail strategy
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= $job->fail_strategy %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-xs-2">
+        Execute strategy
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= $job->execute_strategy %>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+</div>
+
+
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Steps</div>
+  <div class="panel-body">
+    <ol>
+      % for my $s (@{ $job->steps }) {
+      <li><%= $s %></li>
+      % }
+    </ol>
+  </div>
+</div>
+
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Activity</div>
+  <div class="panel-body">
+
+    <table id="log_table" class="display" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>User</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Rexfile</th>
+          <th>Task</th>
+          <th>Server</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <th>Status</th>
+          <th>User</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Rexfile</th>
+          <th>Task</th>
+          <th>Server</th>
+          <th>&nbsp;</th>
+        </tr>
+      </tfoot>
+      <tbody>
+    % for my $log (@{ $job->get_logs }) {
+    % next unless $log->{start_time};
+    % if ( exists $log->{start_time} && exists $log->{end_time} ) {
+    % for my $status_entry (@{ $log->{status} }) {
+        <tr>
+          % my $start_dt = DateTime->from_epoch(epoch => $log->{start_time});
+          % my $end_dt = DateTime->from_epoch(epoch => $log->{end_time});
+          <td><%= $status_entry->{status} %></td>
+          <td><%= $log->{user} %></td>
+          <td><%= $start_dt->ymd("-") %> <%= $start_dt->hms(":") %></td>
+          <td><%= $end_dt->ymd("-") %> <%= $end_dt->hms(":") %></td>
+          <td><%= $status_entry->{rexfile} %></td>
+          <td><%= $status_entry->{task} %></td>
+          <td><%= $status_entry->{server} %></td>
+          <td>[<a href="/project/<%= $project->directory %>/job/<%= $job->directory %>/<%= $log->{id} %>/output">Log</a>]</td>
+        </tr>
+    % }
+    % } else {
+        <tr>
+          % my $start_dt = DateTime->from_epoch(epoch => $log->{start_time});
+          <td>running</td>
+          <td><%= $log->{user} %></td>
+          <td><%= $start_dt->ymd("-") %> <%= $start_dt->hms(":") %></td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>[<a href="/project/<%= $project->directory %>/job/<%= $job->directory %>/<%= $log->{id} %>/output">Log</a>]</td>
+        </tr>
+    % }
+    % }
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<script>
+$(document).ready(function() {
+
+  $('#log_table').dataTable();
+  $(".delete-job-button").click(function() {
+    delete_job("Remove " + $(this).attr("job_name") + "?", $(this).attr("href"));
+  });
+
+} );
+
+
+</script>
+

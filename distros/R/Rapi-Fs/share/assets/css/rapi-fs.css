@@ -1,0 +1,90 @@
+.x-tree-node .node-hidden {
+  opacity: 0.6;
+}
+
+.x-tree-node .node-symlink span {
+  color: DarkCyan ;
+}
+
+.x-tree-node .node-unreadable span {
+  color: DarkRed;
+  font-style: italic;
+}
+
+div.node-link-target {
+  font-family: "Lucida Console",Monaco,monospace;
+}
+.node-link-target .arrow {
+  color:grey;
+  font-weight: normal;
+  vertical-align:middle;
+  font-size: 1.8em;
+}
+
+.node-link-target .txt {
+  color: DarkCyan ;
+  vertical-align:middle;
+  font-weight: bolder;
+  font-size: 0.9em !important;
+}
+
+
+.rapi-fs-fileview table.r-simple-table tr * {
+  white-space: nowrap;
+}
+.rapi-fs-fileview .grey {
+  color:grey !important;
+  font-size:0.9em;
+  font-weight: normal;
+}
+.rapi-fs-fileview .bigger {
+  font-weight:bold;
+  font-size:1.1em;
+}
+.rapi-fs-fileview .download {
+  font-weight:bold;
+  font-size:12px;
+}
+.rapi-fs-fileview .with-icon {
+  display: inline;
+  border-bottom: medium none;
+}
+.rapi-fs-fileview tr.vert {
+  font-size: 0.9em;
+}
+.rapi-fs-fileview tr.vert th {
+  vertical-align: bottom;
+  color: #3F3F3F;
+  padding: 10px 8px 0px 5px;
+}
+.rapi-fs-fileview tr.vert td {
+  vertical-align: top;
+  padding: 0px 8px 0px 5px;
+}
+.rapi-fs-fileview div.file-content {
+  border: 1px solid #dddddd;
+  position: absolute;
+  top: 200px;
+  bottom: 5px;
+  left: 5px;
+  right: 25px;
+  min-height: 200px;
+  min-width: 400px;
+}
+.rapi-fs-fileview div.file-content div.img-wrap {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+}
+.rapi-fs-fileview div.file-content div.img-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.rapi-fs-fileview div.file-content iframe {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+
+}

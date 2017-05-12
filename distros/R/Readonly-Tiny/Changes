@@ -1,0 +1,16 @@
+Revision history for Readonly::Tiny
+
+4   2016-08-27 
+    Internals::hv_clear_placeholders has moved. Use the public
+    Hash::Util API instead.
+
+3   2016-01-07
+    Fix qr//s on perls before 5.12.
+
+2   2015-12-26
+    Export tests.
+    I forgot the MANIFEST (sorry).
+
+1   2015-12-26
+    Initial version, creating readonly values using SvREADONLY without
+    cloning deep structures.

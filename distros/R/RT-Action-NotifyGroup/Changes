@@ -1,0 +1,20 @@
+Abbreviations
+	fea - feature
+	fix - fix
+	upd - update
+
+Revision history for Perl module RT::Action::NotifyGroup
+
+	* fea: Output script usage help if Pod::PlainText installed
+		or perldoc hint in other case
+	* upd: new documentaton for admin script
+	* fea: Support autoconversion of old arguments
+	* fea/fix: get rid of Storable using to save args
+	* fea: New M::I::Configure that prevent installation of .in files
+		get rid of autoconf use/step in installation process
+		and should fix PAUSE indexing of the script
+
+0.01 Wed Sep  8 15:10:13 2004
+	* original version;
+
+

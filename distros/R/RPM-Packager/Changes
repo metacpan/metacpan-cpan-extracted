@@ -1,0 +1,64 @@
+Revision history for RPM-Packager
+
+0.3.5   2016/3/5
+        Fixing up license information in Makefile.PL
+
+0.3.4   2016/3/5
+        Updating license information
+
+0.3.3   2016/2/23
+        Added architecture to the stanza
+
+0.3.2   2016/1/29
+        Updating POD to discuss shellscript for after_install
+
+0.3.1   2015/12/24
+        Emulating copy is tricky when dealing with hidden files / directories
+
+0.3.0   2015/12/22
+        Attempting to go pure Perl for copying files
+
+0.2.1   2015/12/14
+        Fixing a bug introduced in 0.2.0
+
+0.2.0   2015/12/10
+        Replaced some system calls with Perl implementation
+
+0.1.2   2015/12/5
+        Mocking out create_rpm test
+
+0.1.1   2015/12/1
+        Adding test data in MANIFEST for tests
+
+0.1.0   2015/11/18
+        Added after_install to run a script after package installation (%post)
+
+0.0.10  2015/9/16
+        Sending STDERR from which command to /dev/null
+
+0.0.9   2015/9/15
+        Making os field optional for os-independent packages
+
+0.0.8   2015/9/8
+        Trying to fix this POD again
+
+0.0.7   2015/9/7
+        Fixed up YAML in POD
+
+0.0.6   2015/9/6
+        Updating README
+
+0.0.5   2015/9/6
+        Adding docs on YAML file creation
+
+0.0.4   2015/9/4
+        Fixing up the language of POD
+
+0.0.3   2015/9/4
+        Tweaking Makefile.PL to distribute the driver script
+
+0.0.2   2015/9/4
+        Updating MANIFEST
+
+0.0.1   2015/7/31
+        Initial version

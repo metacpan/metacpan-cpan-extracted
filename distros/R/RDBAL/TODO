@@ -1,0 +1,15 @@
+                                            $Date: 1998/03/13 23:10:00 $
+
+These are features that would be nice to have and might even happen someday.
+The order of items does not reflect priority.
+
+  o  Add RDF (Resource Document Format) generation
+
+  o  Other types of database servers (PostgreSQL, mSQL, mySQL, etc.).
+
+  o  More documentation
+
+  o  More tests
+
+  o  Fix bugs, if there are any...
+

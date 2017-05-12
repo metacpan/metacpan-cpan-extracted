@@ -1,0 +1,9 @@
+Revision history for Perl extension Redis::Parser::XS
+
+0.02  Fri Dec 23 21:47:51 EET 2011
+	- fix: forgot to parse nested :, +, - replies in multi-bulk,
+	  thanks to Chip Salzenberg;
+
+0.01  Sat Nov 26 23:38:40 EET 2011
+	- original version;
+

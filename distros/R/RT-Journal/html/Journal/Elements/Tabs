@@ -1,0 +1,78 @@
+%# BEGIN LICENSE BLOCK
+%# 
+%#  Copyright (c) 2002-2003 Jesse Vincent <jesse@bestpractical.com>
+%#  
+%#  This program is free software; you can redistribute it and/or modify
+%#  it under the terms of version 2 of the GNU General Public License 
+%#  as published by the Free Software Foundation.
+%# 
+%#  A copy of that license should have arrived with this
+%#  software, but in any event can be snarfed from www.gnu.org.
+%# 
+%#  This program is distributed in the hope that it will be useful,
+%#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+%#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%#  GNU General Public License for more details.
+%# 
+%# END LICENSE BLOCK
+
+<& /Elements/Header, Title => $Title &>
+<& /Elements/PageLayout,
+    current_toptab => 'Journal/index.html',
+    current_tab => $current_toptab,
+    current_subtab => $current_tab,
+    toptabs => $toptabs,
+    tabs => $second_tabs,
+    topactions => $topactions,
+    actions => $actions,
+    subactions => $subactions,
+    title => $Title
+&>
+<%INIT>
+my $action;
+
+
+my $toptabs = { a => { title => loc('RT'),
+                       path  => '', },
+                aab => { title   => loc('Journals'),
+                         path    => 'Journal/index.html'}
+                };
+
+my $second_tabs = { 'aab' => { title => loc('My Journal'),
+                                               path  => 'Journal/Show.html?user='.$session{'CurrentUser'}->Name },
+                                       post => { title => loc('Post'),
+                                                 path => 'Journal/Post.html' },
+#                                      'articles' => { title => loc('Friends'),
+#                                              path => 'Journal/Show.html?who=friends' },
+#                                      'articles2' => { title => loc('Workgroup'),
+#                                              path => 'Journal/Show.html?who=workgroup' },
+#                                      'search' => { title => loc('Search'),
+#                                              path => 'Journal/Search.html' },
+#                                      'd' => { title => loc('Configuration'),
+#                                               path  => 'Journal/Admin.html' } 
+                                 };
+
+my $topactions = {
+        B => { html => $m->scomp('/Journal/Elements/Search') }
+        };
+
+                    
+  # Now let callbacks add their extra tabs
+  $m->comp('/Elements/Callback', topactions => $topactions, toptabs => $toptabs, %ARGS);
+
+  foreach my $tab (sort keys %{$second_tabs}) {
+    if ($second_tabs->{$tab}->{'path'} eq $current_toptab) {
+      $second_tabs->{$tab}->{"subtabs"} = $tabs;
+      $second_tabs->{$tab}->{"current_subtab"} = $current_tab;
+    }
+        
+  }
+</%INIT>
+<%ARGS>
+$current_toptab => undef
+$current_tab => undef
+$tabs => undef
+$actions => undef
+$subactions => undef
+$Title => undef
+</%ARGS>

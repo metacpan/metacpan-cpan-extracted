@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues total_count="64" offset="0" limit="25" type="array">
+  <issue>
+    <id>444</id>
+    <project id="68" name="zejahz1Uqu5uNgi.ru"/>
+    <tracker id="1" name="Bug"/>
+    <status id="1" name="Новая"/>
+    <priority id="5" name="Высокий"/>
+    <author id="9" name="ahdahyoo4Thi"/>
+    <assigned_to id="10" name="aeri6ohror6I"/>
+    <subject>Не добавляется картинка для товаров с макбука</subject>
+    <description>
+Описание проблемы со слов клиента: в админке невозможно с макбука загрузить картинку в карточку товара. Все кнопки есть. Просто появляется поле с новой картинкой БЕЗ картинки. Нужно подтвердить проблему, оттестировать. Если подтвердится проблема, то устранить. В Safari я проверил, такой проблемы у меня не обнаружилось.</description>
+    <start_date>2012-07-11</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-11T12:12:01+04:00</created_on>
+    <updated_on>2012-07-11T13:11:39+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>443</id>
+    <project id="43" name="Kaegoojeibo8"/>
+    <tracker id="3" name="Support"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="35" name="ieFaiheir7ze"/>
+    <assigned_to id="24" name="Контент"/>
+    <subject>поставить счетчик</subject>
+    <description>поставить код на все страницы
+
+&lt;!-- /Yandex.Metrika counter --&gt;</description>
+    <start_date>2012-07-11</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-11T11:37:58+04:00</created_on>
+    <updated_on>2012-07-11T11:40:07+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>441</id>
+    <project id="19" name="IPhaibe7thui"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="33" name="posa3faeGi5o"/>
+    <subject>Выводить текст на сайте более контрастно</subject>
+    <description>
+</description>
+    <start_date>2012-07-11</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-11T11:26:06+04:00</created_on>
+    <updated_on>2012-07-11T11:26:06+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>439</id>
+    <project id="32" name="noh8eeDieloo"/>
+    <tracker id="2" name="Feature"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="35" name="ieFaiheir7ze"/>
+    <assigned_to id="4" name="Разработка"/>
+    <fixed_version id="18" name="1.01"/>
+    <subject></subject>
+    <description>1. создать раздел "Видео", ссылку на него сделать со слова на главной "Видео": http://sc.shogo.ru/i/C6xUP2Cz.png
+&lt;/iframe&gt;</description>
+    <start_date>2012-07-11</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-11T11:11:37+04:00</created_on>
+    <updated_on>2012-07-11T11:11:37+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>438</id>
+    <project id="67" name="ahchuBaLu1uv"/>
+    <tracker id="1" name="Bug"/>
+    <status id="1" name="Новая"/>
+    <priority id="6" name="Срочный"/>
+    <author id="15" name="eo1sooR6yeez"/>
+    <subject>Программирование</subject>
+    <description>
+</description>
+    <start_date>2012-07-11</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-11T10:33:26+04:00</created_on>
+    <updated_on>2012-07-11T10:33:26+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>436</id>
+    <project id="57" name="uu6jie8Kauyu"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="15" name="eo1sooR6yeez"/>
+    <subject>Контент (сео)</subject>
+    <description>
+
+</description>
+    <start_date>2012-07-11</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-11T10:16:21+04:00</created_on>
+    <updated_on>2012-07-11T10:18:41+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>433</id>
+    <project id="50" name="wah0uu8Ohnoonu5"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="14" name="To5niecha9ae"/>
+    <parent id="284"/>
+    <subject>Скорректировать текст, прокручивающийся в баннерах:</subject>
+    <description>Скорректировать текст, прокручивающийся в баннерах:
+
+фотографов.</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T18:15:19+04:00</created_on>
+    <updated_on>2012-07-10T18:15:32+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>432</id>
+    <project id="50" name="wah0uu8Ohnoonu5"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="14" name="To5niecha9ae"/>
+    <parent id="284"/>
+    <subject>Скорректировать robots.txt</subject>
+    <description>sdfsdf
+</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T18:14:45+04:00</created_on>
+    <updated_on>2012-07-10T18:14:45+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>430</id>
+    <project id="50" name="wah0uu8Ohnoonu5"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="14" name="To5niecha9ae"/>
+    <parent id="284"/>
+    <subject>Скорректировать копирайт:</subject>
+    <description>
+&gt;
+Все права защищены. Полное или частичное копирование материалов запрещено. </description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T18:13:38+04:00</created_on>
+    <updated_on>2012-07-10T18:13:38+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>429</id>
+    <project id="50" name="wah0uu8Ohnoonu5"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="14" name="To5niecha9ae"/>
+    <parent id="284"/>
+    <subject>поправить странички</subject>
+    <description>
+</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T18:13:09+04:00</created_on>
+    <updated_on>2012-07-10T18:13:09+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>428</id>
+    <project id="50" name="wah0uu8Ohnoonu5"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="14" name="To5niecha9ae"/>
+    <parent id="284"/>
+    <subject>Верхнее меню:</subject>
+    <description>
+</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T18:11:59+04:00</created_on>
+    <updated_on>2012-07-10T18:11:59+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>427</id>
+    <project id="50" name="wah0uu8Ohnoonu5"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="14" name="To5niecha9ae"/>
+    <parent id="284"/>
+    <subject>Закрыть в noindex:</subject>
+    <description>акрыть в noindex:
+http://sc.shogo.ru/i/v80GJneKH.png</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T18:11:18+04:00</created_on>
+    <updated_on>2012-07-10T18:11:18+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>424</id>
+    <project id="24" name="sieth1xooweC"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="34" name="iD8guiqueigh"/>
+    <assigned_to id="24" name="Контент"/>
+    <fixed_version id="20" name="1.02"/>
+    <subject>Добавить ссылки на информацию по теме на страницах по типам штор</subject>
+    <description>
+
+</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T17:35:22+04:00</created_on>
+    <updated_on>2012-07-10T17:35:22+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>418</id>
+    <project id="58" name="iengooS1oach"/>
+    <tracker id="3" name="Support"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="35" name="ieFaiheir7ze"/>
+    <assigned_to id="24" name="Контент"/>
+    <fixed_version id="11" name="1.01"/>
+    <subject>неточности в разделе контактов</subject>
+    <description>
+</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T15:26:46+04:00</created_on>
+    <updated_on>2012-07-10T15:26:46+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>416</id>
+    <project id="48" name="ot7eiY4woo1T"/>
+    <tracker id="2" name="Feature"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="14" name="To5niecha9ae"/>
+    <subject>Наполнение в рамках абонемента</subject>
+    <description>
+    </description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T14:58:01+04:00</created_on>
+    <updated_on>2012-07-10T14:58:01+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>413</id>
+    <project id="55" name="niX8iyohgi3i"/>
+    <tracker id="2" name="Feature"/>
+    <status id="1" name="Новая"/>
+    <priority id="5" name="Высокий"/>
+    <author id="14" name="To5niecha9ae"/>
+    <subject>заменить сертификаты и некоторую информацию.</subject>
+    <description>
+.ru/i/UxJ1OgoEq.png</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T12:34:40+04:00</created_on>
+    <updated_on>2012-07-10T12:34:40+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>411</id>
+    <project id="67" name="ahchuBaLu1uv"/>
+    <tracker id="1" name="Bug"/>
+    <status id="1" name="Новая"/>
+    <priority id="5" name="Высокий"/>
+    <author id="15" name="eo1sooR6yeez"/>
+    <assigned_to id="24" name="Контент"/>
+    <subject>Контент и программирование (ремонт)</subject>
+    <description>
+</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T11:59:03+04:00</created_on>
+    <updated_on>2012-07-11T12:00:49+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>410</id>
+    <project id="22" name="iek7iYai9ead"/>
+    <tracker id="1" name="Bug"/>
+    <status id="1" name="Новая"/>
+    <priority id="6" name="Срочный"/>
+    <author id="9" name="ahdahyoo4Thi"/>
+    <assigned_to id="12" name="eo1sooR6yeez"/>
+    <fixed_version id="22" name="1.02"/>
+    <subject>Параметры работают некорректно</subject>
+    <description>
+</description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T10:17:45+04:00</created_on>
+    <updated_on>2012-07-10T17:52:19+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>408</id>
+    <project id="22" name="iek7iYai9ead"/>
+    <tracker id="1" name="Bug"/>
+    <status id="1" name="Новая"/>
+    <priority id="6" name="Срочный"/>
+    <author id="9" name="ahdahyoo4Thi"/>
+    <assigned_to id="12" name="eo1sooR6yeez"/>
+    <fixed_version id="22" name="1.02"/>
+    <subject>Не копируются нормально товары</subject>
+    <description></description>
+    <start_date>2012-07-10</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-10T09:09:47+04:00</created_on>
+    <updated_on>2012-07-10T17:52:31+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>393</id>
+    <project id="42" name="dooz4eighi8E"/>
+    <tracker id="3" name="Support"/>
+    <status id="1" name="Новая"/>
+    <priority id="6" name="Срочный"/>
+    <author id="32" name="iquei4zeiR8U"/>
+    <assigned_to id="25" name="Тестировка"/>
+    <subject>Доработка раздела дилеры (координаты, карта)</subject>
+    <description>
+5. При клике на страничку дилера с карты открывается 404я    http://sc.shogo.ru/i/UmeNvlap.png   http://sc.shogo.ru/i/SF6mAmfnq.png</description>
+    <start_date>2012-07-09</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-09T10:44:20+04:00</created_on>
+    <updated_on>2012-07-10T17:58:22+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>391</id>
+    <project id="58" name="iengooS1oach"/>
+    <tracker id="3" name="Support"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="35" name="ieFaiheir7ze"/>
+    <assigned_to id="24" name="Контент"/>
+    <fixed_version id="11" name="1.01"/>
+    <subject>создание нового раздела</subject>
+    <description>
+</description>
+    <start_date>2012-07-09</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-09T10:07:03+04:00</created_on>
+    <updated_on>2012-07-10T09:45:35+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>367</id>
+    <project id="62" name="oosheineij0A"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="5" name="Высокий"/>
+    <author id="34" name="iD8guiqueigh"/>
+    <assigned_to id="24" name="Контент"/>
+    <parent id="361"/>
+    <subject>Правки по текстам</subject>
+    <description>
+</description>
+    <start_date>2012-07-05</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-05T16:55:17+04:00</created_on>
+    <updated_on>2012-07-05T16:55:17+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>366</id>
+    <project id="62" name="oosheineij0A"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="5" name="Высокий"/>
+    <author id="34" name="iD8guiqueigh"/>
+    <assigned_to id="24" name="Контент"/>
+    <parent id="361"/>
+    <subject>Правки по текстам</subject>
+    <description>
+
+</description>
+    <start_date>2012-07-05</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-05T16:50:30+04:00</created_on>
+    <updated_on>2012-07-05T16:50:30+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>352</id>
+    <project id="44" name="suhoowooS4ei"/>
+    <tracker id="3" name="Support"/>
+    <status id="1" name="Новая"/>
+    <priority id="4" name="Средний"/>
+    <author id="32" name="iquei4zeiR8U"/>
+    <assigned_to id="24" name="Контент"/>
+    <subject>Добавление видео к тренажеру</subject>
+    <description>Добавить видео  http://www.youtube.com/watch?v=shiEFKP26Ow&amp;feature=plcp  к тренажеру Т500</description>
+    <start_date>2012-07-05</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-05T11:42:09+04:00</created_on>
+    <updated_on>2012-07-05T11:42:09+04:00</updated_on>
+  </issue>
+  <issue>
+    <id>346</id>
+    <project id="8" name="eg2Ooxiel1ee.ru"/>
+    <tracker id="4" name="SEO"/>
+    <status id="1" name="Новая"/>
+    <priority id="6" name="Срочный"/>
+    <author id="32" name="iquei4zeiR8U"/>
+    <assigned_to id="31" name="eiSeef2Eecha"/>
+    <subject>Тексты-описания кона и кросс</subject>
+    <description>Разместить описания моделей:  Размещение описаний новых моделей</description>
+    <start_date>2012-07-05</start_date>
+    <due_date/>
+    <done_ratio>0</done_ratio>
+    <estimated_hours/>
+    <created_on>2012-07-05T11:05:09+04:00</created_on>
+    <updated_on>2012-07-05T11:06:43+04:00</updated_on>
+  </issue>
+</issues>

@@ -1,0 +1,41 @@
+NAME
+    RDF::QueryX::Lazy - yeah, all those PREFIX definitions get boring
+
+SYNOPSIS
+     my $query = RDF::QueryX::Lazy->new(<<SPARQL);
+     SELECT *
+     WHERE {
+       ?person foaf:name ?name .
+       OPTIONAL { ?person foaf:homepage ?page . }
+     }
+     SPARQL
+
+DESCRIPTION
+    This is a fairly trivial subclass of RDF::Query that auto-defines many
+    prefixes for you, so you can be lazy. It should have most of the common
+    ones in there.
+
+    Oh yeah, and if you want, you can pass a key 'lazy' in the RDF::Query
+    %options hash with additional prefix mappings.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-QueryX-Lazy>.
+
+SEE ALSO
+    RDF::Query.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

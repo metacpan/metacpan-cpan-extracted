@@ -1,0 +1,72 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Rose-HTML-Objects",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone::PP" : "0",
+            "DateTime" : "0.20",
+            "Email::Valid" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "HTML::Entities" : "0",
+            "IO::String" : "1.08",
+            "Image::Size" : "0",
+            "List::MoreUtils" : "0",
+            "Rose::DateTime" : "0.532",
+            "Rose::Object" : "0.854",
+            "Rose::URI" : "0.021",
+            "Scalar::Util" : "0",
+            "URI::Escape" : "0",
+            "base" : "2.18",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Rose-HTML-Objects"
+      },
+      "homepage" : "http://rosecode.org",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/siracusa/rose/tree/master/modules/Rose-HTML-Objects"
+      },
+      "x_MailingList" : "http://groups.google.com/group/rose-html-objects"
+   },
+   "version" : "0.623"
+}

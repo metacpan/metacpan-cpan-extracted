@@ -1,0 +1,92 @@
+=head1 NAME
+
+Reaction::Manual::Templates
+
+=head1 DESCRIPTION
+
+This is a detailed description of reaction's template system.
+
+=head1 OVERVIEW
+
+=head2 SKINS
+
+=head3 Organization
+
+Reaction's templates are organized into sets called skins. A skin is defined by
+a directory containing several template files and static assets. Skins live in
+directories under the C<share/skin> path in your application distribution. Each
+directory and the template files within compose their own skin. Templates live
+in the C<layout> directory and assets live in the C<web> directory.
+
+=head3 Core Skins
+
+Reaction provides prebuilt skins called C<base> and C<default>. These provide
+the basic html components for a typical web application, such as forms, fields
+and table list views. Skins are extensible, which means you can include all the
+templates from another skin within your custom skin through a configuration
+directive instead of copying template files, making your template setup easy to
+maintain.
+
+=head3 Configuration Directives
+
+The C<share/skin/defaults.conf> file holds general application-wide skin
+configuration. Each skin can be configured individually by placing a C<skin.conf>
+file in it's root directory.
+
+=over
+
+=item * extends $skin_name
+
+Defines C<$skin_name> as the base skin.
+
+=back
+
+=head2 TEMPLATES
+
+Template files are sets of pod-like directives which define a set of layouts.
+They are used for the sole purpose of describing how the data is to be layed out
+at render time. Each template file contains a set of layout definitions which are
+used by reaction widgets to generate the final content. Variables are defined and
+populated in the widgets then passed to the layout fragments in a given template
+file.
+
+=head3 Template Directives
+
+=over
+
+=item * =for layout $fragment_name
+
+Defines a layout fragment called C<$fragment_name>, everything under the
+directive up to the next fragment directive is part of the definition. By default,
+variables with the same name as an existing layout definition are rendered as the
+equivalent layout. Widgets might interfere and select an alternate layout or
+template to be rendered instead. A templates' rendering process always starts by
+a layout called C<widget>.
+
+=item * =extends $template_name
+
+Makes the current template inherit the layout definitions in C<$template_name>.
+Layouts defined in the template override the ones in the base template. The
+special C<NEXT> template name specifies that inheritance should use the equivalent
+template from the base skin as configured in C<skin.conf>.
+
+=item * =widget $widget_name
+
+Selects C<$widget_name> as the driver for the current template.
+
+=back
+
+=head2 LAYOUT FRAGMENTS
+
+=head3 Scope
+
+A layout definition creates a variable scope attached to that layout. Variables
+only exist within their specific layout fragments, that is, they are scoped to
+specific layouts. Overriding a layout places it in the same scope as the base layout.
+
+=head3 Using layouts defined in base templates
+
+The special [% call_next %] variable will be replaced by the layout in the base
+template within the same scope.
+
+=cut

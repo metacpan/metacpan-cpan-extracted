@@ -1,0 +1,63 @@
+Regexp-Keywords
+
+A regexp builder to test against keywords lists.
+
+This module helps you to search inside a list of keywords for some
+of them, using a simple query syntax with AND, OR and NOT operators
+and grouping.
+
+    use Regexp::Keywords;
+    my $kw = Regexp::Keywords->new();
+    
+    my $wanted = 'comedy + ( action , romance ) - thriller';
+    $kw->prepare($wanted);
+    
+    my $movie_tags = 'action,comedy,crime,fantasy,adventure';
+    print "Buy ticket!\n" if $kw->test($movie_tags);
+
+Keywords, also known as tags, are used to classify things in a
+category. Many tags can be assigned at the same time to an item,
+even if they belong to different available categories.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Regexp::Keywords
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Regexp-Keywords
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Regexp-Keywords
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Regexp-Keywords
+
+    Search CPAN
+        http://search.cpan.org/dist/Regexp-Keywords/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Victor Parada
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

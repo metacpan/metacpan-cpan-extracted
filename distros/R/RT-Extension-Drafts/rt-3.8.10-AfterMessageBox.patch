@@ -1,0 +1,12 @@
+diff --git a/share/html/Ticket/Update.html b/share/html/Ticket/Update.html
+index 50c6f93..94e9a94 100755
+--- a/share/html/Ticket/Update.html
++++ b/share/html/Ticket/Update.html
+@@ -144,6 +144,7 @@
+ % $IncludeSignature = 0 if $Action ne 'Respond' && !RT->Config->Get('MessageBoxIncludeSignatureOnComment');
+ <& /Elements/MessageBox, Name=>"UpdateContent", IncludeSignature => $IncludeSignature, %ARGS &>
+ % }
++% $m->callback( %ARGS, CallbackName => 'AfterMessageBox' );
+ </td></tr>
+ </table>
+ 

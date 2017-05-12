@@ -1,0 +1,188 @@
+Revision History for Redis-Dump
+===============================
+
+0.016
+-----
+
+commit 248dc44fdff1f89fd8db283c2693cc4d673053e0
+Author: Remi Paulmier <remi.paulmier@gmail.com>
+
+    added test for database selection
+
+commit 33d4f667983fe42e2092d96829a5ee13214f86f6
+Author: Remi Paulmier <remi.paulmier@gmail.com>
+
+    added database choice in Restore.pm
+
+commit 5f73606e325db856bf096d770e829946b6f13ca8
+Author: Remi Paulmier <remi.paulmier@gmail.com>
+
+    added database choice in Dump.pm
+
+commit 264c8105deb46e3aebab01faa9341f666195cb87
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    eol.
+
+commit 33da9bfceb0079db6ca2e25b6e794912796d4e5c
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Prepare for 0.15 release.
+
+commit d6367b8dc302c29c617e05563ad6e179651aed41
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    redis-config is a new cmd for get/restore config from a redis server.
+
+commit 562b5f8d9cf683cfaf8577cc454131110cd70f75
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Add initial support to dump config of redis server too.
+
+v0.014 2011-07-14
+-----------------
+
+commit 6d1e968f73238f94d25def3eea0ebfe041d9d35b
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Make get_keys better with filter.
+
+v0.013 2011-06-20
+-----------------
+
+commit 0e09c322533ebc30b1a935a8fb064c2f996b1fcc
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    New option --hidevalues.
+
+v0.012 2011-06-16
+-----------------
+
+commit 3285a8aabeb8dca66a4af9b1aeb1438a7e56c32a
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Typo.
+
+commit 957092dcf39eb39a91bd98bbe9e4b299f9629212
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    typo POD.
+
+v0.011 2011-06-16
+-----------------
+
+commit 079940373e058c7d86fa8f1f044a23b965407879
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    POD, prepare to v0.011.
+
+commit c8118b552a3dd2e32eaf585d285ba93dec1d9876
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Add initial redis-restore.
+
+v0.010 2011-06-16
+-----------------
+
+commit aafb1f4bfe224f02d3b5ecc4410beeb34788d792
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Bugfix in filter option with zsets and sets.
+
+v0.009 2011-06-16
+-----------------
+
+commit 3c7070f5a95b62f6e0d9ffbc2f25832d4ec9c2e6
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Fix abstract.
+
+v0.008 2011-06-16
+-----------------
+
+commit 4902cf73d0b99836639b344654c81be83e647a9a
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Documentation.
+
+commit 2a222c5524d8ec57678285c7ed1317e3c4e0e138
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    typo.
+
+commit 95e8df7789dce76821e00495eb72a70f89e7bcf6
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Test for filter (type)
+
+v0.007 2011-06-15
+-----------------
+
+commit 2d239d27e5341245fc821b39197fd525991fd628
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Show score in sorted sets.
+
+v0.006 2011-06-15
+-----------------
+
+commit 77312e97521b8e17270305f8cb0b13133d7f8b08
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    show_type and type filter options.
+
+v0.005 2011-06-15
+-----------------
+
+commit f5e656609be4fa377adf9fb0e714b7797b1315c6
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    POD.
+
+v0.004 2011-06-15
+-----------------
+
+commit 73d030014a16d8abab35e7f4849f250d269bcf7d
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Support for sorted set.
+
+commit 6438d2104915ce115b3e4c0623d39bdb18666977
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Support for set stored.
+
+v0.003 2011-06-15
+-----------------
+
+commit 55f14502f99d7681e45e06af710f3a14dcb7267c
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Examples.
+
+commit e1597ac73f99b341c435bea7ec2ca74de090759b
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Add filter option.
+
+v0.002 2011-06-15
+-----------------
+
+commit 55fa81567cb257b9bbd03a714464957ed75593e2
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    0.002 dist.ini
+
+commit abc3906a27624751ec9f3945e94fce3c1b06420e
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Use Redis 1.904.
+
+commit 20a83595e67f15f871b4b4ef1fa40c80c316b920
+Author: Thiago Berlitz Rondon <thiago.rondon@gmail.com>
+
+    Skip Test::SpawnRedisServer in dist.ini.
+
+===================================
+End of changes in the last 365 days
+===================================

@@ -1,0 +1,67 @@
+NAME
+    RT::BugTracker::Public - Adds a public, (hopefully) userfriendly bug
+    tracking UI to RT
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Set(@Plugins, qw(RT::BugTracker::Public));
+
+        or add RT::BugTracker::Public to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+    You can find local/etc/BugTracker-Public/RT_SiteConfig.pm with example
+    of configuration and sane defaults. Add require in the main
+    RT_SiteConfig.pm or define options there.
+
+  WebPublicUser
+    Make sure to create the public user in your RT system and add the line
+    below to your RT_SiteConfig.pm.
+
+        Set( $WebPublicUser, 'guest' );
+
+    If you didn't name your public user 'guest', then change accordingly.
+
+    The public user should probably be unprivileged and have the following
+    rights
+
+        CreateTicket
+        ModifyCustomField
+        ReplyToTicket
+        SeeCustomField
+        SeeQueue
+        ShowTicket
+
+    If you want the public UI to do anything useful. It should NOT have the
+    ModifySelf right.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-BugTracker-Public@rt.cpan.org|mailto:bug-RT-BugTracker-Public@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-BugTracker-Public>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2014 by Best Practical Solutions
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

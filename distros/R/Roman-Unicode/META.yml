@@ -1,0 +1,30 @@
+---
+abstract: 'Make roman numerals, using the Unicode characters for them'
+author:
+  - 'brian d foy <brian.d.foy@gmail.com>'
+build_requires:
+  Test::More: '0.94'
+  Unicode::Casing: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Roman-Unicode
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Unicode::Normalize: '0'
+  Unicode::UCD: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/briandfoy/Roman-Unicode/issues
+  homepage: https://github.com/briandfoy/Roman-Unicode
+  repository: https://github.com/briandfoy/Roman-Unicode.git
+version: '1.031'

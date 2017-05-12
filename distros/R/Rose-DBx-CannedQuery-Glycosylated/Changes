@@ -1,0 +1,4 @@
+1.01      2015-04-22
+  * Don't test default logger if Log::Any::Adapter::Carp isn't available
+1.00      2015-04-21
+  * First CPAN release

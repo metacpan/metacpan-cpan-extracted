@@ -1,0 +1,36 @@
+=head1 NAME
+
+RocksDB::LDBTool - rocksdb::LDBTool object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $ldbtool = RocksDB::LDBTool->new;
+  $ldbtool->run;
+
+=head1 DESCRIPTION
+
+B<RocksDB::LDBTool> is a rocksdb::LDBTool object.
+
+=head1 CONSTRUCTOR
+
+=head2 C<< RocksDB::LDBTool->new() :RocksDB::LDBTool >>
+
+Create and return a new RocksDB::LDBTool object.
+
+=head1 METHODS
+
+=head2 C<< $ldbtool->run() :Undef >>
+
+Call Run() method of rocksdb::LDBTool.
+
+=head1 SEE ALSO
+
+L<RocksDB>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

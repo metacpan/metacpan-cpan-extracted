@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use RPi::WiringPi;
+use RPi::WiringPi::Constant qw(:all);
+
+my $pi = RPi::WiringPi->new;
+
+my $wpi_map = $pi->pin_map(RPI_MODE_WPI);
+my $gpio_map = $pi->pin_map(RPI_MODE_GPIO);
+
+print "PHYS:  WPI:   GPIO:\n";
+
+for (1..40){
+    my $wpi = $wpi_map->{$_};
+    my $gpio = $gpio_map->{$_};
+
+    next if $wpi == -1;
+    print "$_\t$wpi\t$gpio\n"
+}
+
+print "\n";
+print "PHYS:  WPI:   GPIO:\n";
+
+for (41..63){
+    my $wpi = $wpi_map->{$_};
+    my $gpio = $gpio_map->{$_};
+    next if $wpi == -1;
+    print "$_\t$wpi\t$gpio\n"
+}

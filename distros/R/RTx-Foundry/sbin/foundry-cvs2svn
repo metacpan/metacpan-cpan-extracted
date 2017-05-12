@@ -1,0 +1,88 @@
+#!/usr/local/bin/perl
+# $File: //depot/RT/osf/sbin/foundry-cvs2svn $ $Author: autrijus $
+# $Revision: #10 $ $Change: 10152 $ $DateTime: 2004/02/20 03:56:34 $
+
+use strict;
+use FindBin;
+use File::Copy;
+use File::Spec;
+use File::Path;
+use Proc::PID_File;
+
+eval {
+
+my $c2s_base = $ENV{CVS2SVNTEMP} || File::Spec->tmpdir.'/foundry/cvs2svn';
+mkpath([$c2s_base], 0, 0755) unless -d $c2s_base;
+my $lock_file = "$c2s_base.lock";
+exit if hold_pid_file($lock_file);
+
+eval { require "$FindBin::Bin/../etc/foundry.conf" };
+eval { require "$FindBin::Bin/../etc/Foundry/foundry.conf" };
+
+my ($svn_base) = grep { defined and -d } (
+    $ENV{SVNROOT}, 
+    '/home/svn',
+    '/home/svn-repositories',
+) or die "Cannot find SVNROOT";
+my ($cvs_base) = grep { defined and -d } (
+    $ENV{CVSROOT},
+    '/home/cvs',
+    '/usr/depot/cvsrepo'
+) or die "Cannot find CVSROOT";
+
+$svn_base .= "/foundry-repos";
+$cvs_base .= "/foundry-repos";
+
+my $www_user = $ENV{WWWUSER} || 'www';
+my $www_group = $ENV{WWWGROUP} || 'www';
+
+chdir $svn_base;
+
+foreach my $dir (grep -d, <$cvs_base/*>) {
+    $dir =~ s!.*/!!;
+    next if $dir =~ /CVSROOT/;
+    next unless -d "$cvs_base/$dir" and glob("$cvs_base/$dir/*");
+
+    print $dir, $/;
+    system("chown", "cvs", "$cvs_base/$dir");
+
+    my $vcp = << ".";
+Source: cvs:$cvs_base:$dir --use-cvs --continue
+
+Destination: svn:file://$svn_base/$dir: --db-dir=$c2s_base --init-svnrepo --delete-svnrepo
+
+Map:
+	$dir/(...)<>		trunk/\$1
+	$dir/(...)<(*)>		branches/\$2/\$1
+
+CVSLabelonBranch:
+
+SVNLabeller:
+
+ChangeSets:
+       time                     <=60   ## seconds
+       user_id                  equal  ## case-sensitive equality
+       comment                  equal  ## case-sensitive equality
+       branched_rev_branch_id   equal  ## change only one branch at a time
+.
+
+    open VCP, "| $^X $FindBin::Bin/foundry-vcp vcp:-" or next;
+    print VCP $vcp;
+    close VCP;
+
+    system("chown", "-R", "$www_user:$www_group", "$svn_base/$dir");
+    my $log_dir = "$svn_base/.log";
+    mkdir($log_dir) unless -d $log_dir;
+    unlink("$log_dir/vcp.log.$dir") if -e "$log_dir/vcp.log.$dir";
+    move("vcp.log", "$log_dir/vcp.log.$dir");
+}
+
+};
+
+if (my $interval = shift) {
+    warn $@ if $@;
+    $interval = 1 if $interval < 1;
+    sleep $interval;
+    exec($^X, $0, $interval);
+}
+die $@ if $@;

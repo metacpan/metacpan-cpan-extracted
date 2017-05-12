@@ -1,0 +1,20 @@
+Revision history for Rose-DBx-Object-MakeMethods-EKSBlowfish
+0.07    2014-12-29
+        added tests and an inheritation example in readme
+0.06    2013-03-27
+        added .travis.yml
+        2013-02-25
+        fixes load password bug
+        added load password test
+0.05    2013-02-25
+        fixes empty password bug
+        added empty password test
+0.04    2013-02-24
+        bugfix in _is method
+0.03    2013-02-19
+        Fixes bug in accessing metadata.
+        Some changes in tests.
+0.02    2013-02-05
+        Works with passwords containing the heading eks blowfish identifier.
+0.01    2013-01-28
+        First version.

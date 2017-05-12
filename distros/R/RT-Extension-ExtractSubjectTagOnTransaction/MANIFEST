@@ -1,0 +1,19 @@
+etc/initialdata
+etc/no-autoopen.patch
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/RTx/Factory.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RT/Action/ExtractSubjectTag.pm
+lib/RT/Extension/ExtractSubjectTagOnTransaction.pm
+t/01extract_tags.t
+t/02custom_tags.t
+Makefile.PL
+MANIFEST			This list of files
+README

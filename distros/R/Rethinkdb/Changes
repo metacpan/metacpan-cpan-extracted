@@ -1,0 +1,65 @@
+0.14  2016-07-01
+  - bumping to v0.12
+  - callback should be passed to run() instead of changes()
+  - update changes callback for clarity
+  - pass along optargs to changes for things like include_initial
+  - preping a release
+  - filter nested keys in without()
+  - fix for issue #28
+  - adding new RethinkDB v2.3.4 functionality & tests
+  - test needs to clean itself up + test for the correct thing
+  - updating changes for last release
+
+0.12  2016-04-29
+  - Fix for Issue #22
+  - Fixing some bad tests
+  - Tested with RethinkDB v2.3.1
+
+0.11  2015-09-17
+  - RethinkDB 2.1.0-1 compatibility
+  - Geospatial functionality
+  - `index_create` now takes all possible parameters
+  - Deprecating `attr` in favor of `bracket`
+  - Cleaning & formatting
+
+0.10  2015-07-28
+  - 2.0.4 compatibility
+  - Cleaning & formatting
+
+0.09  2015-03-03
+  - Updating to 1.16.2-1 functionality
+  - Better test coverage
+  - Fixes issues on older versions of Perl
+
+0.08  2015-02-28
+  - Updating to 1.15 functionality
+  - Improving tests for new functionality
+  - Tested against 1.16.2-1
+
+0.07  2014-11-01
+  - Query `run()` now takes an optional callback function
+
+0.06  2014-08-29
+  - Rearranging internal API
+  - Documenting all modules
+
+0.05  2014-08-10
+  - Updating API to be compatible with 1.13.3 (using JSON Protcol)
+
+0.04  2013-11-19
+  - Updating tests to be more reliable (e.g. not relying on order that RethinkDB
+    returns results)
+
+0.03  2014-08-10
+  - Date & time features added with tests
+  - Tidying code with new .perltidyrc
+  - Added LINCESE file
+  - Added Makefile.PL and MANIFEST.SKIP for building
+
+0.02  2013-08-27
+  - Compatible with RethinkDB 1.8
+  - All tests passing
+
+0.01  2013-03-19
+  - Initial code
+  - Compatible with RethinkDB 1.3

@@ -1,0 +1,19 @@
+Revision history for Perl extension Rcs.
+
+0.01  Mon Oct 19 14:09:04 1998
+	- original version; created by h2xs 1.18
+
+1.01  Wed Oct  3 19:59:38 EDT 2001
+	- added nonFatal Verbose tags
+
+1.02 Fri Oct 19 16:57:55 EDT 2001
+	- fixed bug in lock method
+
+1.03 Sat Nov  3 18:55:19 EST 2001
+	- fixed another bug in lock method discovered by Michael Keller
+
+1.04 Fri May 17 00:01:15 EDT 2002
+	- Method rcsmerge contributed by Wim Kerkhoff <wim@nyetwork.org>
+
+1.05 Tue Dec  9 03:54:07 EST 2003
+	- fixed bug reported by Henry (Hank) B. Ivy

@@ -1,0 +1,11 @@
+<%init>
+    my $tools = Menu()->child('tools');
+    $tools->child( 'timeworked' => 
+                    title => 'Time Worked Report',
+                    path => '/Tools/Reports/TimeWorkedReport.html',
+                    description => 'Time Worked Report'
+    );
+</%init>
+<%args>
+    $Actions => undef
+</%args>

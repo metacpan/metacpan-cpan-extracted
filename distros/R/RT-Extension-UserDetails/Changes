@@ -1,0 +1,16 @@
+Revision history for RT-Extension-UserDetails
+
+0.03    Wed, 22 Jan 2014 14:14:17 +0100
+        * Move/copy images path to be compatible with RT 4.2.x
+        * Upgrade Module::Install::RTx so static files are copied on RT 4.2.x
+
+0.02    Wed, 25 May 2011 14:40:57 +0200
+        * New icon from famfamfam.com that is "information" icon rather than
+          previous "help" icon
+        * Fix crash when there is no UserDetailsAttributes setting
+        * Add missing ending ">" that prevented image to appear in some recent
+          non-freesoftware browsers
+
+0.01    Thu, 11 Mar 2010 15:00:24 +0100
+        Initial release.
+

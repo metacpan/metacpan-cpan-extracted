@@ -1,0 +1,20 @@
+This is the README file for RunApp, a module for streamlining 
+applications / services startup.
+
+The latest version could be found at
+
+    http://opensource.fotango.com/svn/trunk/RunApp
+
+* Installation
+
+RunApp uses the standard perl module install process:
+
+% perl Makefile.PL
+% make
+# make install
+
+Copyright (C) 2002-5, Fotango Ltd.
+
+This module is free software; you can redistribute it or modify it
+under the same terms as Perl itself.
+

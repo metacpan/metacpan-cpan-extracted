@@ -1,0 +1,52 @@
+<%ARGS>
+$User => undef
+$Before => undef
+$After => undef
+$Count => 25
+</%ARGS>
+<%INIT>
+
+my @Query;
+push ( @Query, "Queue = '$RT::JournalQueue')");
+push ( @Query, "Creator = '$User'" )    if ($User);
+push ( @Query, "Created >= '$After'" )  if ($After);
+push ( @Query, "Created <= '$Before'" ) if ($Before);
+
+my $Query = join ( " AND ", @Query );
+
+my $Tickets = RT::Tickets->new( $session{'CurrentUser'} );
+$Tickets->FromSQL($Query);
+$Tickets->RowsPerPage($Count);
+$r->content_type('xml/rss');
+
+# create an RSS 1.0 file (http://purl.org/rss/1.0/)
+use XML::RSS;
+my $rss = new XML::RSS( version => '1.0' );
+$rss->channel(
+    title       => "$RT::rtname: Journal Entries",
+    link        => $RT::WebURL,
+    description => "",
+    dc          => {},
+    syn         => {
+        updatePeriod    => "hourly",
+        updateFrequency => "1",
+        updateBase      => "1901-01-01T00:00+00:00",
+    },
+);
+
+while ( my $Ticket = $Tickets->Next() ) {
+    my $row;
+    $rss->add_item(
+        title       => $Ticket->Subject,
+        link        => $RT::WebURL . "/Journal/Entry.html?id=" . $Ticket->id,
+        description => $Ticket->Transactions->First->Content,
+        dc          => {
+            subject => $Ticket->Subject,
+            creator => $Ticket->CreatorObj->RealName . "<"
+            . $Ticket->CreatorObj->EmailAddress . ">",
+        },
+    );
+}
+$m->out( $rss->as_string );
+$m->abort();
+</%INIT>

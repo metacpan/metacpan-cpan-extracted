@@ -1,0 +1,6 @@
+name = "Router-Simple-Reversible"
+# badges = ["travis"]
+authority="cpan:MOTEMEN"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,32 @@
+<%INIT>
+
+
+# Getting the configuration for the module
+# This configuration should be defined in RT_Siteconfig.pm file
+use version;
+
+my $newVersion = version->new("3.7");
+my $currentVersion = version->new($RT::VERSION);
+
+my $config;
+if ($currentVersion > $newVersion) { 
+	$config = RT->Config->Get('FederationConfig');
+} else {
+	$config = $RT::FederationConfig;
+}
+
+# If we don't have a defined configuration, the module will fall
+# back to the RT Authentication system
+
+if (defined $config) {
+	# Getting the needed variables for the configuration
+	
+	if (exists $config->{'LogOutURL'}) {
+		# If the LogoutURL, RT will be redirecting the user to this URL
+		# for cleaning its federation credentials
+		my $logoutURL = $config->{'LogOutURL'};
+		RT::Interface::Web::Redirect( $config->{'LogOutURL'} );
+	}
+}
+
+</%INIT>

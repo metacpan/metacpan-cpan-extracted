@@ -1,0 +1,36 @@
+This extension for RT 3.2 and 3.4 allows sites to "Brand" individual queues
+with distinct tokens in the Subject: headers of outgoing email messages.
+
+To enable this extension:
+
+# cd into the unpacked distribution directory
+
+ perl Makefile.PL
+ make
+ make install
+
+# edit your RT_SiteConfig.pm library to add the following line
+# immediately before the last line of the file:
+
+ use RT::Extension::BrandedQueues;
+
+# The only thing after that use ..." line should be the line:
+
+ 1;
+
+You'll also need to modify any of your local email templates which use
+the $rtname variable. To edit your templates, log into RT as your 
+administrative user, then click:
+
+Configuration -> Global -> Templates -> <Some template name>
+
+For example, RT's default "Autoreply" includes this line:
+
+ "There is no need to reply to this message right now.  Your ticket has been
+ assigned an ID of [{$rtname} #{$Ticket->id()}]."
+
+
+Change this line to read:
+
+ "There is no need to reply to this message right now.  Your ticket has been
+ assigned an ID of [{$Ticket->QueueObj->Tag} #{$Ticket->id()}]."

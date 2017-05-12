@@ -1,0 +1,472 @@
+NAME
+    RSSycklr - (beta) Highly configurable recycling of syndication
+    (RSS/Atom) feeds into tailored, guaranteed XHTML fragments.
+
+SYNOPSIS
+     use strict;
+     use warnings;
+     use RSSycklr;
+     use Encode;
+ 
+     my @feeds = ({ uri => "http://www.xkcd.com/atom.xml",
+                    max_display => 1 },
+                  { uri => "http://green.yahoo.com/rss/blogs/all" },
+                  { uri => "http://www.mnn.com/rss/all-mnn-content" },
+                  { uri => "http://feeds.grist.org/rss/gristfeed" },
+                  { uri => "http://green.yahoo.com/rss/featured" },
+                  { uri => "http://feeds.nationalgeographic.com/ng/NGM/NGM_Magazine" },
+                  { uri => "http://feeds.feedburner.com/greenlivingarticles" },
+                  { uri => "http://www.ecosherpa.com/feed/" },
+                  { uri => "http://www.groovygreen.com/groove/?feed=atom" },
+                  { uri => "http://blog.epa.gov/blog/feed/"},
+                  { uri => "http://www.unep.org/newscentre/rss/rss.asp?rss-id=pr&l=en" },
+                  { uri => "http://feeds.feedburner.com/treehuggersite" },
+                  { uri => "http://redgreenandblue.org/feed/" },
+                  { uri => "http://green.yahoo.com/rss/news" },
+                  { uri => "http://news.cnet.com/8300-11128_3-54.xml" },
+                  { uri => "http://news.google.com/news?rls=en-us&oe=UTF-8&um=1&tab=wn&hl=en&q=Environmental&ie=UTF-8&output=atom" },
+                  { title_override => "O NOES, IZ TEH DED",
+                    uri => "http://rss.news.yahoo.com/rss/obits", });
+ 
+     my $rsklr = RSSycklr->new();
+ 
+     binmode STDOUT, ":encoding(UTF-8)";
+     $rsklr->config({ feeds => \@feeds,
+                      title_only => 1 });
+
+     # print $rsklr->as_string;
+ 
+     while ( my $feed = $rsklr->next() )
+     {
+         print $feed->title_override || $feed->title;
+         print "\n";
+         for my $entry ( $feed->entries )
+         {
+             print " * ", $entry->title, "\n";
+         }
+     }
+
+DESCRIPTION
+    This is a more of a mini-app engine than a pure module. RSSycklr is a
+    package that wraps up the best parts of XML::Feed and HTML::Truncate
+    then filters it through XML::LibXML to guarantee valid XHTML and adds a
+    side of Template for auto-formatted output of XHTML fragments should you
+    so desire.
+
+    This is probably easier to show with examples than explain. This is the
+    part where I show, or maybe explain, someday. For now, take a look at
+    the "CONFIGURATION" sample below and the source for the tool 'rssycklr'
+    that comes with this distribution.
+
+    XHTML validation is currently based on "-//W3C//DTD XHTML 1.0
+    Transitional//EN" and errors are not fatal. You will be able to pick
+    your DTD eventually and decide if errors are fatals or skip the entry or
+    just complain.
+
+METHODS
+    new Create an RSSycklr object.
+
+    load_config
+        Takes a YAML file name or string. It must conform to the
+        configuration format. No validation of input is done at this point.
+        More config options will be probably be added soon. As it calls
+        "config" underneath, loading configuration options will be add them
+        to what's already there, not reset them.
+
+    config
+        Set/get hash reference of the configuration and raw feed data.
+        Setting config is additive, each new hash reference is merged with
+        the current config hash reference.
+
+    add_feeds
+        Takes an array ref of hash refs of feed info. "uri" is the only
+        required key in the hash ref. Other possible keys are shown in
+        "CONFIGURATION" below.
+
+    next
+        Iteration through feeds with delayed execution. Feeds are only
+        fetched and cleaned-up as they are called. "next" is destructive and
+        can be used in a while loop.
+
+            while ( my $feed = $rssycklr->new() ) {
+                print "Title: ", $feed->title, "\n";
+            }
+
+    feeds
+        If you prefer to get your feeds at once in a list or an array ref,
+        use "feeds". It iterates on "next" under the hood, therefore "next"
+        will be empty after "feeds" has been called though "feeds" may be
+        called repeatedly without refetching or parsing. If you "add_feeds"
+        to add new feeds, next will able to iterate on those and "feeds"
+        will add them to those already parsed and fetched.
+
+        Remember that each feed is a web request and they aren't done in any
+        kind of parallel nature so you could expect a list of 20 feeds to
+        return slowly, maybe very slowly.
+
+    as_string
+        Sort of does this-
+
+         $rssycklr->process($rssycklr->template, { rssycklr => $rssycklr })
+               or confess $rssycklr->tt2->error();
+
+        Can also be called for a return value, like so-
+
+         my $output = $rssycklr->as_string;
+
+        In void context, it processes/prints to STDOUT.
+
+         $rssycklr->as_string;
+
+    keep_tags
+        The list (stored as a hash ref) of tags which will be kept when
+        creating ledes from entry bodies. The default list generally
+        comprises the phrasal tags; e.g., "<i/>", "<q/>", "<del/>",
+        "<dfn/>", "<sup/>", et cetera.
+
+         perl -MRSSycklr -MYAML -le '$rsklr = RSSycklr->new; print Dump $rsklr->keep_tags'
+
+        Example: dropping images-
+
+         delete $rsklr->keep_tags->{img};
+
+        Example: drop all tags-
+
+         $rsklr->keep_tags({});
+
+    tt2 The Template object we may create to do output. It's deferred so if
+        you never ask for it, and never call its methods, it's never
+        created.
+
+    template
+        The "template" that will be passed to "process" in Template. It can
+        be a string (scalar ref), a file, or a file handle. The default is a
+        string ref.
+
+         perl -MRSSycklr -le '$rsklr = RSSycklr->new; print ${$rsklr->template}'
+
+    xml_parser
+        The XML::LibXML object.
+
+    html_to_dom
+        Passes an HTML fragment through some HTML::TokeParser::Simple sanity
+        cleanup and returns an XML::LibXML::Document. This is an
+
+    truncater
+        The HTML::Truncate object.
+
+    BUILD
+        Internal method. To allow "config" and "load_config" to be passed as
+        arguments. "BUILD" runs the methods at initialization if you do.
+
+  DELEGATED METHODS
+    As noted above, an RSSycklr object has a collection of objects it
+    wrangles. You may call methods on it which get delegated t its objects.
+    All the methods below belong to the indicated classes and may be treated
+    exactly as the relevant documents show.
+
+    process
+        This is "process" in Template.
+
+    parse_html_string
+        "parse_html_string" in XML::LibXML. You also have access to
+        "recover" in XML::LibXML::Parser and "recover_silently" in
+        XML::LibXML::Parser which are set to "1" by default.
+
+    truncate
+        "truncate" in HTML::Truncate.
+
+INTERNAL PACKAGES
+  RSSycklr::Feed
+    Calls from RSSyckler objects to "feeds" and "next" return
+    "RSSycklr::Feed" objects. They are based on XML::Feed objects.
+
+  SELECT CONFIGURATION SETTINGS
+    More configuration settings are shown in the config example.
+
+    title_override
+        For some feeds, like say a search generated feed from Google, you
+        might get back a title in the XML which is ridiculous for display;
+        e.g., "bingo cards" +tacos site:example.org. In cases likes this it
+        would be nice to provide your own title.
+
+  METHODS
+    entries
+        The processed entries from the feed which passed configuration
+        filters.
+
+    count
+        The number of entries a feed has. Note, this is not the number of
+        entries in the actual XML::Feed, but the number of entries which
+        passed your configuration filters.
+
+  DELEGATED METHODS
+    The following delegate to the underlying XML::Feed object.
+
+    title
+    tagline
+    link
+    copyright
+    author
+    generator
+    language
+
+  RSSycklr::Feed::Entry
+    lede
+        The excerpted portion of the feed entry's content.
+
+    feed
+        The parent "RSSyckler::Feed" object.
+
+  DELEGATED METHODS
+    The following delegate to the underlying XML::Feed::Entry object.
+
+    title
+        This will eventually be replaced by a native method.
+
+    link
+    content
+    category
+    id
+    author
+    issued
+    modified
+
+CONFIGURATION
+    Configuration is a hash in two levels. The top level contains defaults.
+    The key "feeds" contains per feed settings. You can have "max_display =>
+    3" in the top, for example, but have "max_display => 1" and "max_display
+    => 10" in individual feed data. Leaving "max_display" out of feed data
+    would mean a feed would fall back to the top default setting 3.
+
+     ---
+     # length of entry excerpt to keep as "lede"
+     excerpt_length: 110
+     # don't do excerpts, titles, only
+     title_only: ~
+     # master setting for oldest entry age
+     hours_back: 30
+     # stop fetching at this point
+     max_feeds: 10
+     # master setting for entries to keep per feed
+     max_display: 3
+     # seconds to try a feed fetch before skipping
+     timeout: 10
+     # ellipsis on truncated ledes/titles
+     ellipsis: " "
+     # text for "read more" link
+     read_more: [more]
+     # css class for top <div> wrapper
+     css_class: rssycklr
+     # not implemented
+     title_length: ~
+     # not implemented, dl/dt/dd happens now
+     excerpt_style: dl|p|br|ul
+     # not implemented, ul/li happens now
+     title_style: ul|p|br
+     # this is hardcoded for now
+     max_images: 1
+     feed_title_tag: h4
+     dtd: xhtml1-transitional.dtd
+     feeds:
+       - uri: http://green.yahoo.com/rss/blogs/all
+         max_display: 5
+         hours_back: 24
+       - uri: http://sedition.com/feed/atom
+         title_only: 1
+         hours_back: 105
+         timeout: 3
+       - uri: http://dd.pangyre.org/dd.atom
+         excerpt_length: 300
+         hours_back: 48
+
+    Caveat: the "ellipsis" default is utf8 so set it to "..." (three
+    periods) or &hellip; if it's going to cause a problem in your handling.
+
+    excerpt_length
+        How long to make "lede"s. This is passed through HTML::Truncate so
+        it tries to count displayed characters, not real real characters;
+        i.e., "<p>Oh, Hai!</p>" is counted as 8 characters, not 15. Default
+        is at 170.
+
+    title_only
+        If true, don't do excerpts, only pull titles.
+
+    hours_back
+        Maximum age of feed entries to include.
+
+    max_display
+        How many entries from a feed to parse and keep.
+
+    timeout
+        How many seconds to wait for a feed fetch to return before skipping
+        it.
+
+    ellipsis
+    read_more
+        Text for "read more" link.
+
+    css_class
+        The CSS class for the top "<div/>" wrapper.
+
+    max_images
+        Maximum images to keep in a "lede". Hardcoded to 1 right now.
+
+    dtd
+    max_feeds
+        Stop fetching at this point.
+
+    dtd The DTD to validate feed snippets against. The default is
+        "xhtml1-transitional.dtd". Also available: "xhtml1-frameset.dtd",
+        "xhtml1-strict.dtd", and "xhtml11.dtd". Because we use XML::LibXML
+        to parse our snippets we cannot, and frankly wouldn't want to,
+        support HTML 4 and earlier.
+
+    title_length
+        Not implemented.
+
+    excerpt_style
+        Not implemented, dl/dt/dd happens in template now.
+
+    title_style
+        Not implemented, ul/li happens now.
+
+    feed_title_tag
+        Settable; "h4" in template now.
+
+  SAMPLE CSS
+    The image handling is probably the most important part. Feeds might
+    return huge images or several images.
+
+     .rssycklr {
+       font-family: helvetica, sans-serif;
+     }
+     .rssycklr h4 {
+       border-bottom: 1px solid #ccc;
+       line-height: 100%;
+     }
+     .rssycklr h4 a {
+       color:#039!important;
+       text-decoration:none;
+     }
+     .rssycklr .datetime {
+       color: #445;
+       font-size: 80%;
+     }
+     .rssycklr a.readmore {
+       text-decoration:none;
+       font-size: 90%;
+     }
+     .rssycklr img {
+       float: right;
+       clear: right;
+       width: 60px;
+       margin: -3px 0 0 3px;
+     }
+
+AUTHOR
+    Ashley Pond V, "<ashley@cpan.org>".
+
+TODO
+    Collect errors for inspection in the object.
+
+    "as_is" flag?
+
+    Pass through the Pod to make it a bit more useful and less redundant on
+    config stuff.
+
+    If abutting tags stripped tags are flow level, insert a newline...?
+    Define the behavior in the config so even a ¶ or something could be
+    inserted. Turn "<br/>s" into newlines? Use "canTighten" and
+    "isPhraseMarkup" from HTML::Tagset to make these choices. Maybe this is
+    where the DTDs should live too...?
+
+    Test timed out feeds.
+
+    "next" should be putting feeds aside for "feeds"?
+
+    Translate tags? To drop blockquote to q and h* to bold, etc?
+
+    Text only option for ledes? Makes it easier to work on that setting
+    "keep_tags" to empty.
+
+    Put a name field for feeds to override the feed supplied title.
+
+    Make the validation controllable.
+
+    Make a master timeout vs a feed level timeout? No...
+
+    Make utf8 a settable...?
+
+    Move all the DTD handling, and all the other historical ones, HTML 1 and
+    up, into a real distribution...? Ikegami's catalog stuff?
+
+    Make attribute filter configurable.
+
+    More tests.
+
+    Throw errors for extraneous or malformed config data.
+
+    Implement anything in the configuration example which reads, "not
+    implemented." E.g., make the style/tags configurable for titles/ledes;
+    e.g., dl|p|br|ul.
+
+    Submit a patch, or ticket, to Benjamin for a content_type
+    XML::Feed::Entry. We're just assuming it's HTML.
+
+    "Template->process" should probably have a "before" call to allow the
+    config to be merged into the top of the template data.
+
+    Make image count configurable.
+
+    Regex filters?
+
+    Chance of inclusion: a decimal so that a list of feeds 100 feeds with a
+    level of 0.1 would only load (or rather try to) approximately 10 feeds.
+
+BUGS AND LIMITATIONS
+    I love good feedback and bug reports. Please report any bugs or feature
+    requests directly to me via email or through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=RSSycklr>.
+
+THANKS TO
+    Stevan Little, Shawn M Moore, and Benjamin Trott. I had no idea how cool
+    Moose and Mouse were before I put this together. They make very
+    complicated interactions seem quite natural. I changed design and
+    features three or four times putting this together and if the code had
+    all been by hand it probably would have made me dump the project since I
+    already had a perfectly serviceable program doing what it does. Instead,
+    with Mouse, fairly deep changes were nearly trivial.
+
+SEE ALSO
+    XML::Feed, XML::Feed::Entry, Mouse/Moose, XML::LibXML, Template, YAML,
+    HTML::Truncate, DateTime, Scalar::Util, URI, Encode.
+
+COPYRIGHT & LICENSE
+    Copyright (©) 2008-2010 Ashley Pond V.
+
+    This program is free software; you can redistribute it or modify it or
+    both under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTY
+    Because this software is licensed free of charge, there is no warranty
+    for the software, to the extent permitted by applicable law. Except when
+    otherwise stated in writing the copyright holders or other parties
+    provide the software "as is" without warranty of any kind, either
+    expressed or implied, including, but not limited to, the implied
+    warranties of merchantability and fitness for a particular purpose. The
+    entire risk as to the quality and performance of the software is with
+    you. Should the software prove defective, you assume the cost of all
+    necessary servicing, repair, or correction.
+
+    In no event unless required by applicable law or agreed to in writing
+    will any copyright holder, or any other party who may modify and/or
+    redistribute the software as permitted by the above licence, be liable
+    to you for damages, including any general, special, incidental, or
+    consequential damages arising out of the use or inability to use the
+    software (including but not limited to loss of data or data being
+    rendered inaccurate or losses sustained by you or third parties or a
+    failure of the software to operate with any other software), even if
+    such holder or other party has been advised of the possibility of such
+    damages.
+

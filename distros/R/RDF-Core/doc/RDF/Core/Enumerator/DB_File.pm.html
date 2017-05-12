@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RDF::Core::Enumerator::DB_File - Enumerator that can be used with DB_File storage.</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#interface">Interface</a></li>
+	</ul>
+
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>RDF::Core::Enumerator::DB_File - Enumerator that can be used with DB_File storage.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Enumerator is a set of statements retrieved from a model.
+When DB_File enumerator is created, it references statements in it's storage rather then making in-memory copy of all data, so it's vulnerable to adding / removing statements.</p>
+<p>
+</p>
+<h2><a name="interface">Interface</a></h2>
+<ul>
+<li><strong><a name="item_new">new(\%data, \@stmtArray)</a></strong><br />
+</li>
+%data is a hash tied to RDF::Core::Storage::DB_File data and @stmtArray is an array of statements indexes in %data.
+<p></p></ul>
+<p>The rest of the interface is described in RDF::Core::Enumerator.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is subject to the MPL (or the GPL alternatively).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ginger Alliance, <a href="mailto:rdf@gingerall.cz">rdf@gingerall.cz</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<pre>
+  RDF::Core::Enumerator, RDF::Core::Model, RDF::Core::Storage</pre>
+
+</body>
+
+</html>

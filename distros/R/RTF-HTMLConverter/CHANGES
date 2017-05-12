@@ -1,0 +1,18 @@
+0.05  Wed 10 March 2004.
+  - Lexer staff moved into separate directory
+    (many thanks to Ilya Zakharevich <ilya@Math.Berkeley.EDU>
+    who explained me how to do that).
+  - Added example script examples/rtf2html.pl
+    (suggested by Michael V. Korotaev <korotaev@lipetsk.ru>).
+0.041 Fri 13 February 2004.
+  - Added XS_VERSION in Makefile.PL.
+0.04  Fri 13 February 2004.
+  - Fixed bug in determining document title's encoding
+    (reported by Oleg Bartunov <oleg@sai.msu.su>).
+  - Fixed bug that may lead to appearing the style names in text.
+    (reported by Oleg Bartunov <oleg@sai.msu.su>).
+  - More bugfixes and improvements.
+  - More control words supported.
+
+0.03  Thu 22 January 2004.
+  - Fist release.

@@ -1,0 +1,20 @@
+=head1 NAME
+
+RocksDB::Cache - rocksdb::Cache object
+
+=head1 DESCRIPTION
+
+B<RocksDB::Cache> is a rocksdb::Cache object.
+
+Do not use this class directly. Use the subclass of this class.
+(L<RocksDB::LRUCache> is only subclass for now.)
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::LRUCache>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,13 @@
+%# The day after tomorrow is the third day of the rest of your life.
+<%INIT>
+if ($session{'CurrentUser'}->UserObj->HasRight(
+    Right => 'SuperUser',
+    Object => $RT::System,
+)) {
+    $toptabs->{'ZZ-RT-AuthTool'} = { title =>loc("Auth Tools"),
+                          path  => "Developer/AuthTool/index.html" };
+}
+</%init>
+<%args>
+$toptabs =>undef
+</%args>

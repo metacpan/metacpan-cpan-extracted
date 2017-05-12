@@ -1,0 +1,100 @@
+NAME
+    RT::Extension::ExternalStorage - Store attachments outside the database
+
+SYNOPSIS
+        Set( @Plugins, 'RT::Extension::ExternalStorage' );
+
+        Set(%ExternalStorage,
+            Type => 'Disk',
+            Path => '/opt/rt4/var/attachments',
+        );
+
+DESCRIPTION
+    By default, RT stores attachments in the database. This extension moves
+    all attachments that RT does not need efficient access to (which include
+    textual content and images) to outside of the database. This may either
+    be on local disk, or to a cloud storage solution. This decreases the
+    size of RT's database, in turn decreasing the burden of backing up RT's
+    database, at the cost of adding additional locations which must be
+    configured or backed up. Attachment storage paths are calculated based
+    on file contents; this provides de-duplication.
+
+    The files are initially stored in the database when RT receives them;
+    this guarantees that the user does not need to wait for the file to be
+    transferred to disk or to the cloud, and makes it durable to transient
+    failures of cloud connectivity. The provided bin/extract-attachments
+    script, to be run regularly via cron, takes care of moving attachments
+    out of the database at a later time.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::ExternalStorage');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::ExternalStorage));
+
+        or add RT::Extension::ExternalStorage to your existing @Plugins
+        line.
+
+        You will also need to configure the %ExternalStorage option,
+        depending on how and where you want your data stored; see
+        "CONFIGURATION".
+
+    Restart your webserver
+        Restarting the webserver before the next step (extracting existing
+        attachments) is important to ensure that files remain available as
+        they are extracted.
+
+    Extract existing attachments
+        Run bin/extract-attachments; this may take some time, depending on
+        the existing size of the database. This task may be safely cancelled
+        and re-run to resume.
+
+    Schedule attachments extraction
+        Schedule bin/extract-attachments to run at regular intervals via
+        cron. For instance, the following /etc/cron.d/rt entry will run it
+        daily, which may be good to concentrate network or disk usage to
+        times when RT is less in use:
+
+            0 0 * * * root /opt/rt4/local/plugins/RT-Extension-ExternalStorage/bin/extract-attachments
+
+CONFIGURATION
+    This module comes with a number of possible backends; see the
+    documentation in each for necessary configuration details:
+
+    RT::Extension::ExternalStorage::Disk
+    RT::Extension::ExternalStorage::Dropbox
+    RT::Extension::ExternalStorage::AmazonS3
+
+CAVEATS
+    This extension is not currently compatibile with RT's shredder tool;
+    attachments which are shredded will not be removed from external
+    storage.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-ExternalStorage@rt.cpan.org|mailto:bug-RT-Extension-ExternalStorage@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ExternalStorage>.
+
+COPYRIGHT
+    This extension is Copyright (C) 2009-2015 Best Practical Solutions, LLC.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

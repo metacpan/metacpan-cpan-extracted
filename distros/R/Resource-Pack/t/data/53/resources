@@ -1,0 +1,15 @@
+resource(jQuery::Resource->new);
+
+resource(Other::Resource->new(name => 'external'));
+
+file app_js => (
+    file         => 'app.js',
+    dependencies => wire_names('jquery/core', 'external/js'),
+);
+
+file app_css => (
+    file       => 'app.css',
+    install_to => 'css',
+);
+
+dir 'images';

@@ -1,0 +1,50 @@
+          <div class="post">
+            <h2 class="title"><a href="[% R('Post', post.year, post.month, post.slug) %]">[% post.title %]</a></h2>
+            <p class="meta"><span class="date">[% post.posted_on.strftime(time_format) %]</span><span class="posted">Posted by <a href="#">[% post.author || "beppu" %]</a></span></p>
+            <div style="clear: both;">&nbsp;</div>
+            <div class="entry">
+              [% post.body %]
+            </div>
+          </div>
+          <div style="clear: both;">&nbsp;</div>
+          <h1>Comments</h1>
+          <div id="comments">
+            <ol>
+              [% FOREACH comment = comments %]
+              <li>
+                [% IF comment.url %]
+                <div><a href="[% comment.url %]" rel="nofollow">[% comment.name %]</a> said:</div>
+                [% ELSE %]
+                <div>[% comment.name %] said:</div>
+                [% END %]
+                <div>
+                  [% comment.body %]
+                </div>
+              </li>
+              [% END %]
+            </ol>
+          </div>
+          <div>
+            <form id="comment-form" method="post" action="[% R('NewComment') %]">
+              <input type="hidden" name="year"  value="[% post.year  %]" />
+              <input type="hidden" name="month" value="[% post.month %]" />
+              <input type="hidden" name="slug"  value="[% post.slug  %]" />
+              <h3>Name</h3>
+              <input type="text" name="name" value="[% state.name | html %]" />
+              <h3>Email</h3>
+              <input type="text" name="email" value="[% state.email | html %]" />
+              <h3>URL</h3>
+              <input type="text" name="url" value="[% state.url | html %]" />
+              <h3>Comment</h3>
+              <textarea name="body" rows="8" cols="40"></textarea>
+              <h3>Format</h3>
+              <select name="format">
+                <option value="pod">POD</option>
+                <option value="textile">Textile</option>
+                <option value="markdown">Markdown</option>
+              </select>
+              <div>
+                <input type="submit" name="submit" value="Submit" />
+              </div>
+            </form>
+          </div>

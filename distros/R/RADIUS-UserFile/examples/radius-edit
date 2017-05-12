@@ -1,0 +1,206 @@
+#!/usr/local/bin/perl -Tw
+
+=head1 NAME
+
+radius-edit - manipulate a RADIUS users file
+
+=head1 SYNOPSIS
+
+B<radius-edit> B<--add> [B<--file> I<file>] B<--attrib> I<name=value> ... I<user>
+
+B<radius-edit> B<--remove> [B<--file> I<file>] I<user> ...
+
+B<radius-edit> B<--help>
+
+B<radius-edit> B<--man>
+
+B<radius-edit> B<--version>
+
+=head1 DESCRIPTION
+
+Modify a RADIUS users file by adding/updating the specified user or
+by removing the specified list of users.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--add>
+
+Store information on the named user in the RADIUS users file.  The info
+should be specified by using one or more B<--attrib> arguments.
+
+=item B<--remove>
+
+Remove the named user from the RADIUS users file.  More than one user
+may be removed by specifying multiple names.
+
+=item B<--file> I<file>
+
+Specify a RADIUS users file to manipulate instead of the default.
+
+=item B<--attrib> I<name=value>
+
+Specify an attribute to add.  More than one attribute can be added
+by using multiple B<--attrib> options.
+
+=item B<--help>
+
+Print help information and exit.
+
+=item B<--man>
+
+Print the man page and exit.
+
+=item B<--version>
+
+Print the version number and exit.
+
+=back
+
+=head1 RETURN VALUES
+
+=over 4
+
+On success, 0 is returned.  On failure, non-zero is returned and an error
+message is printed to STDERR.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item /etc/raddb/users
+
+Default RADIUS users file, loaded at runtime if a different one isn't
+specified with the B<-f> option.
+
+=back
+
+=head1 REQUIRES
+
+Perl 5.004, Getopt::Long, Pod::Usage, RADIUS::UserFile
+
+=head1 SEE ALSO
+
+L<RADIUS::UserFile>
+
+=head1 AUTHOR
+
+Copyright 2000 O'Shaughnessy Evans, oevans@acm.org.  All rights reserved.
+
+=cut
+
+my $VERSION = do { my @r=(q$Revision: 1.2 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r }; 
+
+use 5.004;
+use strict;
+use blib '..';
+
+use RADIUS::UserFile 0.97;
+use Getopt::Long;
+use Pod::Usage;
+use Tie::IxHash;
+
+
+BEGIN {
+    # Since we're probably running setuid root, give ourselves a reasonable
+    # name (instead of /dev/fd/3, or something neat like that).
+    #$0 = '/usr/local/sbin/radius-edit';
+
+    $ENV{PATH} = '/usr/local/bin:/usr/bin:/usr/sbin';
+}
+
+
+my $RU;             # RADIUS::UserFile object.
+my %Opts;           # command-line options.
+my @Users;          # list of users we're processing.
+my @Attribs;        # attributes to report on.
+
+my $DEF_USERS_FILE = './users';
+
+Parse_Args();
+Main();
+exit 0;
+
+
+sub Parse_Args
+{
+    # Initialize options
+    GetOptions(\%Opts, qw(man help version file=s attrib=s@ add remove))
+     or pod2usage(VERBOSE => 0);
+
+    # Handle options
+    $Opts{man}     and pod2usage(VERBOSE => 2);     # print man page and exit.
+    $Opts{help}    and pod2usage(VERBOSE => 1);     # print help info and exit.
+    $Opts{version} and print("$0 version $VERSION\n"), exit 0;
+    $Opts{add} and $Opts{remove} and do {
+        print STDERR "Aah, I'm confused!  Add and remove are mutually ",
+                     "exclusive.\n";
+        pod2usage(VERBOSE => 0);
+    };
+    !$Opts{add} and !$Opts{remove} and do {
+        print STDERR "I need to know whether I should add or remove a user.\n";
+        pod2usage(VERBOSE => 0);
+    };
+
+    @Users = @ARGV or do {
+        print STDERR "Please specify a user.\n"; pod2usage(VERBOSE => 0) };
+
+    $Opts{add} and $#Users and do {
+        print STDERR "Too many users for --add.\n"; pod2usage(VERBOSE => 0) };
+
+    @Attribs = @{$Opts{attrib}} if defined $Opts{attrib};
+    my $file = $Opts{file} || $DEF_USERS_FILE;
+
+	-f $file or die("$file is not an available text file.\n");
+	$file =~ /^(.+)$/; $file = $1;
+
+    $RU = new RADIUS::UserFile(File => $file) or
+     die("Apparently $file isn't a valid RADIUS users file.\n");
+}
+
+
+sub Main
+{
+    if ($Opts{add}) {
+        my $user = $Users[0];
+        my %attribs;
+        tie %attribs, 'Tie::IxHash';
+
+        foreach (@Attribs) {
+            @_ = split /=/, $_, 2;
+            scalar @_ == 2 or
+             print(STDERR "This attribute pair doesn't look right: $_\n"), next;
+            push @{$attribs{$_[0]}}, $_[1];
+print STDERR "adding attribute $_[0]\n";
+        }
+
+print STDERR "attributes: ", join(' ', keys %attribs), "\n";
+
+        print "Appending old entry for $user.\n" if defined $RU->user($user);
+        $RU->add(Who        => $user,
+                 Attributes => \%attribs,
+                 Comment    => "$user added on ". localtime)
+         or die("There was a problem adding $user\n");
+
+        $RU->update(Who => $user)
+         or die("There was a problem updating the specified file.\n");
+    }
+    else { # $Opts{remove}
+        my (@found, @notfound);
+        foreach (@Users) {
+            $RU->user($_) and push(@found, $_) or push(@notfound, $_);
+        }
+        print("I couldn't find these users in the file: @notfound\n")
+         if @notfound;
+
+        if (@found) {
+            $RU->remove(@found);
+            $RU->update()
+             or die("There was a problem updating the specified file.\n");
+        }
+    }
+}
+

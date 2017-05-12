@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<list application="script1.pl">
+	<students multiple="listelement">
+		<student>
+			<lastname/>
+			<firstname/>
+		</student>
+	</students>
+
+	<program type="hash">
+		<id type="int"/>
+		<code/>
+		<name/>
+	</program>
+</list>

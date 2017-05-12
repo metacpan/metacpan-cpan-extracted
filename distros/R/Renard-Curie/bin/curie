@@ -1,0 +1,76 @@
+#!/usr/bin/env perl
+# PODNAME: curie: a document reader
+
+use strict;
+use warnings;
+
+BEGIN {
+	if( $^O eq 'MSWin32' && exists $ENV{PAR_PROGNAME} ) {
+		# running under PAR::Packer on Windows
+		require File::Basename;
+		require File::Spec;
+		require Config;
+		my $path_to_bin = File::Basename::dirname( $ENV{PAR_PROGNAME} );
+		my $mingw64_bin = File::Spec->catfile( $path_to_bin,
+				qw(mingw64 bin) );
+		my $dep_perl5lib = File::Spec->catfile( $path_to_bin,
+				qw(perl5 lib perl5) );
+		my $dep_arch_perl5lib = File::Spec->catfile( $path_to_bin,
+				qw(perl5 lib perl5 MSWin32-x64-multi-thread) );
+		my $core_perl5lib = File::Spec->catfile( $path_to_bin,
+				qw(mingw64 lib perl5 core_perl) );
+		my $app_perl5lib = File::Spec->catfile( $path_to_bin, qw(lib) );
+
+		$ENV{PATH} = "$mingw64_bin$Config::Config{path_sep}$ENV{PATH}";
+
+		unshift @INC, $core_perl5lib;
+		unshift @INC, $dep_perl5lib;
+		unshift @INC, $dep_arch_perl5lib;
+		unshift @INC, $app_perl5lib;
+
+		# Removes the persistent console window when compiled
+		# with /SUBSYSTEM:CONSOLE
+		print "Reticulating splines...\n";
+		require Win32::HideConsole;
+		Win32::HideConsole::hide_console();
+
+		# Removes the console windows for subprocesses that run under
+		# the cmd.exe shell when compiled with /SUBSYSTEM:WINDOWS
+		require Win32;
+		Win32::SetChildShowWindow(0);
+	}
+}
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Renard::Curie::Setup;
+use Renard::Curie::App;
+
+Renard::Curie::App::main;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+curie: a document reader
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Project Renard
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Project Renard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

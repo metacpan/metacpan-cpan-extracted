@@ -1,0 +1,22 @@
+RDF-Query-Functions-Buzzword-Util
+=================================
+
+Created:      2011-01-04
+Home page:    <https://metacpan.org/release/RDF-Query-Functions-Buzzword-Util>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Query-Functions-Buzzword-Util>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.003  2012-09-11
+
+ - (Packaging) Fix dependencies (run-time deps were declared as
+   test_requires deps).
+
+0.002  2012-09-11
+
+ - (Documentation) Don't use deprecated RDF::TrineShortcuts in examples.
+ - (Packaging) Drop common::sense dependency.
+ - (Packaging) Modernize.
+
+0.001  2011-01-05  # Initial release
+
+

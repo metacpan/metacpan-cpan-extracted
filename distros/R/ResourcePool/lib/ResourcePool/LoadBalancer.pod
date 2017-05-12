@@ -1,0 +1,267 @@
+=head1 NAME
+
+ResourcePool::LoadBalancer - A load balancer across ResourcePool's
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::LoadBalancer;
+ 
+ my $loadbalancer = ResourcePool::LoadBalancer->new("key", MaxTry => 10);
+ 
+ $loadbalancer->add_pool($some_ResourcePool);
+ $loadbalancer->add_pool($some_other_ResourcePool);
+ $loadbalancer->add_pool($third_ResourcePool);
+ 
+ my $resource = $loadbalancer->get();  # get a resource from one pool
+                                       # according to the policy
+ #[...]                                # do something with $resource
+ $loadbalancer->free($resource);       # give it back to the pool
+ 
+ $loadbalancer->fail($resource);       # give back a failed resource
+
+=head1 DESCRIPTION
+
+
+The ResourcePool::LoadBalancer is a generic way to spread requests to different L<ResourcePool's|ResourcePool> to increase performance and/or availability.
+
+Besides the construction the interface of ResourcePool::LoadBalancer is the same as the interface of L<ResourcePool|ResourcePool>. This makes it very simple to change a program which uses L<ResourcePool|ResourcePool> to use the ResourcePool::LoadBalancer by just changing the construction (which is hopefully kept at a central point in your program).
+
+=head2 S<ResourcePool::LoadBalancer-E<gt>new($key, @Options)>
+
+Creates a new ResourcePool::LoadBalancer. This method takes one key to identify the load balancer (used by L<ResourcePool::Singleton|ResourcePool::Singleton>). It is recommended to use some meaningful string as key, since this is used when errors are reported. This key is internally used to distinguish between different pool types, e.g. if you have two ResourcePool::LoadBalancer one for L<DBI|DBI> connections to different servers and use parallel another ResourcePool::LoadBalancer for L<Net::LDAP|Net::LDAP> connections.
+
+=over 4
+
+=item @Options
+
+=over 4
+
+=item B<Policy>
+
+With this option you can specify which L<ResourcePool|ResourcePool> is used if you ask the ResourcePool::LoadBalancer for a resource. You can choose one of these policies: 
+
+=over 4
+
+=item LeastUsage
+
+Takes always the L<ResourcePool|ResourcePool> with the least used resources. This is usually the best policy if you want to do load balancing. For most configurations the L<ResourcePool|ResourcePool> with the least used resources will be the L<ResourcePool|ResourcePool> which accesses the lowest loaded server.
+
+If all L<ResourcePool's|ResourcePool> are equally used this policy will fall back to a RoundRobin behavior. This is very useful to keep your connections alive if you have a stateful firewall which might timeout your connection.
+
+=item RoundRobin
+
+Iterates over all available L<ResourcePool's|ResourcePool> regardless of the usage of them. So, every time you call L<get()|/get> the next L<ResourcePool|ResourcePool> will be used.
+
+=item FailBack
+
+Uses always the first L<ResourcePool|ResourcePool> if it works, only if there is a problem it takes the next one (and so on). For this policy the order in which you pass the pools to ResourcePool::LoadBalancer is relevant.
+
+This policy will try to recover to the first pool.
+
+=item FailOver
+
+Uses always the first L<ResourcePool|ResourcePool> if it works, if there is a problem it will fail over to the second and stay there until it has a problem with this pool as well. If all pools failed, it starts from the first again. For this policy the order in which you pass the pools to ResourcePool::LoadBalancer is relevant.
+
+This policy will NOT try to recover to the first pool.
+
+=item FallBack
+
+A synonym for the FailBack policy.
+
+=back
+
+Regardless of the used Policy, the load balancer will always try to find a valid resource for you. All resources do fail over if required.
+
+Default: LeastUsage
+
+=item B<MaxTry>
+
+The MaxTry option specifies how often the load balancer checks all it's L<ResourcePool's|ResourcePool> for a valid resource before it gives up and returns undef on the L<get()|/get> call.
+
+This option is very similar to the L<same named option from the ResourcePool|ResourcePool>. But keep in mind that this value specifies how often ResourcePool::LoadBalancer will cycle through ALL configured L<ResourcePool's|ResourcePool>. It does NOT specify how many L<ResourcePool's|ResourcePool> are checked before giving up. So if you add another L<ResourcePool|ResourcePool> you do not need to adjust this value. This value will only be used if ALL configured L<ResourcePool's|ResourcePool> failed to deliver a valid resource.
+
+Default: 6
+
+=item B<SleepOnFail>
+
+Very similar to the L<same named option from ResourcePool|ResourcePool>. Tells the load balancer to sleep if it was not able to find a valid resource in ANY of the underlying L<ResourcePool's|ResourcePool>. So, in the worst case, L<get()|/get> tries all L<ResourcePool's|ResourcePool> (all which are not suspended) to obtain a valid resource, if this fails it sleeps. After this sleep all pools are checked again and if it was still not possible to get a valid resource it sleeps again. This is done up to > times before L<get()|/get> fails and returns undef.
+
+Default: [0, 1, 2, 4, 8]
+
+=back
+
+=back
+
+=head2 S<$lb-E<gt>add_pool($resourcepool, @options)>
+
+Adds a L<ResourcePool|ResourcePool> object to the load balancer. You must call this method multiple times to add more pools. You can add as many L<ResourcePool's|ResourcePool> as you want.
+
+There are two options which affect the way the load balancer selects the L<ResourcePool's|ResourcePool>.
+
+=over 4
+
+=item $resourcepool
+
+The L<ResourcePool|ResourcePool> being added.
+
+=item @options
+
+=over 4
+
+=item B<Weight>
+
+Weight may make one L<ResourcePool|ResourcePool> more relevant then others. A L<ResourcePool|ResourcePool> with a high Weight is more expansive then a L<ResourcePool|ResourcePool>with a low Weight and will be used less frequent by the load balancer.
+
+Note: The only policy which takes the Weighting into account is LeastUsage.
+
+Default: 100
+
+=item B<SuspendTimeout>
+
+Every time a L<ResourcePool|ResourcePool> fails to deliver a valid resource, the load balancer will suspend it for SuspendTimeout seconds.
+
+So until the timeout has passed by the load balancer will not use this L<ResourcePool|ResourcePool> again. This can save a lot of time if it takes long to notice that a server is broken down.
+
+Default: 5
+
+=back
+
+=back
+
+=head2 S<$lb-E<gt>get>
+
+Returns a resource. This resource has to be given back via the L<free()|/free> or L<fail()|/fail> method. The get() method calls the L<get() method of the ResourcePool|ResourcePool/get> and might therefore return undef if no valid resource could be found in ALL L<ResourcePool's|ResourcePool>. In that case the load balancer will suspend the L<ResourcePool|ResourcePool> which returned the invalid resource and try the other (non suspended) L<ResourcePool's|ResourcePool> (see >). If it is not possible to find a valid resource in ANY configured L<ResourcePool|ResourcePool>, the load balancer will sleep (see >) and repeat this procedure up to > times. If, after all, the load balancer was not able to obtain a valid resource the get() method will return undef.
+
+According to the > and > settings the get() call might block the programs execution if it is not able to find a valid resource right now. Provided that you use the default settings for > and > a call to get() will block at least for 15 seconds before returning undef. Please see L<the TIMEOUTS section in the ResourcePool documentation|ResourcePool/TIMEOUTS> for some other effects which might affect the time which get() blocks before it returns undef.
+
+B<Returns:> undef
+
+=head2 S<$lb-E<gt>free($resource)>
+
+Marks a resource as free. Basically the same as the L<free() method of the ResourcePool|ResourcePool/free>.
+
+B<Returns:> 
+Return value is true on success or false if the resource doesn't belong 
+to this load balancer.
+
+
+=head2 S<$lb-E<gt>fail($resource)>
+
+Marks the resource as bad. Basically the same as the L<fail() method of the ResourcePool|ResourcePool/fail>.
+
+B<Returns:> 
+Return value is true on success or false if the resource doesn't belong 
+to this load balancer.
+
+
+=head1 EXAMPLES
+
+
+A basic example...
+
+ 
+ use ResourcePool;
+ use ResourcePool::Factory::Net::LDAP;
+ use ResourcePool::LoadBalancer;
+ 
+ ### LoadBalancer setup 
+ 
+ # create a pool to a ldap server
+ my $factory1 = ResourcePool::Factory::Net::LDAP->new("ldap.you.com");
+ my $pool1    = ResourcePool->new($factory1);
+ 
+ # create a pool to another ldap server
+ my $factory2 = ResourcePool::Factory::Net::LDAP->new("ldap2.you.com");
+ my $pool2    = ResourcePool->new($factory2);
+ 
+ # create a empty loadbalancer with a FailBack policy
+ my $loadbalancer = ResourcePool::LoadBalancer->new("LDAP", 
+                        Policy => "FailBack");
+ 
+ # add the first pool to the LoadBalancer
+ # since this LoadBalancer was configured to use the FailBack
+ # policy, this is the primary used pool
+ $loadbalancer->add_pool($pool1);
+ 
+ # add the second pool to the LoadBalancer.
+ # This pool is only used when first pool fails
+ $loadbalancer->add_pool($pool2);
+ 
+ ### LoadBalancer usage (no difference to ResourcePool)
+ for (my $i = 0; $i < 1000000 ; $i++) {
+    my $resource = $loadbalancer->get();  # get a resource from one pool
+                                          # according to the policy
+    if (defined $resource) {
+       eval {
+          #[...]                          # do something with $resource
+          $loadbalancer->free($resource); # give it back to the pool
+       }; 
+       if ($@) { # an exception happened
+          $loadbalancer->fail($resource); # give back a failed resource
+       }
+    } else {
+       die "The LoadBalancer was not able to obtain a valid resource\n";
+    }
+ }
+
+Please notice that the L<get()|/get>/ L<free()|/free> stuff in this example in INSIDE the loop. This is very important to make sure the load balancing and fail over works. As for the L<ResourcePool|ResourcePool> the smartness of the load balancer lies in the L<get()|/get> method, so if you do not call the L<get()|/get> method regular you can not expect the load balancer to handle load balancing or fail over.
+
+The example above does not do any load balancing since the policy was set to FailBack. If you would change this to RoundRobin or LeastUsage you would spread the load across both servers.
+
+You can directly copy and past the example above and try to run it. If you do not change the hostnames you will just see how it fails, but even this will tell you a lot about how it works. Give it a try.
+
+Now lets make a slightly more complex configuration. Imagine you have three ldap servers: one master where you do your write access, two replicas where you do the read access. Now we want ResourcePool::LoadBalancer to implement a load balancing across the two replicas but we want it to use the master also for read access if both replicas are not available.
+
+This setup is simple if you keep in mind what I have said about the ResourcePool::LoadBalancer interface: "Beside the construction the interface of ResourcePool::LoadBalancer is the same as the interface of L<ResourcePool|ResourcePool>. This means that it is possible to make a nested load balancer chain.
+
+ 
+ use ResourcePool;
+ use ResourcePool::Factory::Net::LDAP;
+ use ResourcePool::LoadBalancer;
+ 
+ ### LoadBalancer setup 
+ 
+ # create a pool to the master
+ my $masterfactory   = ResourcePool::Factory::Net::LDAP->new("master");
+ my $master          = ResourcePool->new($masterfactory);
+ 
+ # create pools to the replicas
+ my $replica1factory = ResourcePool::Factory::Net::LDAP->new("replica1");
+ my $replica1        = ResourcePool->new($replica1factory);
+ 
+ my $replica2factory = ResourcePool::Factory::Net::LDAP->new("replica2");
+ my $replica2        = ResourcePool->new($replica2factory);
+ 
+ # create the loadbalancer to spread load across the two replicas
+ # using the default Policy LeastUsage
+ my $replicaLB       = ResourcePool::LoadBalancer->new("LDAP-Replica");
+ $replicaLB->add_pool($replica1);
+ $replicaLB->add_pool($replica2);
+ 
+ # create a superior loadbalancer which handles the FailBack to the
+ # master if both replicas fail.
+ my $loadbalancer = ResourcePool::LoadBalancer->new("LDAP", 
+                        Policy => "FailBack");
+ $loadbalancer->add_pool($replicaLB);   # HERE IS THE MAGIC
+ $loadbalancer->add_pool($master);
+ 
+ ### LoadBalancer usage is the same as above, therefore skipped here
+
+You should keep in mind that this configuration causes a multiplication of the timeout's which are done because of the > settings. In the example above the sleeps sum up to 60 seconds.
+
+=head1 SEE ALSO
+
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::BigPicture|ResourcePool::BigPicture>,
+L<ResourcePool::UML|ResourcePool::UML>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

@@ -1,0 +1,17 @@
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.pod
+SIGNATURE
+dist.ini
+doap.ttl
+lib/RDF/Generator/HTTP.pm
+t/01basic.t
+t/message.t

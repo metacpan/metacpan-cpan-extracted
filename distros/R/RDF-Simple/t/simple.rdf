@@ -1,0 +1,18 @@
+<rdf:RDF 
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:ttt="http://test.org/test/test/"
+>
+  <rdf:Description rdf:about="http://www.w3.org/">
+    <dc:title>World Wide Web Consortium</dc:title> 
+    <ttt:author>T.E. St. Test</ttt:author> 
+  </rdf:Description>
+  <rdf:Description rdf:ID="based">
+    <dc:title>RDF Simple</dc:title> 
+    <ttt:author>Martin Thurn</ttt:author> 
+  </rdf:Description>
+  <rdf:Description rdf:about="#aboutbase">
+    <dc:title>RDF Complicated</dc:title> 
+    <ttt:author>Yoda</ttt:author> 
+  </rdf:Description>
+</rdf:RDF>

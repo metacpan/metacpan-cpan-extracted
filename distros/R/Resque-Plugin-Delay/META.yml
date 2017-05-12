@@ -1,0 +1,49 @@
+---
+abstract: 'Delay the execution of job'
+author:
+  - 'meru_akimbo <merukatoruayu0@gmail.com>'
+build_requires:
+  Redis: '0'
+  Test::MockTime: '0'
+  Test::More: '0.98'
+  Test::RedisServer: '0'
+  Time::Strptime: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Resque-Plugin-Delay
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Resque::Plugin::Delay:
+    file: lib/Resque/Plugin/Delay.pm
+    version: '0.03'
+  Resque::Plugin::Delay::Dequeue:
+    file: lib/Resque/Plugin/Delay/Dequeue.pm
+  Resque::Plugin::Delay::Job:
+    file: lib/Resque/Plugin/Delay/Job.pm
+requires:
+  JSON::XS: '0'
+  Moose: '0'
+  Resque: '0.31'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/meru-akimbo/resque-delay-perl/issues
+  homepage: https://github.com/meru-akimbo/resque-delay-perl
+  repository: git://github.com/meru-akimbo/resque-delay-perl.git
+version: '0.03'
+x_authority: cpan:MERU
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,83 @@
+%# RT::Extension::ReferenceIDoitObjects
+%#
+%# Copyright (C) 2011-17 synetics GmbH, <https://i-doit.com/>
+%#
+%# This program is free software: you can redistribute it and/or modify
+%# it under the terms of the GNU Affero General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# This program is distributed in the hope that it will be useful,
+%# but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%# GNU Affero General Public License for more details.
+%#
+%# You should have received a copy of the GNU Affero General Public License
+%# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%#
+%# Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+<%INIT>
+
+my $ARGSRef = $ARGS{'ARGSRef'};
+
+## Tenant:
+
+my $IDoitTenant = 'i-doit tenant';
+my $cf = RT::CustomField->new($RT::SystemUser);
+$cf->LoadByNameAndQueue(Name => $IDoitTenant, Queue => '0');
+
+unless ($cf->id) {
+    my $msg = loc(sprintf('Custom field "%s" does not exist.', $IDoitTenant));
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+my $cfIDoitTenant = 'CustomField-' . $cf->id;
+
+## Try to fetch tenant from HTTP GET:
+if ($$ARGSRef{'IDoitTenant'}) {
+    $$ARGSRef{$cfIDoitTenant} = $$ARGSRef{'IDoitTenant'};
+}
+
+## Try to fetch default tenant:
+if ((!$$ARGSRef{$cfIDoitTenant}) || ($$ARGSRef{$cfIDoitTenant} =~ /^[ \t]*$/)) {
+    my $IDoitDefaultTenant = RT->Config->Get('IDoitDefaultTenant');
+
+    unless ($IDoitDefaultTenant) {
+        my $msg = loc('Default tenant is not configured.');
+        RT::Logger->error($msg);
+        $$skip_create = 1;
+        push @{$results}, $msg;
+    }
+
+    $$ARGSRef{$cfIDoitTenant} = $IDoitDefaultTenant;
+}
+
+## Objects:
+
+my $IDoitObjects = 'i-doit objects';
+$cf = RT::CustomField->new($RT::SystemUser);
+$cf->LoadByNameAndQueue(Name => $IDoitObjects, Queue => '0');
+
+unless ($cf->id) {
+    my $msg = loc(sprintf('Custom field "%s" does not exist.', $IDoitObjects));
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+my $cfIDoitObjects = 'CustomField-' . $cf->id;
+
+## Try to fetch objects from HTTP GET:
+if ($$ARGSRef{'IDoitObjects'}) {
+    $$ARGSRef{$cfIDoitObjects} = $$ARGSRef{'IDoitObjects'};
+}
+
+</%INIT>
+
+<%ARGS>
+$skip_create => undef
+$results => undef
+</%ARGS>

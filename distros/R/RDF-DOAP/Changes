@@ -1,0 +1,70 @@
+RDF-DOAP
+========
+
+Created:      2013-08-11
+Home page:    <https://metacpan.org/release/RDF-DOAP>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-DOAP>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.012	2014-09-07
+
+ [ Bug Fixes ]
+ - Prevent gather_objects from returning non-references.
+
+0.011	2014-08-12
+
+ [ Bug Fixes ]
+ - Don't import Types::Standard type constraints twice over.
+
+0.010	2013-09-30
+
+ [ Bug Fixes ]
+ - Use Exporter::Tiny instead of Exporter::TypeTiny.
+
+0.009	2013-09-07
+
+ [ Bug Fixes ]
+ - Fix entries in changelog for changes with no explicit rdf:type.
+
+0.008	2013-09-03
+
+ [ Bug Fixes ]
+ - Fix some 'uninitialized' warnings.
+
+0.007	2013-09-03
+
+
+ - Make sure entries within changelog groups are lexicograpically sorted.
+
+0.006	2013-09-03
+
+
+ - Updated: New roles added for dcs:BackCompat and dcs:Tests.
+
+0.005	2013-08-13
+
+ [ Bug Fixes ]
+ - Further fix for `rdf_get`, `rdf_get_literal` and `rdf_get_uri` methods.
+
+0.004	2013-08-13
+
+ [ Bug Fixes ]
+ - Fix `rdf_get`, `rdf_get_literal` and `rdf_get_uri` methods.
+
+ [ Packaging ]
+ - Add missing dep on Test::LongString.
+
+ [ Other ]
+ - Improved stringification for RDF::DOAP::Person.
+
+0.003	2013-08-13
+
+ - Added: RDF::DOAP::Resource now has `rdf_get`, `rdf_get_literal` and
+   `rdf_get_uri` methods.
+
+0.002	2013-08-12
+
+ [ Packaging ]
+ - Various mini fixes.
+
+0.001	2013-08-12	Initial release

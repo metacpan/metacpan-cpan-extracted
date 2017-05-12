@@ -1,0 +1,144 @@
+                       Rosetta-Engine-Generic
+----------------------------------------------------------------------
+
+by Darren Duncan <perl@DarrenDuncan.net>
+
+CONTENTS
+
+* Preface
+* Keeping Up To Date
+* Dependencies
+* Support
+* License And Copyright
+* Acknowledgements
+
+PREFACE
+
+This distribution features the Perl 5 module named
+"Rosetta::Engine::Generic"; see the file lib/Rosetta/Engine/Generic.pm for
+the main documentation, which is in POD format.  The distribution also
+includes a ChangeLog file to say what changes already happened, and a TODO
+file to say what changes have yet to happen.  The file INSTALL should help
+with installation issues.  Read below for how to get support or keep up to
+date, know this distribution's dependencies, or read the credits or
+copyright and license.
+
+This distribution requires a live database to be tested against.  To gain
+the best understanding of whether Rosetta::Engine::Generic will work with
+your preferred database engine and/or working environment, you should edit
+this distribution's test configuration file "t_setup.pl" prior to running
+'make test' and/or 'perl Makefile.PL'.  The setup details that you input
+should match a visible database engine that you have full privileges on,
+including the ability to create schema objects, and select or modify data.
+If you do not edit "t_setup.pl", such as when you are a fully-automatic
+CPAN tester, then the test suite will use the newest SQLite v3 database
+engine by default, and the executed tests will only be as thorough as the
+SQLite v3 feature set supports.
+
+KEEPING UP TO DATE
+
+My module set is constantly under development.  The canonical copies are
+all linked to through my website, "http://www.DarrenDuncan.net/", on the
+page called "Perl Libraries I Made" (name subject to change).
+
+For those of you that are interested in the bleeding edge, I now have a
+public Subversion repository at "http://svn.utsl.gen.nz/trunk/Rosetta/";
+this repository contains all of my newer modules (whose problem domain is
+databases), but not my older modules (which are not about databases).
+
+You can download slightly older but more stable versions of all of my
+modules in standard tarred and gzipped distributions, either from the
+public CPAN archives, "http://www.cpan.org/authors/id/D/DU/DUNCAND/", or
+from my own web server, "http://www.DarrenDuncan.net/d/perl/".
+
+CPAN also extracts the POD from modules and maintains that documentation in
+an organized and searchable fashion.  Their main search site is
+"http://search.cpan.org/", and my own DUNCAND author page is
+"http://search.cpan.org/~duncand/"; distributions are also there.
+
+You can download my oldest distributions from BACKPAN, at
+"http://history.perl.org/backpan/authors/id/D/DU/DUNCAND/", or from my web
+server, at "http://www.DarrenDuncan.net/d/perl/archives/".
+
+DEPENDENCIES
+
+This distribution requires any version of Perl 5.x.y that is at least
+5.8.1.
+
+It also requires the Perl modules 'version' and 'only', which would
+conceptually be built-in to Perl, but aren't, so they are on CPAN instead.
+
+It also requires the Perl module List::Util, which would conceptually be
+built-in to Perl, but is bundled with it instead.
+
+It also requires these modules that are on CPAN: Rosetta '0.71.0-',
+Rosetta::Validator '0.71.0-' (but only for the test suite),
+Rosetta::Utility::SQLBuilder '0.22.0-', Rosetta::Utility::SQLParser '0.3.0-', DBI
+'1.48-', DBD::SQLite '1.09-' (default database engine used by the test
+suite), various DBI Driver (DBD) modules.
+
+This distribution also requires Test::More for its test suite, and that
+module is bundled with Perl.
+
+SUPPORT
+
+Currently I don't have any support arranged with other people, lists,
+newsgroups, or otherwise.  Feel free to ask me if you can't figure things
+out on your own, or another person whom you know has used this.  I may
+start a mailing list for support issues later, so that users of my modules
+can help each other with them.
+
+LICENCE AND COPYRIGHT
+
+This file is part of the Rosetta::Engine::Generic feature reference
+implementation of the Rosetta database portability library.
+
+Rosetta::Engine::Generic is Copyright (c) 2002-2005, Darren R. Duncan.  All
+rights reserved.  Address comments, suggestions, and bug reports to
+perl@DarrenDuncan.net, or visit http://www.DarrenDuncan.net/ for more
+information.
+
+Rosetta::Engine::Generic is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License (GPL) as
+published by the Free Software Foundation (http://www.fsf.org/); either
+version 2 of the License, or (at your option) any later version.  You
+should have received a copy of the GPL as part of the
+Rosetta::Engine::Generic distribution, in the file named "GPL"; if not,
+write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+Boston, MA  02110-1301, USA.
+
+Linking Rosetta::Engine::Generic statically or dynamically with other
+modules is making a combined work based on Rosetta::Engine::Generic.  Thus,
+the terms and conditions of the GPL cover the whole combination.  As a
+special exception, the copyright holders of Rosetta::Engine::Generic give
+you permission to link Rosetta::Engine::Generic with independent modules,
+regardless of the license terms of these independent modules, and to copy
+and distribute the resulting combined work under terms of your choice,
+provided that every copy of the combined work is accompanied by a complete
+copy of the source code of Rosetta::Engine::Generic (the version of
+Rosetta::Engine::Generic used to produce the combined work), being
+distributed under the terms of the GPL plus this exception.  An independent
+module is a module which is not derived from or based on
+Rosetta::Engine::Generic, and which is fully useable when not linked to
+Rosetta::Engine::Generic in any form.
+
+Any versions of Rosetta::Engine::Generic that you modify and distribute
+must carry prominent notices stating that you changed the files and the
+date of any changes, in addition to preserving this original copyright
+notice and other credits.  Rosetta::Engine::Generic is distributed in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+While it is by no means required, the copyright holders of
+Rosetta::Engine::Generic would appreciate being informed any time you
+create a modified version of Rosetta::Engine::Generic that you are willing
+to distribute, because that is a practical way of suggesting improvements
+to the standard version.
+
+ACKNOWLEDGEMENTS
+
+None besides myself so far.
+
+FIN
+
+Share and Enjoy!

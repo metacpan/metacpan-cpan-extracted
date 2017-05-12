@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Resource/Pack/jQuery.pm
+lib/Resource/Pack/jquery-1.4.2.min.js
+t/000-load.t
+t/001-bundled.t
+t/002-url.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

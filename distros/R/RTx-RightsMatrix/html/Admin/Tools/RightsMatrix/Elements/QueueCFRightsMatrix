@@ -1,0 +1,44 @@
+
+<& /Elements/ListActions, actions => \@results &>
+
+<& /Admin/Tools/RightsMatrix/Elements/CustomFieldRightsMatrix, ObjectType => 'RT::Queue', LookupType => 'RT::Queue-RT::Ticket', ObjectRights => \%q_rights, PrincipalObj => $principal, %ARGS &>
+
+<h3>Queue Key:</h3>
+For a queue the possible permissions are:
+<table border="1">
+% foreach (keys %q_rights) {
+<tr>
+<td><%$_%></td><td><%$q_rights{$_}{RIGHT}%></td><td><%$q_rights{$_}{DESC}%></td>
+</tr>
+% }
+</table>
+<p>
+
+<%INIT>
+
+my @results;
+
+my ($principal, $msg) = RTx::RightsMatrix::Util::get_principal( Principal => $ARGS{Principal}, User => $ARGS{User}, CurrentUser => $session{CurrentUser} );
+unless (ref $principal) {
+        $m->comp("/Elements/Error", Why => loc($msg));
+        $m->abort;
+}
+
+</%INIT>
+<%ARGS>
+$User => undef
+$Edit => 0
+$Principal => 0
+$Intersect => 0
+</%ARGS>
+<%ONCE>
+use RTx::RightsMatrix::Util;
+my %q_rights = (
+                  'q' => { RIGHT => 'SeeQueue',    DESC =>'Can see that queue' },
+                  'r' => { RIGHT => 'ShowTicket',    DESC =>'Can see tickets in that queue' },
+                  'w' => { RIGHT => 'ModifyTicket', DESC =>'Can edit/modify tickets in that queue' },
+                  'c' => { RIGHT => 'CreateTicket',  DESC =>'Can create tickets in that queue' },
+                  'd' => { RIGHT => 'DeleteTicket',  DESC =>'Can delete tickets in that queue' },
+                 );
+
+</%ONCE>

@@ -1,0 +1,84 @@
+#announce {
+  padding-top: 10px; /* Keep from running into the menu on the right */
+}
+
+table.announce {
+  background-color:#fcc;
+  width: 100%;
+  border-top-left-radius: 0.3em;
+  border-top-right-radius: 0.3em;
+  border-bottom-right-radius: 0.3em;
+  border-bottom-left-radius: 0.3em;
+  valign: top;
+  border-left: 1px solid #ccc;
+  border-top: 1px solid #ccc;
+  border-bottom: 2px solid #aaa;
+  border-right: 2px solid #aaa;
+  border-radius: 0.5em;
+  padding: 1em 1em 1em 1em;
+}
+
+td.toggle_announcements {
+  text-align: center;
+}
+
+a.toggle_announcements:link {
+  font-weight: bold;
+  color: #000000;
+}
+
+a.toggle_announcements:visited {
+  font-weight: bold;
+  color: #000000;
+}
+
+a.toggle_announcements:hover {
+  font-weight: bold;
+  color: #808080;
+  text-decoration: none;
+}
+
+a.announcements_detail:link {
+  text-decoration: underline;
+}
+
+a.announcements_detail:visited {
+  text-decoration: underline;
+}
+
+a.announcements_detail:hover {
+  text-decoration: underline;
+}
+
+td.announce_subject {
+  width: 25%;
+  color: red;
+  font-weight: bold;
+}
+
+a.announce_subject:link, span.announce_subject {
+  color: red;
+  font-weight: bold;
+}
+
+a.announce_subject:visited {
+  color: red;
+  font-weight: bold;
+}
+
+ul.menu li:first-child {
+  background-color: #fcc;
+  margin-top: -1em;
+  padding-top: 1.4em; /* to fill the background for parent margin-top */
+  border-top-left-radius: 1em;
+  border-top-right-radius: 1em;
+}
+
+ul.menu a.announce {
+  background-color: #fcc;
+}
+
+table.announce td.date {
+  font-size: smaller;
+  color: #777;
+}

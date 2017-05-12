@@ -1,0 +1,109 @@
+R-YapRI version 0.08
+====================
+
+SYPNOSIS
+
+  use R::YapRI::Base;
+
+  ## WORKING WITH THE DEFAULT MODE:
+
+  my $rih = R::YapRI::Base->new();
+  $rih->add_command('bmp(filename="myfile.bmp", width=600, height=800)');
+  $rih->add_command('dev.list()');
+  $rih->add_command('plot(c(1, 5, 10), type = "l")');
+  $rih->add_command('dev.off()');
+ 
+  $rih->run_commands();
+  
+  my $result_file = $rih->get_blocks('default')->get_result_file();
+
+
+
+  ## WORKING WITH COMMAND BLOCKS:
+
+  my $rih = R::YapRI::Base->new();
+
+  ## Create a file-block_1
+
+  $rih->create_block('BLOCK1');
+  $rih->add_command('x <- c(10, 9, 8, 5)', 'BLOCK1');
+  $rih->add_command('z <- c(12, 8, 8, 4)', 'BLOCK1');
+  $rih->add_command('x + z', 'BLOCK1')
+  
+  ## Create a file-block_2
+
+  $rih->create_block('BLOCK2');   
+  $rih->add_command('bmp(filename="myfile.bmp", width=600, height=800)', 
+                    'BLOCK2');
+  $rih->add_command('dev.list()', 'BLOCK2');
+  $rih->add_command('plot(c(1, 5, 10), type = "l")', 'BLOCK2');
+  
+  ## Run each block
+
+  $rih->run_command('BLOCK1');
+  $rih->run_command('BLOCK2');
+
+  ## Get the results
+
+  my $resultfile1 = $rih->get_blocks('BLOCK1')->get_result_file();
+  my $resultfile2 = $rih->get_blocks('BLOCK2')->get_result_file(); 
+
+
+ Example of a module that uses R::YapRI::Base, and R::YapRI::Data::Matrix to
+ calculate the transpose of the matrix
+
+ my $matrix = R::YapRI::Data::Matrix( { 
+              name => 'matrix1', 
+              rown => 3,
+	      coln => 4, 
+`	      rownames => ['A', 'B', 'C'],
+              colnames => ['alpha', 'beta', 'gamma', 'delta'],
+	      data => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+              });
+
+ my $rih2 = R::YapRI::Base->new();
+ $matrix->send_rbase($rih2);
+ 
+ $rih2->create_block('TRMATRIX', $matrix->get_name());
+ $rih2->add_command('trmatrix1 <- t('.$matrix->get_name().')', 'TRMATRIX');
+ $rih2->run_commands('TRMATRIX');    
+ my $trmatrix = R::YapRI::Data::Matrix->read_rbase( $rih2, 
+                                                    'TRMATRIX', 
+                                                    'trmatrix1');
+
+
+DESCRIPTION
+
+YapRI, is "Yet another perl R interface" developed initially to work with 
+different blocks of commands. 
+
+  It run the commands esentially as: 
+  R [options] --file=inputcommandfile > outputresultfile
+
+ So the R::YapRI::Base module, create files, put them in a temp dir by default, 
+open these files, write the R commands to them, execute the files and 
+store all of them as variables in this object.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Test::More
+  Test::Exception
+  Test::Warn
+  Image::Size
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Aureliano Bombarely
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

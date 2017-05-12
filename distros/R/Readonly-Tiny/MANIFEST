@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Readonly/Tiny.pm
+MANIFEST			This list of files
+META.json
+META.yml
+t/00use.t
+t/compat.t
+t/readonly.t
+t/readwrite.t
+t/Util.pm

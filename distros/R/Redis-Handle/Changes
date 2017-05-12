@@ -1,0 +1,6 @@
+Revision history for Redis::Handle
+
+0.2.0   2012-03-27
+
+    - Added tests
+    - Added the ability to pass an existing Redis connection

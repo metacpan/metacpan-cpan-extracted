@@ -1,0 +1,9 @@
+PREFIX : <http://www.w3.org/1999/xhtml>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX rat: <http://www.kjetil.kjernsmo.net/software/rat>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT $resource $desc WHERE {
+  $resource dct:title "Elektronisk Forpost Norge"@no ;
+	    dct:description $desc .
+}

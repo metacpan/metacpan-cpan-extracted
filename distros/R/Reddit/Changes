@@ -1,0 +1,6 @@
+Revision history for Perl extension Reddit.
+
+0.01  Sun Oct 16 16:22:09 2011
+	- original version; created by h2xs 1.23 with options
+		-X -n Reddit
+

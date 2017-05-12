@@ -1,0 +1,38 @@
+% if(RT->Config->Get('CIFMinimal_CollectiveView')){
+<table width="100%" class="ticketsummary" >
+    <tr>
+        <td valign="bottom" width="75%" class="boxcontainer">
+            <&| /Widgets/TitleBox, title => loc("Collective Data"),
+                title_class=> 'inverse',
+                color => "#663366" &>
+% $m->out($cif_data);
+            </&>
+        </td>
+    </tr>
+</table>
+% }
+
+<%init>
+#If we get handed two ids, mason will make them an array. bleck.
+# We want teh first one. Just because there's no other sensible way
+# to deal
+my @id = ( ref $id eq 'ARRAY' ) ? @{$id} : ($id);
+
+my $Ticket = new RT::Ticket( $session{'CurrentUser'} );
+unless ( $Ticket->Load( $id[0] ) ) {
+$m->comp( 'Error.html', Why => loc( "Couldn't load ticket '[_1]'", $id ) );
+    $m->abort();
+}
+
+require RT::CIFMinimal;
+my $cif_data = RT::CIFMinimal::cif_data({
+    user    => $session{'CurrentUser'}->UserObj(),
+    q       => $Ticket->FirstCustomFieldValue('Address'),
+    nolog   => 1,
+    results => \@results,
+});
+</%init>
+<%args>
+$id => undef
+@results => undef
+</%args>

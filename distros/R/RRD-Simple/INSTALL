@@ -1,0 +1,82 @@
+Installing RRD::Simple
+======================
+
+If you already have the RRDs module installed (see the later
+sections below), then you can install the RRD::Simple module
+using the following commands in order:
+
+perl Makefile.PL 
+perl Build
+perl Build test
+perl Build install
+
+
+Installing RRDtool from Source
+==============================
+
+RRD::Simple requires the RRDs module (a part of RRDtool) to
+be available in the Perl @INC path. RRDtool can be downloaded
+from http://www.rrdtool.org or http://oss.oetiker.ch/rrdtool/.
+
+In RRDTool version 1.0.x, the RRDs module is located in the
+"rrdtool-1.0.xx/perl-shared/" directory. In version 1.2.x, it
+is located in "rrdtool-1.2.xx/bindings/perl-shared/".
+
+	tar -zxf rrdtool-1.x.xx.tar.gz
+	cd rrdtool-1.x.xx
+	./configure && make && make install
+	# cd perl-shared        # Version 1.0.x
+	cd bindings/perl-shared # Version 1.2.x
+	make clean
+	perl Makefile.PL && make && make install
+	echo "/usr/local/rrdtool-1.x.xx/lib" >> /etc/ld.so.conf
+	ldconfig
+
+More recent versions of RRDtool will attempt to compile and
+install bindings for TCL, Python and Ruby. If you do not need
+nor want to compile these bindings, you should change the
+./configure command as follows:
+
+	./configure --disable-tcl --disable-python --disable-ruby
+
+
+Installing RRDtool from Source on RHEL
+======================================
+
+If you are installing RRDtool from source under RHEL, you will
+probably need to install the following development RPMs before
+following the instructions above:
+
+	zlib-devel
+	libpng10-devel
+	libpng-devel
+	libart_lgpl-devel
+
+You may also want to optionally install these development RPMs
+if you wish to compile and install the RRDtool bindings for
+TCL, Python and Ruby:
+
+	tcl-devel
+	python-devel
+	ruby-devel
+
+
+Installing RRDtool on Debian & Ubuntu
+=====================================
+
+Run apt-get as root or with sudo as shown here to install the
+rrdtool and librrds-perl packages:
+
+	sudo apt-get install rrdtool
+	sudo apt-get install librrds-perl
+
+
+Installing RRDtool on Fedora Core
+=================================
+
+Run yum as root or with sudo as shown here to install the
+rrdtool and rrdtool-perl packages:
+
+	sudo yum install rrdtool
+	sudo yum install rrdtool-perl
+

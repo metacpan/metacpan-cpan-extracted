@@ -1,0 +1,270 @@
+=head1 NAME
+
+Reaction::Manual::Internals
+
+=head2 Hacking on Reaction
+
+=head3 What is a component?
+
+=head3 What component types are there?
+
+=head3 How do I create a new component?
+
+=head3 How does it work with a database?
+
+=head3 What about Moose?
+
+L<Moose>
+
+=head3 Type system
+
+=head3 What Perl modules should I be familiar with, in order to hack on Reaction's
+internals?
+
+=over
+
+=item L<Moose>
+
+A complete modern object system for Perl 5.
+
+=item L<aliased>
+
+Use shorter package names, i.e., "X::Y::Z" as "Z".
+
+=item L<Catalyst>
+
+The MVC application framework Reaction uses.
+
+=over
+
+=item * L<Catalyst::Controller::BindLex>
+
+=item * L<Catalyst::Model::DBIC::Schema>
+
+=item * L<Catalyst::Plugin::ConfigLoader> 
+
+=item * L<Catalyst::Plugin::I18N>
+
+=item * L<Catalyst::Plugin::Static::Simple>
+
+=item * L<Catalyst::View::TT>
+
+=back
+
+=item TT
+
+Template Toolkit
+
+=item L<Config::General> 
+
+Generic config file module.
+
+=item L<DBIx::Class> 
+
+Object/Relational mapper.
+
+=item L<DateTime>
+
+=item L<DateTime::Format::MySQL>
+
+=item L<Digest::MD5>
+
+=item L<Email::MIME>
+
+=item L<Email::MIME::Creator>
+
+=item L<Email::Send>
+
+=item L<Email::Valid>
+
+=item L<SQL::Translator>
+
+=item L<Test::Class>
+
+=item L<Test::Memory::Cycle>
+
+=item L<Time::ParseDate>
+
+=back
+
+=head3 Packages involved
+
+=over
+
+=item L<Reaction::Class>
+
+Utility class, sets up to export a few methods that return parameters for use
+within Moose's C<has> (as new parameters) in other packages. It also C<use>s
+Moose itself.
+
+The methods it injects are:
+
+=over
+
+=item set_or_lazy_build($field_name)
+
+The attribute is required, if not provided beforehand the build_${name} method
+will be called on the object when the attribute's getter is first called. If
+the method does not exist, or returns undef, an error will be thrown.
+
+=item set_or_lazy_fail()
+
+The attribute is required, if not provided beforehand the 'lazy' parameter of
+Moose will make it fail.
+
+=item trigger_adopt()
+
+Calls adopt_${type} after the attribute value is set to $type.
+
+=item register_inc_entry()
+
+Will mark the calling package as already included, using %INC.
+
+=back
+
+=item Reaction::InterfaceModel::Action
+
+=item Reaction::InterfaceModel::Action::DBIC::ResultSet::Create;
+
+=item Reaction::InterfaceModel::Action::DBIC::ActionReflector;
+
+A method "adaptor" that creates the needed objects to support CRUD DBIC
+actions. In the future the code could be moved to a class higher in the
+hierarchy and only contain the operations to adapt.
+
+Sample run:
+
+Reaction::InterfaceModel::Action::DBIC::ActionReflector->reflect_actions_for(
+Reaction::InterfaceModel::Action::DBIC::ActionReflector=HASH(0x93cb2f0) 
+RTest::TestDB::Foo 
+ComponentUI::Model::Action
+)
+
+Generates and evaluates:
+
+package ComponentUI::Model::Action::DeleteFoo;
+use Reaction::Class;
+extends 'Reaction::InterfaceModel::Action::DBIC::Result::Delete';
+package ComponentUI::Model::Action::UpdateFoo;
+use Reaction::Class;
+extends 'Reaction::InterfaceModel::Action::DBIC::Result::Update';
+has 'baz_list' => (isa => 'ArrayRef', is => 'rw', set_or_lazy_fail('baz_list'), default => sub { [] }, valid_values => sub {
+$_[0]->target_model
+->result_source
+->related_source('links_to_baz_list')
+->related_source('baz')
+->resultset;
+});
+has 'last_name' => (isa => 'NonEmptySimpleStr', is => 'rw', set_or_lazy_fail('last_name'));
+has 'first_name' => (isa => 'NonEmptySimpleStr', is => 'rw', set_or_lazy_fail('first_name'));
+package ComponentUI::Model::Action::CreateFoo;
+use Reaction::Class;
+extends 'Reaction::InterfaceModel::Action::DBIC::ResultSet::Create';
+has 'baz_list' => (isa => 'ArrayRef', is => 'rw', set_or_lazy_fail('baz_list'), default => sub { [] }, valid_values => sub {
+$_[0]->target_model
+->result_source
+->related_source('links_to_baz_list')
+->related_source('baz')
+->resultset;
+});
+has 'last_name' => (isa => 'NonEmptySimpleStr', is => 'rw', set_or_lazy_fail('last_name'));
+has 'first_name' => (isa => 'NonEmptySimpleStr', is => 'rw', set_or_lazy_fail('first_name'));
+
+=item Reaction::InterfaceModel::Action::DBIC::Result::Delete
+
+=item Reaction::InterfaceModel::Action::DBIC::Result::Update
+
+=item Reaction::InterfaceModel::Action::DBIC::User::ResetPassword
+
+=item Reaction::InterfaceModel::Action::DBIC::User::Role::SetPassword
+
+=item Reaction::InterfaceModel::Action::DBIC::User::ChangePassword
+
+=item Reaction::InterfaceModel::Action::User::ResetPassword
+
+=item Reaction::InterfaceModel::Action::User::ChangePassword
+
+=item Reaction::InterfaceModel::Action::User::SetPassword
+
+=item Reaction::Meta::InterfaceModel::Action::ParameterAttribute
+
+=item Reaction::Meta::InterfaceModel::Action::Class
+
+=item Reaction::Types::Email
+
+=item Reaction::Types::Core
+
+=item Reaction::Types::DateTime
+
+=item Reaction::Types::File
+
+=item Reaction::Types::DBIC
+
+=item Reaction::UI::ViewPort::ListView
+
+=item Reaction::UI::ViewPort::Field::Text
+
+=item Reaction::UI::ViewPort::Field::ChooseMany
+
+=item Reaction::UI::ViewPort::Field::String
+
+=item Reaction::UI::ViewPort::Field::Number
+
+=item Reaction::UI::ViewPort::Field::HiddenArray
+
+=item Reaction::UI::ViewPort::Field::DateTime
+
+=item Reaction::UI::ViewPort::Field::File
+
+=item Reaction::UI::ViewPort::Field::ChooseOne
+
+=item Reaction::UI::ViewPort::Field::Password
+
+=item Reaction::UI::ViewPort::ActionForm
+
+=item Reaction::UI::ViewPort::Field
+
+=item Reaction::UI::FocusStack
+
+=item Reaction::UI::RootController
+
+=item Reaction::UI::Window
+
+=item Reaction::UI::Renderer::XHTML
+
+=item Reaction::UI::ViewPort
+
+=item Reaction::UI::CRUDController
+
+=item Reaction::UI::Controller
+
+=back
+
+=head3 Remarks about POD
+
+Don't use C<=over N>. POD assumes that the indent level is 4 if you leave
+it out. Most POD renderers ignore your indent level anyway.
+
+=head2 UNSORTED
+
+Packages involved
+
+t/lib/Rtest/TestDB*: TestDB DBIC declarations.
+t/lib/RTest/TestDB.pm: does DBIC populate for t/.
+t/lib/RTest/UI/ XXX
+
+Reaction::Test::WithDB;
+Reaction::Test;
+Reaction::Test::Mock::Context;
+Reaction::Test::Mock::Request;
+Reaction::Test::Mock::Response;
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel;
+use Ravenel::Document;
+
+my $res = Ravenel::Document->render( {
+	'file'    => "$FindBin::Bin/test.html",
+	'prefix'  => 'r:',
+	'dynamic' => 1,
+} );
+
+print $res . "\n";

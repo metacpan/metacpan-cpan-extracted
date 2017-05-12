@@ -1,0 +1,20 @@
+<%init>
+
+my $result = RT::Extension::MessageSizeLimit::CheckMessageSizeLimit(
+        Subject => $$ARGSRef{'Subject'},
+        Content => $$ARGSRef{'UpdateContent'},
+        Attachments => $session{Attachments}{$$ARGSRef{'Token'}},
+        CurrentUser => $session{'CurrentUser'},
+    );
+
+if ( $result ) {
+    push @$results, $result;
+    $$skip_update = 1;
+}
+
+</%init>
+<%args>
+$ARGSRef => undef
+$results => undef
+$skip_update => undef
+</%args>

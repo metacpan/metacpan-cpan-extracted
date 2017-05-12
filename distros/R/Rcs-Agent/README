@@ -1,0 +1,70 @@
+#
+# $Id: README,v 1.6 2007/04/08 09:14:13 nick Exp $
+#
+
+DESCRIPTION
+-----------
+
+This is Rcs::Agent, version 1.04, an object oriented RCS perl library, used
+for creating and manipulating RCS archives within perl programs.  
+
+Rcs::Agent is copyright (C) 2001 - 2007 Network Ability Ltd.  All rights
+reserved.  This software may be redistributed under the terms of the license
+included in this software distribution.  Please see the file "LICENSE" for
+further details.
+
+
+PREREQUISITES
+-------------
+
+A Unix or Unix-look-alike.  Rcs::Agent will almost certainly not run under
+non-unixy systems.
+
+The following perl modules are also needed for Rcs::Agent to run properly:
+
+String::ShellQuote-1.00
+File::Temp
+
+These (and many other) useful packages are available from your local CPAN
+archive, or http://www.perl.com/.   File::Temp is included with the base
+distribution of perl 5.7 and above, so if you're running this version or
+anything more recent, there's no need to install this module.
+
+
+INSTALLATION
+------------
+
+tar -xvzf Rcs::Agent-1.XX.tar.gz
+cd Rcs::Agent-1.XX
+perl Makefile.PL
+make
+make install
+
+BUGS & SECURITY
+---------------
+
+Rcs::Agent is coded carefully with security in mind.  Like all code,
+however, there is a possibility that bugs or security problems have slipped
+through the net.  If you find a problem with the code, please email us at
+rcs-agent /at/ netability.ie, detailing the problem, and providing a patch
+if possible.
+
+In particular, we recommend that all developers use the 'tmpdir' parameter
+when creating new objects to ensure that RCS does not use /tmp for its
+temporary files.  Please see the man page for more details on this.
+
+
+CONTRIBUTORS
+------------
+
+Nick Hilliard - nick /at/ netability.ie
+
+
+CONTACT INFORMATION
+-------------------
+
+Rcs::Agent is written by Network Ability Ltd, a Dublin, Ireland-based
+company specialising in ISP consultancy and contracting services.  Among
+many other things, we write perl code to suit all occasions.  Please contact
+us at <info /at/ netability.ie> with your requirements.
+

@@ -1,0 +1,12 @@
+Changes
+GPL
+INSTALL
+lib/Rosetta/Utility/SQLParser.pm
+lib/Rosetta/Utility/SQLParser/L/en.pm
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+ReadMe
+t/lib/t_ROS_U_SP_Util.pm
+t/ROS_U_SP_00_Compile.t
+TODO

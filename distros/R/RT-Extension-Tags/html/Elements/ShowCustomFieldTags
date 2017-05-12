@@ -1,0 +1,32 @@
+<%init>
+my $content = $Object->LargeContent || $Object->Content;
+$content = $m->comp('/Elements/ScrubHTML', Content => $content);
+$content =~ s|\n|<br />|g;
+
+my $status;
+if ( RT::Handle::cmp_version($RT::VERSION, "4.4.0") < 0 ){
+    # For pre RT 4.4
+    $status = "(Status = 'new' OR Status = 'open')";
+} else {
+    # RT 4.4 introduced __Active__
+    $status = "Status = '__Active__'";
+}
+
+my $cf = $Object->CustomFieldObj;
+my $cf_id = $cf->id;
+my $query_value = $Object->LargeContent || $Object->Content;
+$query_value =~ s/(['\\])/\\$1/g;
+my $query = "CF.{$cf_id} = '$query_value' AND $status";
+RT::Interface::Web::EscapeURI(\$query);
+
+</%init>
+% if (not $cf->LinkValueTo) {
+<a href="<% RT->Config->Get('WebPath') %>/Search/Results.html?Query=<% $query %>">
+% }
+<%$content|n%>
+% if (not $cf->LinkValueTo) {
+</a>
+% }
+<%ARGS>
+$Object
+</%ARGS>

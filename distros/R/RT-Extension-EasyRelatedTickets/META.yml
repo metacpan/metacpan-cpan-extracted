@@ -1,0 +1,16 @@
+--- 
+abstract: RT Extension-EasyRelatedTickets Extension
+author: sunnavy <sunnavy@bestpractical.com>
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: RT-Extension-EasyRelatedTickets
+no_index: 
+  directory: 
+    - html
+    - inc
+    - t
+version: 0.1

@@ -1,0 +1,45 @@
+---
+abstract: 'plant Roses in your Catalyst garden'
+author:
+  - 'Peter Karman <karman@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Rose-DBx-Garden-Catalyst
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Catalyst: '5.7'
+  Catalyst::Plugin::Static::Simple::ByClass: '0'
+  CatalystX::CRUD: '0.43'
+  CatalystX::CRUD::Model::RDBO: '0.2'
+  CatalystX::CRUD::YUI: '0.017'
+  Class::C3: '0'
+  Data::Dump: '0'
+  File::Slurp::Tiny: '0'
+  IPC::Cmd: '0'
+  MRO::Compat: '0'
+  Rose::DB::Object: '0.77'
+  Rose::DBx::AutoReconnect: '0'
+  Rose::DBx::Garden: '0.190'
+  Rose::DBx::Object::MoreHelpers: '0.06'
+  Rose::HTMLx::Form::Related: '0.12'
+  Test::More: '0'
+  Tree::Simple: '0'
+  Tree::Simple::Visitor::ToNestedHash: '0'
+  perl: '5.008003'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Rose-DBx-Garden-Catalyst
+  homepage: https://github.com/karpet/rose-dbx-garden-catalyst
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/karpet/rose-dbx-garden-catalyst
+version: '0.180'

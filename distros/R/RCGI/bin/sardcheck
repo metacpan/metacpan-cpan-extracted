@@ -1,0 +1,119 @@
+#!/usr/local/bin/perl -s
+
+use strict;
+use RCGI::Config;
+use vars qw( $verbose);
+
+$| = 1;
+my($log_file) = $RCGI::Config::path . "/sar";
+my(%SAR);
+dbmopen(%SAR,$log_file,0664);
+my($do_restart) = 0;
+map {
+    if (/not_responding/) {
+	$do_restart = 1;
+    }
+} (sort (keys %SAR));
+dbmclose(%SAR);
+
+if ($verbose) {
+    print "Do Restart: " . ($do_restart ? 'true' : 'false') . "\n";
+}
+if ($verbose) {
+    print "Kill\n";
+}
+Kill_Defunct('sar','',$do_restart);
+if ($verbose) {
+    print "Kill -9\n";
+}
+while(Kill_Defunct('sar','-9',$do_restart)) {}
+if ($verbose) {
+    print "Restart\n";
+}
+Restart_Sard('sar');
+
+
+
+sub Kill_Defunct {
+    my($username) = shift;
+    my($kill_level) = shift;
+    my($force_restart) = shift;
+    my($user,$pid, $ppid, $gid, $sid);
+    my($do_kill) = ($force_restart) ? 1 : 0;
+    my($found_kill);
+    my(%to_kill);
+    my($do_sleep);
+    open(PS,"ps -fj -u $username |");
+    while(<PS>) {
+	s/^\s*//;
+	s/\s+/\t/g;
+	if (/sard/ && $_ !~ /sardcheck/) {
+	    ($user, $pid, $ppid, $gid, $sid) = split("\t");
+	    if (/<defunct>/) {
+		if ($verbose) {
+		    print "Defunct: $user $pid $ppid\n";
+		}
+		$do_kill = 1;
+		$found_kill = 1;
+		if ($ppid == 1) {
+		    $to_kill{$pid} = 1;
+		} else {
+		    $to_kill{$ppid} = 1;
+		}
+	    }
+	    # kill pid if parent is 1 but gid is not pid
+	    if ($ppid == 1 && $pid != $gid) {
+		if ($verbose) {
+		    print "Orphan: $user $pid $ppid $gid\n";
+		}
+		$do_kill = 1;
+		$found_kill = 1;
+		$to_kill{$pid} = 1;
+	    }
+	}
+    }
+    close(PS);
+
+    if ($do_kill) {
+	map {
+	    $do_sleep = 1;
+	    print STDERR "Killing $_\n";
+	    `kill $kill_level $_ > /dev/null 2>&1`;
+	} (keys %to_kill);
+	if ($do_sleep) {
+	    if ($verbose) {
+		print "kill $kill_level:  Sleep: 30\n";
+	    }
+	    sleep 30;
+	}
+    }
+    return $found_kill;
+}
+
+sub Restart_Sard {
+    my($username) = shift;
+    my($user,$pid, $ppid, $gid, $sid);
+    open(PS,"ps -fj -u $username |");
+    while(<PS>) {
+	if (/sard/ &&
+	    $_ !~ /sardcheck/) {
+	    s/\s+/\t/g;
+	    ($user, $pid, $ppid, $gid, $sid) = split("\t");
+	    if ($verbose) {
+		print;
+	    }
+	    last;
+	}
+    }
+    close(PS);
+    if (!defined($ppid)) {
+	print STDERR "Restart sard\n";
+	`cd /usr/rcgi ; /usr/rcgi/sard sard.conf sar > /dev/null &`;
+	if ($verbose) {
+	    print "Sleep: 30\n";
+	}
+	sleep 30;
+	`$0`;
+    }
+}
+

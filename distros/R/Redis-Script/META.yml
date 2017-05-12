@@ -1,0 +1,42 @@
+---
+abstract: "wrapper class for Redis' script"
+author:
+  - '@gmail.com>'
+build_requires:
+  Redis: '0'
+  Test::More: '0.98'
+  Test::RedisServer: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-Script
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Redis::Script:
+    file: lib/Redis/Script.pm
+    version: '0.02'
+requires:
+  Digest::SHA: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/shogo82148/p5-Redis-Script/issues
+  homepage: https://github.com/shogo82148/p5-Redis-Script
+  repository: git://github.com/shogo82148/p5-Redis-Script.git
+version: '0.02'
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.69.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b366a15302a29496b3b01aa55398e585c23c80fe Changes
+SHA1 a5dafe1231c60367e65fa0fb61780ea362c69a73 MANIFEST
+SHA1 6b7049562b8c48e8230428a9684fc3ad6db0af91 META.yml
+SHA1 9491b6df861a686337d5074943f9c33a20e28490 Makefile.PL
+SHA1 fefc56f283cc9a7cccdeb0bb5a7b9a23ea97433c README
+SHA1 be8ea4e07c8eec610a5dadeba024e4d6712779e8 html/Callbacks/AttachmentWarning/Ticket/Create.html/BeforeCreate
+SHA1 2fb949bbe7665368c6a13583b5028cb3aaabeea5 html/Callbacks/AttachmentWarning/Ticket/Create.html/Default
+SHA1 0cd0a2c74bbd59a0578cdc7647f692e1a8d18647 html/Callbacks/AttachmentWarning/Ticket/Elements/AddAttachments/End
+SHA1 dfa824cd99756027b6c823ee613f54b2e92da096 html/Callbacks/AttachmentWarning/Ticket/Update.html/BeforeUpdate
+SHA1 0c613d2b001ea431990b1d0c01d8dbb9711178ce html/Callbacks/AttachmentWarning/Ticket/Update.html/Initial
+SHA1 b46256e7bc538eadfe9f46563a8924fc7ceed10c html/Elements/AttachmentWarning
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 43b47fb3c5ec06b71bb175258c8c1b2aaf8a10ab inc/Module/Install/RTx.pm
+SHA1 dc94326a076aca41452c1d65bf52a255feeb9ef7 inc/Module/Install/ReadmeFromPod.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 6e699e4a2eb8f51a6de115e7cc32698e01e1add8 lib/RT/Extension/AttachmentWarning.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFRHXTBHdv9ZfNcOAcRAoWGAJ4ngdz777hfy+dybcaKY5zvzdg2qACeKxX3
+EZMM+CtvZ3z1pwVP0RSDdlw=
+=LLDT
+-----END PGP SIGNATURE-----

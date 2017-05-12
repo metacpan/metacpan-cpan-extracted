@@ -1,0 +1,40 @@
+[% IF no_head %][% PROCESS form %][% ELSE %][% doctype %]<html><head><title>[% title %]</title>[% html_head %]</head><body>[% PROCESS form %]</body></html>[% END %]
+
+[% BLOCK form %]
+	[% form.jshead %]
+	<div>
+		<h1>[% title %]</h1>
+		[% IF description %]<p>[% description %]</p>[% END %]
+		[% form.start %]
+		[% FOREACH field = form.fields %][% IF field.type == 'hidden' %][% field.field %][% END %][% END %]
+		<table>
+			[% FOREACH field = field_order %]
+				[% IF form.field.$field and form.field.$field.type != 'hidden' %]
+					<tr>
+						<td>
+							<label[% UNLESS form.field.$field.type.match('^(checkbox|radio)$') %] for="[% form.field.$field.name %]"[% END %]>[% form.field.$field.label %][% IF form.field.$field.required && form.field.$field.type != 'static' %]<span class="warning">*</span>[% END %]</label>
+						</td>
+						<td>
+							[% form.field.$field.field %]
+							[% IF form.field.$field.invalid %]<span class="warning">[% form.field.$field.message || 'Missing or invalid entry, please try again.' %]</span>[% END %]
+						</td>
+						<td>
+							[% form.field.$field.comment %]
+						</td>
+					</tr>
+				[% END %]
+			[% END %]
+			<tr>
+				<td></td>
+				<td colspan="2">[% form_submit %]</td>
+			</tr>
+		</table>
+		[% form.end %]
+	</div>
+	<script type="text/javascript">
+		function notify_error(form, invalid, alertstr, invalid_fields) {
+		    alert(alertstr);
+		    return false;
+		}
+	</script>
+[% END %]

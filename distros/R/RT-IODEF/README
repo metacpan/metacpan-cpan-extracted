@@ -1,0 +1,60 @@
+DETAILS
+
+http://code.google.com/p/perl-xml-iodef/updates/list
+
+This module takes in and processes IODEF XML objects (pgp helps compress the xml FYI, keeps SMTP from breaking it up with \n's) and maps them to customfields who's description matches _IODEF_... (see etc/initialdata for an included example).
+
+SYNOPSIS
+
+  # to map the IODEF XML to a custom field, set the custom field's "description" to it's IODEF (XML::IODEF) representation of the xml path prepended with _IODEF_
+  # these will be mapped when the IODEF_ProcessMessage script runs during a TicketCreate transaction
+  # see lib/RT/Action/IODEF_ProcessMessage.pm
+
+  Description       _IODEF_IncidentDescription
+  Restriction:      _IODEF_Incidentrestriction
+  Address:          _IODEF_IncidentEventDataFlowSystemNodeAddress
+  Severity:         _IODEF_IncidentAssessmentImpactseverity
+  Impact:           _IODEF_IncidentAssessmentImpact
+  Service Protocol: _IODEF_IncidentEventDataFlowSystemServiceip_protocol
+  Service Portlist: _IODEF_IncidentEventDataFlowSystemServicePortlist
+  # and so on...
+
+  # example taken from html/IODEF/IODEF.html
+  <%INIT>
+    use RT::Ticket;
+
+    my $Ticket = RT::Ticket->new($session{'CurrentUser'});
+    $Ticket->Load($ARGS{'id'});
+    my $xml = $Ticket->IODEF();
+
+    $r->content_type('application/xml');
+    $xml = $xml->out();
+  
+    $m->out($xml);
+    $m->abort();
+  </%INIT>
+  <%ARGS>
+  $id => undef
+  </%ARGS>
+
+INSTALLATION
+
+1. #> perl Makefile.PL
+2. #> make
+3. #> make install
+4. #> make initdb
+5. #> vi /opt/rt3/etc/RT_SiteConfig.pm
+
+Set(@Plugins,(qw(RT::IODEF)));
+
+6. #> /etc/init.d/httpd reload
+
+FOR USE WITH RT+IR (Incident Response Plugin)
+
+Apply the following to your 'Incident Reports' queue:
+       
+    Description => 'zIODEF_ProcessMessage'
+    Queue       => ['Incident Reports']
+    ScripCondition  => 'On Create'
+    ScripAction => 'IODEF ProcessMessage'
+    Template    => 'Blank'

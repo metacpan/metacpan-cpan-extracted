@@ -1,0 +1,13 @@
+<SOFTPKG NAME="Rinchi-CPlusPlus-Preprocessor" VERSION="0,01,0,0">
+    <TITLE>Rinchi-CPlusPlus-Preprocessor</TITLE>
+    <ABSTRACT>A C++ to XML SAX preprocessor.</ABSTRACT>
+    <AUTHOR>Brian M. Ames &lt;bmames@apk.net&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Carp" VERSION="1,04,0,0" />
+        <DEPENDENCY NAME="Exporter" VERSION="5,58,0,0" />
+        <DEPENDENCY NAME="XSLoader" VERSION="0,06,0,0" />
+        <OS NAME="linux" />
+        <ARCHITECTURE NAME="i386-linux-thread-multi" />
+        <CODEBASE HREF="" />
+    </IMPLEMENTATION>
+</SOFTPKG>

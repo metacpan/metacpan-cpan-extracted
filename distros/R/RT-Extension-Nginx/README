@@ -1,0 +1,62 @@
+NAME
+    RT::Extension::Nginx - optimized request tracker within minutes
+
+SYNOPSIS
+        perl Makefile.PL
+        make
+        make install
+
+        cd /opt/rt4/local/plugins/RT-Extension-Nginx/
+        ./sbin/rt-generate-nginx-conf
+        ./sbin/rt-nginx-control start
+
+DESCRIPTION
+    This is beta software. Lacks some documentation.
+
+    Extension comes with two scripts:
+
+    rt-generate-nginx-conf
+        Generates optimized nginx config from RT configuration and
+        templates. Creates required directories and files.
+
+    rt-nginx-control
+        Simple script that can start, stop and restart nginx and fcgi
+        processes. Run without arguments to see help.
+
+FEATURES
+  Fast web server in front
+    Nginx is very fast web server with low memory footprint.
+
+  Reverse proxy like setup
+    Two servers schema with web server in front and FastCGI (FCGI) server
+    running RT as backend. Nginx buffers replies from FCGI, so heavy FCGI
+    processes get free and ready to serve next request before user gets the
+    current request.
+
+  Forking FCGI
+    FCGI processes are forked so share some memory between processes
+    lowering memory footprint.
+
+  Serving images without FCGI
+    Nginx serves /NoAuth/images/ location from files without touching FCGI
+    and does it properly accounting local directory and plugins'
+    directories.
+
+  Semi-static serving of css and js
+    Files served from /NoAuth/css/ and /NoAuth/js/ locations are stored on
+    first request for re-use.
+
+  Content gziping
+    Html, css and js gzipped. For example size of the primary css file drops
+    from 78k down to 19kb.
+
+  TODO
+    A few things can be improved within RT and this extension, but it's a
+    good start.
+
+AUTHOR
+    Ruslan Zakirov <ruz@bestpractical.com>
+
+LICENSE
+    Under the same terms as perl itself.
+

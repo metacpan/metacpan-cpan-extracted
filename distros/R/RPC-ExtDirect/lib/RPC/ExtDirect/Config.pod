@@ -1,0 +1,524 @@
+=pod
+
+=head1 NAME
+
+RPC::ExtDirect::Config - Centralized configuration handling for RPC::ExtDirect
+
+=head1 SYNOPSIS
+
+    use RPC::ExtDirect::Config;
+    
+    my $cfg = RPC::ExtDirect::Config->new(
+        option1 => 'value1',
+        option2 => 42,
+        ...
+    );
+    
+    my $option1 = $cfg->option1();
+    $cfg->option1('value2');
+
+=head1 DESCRIPTION
+
+This package implements configuration handling for various RPC::ExtDirect
+modules in a centralized and consistent fashion.
+
+RPC::ExtDirect::Config also supports the legacy configuration approach
+via package global variables, as implemented in RPC::ExtDirect 1.x and 2.x.
+Note that using package global vars is deprecated, and Config will emit
+a warning for every such variable. The value in the variable will still
+take effect, despite the warning.
+
+=head1 CHAINED OPTIONS
+
+Besides simple configuration options, RPC::ExtDirect::Config supports
+"chained" options that fall back to another option when no value
+is provided.
+
+Assume an option C<foo> that is chained to option C<bar>. When assigning
+values, Config will set both C<foo> and C<bar> independently. When
+retrieving value for option C<bar>, Config will first look if C<bar>
+has any value defined for it and return it if there is one. However,
+when there is no value defined for C<bar>, Config will then "fall back"
+to the value of C<foo>, and return it instead.
+
+This allows for very granular configuration of different parts of the
+RPC::ExtDirect stack. For example, you can turn on global debugging
+with the L</debug> option, and turn off Request debugging by
+setting L</debug_request> to falsy value.
+
+It is possible to add your own configuration options, both simple and
+chained. Read RPC::ExtDirect::Config source to see how it is done.
+
+=head1 ACCESSOR METHODS
+
+For every option held in a Config instance, there are two accessor
+methods created automatically: a getter/setter, and a predicate. Assuming
+an option named C<foo>, these accessors will be:
+
+=over 4
+
+=item has_foo()
+
+A predicate method is used to check if a value has been set for an option,
+even if that value is undefined. Note that a predicate is never
+L<chained|/"CHAINED OPTIONS">, and if a C<foo> value does not exist the
+predicate will return false without falling back to C<bar>.
+
+=item foo()
+
+A getter/setter method can be used to read and write the value. Called
+with no arguments, it acts as a getter and returns the value for an option;
+when called with one or more arguments, it will replace the existing
+value with the first argument, ignoring any others.
+
+=back
+
+=head1 OPTIONS
+
+The stock RPC::ExtDirect::Config supports the following options:
+
+=over 4
+
+=item api_action_class
+
+Class name to use instead of L<RPC::ExtDirect::API::Action> when creating
+the API tree. Action objects instantiated from this class will hold
+collections of Method objects.
+
+Use this option to override or inject new functionality in Action objects.
+
+Default: C<'RPC::ExtDirect::API::Action'>.
+
+=item api_method_class
+
+Class name to use instead of L<RPC::ExtDirect::API::Method> when creating
+the API tree. Method objects will be instantiated from this class.
+
+Use this option to override or inject new functionality in Method objects.
+
+Default: C<'RPC::ExtDirect::API::Method'>.
+
+=item api_hook_class
+
+Class name to be used instead of L<RPC::ExtDirect::API::Hook> when creating
+the API tree. Hook objects will be instantiated from this class.
+
+Use this option to override or inject new functionality in Hook objects.
+
+Default: C<'RPC::ExtDirect::API::Hook'>.
+
+=item api_full_action_names
+
+When set to truthy value, API L<Action|RPC::ExtDirect::Intro/Action> names
+will default to package name with C<'::'> replaced with dots:
+C<< 'Foo::Bar::Baz' -> 'Foo.Bar.Baz' >>, instead of using only the last
+chunk of the package name: C<< 'Foo::Bar::Baz' -> 'Baz' >>.
+
+Default: C<!1> (false).
+
+=item debug
+
+Turn global debugging flag on or off.
+
+Default: C<!1> (false).
+
+=item debug_api
+
+Turn API debugging on or off. At this time, the only effect is that the
+API JavaScript is pretty printed when debugging.
+
+Default: C<undef>, chained to: L</debug>.
+
+=item debug_eventprovider
+
+Turn debugging on/off for RPC::ExtDirect::EventProvider module.
+
+Default: C<undef>, chained to: L</debug>.
+
+=item debug_serialize
+
+Turn debugging on/off for serialization method in
+C<RPC::ExtDirect::Serializer> module. This option only affects
+"from Perl to JSON" conversion.
+
+Default: C<undef>, chained to: L</debug>.
+
+=item debug_deserialize
+
+Turn debugging on/off for deserialization method in
+C<RPC::ExtDirect::Serializer> module. This option only affects
+"from JSON to Perl" conversion.
+
+Default: C<undef>, chained to: L</debug>.
+
+=item debug_request
+
+Turn debugging on/off for C<RPC::ExtDirect::Request> module. When
+debugging is on, Request will provide verbose exceptions. There
+is no other effect at this time, but this can change in the
+future.
+
+To make exceptions informational without turning on debugging,
+set L</verbose_exceptions> option.
+
+Default: C<undef>, chained to: L</debug>.
+
+=item debug_router
+
+Turn debugging on/off for C<RPC::ExtDirect::Router> module. When
+debugging is on, all Requests or Exceptions generated in the Router
+will provide verbose exceptions. There are no other effects at this
+time, but this can change in the future.
+
+To make exceptions informational without turning on debugging,
+set L</verbose_exceptions> option.
+
+Default: C<undef>, chained to: L</debug>.
+
+=item exception_class
+
+Class name to be used instead of C<RPC::ExtDirect::Exception> when
+instantiating new Exception objects.
+
+This option will affect all places in the code that can throw
+Exceptions, unless overridden by specific options below.
+
+Default: C<'RPC::ExtDirect::Exception'>.
+
+=item exception_class_serialize
+
+Class name to be used when instantiating Exception objects thrown
+in serialization method of C<RPC::ExtDirect::Serializer> module.
+
+This option will not affect any other place in the code that can
+throw Exceptions.
+
+Default: C<undef>, chained to: L</exception_class>.
+
+=item exception_class_deserialize
+
+Class name to be used when instantiating Exception objects thrown
+in deserialization method of C<RPC::ExtDirect::Serializer> module.
+
+This option will not affect any other place in the code that can
+throw Exceptions.
+
+Default: C<undef>, chained to: L</exception_class>.
+
+=item exception_class_request
+
+Class name to be used when instantiating Exception objects thrown
+in C<RPC::ExtDirect::Request>, when a Request is being processed.
+
+This option will not affect any other place in the code that can
+throw Exceptions.
+
+Default: C<undef>, chained to: L</exception_class>.
+
+=item request_class
+
+Class name to be used instead of C<RPC::ExtDirect::Request> when
+instantiating new Request objects.
+
+Default: C<'RPC::ExtDirect::Request'>.
+
+=item request_class_deserialize
+
+Class name to be used when instantiating Request objects in
+deserialization method of C<RPC::ExtDirect::Serializer> module.
+
+This option will not affect any other place in the code.
+
+Default: C<undef>, chained to: L</request_class>.
+
+=item request_class_eventprovider
+
+Class name to be used instead of C<RPC::ExtDirect::Request::PollHandler>
+when instantiating Request objects in C<RPC::ExtDirect::EventProvider>
+module.
+
+PollHandler is a subclass of Request; when configuring this option
+use a subclass of PollHandler.
+
+Default: C<'RPC::ExtDirect::Request::PollHandler'>.
+
+=item serializer_class
+
+Class name to be used instead of C<RPC::ExtDirect::Serializer> when
+instantiating new objects to be used to serialize data (Perl to JSON).
+
+Default: C<'RPC::ExtDirect::Serializer'>.
+
+=item serializer_class_api
+
+Class name to be used when instantiating Serializer objects used to
+serialize API data.
+
+Default: C<undef>, chained to: L</serializer_class>.
+
+=item serializer_class_eventprovider
+
+Class name to be used when instantiating Serializer objects used to
+serialize Request results in C<RPC::ExtDirect::EventProvider> module.
+
+Default: C<undef>, chained to: L</serializer_class>.
+
+=item serializer_class_router
+
+Class name to be used when instantiating Serializer objects used to
+serialize Request results in C<RPC::ExtDirect::Router> module.
+
+Default: C<undef>, chained to: L</serializer_class>.
+
+=item deserializer_class
+
+Class name to be used instead of C<RPC::ExtDirect::Serializer> when
+instantiating new objects to be used to deserialize data (JSON to Perl).
+
+Default: C<'RPC::ExtDirect::Serializer'>.
+
+=item deserializer_class_router
+
+Class name to be used when instantiating Serializer objects used to
+deserialize incoming Request data in C<RPC::ExtDirect::Router> module.
+
+Default: C<undef>, chained to: L</deserializer_class>.
+
+=item json_options
+
+Hashref of options to be passed to C<JSON::to_json> and C<JSON::from_json>
+functions. This is a global option that affects both directions for all
+JSON-related operations.
+
+See L<JSON> for explanation of the options.
+
+Default: C<undef>.
+
+=item json_options_serialize
+
+Options to be passed to C<JSON::to_json> when serializing outbound data.
+This will affect only "Perl to JSON" direction.
+
+Default: C<undef>, chained to: L</json_options>.
+
+=item json_options_deserialize
+
+Options to be passed to C<JSON::from_json> function when deserializing
+inbound data. This will affect only "JSON to Perl" direction.
+
+Default: C<undef>, chained to: L</json_options>.
+
+=item router_class
+
+Class name to be used when instantiating Router objects instead of
+C<RPC::ExtDirect::Router>. This config option is not used directly by
+the core RPC::ExtDirect code, but rather by the gateways like
+L<CGI::ExtDirect> and L<Plack::Middleware::ExtDirect>.
+
+Default: C<'RPC::ExtDirect::Router'>.
+
+=item eventprovider_class
+
+Class name to be used when instantiating EventProvider objects instead of
+C<RPC::ExtDirect::EventProvider>. Similar to L</router_class>,
+this option is used by the gateway modules.
+
+Default: C<'RPC::ExtDirect::EventProvider'>.
+
+=item verbose_exceptions
+
+Turn informative exceptions on/off. For whatever reason, Ext.Direct spec
+requires server stack to return detailed exceptions in debugging mode only,
+replacing them with generic "An error has occured" in production mode.
+Most probably this was done to increase application security, but as the
+result it hinders development and support greatly.
+
+RPC::ExtDirect tries to be spec compliant, but provides a way to turn on
+verbose exceptions via this config option. This will not affect debugging,
+only exceptions returned to the client side.
+
+Default: C<!1> (false).
+
+=item api_path
+
+URI path for the Ext.Direct API generator handler. This option is not
+used directly by the core RPC::ExtDirect code; gateways like
+L<CGI::ExtDirect> and L<Plack::Middleware::ExtDirect> use this option
+to map incoming HTTP GET requests to the RPC::ExtDirect::API code
+that generates the JavaScript API declaration for the client side
+service discovery request.
+
+Default: C<'/extdirectapi'>.
+
+=item router_path
+
+URI path for the Ext.Direct router handler. This path is advertised in
+the Ext.Direct API declaration generated by the API handler, to be used
+by the client side when making Ext.Direct routing requests.
+
+Default: C<'/extdirectrouter'>.
+
+=item poll_path
+
+URI path for the Ext.Direct poll handler. This path is advertised in the
+Ext.Direct API declaration generated by the API handler, to be used
+by the client side when making Ext.Direct event polling requests.
+
+Default: C<'/extdirectevents'>.
+
+=item remoting_var
+
+Name of the JavaScript variable for the remoting API declaration. The
+JavaScript code generated by the API handler will look like this:
+
+C<Ext.app.REMOTING_API={...}>
+
+Default: C<'Ext.app.REMOTING_API'>.
+
+=item polling_var
+
+Name of the JavaScript variable for the polling API declaration. The
+JavaScript code generated by the API handler will look like this:
+
+C<Ext.app.POLLING_API={...}>
+
+Default: C<'Ext.app.POLLING_API'>.
+
+=item namespace
+
+JavaScript namespace to be declared in the remoting API. See
+L<Ext.direct.RemotingProvider|http://docs.sencha.com/extjs/5.1/5.1.0-apidocs/#!/api/Ext.direct.RemotingProvider>
+documentation for more detailed information on this option.
+
+Default: C<''> (empty string).
+
+=item auto_connect
+
+When set to truthy value, RPC::ExtDirect::API will add JavaScript code
+to automatically set up RemotingProvider and PollingProvider on the
+client side to the Ext.Direct declaration JavaScript chunk, so that
+JavaScript application won't need to do that.
+
+This option is deprecated as of RPC::ExtDirect 3.0, and should not
+be used going forward.
+
+Default: C<!1> (false).
+
+=item no_polling
+
+Explicitly disable polling API advertisements in the generated Ext.Direct
+API, even if there are EventProvider modules registered with RPC::ExtDirect
+stack. This option is mostly used for testing and debugging.
+
+Default: C<!1> (false).
+
+=item max_retries
+
+Number of times for the client side to re-attempt delivery on failure
+of a call. (see L<Ext.direct.RemotingProvider.maxRetries|http://docs.sencha.com/extjs/5.1/5.1.0-apidocs/#!/api/Ext.direct.RemotingProvider-cfg-maxRetries>).
+
+Default: C<undef>.
+
+=item timeout
+
+The timeout for the client side to use for each request
+(see L<Ext.direct.RemotingProvider.timeout|http://docs.sencha.com/extjs/5.1/5.1.0-apidocs/#!/api/Ext.direct.RemotingProvider-cfg-timeout>).
+
+Default: C<undef>.
+
+=back
+
+=head1 CONFIG OBJECT INTERFACE
+
+L<RPC::ExtDirect::Config> provides several public methods:
+
+=over 4
+
+=item C<new>
+
+Constructor. Returns a new L<RPC::ExtDirect::Config> object populated
+with key/value pairs passed in the arguments. If an option is not
+specified, a default value will be assumed; see L</OPTIONS> for more
+information.
+
+The supported legacy package global variables will be read before the
+arguments are processed; thus any option passed directly to constructor
+will override its namesake in a package global. This won't prevent the
+warnings from being emitted; package global vars are strongly deprecated
+and should not be used. There is no way to disable the warnings.
+
+This method accepts named arguments in a hash or hashref.
+
+Parameters: see L</OPTIONS>.
+
+=item C<clone>
+
+Constructor, instance method. Returns a new L<RPC::ExtDirect::Config> object
+with options copied from the instance C<clone> was called on. This method
+only does shallow copying, i.e. any config option that is a reference will
+refer to the same underlying object.
+
+=item C<read_global_vars>
+
+Instance method. Reads legacy package global variables used to configure
+L<RPC::ExtDirect> in versions 1.x and 2.x; issues the warnings about their
+usage. The warnings cannot be turned off; change your code not to use
+package globals instead.
+
+=item C<add_accessors>
+
+Class/instance method. Adds L<accessor methods|/"ACCESSOR METHODS"> from
+arguments; this can be used in subclasses to extend the list of Config
+options. This method accepts named arguments in a hash.
+
+=item C<set_options>
+
+Instance method. Sets one or more Config options in the object it was
+called on. Accepts named arguments in a hash or hashref.
+
+Parameters: see L</OPTIONS>.
+
+=item C<get_router_path>
+
+Class method. Returns the current L</router_path> value from the
+L<global API Config instance|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">.
+
+This method is B<DEPRECATED> and provided only for backward compatibility.
+Use C<router_path> L<accessor method|/"ACCESSOR METHODS"> on a Config
+instance instead.
+
+=item C<get_poll_path>
+
+Class method. Returns the current L</poll_path> value from the
+L<global API Config instance|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">.
+
+This method is B<DEPRECATED> and provided only for backward compatibility.
+Use C<poll_path> L<accessor method|/"ACCESSOR METHODS"> on a Config
+instance instead.
+
+=item C<get_remoting_var>
+
+Class method. Returns the current L</remoting_var> value from the
+L<global API Config instance|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">.
+
+This method is B<DEPRECATED> and provided only for backward compatibility.
+Use C<remoting_var> L<accessor method|/"ACCESSOR METHODS"> on a Config
+instance instead.
+
+=item C<get_polling_var>
+
+Class method. Returns the current L</polling_var> value from the
+L<global API Config instance|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">.
+
+This method is B<DEPRECATED> and provided only for backward compatibility.
+Use C<polling_var> L<accessor method|/"ACCESSOR METHODS"> on a Config
+instance instead.
+
+=back
+
+=head1 SEE ALSO
+
+More documentation can be found in L<RPC::ExtDirect::API> and L<RPC::ExtDirect>
+modules.
+
+=cut

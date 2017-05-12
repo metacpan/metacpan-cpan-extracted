@@ -1,0 +1,185 @@
+<TMPL_INCLUDE header.tmpl>
+<h1><a href="<TMPL_VAR self_url>">Index</a> &gt; <TMPL_VAR title></h1>
+
+<div class="contents">
+  <p>
+    These instructions will help you install and configure your own RRD::Simple Monitoring
+    server, using rrd-server.pl and rrd-server.cgi.
+    You can find the very latest version of the RRD::Simple Monitoring software that
+    is in live use on <TMPL_VAR HTTP_HOST>,
+    <a href="http://<TMPL_VAR HTTP_HOST>/rrd-simple-monitoring.tar.gz">here</a>.
+  </p>
+
+  <h3>Pre-requisite Software (see <a href="#pre-built-rpms">pre-built RPMs</a>)</h3>
+  <p>
+    If you are using a <a href="http://www.perl.org/get.html">recent 5.8.x version of Perl</a>,
+    only the following additional modules are required to run the rrd-browse.cgi web interface:
+    <ul>
+      <li><a href="http://search.cpan.org/~tlinden/Config-General/">Config::General</a></li>
+      <li><a href="http://search.cpan.org/~samtregar/HTML-Template/">HTML::Template</a></li>
+      <li><a href="http://search.cpan.org/~samtregar/HTML-Template-Expr/">HTML::Template::Expr</a></li>
+      <li><a href="http://search.cpan.org/~dconway/Parse-RecDescent/">Parse::RecDescent</a></li>
+    </ul>
+  </p>
+  <p>
+    You can enable the caching functionality of the rrd-browse.cgi web interface
+    (and thereby improve performance for larger installations) by simply
+    installing the following additional modules:
+    <ul>
+      <li><a href="http://search.cpan.org/~cleishman/Cache/">Cache</a></li>
+      <li><a href="http://search.cpan.org/~pmqs/DB_File/">DB_File</a></li>
+      <li><a href="http://search.cpan.org/~bbb/File-NFSLock/">File::NFSLock</a></li>
+      <li><a href="http://search.cpan.org/~jmm/Heap/">Heap</a></li>
+      <li><a href="http://search.cpan.org/~gaas/IO-String/">IO::String</a></li>
+      <li><a href="http://search.cpan.org/~gbarr/TimeDate/">Date::Parse</a></li>
+      <li><a href="http://search.cpan.org/~jpeacock/version/">version</a></li>
+    </ul>
+  </p>
+  <p>
+    Likewise, if you are running a recent version of Perl, the following modules
+    are required to run the rrd-server.pl script (which is called by rrd-server.cgi):
+    <ul>
+      <li><a href="http://search.cpan.org/~kwilliams/Module-Build/">Module::Build</a></li>
+      <li><a href="http://search.cpan.org/~nicolaw/RRD-Simple/">RRD::Simple</a>
+        - RRD::Simple requires RRDtool to be installed. See the RRD::Simple
+        <a href="http://search.cpan.org/~nicolaw/RRD-Simple/INSTALL">INSTALL</a> document for details. You will need to install RRDtool version 1.2.x or higher.</li>
+    </ul>
+  </p>
+
+  <h3>Selecting an Installation Location</h3>
+  <p>
+    Select a location where you want to install the RRD monitoring software. By default,
+    the software is configured to be installed under <code>/home/system/rrd/</code>,
+    <code><TMPL_VAR DOCUMENT_ROOT>/</code> or some other randomly bizarre
+    location. You will most likely want to change this to something more sane like
+    <code>/usr/local/rrd-server/</code>. The directory structure under that
+    installation location should look like the following:
+    <ul>
+      <li><code>./bin/</code> - should contain rrd-server.pl and rrd-client.pl</li>
+      <li><code>./cgi-bin/</code> - should contain rrd-server.cgi, rrd-browse.cgi and *.tmpl templates</li>
+      <li><code>./etc/</code> - should contain graph.defs, create.defs and rrd-httpd.conf</li>
+    </ul>
+    <ul>
+      <li><code>./data/</code> - will contain the .rrd files</li>
+      <li><code>./graphs/</code> - will contain the graph images</li>
+      <li><code>./thumbnails/</code> - will contain the thumbnail images</li>
+    </ul>
+    Create these directories in your install directory, and copy the files in to the
+    relevant directories. Remember to check that you have set execute permissions for
+    the .pl and .cgi scripts.
+  </p>
+  <p>
+    Once the files are in place, you will need to make a couple of small changes to the
+    following files: <code>./bin/rrd-server.pl</code>, <code>./cgi-bin/rrd-server.cgi</code>,
+    <code>./cgi-bin/rrd-browse.cgi</code> and <code>./etc/rrd-httpd.conf</code>.
+    You should change any occurrence of <code>/home/system/rrd</code> to reflect your
+    installation directory. In the case of the three .pl and .cgi files, this will be
+    located in one place at the top of the file, and will look something like this:
+<pre>
+# User defined constants
+use constant BASEDIR => '/home/system/rrd';
+</pre>
+  </p>
+
+  <h3>Setting up rrd-server.cgi &amp; rrd-browse.cgi</h3>
+  <p>
+    In order for rrd-server.cgi abd rrd-browse.cgi to work, you must allow your web server to
+    execute them as CGI scripts. The <code>./etc/rrd-httpd.conf</code> file contains a number
+    of configuration directives that will allow your Apache web server to access the CGI scripts
+    under the <code>/cgi-bin/rrd/</code> URL path on your server. You should either copy and
+    paste the contents of this config file in to your Apache configuration file as you see fit,
+    or, if you are running a Fedora Core or RedHat server, you might want to create a symbolic
+    link to the configuration file like so:
+    <p>
+      <code>ln -s /home/system/rrd/etc/rrd-httpd.conf /etc/httpd/conf.d/rrd-httpd.conf</code>
+    </p>
+    Restarting your Apache web server afterwards should make these scripts visible.
+  </p>
+
+  <h3>Automating Graph &amp; Thumbnail Creation</h3>
+  <p>
+    The rrd-server.cgi and rrd-server.pl scripts only perform data storage functions, and
+    rrd-browse.cgi will only allow you to navigate the existing graphs and thumbnails. None
+    of these scripts will automatically create graphs and thumbnails on their own. To generate
+    the graphs, you will need to run the <code>./bin/rrd-server.pl</code> script with the
+    <code>-g</code> and <code>-t</code> parameters. This will create the graphs and thumbnails
+    respectively. Add the following to your crontab to generate these on a regular basis:
+    <p>
+      <code>8,18,28,38,48,58 * * * * /home/system/rrd/bin/rrd-server.pl -gt >/dev/null 2>&1</code>
+    </p>
+  </p>
+
+  <h3><a name="pre-built-rpms">Pre-requisite RPMs for RedHat Enterprise Linux 4</a></h3>
+  <p>
+    This is a selection of pre-requisite RPMs that have been built using the
+    <a href="http://search.cpan.org/~ecalder/cpan2rpm/">cpan2rpm</a> script. They
+    were built under RedHat Enterprise Linux 4 ES i386 with perl 5.8.5. Some of these
+    packages may already be available as part of the base RHEL4 install, and others
+    may also be available from the DAG Wieers website at
+    <a href="http://dag.wieers.com/rpm/">http://dag.wieers.com/rpm/</a>.
+    <ul>
+      <li><a href="/prerequisites/el4/perl-Cache-2.04-1.noarch.rpm">perl-Cache-2.04-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-Cache-2.04-1.src.rpm">perl-Cache-2.04-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-Config-General-2.34-1.i386.rpm">perl-Config-General-2.34-1.i386.rpm</a>,
+          <a href="/prerequisites/el4/perl-Config-General-2.34-1.src.rpm">perl-Config-General-2.34-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-DB_File-1.816-1.i386.rpm">perl-DB_File-1.816-1.i386.rpm</a>,
+          <a href="/prerequisites/el4/perl-DB_File-1.816-1.src.rpm">perl-DB_File-1.816-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-File-NFSLock-1.20-1.noarch.rpm">perl-File-NFSLock-1.20-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-File-NFSLock-1.20-1.src.rpm">perl-File-NFSLock-1.20-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-Heap-0.80-1.noarch.rpm">perl-Heap-0.80-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-Heap-0.80-1.src.rpm">perl-Heap-0.80-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-HTML-Template-2.9-1.noarch.rpm">perl-HTML-Template-2.9-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-HTML-Template-2.9-1.src.rpm">perl-HTML-Template-2.9-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-HTML-Template-Expr-0.07-1.noarch.rpm">perl-HTML-Template-Expr-0.07-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-HTML-Template-Expr-0.07-1.src.rpm">perl-HTML-Template-Expr-0.07-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-IO-String-1.08-1.noarch.rpm">perl-IO-String-1.08-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-IO-String-1.08-1.src.rpm">perl-IO-String-1.08-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-Module-Build-0.2808-1.noarch.rpm">perl-Module-Build-0.2808-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-Module-Build-0.2808-1.src.rpm">perl-Module-Build-0.2808-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-Module-Pluggable-3.6-1.noarch.rpm">perl-Module-Pluggable-3.6-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-Module-Pluggable-3.6-1.src.rpm">perl-Module-Pluggable-3.6-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-Parse-RecDescent-v1.95.1.tar.gz-1.95.1-1.i386.rpm">perl-Parse-RecDescent-v1.95.1.tar.gz-1.95.1-1.i386.rpm</a>,
+          <a href="/prerequisites/el4/perl-Parse-RecDescent-v1.95.1.tar.gz-1.95.1-1.src.rpm">perl-Parse-RecDescent-v1.95.1.tar.gz-1.95.1-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-RRD-Simple-1.43-1.noarch.rpm">perl-RRD-Simple-1.43-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-RRD-Simple-1.43-1.src.rpm">perl-RRD-Simple-1.43-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-TimeDate-1.16-1.noarch.rpm">perl-TimeDate-1.16-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-TimeDate-1.16-1.src.rpm">perl-TimeDate-1.16-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-version-0.74-1.i386.rpm">perl-version-0.74-1.i386.rpm</a>,
+          <a href="/prerequisites/el4/perl-version-0.74-1.src.rpm">perl-version-0.74-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el4/perl-XML-Simple-2.18-1.noarch.rpm">perl-XML-Simple-2.18-1.noarch.rpm</a>,
+          <a href="/prerequisites/el4/perl-XML-Simple-2.18-1.src.rpm">perl-XML-Simple-2.18-1.src.rpm</a></li>
+    </ul>
+  </p>
+
+  <h3>Pre-requisite RPMs for RedHat Enterprise Linux 5</a></h3>
+  <p>
+    These RPMs were built under RedHat Enterprise Linux 5 ES i386 with perl 5.8.8.
+    <ul>
+      <li><a href="/prerequisites/el5/perl-Cache-2.04-1.noarch.rpm">perl-Cache-2.04-1.noarch.rpm</a>,
+          <a href="/prerequisites/el5/perl-Cache-2.04-1.src.rpm">perl-Cache-2.04-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-Config-General-2.34-1.i386.rpm">perl-Config-General-2.34-1.i386.rpm</a>,
+          <a href="/prerequisites/el5/perl-Config-General-2.34-1.src.rpm">perl-Config-General-2.34-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-DB_File-1.816-1.i386.rpm">perl-DB_File-1.816-1.i386.rpm</a>,
+          <a href="/prerequisites/el5/perl-DB_File-1.816-1.src.rpm">perl-DB_File-1.816-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-File-NFSLock-1.20-1.noarch.rpm">perl-File-NFSLock-1.20-1.noarch.rpm</a>,
+          <a href="/prerequisites/el5/perl-File-NFSLock-1.20-1.src.rpm">perl-File-NFSLock-1.20-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-Heap-0.80-1.noarch.rpm">perl-Heap-0.80-1.noarch.rpm</a>,
+          <a href="/prerequisites/el5/perl-Heap-0.80-1.src.rpm">perl-Heap-0.80-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-HTML-Template-2.9-1.noarch.rpm">perl-HTML-Template-2.9-1.noarch.rpm</a>,
+          <a href="/prerequisites/el5/perl-HTML-Template-2.9-1.src.rpm">perl-HTML-Template-2.9-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-HTML-Template-Expr-0.07-1.noarch.rpm">perl-HTML-Template-Expr-0.07-1.noarch.rpm</a>,
+          <a href="/prerequisites/el5/perl-HTML-Template-Expr-0.07-1.src.rpm">perl-HTML-Template-Expr-0.07-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-IO-String-1.08-1.noarch.rpm">perl-IO-String-1.08-1.noarch.rpm</a>,
+          <a href="/prerequisites/el5/perl-IO-String-1.08-1.src.rpm">perl-IO-String-1.08-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-Module-Build-0.2808-1.noarch.rpm">perl-Module-Build-0.2808-1.noarch.rpm</a>,
+          <a href="/prerequisites/el5/perl-Module-Build-0.2808-1.src.rpm">perl-Module-Build-0.2808-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-Parse-RecDescent-v1.95.1.tar.gz-1.95.1-1.i386.rpm">perl-Parse-RecDescent-v1.95.1.tar.gz-1.95.1-1.i386.rpm</a>,
+          <a href="/prerequisites/el5/perl-Parse-RecDescent-v1.95.1.tar.gz-1.95.1-1.src.rpm">perl-Parse-RecDescent-v1.95.1.tar.gz-1.95.1-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-TimeDate-1.16-1.noarch.rpm">perl-TimeDate-1.16-1.noarch.rpm</a>,
+          <a href="/prerequisites/el5/perl-TimeDate-1.16-1.src.rpm">perl-TimeDate-1.16-1.src.rpm</a></li>
+      <li><a href="/prerequisites/el5/perl-version-0.74-1.i386.rpm">perl-version-0.74-1.i386.rpm</a>,
+          <a href="/prerequisites/el5/perl-version-0.74-1.src.rpm">perl-version-0.74-1.src.rpm</a></li>
+    <ul>
+  </p>
+</div>
+<TMPL_INCLUDE footer.tmpl>

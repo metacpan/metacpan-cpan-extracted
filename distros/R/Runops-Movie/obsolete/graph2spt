@@ -1,0 +1,19 @@
+#!perl
+use strict;
+use warnings;
+use feature ':5.10';
+use Storable qw( retrieve store );
+use Graph::Directed ();
+use File::Basename qw( dirname );
+use lib dirname( __FILE__ );
+use TM qw( size );
+
+# my $in_graph  = "$ARGV[0].graph";
+# my $out_graph = $in_graph;
+# 
+# say "Read $in_graph (@{[ size( -s $in_graph ) ]})";
+# my $g = retrieve( $in_graph );
+# $g = $g->SPT_Dijkstra( 'root' );
+# 
+# store( $g, $out_graph );
+# say "Wrote $out_graph (@{[ size( -s $out_graph ) ]})"

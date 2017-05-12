@@ -1,0 +1,545 @@
+<HTML>
+<HEAD>
+<TITLE>Relations::Abstract - DBI/DBD::mysql Functions to Save Development Time and Code Space</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+  <!-- beginning of leaf header-->
+
+  <TABLE border=0  cellpadding=0 cellspacing=0 width=100%>
+  <TR>
+    <TD valign=middle width='100%'
+    bgcolor='#cc0066'> <font face='sans-serif' size='+1'
+    color='#ff99cc'>&nbsp;&nbsp;&nbsp;Relations::Abstract - DBI/DBD::mysql module to ease development</font>
+    </TD>
+  </TR>
+  </TABLE>
+  <p>&nbsp</p>
+  <!-- end of leaf content-->
+  
+
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#abstract">ABSTRACT</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#what it does">WHAT IT DOES</A></LI>
+		<LI><A HREF="#calling relations::abstract routines">CALLING RELATIONS::ABSTRACT ROUTINES</A></LI>
+		<LI><A HREF="#where and set arguments">WHERE AND SET ARGUMENTS</A></LI>
+		<LI><A HREF="#query arguments">QUERY ARGUMENTS</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::abstract functions">LIST OF RELATIONS::ABSTRACT FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#set_dbh">set_dbh</A></LI>
+		<LI><A HREF="#run_query">run_query</A></LI>
+		<LI><A HREF="#select_field">select_field</A></LI>
+		<LI><A HREF="#select_row">select_row</A></LI>
+		<LI><A HREF="#select_column">select_column</A></LI>
+		<LI><A HREF="#select_matrix">select_matrix</A></LI>
+		<LI><A HREF="#insert_row">insert_row</A></LI>
+		<LI><A HREF="#insert_id">insert_id</A></LI>
+		<LI><A HREF="#select_insert_id">select_insert_id</A></LI>
+		<LI><A HREF="#update_rows">update_rows</A></LI>
+		<LI><A HREF="#delete_rows">delete_rows</A></LI>
+		<LI><A HREF="#report_error">report_error</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::query properties">LIST OF RELATIONS::QUERY PROPERTIES</A></LI>
+	<UL>
+
+		<LI><A HREF="#dbh">dbh</A></LI>
+	</UL>
+
+	<LI><A HREF="#todo list">TODO LIST</A></LI>
+	<UL>
+
+		<LI><A HREF="#create an insert_rows() function.">Create an <CODE>insert_rows()</CODE> function.</A></LI>
+	</UL>
+
+	<LI><A HREF="#other related work">OTHER RELATED WORK</A></LI>
+	<UL>
+
+		<LI><A HREF="#relations (perl)">Relations (Perl)</A></LI>
+		<LI><A HREF="#relationsquery (perl)">Relations-Query (Perl)</A></LI>
+		<LI><A HREF="#relationsabstract (perl)">Relations-Abstract (Perl)</A></LI>
+		<LI><A HREF="#relationsadmin (php)">Relations-Admin (PHP)</A></LI>
+		<LI><A HREF="#relationsfamily (perl)">Relations-Family (Perl)</A></LI>
+		<LI><A HREF="#relationsdisplay (perl)">Relations-Display (Perl)</A></LI>
+		<LI><A HREF="#relationsreport (perl)">Relations-Report (Perl)</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Relations::Abstract - DBI/DBD::mysql Functions to Save Development Time and Code Space</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use DBI;
+  use Relations::Abstract;</PRE>
+<PRE>
+  $dsn = &quot;DBI:mysql:mysql&quot;;</PRE>
+<PRE>
+  $abstract = DBI-&gt;connect($dsn,$username,$password,{PrintError =&gt; 1, RaiseError =&gt; 0});</PRE>
+<PRE>
+  # Create a Relations::Abstract object using the database handle</PRE>
+<PRE>
+  $abs = new Relations::Abstract($dbh);</PRE>
+<PRE>
+  # Drop, create and use a database</PRE>
+<PRE>
+  $abstract-&gt;run_query(&quot;drop database if exists abs_test&quot;);
+  $abstract-&gt;run_query(&quot;create database abs_test&quot;);
+  $abstract-&gt;run_query(&quot;use abs_test&quot;);</PRE>
+<PRE>
+  # Create a table</PRE>
+<PRE>
+  $abstract-&gt;run_query(&quot;
+    create table sizes
+      (
+        size_id int unsigned auto_increment,
+        num int unsigned,
+        descr varchar(16),
+        primary key (size_id),
+        unique descr (descr),
+        unique num (num),
+        index (size_id)
+      )
+  &quot;);</PRE>
+<PRE>
+  # Retreive size 12 if already within the database, else add
+  # size 12 information into the database and get its size_id.</PRE>
+<PRE>
+  $size_id = $abstract-&gt;select_insert_id(-id    =&gt; 'size_id',
+                                         -table =&gt; &quot;sizes&quot;,
+                                         -where =&gt; {num    =&gt; 12},
+                                         -set   =&gt; {num    =&gt; 12,
+                                                    descr  =&gt; $abstract-&gt;{dbh}-&gt;quote('Bigfoot')});</PRE>
+<PRE>
+  $abstract-&gt;report_error(&quot;Nothing left to demo!&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="abstract">ABSTRACT</A></H1>
+<P>This perl library uses perl5 objects to simplify using the DBI 
+DBD::mysql modules. It takes the most common (in my experience) 
+collection of DBI calls to a MySQL databate, and changes them 
+to one liners. It utilizes a object-oriented programming style.</P>
+<P>The current version of Relations is available at</P>
+<PRE>
+  <A HREF="http://www.gaf3.com">http://www.gaf3.com</A></PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="what it does">WHAT IT DOES</A></H2>
+<P>All Abstract does is take information about what you want to do
+to a database and does it by creating and executing SQL statements via
+DBI. That's it. It's there just to simplify the amount of code one has
+to write and maintain with respect long and complex database tasks.</P>
+<P>The simplest example is the run_query function. It takes a SQL string 
+and prepares, executes, and finishes that SQL string via DBI.</P>
+<PRE>
+  $abstract-&gt;run_query(&quot;drop database if exists abs_test&quot;);</PRE>
+<P>This puts ``drop database if exists abs_test'' through the
+prepare, execute, and finish functions of DBI.</P>
+<P>The most complex example is the select_insert_id function. Its used
+for either looking up a certain record's primary id value if it already
+exists in the table, or adding that record and retreiving its new primary 
+id value if it does not already exist in the table.</P>
+<PRE>
+  $size_id = $abstract-&gt;select_insert_id(-id    =&gt; 'size_id',
+                                         -table =&gt; &quot;sizes&quot;,
+                                         -where =&gt; {num    =&gt; 12},
+                                         -set   =&gt; {num    =&gt; 12,
+                                                    descr  =&gt; $abstract-&gt;{dbh}-&gt;quote('Bigfoot')});</PRE>
+<P>This puts several SQL strings through the prepare, execute, and finish 
+functions of DBI.</P>
+<P>First using the primary id name, the table name, and the where clause, 
+select_insert_id creates the SQL statement, ``select size_id from sizes 
+where num=12'', and prepares, executes, and finishes it. If a row is 
+returned, select_insert_id returns the looked up value of size_id.</P>
+<P>If a row is not returned, select_insert_id then creates a another SQL 
+statement, ``insert into sizes set num=12,descr='Bigfoot' '' using 
+the table name, and set clause, and puts it through DBI. After that,
+it runs another SQL statement ``select <CODE>last_insert_id()</CODE> as id'' to 
+retrieve the new primary id value for the new record. Though the function
+is long, it is certainly shorter than 9 calls to DBI functions, and a few
+if-else's.</P>
+<P>
+<H2><A NAME="calling relations::abstract routines">CALLING RELATIONS::ABSTRACT ROUTINES</A></H2>
+<P>Some Abstract routines, those with more than one argument, use an ordered, 
+named and hashed argument calling style, and some, those with only one 
+argument, just use an ordered argument calling style. This is because 
+some routines have as many as five arguments, and the code is easier to 
+understand given a named argument style, but since some people, however, 
+prefer the ordered argument style because its smaller, I'm glad to do that 
+too. Furthermore, if you want to name a single argument in a function, 
+you're a bit loopy.</P>
+<P>If you use the ordered argument calling style, such as</P>
+<PRE>
+  $hash_ref =  $abstract-&gt;select_row('sizes',{num =&gt; 10});</PRE>
+<P>the order matters, and you should consult the function defintions 
+later in this document to determine the order to use.</P>
+<P>If you use the named argument calling style, such as</P>
+<PRE>
+  $hash_ref =  $abstract-&gt;select_row(-table =&gt; 'sizes',
+                                     -where =&gt; {num =&gt; 10});</PRE>
+<P>the order does not matter, but the names, and minus signs preceeding them, do.
+You should consult the function defintions later in this document to determine 
+the names to use.</P>
+<P>In the named arugment style, each argument name is preceded by a dash.  
+Neither case nor order matters in the argument list.  -table, -Table, and 
+-TABLE are all acceptable.  In fact, only the first argument needs to begin with 
+a dash.  If a dash is present in the first argument, Relations::Abstract assumes
+dashes for the subsequent ones.</P>
+<P>If you use the hashed argument calling style, such as</P>
+<PRE>
+  $hash_ref =  $abstract-&gt;select_row({table =&gt; 'sizes',
+                                      where =&gt; {num =&gt; 10}});</PRE>
+<P>or</P>
+<PRE>
+  $hash_ref =  $abstract-&gt;select_row({-table =&gt; 'sizes',
+                                      -where =&gt; {num =&gt; 10}});</PRE>
+<P>the order does not matter, but the names, and curly braces do, (minus signs are
+optional). You should consult the function defintions later in this document to 
+determine the names to use.</P>
+<P>In the hashed arugment style, no dashes are needed, but they won't cause problems
+if you put them in. Neither case nor order matters in the argument list. table, 
+Table, and TABLE are all acceptable. If a hash is the first argument, 
+Relations::Abstract assumes that is the only argument that matters, and ignores any 
+other arguments after the {}'s.</P>
+<P>
+<H2><A NAME="where and set arguments">WHERE AND SET ARGUMENTS</A></H2>
+<P>Many of the Relations functions recognize arguments named where and set.
+These arguments are used to populate (respectively) the 'where' and 'set'
+areas of SQL statements. Since both these areas can require a varying number
+of entries, each can be sent as a hash, array, or string.</P>
+<P>WHERE FUNCTIONALITY</P>
+<P>If sent as a hash, a where argument would become a string of $key=$value 
+pairs, concatented with an ' and ' and placed right after the where keyword.</P>
+<P>For example,</P>
+<PRE>
+  $hash_ref =  $abstract-&gt;select_row(-table =&gt; 'sizes',
+                                     -where =&gt; {num   =&gt; 10,
+                                                descr =&gt; $dbh-&gt;quote('Momma Bear')});</PRE>
+<P>creates and executes the SQL statment ``select * from sizes where num=10 and 
+descr='Momma Bear'''.</P>
+<P>If sent as an array, a where argument would become a string of array members,
+concatented with an ' and '.  and placed right after the 'where' keyword.</P>
+<P>For example,</P>
+<PRE>
+  $hash_ref =  $abstract-&gt;select_row(-table =&gt; 'sizes',
+                                     -where =&gt; [&quot;num &lt; 8&quot;,
+                                                &quot;descr not in ('Momma Bear','Papa Bear')&quot;]);</PRE>
+<P>creates and executes the SQL statment 
+``select * from sizes where num &lt; 8 and descr not in ('Momma Bear','Papa Bear')''.</P>
+<P>If sent as a string, a where argument is placed as is right after the 'where' 
+keyword.</P>
+<P>For example,</P>
+<PRE>
+  $hash_ref =  $abstract-&gt;select_row(-table =&gt; 'sizes',
+                                     -where =&gt; &quot;num &gt; 10 or (num &lt; 5 and num &gt; 0)&quot;);</PRE>
+<P>creates and executes the SQL statment ``select * from sizes where num &lt; 8 or 
+(num &lt; 5 and num &gt; 0)''.</P>
+<P>SET FUNCTIONALITY</P>
+<P>If sent as a hash, a set argument would become a string of $key=$value 
+pairs, concatented with an ',' and placed right after the 'set' keyword.</P>
+<P>For example,</P>
+<PRE>
+  $abstract-&gt;insert_row(-table =&gt; 'sizes',
+                        -set   =&gt; {num   =&gt; 7,
+                                   descr =&gt; $dbh-&gt;quote('Goldilocks')});</PRE>
+<P>creates and executes the SQL statment 
+``insert into sizes set num=7, descr='Goldilocks'''.</P>
+<P>If sent as an array, a set argument would become a string of array members,
+concatented with an ','.  and placed right after the 'set' keyword.</P>
+<P>For example,</P>
+<PRE>
+  $abstract-&gt;insert_row(-table =&gt; 'sizes',
+                        -set   =&gt; [&quot;num=7&quot;,
+                                   &quot;descr='Goldilocks'&quot;]);</PRE>
+<P>creates and executes the SQL statment 
+``insert into sizes set num=7, descr='Goldilocks'''.</P>
+<P>If sent as a string, a set argument is placed as is right after the 
+'set' keyword.</P>
+<P>For example,</P>
+<PRE>
+  $abstract-&gt;insert_row(-table =&gt; 'sizes',
+                        -set   =&gt; &quot;num=7,descr='Goldilocks'&quot;);</PRE>
+<P>creates and executes the SQL statment 
+``insert into sizes set num=7,descr='Goldilocks'''.</P>
+<P>I'm not sure if the set argument needs to be so flexible, but I thought I'd 
+make it that way, just in case.</P>
+<P>
+<H2><A NAME="query arguments">QUERY ARGUMENTS</A></H2>
+<P>Many of the Relations functions recognize an argument named query. This
+argument can either be a string, hash or Relations::Query object.</P>
+<P>The following calls are all equivalent</P>
+<PRE>
+  $object-&gt;function(&quot;select nothing from void&quot;);</PRE>
+<PRE>
+  $object-&gt;function({select =&gt; 'nothing',
+                     from   =&gt; 'void'});</PRE>
+<PRE>
+  $object-&gt;function(Relations::Query-&gt;new(-select =&gt; 'nothing',
+                                          -from   =&gt; 'void'));</PRE>
+<P>Since whatever query value is sent to Relations::Query's <CODE>to_string()</CODE> 
+function, consult the <CODE>to_string()</CODE> function in the Relations::Query 
+documentation for more (just a little really) information.</P>
+<P>
+<HR>
+<H1><A NAME="list of relations::abstract functions">LIST OF RELATIONS::ABSTRACT FUNCTIONS</A></H1>
+<P>An example of each function is provided in 'test.pl'.</P>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+  $abstract = Relations::Abstract-&gt;new($dbh);</PRE>
+<P>Creates a new abstract object using the DBI database handle. This
+handle will be used for all DBI interactions.</P>
+<P>
+<H2><A NAME="set_dbh">set_dbh</A></H2>
+<PRE>
+  $abstract-&gt;set_dbh($dbh);</PRE>
+<P>Sets the default database handle to use for all DBI calls.</P>
+<P>
+<H2><A NAME="run_query">run_query</A></H2>
+<PRE>
+  $abstract-&gt;run_query($query);</PRE>
+<P>Runs the given query, $query.</P>
+<P>
+<H2><A NAME="select_field">select_field</A></H2>
+<PRE>
+  $value = $abstract-&gt;select_field($field,$table,$where);</PRE>
+<PRE>
+  $value = $abstract-&gt;select_field(-field =&gt; $field,
+                                   -table =&gt; $table,
+                                   -where =&gt; $where);</PRE>
+<PRE>
+  $value = $abstract-&gt;select_field(-field =&gt; $field,
+                                   -query =&gt; $query);</PRE>
+<P>Returns the first $field value from $table that satisfies $where.
+It can also grab $field's value from the query specified by 
+$query. Uses SQL statements in the form:</P>
+<PRE>
+  select $field from $table where $where
+or
+  $query</PRE>
+<P>
+<H2><A NAME="select_row">select_row</A></H2>
+<PRE>
+  $hash_ref = $abstract-&gt;select_row($table,$where);</PRE>
+<PRE>
+  $hash_ref = $abstract-&gt;select_row(-table =&gt; $table,
+                                    -where =&gt; $where);</PRE>
+<PRE>
+  $hash_ref = $abstract-&gt;select_row(-query =&gt; $query);</PRE>
+<P>Returns a hash reference for the first row in $table that satisfies 
+$where. It can also grab the first row from the query specified by 
+$query. Uses SQL statements in the form:</P>
+<PRE>
+  select * from $table where $where
+or
+  $query</PRE>
+<P>
+<H2><A NAME="select_column">select_column</A></H2>
+<PRE>
+  $array_ref = $abstract-&gt;select_column($field,$table,$where);</PRE>
+<PRE>
+  $array_ref = $abstract-&gt;select_column(-field =&gt; $field,
+                                        -table =&gt; $table,
+                                        -where =&gt; $where);</PRE>
+<PRE>
+  $array_ref = $abstract-&gt;select_column(-field =&gt; $field,
+                                        -query =&gt; $query);</PRE>
+<P>Returns an array reference of all $field values from $table that 
+satisfy $where. It can also grab all $field's values from the 
+query specified by $query. Uses SQL statements in the form:</P>
+<PRE>
+  select $field from $table where $where
+or 
+  $query</PRE>
+<P>
+<H2><A NAME="select_matrix">select_matrix</A></H2>
+<PRE>
+  $array_ref = $abstract-&gt;select_matrix($table,$where);</PRE>
+<PRE>
+  $array_ref = $abstract-&gt;select_matrix(-table =&gt; $table,
+                                        -where =&gt; $where);</PRE>
+<PRE>
+  $array_ref = $abstract-&gt;select_matrix(-query =&gt; $query);</PRE>
+<P>Returns an array reference of hash references of all rows in $table 
+that satisfy $where. It can also grab all values from the query 
+specified by $query. Uses SQL statements in the form:</P>
+<PRE>
+  select * from $table where $where
+or
+  $query;</PRE>
+<P>
+<H2><A NAME="insert_row">insert_row</A></H2>
+<PRE>
+  $abstract-&gt;insert_row($table,$set);</PRE>
+<PRE>
+  $abstract-&gt;insert_row(-table =&gt; $table,
+                        -set   =&gt; $set);</PRE>
+<P>Inserts $set into $table. Uses SQL statements in the form:</P>
+<PRE>
+  insert into $table set $set</PRE>
+<P>
+<H2><A NAME="insert_id">insert_id</A></H2>
+<PRE>
+  $abstract-&gt;insert_id($table,$set);</PRE>
+<PRE>
+  $abstract-&gt;insert_id(-table =&gt; $table,
+                       -set   =&gt; $set);</PRE>
+<P>For tables with auto incrementing primary keys. Inserts $set into $table
+and returns the new primary key value. Uses SQL statements in the form:</P>
+<PRE>
+  insert into $table set $set
+and
+  select last_insert_id() as id</PRE>
+<P>
+<H2><A NAME="select_insert_id">select_insert_id</A></H2>
+<PRE>
+  $abstract-&gt;select_insert_id($id,$table,$where,$set);</PRE>
+<PRE>
+  $abstract-&gt;select_insert_id(-id    =&gt; $id,
+                              -table =&gt; $table,
+                              -where =&gt; $where,
+                              -set   =&gt; $set);</PRE>
+<P>For tables with auto incrementing primary keys. It first tries to 
+return the first $id value from $table that satisfies $where. If 
+that doesn't work, it then inserts $set into $table, and returns 
+the newly generated primary id. It does not use $id to lookup the 
+primary id value, but instead last_insert_id(). It uses SQL 
+statements in the form:</P>
+<PRE>
+  select $id from $table where $where
+and (if the first returns nothing)
+{
+  insert into $table set $set
+and
+  select last_insert_id() as id
+}</PRE>
+<P>
+<H2><A NAME="update_rows">update_rows</A></H2>
+<PRE>
+  $abstract-&gt;update_rows($table,$where,$set);</PRE>
+<PRE>
+  $abstract-&gt;update_rows(-table =&gt; $table,
+                         -where =&gt; $where,
+                         -set   =&gt; $set);</PRE>
+<P>Updates all rows in $table that satisfy $where with $set. Uses
+an SQL statements in the form:</P>
+<PRE>
+  update $table set $set where $where</PRE>
+<P>
+<H2><A NAME="delete_rows">delete_rows</A></H2>
+<PRE>
+  $abstract-&gt;delete_rows($table,$where);</PRE>
+<PRE>
+  $abstract-&gt;delete_rows(-table =&gt; $table,
+                         -where =&gt; $where);</PRE>
+<P>Deletes all records from $table that satisfy $where. Uses an 
+SQL statement in the form:</P>
+<PRE>
+  delete from $table where $where</PRE>
+<P>
+<H2><A NAME="report_error">report_error</A></H2>
+<PRE>
+  $abstract-&gt;report_error($message);</PRE>
+<P>Reports an error if the dbh PrintError is set to true. Always 
+returns nothing with ``return;'' so you can use it to return a
+a null value when something fails.</P>
+<P>
+<HR>
+<H1><A NAME="list of relations::query properties">LIST OF RELATIONS::QUERY PROPERTIES</A></H1>
+<P>
+<H2><A NAME="dbh">dbh</A></H2>
+<P>The DBI database handle.</P>
+<P>
+<HR>
+<H1><A NAME="todo list">TODO LIST</A></H1>
+<P>
+<H2><A NAME="create an insert_rows() function.">Create an <CODE>insert_rows()</CODE> function.</A></H2>
+<P>
+<HR>
+<H1><A NAME="other related work">OTHER RELATED WORK</A></H1>
+<P>
+<H2><A NAME="relations (perl)">Relations (Perl)</A></H2>
+<P>Contains functions for dealing with databases. It's mainly used as 
+the foundation for the other Relations modules. It may be useful for 
+people that deal with databases as well.</P>
+<P>
+<H2><A NAME="relationsquery (perl)">Relations-Query (Perl)</A></H2>
+<P>An object oriented form of a SQL select query. Takes hashes.
+arrays, or strings for different clauses (select,where,limit)
+and creates a string for each clause. Also allows users to add to
+existing clauses. Returns a string which can then be sent to a 
+database.</P>
+<P>
+<H2><A NAME="relationsabstract (perl)">Relations-Abstract (Perl)</A></H2>
+<P>Meant to save development time and code space. It takes the most common 
+(in my experience) collection of calls to a MySQL database, and changes 
+them to one liner calls to an object.</P>
+<P>
+<H2><A NAME="relationsadmin (php)">Relations-Admin (PHP)</A></H2>
+<P>Some generalized objects for creating Web interfaces to relational 
+databases. Allows users to insert, select, update, and delete records from 
+different tables. It has functionality to use tables as lookup values 
+for records in other tables.</P>
+<P>
+<H2><A NAME="relationsfamily (perl)">Relations-Family (Perl)</A></H2>
+<P>Query engine for relational databases.  It queries members from 
+any table in a relational database using members selected from any 
+other tables in the relational database. This is especially useful with 
+complex databases: databases with many tables and many connections 
+between tables.</P>
+<P>
+<H2><A NAME="relationsdisplay (perl)">Relations-Display (Perl)</A></H2>
+<P>Module creating graphs from database queries. It takes in a query through a 
+Relations-Query object, along with information pertaining to which field 
+values from the query results are to be used in creating the graph title, 
+x axis label and titles, legend label (not used on the graph) and titles, 
+and y axis data. Returns a graph and/or table built from from the query.</P>
+<P>
+<H2><A NAME="relationsreport (perl)">Relations-Report (Perl)</A></H2>
+<P>An Web interface for Relations-Family, Reations-Query, and Relations-Display. 
+It creates complex (too complex?) web pages for selecting from the different 
+tables in a Relations-Family object. It also has controls for specifying the 
+grouping and ordering of data with a Relations-Query object, which is also 
+based on selections in the Relations-Family object. That Relations-Query can 
+then be passed to a Relations-Display object, and a graph and/or table will 
+be displayed.</P>
+
+
+    <!-- beginning of leaf footer-->
+    <p>&nbsp;</p>
+    <TABLE border=0  cellpadding=0 cellspacing=0 width=100%>
+    <TR>
+      <TD valign=middle
+        bgcolor='#cc0066'> <font face='sans-serif' size='+1'
+        color='#ff99cc'>&nbsp;&nbsp;&nbsp;Relations::Abstract - DBI/DBD::mysql module to ease development</font>
+      </TD>
+    </TR>
+    </TABLE>
+    <!-- end of leaf footer-->
+  
+</BODY>
+
+</HTML>

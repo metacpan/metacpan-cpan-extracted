@@ -1,0 +1,16 @@
+@Queues = ({ Name              => 'RTAnnounce',
+             Description       => 'Queue for announcements',
+             CorrespondAddress => "",
+             CommentAddress    => "", });
+
+@CustomFields = (
+    {
+        Name        => 'Announcement Groups',
+        Queue       => 'RTAnnounce',
+        Type        => 'Select',
+        Disabled    => 0,
+        Description => 'Groups who can view individual announcements',
+        Values      => [ ],
+        ValuesClass => 'RT::CustomFieldValues::AnnounceGroups',
+    },
+);

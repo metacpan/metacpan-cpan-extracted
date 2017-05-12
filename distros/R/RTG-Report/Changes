@@ -1,0 +1,75 @@
+
+CHANGES
+
+v1.17  - Apr 18, 2013
+
+ - updated matt's email address, other packaging updates
+
+v1.16  - Oct 10, 2008
+
+ - added pod docs to Report.pm
+ - added t/pod-coverage.t
+ - added license to Makefile.PL (and META.yml)
+
+v1.15  - Oct 08, 2008
+
+ - altered version numbering
+ - released on CPAN
+
+v1.5.0 - Mar 01, 2008
+
+ - moved config values into rtgreport.conf
+ - added missing documentation 
+ - renamed pod to net, less LT specific and more generally applicable
+ - added network_plain subroutine as a code example implementing plain text
+ - refactored much code info Report.pm (shared with bandwidth report)
+
+v1.1.5 - Feb 07, 2008
+
+ - bug fix, reports with end dates of < 10 needed zero padding for the day value
+ - append missing descriptions list to -desc reports
+
+v1.1.4 - Feb 04, 2008
+
+ - added units to header of 95th column
+
+v1.1.3 - Jan 28, 2008
+ -units option accepts mb or gb as arguments
+
+v1.1.2 - Jan 25, 2008
+
+ - include the runtime messages in the email report
+ - CLI -desc can optionally be a file with interface descriptions, one per
+   line.
+
+v1.1.1 - Jan 24, 2008
+
+ - only insert the CSV header line once (instead of once per net) - per Tim J
+ - new CLI option: -desc, only match interfaces with that description
+ - new CLI option: -nosum, suppress summary fields
+
+v1.1.0 - Jan 17, 2008 
+
+ - added net documentation
+ - added dc name to each net definition
+ - added CLI options: gig, help, rates, units, util
+ - units now sets the units (K/M/G) for the report
+ - print H:M:S in start/stop timestamps
+ - report uplink/downlink/isp links separately
+ - only display averages and utilization if selected on cli
+ - duplicate timestamps can occur when "falling back"
+    during DST. Instead of ignoring the entry, add the
+    counters and ignore the timestamp.
+ - calculate 95th percentile if gig option
+
+v1.0.1 - Jan 10, 2008
+
+ - made the site config options command line options
+ - added filtering logic to weed out vlans, etc.
+ - sort the networks in numberic order
+ - commented out utilization values
+
+v1.0   - Jan 07, 2008
+
+ - initial authoring - based on RTG's report.pl
+

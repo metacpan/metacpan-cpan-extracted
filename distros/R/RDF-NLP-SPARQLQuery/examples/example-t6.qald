@@ -1,0 +1,39 @@
+DOC: qald-4_biomedical_test-6
+language: EN
+
+sentence: 
+# sentence form (ended by _END_SENT_)
+Give me the side-effects drugs with a solubility of 3.24e-02 mg/mL.
+_END_SENT_
+
+word information:
+# Inflected form<tab>POSTAG<tab>Lemma<tab>offset (ended by _END_POSTAG_)
+Give	VB	give	10	
+me	PP	me	15	
+the	DT	the	18	
+side-effects	NNS	side-effect	22	
+drugs	NNS	drug	35	
+with	IN	with	41	
+a	DT	a	46	
+solubility	NN	solubility	48	
+of	IN	of	59	
+3.24e-02 mg/mL	NP	3.24e-02 mg/mL	62	
+.	SENT	.	76	
+
+_END_POSTAG_
+
+semantic units:
+# term form<tab>term canonical form<tab>semantic features<tab>offset start<tab>offset end (ended by _END_SEM_UNIT_)
+3.24e-02 mg/mL	3.24e-02 mg/mL	STRING	62	75
+3	3	INT	62	62
+24	24	INT	64	65
+02	02	INT	68	69
+solubility	solubility	predictedWaterSolubility:predictedWaterSolubility	48	57
+drugs	drug	drug:drug	35	39
+solubility	solubility	predictedWaterSolubility:predictedWaterSolubility	48	57
+side-effects	side effect	sideEffect	22	33
+drugs	drug	drug:drug	35	39
+_END_SEM_UNIT_
+
+_END_DOC_
+

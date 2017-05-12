@@ -1,0 +1,86 @@
+
+ # Sample Rexfile
+
+desc "Show Unix version";
+task uname => sub {
+    my $uname = run "uname -a";
+
+    Rex::Logger::info("uname: $uname");
+
+    return $uname;
+};
+
+desc "Show Uptime";
+task uptime => sub {
+	my $uptime = run "uptime";
+
+    Rex::Logger::info("uptime: $uptime");
+
+    return $uptime;
+};
+
+desc "Get Operating System";
+task "get-os" => sub {
+
+	my $os = get_operating_system();
+	my $os_version = operating_system_version();
+
+	Rex::Logger::info("OS: $os  [$os_version]");
+
+	#Rex::Logger::info("SYS INFO: " . Dumper({get_system_information()}));
+
+	my $memory = memory();
+	Rex::Logger::info("RAM: $memory->{total} Mb");
+
+	my $cpu_stat = `grep '^cpu[0-9]' /proc/stat`;
+	my $cpu = scalar ($cpu_stat =~ /(cpu[0-9])/g);
+	Rex::Logger::info("CPU: $cpu");
+
+	my $data = {
+		os 			=> $os,
+		os_version	=> $os_version,
+		memory 		=> $memory,
+		cpu 		=> $cpu,
+	};
+};
+
+desc "Nested Task";
+task nested_task => sub {
+
+	say "nested_task starting";
+	Rex::Logger::info("nested_task starting");
+
+	run_task('nested_task2');
+
+	say "nested_task ending";
+	Rex::Logger::info("nested_task ending");
+
+	return 1;
+};
+
+desc "Nested Task 2";
+task nested_task2 => sub {
+
+	say "nested_task2 running";
+	Rex::Logger::info("nested_task2 running");
+};
+
+desc "Long Running Task";
+task long_run => sub {
+
+	foreach my $i (1..20) {
+
+		sleep 2;
+		Rex::Logger::info("long_run: $i");
+	}
+};
+
+desc "Longer Running Task";
+task long_run2 => sub {
+
+	foreach my $i (1..100) {
+
+		sleep 2;
+		Rex::Logger::info("long_run: $i");
+	}
+};

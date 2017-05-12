@@ -1,0 +1,5 @@
+<%args>
+$QueryString => undef
+</%args>
+<a href="<%$RT::WebPath%>/Search/Tree.html<%$QueryString%>"><&|/l&>Tree view</&></a>
+

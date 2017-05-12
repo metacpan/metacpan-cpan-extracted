@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+Object.pm
+Object/Broker.pm
+Object/Container.pm
+Object/Transport.pm
+README
+t/01.t
+t/02.t
+t/03.t
+t/04.t
+t/05.t
+t/TestModuleA.pm
+t/TestModuleB.pm
+t/TestModuleC.pm
+t/broker.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

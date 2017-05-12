@@ -1,0 +1,48 @@
+0.13 2016-07-14
+- Packaging fixes; reinstate latest Module::Install::RTx.  Fixes
+  cpan#116138.
+
+0.12 2016-07-11
+ - Packaging improvements
+
+0.11 2016-06-30
+ - Allow rules to require or restrict specific values on transition
+
+0.10 2016-04-02
+ - Updates to run on RT 4.4 (tests)
+ - Fix bug where non-mandatory fields were displayed on update
+ - Add a new config option if you liked the previously mentioned bug
+ - Add French translation. Thanks to Emmanuel Lacour
+
+0.09_01 2015-01-29
+ - Support for Basics and Jumbo (Modify.html and ModifyAll.html)
+
+0.09 2014-09-30
+ - Further MANIFEST fixes (..sigh)
+
+0.08 2014-09-30
+ - MANIFEST fixes
+
+0.07 2014-09-30
+ - Compatibility with RT 4.2
+ - Bump the minimum version to 4.0.9, to no longer require shipping a patch
+ - Packaging updates
+
+0.06 2014-02-06
+ - Packaging updates (don't index ::Test)
+
+0.05 2014-02-06
+ - Fix a bug, where if no Cfs were listed, then all were treated as
+   mandatory
+
+0.04 2013-03-26
+ - Link to TODO from CAVEATS
+ - Generate a README for github
+
+0.03 2013-02-27
+ - Allows mandatory checking during ticket creation
+ - Mandatory-ness now also applies to the mobile UI
+ - Move tests to being author-only tests
+
+0.01 2012-07-23
+ - Initial release

@@ -1,0 +1,13 @@
+# Revision history for Perl extension Regexp::Trie.
+#
+# $Id: Changes,v 0.2 2006/04/27 05:24:23 dankogai Exp dankogai $
+#
+$Revision: 0.2 $ $Date: 2006/04/27 05:24:23 $
+- Regexp/Trie.pm
++ lib/Regexp/Trie.pm
+  be nicer to Module::Build
+
+0.01  Thu Apr 27 11:31:11 2006
+	- original version; created by h2xs 1.23 with options
+		-XA Regexp::Trie
+

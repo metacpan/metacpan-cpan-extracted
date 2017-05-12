@@ -1,0 +1,26 @@
+*** src/backend/utils/adt/ruleutils.c.orig	Tue Aug 10 16:55:07 1999
+--- src/backend/utils/adt/ruleutils.c	Tue Aug 10 18:05:12 1999
+***************
+*** 1370,1381 ****
+  						strcat(buf, "old.");
+  					else
+  					{
+! 						if (strcmp(rte->relname, rte->refname) != 0)
+! 						{
+! 							strcat(buf, "\"");
+! 							strcat(buf, rte->refname);
+! 							strcat(buf, "\".");
+! 						}
+  					}
+  				}
+  				strcat(buf, "\"");
+--- 1370,1378 ----
+  						strcat(buf, "old.");
+  					else
+  					{
+! 						strcat(buf, "\"");
+! 						strcat(buf, rte->refname);
+! 						strcat(buf, "\".");
+  					}
+  				}
+  				strcat(buf, "\"");

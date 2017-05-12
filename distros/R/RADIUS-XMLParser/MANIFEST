@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/load.t
+t/parse.t
+resources/radius.log
+tmp/tmp
+RADIUS/XMLParser.pm
+version.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

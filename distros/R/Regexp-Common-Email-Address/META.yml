@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Regexp-Common-Email-Address
+version:      1.01
+version_from: lib/Regexp/Common/Email/Address.pm
+installdirs:  site
+requires:
+    Email::Address:                1.80
+    Regexp::Common:                2.119
+    Test::More:                    0.47
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.24

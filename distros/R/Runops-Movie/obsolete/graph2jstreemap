@@ -1,0 +1,48 @@
+#!perl
+use strict;
+use warnings;
+use feature ':5.10';
+use Storable qw( retrieve );
+use DBM::Deep;
+
+use File::Basename qw( dirname );
+use lib dirname(__FILE__);
+use TM qw( size );
+
+my $in_edge   = "$ARGV[0].edge";
+my $in_vertex = "$ARGV[0].size";
+#my $in_type   = "$ARGV[0].type";
+my $out_tree  = "$ARGV[0].tree";
+
+say STDERR "Read $in_edge (@{[ size( -s $in_edge ) ]})";
+my $edge = retrieve( $in_edge );
+
+say STDERR "Read $in_vertex (@{[ size( -s $in_vertex ) ]})";
+my $vertex_size = retrieve( $in_vertex );
+
+#say STDERR "Read $in_type (@{[ size( -s $in_type ) ]})";
+# my $type = retrieve( $in_type );
+my $type = {};
+
+my %color = (
+    0 => '#cccccc',
+);
+
+pt( 'root' );
+
+use constant { VERTEX => 0 };
+sub pt {
+    if ( 0.01 <= $vertex_size->{$_[VERTEX]} / $vertex_size->{'root'} ) {
+        if ( keys %{$edge->{$_[VERTEX]}} ) {
+            print qq{new TreeParentNode('$_[VERTEX]',[};
+            my ($one,@children) = keys %{$edge->{$_[VERTEX]}};
+            pt($_,), print(',') for @children;
+            pt($one);
+            print "])";
+        }
+        else {
+            print qq{new TreeNode('$_[VERTEX]',$vertex_size->{$_[VERTEX]})};
+        }
+    }
+}
+

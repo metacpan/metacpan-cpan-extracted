@@ -1,0 +1,79 @@
+=head1 NAME
+
+Rapi::Demo::Chinook - PSGI version of the RapidApp "Chinook" demo
+
+=head1 SYNOPSIS
+
+ use Rapi::Demo::Chinook;
+ my $app = Rapi::Demo::Chinook->new;
+
+ # Plack/PSGI app:
+ $app->to_app
+
+Or, from the command-line:
+
+ plackup -MRapi::Demo::Chinook -e 'Rapi::Demo::Chinook->new->to_app'
+
+
+=head1 DESCRIPTION
+
+This module is a simple L<Plack>/PSGI version of the L<RapidApp>/L<RapidDbic|Catalyst::Plugin::RapidApp::RapidDbic> 
+"Chinook" demo at L<http://www.rapidapp.info/demos/chinook>. This module was written to allow CPAN 
+distribution of the demo for easy access and portability within PSGI-based setups.
+
+=head1 CONFIGURATION
+
+C<Rapi::Demo::Chinook> extends L<RapidApp::Builder> and supports all of its options, as well as the 
+following params specific to this module:
+
+=head2 chinook_db
+
+Path to the SQLite database file, which may or may not already exist. If the file does not already
+exist, it is created as a copy from the default database, which is the state of the DB at the end
+of "Part 2" of the Chinook demo at L<http://www.rapidapp.info/demos/chinook>.
+
+Defaults to C<'chinook.db'> in the current working directory.
+
+=head1 METHODS
+
+=head2 init_db
+
+Copies the default database to the path specified by C<chinook_db>. Pass a true value as the first
+argument to overwrite the target file if it already exists.
+
+This method is called automatically the first time the module is loaded, or if the C<chinook_db> file
+doesn't exist.
+
+=head1 SEE ALSO
+
+=over
+
+=item * 
+
+L<RapidApp>
+
+=item * 
+
+L<RapidApp::Builder>
+
+=item * 
+
+L<http://www.rapidapp.info/demos/chinook>
+
+=back
+
+
+=head1 AUTHOR
+
+Henry Van Styn <vanstyn@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by IntelliTree Solutions llc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
+=cut
+

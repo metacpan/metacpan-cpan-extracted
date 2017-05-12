@@ -1,0 +1,34 @@
+---
+abstract: 'An Application to interface with http://rosettacode.org'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RosettaCode
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  App::Cmd: '0'
+  IO::All: '0'
+  MediaWiki::Bot: '0'
+  Mo: '0'
+  Mo::xxx: '0'
+  Module::Pluggable: '0'
+  YAML::XS: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/rosettacode-pm/issues
+  homepage: https://github.com/ingydotnet/rosettacode-pm
+  repository: https://github.com/ingydotnet/rosettacode-pm.git
+version: 0.0.15

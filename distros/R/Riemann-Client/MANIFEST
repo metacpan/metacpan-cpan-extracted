@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+extra/codegen.pl
+extra/protocol
+lib/Riemann/Client.pm
+lib/Riemann/Client/Protocol.pm
+lib/Riemann/Client/Transport.pm
+lib/Riemann/Client/Transport/TCP.pm
+lib/Riemann/Client/Transport/UDP.pm
+t/01-protocol_classes.t
+t/02-send_and_query.t
+t/03-tcp_disconnect.t

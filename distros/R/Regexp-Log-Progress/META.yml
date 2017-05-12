@@ -1,0 +1,39 @@
+---
+name: Regexp-Log-Progress
+version: 0.03
+author:
+  - 'Kevin L. Esteb <kesteb@wsipc.org>'
+abstract: A set of regex's to parse Progress log files
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+requires:
+  Regexp::Log: 0.0
+  perl: v5.8.8
+configure_requires:
+  Module::Build: 0
+provides:
+  Regexp::Log::Progress:
+    file: lib/Regexp/Log/Progress.pm
+    version: 0.03
+  Regexp::Log::Progress::AdminServer:
+    file: lib/Regexp/Log/Progress/AdminServer.pm
+    version: 0.01
+  Regexp::Log::Progress::Broker:
+    file: lib/Regexp/Log/Progress/Broker.pm
+    version: 0.01
+  Regexp::Log::Progress::Database:
+    file: lib/Regexp/Log/Progress/Database.pm
+    version: 0.01
+  Regexp::Log::Progress::NameServer:
+    file: lib/Regexp/Log/Progress/NameServer.pm
+    version: 0.01
+  Regexp::Log::Progress::Server:
+    file: lib/Regexp/Log/Progress/Server.pm
+    version: 0.01
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

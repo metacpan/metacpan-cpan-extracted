@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RDF::Core - An object oriented Perl modules for handling tasks related to RDF.</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>RDF::Core - An object oriented Perl modules for handling tasks related to RDF.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>RDF::Core has these parts:</p>
+<ul>
+<li><strong><a name="item_rdf_3a_3acore_3a_3amodel"><strong>RDF::Core::Model</strong></a></strong><br />
+</li>
+Model provides interface to store RDF statements, ask about them and retrieve them back.
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3aconstants"><strong>RDF::Core::Constants</strong></a></strong><br />
+</li>
+Defines usefule constants for the RDF processing like namespaces etc.
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3aparser"><strong>RDF::Core::Parser</strong></a></strong><br />
+</li>
+Generates statements from an RDF XML document.
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3amodel_3a_3aparser"><strong>RDF::Core::Model::Parser</strong></a></strong><br />
+</li>
+Model::Parser is a simple interface object to a parser. It's purpose is to provide a prototype of object accomodating any other parser.
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3aserializer"><strong>RDF::Core::Serializer</strong></a></strong><br />
+</li>
+Serializes RDF Model into XML.
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3amodel_3a_3aserializer"><strong>RDF::Core::Model::Serializer</strong></a></strong><br />
+</li>
+Model::Serializer is an interface object for Serializer.
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3astorage"><strong>RDF::Core::Storage</strong></a></strong><br />
+</li>
+An object for storing statements. There are several implementations of Storage - in memory, in a BerkeleyDB 1.x (DB_File) files and PostgreSQL database.
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3aenumerator"><strong>RDF::Core::Enumerator</strong></a></strong><br />
+</li>
+Enumerator is a result set of statements retrieved from Model
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3aquery"><strong>RDF::Core::Query</strong></a></strong><br />
+</li>
+An implementation of query language.
+<p></p>
+<li><strong><a name="item_rdf_3a_3acore_3a_3aschema"><strong>RDF::Core::Schema</strong></a></strong><br />
+</li>
+The RDF Schema utilities.
+<p></p>
+<li><strong><a name="item_basic_elements"><strong>Basic elements</strong></a></strong><br />
+</li>
+RDF::Core::Statement, RDF::Core::Resource, RDF::Core::Literal, RDF::Core::Node
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is subject to the MPL (or the GPL alternatively).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ginger Alliance, <a href="mailto:rdf@gingerall.cz">rdf@gingerall.cz</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>perl(1).</p>
+
+</body>
+
+</html>

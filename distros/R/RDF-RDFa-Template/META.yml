@@ -1,0 +1,43 @@
+---
+abstract: 'A simple templating system using RDFa to build RDF data views'
+author:
+  - 'Kjetil Kjernsmo <kjetilk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::More: 0.88
+  Test::XML: 0
+  XML::LibXML::XPathContext: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RDF-RDFa-Template
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  File::Util: 0
+  HTTP::Server::Simple::CGI: 0
+  RDF::Query: 2
+  RDF::Query::Client: 0
+  RDF::RDFa::Parser: 1
+  RDF::Trine: 0.114
+  RDF::Trine::Node::Literal::XML: 0
+  XML::LibXML: 1.59
+  XML::LibXML::SAX::Builder: 0
+  XML::LibXML::SAX::Parser: 0
+  XML::SAX::Base: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=RDF-RDFa-Template
+  homepage: http://www.kjetil.kjernsmo.net/software/rat/
+  license: http://dev.perl.org/licenses/
+  repository: svn+ssh://svn.kjernsmo.net/RDF-RDFa-Template/trunk
+version: 0.05

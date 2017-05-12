@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 ffcbbb71ae91d06657c04f7946352343053dd6d5 Changes
+SHA1 3f483e20d972ccba35df59b6ed44d1f4fb08dd4d MANIFEST
+SHA1 136420e296511762812b969d4c12c1366d12c417 MANIFEST.SKIP
+SHA1 6734a4a7d493915707e5e9a68d45469f74975dcf META.yml
+SHA1 e06c667b791ca91ccf0d3065a12fe47a47049610 Makefile.PL
+SHA1 12f4ecc1024b3f02fdb9589245861a833ebde131 README
+SHA1 a5e346237854f9436707628554598959befbb20d html/Callbacks/AddAttachmentsFromTransactions/Elements/ShowMessageHeaders/BeforeLocalization
+SHA1 343476e819b9e89fbeb2b4239ad5b2ee695372f8 html/Callbacks/AddAttachmentsFromTransactions/Elements/ShowMessageHeaders/Default
+SHA1 7631214fc1ae024781166db7045101d0fc47b6b4 html/Callbacks/AddAttachmentsFromTransactions/Ticket/Elements/AddAttachments/End
+SHA1 76f4f19ddd6e3f3cfa157757043a4ad767240b18 html/Callbacks/AddAttachmentsFromTransactions/Ticket/Elements/ShowMessageHeaders/BeforeLocalization
+SHA1 343476e819b9e89fbeb2b4239ad5b2ee695372f8 html/Callbacks/AddAttachmentsFromTransactions/Ticket/Elements/ShowMessageHeaders/Default
+SHA1 0d85fcd34eb38a93ca75f171058b9ab432f0e17d html/Callbacks/AddAttachmentsFromTransactions/Ticket/Update.html/BeforeDisplay
+SHA1 52ca391bc815bfd15c142a17ca44e5e659404922 html/Callbacks/AddAttachmentsFromTransactions/Ticket/Update.html/BeforeSubmit
+SHA1 934a7f8a3741c91347e322dd1954834963b9ddb4 html/Ticket/Elements/AddAttachmentsFromTransactions
+SHA1 25c34611d32f04c8f31f0954738d4f9ad1445e58 inc/Module/Install.pm
+SHA1 873e0c701d5fcbda91b69351072829d23cd4ea39 inc/Module/Install/Base.pm
+SHA1 195f689404849bd6e725a24c0e574fced7a5c450 inc/Module/Install/Can.pm
+SHA1 7ca66de454258074c191b5e1012dffacffc5c42d inc/Module/Install/Fetch.pm
+SHA1 23f746abd5be080a787f5189e3c98739b661c5b1 inc/Module/Install/Include.pm
+SHA1 07be064784c1689db53d4e969dacf26480eeba97 inc/Module/Install/Makefile.pm
+SHA1 2617a7b4d9e96e4840ec973a6f99f645d8dd2e27 inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 a0fdfa64dbe46ce06b058a062020b6bf0e8ff793 inc/Module/Install/Win32.pm
+SHA1 118cc99ef1d3441d6e3f17fabd778438926119d5 inc/Module/Install/WriteAll.pm
+SHA1 4a2989632b48af38fe30768e409181032d506ecb inc/YAML/Tiny.pm
+SHA1 a33317fa5684c518e34d691dc899685f5e929e9e lib/RT/Extension/AddAttachmentsFromTransactions.pm
+SHA1 da3d0e9d29f23fe02a287224063b13cc987033ff xt/00-compile.t
+SHA1 9f535c72c86c8a7e9e83d8036c990eaff89799c4 xt/00-mason-syntax.t
+SHA1 5e72ef9186fe23495db9116b7d0dbee17dbfc4e1 xt/99-policy.t
+SHA1 0018b62a62b928bb4edf66e79de1aad7f47002c3 xt/lib/RT/Extension/AddAttachmentsFromTransactions/Test.pm.in
+SHA1 77c68add5ff60e63623c279255c44ad0dae3fba4 xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJVNNw7AAoJEKq6dEXbZ7ZryXwP/2Vj2QKGX3EZPhko8gVOizfm
+cnxpjgu/DWAVKAQI71pD9YodjGLKMXzLBVJE3LeQqRQYqaQsrIEvjRsJh9jRn/3x
+mUex6qYzp1+Ny21rR58j04NPbZV3zCX0FHmYwCQPc6NQ0pVV4gRuwCLbgU08EHo1
+z+gp9h1LwaTkoMx73m592NZjSVwUZsrc4LfK5Ms3WwvCl3167WxnygUOIpcLc0aB
+tZuy5wdhPMSuRexQsrtoBcGpy2qE7PiRgcAhjaKbTI/4dKZqY7HHGhIkLbrce5yu
+bEdaWh1HRb0ZzCKFdpH+CrjJbGa7WOr82noEtRStcbCWvFITeDyHO39X2b6qUSww
+b61me43ZSiMKdDP75pIbwgfiS8lVZlnVIwXO3PnTrAm4hBRwzoyaW5py4wiqqaGu
++QX98GnCy+VXmCfhcewt8qf0owEKY/JD+HlRzeOwp88Ehya52+S5PCXS6ft4pHPt
+yaqVcqvBx9RFjuw+TSXgyImHJir7m4Tm73K+R2MESSpAum03UfosUiK4TiYPQnBe
+PejRE5qn6HSxYVts0sUJhkChtNPuYY9xxmpJK97B1pKLZIrGJBTqbrV9p+fnuPjF
+sd7s066ZYdeRbfj+eLNIFHYoh+GqUnBdjgUD3xOtYHdppf4rDHq5Saa6A6Q9XNmK
+Sk1PZDCUrfRtl5qGhXT2
+=XK4Z
+-----END PGP SIGNATURE-----

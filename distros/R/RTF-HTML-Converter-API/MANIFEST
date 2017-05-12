@@ -1,0 +1,9 @@
+lib/RTF/HTML/Converter/API.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/test.pl
+t/rtf-test.rtf
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

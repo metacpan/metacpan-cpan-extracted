@@ -1,0 +1,149 @@
+<& /Minimal/Elements/Header, Title => loc('#[_1]: [_2]', $Ticket->id, $Ticket->Subject) &>
+<& /Elements/ListActions, actions => \@results &>
+
+<table width="100%" class="ticketsummary" >
+    <tr>
+        <td valign="top" width="50%" class="boxcontainer">
+            <&| /Widgets/TitleBox, title => loc('The Basics'), 
+                title_class=> 'inverse',  
+                color => "#993333" &>
+	        <& /Ticket/Elements/ShowCustomFields, Ticket => $Ticket &>
+            </&>
+        </td>
+        <td valign="top" width="50%" class="boxcontainer">
+            <&| /Widgets/TitleBox, title => loc("Status"),
+                title_class=> 'inverse',
+                color => "#663366" &>
+            <& Elements/ShowStatus, Ticket => $Ticket, UpdatedLink => 0 &>
+	        </&>
+        </td>
+    </tr>
+</table>
+% if(RT->Config->Get('CIFMinimal_CollectiveView')){
+<table width="100%" class="ticketsummary" >
+    <tr>
+        <td valign="bottom" width="75%" class="boxcontainer">
+            <&| /Widgets/TitleBox, title => loc("Collective Data"),
+                title_class=> 'inverse',
+                color => "#663366" &>
+% $m->out($cif_data);
+            </&>
+        </td>
+    </tr>
+</table>
+% }
+
+%#!!pape: selfservice_find_attachments.patch {{
+<& /Ticket/Elements/ShowHistory, 
+      Ticket => $Ticket, 
+      URIFile => "Display.html", 
+      ShowHeaders => $ARGS{'ShowHeaders'},
+      DownloadableHeaders => 0,
+      AttachPath => "Attachment", 
+      Attachments => $attachments, 
+      UpdatePath => "Update.html" 
+&>
+%#!!pape: selfservice_find_attachments.patch }}
+
+
+
+<%INIT>
+my ( $field, @results );
+
+# {{{ Load the ticket
+#If we get handed two ids, mason will make them an array. bleck.
+# We want teh first one. Just because there's no other sensible way
+# to deal
+my @id = ( ref $id eq 'ARRAY' ) ? @{$id} : ($id);
+
+my $Ticket = new RT::Ticket( $session{'CurrentUser'} );
+
+# store the uploaded attachment in session
+if ( $ARGS{'Attach'} ) {    # attachment?
+    $session{'Attachments'} = {} unless defined $session{'Attachments'};
+
+    my $attachment = MakeMIMEEntity(
+        AttachmentFieldName => 'Attach'
+    );
+
+    my $file_path = Encode::decode_utf8("$ARGS{'Attach'}");
+    $session{'Attachments'} = {
+        %{ $session{'Attachments'} || {} },
+        $file_path => $attachment,
+    };
+}
+			
+unless ( $Ticket->Load( $id[0] ) ) {
+    $m->comp( 'Error.html', Why => loc( "Couldn't load ticket '[_1]'", $id ) );
+    $m->abort();
+}
+# This code does automatic redirection if any updates happen.
+unless ( $Ticket->CurrentUserHasRight('ShowTicket') ) {
+    $m->comp( 'Error.html',
+        Why => loc("No permission to display that ticket") );
+    # XXX: Why abort? then we loose footer //ruz
+    $m->abort();
+}
+
+my ( $code, $msg );
+
+if($session{'Attachments'} || ( defined $ARGS{'UpdateContent'} && $ARGS{'UpdateContent'} ne '' && $ARGS{'UpdateContent'} ne "-- \n". $session{'CurrentUser'}->UserObj->Signature)){
+        $ARGS{UpdateAttachments} = $session{'Attachments'};
+}
+push @results, ProcessUpdateMessage(
+    ARGSRef   => \%ARGS,
+    TicketObj => $Ticket
+);
+delete $session{'Attachments'};
+
+# delete temporary storage entry to make WebUI clean
+unless ( keys %{ $session{'Attachments'} } and $ARGS{'UpdateAttach'} ) {
+    delete $session{'Attachments'};
+}
+
+my @cfupdates = ProcessTicketCustomFieldUpdates(ARGSRef => \%ARGS);
+push (@results, @cfupdates);
+
+#Update the status
+if((defined($ARGS{'Status'})) and $ARGS{'Status'} and ( $ARGS{'Status'} ne $Ticket->Status ) ){
+    ( $code, $msg ) = $Ticket->SetStatus( $ARGS{'Status'} );
+    push @results, "$msg";
+}
+
+# This code does automatic redirection if any updates happen.
+#unless ( $Ticket->CurrentUserHasRight('ShowTicket') ) {
+#    $m->comp( 'Error.html',
+#        Why => loc("No permission to display that ticket") );
+#    # XXX: Why abort? then we loose footer //ruz
+#    $m->abort();
+#}
+
+if (@results) {
+    # We've done something, so we need to clear the decks to avoid
+    # resubmission on refresh.
+    # But we need to store Actions somewhere too, so we don't lose them.
+    my $key = Digest::MD5::md5_hex(rand(1024));
+    push @{ $session{"Actions"}->{$key}  ||= [] }, @results;
+    $session{'i'}++;
+    RT::Interface::Web::Redirect( RT->Config->Get('WebURL') ."Minimal/Display.html?id=". $Ticket->id."&results=".$key);
+}
+
+my $Transactions = $Ticket->Transactions;
+
+my $attachments = $m->comp( '/Ticket/Elements/FindAttachments', Ticket => $Ticket );
+$m->callback(CallbackName => 'BeforeDisplay', Ticket => \$Ticket, ARGSRef => \%ARGS);
+
+require RT::CIFMinimal;
+my $cif_data = RT::CIFMinimal::cif_data({
+    user    => $session{'CurrentUser'}->UserObj(),
+    q       => $Ticket->FirstCustomFieldValue('Address'),
+    nolog   => 1,
+    results => \@results,
+});
+
+</%INIT>
+
+
+<%ARGS>
+$id => undef
+</%ARGS>

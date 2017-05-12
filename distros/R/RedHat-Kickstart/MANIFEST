@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+README
+kickstart
+lib/RedHat/SysConfig.pm
+lib/RedHat/Kickstart.pm
+lib/RedHat/XML.pm
+t/T.pm
+t/kickstart.t
+t/xml.t

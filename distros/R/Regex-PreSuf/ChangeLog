@@ -1,0 +1,138 @@
+2006-02-26  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* A tiny prettification/optimisation from Sebastian Nagel.
+	
+	* Included (finally) a words file so that there is no
+	  need to look for one in the system (obsoletes the
+	  patch suggested in "[rt.cpan.org #17820] MSWin32 test fix").
+	
+	* Release as 1.17.
+
+2004-05-12  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Newlines in patterns didn't work.  Fix from Bart Lateur.
+
+	* Limit the number of words used for the big test,
+	  split the big test to its own test file.
+	
+	* Release as 1.16.
+
+Tue May 16 05:25:01 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Sigh.  The t/presuf.t would also fail if no words 
+	  file could be found because of faulty test logic.
+	  Reported by Paul Schinder.
+
+	* Release as 1.15.
+
+	* The ppclinux /usr/dict/words still tripped the test suite.
+	  (No actual bug in the presuf() code)  Reported by Paul Schinder.
+	
+	* Release as 1.14.
+
+Mon May 15 22:46:45 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Add aggregate timings to the big test, the original patch
+	  supplied by Mike Giroux.
+
+	* Cosmetics changes in presuf.t output.
+	
+	* Release as 1.13.
+
+Mon May 15 00:53:00 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Ahem.  In 1.11 I fixed the test suite against empty
+	  test inputs but forgot to fix presuf() itself against
+	  empty inputs.
+	
+	* Release as 1.12.
+
+	* The test suite would got stuck if there were no words
+	  beginning with a certain letter.  Reported by Paul Schinder.
+
+	* Now testing also words ending with a certain letter.
+
+	* Give an estimate on the remaining testing time on the big
+	  vocabulary test as it may take a while.
+
+	* Release as 1.11.
+	
+Fri May 12 23:16:07 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Handle metacharacters: now you can use the regular
+	  expression metacharacters in your words withour fear
+	  of the resulting regex being illegal (famous last words?)
+          Note that this also also means that if you have been using
+	  metacharacters in your words, they will now be backslash-protected.
+	
+	* Run a big test (and time-consuming, up to several minutes)
+	  in case we can find a dictionary file (like /usr/dict/words).
+	  Show also timings compared with the naïve way.  They look sweet:
+
+	# Hang on, collecting words for the next test...
+	# Got 25486 words.
+	# NOTE THAT THIS TEST WILL TAKE SEVERAL MINUTES.
+	# WE WILL TEST ALL THE LETTERS FROM a TO z.
+	# Testing 1408 words beginning with 'a'...
+	# Naïve/create:    0 wallclock secs ( 0.00 usr +  0.00 sys =  0.00 CPU)
+	# Naïve/execute:  15 wallclock secs (14.52 usr +  0.02 sys = 14.53 CPU)
+	# PreSuf/create:   1 wallclock secs ( 1.72 usr +  0.03 sys =  1.75 CPU)
+	# PreSuf/execute:  3 wallclock secs ( 2.08 usr +  0.02 sys =  2.10 CPU)
+	# Testing 1277 words beginning with 'b'...
+	# Naïve/create:    0 wallclock secs ( 0.02 usr +  0.00 sys =  0.02 CPU)
+	# Naïve/execute:  13 wallclock secs (13.08 usr +  0.03 sys = 13.12 CPU)
+	# PreSuf/create:   2 wallclock secs ( 1.45 usr +  0.00 sys =  1.45 CPU)
+	# PreSuf/execute:  1 wallclock secs ( 1.37 usr +  0.00 sys =  1.37 CPU)
+	# Testing 2144 words beginning with 'c'...
+	# Naïve/create:    0 wallclock secs ( 0.00 usr +  0.00 sys =  0.00 CPU)
+	# Naïve/execute:  23 wallclock secs (22.40 usr +  0.05 sys = 22.45 CPU)
+	# PreSuf/create:   3 wallclock secs ( 2.90 usr +  0.02 sys =  2.92 CPU)
+	# PreSuf/execute:  3 wallclock secs ( 2.90 usr +  0.00 sys =  2.90 CPU)
+	# Testing 1145 words beginning with 'd'...
+
+	  The naïve way is just to concatenate the words with "|"
+	  (that's the Naïve/create).  PreSuf/create is the presuf() call.
+	  The */execute are the running times of the respective
+	  regular expressions.		
+	
+	* Release as 1.10.  The jump in the version number is
+	  warranted by the fixed handling of metacharacters.
+	
+Thu May 11 23:15:16 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* PreSuf.pm: make the debug prints only to show up
+	  when debugging requested (aaargh, I've developed
+	  a bad habit of doing this lately, leaving debugging
+	  on for the released versions), spotted by Mike Giroux.
+
+	* Fix two bugs spotted by Mike Giroux: qw(rattle rattlesnake)
+	  and qw(rata ratepayer rater) didn't produced correct results.
+
+	* Release as 1.03.  
+
+Sat May  6 01:17:24 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Fix a bug where qw(aba a) was presufixed as 'ab?a',
+	  which incorrectly matches qw(aba aa).
+	  Now correctly produces 'a(?:ba)?'.  Bug spotted by
+	  Mark Kvale. 
+
+	* Release as 1.02.
+
+Wed Apr 12 19:33:37 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release as 1.01. 
+
+Wed Apr 12 05:49:52 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Tell about prefix_length() and suffix_length().
+	
+	* Fixed tiny documentation nits.
+
+	* Bump version number to 0.005.
+	
+	
+	
+	
+	
+

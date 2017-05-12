@@ -1,0 +1,62 @@
+%# One way to stop a runaway horse is to bet on him.
+
+<!-- comment it by hcchien
+                  <table width="100%" border="0" cellspacing="0" cellpadding="4">
+                    <tr> 
+                      <td bgcolor="#82D1EC" class="poptable" valign="bottom" > 
+                          <&|/l&>Project Name</&>: <% $QueueObj->Name %></td>
+                    </tr>
+-->
+                    <tr> 
+                      <td bgcolor="#A3DEF1"> 
+                        <table border="0" cellspacing="0" cellpadding="0" align="center" width="100%">
+			  <tr> 
+			    <td class="poptable" bgcolor="#C4E1F0">
+</form>
+% $m->call_next;
+			    </td>
+			  </tr>
+			</table>
+<%ATTR>
+Tab2	=> 'Wiki'
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>
+<%SHARED>
+use MIME::Base64;
+use WWW::Mechanize;
+
+my $u = $session{'CurrentUser'}->UserObj;
+$RT::BaseURL = "/Foundry/Project/Doc/List.html/";
+
+our $ua = WWW::Mechanize->new;
+our $wws = "$ENV{WIKI_URL}/";
+
+our ($Get, $Post) = map {
+    my $method = $_;
+    sub {
+	my $url = shift;
+	$url = $wws . $url unless $url =~ /^\w+:\//;
+	#$url .= "?root=sympa";
+	my $rv;
+	if ($method eq 'get') {
+	    $ua->get($url, @_);
+	    Encode::_utf8_on($rv = $ua->content);
+	}
+	else {
+	    Encode::_utf8_on($rv = $ua->post($url, @_)->as_string);
+	}
+	$rv =~ s{^.*?</div>}{}s;
+	$rv =~ s{</body>.*$}{}s;
+	$rv =~ s{ \| <a href="[^>]+">Preferences</a>}{};
+	$rv =~ s{>(Edit this document|View document history)<}
+		{'>' . loc($1) . '<'}eg;
+	$rv =~ s{(Search)(\Q: <input type="text" name="find" size="20"\E)}
+		{loc($1) . $2}eg;
+	$rv =~ s{\Q$ENV{WIKI_URL}/\E}
+		{"$RT::BaseURL}g;
+	$rv;
+    };
+} qw(get post);
+</%SHARED>

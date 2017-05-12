@@ -1,0 +1,80 @@
+<%init>
+my $ticket_id = $m->dhandler_arg();
+my $ticket =RT::Ticket->new($session{'CurrentUser'});
+
+my $title;
+
+$ticket_id = undef if ($ticket_id eq 'index.html');
+
+if( $ticket_id eq 'new') {
+
+    my ($id,$msg,$tmsg) =$ticket->Create( Subject => $ARGS{'Subject'},
+                     MIMEObj => MIME::Entity->build(Data => $ARGS{'Content'}),
+                     Queue => 'Service Updates',
+                     );
+
+    if ($id) {
+        
+    $m->redirect($RT::WebPath."/ServiceUpdate/Show/".$id); 
+    } else  {
+        Error(loc("Couldn't create a new service update ticket:".$msg));
+    }
+
+}
+elsif  ($ticket_id && $ARGS{'Subject'}) {
+
+    unless ( $ticket_id =~ /^\d+$/) {
+    Abort(loc("The link you followed doesn't seem to be a service update id"));
+    $m->abort();
+    }
+    $ticket->Load($ticket_id);
+    $ticket->SetSubject($ARGS{'Subject'});
+    if ($ARGS{'Live'}) {
+        if ($ticket->Status() !~ /^(?:new|open)$/) {
+            $ticket->SetStatus('open');
+        }
+
+    } else {
+        if ($ticket->Status() =~ /^(?:new|open)$/) {
+            $ticket->SetStatus('resolved');
+            }
+
+    }
+
+
+    $ticket->Comment(Content => $ARGS{'Content'});
+    $m->redirect($RT::WebPath."/ServiceUpdate/Show/".$ticket_id); 
+
+
+}
+if ($ticket_id) {
+    $ticket->Load($ticket_id);
+    $title = loc("Modify service update");
+} else {
+    $title = loc("New service update");
+    $ticket_id = 'new';
+
+}
+</%init>
+<& /ServiceUpdate/Elements/Header, Title => $title &>
+<div class="serviceupdate">
+<form method="post" action="<%$RT::WebPath%>/ServiceUpdate/Edit/<%$ticket_id%>">
+% if ($ticket->id) {
+<input type="hidden" name="id" value="<%$ticket->id%>" />
+% } 
+<h1><%$title%></h1>
+<div class="serviceupdate-history-entry">
+<label id="Subject"><&|/l&>Subject</&>:</label> <input name="Subject" value="<%$ticket->Subject%>" size="40" />
+% if ($ticket->id) {
+<br />
+<input type="checkbox" name="Live" <%$ticket->Status !~ /(?:stalled|resolved|rejected|deleted)/ ? 'checked' : '' %> /> <&|/l&>Display this service update in page headers.</&>
+% }
+<br />
+<div class="serviceupdate-history-content">
+<&|/l&>Current status information</&>:
+<&/Elements/MessageBox, Name => 'Content', Height => 11 &>
+</div>
+</div>
+<& /Elements/Submit&>
+</div>
+</form>

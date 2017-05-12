@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<person>
+	<_personname id='personname' type='hash'>
+		<id type="integer" mandatory="yes"/>
+		<firstname mandatory="yes"/>
+		<middlename/>
+		<lastname mandatory="yes"/>
+		<lineage/>
+	</_personname>
+
+	<person id='person' type='hash'>
+		<personname typeref='#personname'/>
+		<age type="int"/>
+	</person>
+</person>
+

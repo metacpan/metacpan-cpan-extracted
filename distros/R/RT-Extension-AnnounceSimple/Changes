@@ -1,0 +1,10 @@
+Revision history for RT::Extension::AnnounceSimple
+
+1.01 2016-03-03
+ - bump rt_too_new for RT 4.4
+
+1.00 2015-10-06
+ - implement queue announce
+
+0.01 2015-01-29
+ - initial release

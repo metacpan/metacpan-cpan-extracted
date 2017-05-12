@@ -1,0 +1,19 @@
+
+
+Install via CPAN:
+
+ perl -MCPAN -e 'install RTG::Report'
+
+Or download the distribution from CPAN and build like any other perl module:
+
+  perl Makefile.PL
+  make
+  make install
+
+Optional build targets are also supported:
+
+  make test
+
+If you are missing any of the required perl modules, you can run bin/install_deps.pl and it will install them for you via CPAN or FreeBSD ports.
+
+

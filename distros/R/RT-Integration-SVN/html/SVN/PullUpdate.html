@@ -1,0 +1,116 @@
+<%ARGS>
+$rev
+</%ARGS>
+<%init>
+
+unless ( $rev =~ /^(\d+)$/ ) {
+    $m->out("Numeric revision needed");
+    $m->abort();
+}
+
+my $REPO = $RT::SvnRepository || "svn://localhost/";
+my $LOOK = $RT::PathToSvn;
+
+my $CHANGE_URI = $REPO . "@" . $rev;
+
+unless (-f $LOOK && -x $LOOK ) {
+	die "Couldn't find your svn binary ('$LOOK')";
+}
+
+open( SVNLOOK, "$LOOK log $REPO -r $rev|" ) || die $@;
+
+my $dashes = <SVNLOOK>;
+my $data   = <SVNLOOK>;
+my ( $revision, $actor, $foo );
+if ( $data =~ /^r(\d+)\s*\|\s*(.*?)\s*\|/ ) {
+    $revision = $1;
+    $actor    = $2;
+
+}
+unless ( $rev == $revision )  {
+die "$LOOK log $REPO -r $rev\n$rev is not $revision\n$data" ;
+}
+my @msg = <SVNLOOK>;
+$dashes = pop(@msg);
+
+close(SVNLOOK);
+
+my $user = RT::CurrentUser->new($actor);
+unless ( $user->id ) {
+    $user->LoadByCols( Gecos => $actor );
+}
+
+unless ( $user->id ) {
+    die "Unknown user";
+}
+
+my $ticket;
+my $update_msg    = '';
+my $update_type   = 'comment';
+my $update_status = '';
+my $update_owner  = '';
+my %set;
+foreach my $line (@msg) {
+    if ( $line =~ /^\s*RT-Ticket:\s*(\w*?)(?:\#?)(\d*)/i ) {
+        next if ($1 && $1 !~ /^$RT::rtname$/i);
+        $ticket = RT::Ticket->new($user);
+        $ticket->Load($2);
+    }
+    elsif ( $line =~ /^\s*RT-Status:\s*(\w+)/i ) {
+        $update_status = lc($1);
+    }
+    elsif ( $line =~ /^\s*RT-(?:Update|Action):\s*(comment|correspond)/i ) {
+        $update_type = lc($1);
+    }
+    elsif ( $line =~ /^\s*RT-Owner:\s*(\w+)/i ) {
+	$update_owner = $1;
+    }
+    elsif ( $line =~ /^\s*RT-(\w+):\s*(\w+)/i ) {
+        $set{$1} = $2;
+    }
+    else {
+        $update_msg .= $line;
+    }
+
+}
+
+if ( $ticket && $ticket->id ) {
+    my $refers_to = $ticket->RefersTo;
+    while ( my $refer = $refers_to->Next ) {
+        if ( $refer->TargetURI->URI eq $CHANGE_URI ) {
+            $RT::Logger->error(
+                "Attempt to apply $CHANGE_URI which was already applied");
+            $m->out("Attempt to apply $CHANGE_URI which was already applied");
+            $m->abort();
+            return ();
+        }
+    }
+    $ticket->AddLink( Type => 'RefersTo', Target => $CHANGE_URI );
+    $m->out( "Added link to $CHANGE_URI\n" );
+
+    $update_msg  = "Subversion update $REPO\@$rev \n" . $update_msg;
+    $update_type = ucfirst($update_type);
+    $ticket->$update_type( Content => $update_msg );
+    $m->out( "Added commit text as $update_type\n" );
+
+    if ($update_owner) {
+	my ($status, $msg) = $ticket->SetOwner($update_owner);
+	$m->out( "Set owner to $update_owner\n" );
+	$m->out( "Failed: $msg\n" ) unless $status;
+    }
+
+    if ($update_status && $ticket->QueueObj->IsValidStatus($update_status)) {
+        $ticket->SetStatus($update_status);
+	$m->out( "Set status to $update_status\n" );
+    }
+
+    if (keys %set) {
+	for my $k (keys %set) {
+	    my $meth = "Set$k";
+	    $ticket->$meth($set{$k});
+	    $m->out( "Set $k to $set{$k}\n" );
+	}
+    }
+}
+$m->abort();
+</%init>

@@ -1,0 +1,20 @@
+use strict;
+use warnings;
+
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+my $users = RT::Users->new( $RT::SystemUser );
+$users->LimitToDeleted;
+
+while ( my $user = $users->Next ) {
+    print "Going to enable user '". $user->Name ."'. Ok? [y/N]: ";
+    my $answer = <>;
+    next unless $answer =~ /^y(es)?$/i;
+
+    my ($status, $msg) = $user->SetDisabled(0);
+    $RT::Logger->error("Couldn't enable user record: $msg")
+        unless $status;
+}
+

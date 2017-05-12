@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY version SYSTEM "version.xml">
+]>
+<refentry id="rasqal-section-unused">
+<refmeta>
+<refentrytitle role="top_of_page">Unused items</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>RASQAL Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Unused items</refname>
+<refpurpose>Not used</refpurpose>
+<!--[<xref linkend="desc" endterm="desc.title"/>]-->
+</refnamediv>
+
+<refsynopsisdiv role="synopsis">
+<title role="synopsis.title">Synopsis</title>
+
+<synopsis>
+
+
+
+#define     <link linkend="RASQAL-API:CAPS">RASQAL_API</link>
+struct      <link linkend="rasqal-expression-s">rasqal_expression_s</link>;
+struct      <link linkend="rasqal-literal-s">rasqal_literal_s</link>;
+struct      <link linkend="rasqal-triples-match-s">rasqal_triples_match_s</link>;
+struct      <link linkend="rasqal-triples-source-s">rasqal_triples_source_s</link>;
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+
+
+
+
+<refsect1 role="desc">
+<title role="desc.title">Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1 role="details">
+<title role="details.title">Details</title>
+<refsect2>
+<title><anchor id="RASQAL-API:CAPS" role="macro"/>RASQAL_API</title>
+<indexterm><primary>RASQAL_API</primary></indexterm><programlisting>#define     RASQAL_API</programlisting>
+<para>
+Macro for wrapping API function call declarations.</para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="rasqal-expression-s" role="struct"/>struct rasqal_expression_s</title>
+<indexterm><primary>rasqal_expression_s</primary></indexterm><programlisting>struct rasqal_expression_s {
+  int usage; /* reference count - 1 for itself */
+
+  rasqal_op op;
+  struct rasqal_expression_s* arg1;
+  struct rasqal_expression_s* arg2;
+  struct rasqal_expression_s* arg3; /* optional 3rd arg for EXPR_REGEX */
+  rasqal_literal* literal;
+  rasqal_variable* variable;
+  unsigned char *value; /* UTF-8 value */
+
+  /* for extension function qname(args...) and cast-to-uri */
+  raptor_uri* name;
+  raptor_sequence* args;
+};
+</programlisting>
+<para>
+Internal - see <link linkend="rasqal-expression"><type>rasqal_expression</type></link>.</para>
+<para>
+
+</para><variablelist role="struct">
+<varlistentry>
+<term><link linkend="int">int</link>&nbsp;<structfield>usage</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><link linkend="rasqal-op">rasqal_op</link>&nbsp;<structfield>op</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>struct&nbsp;<link linkend="rasqal-expression-s">rasqal_expression_s</link>&nbsp;*<structfield>arg1</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>struct&nbsp;<link linkend="rasqal-expression-s">rasqal_expression_s</link>&nbsp;*<structfield>arg2</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>struct&nbsp;<link linkend="rasqal-expression-s">rasqal_expression_s</link>&nbsp;*<structfield>arg3</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><link linkend="rasqal-literal">rasqal_literal</link>&nbsp;*<structfield>literal</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><link linkend="rasqal-variable">rasqal_variable</link>&nbsp;*<structfield>variable</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>unsigned&nbsp;<link linkend="char">char</link>&nbsp;*<structfield>value</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><link linkend="raptor-uri">raptor_uri</link>&nbsp;*<structfield>name</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><link linkend="raptor-sequence">raptor_sequence</link>&nbsp;*<structfield>args</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rasqal-literal-s" role="struct"/>struct rasqal_literal_s</title>
+<indexterm><primary>rasqal_literal_s</primary></indexterm><programlisting>struct rasqal_literal_s {
+  int usage;
+  rasqal_literal_type type;
+  /* UTF-8 string, pattern, qname, blank, double, float, decimal, datetime */
+  const unsigned char *string;
+  unsigned int string_len;
+  
+  union {
+    /* integer and boolean types */
+    int integer;
+    /* double and float */
+    double floating;
+    /* uri (can be temporarily NULL if a qname, see flags below) */
+    raptor_uri* uri;
+    /* variable */
+    rasqal_variable* variable;
+};
+</programlisting>
+<para>
+Internal - see <link linkend="rasqal-literal"><type>rasqal_literal</type></link>.</para>
+<para>
+
+</para><variablelist role="struct">
+<varlistentry>
+<term><link linkend="int">int</link>&nbsp;<structfield>usage</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><link linkend="rasqal-literal-type">rasqal_literal_type</link>&nbsp;<structfield>type</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>const&nbsp;unsigned&nbsp;<link linkend="char">char</link>&nbsp;*<structfield>string</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>unsigned&nbsp;<link linkend="int">int</link>&nbsp;<structfield>string_len</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rasqal-triples-match-s" role="struct"/>struct rasqal_triples_match_s</title>
+<indexterm><primary>rasqal_triples_match_s</primary></indexterm><programlisting>struct rasqal_triples_match_s {
+  void *user_data;
+
+  rasqal_triple_parts (*bind_match)(struct rasqal_triples_match_s*, void *user_data, rasqal_variable *bindings[4], rasqal_triple_parts parts);
+
+  void (*next_match)(struct rasqal_triples_match_s*, void *user_data);
+
+  int (*is_end)(struct rasqal_triples_match_s*, void *user_data);
+
+  void (*finish)(struct rasqal_triples_match_s*, void *user_data);
+};
+</programlisting>
+<para>
+Internal - see <link linkend="rasqal-triples-match"><type>rasqal_triples_match</type></link>.</para>
+<para>
+
+</para><variablelist role="struct">
+<varlistentry>
+<term><link linkend="void">void</link>&nbsp;*<structfield>user_data</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><structfield>bind_match</structfield>&nbsp;()</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><structfield>next_match</structfield>&nbsp;()</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><structfield>is_end</structfield>&nbsp;()</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><structfield>finish</structfield>&nbsp;()</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rasqal-triples-source-s" role="struct"/>struct rasqal_triples_source_s</title>
+<indexterm><primary>rasqal_triples_source_s</primary></indexterm><programlisting>struct rasqal_triples_source_s {
+  rasqal_query* query;
+
+  void *user_data;
+
+  int (*init_triples_match)(rasqal_triples_match* rtm, struct rasqal_triples_source_s* rts, void *user_data, rasqal_triple_meta *m, rasqal_triple *t);
+
+  int (*triple_present)(struct rasqal_triples_source_s* rts, void *user_data, rasqal_triple *t);
+
+  void (*free_triples_source)(void *user_data);
+};
+</programlisting>
+<para>
+Internal - see <link linkend="rasqal-triples-source"><type>rasqal_triples_source</type></link>.</para>
+<para>
+
+</para><variablelist role="struct">
+<varlistentry>
+<term><link linkend="rasqal-query">rasqal_query</link>&nbsp;*<structfield>query</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><link linkend="void">void</link>&nbsp;*<structfield>user_data</structfield>;</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><structfield>init_triples_match</structfield>&nbsp;()</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><structfield>triple_present</structfield>&nbsp;()</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term><structfield>free_triples_source</structfield>&nbsp;()</term>
+<listitem><simpara> Internal
+</simpara></listitem>
+</varlistentry>
+</variablelist></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

@@ -1,0 +1,22 @@
+[% META title = 'Edit person' %]
+
+[% person = s.get(cgi.param('r_person')) %]
+
+<table>
+  <tr>
+    <td>First name</td>
+    <td><input name="r_fn"
+           value="[% person.arc_obj("${NS_LD}/Property#first_name").li.value %]">
+    </td>
+  </tr>
+  <tr>
+    <td>Last name</td>
+    <td><input name="r_ln"
+           value="[% person.arc_obj("${NS_LD}/Property#last_name").li.value %]">
+    </td>
+  </tr>
+</table>
+
+<input type="hidden" name="r_person" value="$person.uri">
+<input type="button" OnClick="javascript:go('person_list','person_edit')" value=" Edit  ">
+

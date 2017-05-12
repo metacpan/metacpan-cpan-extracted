@@ -1,0 +1,13 @@
+[% IF ADD_TIMESTAMP; PROCESS timestamp.tt2; END -%]
+[% PROCESS html.tt2 -%]
+[% USE DBI -%]
+[% USE Dumper -%]
+[% USE dbh = DBI( 'DBI:Sys:' ) -%]
+[% st = dbh.query( 'SELECT * FROM grent' ) -%]
+[% r = {
+    cols = st.get_colnames()
+    data = st.get_all_list()
+    name = 'pwent'
+    caption = 'grent'
+    } -%]
+[% htmltable(r) -%]

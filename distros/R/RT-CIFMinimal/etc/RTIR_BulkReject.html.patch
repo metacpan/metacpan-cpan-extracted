@@ -1,0 +1,29 @@
+--- BulkReject.html.orig    2011-10-18 19:18:16.000000000 +0000
++++ BulkReject.html 2011-10-18 19:33:12.000000000 +0000
+@@ -93,15 +93,17 @@
+         $id = $t->id;
+ 
+         # If we don't own the thing we're linking to, change the owner
+-        if (   $t->Owner != $session{'CurrentUser'}->id
+-            && $t->Owner != $RT::Nobody->id )
+-        {
+-            push @tempresults, [ 
+-                $id,
+-                loc("You may not reject tickets that belong to another user."),
+-            ];
+-            push @tempresults, [ $id, loc("Skipped.") ];
+-            next;
++        if(!$session{'CurrentUser'}->HasRight(Right => 'SuperUser', Object => $RT::System)){
++            if ($t->Owner != $session{'CurrentUser'}->id
++                && $t->Owner != $RT::Nobody->id )
++            {
++                push @tempresults, [
++                    $id,
++                    loc("You may not reject tickets that belong to another user."),
++                ];
++                push @tempresults, [ $id, loc("Skipped.") ];
++                next;
++            }
+         }
+ 
+         # warn if this IR has any incidents

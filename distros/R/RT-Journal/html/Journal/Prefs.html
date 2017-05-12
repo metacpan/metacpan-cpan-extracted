@@ -1,0 +1,28 @@
+<%init>
+
+my %params;
+foreach my $param qw(BaseURL Title StyleURL) {
+	my $default;
+	my @attr =$session{'CurrentUser'}->UserObj->Attributes->Named('RT::Journal-'.$param);
+	if ($attr[0]) {
+		$params{$param} = $attr[0]->Content;
+	}
+	my $value = $ARGS{$param};
+	next unless($value);
+
+    if ( $value && $value != $default) {
+    	if ($attr[0]) { $attr[0]->SetContent($value); }
+	else { $session{'CurrentUser'}->UserObj->AddAttribute( Name => 'RT::Journal-'. $param, Content => $value ) }
+		$params{$param} = $attr[0]->Content;
+        }
+	
+
+    }
+</%init>
+<& Elements/Tabs, Title => loc('Journal Preferences')&>
+<form method="post" action="Prefs.html">
+%foreach my $param qw(BaseURL Title StyleURL) {
+<%$param%>: <input type=text name="<%$param%>" value="<%$params{$param}%>"> <br>
+% }
+<&/Elements/Submit&>
+</form>

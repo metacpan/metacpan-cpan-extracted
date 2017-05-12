@@ -1,0 +1,78 @@
+# Notation3 in Notation3
+# Context Free Grammar without tokenization
+#
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix cfg: <http://www.w3.org/2000/10/swap/grammar/bnf#>.
+@prefix rul: <http://www.w3.org/2000/10/swap/grammar/bnf-rules#>.
+@prefix : <http://www.w3.org/2000/10/swap/grammar/n3#>.
+@prefix n3: <http://www.w3.org/2000/10/swap/grammar/n3#>.
+@prefix list: <http://www.w3.org/2000/10/swap/list#>.
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@keywords a, is, of.
+
+<> cfg:syntaxFor [ cfg:internetMediaType 
+		<http://www.w3.org/2003/mediatypes#application/n3>].
+
+# <> rdfsem:semanticsFor ""   .....
+
+# __________________________________________________________________
+#
+# The N3 Full Grammar
+
+
+language a cfg:Language;
+	cfg:document	document;
+	cfg:whiteSpace	"@@@@@".
+
+
+document a rul:Used;
+	cfg:mustBeOneSequence(
+	
+		(
+#			[ cfg:zeroOrMore declaration ]
+#			[ cfg:zeroOrMore universal ]
+#			[ cfg:zeroOrMore existential ]
+			statements_optional
+			cfg:eof
+		)
+	).
+
+statements_optional cfg:mustBeOneSequence (() ( statement "." statements_optional ) ).
+
+# Formula does NOT need period on last statement
+
+formulacontent cfg:mustBeOneSequence (
+		( statementlist )
+	).
+
+
+statementlist cfg:mustBeOneSequence (
+		( )
+		( statement statementtail )
+	).
+
+statementtail cfg:mustBeOneSequence (
+		( )
+		( "." statementlist )
+	).
+
+
+universal cfg:mustBeOneSequence (
+		(
+			"@forAll"
+			[ cfg:commaSeparatedListOf symbol ]
+		)).
+
+existential cfg:mustBeOneSequence(
+		(	 "@forSome" 
+			 [ cfg:commaSeparatedListOf symbol ]
+		)).
+
+
+declaration cfg:mustBeOneSequence(
+		( "@prefix" prefix explicituri  )
+		( "@keywords" [ cfg:commaSeparatedListOf barename ] )
+	).
+
+# the original is longer

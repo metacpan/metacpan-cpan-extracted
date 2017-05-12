@@ -1,0 +1,44 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: RT-Extension-ReminderImproved\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Christian Loos <cloos@netcologne.de>\n"
+"Language-Team: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: html/Ticket/Elements/Reminders:148
+msgid "(Check box to complete)"
+msgstr "(Auswahl wird erledigt)"
+
+#: html/Callbacks/ReminderImproved/Tools/Elements/Tabs/Default:5 html/Callbacks/ReminderImproved/Tools/index.html/Default:5 html/Tools/MyReminders.html:8
+msgid "My reminders"
+msgstr "Meine Erinnerungen"
+
+#: html/Ticket/Elements/Reminders:161
+msgid "New reminder:"
+msgstr "Neue Erinnerung:"
+
+#: html/Elements/ShowReminders:4 html/Ticket/Elements/Reminders:126
+msgid "Reminder"
+msgstr "Erinnerung"
+
+#: NOT FOUND IN SOURCE
+msgid "Reminder '%1' completed"
+msgstr "Erinnerung '%1' erledigt"
+
+#: html/Elements/MyReminders:50 html/Ticket/Elements/Reminders:123 html/Ticket/Reminders.html:57
+msgid "Reminders"
+msgstr "Erinnerungen"
+
+#: html/Ticket/Reminders.html:48 html/Ticket/Reminders.html:52
+#. ($Ticket->Id)
+msgid "Reminders for ticket #%1"
+msgstr "Erinnerungen für Ticket #%1"
+
+#: html/Callbacks/ReminderImproved/Tools/index.html/Default:7
+msgid "Shows your new and open reminders"
+msgstr "Zeigt deine neuen und offenen Erinnerungen"
+

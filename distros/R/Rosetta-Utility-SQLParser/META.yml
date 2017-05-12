@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Rosetta-Utility-SQLParser
+version:      v0.3.0
+version_from: lib/Rosetta/Utility/SQLParser.pm
+installdirs:  site
+requires:
+    Locale::KeyedText:             1.6.0
+    only:                          0
+    Rosetta::Model:                0.71.0
+    Test::More:                    0
+    version:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

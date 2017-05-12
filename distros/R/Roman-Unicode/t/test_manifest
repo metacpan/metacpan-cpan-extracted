@@ -1,0 +1,7 @@
+load.t
+numbers.t
+ascii.t
+properties.t
+lowercase.t
+pod.t
+pod_coverage.t

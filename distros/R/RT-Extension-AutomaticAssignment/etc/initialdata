@@ -1,0 +1,13 @@
+@ScripActions = (
+   {
+       Name => 'Automatic Assignment',
+       Description => 'Automatically assign unowned ticket',
+       ExecModule => 'AutomaticAssignment',
+   },
+   {
+       Name => 'Automatic Reassignment',
+       Description => 'Automatically assign unowned or owned ticket',
+       ExecModule => 'AutomaticReassignment',
+   },
+);
+

@@ -1,0 +1,65 @@
+=head1 NAME
+
+ResourcePool::Resource - A L<ResourcePool|ResourcePool> wrapper class for a resource
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Resource;
+ 
+ my $resource = ResourcePool::Resource->new();
+
+=head1 DESCRIPTION
+
+
+This class is a base class for the resources which will be used with L<ResourcePool|ResourcePool>. L<ResourcePool|ResourcePool> uses this class internally to have a unique interface to interact with the resource.
+
+Each ResourcePool::Resource class gets constructed by the corresponding L<ResourcePool::Factory|ResourcePool::Factory> class. In fact the Factory classes are just used to store the parameters which are required to construct a resource.
+
+Every class which is derived from ResourcePool::Resource must override the L<close|/close>, L<fail_close|/fail_close> and L<get_plain_resource|/get_plain_resource> methods and should override at least one of L<precheck|/precheck> or L<postcheck|/postcheck>.
+
+=head2 S<$resource-E<gt>close>
+
+Closes a connection gracefully.
+
+B<Returns:> undef
+
+=head2 S<$resource-E<gt>fail_close>
+
+Closes a failed connection and ignores error (since this connection is known to be broken)
+
+B<Returns:> undef
+
+=head2 S<$resource-E<gt>get_plain_resource>
+
+Returns the naked resource which can be used by the client. This is the L<DBI|DBI> or L<Net::LDAP|Net::LDAP> handle for example.
+
+B<Returns:> a reference to a  object
+
+=head2 S<$resource-E<gt>precheck>
+
+Checks a connection. This method is called by the L<get() method of the ResourcePool|ResourcePool/get> before it returns a connection. The default implementation always returns true.
+
+B<Returns:> true if the connection is valid
+
+=head2 S<$resource-E<gt>postcheck>
+
+Checks a connection. This method is called by the L<free() method of the ResourcePool|ResourcePool/free> to check if a connection is still valid. The default implementation always returns true.
+
+B<Returns:> true if the connection is valid
+
+=head1 SEE ALSO
+
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Resource::DBI|ResourcePool::Resource::DBI>,
+L<ResourcePool::Resource::Net::LDAP|ResourcePool::Resource::Net::LDAP>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

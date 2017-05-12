@@ -1,0 +1,28 @@
+<SELECT NAME="<%$Name%>" style="width:150">
+%if (!$Mandatory) {
+<OPTION VALUE="">(<&|/l&>Please Select</&>)</OPTION>
+%}
+<OPTION <% ($RT::Nobody->Id() == $Default) && "SELECTED" %> VALUE=""><&|/l&>none</&></OPTION>
+%my %seen;
+%foreach my $Users ($Admins, $Members) {
+%    while ( my $User = $Users->Next())  {
+%        next if $seen{$User->Id}++;
+<OPTION VALUE="<%$User->Id()%>" <% ($User->Id() == $Default) && "SELECTED" %>><%$User->Name()%></OPTION>
+%    }
+%}
+</SELECT>
+
+<%INIT>
+$QueueObj ||= $TicketObj->QueueObj;
+my $Admins = $QueueObj->AdminCc->UserMembersObj;
+my $Members = $QueueObj->Cc->UserMembersObj;
+</%INIT>
+
+<%ARGS>
+$QueueObj => undef
+$Name => undef
+$Default => undef
+$User => undef
+$TicketObj => undef
+$Mandatory => undef
+</%ARGS>

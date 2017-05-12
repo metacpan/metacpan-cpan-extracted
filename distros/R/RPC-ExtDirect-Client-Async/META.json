@@ -1,0 +1,55 @@
+{
+   "abstract" : "Asynchronous Ext.Direct client in Perl",
+   "author" : [
+      "Alex Tokarev <tokarev@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RPC-ExtDirect-Client-Async",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CGI::ExtDirect" : "3.24",
+            "ExtUtils::MakeMaker" : "0",
+            "RPC::ExtDirect::Server" : "1.24",
+            "Test::More" : "0.82"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "2.00",
+            "RPC::ExtDirect::Client" : "1.25",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nohuhu/RPC-ExtDirect-Client-Async/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/nohuhu/RPC-ExtDirect-Client-Async"
+      }
+   },
+   "version" : "1.25",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

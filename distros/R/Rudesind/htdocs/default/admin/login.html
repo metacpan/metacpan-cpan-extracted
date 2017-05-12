@@ -1,0 +1,21 @@
+% if ( $App->config->admin_password ) {
+<form action="<% $App->config->uri_root %>/submit/login" method="POST">
+<input type="hidden" name="redirect_to" value="<% $ARGS{redirect_to} || '' %>" />
+Admin password: <input type="password" name="password" class="Rudesind-password-entry" />
+<br />
+<input type="submit" value="Submit" class="Rudesind-submit-button" />
+</form>
+% } else {
+<p>
+No admin password has been set in your config file.
+</p>
+% }
+
+<%init>
+$App->redirect( uri => $App->config->uri_root . '/admin/index.mhtml' )
+    if $App->is_admin;
+</%init>
+
+<%flags>
+inherit => '/autohandler'
+</%flags>

@@ -1,0 +1,29 @@
+---
+abstract: 'remotely control the GPIO on a RaspberryPi using the pigpiod daemon'
+author:
+  - 'Horea Gligan'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RPi-PIGPIO
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  Module::Find: '0'
+  Package::Constants: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  perl: '5.010000'
+version: '0.014'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

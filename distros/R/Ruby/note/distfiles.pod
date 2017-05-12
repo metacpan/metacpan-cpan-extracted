@@ -1,0 +1,19 @@
+=encoding utf-8
+
+=head1 NAME
+
+distfiles.pod - Ruby.pmのファイル構成
+
+=head1 FILES
+
+inspect.c - PerlのRuby::rb_inspect()をCから呼び出す（デバッグ用）
+
+perlio.c - RubyからPerlIOへアクセスするクラスPerl::IO
+
+perlobject.c - RubyからPerlのオブジェクトにアクセスするモジュールPerlと諸クラス
+
+Ruby.xs - Perlから直接呼ばれるXSUB
+
+ruby_pm.c - RubyとPerlの仲介ルーチンのコア
+
+=cut

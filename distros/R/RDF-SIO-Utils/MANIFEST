@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/RDF/SIO/Utils.pm
+lib/RDF/SIO/Utils/Constants.pm
+lib/RDF/SIO/Utils/Trine.pm
+t/Utils.t

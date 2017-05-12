@@ -1,0 +1,45 @@
+=head1 NAME
+
+RocksDB::TransactionLogIterator - rocksdb::TransactionLogIterator object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $db = RocksDB->new('/path/to/db');
+  my $pos = 0;
+  for (my $iter = $db->get_updates_since($pos); $iter->valid; $iter->next) {
+      # get RocksDB::BatchResult object
+      my $result = $iter->get_batch;
+  }
+
+=head1 DESCRIPTION
+
+B<RocksDB::TransactionLogIterator> is a rocksdb::TransactionLogIterator object.
+
+=head1 METHODS
+
+=head2 C<< $iter->valid() :Bool >>
+
+An iterator is either positioned at a WriteBatch or not valid.
+This method returns true if the iterator is valid.
+Can read data from a valid iterator.
+
+=head2 C<< $iter->next() :Undef >>
+
+Moves the iterator to the next WriteBatch.
+
+=head2 C<< $iter->get_batch() :RocksDB::BatchResult >>
+
+If valid return's the current write_batch and the sequence number of the
+earliest transaction contained in the batch.
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::BatchResult>, L<RocksDB::WriteBatch>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

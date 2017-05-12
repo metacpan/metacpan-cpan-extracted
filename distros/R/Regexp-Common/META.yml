@@ -1,0 +1,43 @@
+---
+abstract: 'Provide commonly requested regular expressions'
+author:
+  - 'Abigail <regexp-common@abigail.be>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  perl: '5.01'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.01'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - 'regular expression'
+  - pattern
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-Common
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.01'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources: {}
+version: '2017040401'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

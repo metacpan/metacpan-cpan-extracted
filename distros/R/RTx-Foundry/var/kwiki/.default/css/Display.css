@@ -1,0 +1,79 @@
+
+a         {text-decoration: none}
+a:link    {color: #d64}
+a:visited {color: #864}
+a:hover   {text-decoration: underline}
+a:active  {text-decoration: underline}
+a.empty   {color: gray}
+a.private {color: black}
+
+.error    {color: #f00;}
+
+pre {
+	font-family: geneva, verdana, arial, sans-serif;
+	font-size: 13px;
+	color: #EEE;
+	background-color: #333;
+	border: 1px dashed #EEE;
+	padding: 2px;
+	padding-left: 10px;
+	margin-left: 30px;
+	margin-right: 75px;
+}
+
+del {
+	text-decoration: none;
+	background-color: yellow;
+	color: blue;
+}
+ins {
+	text-decoration: none;
+	background-color: lightgreen;
+	color: blue;
+}
+
+.title,
+.side,
+.sidetitle {
+	font-size: large;
+}
+
+.description,
+.blogbody,
+.date,
+.comments-body,
+.comments-post,
+.comments-head {
+	font-size: medium;
+}
+
+.posted {
+	font-size: small;
+}
+
+.syndicate,
+.powered {
+	font-size: x-small;
+}
+
+table.changes {
+	width: 100%;
+	table-layout: fixed;
+} /* fix width of table from RecentChange page */
+
+table.changes td.page-id {
+} /* do nothing to "Page-ID" cell from RecentChange table */
+
+table.changes td.edit-by {
+	text-align: right;
+} /* make "Edit-By" cell from RecentChange table align to right */
+
+table.changes td.edit-time {
+	font-size: x-small;
+} /* decrease font size of "Edit-Time" cell from RecentChange table */
+
+div.side a { display: list-item; list-style-type: none }
+div.upper-nav { display: none; }
+.blog h1 { display: none; }
+textarea { width: 100% }
+body div#content div.blog div.blogbody h1 { display: inline; }

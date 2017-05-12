@@ -1,0 +1,20 @@
+=for layout widget
+
+[% label %]
+[% list  %]
+
+=for layout label
+
+<span class="field_array_label"> [% content | html %]: </span>
+
+=for layout list
+
+<ul>
+  [% content %]
+</ul>
+
+=for layout item
+
+<li>[% content | html %]</li>
+
+=cut

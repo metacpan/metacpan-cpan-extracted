@@ -1,0 +1,23 @@
+Regexp::Extended 
+================
+
+Simple wrapper arround the perl re engine using constant overloading
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+none
+
+COPYRIGHT AND LICENCE
+
+Released 2003 
+
+Copyright (C) 2003 IROSOFT <lachinois@hotmail.com>

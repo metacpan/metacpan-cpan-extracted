@@ -1,0 +1,25 @@
+adm/debian-build
+Changes
+eg/dt
+eg/graph.pl
+lib/RRDTool/OO.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001Basic.t
+t/002Pod.t
+t/003Discover.t
+t/004Template.t
+t/005Graph.t
+t/006Tune.t
+t/007Dump.t
+t/008Mult.t
+t/009Dry.t
+t/010ABD.t
+t/011Bugs.t
+t/012Xport.t
+t/013Clone.t
+t/inc/round.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

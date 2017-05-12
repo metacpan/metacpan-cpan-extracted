@@ -1,0 +1,4 @@
+perl Build.PL --config optimize='-g -O0'
+./Build
+gdb -x cmds.gdb /usr/bin/perl
+

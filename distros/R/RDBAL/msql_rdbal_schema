@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+
+#
+# This script is to manually create a schema cache entry for a mSQL
+# database such that RDBAL may be then used with the DBI layer.
+#
+
+use RDBAL::Config;
+
+$server = shift;
+
+$database = shift;
+
+if (!defined($database)) {
+	die "Usage is: msql_pqedit_schema server database\n";
+}
+
+$msql_home = $ENV{'MSQL_HOME'};
+
+$relshow = "$msql_home/bin/relshow";
+
+open(TABLE,"$relshow $database |");
+$section_break = 0;
+while(<TABLE>) {
+    if (/^\s*\+\-+\+\s*$/) {
+	++$section_break;
+	next;
+    }	
+    if ($section_break == 2) {
+	s/\|/\t/g;
+	s/^\s*//g;
+	s/\s*$//g;
+	push @table, ($_);
+    } elsif ($section_break == 3) {
+	last;
+    }
+}
+close(TABLE);
+
+$cache_file = "$RDBAL::Config::cache_directory/$server$database.cache";
+open(CACHE,">$cache_file");
+
+map {
+    $section_break = 0;
+    $table = $_;
+    open(FIELD,"$relshow $database $table |");
+    while(<FIELD>) {
+	if (/^\s*\+\-.*\-+\+\s*$/) {
+	    ++$section_break;
+	    next;
+	}	
+	if ($section_break == 2) {
+	    s/\s*\|\s*/\|/g;
+	    s/\|/\t/g;
+	    s/^\s*//g;
+	    s/\s*$//g;
+	    ($field, $type, $length, $null, $unique_index) = split("\t");
+	    if ($type ne 'index') {
+		print CACHE join("\t",('O', $table, 'U', $field, $type, $length, '', '', '', $null)),"\n";
+	    } else {
+		push @index, ("$table\t$field");
+		if (!defined($primary_index{$table}) &&
+		    $unique_index eq 'Y') {
+		    $primary_index{$table} = $field;
+		    push @primary_index, ("$table\t$field");
+		}
+		if ($unique_index eq 'Y') {
+		    $UNIQUE_INDEX{"$table\t$field"} = 1;
+		}
+	    }
+	} elsif ($section_break == 3) {
+	    last;
+	}
+    }
+    close(FIELD);
+} @table;
+
+print CACHE "\f\n";
+
+map {
+    ($table, $pindex) = split("\t");
+    $section_break = 0;
+    $field_number = 0;
+    open(PINDEX,"$relshow $database $table $pindex |");
+    while(<PINDEX>) {
+	if (/^\s*\+\-+\+\s*$/) {
+	    ++$section_break;
+	    next;
+	}	
+	if ($section_break == 2) {
+	    s/\|/\t/g;
+	    s/^\s*//g;
+	    s/\s*$//g;
+	    $field_number++;
+	    print CACHE join("\t",('PK', $table, 'User Table', $database, 'dbo', $table, $_, $field_number, $index)),"\n";
+	} elsif ($section_break == 3) {
+	    last;
+	}
+    }
+    close(PINDEX);
+} @primary_index;
+
+print CACHE "\f\n";
+# No Foreign Key Section
+
+print CACHE "\f\n";
+
+# Index Section
+print CACHE "\f\n";
+
+map {
+    $section_break = 0;
+    ($table,$index) = split("\t");
+    undef @field;
+    undef $index_type;
+    open(INDEX,"$relshow $database $table $index |");
+    while(<INDEX>) {
+	if (/^\s*\+\-+\+\s*$/) {
+	    ++$section_break;
+	    next;
+	}	
+	if (/Index\s*Type\s*\=\s*/) {
+	    ($index_type) = /Index\s*Type\s*\=\s*(.*)\s*$/;
+	}
+	if ($section_break == 2) {
+	    s/\|/\t/g;
+	    s/^\s*//g;
+	    s/\s*$//g;
+	    push @field, ($_);
+	} elsif ($section_break == 3) {
+	    last;
+	}
+    }
+    close(INDEX);
+    undef @description;
+    if (defined($UNIQUE_INDEX{"$table\t$index"})) {
+	push @description, ('unique');
+    }
+    if (defined($primary_index{$table}) &&
+	$primary_index{$table} eq $index) {
+	push @description, ('primary key');
+    }
+    print CACHE join("\t",('I', $table, 'User Table', $index,
+			   join(' ',(join(', ',@description),$index_type)),
+			   join(', ',@field))),"\n";
+} @index;
+
+
+# View section
+print CACHE "\f\n";
+
+
+close(CACHE);

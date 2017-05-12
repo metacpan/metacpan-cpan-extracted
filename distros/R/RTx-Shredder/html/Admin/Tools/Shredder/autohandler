@@ -1,0 +1,13 @@
+<%INIT>
+unless( $session{'CurrentUser'}->HasRight( Right => 'SuperUser', Object => $RT::System ) ) {
+	return $m->comp( 'Elements/Error/NoRights' );
+}
+
+use RTx::Shredder ();
+my $path = RTx::Shredder->StoragePath;
+unless( -d $path && -w _ ) {
+	return $m->comp( 'Elements/Error/NoStorage', Path => $path );
+}
+
+$m->call_next(%ARGS);
+</%INIT>

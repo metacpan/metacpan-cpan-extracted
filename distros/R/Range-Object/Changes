@@ -1,0 +1,79 @@
+Revision history for Perl module Range::Object.
+
+0.93  Mon Nov 21 18:47:03 2011
+
+    Moved all Range::Object-descended packages to Range::Object::*
+    namespace. An obvious move, in hindsight.
+
+    Fixed some tests broken in 0.91.
+
+0.92  Mon Nov 21 00:26:33 2011
+
+    Removed versions from all packages except Range::Object itself.
+    It appears that having all packages versioned only leads to
+    confusion (mine, specifically).
+
+0.91  Sun Nov 20 17:11:38 2011
+
+    Apparently, permission for Range::String namespace is already
+    taken on CPAN; to avoid collision I renamed my module to
+    Range::Strings.
+
+    No other changes were made.
+
+0.9   Sun Nov 20 16:39:23 2011
+
+    Cleaned up code and POD sections for CPAN release.
+
+0.3   Wed Sep 14 01:04:47 2011
+
+    Testing on 32-bit Perl build uncovered a few bugs, mostly with
+    regards to digit handling. To avoid messing with integer logic,
+    a new Range::DigitString module was added. Basically it's the
+    same as Range::Extension except that it doesn't allow [*#]
+    in the beginning.
+
+    Fixed a bug in Range::Object that prevented an integer or
+    digit string with zero value from being handled properly.
+
+    Update test suite to handle Range::DigitString too.
+
+0.25  Mon Sep 05 23:17:46 2011
+
+    Fixed a bug in Range::Object: both add() and remove() returned
+    failure if passed empty input range, when they should have
+    returned $self. They do now.
+
+0.24  Thu Aug 18 23:36:04 2011
+
+    Fixed a bug in Range::PhoneDigits: ranges of numbers
+    beginning with [*#] did not expand properly.
+    Added a test for this condition as well.
+
+    Abstracted expansion code as subroutine in Range::Object.
+
+0.23  Mon Aug 15 17:10:04 2011
+
+    Wrote extended set of tests involving valid and invalid input
+    cases for each individual field type.
+
+    Fixed all bugs uncovered by these tests. A lot of them.
+
+0.2   Thu Aug 11 19:06:57 2011
+
+    Fixed a wart in test suite: not all invalid input options were
+    checked for each module, leading to bugs.
+
+    Fixed a couple of bugs in Range::Object and Range::Extension,
+    all with invalid input handling.
+
+    Refactored Range::Object a bit. Changes include new parsing
+    method, more abstraction; Range::Extension is now descended
+    from Object instead of String.
+
+    Test suite reworked too; it is more unified now and includes
+    more thorough testing for different modules and input types.
+
+0.01  Sat Aug 06 00:17:19 2011
+
+    Started implementing Range::Object

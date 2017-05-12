@@ -1,0 +1,16 @@
+README
+LICENSE
+INSTALL
+MANIFEST
+Makefile.PL
+lib/Regexp/ERE.pm
+t/input_constraints.t
+t/nfa_comparison.t
+t/nfa_intersection.t
+t/regex_comparison.t
+t/regex_divisor.t
+t/regex_match.t
+t/regex_roundtrip.t
+t/tree_concatenation.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

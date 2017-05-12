@@ -1,0 +1,35 @@
+=head1 NAME
+
+ResourcePool::Command::NoFailoverException - An Exception for L<ResourcePool|ResourcePool> commands which doesn't cause fail over.
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Command::NoFailoverException;
+ 
+ my $ex = ResourcePool::Command::NoFailoverException->new($rootException);
+
+=head1 DESCRIPTION
+
+
+This exception can be thrown by commands to indicate a logical failure of the execution. If the execution environment fetches an NoFailoverException it directly propagates it to it's caller without any retry or fail over.
+
+=head2 S<ResourcePool::Command::NoFailoverException-E<gt>new>
+
+Takes the original exception which cause the failure. This exception is accessible to the client using the L<rootException()|/rootException> method.
+
+
+=head2 S<$ex-E<gt>rootException>
+
+This method returns the exception which cause the execute to fail.
+
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

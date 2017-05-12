@@ -1,0 +1,3 @@
+version=3
+http://search.cpan.org/dist/Regexp-Log-Progress/   .*/Regexp-Log-Progressv?(\d[\d.-]+)\.(?:tar(?:\.gz|\.bz2)?|tgz|zip)$
+

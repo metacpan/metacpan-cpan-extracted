@@ -1,0 +1,12 @@
+[% IF ADD_TIMESTAMP; PROCESS timestamp.tt2; END -%]
+[% PROCESS sql.tt2 -%]
+[% USE DBI -%]
+[% USE Dumper -%]
+[% USE dbh = DBI( 'DBI:Sys:' ) -%]
+[% st = dbh.query( 'SELECT * FROM pwent' ) -%]
+[% r = {
+    cols = st.get_colnames()
+    data = st.get_all_list()
+    tablename = 'pwent'
+    } -%]
+[% sqltable(r) -%]

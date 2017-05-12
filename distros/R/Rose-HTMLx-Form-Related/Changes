@@ -1,0 +1,117 @@
+Revision history for Rose-HTMLx-Form-Related
+
+0.24 2 Nov 2013
+ - skip POD tests on CPAN
+
+0.23 24 Sept 2013
+ - doc patch from Adam Mackler
+ - doc patch and RDBO tests inspired by mailing list questions from Gordon
+   Haverland
+ - treat many-to-one relationship like foreign key relationship in RDBO metadata
+ - master repository moved to github, Changes file ran through tidy_changelog
+
+0.22 11 April 2010
+ - use RelInfo->label, if defined, as the label for converted fields.
+
+0.21 18 Mar 2010
+ - only pass field->description if it is defined.
+
+0.20 21 Feb 2010
+ - pass field->description through when transforming related Field objects.
+
+0.19 19 Jan 2010
+ - add dep on MRO::Compat. Use it in show_related_field_using() in RDBO and
+   DBIC Metadata subclasses.
+ - show_related_field_using() will now return 'unique_value' if the foreign
+   class implements that method.
+
+0.18 1 Dec 2009
+ - fix failing dbic test
+
+0.17 22 April 2009
+ - add Rose::HTMLx::Form::Field::PopUpMenuNumeric as dependency
+ - skip non-FKs when designating a related_field
+ - add default_related_sort_by() to Metadata base class
+ - add sort_prefix() to Metadata base class
+
+0.16 27 Feb 2009
+ - revert change in 0.15 with only setting $app if ref(). This caused tests
+   in CatalystX::CRUD::YUI to fail.
+ - don't try converting non-text fields to autocomplete
+
+0.15 10 Feb 2009
+ - double check that $app is a ref() rather than a class name before
+   setting in RelInfo
+ - add missing docs that Class::XSAccessor (optional for Rose::Object)
+   triggers for Pod::Coverage
+
+0.14 30 Dec 2008
+ - allow for null value in generated menu fields
+ - double check for controller in make autocomplete field
+ - catch condition where the same field is used as both a FK and one side
+   of a o2m relationship. prefer the FK.
+
+0.13 24 Nov 2008
+ - fix autocomplete bug to call get_controller() rather than simply
+   controller()
+ - add map_to_column, map_from_column and map_class_controller_class to
+   RelInfo
+ - add as_hash() to RelInfo
+
+0.12 17 Nov 2008
+ - support the new 'unqiue_value()' method in RDBOHelpers and MoreHelpers,
+   which will now override show_related_field_using() when called in
+   foreign_field_value().
+
+0.11 27 Oct 2008
+ - fix dbic tests so they skip the correct number of tests
+
+0.10 27 Oct 2008
+ - calling $form->reset or $form->clear will now refetch objects from db
+   for interrelated  menus, re-populating the options.
+
+0.09 15 Oct 2008
+ - add some more debugging to RDBO Metadata
+ - add init_default_sort_by to Metadata base class
+
+0.08 12 Sept 2008
+ - fix missing req in Makefile.PL
+
+0.07 11 Sept 2008
+ - support multicolumn PKs in DBIC::Metadata
+ - do not re-make pop menus or autocomplete fields in interrelate_fields()
+ - add foreign_column_for() method in RelInfo to support multi-col FKs
+ - add interrelate_fields() boolean to Metadata to toggle on/off
+ - skip interrelate_fields() if FK represents multiple columns
+ - skip DBIC::Metadata->discover_relationships() if DBIC_DEPLOY_IN_PROGRESS
+ - refactor DBIC::discover_relationships() to use ResultSource instead of
+   ResultSet
+ - catch edge case where no foreign class defined
+
+0.06 26 Aug 2008
+ - set label for DBIC m2m to method name not rel_name
+
+0.05 25 Aug 2008
+ - add app() method to RelInfo class and set it in discover_relationships()
+ - added get_controller() to RelInfo
+ - add missing prereqs to Makefile.PL
+ - add missing docs
+ - refactor DBIC get_objects() and get_objects_count() to actually work.
+
+0.04 24 Aug 2008
+ - problem in 0.02 and 0.03 was not source vs class but using each() on a
+   hash ref. Might be that the internal iterator needed resetting. In any
+   case, changing to keys() fixed issue with undef values.
+
+0.03 23 Aug 2008
+ - revert 0.02 change for DBIC to use both source() AND class() because of
+   the way inheritance works in RDBOHelpers
+ - added tests for all relationships
+
+0.02 23 Aug 2008
+ - switch to schema->source from schema->class when introspecting DBIC
+   components' relationships
+
+0.01 23 Aug 2008
+ - First version, released on an unsuspecting world.
+

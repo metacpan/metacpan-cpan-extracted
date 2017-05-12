@@ -1,0 +1,53 @@
+NAME
+    RTFM::Extension::ArticleTemplates - turns articles into dynamic
+    templates.
+
+DESCRIPTION
+    This extension works with RT 3.8 and RTFM. If you are using RT 4.0
+    please see RT::Extension::ArticleTemplates.
+
+    When this extension is installed RTFM parses content of articles as a
+    template using Text::Template module. Using this extension you can make
+    your articles dynamic. Text::Template module is used to parse RT's
+    Templates as well and its syntax is pretty simple - you can consult RT
+    docs/wiki or module's documentation.
+
+VERY IMPORTANT
+    It's a SECURITY RISK to install this extension on systems where articles
+    can be changed by not trusted users. You're warned!
+
+    Your articles may contain some text that looks like a template and will
+    be parsed after installation when it's actually is not valid template.
+
+INSTALLATION
+    This extension requires RTFM 2.2.2.
+
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Set(@Plugins, qw(RTFM::Extension::ArticleTemplates));
+
+        or add "RTFM::Extension::ArticleTemplates" to your existing @Plugins
+        line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Kevin Falcone <falcone@bestpractical.com> Ruslan Zakirov
+    <ruz@bestpractical.com>
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008,2012 Best Practical Solutions, LLC. All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the terms of version 2 of the GNU General Public License.
+

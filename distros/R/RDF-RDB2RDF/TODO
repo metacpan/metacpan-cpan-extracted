@@ -1,0 +1,3 @@
+* print to handle option for process_turtle
+* rr:RefObjectMap, rr:parentTriplesMap, rr:joinCondition, rr:JoinCondition, rr:child, rr:parent needs lots more testing.
+* rr:defaultGraph is not understood.

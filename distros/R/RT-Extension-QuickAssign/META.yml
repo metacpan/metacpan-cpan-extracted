@@ -1,0 +1,29 @@
+---
+abstract: 'RT-Extension-QuickAssign Extension'
+author:
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: gplv2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-QuickAssign
+no_index:
+  directory:
+    - html
+    - inc
+requires:
+  perl: 5.8.3
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://github.com/bestpractical/rt-extension-quickassign
+version: '1.00'
+x_module_install_rtx_version: '0.36'
+x_requires_rt: 4.0.0
+x_rt_too_new: 4.4.0

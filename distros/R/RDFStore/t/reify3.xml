@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<rdf:RDF
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:s="http://description.org/schema/">
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila" bagID="D_001">
+      <s:Creator>Ora Lassila</s:Creator>
+      <s:Title>Ora's Home Page</s:Title>
+    </rdf:Description>
+   </rdf:RDF>

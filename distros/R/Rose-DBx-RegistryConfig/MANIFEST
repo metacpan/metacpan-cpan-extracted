@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/Rose/DBx/RegistryConfig.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/direct-usage.t
+t/boilerplate.t
+t/auto-load-fixups.t
+t/domain-parser-callback.t
+t/domain-parser-subclass.t
+t/local-subclass.t
+t/db/art_gallery.sqlite
+t/db/taxonomy.sqlite
+t/config/art_gallery.sql
+t/config/taxonomy.sql
+t/config/domain_config_sqlite.yaml
+t/config/domain_config.yaml
+t/config/domain_config_2bfixedup.yaml
+t/config/rosedbrc
+t/lib/My/DB/Species.pm
+t/lib/My/DB.pm
+META.yml                                 Module meta-data (added by MakeMaker)

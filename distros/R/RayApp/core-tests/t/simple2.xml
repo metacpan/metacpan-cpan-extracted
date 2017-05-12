@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<application>
+	<_param name="id" type="int" />
+	<mám multiple="list">
+		<_param name="_param" />
+		<_data name="_param" type="num" />
+
+		<record>
+			<name />
+			<result type="int" />
+		</record>
+	</mám>
+</application>
+

@@ -1,0 +1,8 @@
+RTSP::Lite
+
+Lightweight RTSP implementation
+
+The main focus of the module is to help you write simple RTSP clients
+for monitoring and debugging streaming server
+
+http://www.kosho.org/tools/rtsp-lite/

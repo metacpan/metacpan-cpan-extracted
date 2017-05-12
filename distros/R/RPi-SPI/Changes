@@ -1,0 +1,32 @@
+Revision history for RPi-SPI
+
+2.3606  2017-03-13
+        - changed version scheme from 2.36.x to to 2.360x in module and prereqs
+
+2.36.5  2017-03-11
+        - we now accept a GPIO pin number as the channel. If 0 or 1 are sent
+          in as channel, we'll use the built-in RPi SPI channel (CE0 or CE1).
+          If a GPIO pin is sent in that is greater than 1, we'll know that this
+          connects to your CS/SS pin on your IC, and we'll automagically
+          bit-bang on that pin for communication, freeing up the two onboard
+          hardware SPI channels. The API was not changed for this. (closes #1)
+        - prereq of WiringPi::API now 2.36.7
+
+2.36.4  2017-01-26
+        - changed rw() so that it now returns an array, per WiringPi::API's
+          spiDataRW() call. This was an oversight/bug in that code
+        - fix quoting issue in a prereq in Makefile.PL
+        - WiringPi::API prereq now v2.36.4
+
+2.36.2  2017-01-22
+        - fix params in pod, they weren't displaying correctly
+
+2.36.1  2017-01-22
+        - initial release (version number matches wiringPi's, plus an
+          incremental trailing decimal place for updates to this module
+        - we default to 1MHz speed if not specified in the new() method
+        - we die() if we can't open or write to the SPI bus
+        - changed to using WiringPi::API::spiDataRW() (a custom wrapper for
+          wiringPiSPIDataRW(), so that we can send in an aref to the C
+          functions)
+

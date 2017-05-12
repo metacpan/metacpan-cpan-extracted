@@ -1,0 +1,55 @@
+# Chinese localization catalog
+msgid ""
+msgstr ""
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Autrijus Tang <autrijus@autrijus.org>\n"
+"Language-Team: Chinese <autrijus@autrijus.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: html/Developer/CronTool/index.html:98
+msgid "Action committed."
+msgstr "動作執行完畢。"
+
+#: html/Developer/CronTool/index.html:94
+msgid "Action prepared..."
+msgstr "動作準備完畢..."
+
+#: html/Developer/CronTool/index.html:70
+msgid "Checking..."
+msgstr "正在檢查..."
+
+#: html/Developer/CronTool/index.html:81
+msgid "Condition matches..."
+msgstr "符合條件..."
+
+#. ($_[0], $@)
+#: html/Developer/CronTool/index.html:48
+msgid "Failed to load module %1. (%2)"
+msgstr "無法載入模組 %1。(%2)"
+
+#: html/Developer/CronTool/index.html:102
+msgid "Finished."
+msgstr "完畢。"
+
+#: html/Developer/CronTool/index.html:35
+msgid "Run"
+msgstr "執行"
+
+#: html/Developer/CronTool/index.html:25
+msgid "Parameter"
+msgstr "呼叫參數"
+
+#: html/Developer/CronTool/index.html:51
+msgid "Starting..."
+msgstr "正在開始..."
+
+#: html/Developer/CronTool/index.html:33
+msgid "Verbose"
+msgstr "顯示額外的訊息"
+
+#: html/Callbacks/RT-WebCronTool/Elements/Tabs/Default:7
+#: html/Developer/CronTool/index.html:42
+msgid "Web CronTool"
+msgstr "線上批次工具"

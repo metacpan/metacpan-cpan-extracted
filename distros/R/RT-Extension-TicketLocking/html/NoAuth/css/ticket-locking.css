@@ -1,0 +1,25 @@
+.locked-by-you, .locked {
+    border-color: #AAAA99 #999900 #999900 #AAAA99;
+    border-style: solid;
+    border-width: 1px 2px 2px 1px;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    margin-top: 1em;
+    margin-bottom: 2em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    padding-left: 1em;
+}
+
+.locked-by-you {
+    background: none repeat scroll 0 0 #80FFCC;
+}
+
+.locked {
+    background: none repeat scroll 0 0 #FFCCCC;
+}
+
+% $m->abort;
+<%INIT>
+$r->content_type('text/css');
+</%INIT>

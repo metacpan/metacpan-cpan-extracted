@@ -1,0 +1,14 @@
+%# You know if they ever find a way to harness sarcasm as an energy source,
+%# you people are all going to owe me big.
+%#               -- Bill Paul
+<select name="Status" style="width:150px">
+    <option <% ($Status eq 'all') ? 'selected' : '' %>
+	value='all'><&|/l&>all</&></option>
+    <option <% ($Status eq 'unresolved') ? 'selected' : '' %>
+	value='unresolved'><&|/l&>unresolved</&></option>
+    <option <% ($Status eq 'resolved') ? 'selected' : '' %>
+	value='resolved'><&|/l&>resolved</&></option>
+</select>
+<%ARGS>
+$Status	=> ''
+</%ARGS>

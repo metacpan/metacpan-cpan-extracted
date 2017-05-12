@@ -1,0 +1,4 @@
+<& /Elements/AnnounceSimple, Object => $Ticket->QueueObj &>
+<%args>
+$Ticket
+</%args>

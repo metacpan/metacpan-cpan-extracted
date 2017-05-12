@@ -1,0 +1,120 @@
+RT-Extension-HideWidgets
+
+NAME
+
+    RT::Extension::HideWidgets - Allows adnistrators to authorize users
+    or groups to see/not see widgets, from the Ticket view.
+
+DESCRIPTION
+
+    This RT extension alters the administration panel adding custom rights.
+    These rights are prepended by '[RT::Extension::HideWidgets]'
+
+TODO
+
+    Add a po file to translate this extension.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make install
+        /!\ May need root permissions
+
+        Edit your <path_to_rt>/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::HideWidgets');
+
+        For RT 3.8 and 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::HideWidgets));
+
+        or add "RT::Extension::HideWidgets" to your existing @Plugins
+        line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+    Be advised that a local ShowSummary file is create when using this 
+    extension. 
+
+CONFIGURATION
+
+To use this module, you need to have Administration rights, then go to :
+	Administration->Global->Users Rights or
+	Administration->Global->Group Rights
+Note that if you're a 'SuperUser', you'll always see widgets
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc RT::Extension::HideWidgets
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=RT-Extension-HideWidgets
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/RT-Extension-HideWidgets
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/RT-Extension-HideWidgets
+
+    Search CPAN
+        http://search.cpan.org/dist/RT-Extension-HideWidgets/
+
+If you need more help, you can contact us via http://www.oeris.fr
+
+AUTHOR
+        Neil Orley    	<neil.orley@oeris.fr>
+
+LICENSE AND COPYRIGHT
+
+Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+Copyright (C) 2014 Neil Orley (Oeris)
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

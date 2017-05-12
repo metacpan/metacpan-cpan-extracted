@@ -1,0 +1,49 @@
+---
+abstract: 'Interface to the Buildbot v2 REST API'
+author:
+  - 'Dan Collins <DCOLLINS@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: REST-Buildbot
+provides:
+  REST::Buildbot:
+    file: lib/REST/Buildbot.pm
+    version: '0.02'
+  REST::Buildbot::Build:
+    file: lib/REST/Buildbot/Build.pm
+    version: '0.02'
+  REST::Buildbot::BuildRequest:
+    file: lib/REST/Buildbot/BuildRequest.pm
+    version: '0.02'
+  REST::Buildbot::BuildSet:
+    file: lib/REST/Buildbot/BuildSet.pm
+    version: '0.02'
+  REST::Buildbot::Builder:
+    file: lib/REST/Buildbot/Builder.pm
+    version: '0.02'
+  REST::Buildbot::Change:
+    file: lib/REST/Buildbot/Change.pm
+    version: '0.02'
+  REST::Buildbot::Log:
+    file: lib/REST/Buildbot/Log.pm
+    version: '0.02'
+  REST::Buildbot::SourceStamp:
+    file: lib/REST/Buildbot/SourceStamp.pm
+    version: '0.02'
+  REST::Buildbot::Step:
+    file: lib/REST/Buildbot/Step.pm
+    version: '0.02'
+requires:
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

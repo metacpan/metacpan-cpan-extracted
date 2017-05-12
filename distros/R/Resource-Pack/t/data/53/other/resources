@@ -1,0 +1,10 @@
+resource(jQuery::Resource->new);
+
+file js => (
+    file         => 'other.js',
+    dependencies => wire_names('css', 'jquery/core'),
+);
+
+dir 'css';
+
+file optional_js => 'other_extras.js';

@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 70d8d0bbfe0ad29955fc26180ae1c38511db73b4 Changes
+SHA1 88dd6c0b691ee82b4fa5dbe71fb4ebef38b31914 MANIFEST
+SHA1 8774f2fad0733dc2740e512f1a84704c1ec10332 META.yml
+SHA1 23f5226a13abb3c25ed68d47daaa8d9c05f5b581 Makefile.PL
+SHA1 a4c0017ee080402fad50e32f321a242a82331d9e README
+SHA1 c48efbaa1296d4c672d186ce05bcfdf8346b602b html/Callbacks/AjaxPreviewScrips/Ticket/Update.html/AfterForm
+SHA1 ef4d578007b64370e38e151242a0757328069be7 html/Elements/Crypt/SignEncryptWidget
+SHA1 619d9f769b3d26ce6c0692a5259b8594245188ff html/Helpers/PreviewScrips
+SHA1 edca866b4e363767c97f450cec4ab560ffb45527 html/Helpers/ShowSimplifiedRecipients
+SHA1 11fc1e8ac8f0db3e63f02dfd8e246d921236e28a html/Ticket/Elements/PreviewScrips
+SHA1 41f3b848b1cd139bcd260eac4952a092e03cb5c4 html/Ticket/Elements/ShowSimplifiedRecipients
+SHA1 483f2a68baea872db91a7d51bab8f3ed5b2d068b html/Ticket/ModifyPeople.html
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 7173d20065379a781d0218b7e747ca7a9b11f7a0 inc/YAML/Tiny.pm
+SHA1 7f49161e682231c79b7d168d40d2092fbb2bc992 lib/RT/Extension/AjaxPreviewScrips.pm
+SHA1 0f9c9d8e73348926e564a289ef669f0cb8a8780c static/css/ajaxpreviewscrips.css
+SHA1 016ac6be187f6a8b4f88f61be6cddb257cec63ef static/js/checkboxes.js
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlU/wl0ACgkQMflWJZZAbqCzxwCfaC3T5He8ttjmK+eZH89D8Enf
+RFMAoK8V4AM7eXpQyj5Xxvs4jRXy1zTd
+=KCsW
+-----END PGP SIGNATURE-----

@@ -1,0 +1,51 @@
+---
+abstract: 'Fast XML-RPC parser with libxml'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>'
+build_requires:
+  Test::More: 0.96
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.4, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RPC-XML-Parser-LibXML
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  RPC::XML::Parser::LibXML:
+    file: lib/RPC/XML/Parser/LibXML.pm
+    version: 0.08
+requires:
+  Carp: 0
+  Encode: 0
+  MIME::Base64: 0
+  RPC::XML: 0.73
+  XML::LibXML: 1.73
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/tokuhirom/RPC-XML-Parser-LibXML/issues
+  homepage: https://github.com/tokuhirom/RPC-XML-Parser-LibXML
+  repository: git://github.com/tokuhirom/RPC-XML-Parser-LibXML.git
+version: 0.08
+x_contributors:
+  - 'otsune <otsune@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'mattn <mattn@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'miyagawa <miyagawa@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'Yann Kerherve <yann@cyberion.net>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'

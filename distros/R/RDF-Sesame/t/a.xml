@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tableQueryResult>
+	<header>
+		<columnName>persona</columnName>
+		<columnName>p_begin</columnName>
+		<columnName>p_end</columnName>
+	</header>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/xrMcVQIU9peejGEI7SyXJA</uri>
+		<literal>2005-11-10</literal>
+		<literal>2006-04-03</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/NXkJwKuKDxJ7r40akT-zXQ</uri>
+		<literal>2005-12-13</literal>
+
+		<null/>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/ST8NgI7pR5kKQ9I87isGkQ</uri>
+		<literal>2005-11-08</literal>
+		<null/>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/abViJ9nBfPpCoEQpv3ArXA</uri>
+		<literal>2006-01-27</literal>
+		<literal>2006-02-06</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/SZrpYWMR4SbLOLtpwgUNhg</uri>
+		<literal>2005-12-20</literal>
+
+		<literal>2006-02-25</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/4TuFsDzYseWr-IHKLLU-hw</uri>
+		<literal>2006-01-31</literal>
+		<null/>
+	</tuple>
+
+	<tuple>
+		<uri>http://scswks91/census/uniq/nz7jRsqDBXk06Akjz_iDjw</uri>
+		<literal>2005-11-08</literal>
+		<literal>2006-01-30</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/GXuzbtk-hYoPWgS9hHsoaA</uri>
+
+		<literal>2005-12-06</literal>
+		<literal>2006-02-27</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/RS__q_8JmRz1PvhQXbWMZA</uri>
+		<literal>2006-01-26</literal>
+		<literal>2006-03-21</literal>
+
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/Bo1ZB23I_Km5wvTn_maVHg</uri>
+		<literal>2005-11-10</literal>
+		<literal>2006-02-27</literal>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/k4BxsUwy_TtgKcgsdaZBHg</uri>
+		<literal>2005-11-04</literal>
+		<literal>2006-03-20</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/UuYIEg9TowulrZYBf3FGaw</uri>
+		<literal>2005-12-01</literal>
+
+		<null/>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/gnI8HCVkcWvezrHSqXrnvg</uri>
+		<literal>2005-11-22</literal>
+		<null/>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/hGG4amb1f4pkq2SkHSKo_Q</uri>
+		<literal>2005-11-04</literal>
+		<literal>2006-02-13</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/sPDwB2RqhvG0LqTwdPDgDQ</uri>
+		<literal>2005-11-10</literal>
+
+		<literal>2006-02-13</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/-zEYmtQ65JZpTksH12oE2g</uri>
+		<literal>2006-01-23</literal>
+		<literal>2006-03-06</literal>
+	</tuple>
+
+	<tuple>
+		<uri>http://scswks91/census/uniq/xovgRShnN3EEdOuKQIKPxA</uri>
+		<literal>2005-11-08</literal>
+		<literal>2006-04-03</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/GdWyXC25WLiXLvOaj4UTxA</uri>
+
+		<literal>2006-01-31</literal>
+		<null/>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/OPd-3gKCmEMosCEVr74etw</uri>
+		<literal>2005-11-04</literal>
+		<literal>2006-03-14</literal>
+
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/1qxw2zYoE2tXsxEkm5hbIQ</uri>
+		<literal>2006-01-12</literal>
+		<literal>2006-03-21</literal>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/CtgF6gDpzTcjHZzW_jF3ng</uri>
+		<literal>2006-01-12</literal>
+		<literal>2006-02-01</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/r81Z1YrKItjtf5LTLzI9uA</uri>
+		<literal>2005-10-20</literal>
+
+		<literal>2006-01-02</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/Fawef1hTwmhh1yIv2q5hcA</uri>
+		<literal>2006-01-03</literal>
+		<literal>2006-03-14</literal>
+
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/-4eq21xUmTqMYKCvIQxUuw</uri>
+		<literal>2005-12-28</literal>
+		<literal>2006-03-10</literal>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/0NHVk6s6_1HtplLdzvVdog</uri>
+		<literal>2005-12-14</literal>
+		<literal>2006-01-08</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/lKuoupYRt5XRFhR26SAOdA</uri>
+		<literal>2005-09-20</literal>
+
+		<literal>2006-03-20</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/ilDgBHqH-Afmc4j3p9wpUg</uri>
+		<literal>2005-11-22</literal>
+		<literal>2006-01-11</literal>
+	</tuple>
+
+	<tuple>
+		<uri>http://scswks91/census/uniq/ZqEMx4iWAiJadt-FxI8qsQ</uri>
+		<literal>2006-01-31</literal>
+		<literal>2006-03-08</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/pvIHmgCL76cBKcPx1-VYXA</uri>
+
+		<literal>2006-01-24</literal>
+		<literal>2006-03-29</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/I90CIBComJLkABncPfa-Zg</uri>
+		<literal>2006-01-31</literal>
+		<literal>2006-02-12</literal>
+
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/Z1XhIpcItlKk0LRoYv34lQ</uri>
+		<literal>2005-11-03</literal>
+		<literal>2006-01-23</literal>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/oGUQDSsoYzNCmeGRvisL_g</uri>
+		<literal>2005-11-15</literal>
+		<literal>2006-01-30</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/hdC7UJvmwvP9jvlsS2UPDA</uri>
+		<literal>2005-11-01</literal>
+
+		<literal>2006-01-30</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/wDOps8k-JwAQc02HpwkcZw</uri>
+		<literal>2005-11-08</literal>
+		<literal>2006-04-03</literal>
+	</tuple>
+
+	<tuple>
+		<uri>http://scswks91/census/uniq/b59nDtAFELIYgf-1g_xkfA</uri>
+		<literal>2005-12-06</literal>
+		<null/>
+	</tuple>
+</tableQueryResult>

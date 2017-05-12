@@ -1,0 +1,13 @@
+
+1.7 Thu Oct 12 12:22:51 EDT 2006
+    * Added support for multiple sorts (like RT 3.6 uses)
+
+1.6 Mon May  1 16:24:17 EDT 2006
+    * Fixing the stub library to not annoy pause
+
+
+1.5 Mon May  1 15:10:53 EDT 2006
+    * Proper support for searches with no results
+
+1.0
+    * Initial release

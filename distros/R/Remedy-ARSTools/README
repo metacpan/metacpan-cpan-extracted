@@ -1,0 +1,24 @@
+Remedy::ARSTools
+================
+
+This module provides a simplified object interface for ARSperl, with 
+field definition data caching thrown in as well. 
+
+YOU NEED ARSperl INSTALLED FOR THIS MODULE TO WORK.
+Please refer to the included POD documentation.
+
+This module provides a alternative OO layer for ARSperl. As well as 
+caching of field table data in an external file. See POD.
+
+This should be considdered a stable release.
+ 
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+

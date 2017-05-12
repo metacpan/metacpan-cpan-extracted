@@ -1,0 +1,7 @@
+Regexp::Chinese::TradSimp - Take a string containing Chinese text, and turn it
+into a traditional-simplified-insensitive regexp.
+
+Given a string containing Chinese text, transforms it into a regexp that can
+be used to match both the simplified and the traditional version of the
+text.  The distribution also includes a commandline tool, dets
+(DEsensitise Traditional-Simplified).

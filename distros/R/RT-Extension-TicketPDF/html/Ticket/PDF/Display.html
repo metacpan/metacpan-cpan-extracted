@@ -1,0 +1,14 @@
+<style>
+    /* forcing print.css if wkhtmltopdf option --print-media-type fails. */
+    #quickbar, #main-navigation, #page-navigation, #topactions { display: none }
+    .message-stanza-folder.closed { display: none }
+    .message-stanza.closed { display: block }
+    <& /NoAuth/css/print.css &>
+</style>
+<& /Ticket/Display.html, id => $id &>
+<link rel="stylesheet" href="/rt-sandbox/NoAuth/css/print.css" type="text/css" media="all" />
+<%ARGS>
+    # vim: syn=mason
+    $id => undef
+</%ARGS>
+

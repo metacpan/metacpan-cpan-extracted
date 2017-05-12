@@ -1,0 +1,86 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/project>
+	a                    doap:Project;
+	cpan-uri:x_IRC       <irc://irc.perl.org/#perlrdf>;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Moo"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine"^^doap-deps:CpanId ], [ doap-deps:on "URI::NamespaceMap"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "HTTP::Message"^^doap-deps:CpanId ], [ doap-deps:on "URI"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::RDF"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-rdf-generator-http/issues>;
+	doap:category        <http://dbpedia.org/resource/Category:Hypertext_Transfer_Protocol>, <http://dbpedia.org/resource/Category:Semantic_Web>;
+	doap:created         "2014-10-08"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:download-page   <https://metacpan.org/release/RDF-Generator-HTTP>;
+	doap:homepage        <https://metacpan.org/release/RDF-Generator-HTTP>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:mailing-list    <http://lists.perlrdf.org/listinfo/dev>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:name            "RDF-Generator-HTTP";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-rdf-generator-http>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-generator-http&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "Generate RDF from a HTTP request"@en;
+	doap:wiki            <http://wiki.perlrdf.org/>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "RDF-Generator-HTTP-0.001"^^xsd:string;
+	dc:issued            "2014-10-08"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-Generator-HTTP-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Improve documentation";
+	dc:identifier        "RDF-Generator-HTTP-0.002"^^xsd:string;
+	dc:issued            "2014-12-14"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-Generator-HTTP-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Attributes for subjects";
+	dc:identifier        "RDF-Generator-HTTP-0.003"^^xsd:string;
+	dc:issued            "2014-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix internal link";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Create attributes to set and access the subjects of messages.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/v_0-002>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-Generator-HTTP-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK";
+	foaf:page            <https://metacpan.org/author/KJETILK>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-generator-http&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>.
+

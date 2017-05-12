@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename;
+use Cwd "abs_path";
+use lib dirname(abs_path(__FILE__)) . "/../../../lib/";
+use lib map { dirname(abs_path(__FILE__)) . "/../" . $_ } qw(app/helpers app/controllers app/models lib);
+
+# print map {$_."\n"} @INC;
+# above line is used for debugging
+
+for (@INC) {
+  my @files = `ls $_`;
+  # Load all module in application.
+
+  my @controllers = grep /\w+_controller.pm/, @files;
+  for my $controller (@controllers) {
+    eval qq{ require($controller); }
+  }
+
+  my @helpers = grep /\w+_helper.pm/, @files;
+  for my $helper (@helpers) {
+    eval qq{ require($helper); }
+  }
+
+  my @models = grep /model/, @files;
+  for my $model (@models) {
+    eval qq{ require($model); }
+  }
+
+}
+
+use HTTP::Engine::Response;
+sub default {
+  # default handler, for debugging
+  HTTP::Engine::Response->new(
+    body => "default",
+  );
+}
+
+use HTTP::Engine;
+my $engine = HTTP::Engine->new(
+
+    interface => {
+        module => "ServerSimple",
+        args   => {
+            host => "shelling.ccca.nctu.edu.tw",
+            port => "3500",
+        },  
+        request_handler => \&default, # still need set
+    }
+);
+
+$engine->run();
+

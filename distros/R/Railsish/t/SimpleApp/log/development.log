@@ -1,0 +1,16 @@
+Loading controllers: /Users/gugod/git/Railsish/t/SimpleApp/app/controllers/*.pm
+ - ApplicationController loaded
+   - ApplicationHelpers loaded
+ - IndexController loaded
+ - WelcomeController loaded
+---
+action: here
+controller: welcome
+format: html
+method: get
+params:
+  action: here
+  controller: welcome
+request_path: /welcome/here
+session: {}
+

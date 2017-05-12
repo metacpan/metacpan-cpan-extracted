@@ -1,0 +1,26 @@
+Changes
+html/Callbacks/RT-View-Directory/Search/Results.html/SearchActions
+html/View-Directory/dhandler
+html/View-Directory/Elements/ListAttachments
+html/View-Directory/Search/dhandler
+html/View-Directory/Search/Ticket/Attachment/dhandler
+html/View-Directory/Search/Ticket/dhandler
+html/View-Directory/Ticket/dhandler
+html/View-Directory/Ticket/File
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RT/View/Directory.pm
+Makefile
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE

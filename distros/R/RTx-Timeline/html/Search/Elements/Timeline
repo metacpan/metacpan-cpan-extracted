@@ -1,0 +1,83 @@
+<script type="text/javascript" language="javascript">
+var tl;
+function LoadTimeline() {
+  var eventSource = new Timeline.DefaultEventSource();
+
+  var theme = Timeline.ClassicTheme.create();
+  theme.event.label.width = 250; // px
+  theme.event.bubble.width = 250;
+  theme.event.bubble.height = 200;
+
+  var bandInfos = [
+    Timeline.createBandInfo({
+        eventSource:    eventSource,
+        date:           "<%$start%>",
+        //date:           "Apr 01 2005 00:00:00 GMT",
+        width:          "75%",
+        intervalUnit:   Timeline.DateTime.DAY,
+        intervalPixels: 200
+    }),
+    Timeline.createBandInfo({
+        eventSource:    eventSource,
+        date:           "<%$start%>",
+        width:          "20%",
+        intervalUnit:   Timeline.DateTime.MONTH,
+        intervalPixels: 300,
+        showEventText:  false,
+        trackHeight:    0.5
+    }),
+    Timeline.createBandInfo({
+        eventSource:    eventSource,
+        date:           "<%$start%>",
+        width:          "5%",
+        intervalUnit:   Timeline.DateTime.YEAR,
+        intervalPixels: 500,
+        showEventText:  false,
+        trackHeight:    0.2
+    })
+  ];
+  bandInfos[1].syncWith = 0;
+  bandInfos[1].highlight = true;
+  bandInfos[2].syncWith = 1;
+  bandInfos[2].highlight = true;
+
+  tl = Timeline.create(document.getElementById("<%$id%>"), bandInfos, Timeline.HORIZONTAL);
+  tl.loadJSON("<%$RT::WebPath%>/Search/Elements/timeline.js?Query=<%$Query|n%>", function(json, url) { eventSource.loadJSON(json, url); });
+}
+
+var resizeTimerID = null;
+function ResizeTimeline() {
+    if (resizeTimerID == null) {
+        resizeTimerID = window.setTimeout(function() {
+            resizeTimerID = null;
+            tl.layout();
+        }, 500);
+    }
+}
+onLoadHook("LoadTimeline()");
+</script>
+
+<% $Tickets->CountAll %> Tickets
+<div id="<%$id%>" style="height: <%$height%>; border: 1px solid #aaa"></div>
+
+
+
+<%INIT>
+my $Tickets = RT::Tickets->new( $session{CurrentUser} );
+$Tickets->FromSQL( $Query );
+$Tickets->OrderBy( FIELD => 'id', ORDER => 'ASC' );
+$Tickets->RowsPerPage( 1 );
+$Tickets->GotoPage( 0 );
+my $ticket = $Tickets->First;
+my $time = $ticket ? $ticket->CreatedObj->Unix : time();
+my $start = strftime "%b %e %Y 00:00:00 GMT", localtime($time);
+#my $start = strftime "%b %e %Y %H:%M:%S GMT", localtime($time);
+</%INIT>
+<%ARGS>
+$Query
+$id => 'my-timeline'
+$height => '400px'
+</%ARGS>
+<%ONCE>
+use POSIX qw(strftime);
+</%ONCE>

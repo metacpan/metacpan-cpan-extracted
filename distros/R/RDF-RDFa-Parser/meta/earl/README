@@ -1,0 +1,25 @@
+Test summary for RDFa 1.1 Test Suite
+====================================
+
+Test date:        2012-06-05T22:59:42Z
+Tested product:   RDF-RDFa-Parser-1.097
+
+HTML4+RDFa 1.0          PASS:   101  FAIL:     0  SKIP:     2
+HTML5+RDFa 1.0          PASS:    98  FAIL:     0  SKIP:     2
+XHTML1+RDFa 1.0         PASS:   115  FAIL:     0  SKIP:     2
+Atom+RDFa 1.0           PASS:     9  FAIL:     0  SKIP:     0
+DataRSS+RDFa 1.0        PASS:    10  FAIL:     0  SKIP:     0
+HTML4+RDFa 1.1          PASS:   159  FAIL:     0  SKIP:     3
+HTML5+RDFa 1.1          PASS:   176  FAIL:     0  SKIP:     2
+XHTML1+RDFa 1.1         PASS:   164  FAIL:     0  SKIP:     2
+Atom+RDFa 1.1           PASS:    12  FAIL:     0  SKIP:     0
+DataRSS+RDFa 1.1        PASS:    13  FAIL:     0  SKIP:     0
+XHTML5+RDFa 1.1         PASS:   178  FAIL:     0  SKIP:     3
+SVG+RDFa 1.1            PASS:    30  FAIL:     0  SKIP:     0
+XML+RDFa 1.1            PASS:   109  FAIL:     0  SKIP:     1
+HTML5+RDFa 1.1-role     PASS:     6  FAIL:     0  SKIP:     0
+XHTML1+RDFa 1.1-role    PASS:     6  FAIL:     0  SKIP:     0
+XHTML5+RDFa 1.1-role    PASS:     6  FAIL:     0  SKIP:     0
+XML+RDFa 1.1-role       PASS:     5  FAIL:     0  SKIP:     0
+
+Grand Total             PASS:  1197  FAIL:     0  SKIP:    17

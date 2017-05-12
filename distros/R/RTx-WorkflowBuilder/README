@@ -1,0 +1,51 @@
+RTx::WorkflowBuilder is a tool for configuring approval workflow in RT.
+
+Best Practical sells support and customization for RT.  Feel free to
+contact us at sales@bestpractical.com if you have any questions about
+our service offerings.
+
+
+Installation instructions:
+--------------------------
+
+1) Install RT 3.8.2 or newer.
+
+2) Once RT appears to be happily installed, cd into the directory
+   where you unpacked RTx::WorkflowBuilder.
+
+3) perl Makefile.PL
+
+4) make install
+
+Further reading:
+-----------------------------------------------------
+
+perldoc bin/rt-workflow - quick overview and configuration
+
+Development
+------------------------------------------------------
+
+If you would like to run RTx::WorkflowBuilder's tests, you need to
+set a few environment variables
+RT_DBA_USER - a user who can create a database on your 
+              RDBMS (such as root on mysql)
+RT_DBA_PASSWORD - the password for RT_DBA_USER
+PERL5LIB - the path to your RT libraries (/opt/rt3/lib)
+
+RT_DBA_USER=user RT_DBA_PASSWORD=password PERL5LIB=/opt/rt3/lib make test
+
+These are intended to be run before installing RTx::WorkflowBuilder.
+Like RT, RTx::WorkflowBuilder expects to be able to create a new
+database called rt3test on your system.
+
+Bug reporting and discussion lists:
+-----------------------------------------------------
+
+You probably want to discuss RTx::WorkflowBuilder on
+rt-users@lists.bestpractical.com.  (Send mail to
+rt-users-request@lists.fsck.com to subscribe)
+
+Bug reports can be sent to bugs-rtx-workflowbuilder@bestpractical.com. 
+You can look at open bug reports at
+https://rt.cpan.org/Public/Dist/Display.html?Name=RTx-WorkflowBuilder.
+Log in as guest/guest to see the content of bug reports.

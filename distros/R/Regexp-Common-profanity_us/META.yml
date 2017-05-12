@@ -1,0 +1,22 @@
+---
+abstract: 'provide regexes for U.S. profanity'
+author:
+  - 'Terrence Brannon'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Regexp-Common-profanity_us
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Data::Section::Simple: 0
+  Exporter: 0
+  Regexp::Common: 0
+version: 4.112150

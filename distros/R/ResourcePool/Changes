@@ -1,0 +1,136 @@
+Changelog for ResourcePool
+
+V1.0107 - 2013-04-16
+  *   Made it Hash-Randomization proof. (Bug #84265)
+
+V1.0105 - 2009-11-25
+
+  *   Made the timeout in the tests less restritive to avoid false 
+      failure in case the test is performad on a loaded machine (Bug #29200).
+
+V1.0104 - 2003-05-07
+
+  *  ResourcePool did use a stringified object as key in a hash 
+     reference. This has been replaced by using Tie::RefHash. 
+
+V1.0103 - 2003-05-07
+
+  *  Applied a patch from Chad Redman which is basically the same as 
+     the patch from Eric Parusel which was partitially applied to 
+     1.0102. This time I applied the patch to the correct CVS branch 
+     *argl*. 
+
+  *  Minor corrections and improvements in documentation. 
+
+V1.0102 - 2003-03-27
+
+  *  Two new LoadBalancer policies have been introduced: FailBack is 
+     a alias for FallBack, and FailOver which acts like FailBack but 
+     does stay on the fall back node. 
+
+  *  Applied patch from Eric Parusel to fix a problem when debuging 
+     LoadBalancer. 
+
+V1.0101 - 2003-03-14
+
+  *  An obsolete dependency for the Storable module has been removed. 
+
+V1.0100 - 2003-02-27
+
+  *  This release introduces a new way to use ResourcePool and 
+     LoadBalancer. It implements the Command design pattern as 
+     described in the GOF Design Patterns book. This release is a 
+     preview, the features are not yet fully implemented and might 
+     therefore not sufficient for you needs right now. 
+
+V1.0000 - 2003-01-02
+
+  *  From this release on, the ResourcePool package will not contain 
+     resource bindings anymore. The previously included bindings for 
+     DBI and Net::LDAP are available in the ResourcePool-Resource-DBI 
+     and ResourcePool-Resource-Net-LDAP packages on CPAN. 
+
+  *  Applied patch from James G Smith which introduced the is_created 
+     method to ResourcePool::Singleton. This does not change the 
+     behavior of any ResourcePool module. 
+
+V0.9910 - 2002-11-25
+
+  *  The runtime overhead introduced by ResourcePool and LoadBalancer 
+     has been reduced. Depending on you configuration this release 
+     has up to 35% less overhead. 
+
+  *  Fixed a bug in LoadBalancer's documentation. The Weight 
+     parameter works only for the LeastUsage policy. 
+
+  *  A general code cleanup has been done to gain the performance 
+     benefits. 
+
+  *  Added tests for LoadBalancer. 
+
+V0.9909 - 2002-10-07
+
+  *  A refactoring of the Singleton behavior of ResourcePool::Factory 
+     makes it possible to implement nicer factories 
+
+  *  Adopted ResourcePool::Factory::Net::LDAP to have a more native 
+     interface. 
+
+  *  Fixed links within the POD documentation (was broken for some 
+     pod2html translators) 
+
+  *  Added documentation for Net::LDAP bindings which were lost in 
+     the previous release. 
+
+V0.9908 - 2002-09-30
+
+  *  Added documentation: ResourcePool::BigPicture, ResourcePool::UML 
+     and ResourcePool::ExtensionGuide 
+
+  *  Changed Net::LDAP factory to accept the bind parameters in the 
+     same way as Net::LDAP expects them. 
+
+  *  Added tests 
+
+V0.9907 - 2002-08-30
+
+  *  Fixed a major bug in Net::LDAP bindings which was introduced in 
+     V0.9906. Every LDAP connection was believed to be broken when 
+     handed back via free(). 
+
+V0.9906 - 2002-07-10
+
+  *  wrapped DBI calls into eval{} blocks to make RaiseError aware. 
+
+  *  It's possible to pass the options for ResourcePool and 
+     LoadBalancer using a Hash reference. 
+
+  *  added tests 
+
+V0.9905 - 2002-07-05
+
+  *  A rollback() is performed on DBI sessions with AutoCommit 
+     disabled when they are free()ed. 
+
+  *  free() and fail() for ResourcePool and LoadBalancer return 
+     meaningful values. 
+
+  *  added tests 
+
+V0.9904 - 2002-06-04
+
+  *  Implemented the SleepOnFail option for ResourcePool and 
+     LoadBalancer. 
+
+  *  Fixed typo in Net::LDAP bindings which caused incomplete error 
+     reporting (thx to Sean Welsh) 
+
+  *  Fixed many typo's in the documentation (thx to Florian 
+     Helmberger) 
+
+  *  Greatly improved and extended the documentation. 
+
+V0.9903 - 2001-10-15
+
+  *  first public release 
+

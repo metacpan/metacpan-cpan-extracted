@@ -1,0 +1,1227 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+
+########################
+# Command Line Options
+########################
+my %opts = ( port => 8080, host => 'localhost', bg => 0 );
+GetOptions(
+    "port|p=s"     => \$opts{port},
+    "host|H=s"     => \$opts{host},
+    "background|b" => \$opts{bg},
+    "help|h"       => \$opts{help},
+    "include|I=s"  => \$opts{include},
+) || ( $opts{help} = 1 );
+die_with_usage() if $opts{help};
+$opts{ra_class} = shift || die_with_usage("No class given");
+
+#########################
+# Setup the Environment
+#########################
+extend_INC( $opts{include} );
+load_class( $opts{ra_class} );
+
+######################
+# Run the Web Server
+######################
+my $server = WebServer->new( $opts{port} );
+$server->host( $opts{host} );
+my $run_method = $opts{bg} ? "background" : "run";
+$server->{ra_class} = $opts{ra_class};
+$server->$run_method();
+exit;
+
+###########
+# Helpers
+###########
+
+sub extend_INC {
+    my $include = shift || "";
+    my @dirs = split /,/, $include;
+    unshift @INC, reverse(@dirs);
+}
+
+sub load_class {
+    my $klass = shift;
+    eval "require $klass;";
+    die "Unable to load $klass: $@\n" if $@;
+}
+
+sub die_with_usage {
+    my $msg = shift || "";
+    warn "$msg\n\n" if $msg;
+    die <<USAGE
+Usage: $0 [options] Some::RA::Class
+
+Runs a server dedicated to serving up Some::RA::Class, which should subclass
+REST::Application or REST::Application::Routes.
+
+Options:
+
+    --include
+    -I
+        Use this to add directories to Perl's \@INC.  Directories should be
+        comma seperated.
+
+    --port port_num
+    -p port_num
+        Set the port number for the server to run on.
+
+    --host hostname
+    -H hostname
+        Set the hostname the server binds to.
+
+    --background
+    -b
+        Use this to background the webserver, otherwise it runs in the
+        foreground.
+
+USAGE
+}
+
+package WebServer;
+use strict;
+use warnings;
+use REST::Application;
+use base qw(HTTP::Server::Simple::CGI);
+
+sub handle_request {
+    my ( $self, $cgi ) = @_;
+    my $klass = $self->{ra_class};
+    my $ra = $klass->new();
+    $ra->run();
+}
+
+sub print_banner {
+    my $self = shift;
+    print "Server is serving class "
+        . $self->{ra_class}
+        . " at http://"
+        . $self->host . ":"
+        . $self->port . "/\n\n";
+}
+
+1;
+
+package HTTP::Server::Simple;
+use strict;
+use warnings;
+use FileHandle;
+use Socket;
+use Carp;
+use URI::Escape;
+
+no warnings 'redefine';
+
+use vars qw($VERSION $bad_request_doc);
+$VERSION = '0.26';
+
+
+=head1 NAME
+
+HTTP::Server::Simple - Lightweight HTTP server
+
+
+=head1 SYNOPSIS
+
+ use warnings;
+ use strict;
+ 
+ use HTTP::Server::Simple;
+ 
+ my $server = HTTP::Server::Simple->new();
+ $server->run();
+
+However, normally you will sub-class the HTTP::Server::Simple::CGI
+module (see L<HTTP::Server::Simple::CGI>);
+
+ package Your::Web::Server;
+ use base qw(HTTP::Server::Simple::CGI);
+ 
+ sub handle_request {
+     my ($self, $cgi) = @_;
+
+     #... do something, print output to default
+     # selected filehandle...
+
+ }
+ 
+ 1;
+
+=head1 DESCRIPTION
+
+This is a simple standalone HTTP server. By default, it doesn't thread 
+or fork.
+
+It does, however, act as a simple frontend which can be used 
+to build a standalone web-based application or turn a CGI into one.
+
+(It's possible to use Net::Server to get threading, forking,
+preforking and so on. Autrijus Tang wrote the functionality and owes docs for that ;)
+
+By default, the server traps a few signals:
+
+=over
+
+=item HUP
+
+When you C<kill -HUP> the server, it does its best to rexec
+itself.  Please note that in order to provide restart-on-SIGHUP,
+HTTP::Server::Simple sets a SIGHUP handler during initialisation. If
+your request handling code forks you need to make sure you reset this
+or unexpected things will happen if somebody sends a HUP to all running
+processes spawned by your app (e.g. by "kill -HUP <script>")
+
+
+=item PIPE
+
+If the server detects a broken pipe while writing output to the client, 
+it ignores the signal. Otherwise, a client closing the connection early 
+could kill the server
+
+=back
+
+=head2 HTTP::Server::Simple->new($port)
+
+API call to start a new server.  Does not actually start listening
+until you call C<-E<gt>run()>.
+
+=cut
+
+sub new {
+    my ( $proto, $port ) = @_;
+    my $class = ref($proto) || $proto;
+
+    if ( $class eq __PACKAGE__ ) {
+        require HTTP::Server::Simple::CGI;
+        return HTTP::Server::Simple::CGI->new( @_[ 1 .. $#_ ] );
+    }
+
+    my $self = {};
+    bless( $self, $class );
+    $self->port( $port || '8080' );
+
+
+
+    return $self;
+}
+
+
+=head2 lookup_localhost
+
+Looks up the local host's hostname and IP address.
+
+Stuffs them into
+
+$self->{'localname'} and $self->{'localaddr'}
+
+=cut
+
+sub lookup_localhost {
+    my $self = shift;
+
+    my $local_sockaddr = getsockname( $self->stdio_handle );
+    my ( undef, $localiaddr ) = sockaddr_in($local_sockaddr);
+    $self->host( gethostbyaddr( $localiaddr, AF_INET ) || "localhost");
+    $self->{'local_addr'} = inet_ntoa($localiaddr) || "127.0.0.1";
+}
+
+
+
+
+=head2 port [NUMBER]
+
+Takes an optional port number for this server to listen on.
+
+Returns this server's port. (Defaults to 8080)
+
+=cut
+
+sub port {
+    my $self = shift;
+    $self->{'port'} = shift if (@_);
+    return ( $self->{'port'} );
+
+}
+
+=head2 host [address]
+
+Takes an optional host address for this server to bind to.
+
+Returns this server's bound address (if any).  Defaults to C<undef>
+(bind to all interfaces).
+
+=cut
+
+sub host {
+    my $self = shift;
+    $self->{'host'} = shift if (@_);
+    return ( $self->{'host'} );
+
+}
+
+=head2 background
+
+Run the server in the background. returns pid.
+
+=cut
+
+sub background {
+    my $self  = shift;
+    my $child = fork;
+    die "Can't fork: $!" unless defined($child);
+    return $child if $child;
+
+    if ( $^O !~ /MSWin32/ ) {
+        require POSIX;
+        POSIX::setsid()
+            or die "Can't start a new session: $!";
+    }
+    $self->run();
+}
+
+=head2 run
+
+Run the server.  If all goes well, this won't ever return, but it will
+start listening for http requests.
+
+=cut
+
+my $server_class_id = 0;
+
+sub run {
+    my $self   = shift;
+    my $server = $self->net_server;
+
+    # Handle SIGHUP
+
+    local $SIG{CHLD} = 'IGNORE';    # reap child processes
+    local $SIG{HUP} = sub {
+
+        # XXX TODO: Autrijus says this code was incorrect when he wrote
+        # it and we should move to the sample code from perldoc perlipc
+        close HTTPDaemon;
+
+        # and then, on systems implementing fork(), we make sure
+        # we are running with a new pid, so another -HUP will still
+        # work on the new process.
+        require Config;
+        if ( $Config::Config{d_fork} and my $pid = fork() ) {
+
+            # finally, allow ^C on the parent process to terminate
+            # the children.
+            waitpid( $pid, 0 );
+            exit;
+        }
+
+        # do the exec. if $0 is not executable, try running it with $^X.
+        exec {$0}( ( ( -x $0 ) ? () : ($^X) ), $0, @ARGV );
+    } if exists $SIG{'HUP'};
+
+    # $pkg is generated anew for each invocation to "run"
+    # Just so we can use different net_server() implementations
+    # in different runs.
+    my $pkg = join '::', ref($self), "NetServer" . $server_class_id++;
+
+    no strict 'refs';
+    *{"$pkg\::process_request"} = $self->_process_request;
+
+    if ($server) {
+        require join( '/', split /::/, $server ) . '.pm';
+        *{"$pkg\::ISA"} = [$server];
+        $self->print_banner;
+    }
+    else {
+        $self->setup_listener;
+	$self->after_setup_listener();
+        *{"$pkg\::run"} = $self->_default_run;
+    }
+
+    $pkg->run( port => $self->port );
+}
+
+=head2 net_server
+
+User-overridable method. If you set it to a C<Net::Server> subclass,
+that subclass is used for the C<run> method.  Otherwise, a minimal 
+implementation is used as default.
+
+=cut
+
+sub net_server {undef}
+
+sub _default_run {
+    my $self = shift;
+
+    # Default "run" closure method for a stub, minimal Net::Server instance.
+    return sub {
+        my $pkg = shift;
+
+        $self->print_banner;
+
+        while (1) {
+            local $SIG{PIPE} = 'IGNORE';    # If we don't ignore SIGPIPE, a
+                 # client closing the connection before we
+                 # finish sending will cause the server to exit
+            while ( accept( my $remote = new FileHandle, HTTPDaemon ) ) {
+                $self->stdio_handle($remote);
+                $self->lookup_localhost() unless ($self->host);
+                $self->accept_hook if $self->can("accept_hook");
+
+
+                *STDIN  = $self->stdin_handle();
+                *STDOUT = $self->stdout_handle();
+                select STDOUT;   # required for HTTP::Server::Simple::Recorder
+                                 # XXX TODO glasser: why?
+                $pkg->process_request;
+                close $remote;
+            }
+        }
+    };
+}
+
+sub _process_request {
+    my $self = shift;
+
+    # Create a callback closure that is invoked for each incoming request;
+    # the $self above is bound into the closure.
+    sub {
+
+        $self->stdio_handle(*STDIN) unless $self->stdio_handle;
+
+ # Default to unencoded, raw data out.
+ # if you're sending utf8 and latin1 data mixed, you may need to override this
+        binmode STDIN,  ':raw';
+        binmode STDOUT, ':raw';
+
+        # The ternary operator below is to protect against a crash caused by IE
+        # Ported from Catalyst::Engine::HTTP (Originally by Jasper Krogh and Peter Edwards)
+        # ( http://dev.catalyst.perl.org/changeset/5195, 5221 )
+        
+        my $remote_sockaddr = getpeername( $self->stdio_handle );
+        my ( undef, $iaddr ) = $remote_sockaddr ? sockaddr_in($remote_sockaddr) : (undef,undef);
+        my $peeraddr = $iaddr ? ( inet_ntoa($iaddr) || "127.0.0.1" ) : '127.0.0.1';
+        
+        my ( $method, $request_uri, $proto ) = $self->parse_request;
+        
+        unless ($self->valid_http_method($method) ) {
+            $self->bad_request;
+            return;
+        }
+
+        $proto ||= "HTTP/0.9";
+
+        my ( $file, $query_string )
+            = ( $request_uri =~ /([^?]*)(?:\?(.*))?/ );    # split at ?
+
+        $self->setup(
+            method       => $method,
+            protocol     => $proto,
+            query_string => ( defined($query_string) ? $query_string : '' ),
+            request_uri  => $request_uri,
+            path         => $file,
+            localname    => $self->host,
+            localport    => $self->port,
+            peername     => $peeraddr,
+            peeraddr     => $peeraddr,
+        );
+
+        # HTTP/0.9 didn't have any headers (I think)
+        if ( $proto =~ m{HTTP/(\d(\.\d)?)$} and $1 >= 1 ) {
+
+            my $headers = $self->parse_headers
+                or do { $self->bad_request; return };
+
+            $self->headers($headers);
+
+        }
+
+        $self->post_setup_hook if $self->can("post_setup_hook");
+
+        $self->handler;
+        }
+}
+
+
+
+
+
+=head2 stdio_handle [FILEHANDLE]
+
+When called with an argument, sets the socket to the server to that arg.
+
+Returns the socket to the server; you should only use this for actual socket-related
+calls like C<getsockname>.  If all you want is to read or write to the socket,
+you should use C<stdin_handle> and C<stdout_handle> to get the in and out filehandles
+explicitly.
+
+=cut
+
+sub stdio_handle {
+    my $self = shift;
+    $self->{'_stdio_handle'} = shift if (@_);
+    return $self->{'_stdio_handle'};
+}
+
+=head2 stdin_handle
+
+Returns a filehandle used for input from the client.  By default, 
+returns whatever was set with C<stdio_handle>, but a subclass
+could do something interesting here (see L<HTTP::Server::Simple::Logger>).
+
+=cut
+
+sub stdin_handle {
+    my $self = shift;
+    return $self->stdio_handle;
+}
+
+=head2 stdout_handle
+
+Returns a filehandle used for output to the client.  By default, 
+returns whatever was set with C<stdio_handle>, but a subclass
+could do something interesting here (see L<HTTP::Server::Simple::Logger>).
+
+=cut
+
+sub stdout_handle {
+    my $self = shift;
+    return $self->stdio_handle;
+}
+
+=head1 IMPORTANT SUB-CLASS METHODS
+
+A selection of these methods should be provided by sub-classes of this
+module.
+
+=head2 handler
+
+This method is called after setup, with no parameters.  It should
+print a valid, I<full> HTTP response to the default selected
+filehandle.
+
+=cut
+
+sub handler {
+    my ($self) = @_;
+    if ( ref($self) ne __PACKAGE__ ) {
+        croak "do not call " . ref($self) . "::SUPER->handler";
+    }
+    else {
+        die "handler called out of context";
+    }
+}
+
+=head2 setup(name =E<gt> $value, ...)
+
+This method is called with a name =E<gt> value list of various things
+to do with the request.  This list is given below.
+
+The default setup handler simply tries to call methods with the names
+of keys of this list.
+
+  ITEM/METHOD   Set to                Example
+  -----------  ------------------    ------------------------
+  method       Request Method        "GET", "POST", "HEAD"
+  protocol     HTTP version          "HTTP/1.1"
+  request_uri  Complete Request URI  "/foobar/baz?foo=bar"
+  path         Path part of URI      "/foobar/baz"
+  query_string Query String          undef, "foo=bar"
+  port         Received Port         80, 8080
+  peername     Remote name           "200.2.4.5", "foo.com"
+  peeraddr     Remote address        "200.2.4.5", "::1"
+  localname    Local interface       "localhost", "myhost.com"
+
+=cut
+
+sub setup {
+    my $self = shift;
+    while ( my ( $item, $value ) = splice @_, 0, 2 ) {
+        $self->$item($value) if $self->can($item);
+    }
+}
+
+=head2 headers([Header =E<gt> $value, ...])
+
+Receives HTTP headers and does something useful with them.  This is
+called by the default C<setup()> method.
+
+You have lots of options when it comes to how you receive headers.
+
+You can, if you really want, define C<parse_headers()> and parse them
+raw yourself.
+
+Secondly, you can intercept them very slightly cooked via the
+C<setup()> method, above.
+
+Thirdly, you can leave the C<setup()> header as-is (or calling the
+superclass C<setup()> for unknown request items).  Then you can define
+C<headers()> in your sub-class and receive them all at once.
+
+Finally, you can define handlers to receive individual HTTP headers.
+This can be useful for very simple SOAP servers (to name a
+crack-fueled standard that defines its own special HTTP headers). 
+
+To do so, you'll want to define the C<header()> method in your subclass.
+That method will be handed a (key,value) pair of the header name and the value.
+
+
+=cut
+
+sub headers {
+    my $self    = shift;
+    my $headers = shift;
+
+    my $can_header = $self->can("header");
+    while ( my ( $header, $value ) = splice @$headers, 0, 2 ) {
+        if ($can_header) {
+            $self->header( $header => $value );
+        }
+    }
+}
+
+=head2 accept_hook
+
+If defined by a sub-class, this method is called directly after an
+accept happens.
+
+=head2 post_setup_hook
+
+If defined by a sub-class, this method is called after all setup has
+finished, before the handler method.
+
+=head2  print_banner
+
+This routine prints a banner before the server request-handling loop
+starts.
+
+Methods below this point are probably not terribly useful to define
+yourself in subclasses.
+
+=cut
+
+sub print_banner {
+    my $self = shift;
+
+    print(    __PACKAGE__
+            . ": You can connect to your server at "
+            . "http://localhost:"
+            . $self->port
+            . "/\n" );
+
+}
+
+=head2 parse_request
+
+Parse the HTTP request line.
+
+Returns three values, the request method, request URI and the protocol
+Sub-classed versions of this should return three values - request
+method, request URI and proto
+
+=cut
+
+sub parse_request {
+    my $self = shift;
+    my $chunk;
+    while ( sysread( STDIN, my $buff, 1 ) ) {
+        last if $buff eq "\n";
+        $chunk .= $buff;
+    }
+    defined($chunk) or return undef;
+    $_ = $chunk;
+
+    m/^(\w+)\s+(\S+)(?:\s+(\S+))?\r?$/;
+    my $method   = $1 || '';
+    my $uri      = $2 || '';
+    my $protocol = $3 || '';
+
+    return ( $method, uri_unescape( $uri ), $protocol );
+}
+
+=head2 parse_headers
+
+Parse incoming HTTP headers from STDIN.
+
+Remember, this is a B<simple> HTTP server, so nothing intelligent is
+done with them C<:-)>.
+
+This should return an ARRAY ref of C<(header =E<gt> value)> pairs
+inside the array.
+
+=cut
+
+sub parse_headers {
+    my $self = shift;
+
+    my @headers;
+
+    my $chunk = '';
+    while ( sysread( STDIN, my $buff, 1 ) ) {
+        if ( $buff eq "\n" ) {
+            $chunk =~ s/[\r\l\n\s]+$//;
+            if ( $chunk =~ /^([\w\-]+): (.+)/i ) {
+                push @headers, $1 => $2;
+            }
+            last if ( $chunk =~ /^$/ );
+            $chunk = '';
+        }
+        else { $chunk .= $buff }
+    }
+
+    return ( \@headers );
+}
+
+=head2 setup_listener
+
+This routine binds the server to a port and interface.
+
+=cut
+
+sub setup_listener {
+    my $self = shift;
+
+    my $tcp = getprotobyname('tcp');
+
+    socket( HTTPDaemon, PF_INET, SOCK_STREAM, $tcp ) or die "socket: $!";
+    setsockopt( HTTPDaemon, SOL_SOCKET, SO_REUSEADDR, pack( "l", 1 ) )
+        or warn "setsockopt: $!";
+    bind( HTTPDaemon,
+        sockaddr_in(
+            $self->port(),
+            (   $self->host
+                ? inet_aton( $self->host )
+                : INADDR_ANY
+            )
+        )
+        )
+        or die "bind: $!";
+    listen( HTTPDaemon, SOMAXCONN ) or die "listen: $!";
+
+}
+
+
+=head2 after_setup_listener
+
+This method is called immediately after setup_listener. It's here just for you to override.
+
+=cut
+
+sub after_setup_listener {
+}
+
+=head2 bad_request
+
+This method should print a valid HTTP response that says that the
+request was invalid.
+
+=cut
+
+$bad_request_doc = join "", <DATA>;
+
+sub bad_request {
+    my $self = shift;
+
+    print "HTTP/1.0 400 Bad request\r\n";    # probably OK by now
+    print "Content-Type: text/html\r\nContent-Length: ",
+        length($bad_request_doc), "\r\n\r\n", $bad_request_doc;
+}
+
+=head2 valid_http_method($method)
+
+Given a candidate HTTP method in $method, determine if it is valid.
+Override if, for example, you'd like to do some WebDAV.
+
+=cut 
+
+sub valid_http_method {
+    my $self   = shift;
+    my $method = shift or return 0;
+    return $method =~ /^(?:GET|POST|HEAD|PUT|DELETE)$/;
+}
+
+=head1 AUTHOR
+
+Copyright (c) 2004-2006 Jesse Vincent, <jesse@bestpractical.com>.
+All rights reserved.
+
+Marcus Ramberg <drave@thefeed.no> contributed tests, cleanup, etc
+
+Sam Vilain, <samv@cpan.org> contributed the CGI.pm split-out and
+header/setup API.
+
+=head1 BUGS
+
+There certainly are some. Please report them via rt.cpan.org
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+1;
+
+__DATA__
+<html>
+  <head>
+    <title>Bad Request</title>
+  </head>
+  <body>
+    <h1>Bad Request</h1>
+
+    <p>Your browser sent a request which this web server could not
+      grok.</p>
+  </body>
+</html>
+
+package HTTP::Server::Simple::CGI;
+
+use base qw(HTTP::Server::Simple HTTP::Server::Simple::CGI::Environment);
+use strict;
+use warnings;
+
+use CGI ();
+
+use vars qw($VERSION $default_doc);
+$VERSION = $HTTP::Server::Simple::VERSION;
+
+=head1 NAME
+
+HTTP::Server::Simple::CGI - CGI.pm-style version of HTTP::Server::Simple
+
+=head1 DESCRIPTION
+
+HTTP::Server::Simple was already simple, but some smart-ass pointed
+out that there is no CGI in HTTP, and so this module was born to
+isolate the CGI.pm-related parts of this handler.
+
+
+=head2 accept_hook
+
+The accept_hook in this sub-class clears the environment to the
+start-up state.
+
+=cut
+
+sub accept_hook {
+    my $self = shift;
+    $self->setup_environment(@_);
+}
+
+=head2 post_setup_hook
+
+
+
+=cut
+
+sub post_setup_hook {
+    my $self = shift;
+    $self->setup_server_url;
+    CGI::initialize_globals();
+}
+
+=head2 setup
+
+This method sets up CGI environment variables based on various
+meta-headers, like the protocol, remote host name, request path, etc.
+
+See the docs in L<HTTP::Server::Simple> for more detail.
+
+=cut
+
+sub setup {
+    my $self = shift;
+    $self->setup_environment_from_metadata(@_);
+}
+
+=head2 handle_request CGI
+
+This routine is called whenever your server gets a request it can
+handle.
+
+It's called with a CGI object that's been pre-initialized.
+You want to override this method in your subclass
+
+
+=cut
+
+$default_doc = ( join "", <DATA> );
+
+sub handle_request {
+    my ( $self, $cgi ) = @_;
+
+    print "HTTP/1.0 200 OK\r\n";    # probably OK by now
+    print "Content-Type: text/html\r\nContent-Length: ", length($default_doc),
+        "\r\n\r\n", $default_doc;
+}
+
+=head2 handler
+
+Handler implemented as part of HTTP::Server::Simple API
+
+=cut
+
+sub handler {
+    my $self = shift;
+    my $cgi  = new CGI();
+    eval { $self->handle_request($cgi) };
+    if ($@) {
+        my $error = $@;
+        warn $error;
+    }
+}
+
+1;
+
+__DATA__
+<html>
+  <head>
+    <title>Hello!</title>
+  </head>
+  <body>
+    <h1>Congratulations!</h1>
+
+    <p>You now have a functional HTTP::Server::Simple::CGI running.
+      </p>
+
+    <p><i>(If you're seeing this page, it means you haven't subclassed
+      HTTP::Server::Simple::CGI, which you'll need to do to make it
+      useful.)</i>
+      </p>
+  </body>
+</html>
+
+package HTTP::Server::Simple::CGI::Environment;
+
+use strict;
+use warnings;
+use HTTP::Server::Simple;
+
+use vars qw($VERSION %ENV_MAPPING);
+$VERSION = $HTTP::Server::Simple::VERSION;
+
+my %clean_env = %ENV;
+
+=head1 NAME
+
+HTTP::Server::Simple::CGI::Environment - a HTTP::Server::Simple mixin to provide the CGI protocol
+
+=head1 DESCRIPTION
+
+This mixin abstracts the CGI protocol out from HTTP::Server::Simple::CGI so that 
+it's easier to provide your own CGI handlers with HTTP::Server::Simple which 
+B<don't> use CGI.pm
+
+=head2 setup_environment
+
+C<setup_environemnt> is usually called in the superclass's accept_hook
+
+This routine in this sub-class clears the environment to the
+start-up state.
+
+=cut
+
+sub setup_environment {
+    %ENV = (
+        %clean_env,
+        SERVER_SOFTWARE   => "HTTP::Server::Simple/$VERSION",
+        GATEWAY_INTERFACE => 'CGI/1.1'
+    );
+}
+
+=head2 setup_server_url
+
+Sets up the SERVER_URL environment variable
+
+=cut
+
+sub setup_server_url {
+    $ENV{SERVER_URL}
+        ||= ( "http://" . ($ENV{SERVER_NAME} || 'localhost') . ":" . ( $ENV{SERVER_PORT}||80) . "/" );
+}
+
+=head2 setup_environment_from_metadata
+
+This method sets up CGI environment variables based on various
+meta-headers, like the protocol, remote host name, request path, etc.
+
+See the docs in L<HTTP::Server::Simple> for more detail.
+
+=cut
+
+%ENV_MAPPING = (
+    protocol     => "SERVER_PROTOCOL",
+    localport    => "SERVER_PORT",
+    localname    => "SERVER_NAME",
+    path         => "PATH_INFO",
+    request_uri  => "REQUEST_URI",
+    method       => "REQUEST_METHOD",
+    peeraddr     => "REMOTE_ADDR",
+    peername     => "REMOTE_HOST",
+    query_string => "QUERY_STRING",
+);
+
+sub setup_environment_from_metadata {
+    no warnings 'uninitialized';
+    my $self = shift;
+
+    # XXX TODO: rather than clone functionality from the base class,
+    # we should call super
+    #
+    while ( my ( $item, $value ) = splice @_, 0, 2 ) {
+        if ( my $k = $ENV_MAPPING{$item} ) {
+            $ENV{$k} = $value;
+        }
+    }
+
+}
+
+=head2  header
+
+C<header> turns a single HTTP headers into CGI environment variables.
+
+=cut
+
+sub header {
+    my $self  = shift;
+    my $tag   = shift;
+    my $value = shift;
+
+    $tag = uc($tag);
+    $tag =~ s/^COOKIES$/COOKIE/;
+    $tag =~ s/-/_/g;
+    $tag = "HTTP_" . $tag
+        unless $tag =~ m/^(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)$/;
+
+    if ( exists $ENV{$tag} ) {
+        $ENV{$tag} .= "; $value";
+    }
+    else {
+        $ENV{$tag} = $value;
+    }
+}
+
+1;
+
+#
+# $Id: server,v 1.2 2007/01/18 04:57:14 matthew Exp $
+#
+
+package URI::Escape;
+use strict;
+
+=head1 NAME
+
+URI::Escape - Escape and unescape unsafe characters
+
+=head1 SYNOPSIS
+
+ use URI::Escape;
+ $safe = uri_escape("10% is enough\n");
+ $verysafe = uri_escape("foo", "\0-\377");
+ $str  = uri_unescape($safe);
+
+=head1 DESCRIPTION
+
+This module provides functions to escape and unescape URI strings as
+defined by RFC 2396 (and updated by RFC 2732).
+A URI consists of a restricted set of characters,
+denoted as C<uric> in RFC 2396.  The restricted set of characters
+consists of digits, letters, and a few graphic symbols chosen from
+those common to most of the character encodings and input facilities
+available to Internet users:
+
+  "A" .. "Z", "a" .. "z", "0" .. "9",
+  ";", "/", "?", ":", "@", "&", "=", "+", "$", ",", "[", "]",   # reserved
+  "-", "_", ".", "!", "~", "*", "'", "(", ")"
+
+In addition, any byte (octet) can be represented in a URI by an escape
+sequence: a triplet consisting of the character "%" followed by two
+hexadecimal digits.  A byte can also be represented directly by a
+character, using the US-ASCII character for that octet (iff the
+character is part of C<uric>).
+
+Some of the C<uric> characters are I<reserved> for use as delimiters
+or as part of certain URI components.  These must be escaped if they are
+to be treated as ordinary data.  Read RFC 2396 for further details.
+
+The functions provided (and exported by default) from this module are:
+
+=over 4
+
+=item uri_escape( $string )
+
+=item uri_escape( $string, $unsafe )
+
+Replaces each unsafe character in the $string with the corresponding
+escape sequence and returns the result.  The $string argument should
+be a string of bytes.  The uri_escape() function will croak if given a
+characters with code above 255.  Use uri_escape_utf8() if you know you
+have such chars or/and want chars in the 128 .. 255 range treated as
+UTF-8.
+
+The uri_escape() function takes an optional second argument that
+overrides the set of characters that are to be escaped.  The set is
+specified as a string that can be used in a regular expression
+character class (between [ ]).  E.g.:
+
+  "\x00-\x1f\x7f-\xff"          # all control and hi-bit characters
+  "a-z"                         # all lower case characters
+  "^A-Za-z"                     # everything not a letter
+
+The default set of characters to be escaped is all those which are
+I<not> part of the C<uric> character class shown above as well as the
+reserved characters.  I.e. the default is:
+
+  "^A-Za-z0-9\-_.!~*'()"
+
+=item uri_escape_utf8( $string )
+
+=item uri_escape_utf8( $string, $unsafe )
+
+Works like uri_escape(), but will encode chars as UTF-8 before
+escaping them.  This makes this function able do deal with characters
+with code above 255 in $string.  Note that chars in the 128 .. 255
+range will be escaped differently by this function compared to what
+uri_escape() would.  For chars in the 0 .. 127 range there is no
+difference.
+
+The call:
+
+    $uri = uri_escape_utf8($string);
+
+will be the same as:
+
+    use Encode qw(encode);
+    $uri = uri_escape(encode("UTF-8", $string));
+
+but will even work for perl-5.6 for chars in the 128 .. 255 range.
+
+Note: Javascript has a function called escape() that produce the
+sequence "%uXXXX" for chars in the 256 .. 65535 range.  This function
+has really nothing to do with URI escaping but some folks got confused
+since it "does the right thing" in the 0 .. 255 range.  Because of
+this you sometimes see "URIs" with these kind of escapes.  The
+JavaScript encodeURI() function is similar to uri_escape_utf8().
+
+=item uri_unescape($string,...)
+
+Returns a string with each %XX sequence replaced with the actual byte
+(octet).
+
+This does the same as:
+
+   $string =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+
+but does not modify the string in-place as this RE would.  Using the
+uri_unescape() function instead of the RE might make the code look
+cleaner and is a few characters less to type.
+
+In a simple benchmark test I did,
+calling the function (instead of the inline RE above) if a few chars
+were unescaped was something like 40% slower, and something like 700% slower if none were.  If
+you are going to unescape a lot of times it might be a good idea to
+inline the RE.
+
+If the uri_unescape() function is passed multiple strings, then each
+one is returned unescaped.
+
+=back
+
+The module can also export the C<%escapes> hash, which contains the
+mapping from all 256 bytes to the corresponding escape codes.  Lookup
+in this hash is faster than evaluating C<sprintf("%%%02X", ord($byte))>
+each time.
+
+=head1 SEE ALSO
+
+L<URI>
+
+
+=head1 COPYRIGHT
+
+Copyright 1995-2004 Gisle Aas.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+use vars qw(%escapes);
+
+require Exporter;
+@ISA = qw(Exporter);
+@EXPORT = qw(uri_escape uri_unescape);
+@EXPORT_OK = qw(%escapes uri_escape_utf8);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/);
+
+use Carp ();
+
+# Build a char->hex map
+for (0..255) {
+    $escapes{chr($_)} = sprintf("%%%02X", $_);
+}
+
+my %subst;  # compiled patternes
+
+sub uri_escape
+{
+    my($text, $patn) = @_;
+    return undef unless defined $text;
+    if (defined $patn){
+	unless (exists  $subst{$patn}) {
+	    # Because we can't compile the regex we fake it with a cached sub
+	    (my $tmp = $patn) =~ s,/,\\/,g;
+	    eval "\$subst{\$patn} = sub {\$_[0] =~ s/([$tmp])/\$escapes{\$1} || _fail_hi(\$1)/ge; }";
+	    Carp::croak("uri_escape: $@") if $@;
+	}
+	&{$subst{$patn}}($text);
+    } else {
+	# Default unsafe characters.  RFC 2732 ^(uric - reserved)
+	$text =~ s/([^A-Za-z0-9\-_.!~*'()])/$escapes{$1} || _fail_hi($1)/ge;
+    }
+    $text;
+}
+
+sub _fail_hi {
+    my $chr = shift;
+    Carp::croak(sprintf "Can't escape \\x{%04X}, try uri_escape_utf8() instead", ord($chr));
+}
+
+sub uri_escape_utf8
+{
+    my $text = shift;
+    if ($] < 5.008) {
+	$text =~ s/([^\0-\x7F])/do {my $o = ord($1); sprintf("%c%c", 0xc0 | ($o >> 6), 0x80 | ($o & 0x3f)) }/ge;
+    }
+    else {
+	utf8::encode($text);
+    }
+
+    return uri_escape($text, @_);
+}
+
+sub uri_unescape
+{
+    # Note from RFC1630:  "Sequences which start with a percent sign
+    # but are not followed by two hexadecimal characters are reserved
+    # for future extension"
+    my $str = shift;
+    if (@_ && wantarray) {
+	# not executed for the common case of a single argument
+	my @str = ($str, @_);  # need to copy
+	foreach (@str) {
+	    s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+	}
+	return @str;
+    }
+    $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg if defined $str;
+    $str;
+}
+
+1;

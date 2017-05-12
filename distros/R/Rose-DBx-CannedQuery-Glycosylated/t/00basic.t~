@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+# Basic testing that module loads and that a couple simple functions
+# that don't require an actual db work
+
+use Test::More tests => 1;
+
+require_ok('CHOP::RDB::CannedQuery::Glycosylated');
+

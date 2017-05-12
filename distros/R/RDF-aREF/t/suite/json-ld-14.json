@@ -1,0 +1,4 @@
+{ 
+    "_id": "http://me.markus-lanthaler.com/",
+    "a": ["schema_Restaurant","schema_Brewery"]
+}

@@ -1,0 +1,14 @@
+%# UFO's are for real: the Air Force doesn't exist.
+
+<table border="0" cellspacing="1" cellpadding="2" width=100%>
+<tr><td class="tableTitle"><&|/l&>Requestor</&></td>
+    <td class="tableTitle"><&|/l&>#</&></td></tr>
+% foreach my $name (sort { $Data->{$b} <=> $Data->{$a} } keys %$Data) {
+<tr><td bgcolor="white"><% $name %></td>
+<td bgcolor="white" align="right"><% $Data->{$name} %></td></tr>
+% }
+</table>
+
+<%ARGS>
+$Data => {}
+</%ARGS>

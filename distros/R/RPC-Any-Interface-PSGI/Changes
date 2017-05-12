@@ -1,0 +1,12 @@
+Revision history for RPC-Any-Interface-PSGI
+
+0.03    Mon Aug 15 14:21:15 PHT 2011
+          - Switched to Module::Install
+          - Require Plack and Moose
+
+0.02    Mon Aug  8 11:17:33 PHT 2011
+          - Require RPC::Any
+
+0.01    Mon Jul 25 11:30:05 PHT 2011
+          - First version, released on an unsuspecting world.
+

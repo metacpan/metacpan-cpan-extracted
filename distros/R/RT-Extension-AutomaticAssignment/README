@@ -1,0 +1,91 @@
+NAME
+    RT-Extension-AutomaticAssignment - automatically assign tickets based on
+    rules
+
+INSTALLATION
+    RT-Extension-AutomaticAssignment requires version RT 4.2.0 or later.
+
+    perl Makefile.PL
+    make
+    make install
+        This step may require root permissions.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin( "RT::Extension::AutomaticAssignment" );
+
+        You may wish to also add this line if you want to use the "Work
+        Schedule" filter, which exposes the RT's SLA business hours as
+        custom field values:
+
+            Set( @CustomFieldValuesSources, "RT::CustomFieldValues::ServiceBusinessHours" );
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+    Create scrips
+        You may control which circumstances automatic assignment should take
+        place using RT's scrips system. For example, perhaps you want an "On
+        Create, Automatic Assignment" scrip on some of your queues. Any
+        tickets explicitly created with an owner will retain that owner, but
+        unowned tickets will use the automatic assignment system. You may
+        also want an "On Queue Change, Automatic Reassignment" scrip. The
+        "Automatic Reassignment" action is slightly different from
+        "Automatic Assignment" action because reassignment will happen even
+        if the ticket has an owner already.
+
+        You may specify as many automatic assignment and reassignment scrips
+        as you like. The automatic assignment admin UI will warn you,
+        however, if it finds no scrips.
+
+    Configure automatic assignment policies
+        Visit Admin -> Queues -> Select -> (queue) -> Automatic Assignment
+        to configure the automatic assignment policy for a queue.
+
+        There are two important stages to the automatic assignment policy.
+        First, you configure rules for deciding which users are eligible to
+        be automatically assigned tickets (based on time of day, group
+        membership, etc). Next, you configure a policy for deciding which of
+        those eligible users will be made the owner of each ticket (who has
+        the fewest open tickets, randomly, etc).
+
+        Filters are policies which reduce the number of potential candidate
+        owners based on the specified rule. For example, the "Member of
+        Group" filter limits automatic assignment to only members of the
+        selected group. The "Work Schedule" filter allows users (or,
+        perhaps, only their manager) to select which business hours that
+        they are available. You may specify zero, one, or more filters. Each
+        user must fulfill the requirements of *all* the filters to be
+        included in automatic assignment.
+
+        Chooser is the policy that automatic assignment uses to pick a
+        single owner from a list of many potential candidates. The most
+        basic Chooser is "Random". A more useful Chooser is "Active
+        Tickets": the user with the fewest number of active tickets in the
+        queue is assigned the ticket. The "Round Robin" Chooser distributes
+        tickets to each candidate owner evenly.
+
+        Each Filter and Chooser provides its documentation and configuration
+        directly on the automatic assignment interface.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-AutomaticAssignment@rt.cpan.org|mailto:bug-RT-Extension-AutomaticAssignment@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AutomaticAssignment>.
+
+COPYRIGHT
+    This extension is Copyright (C) 2016 Best Practical Solutions, LLC.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

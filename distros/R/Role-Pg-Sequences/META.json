@@ -1,0 +1,58 @@
+{
+   "abstract" : "Client Role for handling PostgreSQL Sequences",
+   "author" : [
+      "Kaare Rasmussen <kaare at cpan dot net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Role-Pg-Sequences",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::Pg" : "3",
+            "DBI" : "0",
+            "Moose::Role" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : "0",
+            "Test::Class" : "0",
+            "Test::More" : "0",
+            "Test::Pod::Coverage" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kaare/Role-Pg-Sequences.git",
+         "web" : "http://github.com/kaare/Role-Pg-Sequences"
+      }
+   },
+   "version" : "0.002"
+}
+

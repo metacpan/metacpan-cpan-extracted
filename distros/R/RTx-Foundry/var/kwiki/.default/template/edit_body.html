@@ -1,0 +1,51 @@
+<h2 class="comments-head">{{EDIT}}</h2>
+
+<div class="comments-post">
+<br />
+<script src="javascript/Edit.js"></script>
+<form method="post" 
+      action="[% script %]" 
+      enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="action" value="edit">
+<input type="hidden" name="page_id" value="[% page_id %]">
+<input type="hidden" name="version_mark" value="[% version_mark %]">
+<input type="submit" name="button-save" value="{{SAVE}}">
+<input type="text" name="page_id_new" value="[% page_id_new %]" 
+       size="15" onfocus="this.value=''">
+<input type="submit" name="button-preview" value="{{PREVIEW}}">
+<br />
+[% IF error_msg %]
+<br />
+<div class="error">[% error_msg %]</div>
+[% END %]
+<br />
+[% IF is_admin %]
+<br />
+<input type="radio" name="privacy" value="public"[% public_checked %]>
+<b>{{Public}}</b>
+<input type="radio" name="privacy" value="protected"[% protected_checked %]>
+<b>{{Protected}}</b>
+<input type="radio" name="privacy" value="private"[% private_checked %]>
+<b>{{Private}}</b><br />
+[% END %]
+
+<textarea name="wiki_text" 
+          rows="25"
+          cols="65" 
+          wrap="virtual"
+>[% wiki_text %]</textarea>
+<br />
+[% history %]
+<br />
+[% IF is_admin %]
+<br />
+<input type="checkbox" name="blog"
+       onclick="setProtected(this)">
+<b>{{Blog this page on SAVE}}</b><br />
+<input type="checkbox" name="delete"
+       onclick="setForDelete(this)">
+<b>{{Permanently delete this page on SAVE}}</b><br />
+[% END %]
+</form>
+
+</div><!-- close "comments-post" -->

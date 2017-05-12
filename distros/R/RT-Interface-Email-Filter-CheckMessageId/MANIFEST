@@ -1,0 +1,11 @@
+Changes
+INSTALL
+lib/RT/Interface/Email/Filter/CheckMessageId.pm
+Makefile.PL
+MANIFEST
+README
+xt/00.load.t
+xt/01.parse.t
+xt/pod-coverage.t
+xt/pod.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

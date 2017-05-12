@@ -1,0 +1,116 @@
+=head1 NAME
+
+REST::Google::Feeds - OO interface to Google Feeds API
+
+=head1 SYNOPSIS
+
+	use REST::Google::Feeds;
+
+	REST::Google::Feeds->http_referer('http://example.com');
+
+	my $res = REST::Google::Feeds->new('http://digg.com/rss/index.xml');
+
+	die "response status failure" if $res->responseStatus != 200;
+
+	my $feed = $res->responseData->feed;
+
+	printf "title: %s\n", $feed->title;
+	printf "link: %s\n", $feed->link;
+	printf "description: %s\n", $feed->description;
+
+	foreach my $e ( $feed->entries ) {
+		printf "\n";
+		printf "title: %s\n", $e->title;
+		printf "link: %s\n", $e->link;
+		printf "date published: %s\n", $e->publishedDate;
+	}
+
+=head1 DESCRIPTION
+
+C<REST::Google::Feeds> provides OO interface to Google REST (aka AJAX) API for feeds.
+
+=head1 METHODS
+
+=over
+
+=item __PACKAGE__->http_referer()
+
+Get/set HTTP C<Referer> header.
+
+I<Note:> Google says that you should supply a valid HTTP referer header each time you
+perform a request to their AJAX API, so C<new()> raises warning unless referer is specified.
+
+=item __PACKAGE__->new()
+
+C<q> argument should contain URL to a valid RSS or Atom feed. 
+Please refer to 'Google Feeds AJAX API' documentation for complete list of arguments for Google Feeds service. E.g.:
+
+	my $res = REST::Google::Feeds->new(
+		q => 'http://digg.com/rss/index.xml',
+	);
+
+The code above will perform a following HTTP GET request:
+
+	http://ajax.googleapis.com/ajax/services/feed/load?q=http%3A%2F%2Fdigg.com%2Frss%2Findex.xml&v=1.0
+
+I<Note:> You can left protocol version number unspecified while making your searches since
+C<v=1.0> is passed by default.
+
+See L<REST::Google> C<new> method.
+
+=item responseData
+
+Method returns C<REST::Google::Feeds::Data> object, which has a single method C<feed>.
+
+	my $res = REST::Google::Feeds->new(
+		q => 'http://digg.com/rss/index.xml',
+	);
+
+	my $feed = $res->responseData->feed;
+
+=item feed
+
+Method returns C<REST::Google::Feeds::Feed> object, which has accessors for all incapsulated data.
+
+	my $feed = $res->responseData->feed;
+	print $feed->title;
+	print $feed->link;
+
+Attributes of C<$feed> are:
+
+	title
+	link
+	author
+	description
+	type
+	entries
+
+Obtaining feed entries:
+
+	foreach my $entry ($feed->entries) {
+		print $entry->title;
+	}
+
+Attributes of C<$entry> are:
+
+	title
+	link
+	author
+	publishedDate
+	contentSnippet
+	content
+	categories
+
+=back
+
+=head1 SEE ALSO
+
+L<REST::Google> - the base class for this module
+
+L<http://code.google.com/apis/ajaxfeeds/documentation/#fonje> - Google Feeds AJAX API
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2008, Eugen Sobchenko <ejs@cpan.org> and Sergey Sinkovskiy <glorybox@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

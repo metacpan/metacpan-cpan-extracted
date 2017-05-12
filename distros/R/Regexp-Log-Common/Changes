@@ -1,0 +1,61 @@
+Revision history for Regexp-Log-Common
+======================================
+
+0.10    2014-10-15
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+
+0.09    2014-05-28
+        - fixed distribution name in META.
+        - extended support of more LogFormat fields.
+        - overhaul of documentation
+        - move test data file into their own directory.
+        - added git repository links to metadata.
+
+0.08	2013-07-29
+        - change file dates changed to meet W3CDTF standards.
+        - test file updates.
+        - updated license paths in META files.
+
+0.07	2012-08-20
+        - replaced unicode character with ASCII alternative.
+
+0.06    2012-07-15
+        - added examples/logparser.pl
+        - fixed documentation (Andrew Ford)
+        - amended additional tests to check $ENV{AUTOMATED_TESTING}
+        - spelling fix. (thanks to Florian Schlichting & Gregor Herrmann).
+        - added minimum perl version (5.006).
+        - META tests no longer require specific versions.
+        - License updated to Artistic License v2.0.
+        - removed Artistic file.
+        - added META.json and test script.
+    	- added missing IO::File pre-requisite.
+        - remove DSLIP info, as its no longer used.
+        - reworked Makefile.PL for clarity.
+
+0.05    2007-03-02
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE and Artistic files.
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - POD/README updates
+        - Devel::Cover - 100%
+
+0.04    2005-04-28
+        - bytes can also be '-' instead of 0 (Salvador Fandiño García)
+
+0.03    2005-03-21
+        - added POD coverage test script
+        - updated POD
+        - added DSLIP information
+
+0.02    2005-03-01
+        - fix for numeric or named remote host (Duane Wessels)
+        - fix for bytes (304 responses) (Duane Wessels)
+
+0.01    2005-01-21
+        - original version
+        - this module uses the base class of Regexp::Log

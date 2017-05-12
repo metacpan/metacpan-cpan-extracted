@@ -1,0 +1,77 @@
+{
+    "_comment": "Идентификаторы ключевых полей",
+    "key_fields": {
+        "1": "ACCOUNT_ID",
+        "5": "SWITCH_ID"
+    },
+
+    "_comment": [
+        "Базы данных.",
+        "type может содержать: mysql, Pg, SQLite (регистр символов важен!).",
+        "В случае с SQLite поле database содержит полный путь к файлу БД"
+    ],
+    "databases": {
+        "users": {
+            "database": "users",
+            "type": "mysql",
+            "host": "localhost",
+            "port": "3306",
+            "username": "root",
+            "password": "1"
+        },
+        "ip": {
+            "database": "/home/rt/ip_addresses.db",
+            "type": "SQLite",
+            "username": "",
+            "password": ""
+        }
+    },
+
+    "_comment": "Источники данных для пользовательских полей",
+    "field_sources": {
+
+        "_comment": [
+            "IP-адреса (CF id == 2)",
+            "Для получения данных из БД нужно указать идентификатор БД и SQL-запрос."
+        ],
+        "2": [
+            {
+                "database": "users",
+                "sql"     : "SELECT ip FROM ip_address WHERE account_id = ACCOUNT_ID"
+            }
+        ],
+
+        "_comment": [
+            "Телефон (CF id == 3)",
+            "Для получения данных из внешней команды нужно указать эту команду",
+            "(с полным путем и всеми опциями командной строки)."
+        ],
+        "3": [
+            {
+                "command": "/bin/echo 'hello ACCOUNT_ID'"
+            }
+        ],
+
+        "_comment": "Адрес (CF id == 4)",
+        "4": [
+            {
+                "database": "users",
+                "sql": "SELECT address FROM user_address WHERE account_id = ACCOUNT_ID"
+            }
+        ],
+
+        "_comment": "Тело заявки",
+        "Body":    [
+            { "command": "/bin/cat /home/rt/ACCOUNT_ID" },
+            { "command": "/bin/cat /home/rt/ACCOUNT_ID" },
+            { "command": "/bin/cat /home/rt/ACCOUNT_ID" },
+            { "Text": "Это просто текст. Акк ИД: ACCOUNT_ID" },
+            { "Text": "Это обычный текст без акк. ид." }
+        ],
+
+        "_comment": "Тема заявки",
+        "Subject": [
+            { "command": "/bin/echo 'this is a subject, account: ACCOUNT_ID'" }
+        ]
+    }
+}

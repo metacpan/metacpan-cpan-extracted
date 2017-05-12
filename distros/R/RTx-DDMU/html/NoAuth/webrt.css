@@ -1,0 +1,377 @@
+#event {
+    font-family: trebuchet ms, verdana, arial, sans-serif;
+    color:#000000;
+    font-weight:normal;
+    background:#FFFFFF;
+    padding-left:15px;
+    padding-right: 15px;
+    border: 1px solid #c1c1bf;
+    border-spacing: 1px;
+    width: 80%;
+    align: center; 					
+}
+		
+#event a {
+    color: #6994BF;
+    text-decoration: none;
+}
+
+#event a:link,
+#event a:visited {
+    color: #6994BF
+}
+
+#event a:active {
+    color: #FF6600;
+}
+#event a:hover {
+    font-family: trebuchet ms, verdana, arial, sans-serif;
+    font-size: normal;
+    color: #FF6600;
+    text-decoration: none;
+}
+
+.org {
+    background:#ffF;
+    color:#000;
+    font-size: normal;
+    padding-left:10px;
+}
+		
+.contact {
+    font-family: trebuchet ms,verdana, ariel, sans-serif;
+    color:#000;
+    font-size: normal; 
+    background:#fff;
+    padding-left:10px;	
+}	
+.locate {
+    font-family: trebuchet ms, verdana, ariel, sans-serif;
+    color:#000;
+    font-size: normal;
+    background:#fff;
+    padding-left:10px;	
+}
+.date {
+    font-family: trebuchet ms, verdana, arial, sans-serif;
+    color:#000;
+    font-size:normal;
+    font-weight:normal;
+    background:#fafafa;
+    line-height:140%;		
+    border-left:1px solid #fafafa;			
+    border-right:1px solid #fafafa;
+    border-bottom:1px solid #fafafa;
+    padding:10px;
+    padding-right:10px;
+}
+.calendar {
+    align: center;
+}
+	    
+.caltable {
+    border: 1px solid #fafafa;
+    border-spacing: 5px;
+    width: 100%;
+    align: center;
+    font-color: #000000;
+}
+.calcell {
+    border: 1px solid #fafafa;
+}
+.calweekdaycell {
+    border: 1px solid #c1c1bf;
+    font-family: trebuchet ms, verdana;
+    font-size: 12px;
+    padding-right: 6px;
+    text-align: right;
+    vertical-align: top;
+}
+.calweekdaycell a {
+    font-color: #000000;
+    text-decoration: none;
+}
+.calweekdaycell a:link {
+    font-color: #000000;
+    text-decoraton: dashed;
+}	
+.calweekdaycell	a:active {
+    color: #FF6600;
+}
+.calweekdaycell	a:hover {
+    color: #FF6600;
+}
+.calweekdaycell	a:visited {
+    color: #6994BF;
+}
+.calweekendcell {
+    border: 1px solid #6994bf;
+    font-family: trebuchet ms, verdana;
+    font-size: 12px;
+    padding-right: 6px;
+    text-align: right;
+    vertical-align: top;
+}
+.calweekendcell a {
+    font-color: #000000;
+    text-decoration: none;
+}
+.calweekendcell a:link {
+    font-color: #000000;
+    text-decoraton: dashed;
+}	
+.calweekendcell	a:active {
+    color: #FF6600;
+}
+.calweekendcell	a:hover {
+    color: #FF6600;
+}
+.calweekendcell	a:visited {
+    color: #6994BF;
+}
+
+.caltodaycell {
+    background-color: #deecec;
+    border: 1px solid #ff6600;
+    font-family: trebuchet ms, verdana;
+    font-size: 12px;
+    padding-right: 6px;
+    text-align: right;
+    vertical-align: top;
+}
+.caltodaycell a {
+    font-color: #000000;
+    text-decoration: none;
+}
+.caltodaycell a:link {
+    font-color: #000000;
+    text-decoraton: dashed;
+}	
+.caltodaycell	a:active {
+    color: #FF6600;
+}
+.caltodaycell	a:hover {
+    color: #FF6600;
+}
+.caltodaycell	a:visited {
+    color: #6994BF;
+}
+
+.calheader {
+    background-color: #fafafa;
+    border: 1px solid #cacabf;
+    font-color: #ff6600;
+    font-family: trebuchet ms, verdana;
+    font-size: 16px;
+    font-weight: normal;
+    padding: 6px;
+    text-align: center;
+}
+.calrightcell {
+    border: 1px solid #c1c1bf;
+    font-family: trebuchet ms, verdana;
+    font-size: 12px;
+    padding-right: 6px;
+    text-align: right;
+    vertical-align: top;
+}
+.calrightcell a {
+    font-color: #000000;
+    text-decoration: none;
+}
+.calrightcell a:link {
+    font-color: #000000;
+    text-decoraton: dashed;
+}	
+.calrightcell	a:active {
+    color: #FF6600;
+}
+.calrightcell	a:hover {
+    color: #FF6600;
+}
+.calrightcell	a:visited {
+    color: #6994BF;
+}
+.calleftcell {
+    border: 1px solid #c1c1bf;
+    font-family: trebuchet ms, verdana;
+    font-size: 12px;
+    padding-left: 6px;
+    text-align: left;
+    vertical-align: top;
+}
+.calleftcell a {
+    font-color: #000000;
+    text-decoration: none;
+}
+.calleftcell a:link {
+    font-color: #000000;
+    text-decoraton: dashed;
+}	
+.calleftcell	a:active {
+    color: #FF6600;
+}
+.calleftcell	a:hover {
+    color: #FF6600;
+}
+.calleftcell	a:visited {
+    color: #6994BF;
+}
+.point {
+    color: #FF6600;
+    font-size:12px;
+}
+        
+table.editform {
+    border: 1px solid #fafafa;
+    border-spacing: 1px;
+    width: 550px;
+}
+.editform .formfield {
+    background-color: #fafafa;
+    font-family: trebuchet ms, verdana;
+    font-size: 12px;
+    padding-right: 6px;
+    text-align: right;
+    vertical-align: top;
+    width: 150px;
+}
+.editform .forminput {
+    border-top: 0px solid #fafafa;
+    font-family: verdana;
+    font-size: 12px;
+    text-align: left;
+    vertical-align: top;
+}
+.editform .formnotes {
+    font-size: 10px;
+}
+.editform .formrequired {
+    background-color: #fcceef;
+    font-family: trebuchet ms, verdana;
+    font-size: 12px;
+    font-weight: normal;
+    padding-right: 6px;
+    text-align: right;
+}
+.editform .heading {
+    background-color: #fafafa;
+    font-color: #ff6600;
+    font-family: trebuchet ms, verdana;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 6px;
+    text-align: center;
+}
+.editform .intro {
+    font-family: verdana;
+    font-size: 12px;
+    padding: 6px;
+}
+.editoptions {
+    font-family: verdana;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: right;
+}
+.smallstring {
+    font-size: 12px;
+    font-weight: normal;
+    font-family: trebuchet ms, verdana;
+}
+
+form#editform {
+    margin-top: 12px;
+    text-align: center;
+    width: 500px;
+}
+.formfield {
+    border-bottom: 0px solid #6699cc;
+    font-family: trebuchet ms, verdana;
+    font-size: 12px;
+    text-align: right;
+    vertical-align: middle;
+}
+.forminput {
+    font-family: verdana;
+    font-size: 12px;
+    text-align: left;
+    vertical-align: top;
+}
+
+#search {	}
+
+#search input {
+    text-align: center;
+    color: #4f4f4f;
+    border: 0px;
+    font: 10px/8px trebuchet ms, verdana, Sans-Serif;
+    padding: 1px;
+    border: 1px solid #ccc;
+}
+
+#search .button {
+    border: 0px;
+    font: 10px trebuchet ms, verdana, Sans-Serif;
+    color: black;
+    padding: 2px;
+    background: #fff;
+}
+		
+#formcss {
+
+}
+		
+#formcss input{
+    text-align: center;
+    color: #4f4f4f;
+    font: 11px trebuchet ms, verdana, Sans-Serif;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+	
+#formcss .button {
+    text-align: center;
+    border: 1px solid #ccc;
+    font: 11px trebuchet ms, verdana, Sans-Serif;
+    color: #4f4f4f;
+    padding: 2px;
+    background: #fff;
+}
+		
+#form option {
+    text-align: center;
+    color: #4f4f4f;
+    font-family: trebuchet ms, verdana, Sans-Serif;
+    font-size: 11px;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+#formcss select{
+    border: 1px dotted #FFCC99;
+    font-family:  trebuchet ms, verdana, serif; 
+    font-size: 11px; 
+    color: #666666; 
+    background-color: #FFFFFF; 
+    width:;
+    scrollbar-arrow-color: yellow;
+    scrollbar-base-color: black;
+    scrollbar-dark-shadow-color: #cccccc;
+    scrollbar-track-color: #cccccc;
+    scrollbar-face-color: #b4b4b4;
+    scrollbar-shadow-color: white;
+    scrollbar-highlight-color: silver;
+    scrollbar-3d-light-color: black
+}
+
+%# Provide a callback for adding/modifying the style sheet.
+%# http://www.w3.org/TR/REC-CSS1 - section 3.2, says:
+%#   "latter specified rule wins"
+<& /Elements/Callback &>
+<%flags>
+inherit => undef
+</%flags>
+<%init>
+$r->content_type('text/css');
+#$r->headers_out->{'Expires'} = '+30m';
+</%init>

@@ -1,0 +1,8 @@
+<%ONCE>
+eval {
+    	require RT::IODEF;
+};
+if ( $@ ) {
+    $RT::Logger->crit("System error. Couldn't load RT-IODEF module(s): $@");
+}
+</%ONCE>

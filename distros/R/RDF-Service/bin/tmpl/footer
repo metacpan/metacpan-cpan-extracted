@@ -1,0 +1,19 @@
+
+<input type=hidden name=handler value="$template.next_handler">
+<input type=hidden name=previous value="$handler">
+<input type=hidden name=action value="">
+</form>
+
+<p><a href="javascript:go('person_add_form')">Add Person</a>
+ | <a href="javascript:go('person_list')">List persons</a>
+ | <a href="javascript:go('person_list','initiate_db')">Initiate DB</a>
+</p>
+
+[% rows = 4 + dlines() - offset %]
+<script language="javascript">
+parent.log.location.href="tail.cgi?$rows";
+</script>
+
+<p><em>Session [% s.uri %]</em></p>
+
+</body></html>

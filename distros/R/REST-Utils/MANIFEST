@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+lib/REST/Utils.pm
+t/00-signature.t
+t/01-load.t
+t/content-negotiation.t
+t/get-body.t
+t/http-tunnel.t
+t/mime-parse.t
+Makefile.PL
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

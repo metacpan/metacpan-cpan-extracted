@@ -1,0 +1,39 @@
+Changes
+COPYING
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/source/format
+debian/watch
+devel/no-defaults.pl
+devel/regexp-emacs.pl
+lib/Regexp/Common/ANSIescape.pm
+lib/Regexp/Common/Emacs.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+SIGNATURE
+t/ANSIescape.t
+t/Emacs.t
+t/MyTestHelpers.pm
+xt/0-examples-xrefs.t
+xt/0-file-is-part-of.t
+xt/0-META-read.t
+xt/0-no-debug-left-on.t
+xt/0-Test-ConsistentVersion.t
+xt/0-Test-DistManifest.t
+xt/0-Test-Pod.t
+xt/0-Test-Synopsis.t
+xt/0-Test-YAML-Meta.t
+xtools/my-check-copyright-years.sh
+xtools/my-check-file-part-of.sh
+xtools/my-check-spelling.sh
+xtools/my-deb.sh
+xtools/my-diff-prev.sh
+xtools/my-manifest.sh
+xtools/my-pc.sh
+xtools/my-tags.sh
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

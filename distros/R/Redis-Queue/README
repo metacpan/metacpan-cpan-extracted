@@ -1,0 +1,42 @@
+Redis-Queue
+
+Queue management using Redis cache server.
+
+We're still in the process of setting this library up for public consumption.
+Please do not submit any bug reports while this message is still in the README.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Redis::Queue
+
+You can also look for information at:
+
+    GitHub
+        https://github.com/Redis-Queue
+
+ACKNOWLEDGEMENTS
+
+Thank you to Marchex <http://www.marchex.com/> for allowing time to be spent
+developing and maintaining this library.
+Thanks also to Chris Petersen for major assistance in packaging of this library.
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Alex Popiel
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License version 2.0.
+
+See http://www.perlfoundation.org/artistic_license_2_0 for more information.

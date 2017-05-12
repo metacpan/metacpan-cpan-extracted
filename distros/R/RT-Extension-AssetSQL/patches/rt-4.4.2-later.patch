@@ -1,0 +1,73 @@
+diff --git a/share/html/Elements/CollectionList b/share/html/Elements/CollectionList
+index fd8c6e6..08ce079 100644
+--- a/share/html/Elements/CollectionList
++++ b/share/html/Elements/CollectionList
+@@ -50,6 +50,10 @@ if (!$Collection && $Class eq 'RT::Tickets') {
+     $Collection = RT::Tickets->new( $session{'CurrentUser'} );
+     $Collection->FromSQL($Query);
+ }
++elsif (!$Collection && $Class eq 'RT::Assets') {
++    $Collection = RT::Assets->new( $session{'CurrentUser'} );
++    $Collection->FromSQL($Query);
++}
+ 
+ # flip HasResults from undef to 0 to indicate there was a search, so
+ # dashboard mail can be suppressed if there are no results
+diff --git a/share/html/Elements/ShowSearch b/share/html/Elements/ShowSearch
+index 53ad702..5be90d6 100644
+--- a/share/html/Elements/ShowSearch
++++ b/share/html/Elements/ShowSearch
+@@ -52,7 +52,7 @@
+     titleright => $customize ? loc('Edit') : '',
+     titleright_href => $customize,
+     hideable => $hideable &>
+-<& $query_display_component, hideable => $hideable, %$ProcessedSearchArg, ShowNavigation => 0, Class => 'RT::Tickets', HasResults => $HasResults, PreferOrderBy => 1 &>
++<& $query_display_component, hideable => $hideable, %$ProcessedSearchArg, ShowNavigation => 0, Class => $SearchArg && ($SearchArg->{SearchType}||'') eq 'Asset' ? 'RT::Assets' : 'RT::Tickets', HasResults => $HasResults, PreferOrderBy => 1 &>
+ </&>
+ <%init>
+ my $search;
+@@ -76,7 +76,13 @@ if ($SavedSearch) {
+     }
+     $SearchArg->{'SavedSearchId'} ||= $SavedSearch;
+     $SearchArg->{'SearchType'} ||= 'Ticket';
+-    if ( $SearchArg->{SearchType} ne 'Ticket' ) {
++    if ( $SearchArg->{SearchType} eq 'Asset' ) {
++        $query_link_url = RT->Config->Get('WebPath') . "/Asset/Search/Results.html";
++        $customize = RT->Config->Get('WebPath') . '/Asset/Search/Build.html?'
++            . $m->comp( '/Elements/QueryString',
++            SavedSearchLoad => $SavedSearch );
++    }
++    elsif ( $SearchArg->{SearchType} ne 'Ticket' ) {
+ 
+         # XXX: dispatch to different handler here
+         $query_display_component
+@@ -133,14 +139,24 @@ my $QueryString = '?' . $m->comp( '/Elements/QueryString', %$SearchArg );
+ 
+ my $title_raw;
+ if ($ShowCount) {
+-    my $tickets = RT::Tickets->new( $session{'CurrentUser'} );
+-    $tickets->FromSQL($ProcessedSearchArg->{Query});
+-    my $count = $tickets->CountAll();
++    my $collection;
++    my $count;
+ 
+-    $title_raw = '<span class="results-count">' . loc('(Found [quant,_1,ticket,tickets])', $count) . '</span>';
++    if ($SearchArg && ($SearchArg->{SearchType}||'') eq 'Asset') {
++        $collection = RT::Assets->new( $session{'CurrentUser'} );
++        $collection->FromSQL($ProcessedSearchArg->{Query});
++        $count = $collection->CountAll();
++        $title_raw = '<span class="results-count">' . loc('(Found [quant,_1,asset,assets])', $count) . '</span>';
++    }
++    else {
++        $collection = RT::Tickets->new( $session{'CurrentUser'} );
++        $collection->FromSQL($ProcessedSearchArg->{Query});
++        $count = $collection->CountAll();
++        $title_raw = '<span class="results-count">' . loc('(Found [quant,_1,ticket,tickets])', $count) . '</span>';
++    }
+ 
+     # don't repeat the search in CollectionList
+-    $ProcessedSearchArg->{Collection} = $tickets;
++    $ProcessedSearchArg->{Collection} = $collection;
+     $ProcessedSearchArg->{TotalFound} = $count;
+ }
+ </%init>

@@ -1,0 +1,232 @@
+#!/usr/bin/perl
+
+# rrd perl tool
+
+# pragmata ----------------------------
+
+use feature  qw( :5.10 );
+use strict;
+use warnings;
+
+# utility -----------------------------
+
+use Data::Dumper           qw( Dumper );
+use File::Find             qw( find );
+use File::Spec::Functions  qw( catfile );
+use FindBin                qw( $Bin $Script );
+use Getopt::Long           qw( GetOptions :config no_ignore_case );
+use List::MoreUtils        qw( uniq );
+use Log::Log4perl          qw( );
+use Params::Validate       qw( validate_pos
+                               HASHREF SCALAR );
+use RRDs                   qw( );
+use YAML                   qw( );
+
+use lib  "$Bin/perllib";
+
+use RRD::Daemon::Util         qw( ftime FTIME_INC_EPOCH FTIME_SHORT
+                                  ddumps tdumpc tdumps
+                                  init_log4perl mlhash );
+use RRD::Daemon::RRDB         qw( );
+use RRD::Daemon::RRDB::Graph  qw( );
+
+# constants ---------------------------
+
+use constant MODE_INFO     => 'mode:info';
+use constant MODE_RAWINFO  => 'mode:rawinfo';
+use constant MODE_GRAPH    => 'mode:graph';
+use constant MODE_FETCH    => 'mode:fetch';
+
+# globals -----------------------------
+
+$Data::Dumper::Sortkeys = 1;
+
+my $Overwrite;
+my $MaxPrintInterval = 3; # number of consecutive undefined values to print in fetch mode
+my $Start;
+my $End;
+my @Colours;
+
+# sub ------------------------------------------------------------------------
+
+sub dump_rawinfo {
+  my ($rrdfn) = validate_pos(@_, 'SCALAR');
+
+  my $info = mlhash(RRDs::info($rrdfn), qr/\./);
+  say YAML::Dump $info;
+}
+
+# -------------------------------------
+
+sub dump_info {
+  my ($rrdfn) = validate_pos(@_, 'SCALAR');
+
+  my $rrdb = RRD::Daemon::RRDB->new($rrdfn);
+  my $infostr = $rrdb->info_string;
+  print $infostr;
+}
+
+# -------------------------------------
+
+sub dump_graph {
+  my ($rrdfns, $out_fn, $range) = @_;
+
+  die "cannot graph without a file to write to\n"
+    unless defined $out_fn;
+  die "will not overwrite '$out_fn' without -O\n"
+    if -e $out_fn and ! defined $Overwrite;
+
+  my $graph = RRD::Daemon::RRDB::Graph->new($rrdfns);
+  $graph->range($range);
+  $graph->start($Start);
+  $graph->end($End);
+  $graph->colours(@Colours)
+    if @Colours;
+  $graph->graph($out_fn, $range);
+}
+
+# -------------------------------------
+
+sub dump_data {
+  my ($rrdfn, $cf)= @_; # cf is consolidation function
+  my $rrdb = RRD::Daemon::RRDB->new($rrdfn);
+
+  my @fetch_args = ($rrdfn, $cf);
+  push @fetch_args, -s => $Start
+    if defined $Start;
+  push @fetch_args, -e => $End
+    if defined $End;
+  
+  my ($start, $step, $names, $data) = RRDs::fetch @fetch_args;
+  my $end = $start + $step*@$data;
+  printf "Intvl:\t[%10d %s GMT] --- [%10d %s GMT]\n",
+         $start, scalar gmtime $start,
+         $end,   scalar gmtime $end;
+  print  "Step:\t${step}s\n";
+  print  "DS:\t", join (", ", @$names), "\n";
+  print "Data#:\t", $#$data + 1, "\n";
+  print "Data:\n";
+
+  # indices of defined data points
+  my @dpoints = grep grep(defined, @{$data->[$_]}), 0..$#$data;
+
+  my $last_dpoint;
+  # make a start...
+  if ( @dpoints ) {
+    $last_dpoint = $dpoints[0];
+    _dump_dpoints($step*$dpoints[0]+$start, $data->[$dpoints[0]]);
+  }
+
+  # ...for each defined point, print it; for everything else, print ellipses
+  # unless the gap between defined points is few
+  for my $dpoint ( @dpoints[1..$#dpoints] ) {
+    given ( $dpoint - $last_dpoint ) {
+      when ( $_ > $MaxPrintInterval )
+        { say '  ...' }
+      when ( $_ <= $MaxPrintInterval )
+        { _dump_dpoints($step*($_)+$start)
+            for $last_dpoint+1..$dpoint-1 }
+      default
+        { }
+    }
+    _dump_dpoints($step*$dpoint+$start, $data->[$dpoint]);
+    $last_dpoint = $dpoint;
+  }
+}
+
+sub _dump_dpoints {
+  printf "  [%10d %s GMT]\t%s\n",
+         $_[0], scalar(gmtime $_[0]),
+         join "\t", map defined $_ ? sprintf("%6.1f", $_) : '-', @{$_[1]};
+}
+
+# main -----------------------------------------------------------------------
+
+init_log4perl;
+
+my ($out_fn, $range);
+GetOptions('v|verbose+'  => sub { Log::Log4perl->get_logger('')->more_logging },
+           'q|quiet+'    => sub { Log::Log4perl->get_logger('')->less_logging },
+           'o|outfile=s' => \$out_fn,
+           'O|overwrite!'=> \$Overwrite,
+           'r|range=s'   => \$range,
+           'debug=s',    => \&Log::Log4perl::Local::debug,
+           'debug-all'   => \&Log::Log4perl::Local::debug,
+           'trace=s',    => \&Log::Log4perl::Local::debug,
+           'trace-all'   => \&Log::Log4perl::Local::debug,
+           'mpi=i'       => \$MaxPrintInterval,
+           's|start=s'   => \$Start,
+           'e|end=s'     => \$End,
+           'colour|color|C=s' => sub { push @Colours, split /,/, $_[1] },
+          )
+  or die "options parsing failed\n";
+
+die "Usage: $Script <info> <rrdfn>+\n"
+  unless 2 <= @ARGV;
+my ($mode, @rrdfns) = @ARGV;
+die "multiple rrdfns permitted only in graph mode\n"
+  if 1 < @ARGV and ! 'graph' eq $mode;
+my $rrdfn = $rrdfns[0];
+my $rrdb  = RRD::Daemon::RRDB->new($rrdfn)
+  or die "failed to create RRDB from $rrdfn\n";
+
+# scan rrdfns for directories; if found, search them for rrd files
+for(my$i=0; $i<@rrdfns; $i++) {
+  use Data::Dumper; 
+  given ( $rrdfns[$i] ) {
+    when ( -d ) {
+      my @new_fns;
+      find({ wanted => sub {
+               push @new_fns, $File::Find::name
+                 if $File::Find::name =~ /\.rrd/ and -f $File::Find::name;
+             },
+             no_chdir => 1, 
+             preprocess => sub { 
+               # pre-filter unreadable items, to avoid annoying warnings
+               return grep -r catfile($File::Find::dir, $_), @_;
+             } }, $_);
+      splice @rrdfns, $i, 1, @new_fns;
+      $i += @new_fns - 1;
+    }
+
+    # order is important; -d => -e, so check -d first
+    when ( -e ) { } # nothing to see here
+
+    default     { die "no such file: $_\n" }
+  }
+}
+
+@rrdfns = uniq @rrdfns;
+tdumps rrdfns => \@rrdfns;
+
+if ( defined $Start and $Start !~ /^\d+$/ ) {
+  my $end = $End || time;
+  tdumpc { Start => $Start, end => $end };
+  ($Start, $End) = RRDs::times $Start, $end;
+  tdumpc { Start => ftime($Start), End => ftime($End) };
+} elsif ( defined $End and $End !~ /^\d+$/ ) {
+  my $start = $Start || $rrdb->start;
+  tdumpc { start => $start, End => $End };
+  ($Start, $End) = RRDs::times $start, $End;
+  tdumpc { Start => ftime($Start), End => ftime($End) };
+}
+
+ddumps Start => ftime($Start, FTIME_INC_EPOCH),
+       End   => ftime($End, FTIME_INC_EPOCH) ;
+
+my $Mode;
+given ( $mode ) {
+  when ( 'info' )     { $Mode = MODE_INFO }
+  when ( 'rawinfo' )  { $Mode = MODE_RAWINFO }
+  when ( 'graph' )    { $Mode = MODE_GRAPH }
+  when ( 'fetch' )    { $Mode = MODE_FETCH }
+  default             { die "bad mode string '$mode'\n" }
+}
+
+given ( $Mode ) {
+  when ( MODE_INFO )     { dump_info($rrdfn)                   }
+  when ( MODE_RAWINFO )  { dump_rawinfo($rrdfn)                }
+  when ( MODE_GRAPH )    { dump_graph(\@rrdfns, $out_fn, $range) }
+  when ( MODE_FETCH )    { dump_data($rrdfn, 'MAX')           } # XXX MAX
+  default                { die sprintf "unknown mode '%s'\n", $Mode//'*undef*' }
+}

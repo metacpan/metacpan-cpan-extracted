@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+##
+## I do nothing.  This is a placeholder for upgrades from pre-2.72.
+##
+## Copyright (c) 1998, Vipul Ved Prakash.  All rights reserved.
+## This code is free software; you can redistribute it and/or modify
+## it under the same terms as Perl itself.
+##
+## $Id: razor-client,v 1.10 2005/06/16 21:54:14 vipul Exp $
+
+# No longer creates symlinks, leaving this wrapper behind to ensure
+# that upgrades work as expected.
+
+print "This program is deprecated and no longer necessary. You may begin using Razor now.\n";
+
+exit;

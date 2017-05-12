@@ -1,0 +1,7 @@
+/*
+ * Test 1-01 : dump the model
+ */
+
+SELECT *
+SOURCE <model1.nt>
+WHERE  (?x, ?y, ?z)

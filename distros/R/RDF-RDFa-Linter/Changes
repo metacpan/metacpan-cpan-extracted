@@ -1,0 +1,41 @@
+RDF-RDFa-Linter
+===============
+
+Created:      2010-05-07
+Home page:    <https://metacpan.org/release/RDF-RDFa-Linter>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDFa-Linter>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.053  2012-12-12
+
+ - (Update) Switch from RDF::TrineShortcuts to RDF::TrineX::Functions.
+
+0.052  2011-10-18
+
+ - (Addition) RDF::RDFa::Linter::Service::SchemaOrg.
+ - (Packaging) use Module::Package::RDF
+ - (Update) RDF::RDFa::Linter::Service::Facebook.
+
+0.051  2010-12-22
+
+ - Add RDF::RDFa::Generator dependency to Makefile.PL.
+
+0.050  2010-12-21
+
+ - (Update) Support ogp.me namespace for Open Graph Protocol data.
+
+0.04  2010-05-22
+
+ - (Bugfix) Include Google.pm in the MANIFEST file.
+
+0.03  2010-05-22
+
+ - (Addition) Add very minimal checks for Google Rich Snippets.
+
+0.02  2010-05-21
+
+ - (Addition) Add longitude and latitude sanity checks for OGP.
+
+0.01  2010-05-19  # First release
+
+

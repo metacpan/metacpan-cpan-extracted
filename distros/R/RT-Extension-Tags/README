@@ -1,0 +1,78 @@
+NAME
+    RT-Extension-Tags - Provides simple tagging using custom fields
+
+DESCRIPTION
+    This extension allows you to create tags using custom fields on tickets.
+    It adds a new custom field type, "Tags", which allows users to add new
+    values (tags) that will then be added to the list of available
+    autocomplete values for that custom field.
+
+    The created tags become links to a search of all active tickets with
+    that tag.
+
+  Tag Custom Field
+    The initdb step installs an example global Tag custom field.
+
+RT VERSION
+    Works with RT 4.0, 4.2, 4.4
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        This optional step installs an example global Tag custom field.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::Tags');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::Tags));
+
+        or add RT::Extension::Tags to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+  UPGRADING
+    If you are upgrading from version 0.01 or 0.02, note that the custom
+    field type was changed from a default RT "multiple values with
+    autocompletion" to a dedicated tag custom field type. To upgrade:
+
+    *   Change your Tag custom field to use the new tag custom field type
+
+        You can either edit your existing custom field and change the Type
+        to "Enter multiple tags" or run the initdb step and copy your values
+        to the new Tag custom field automatically created.
+
+    *   Disable the scrip "On Custom Field Change Add New Tag Values"
+
+        This scrip is no longer needed with the new tag custom field type,
+        so you can disable or delete it.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-Tags@rt.cpan.org|mailto:bug-RT-Extension-Tags@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Tags>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2016 by Best Practical Solutions, LLC
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

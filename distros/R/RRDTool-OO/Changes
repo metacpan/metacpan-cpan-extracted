@@ -1,0 +1,188 @@
+0.36  (05/12/2015)
+    (ms) Gelu Lupa added RRD's first() function.
+
+0.35  (07/20/2014)
+    (ms) Fix for [rt.cpan.org #97322], now rounding results to cope with
+         floating point inaccuracies in rrdtool. Reported by Andreas König.
+
+0.34  (06/26/2014)
+    (ms) Added disable_rrdtool_tag option as suggested by Sun Guonian.
+
+0.33  (07/08/2013)
+    (ms) Florian Eckert reported that graph() modified 2nd level
+         entries of the options array passed to it. Used Storable::clone
+         in OO.pm to make a deep copy first.
+
+0.32  (03/06/2012)
+    (ms) [rt.cpan.org #63351] Applied modified patch by Jonas Wagner to
+         fix stacked graphs with no legend.
+    (ms) Implements RRDs::xport and returns a Perl structure instead of 
+         basic xport array (Remi Ferrand, Fabien Wernli).
+
+0.31  (05/26/2010)
+    (ms) [rt.cpan.org #54870] Fixed typos/pod errors reported by
+         Salvatore Bonaccorso.
+    (ms) Fixed overwriting input parameters in create(), bug reported
+         by Erik Wasser.
+
+0.30  (02/21/2010)
+    (ms) [RT 53961] Worked around rrdtool-1.3.5 inaccuracy problem by
+         skipping certain tests for rrdtool <= 1.4.
+
+0.29  (02/20/2010)
+    (ms) Added github repository link to Makefile.PL
+    (ms) Fixed documentation for fetch_next().
+    (ms) [RT 54544] Tom Regner added support for updatev().
+
+0.28 (11/05/2009)
+    (ms) Applied patch by Lyle Brooks, adding optional step, start, and
+         end parameters to "draw".
+
+0.27 (10/11/2009)
+    (ms) Slaven Rezic reported huge memory consumption by the test suite,
+         turned out to be fetch_start() call spanning several years. 
+         Fixed by defining the end time as well as the start time.
+
+0.26 (09/27/2009)
+    (ms) [RT 32601] Using prompt() instead of manually asking for input 
+         in Makefile.PL (by Fabien Wernli)
+    (ms) [RT 32046] Calling setlocale() to fix error message check in 
+         foreign locales (by Fabien Wernli)
+    (ms) Implemented graphv method. This works just like graph() but uses 
+         rrdtool's graphv internally, giving access to additional 
+         information using print_results() method (by Fabien Wernli)
+    (ms) Improved RRDs version testing (by Fabien Wernli).
+
+0.25 (04/25/2009)
+    (ms) Applied patch by Christian Dengler, adding the 'hrule' graph
+         parameter and increasing the sleep time in 002Pod.t to two
+         secs to prevent system clock inacurracies from causing
+         test failures.
+
+0.24 (04/02/2009)
+    (ms) Added support for capturing PRINT output as suggested by
+         Peter Mistich. print_output() now returns a ref to an array
+         with the output of the last graph() command's PRINT output.
+
+0.23 (02/05/2009)
+    (ms) update() now accepts DateTime objects as well (suggested by 
+         Jay Buffington)
+    (ms) [rt.cpan.org #43011] Fixed rounding error on 64-bit systems
+         reported by Todd E. Rinaldo
+
+0.22 (05/20/2008)
+    (ms) Added aberrant behavior detection (hwpredict) with documentation
+         and test cases.
+
+0.21 (01/23/2008)
+    (ms) Provided backwards compatibility to rrdtool-1.0 for 
+         draw/type=stack, which now translates to an area with the 
+         :STACK option.
+
+0.20 (01/22/2008)
+    (ms) Bas van der Veen reported that the rrdtool download link 
+         changed to http://oss.oetiker.ch/rrdtool/pub/rrdtool.tar.gz,
+         adapted Makefile.PL.
+    (ms) No longer expecting 'Permission denied' to support localized
+         OSes.
+
+0.19 (05/12/2007)
+    (ms) Added 'strict' mode (defaults to true).
+    (ms) Added latest graph parameters from the latest rrdtool release.
+
+0.18 (05/12/2007)
+    (ms) Added 'dry mode' patch by Jacquelin Charbonnel.
+
+0.17 (09/10/2006)
+    (ms) Changed build command in Makefile.PL to adapt to new
+         rrdtool-1.2 directory hierarchy, as suggested by Zac Israel.
+
+0.16 (08/23/2006)
+    (ms) Added 'base' option to graph method, as suggested by 
+         Anton Shevchenko.
+
+0.15 (07/23/2006)
+    (ms) Fixed bug with multiple comment lines, of which only the first
+         one was printed in the graph. It was introduced in 0.14. 
+         Thanks to Steve van der Burg for reporting and a patch.
+
+0.14 (04/28/2006)
+    (ms) Order of prints, legends, gprints etc. now preserved, see
+         http://lists.ee.ethz.ch/rrd-users/msg11161.html
+
+0.13 (08/07/2005)
+    (ms) Added line, area, tick, and shift to graph method.
+    (ms) Added vdef to graph.
+    (ms) More checks on rrdtool installation, now requiring 1.2.x.
+
+0.12 (07/07/2005)
+    (ms) Steve van der Burg added vrule, comment, and font options
+    (ms) Makefile.PL dependencies version number changed from undef to 0
+    (ms) Added 'rigid' option to graph.
+
+0.11 (01/05/2005)
+    (ms) Added suggestion by Richard Lippmann <lippmann@sprachtheorie.de>
+         to allow for invisible graphs, just used as base for later 
+         'cdef' calculations. Since leaving 'type' out will have
+         RRDTool::OO default to 'line', type => 'hidden' is used to
+         indicate the graph shouldn't be drawn. 
+    (ms) Added gprint/print options for graphs
+
+0.10 (11/20/2004)
+    (ms) Added legends to graph()
+    (ms) Maxence Gerbedoen <maxxenceg@wanadoo.fr> suggested a patch to 
+         add 'cdef' functionality. Added slightly differently.
+
+0.09 (10/08/2004)
+    (ms) Fixed bug [cpan #7897]. new() now accepts a raise_error setting.
+
+0.08 (09/24/2004)
+    (ms) Added documentation for multiple data sources and archives.
+    (ms) Martin Kurahaupo <martin@kurahaupo.gen.nz> added a patch
+         to prevent the test suite from failing when run as root
+         because a test file can't be write-protected.
+    (ms) Chris Fedde <cfedde@denver.pm.org> provided a patch to 
+         structure ::info's output more perl-like. Got input from
+         perlmonks (thanks nobull!) on how to efficiently transform
+         RRDTools info output into Perl data structures.
+
+0.07 (08/15/2004)
+    (ms) doc and test fixes for new rrdtool release 1.0.49. dump()
+         and restore() are now supported.
+
+0.06 (06/21/2004)
+    (ms) added 'start' param in create() docs
+    (ms) JJ Knitis <jj@dangercreative.com> provided a fix for
+         multiple 'color' settings in graph. Added new graph/color
+         syntax.
+
+0.05 (05/26/2004)
+    (ms) added support for dump() and restore(). Test cases in
+         t/007Dump.t will wait until these functions are 
+         available in rrdtool, and are skipped until then.
+    (ms) Some graph options don't have parameters, they can
+         specified via option_name => undef now.
+    (ms) Added lower_limit graph option
+    (ms) Added eg/graph.pl as a graph example
+
+0.04 05/22/2004
+    (ms) added more functionality to graph(), new test cases.
+    (ms) if a graph contains several files, use the defaults
+         from each file
+    (ms) added tune(), info(), last().
+         dump()/restore() added also, but not activated yet, 
+         because not available via RRDs.
+
+0.03 05/18/2004
+    (ms) fixed discovery of CFs
+    (ms) fixed update with values/hash and added test case
+
+0.02 05/16/2004
+    (ms) used rrdtool info for meta queries
+
+0.01 05/12/2004
+    (ms) Where it all began.
+
+TODO:
+
+* fetch_start/next iterator with saved timestamp, without caching all values

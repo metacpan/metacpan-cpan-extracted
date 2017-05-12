@@ -1,0 +1,35 @@
+---
+abstract: 'Bolt-on lazy XML generation'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+  - 'Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Role-Markup-XML
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Moo: 2.000001
+  XML::LibXML: 2.0116
+  namespace::autoclean: 0.28
+  perl: 5.01
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Role-Markup-XML
+  homepage: http://doriantaylor.com/
+  license: http://www.apache.org/licenses/LICENSE-2.0
+  repository: git://github.com/doriantaylor/p5-role-markup-xml.git
+version: '0.04'

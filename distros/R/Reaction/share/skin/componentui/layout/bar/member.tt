@@ -1,0 +1,21 @@
+=widget Collection::Grid::Member
+
+=for layout widget
+
+<fieldset style="width:50%; border:1px solid black; margin-bottom:4px; display:inline;">
+  <div style="width:100%; text-align:right;">
+     [% actions %]
+  </div>
+   [% field_list %]
+</fieldset><br>
+
+=for layout field
+[% call_next %] <br>
+
+=for layout action
+
+<span style="border:1px solid black; margin-right:3px; padding:2px;">
+  [% call_next %]
+</span>
+
+=cut

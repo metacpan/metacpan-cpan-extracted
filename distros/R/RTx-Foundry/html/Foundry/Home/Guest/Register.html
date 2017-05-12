@@ -1,0 +1,96 @@
+%# Ehrman's Commentary:
+%# 	(1) Things will get worse before they get better.
+%# 	(2) Who said things would get better?
+
+<& Elements/ShowRegister, Step => $Step &>
+
+% if ($Step == 0) {
+
+<& /Foundry/Home/Elements/ShowTerm, Template => 'TermOfUse' &>
+<input type="hidden" name="Email" value="<% $Email %>">
+
+% } elsif ($ARGS{id} and !@Error) {
+
+%     $m->scomp('/Work/Tickets/Display.html', Queue => 'NewUser', %ARGS);
+
+<p>
+<&|/l, $RT::Organization&>Congratulations. You have registered on [_1].</&>
+<p>
+<&|/l&>You are now being sent a confirmation email to verify your email address.  Activate your account by either visiting the link sent to you in this email, or replying to that email.</&>
+
+% } else {
+
+<input type="hidden" name="Step" value="1">
+<& /Work/Tickets/Create.html,
+    %ARGS,
+    Queue   => 'NewUser',
+    NoUI    => 1,
+    Loc	    => 1,
+    Subject => 'Account Registration',
+    id	    => undef,
+    NoCF    => { Attachments => 1 },
+&>
+
+% }
+
+<%INIT>
+my @Error;
+
+if ($Step == 1 and $Action eq 'Disagree') {
+    $m->print("<a href='/'>" . loc("Homepage") . '</a>');
+    return;
+}
+
+require Email::Valid;
+
+my ($Name, $Password, $PasswordCheck, $RealName, $EmailAddress) = @ARGS{
+    map "CustomField-".RT::CustomField->NameToId($_)."-Values",
+    qw(Name Password PasswordCheck RealName Email)
+};
+
+$Email ||= $EmailAddress;
+
+if ($ARGS{id}) {
+    push @Error, loc('Missing mandatory fields')
+	unless $Name and $Password and $PasswordCheck and $Email;
+    push @Error, loc('Name must be 3-15 characters of digits, letters or underscore, beginning with a letter')
+	unless !$Name or $Name =~ /^[A-Za-z]\w{2,14}$/;
+    push @Error, loc('Passwords do not match')
+	unless $Password eq $PasswordCheck;
+    push @Error, loc('Password must be at least [_1] letters', $RT::MinimumPasswordLength)
+	unless !$Password or length($Password) >= $RT::MinimumPasswordLength;
+    push @Error, loc('Invalid email address')
+	unless !$Email or $Email = Email::Valid->address( -address => $Email );
+
+    if ($Name) {
+        my $user = RT::User->new($session{CurrentUser});
+        $user->LoadByCol( "Name", $Name );
+        push @Error, loc('This account already exists') if $user->Id;
+    }
+
+    if ($Email) {
+	my $user = RT::User->new($session{CurrentUser});
+	my $address = $user->CanonicalizeEmailAddress($Email);
+	$user->LoadByCol( "EmailAddress", $address );
+	if (!$user->Id) {
+	    # reclaim salvaged empty emails
+	    $user->LoadByCol( "Name", $address );
+	    $user->RT::Record::_Set( Field => "EmailAddress", Value => $address) if $user->Id;
+	}
+	push @Error, loc('This email address already exists') if $user->Id and $user->Name ne $Email;
+    }
+}
+$ARGS{"CustomField-".RT::CustomField->NameToId('Email')."-Values"} = $Email if $Email;
+$ARGS{"Requestors"} = $Email if $Email;
+$m->notes( error => \@Error ) if @Error;
+$Step = 2 if ($ARGS{id} and !@Error);
+
+</%INIT>
+<%ARGS>
+$Step	=> 0
+$Action	=> undef
+$Email	=> ''
+</%ARGS>
+<%ATTR>
+Tab2	=> 'Register'
+</%ATTR>

@@ -1,0 +1,102 @@
+=head1 NAME
+
+ResourcePool::Command - The implementation of the Command design pattern with L<ResourcePool|ResourcePool>.
+
+=head1 SYNOPSIS
+
+
+ 
+ package Command;
+ 
+ use ResourcePool::Command;
+ use vars qw(@ISA);
+ 
+ push @ISA, qw(ResourcePool::Command);
+ 
+ sub new($) {
+     my $proto = shift;
+     my $class = ref($proto) || $proto;
+     my $self = {};
+     bless($self, $class);
+     return $self;
+ }
+ 
+ sub execute($$) {
+     my ($self, $resource) = @_;
+     return "The quick brown fox jumps over the lazy dog\n";
+ }
+ 
+ package main;
+ 
+ my $pool; # imagine this is a ResourcePool 
+           # or LoadBalancer instance
+ my $cmd = Command->new();
+ 
+ print $pool->execute($cmd);
+ # prints "The quick brown fox jumps over the lazy dog" and a new line
+
+=head1 DESCRIPTION
+
+
+The ResourcePool::Command class builds a base for commands like described in the GoF book "Design Patterns".
+
+This makes it possible to use L<ResourcePool|ResourcePool> in a very different way, without manually calling the L<get()|ResourcePool/get>, L<free()|ResourcePool/free> or L<fail()|ResourcePool/fail> methods. This common structure is encapsulated into the L<ResourcePool::Command::Execute|ResourcePool::Command::Execute> class. The functionality can be accessed by using the execute() methods of L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> like shown above.
+
+If you are new to this pattern, please consult one of the existing implementations (listed in the L<SEE ALSO|/SEE ALSO> section) to see how it works. This document provides information required to implement new Commands which is not necessary in most cases.
+
+To use this pattern you have to derive a class from this class and overload the required methods. At least the L<execute()|/execute> method has to be overloaded.
+
+Please note that the available resource bindings might include generic commands which can be useful. In many cases you will be able to use this pattern without implementing Commands yourself. The L<SEE ALSO|/SEE ALSO> section includes references to all known Command implementations.
+
+For the remainder of this document, I will use the L<ResourcePool::Command::DBI::Execute|ResourcePool::Command::DBI::Execute> as an example, since most people are familiar with the perl DBI. Please note that the DBI examples used here do not build a complete description of the L<ResourcePool::Command::DBI::Execute|ResourcePool::Command::DBI::Execute> package included in the DBI resource binding distribution.
+
+=head2 S<ResourcePool::Command-E<gt>new>
+
+The Command pattern does not introduce any limitations upon the constructor. It can be defined by the developer of the Command as required.
+
+For an execution of an SQL command with DBI the constructor could take the SQL string as argument and store it for later execution.
+
+
+=head2 S<$pool-E<gt>execute($resource, ...)>
+
+Will be called with an valid resource from the pool or loadbalancer where the execute() method was invoked on.
+
+This method must be defined by the derived class, you have to implement the logic which should happen upon execution within this method.
+
+If this function returns normally, the result value will be passed to the caller. If it terminates abnormally by throwing an exception in some way, the execution environment will try again until the MaxExecTry value of the underlaying pool or loadbalancer has been reached. If it terminates abnormally by throwing an L<ResourcePool::Command::NoFailoverException|ResourcePool::Command::NoFailoverException>, the execution environment will propagate this exception to the caller. Please have a look at the L<ERROR CONDITIONS section of the ResourcePool::Command::Execute class|ResourcePool::Command::Execute/ERROR CONDITIONS> for further detail about error handling.
+
+For the L<ResourcePool::Command::DBI::Execute|ResourcePool::Command::DBI::Execute> example, this method would take the previously stored SQL string, prepare it, bind the supplied arguments, and execute it. Depending on the result it would have to throw an appropriate error to trigger the fail over and retry.
+
+=over 4
+
+=item $resource
+
+A valid resource from the pool/loadbalancer.
+
+=item ...
+
+Additional argument which were passed to the execute() method of the pool or loadbalancer. This arguments are ignored by the execution environment and just passed one-by-one. This makes it possible to use a single instance of an Command with different parameters.
+
+For example the DBI implementation allows to specify the arguments to the bind parameters to the execute() method, which makes it possible to use a prepared Command with different values.
+
+=back
+
+=head2 S<$pool-E<gt>info>
+
+This method is called by the execution environment if some problem occurred. The string returned by this method will be used for reporting purposes. Even if its not required to overload this method, it's highly recommended because it will make your life much easier. The default implementation just returns the class name of the Command.
+
+
+=head1 SEE ALSO
+
+L<ResourcePool::Command::DBI::SelectRow|ResourcePool::Command::DBI::SelectRow>,
+L<ResourcePool::Command::DBI::Execute|ResourcePool::Command::DBI::Execute>,
+L<ResourcePool::Command::SOAP::Lite::Call|ResourcePool::Command::SOAP::Lite::Call>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

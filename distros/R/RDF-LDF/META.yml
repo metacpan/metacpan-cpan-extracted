@@ -1,0 +1,61 @@
+---
+abstract: 'Linked Data Fragments client'
+author:
+  - 'Patrick Hochstenbach'
+build_requires:
+  Encode: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RDF-LDF
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Log::Any: '1.00'
+  Moo: '1.004006'
+  RDF::Query: '2.913'
+  RDF::Trine: '1.013'
+requires:
+  Cache::LRU: '0'
+  Clone: '0'
+  Data::Compare: '0'
+  Getopt::Long: '0'
+  HTTP::Message: '0'
+  JSON: '0'
+  LWP::UserAgent::CHICaching: '0'
+  Log::Any: '0'
+  Moo: '0'
+  RDF::NS: '20150725'
+  RDF::Query: '0'
+  RDF::Trine: '0'
+  Throwable: '0'
+  URI::Escape: '0'
+  URI::Template: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/phochste/RDF-LDF/issues
+  homepage: https://github.com/phochste/RDF-LDF
+  repository: https://github.com/phochste/RDF-LDF.git
+version: '0.22'
+x_contributors:
+  - 'Gregory Todd Williams <greg@evilfunhouse.com>'
+  - 'Jakob Voß <jakob@nichtich.de>'
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Kjetil Kjernsmo <kjetil@kjernsmo.net>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

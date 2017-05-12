@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/echo-reverse-server-example.pl
+lib/Reflexive/Role/TCPServer.pm
+t/01-basic.t
+t/release-pod-syntax.t
+weaver.ini

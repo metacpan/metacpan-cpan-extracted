@@ -1,0 +1,11 @@
+Revision history for Perl extension Repl::Loop.
+
+0.90  Wed May 19 17:09:25 2010
+	- Prepared the module for the Github.
+	  Reviewed module structure and documentation.
+	  Changes since previous version were not tracked.
+		
+0.01  Wed Mar 31 16:54:30 2010
+	- original version; created by h2xs 1.23 with options
+		-X -n Repl::Loop
+

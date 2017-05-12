@@ -1,0 +1,32 @@
+---
+abstract: 'Dump RDF data objects'
+author:
+  - 'Jakob Voß'
+build_requires:
+  RDF::Trine: 0
+  RDF::Trine::Model: 0
+  RDF::Trine::Parser: 0
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RDF-Dumper
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  RDF::Trine::Serializer: 0
+  Scalar::Util: 0
+  Sub::Exporter: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/nichtich/RDF-Dumper/issues
+  homepage: https://github.com/nichtich/RDF-Dumper
+  repository: https://github.com/nichtich/RDF-Dumper.git
+version: 0.3

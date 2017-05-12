@@ -1,0 +1,58 @@
+{
+   "abstract" : "It's a simple way to dump and backup data from redis-server",
+   "author" : [
+      "Thiago Rondon <thiago@nsms.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-Dump",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : 0,
+            "Moose" : 0,
+            "MooseX::Getopt" : 0,
+            "MooseX::Types::Path::Class" : 0,
+            "Redis" : "1.904"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "Exporter" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "IO::String" : 0,
+            "POSIX" : 0,
+            "Test::Deep" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/maluco/Redis-Dump/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/maluco/Redis-Dump",
+         "web" : "http://github.com/maluco/Redis-Dump"
+      }
+   },
+   "version" : "0.016"
+}
+

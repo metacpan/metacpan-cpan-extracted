@@ -1,0 +1,5 @@
+test:
+  dsn: hash
+
+development:
+  dsn: dbi:SQLite:dbname=railsish-app2-test.sqlite3

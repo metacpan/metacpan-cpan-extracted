@@ -1,0 +1,31 @@
+{
+   "abstract" : "An easy to read, fully functional RobotC for Vex wrapper.",
+   "author" : [
+      "James Albert"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RobotC-Wrapper",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "YAML" : "0.84"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06"
+}
+

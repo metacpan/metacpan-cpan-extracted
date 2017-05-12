@@ -1,0 +1,627 @@
+Revision history for RapidApp
+
+1.2111 2017-02-26
+    - Minor bugfix in edge-case mutli-rel render (VANSTYN)
+
+1.2110 2017-02-03
+    - NavCore Manage Navtree now supports 'Custom Link' node types (VANSTYN)
+    - Tree API now supports custom-defined node types (VANSTYN)
+    - Auto-generation of icon-selector combo of all icon assets (VANSTYN)
+    - Fix edge-case bug in recently added _table_name_safe func (VANSTYN)
+    - Require Catalyst::Controller::AutoAssets 0.40 (VANSTYN)
+    - Require Catalyst 5.90114 (VANSTYN)
+
+1.2101 2016-12-01
+    - Require JSON 2.90 (VANSTYN)
+    - Require JSON::PP 2.27400 (VANSTYN)
+    - Bugfix in ExcelExport when not mounted at '/' - #172 (VANSTYN)
+    - Merge PR #171 (RIBASUSHI)
+
+1.2100 2016-10-21
+    - Virtual columns now support quick search (VANSTYN)
+    - Exlcude blob columns from quick search (treat as integer) (VANSTYN)
+    - Fix "Open Another ..." tab when one is already open (VANSTYN)
+    - Now using '_skip_namespace_frames' for better DBIC errors (VANSTYN)
+    - Fix legacy multi-rel renderer edge case (VANSTYN)
+    - Improve JavaScript error/exception handling in AutoPanel (VANSTYN)
+    - REALLY fix bug preventing col profiles from changing allow_add_edit (VANSTYN)
+    - Fix bug in DbicLnk rest urls with case-sensitive key/cols (VANSTYN)
+    - Fix bug in rest PK vals containing slash '/' (VANSTYN)
+    - Merge PR #169 (RIBASUSHI)
+    - Require Path::Class 0.37 with important bug fix (VANSTYN)
+    - Require DBIx::Class 0.082840 (VANSTYN)
+    - Require Catalyst 5.90112 (VANSTYN)
+    - Require Plack 1.0042 (VANSTYN)
+    - Misc bug fixes (VANSTYN)
+
+1.2000 2016-06-15
+    - RapidApp::Util::RapidDbic::CfgWriter system (VANSTYN)
+        * New apps bootstrap with devel/model_db_updater.pl script
+        * Supports regeneration of databases, schema + TableSpec cfgs
+    - Started new 'rau.pl' script/system (VANSTYN)
+    - RapidDbic bootstraps new apps with local grid_class (VANSTYN)
+    - TC: template_render() auto detects/uses $c, if available (VANSTYN)
+    - More consistent handling for 'default_favicon_url' (VANSTYN)
+    - rapidapp.pl no longer supports "upgrade" from catalyst.pl (VANSTYN)
+    - rapidapp.pl custom logic within rapi/psgi (VANSTYN)
+    - rapidapp.pl cmd used now recorded as comment in bootstrapped app (VANSTYN)
+    - Fix bug preventing column profiles from changing allow_add_edit (VANSTYN)
+    - Now using Catalyst::Plugin::SimpleCAS (1.000) API (VANSTYN)
+
+1.1100 2016-04-27
+    - Added '--total-counts-off' option to rdbic.pl - #168 (VANSTYN)
+    - Grids now support turning the total count on/off (UI) - #168 (VANSTYN)
+    - Moved Column Summary function defs to be client-side - #68 (VANSTYN)
+    - Refactoring of Column Summaries internals (VANSTYN)
+    - Fix 5.18+ bugs in extconfig hash order using Tie::IxHash (VANSTYN)
+
+1.1008 2016-04-16
+    - Silence DBIC-generated nullable PK warnings for now - #167 (VANSTYN)
+    - Override force all joins 'LEFT' within grid/module read scope (VANSTYN)
+
+1.1007 2016-04-01
+    - Loader default 'qualify_objects=1' set with 'db_schema' - #164 (VANSTYN)
+    - Added dev utility devel/source_dev_shell_vars.bash - #166 (VANSTYN)
+    - Fix virtual column bugs/regressions introduced in 1.1006 - #165 (VANSTYN)
+    - More improvements to MSSQL support (VANSTYN)
+
+1.1006 2016-03-25
+    - rdbic.pl/rapidapp.pl --loader-option + --connect-option (VANSTYN)
+    - Updated usage docs with examples setting db_schema and MSSQL dsn (VANSTYN)
+    - Update shebang of all scripts/* to use '#!/usr/bin/env perl' (VANSTYN)
+    - Misc fixes/improvements for MSSQL support (VANSTYN)
+    - Properly detect/load MSSQL DBIC::SL driver during bootstrap (VANSTYN)
+    - JSON encoder handles \'now()' values (sets undef) (VANSTYN)
+    - Require IPC::Cmd 0.94 (VANSTYN)
+    - Require DBIx::Class::Schema::Loader 0.07045 (VANSTYN)
+    - Require DBIx::Class 0.082821 (VANSTYN)
+    - Add travis job for perl 5.22 (VANSTYN)
+    - Stop running unit tests for deps in travis (VANSTYN)
+
+1.1005 2016-01-31
+    - New RapidDbic apps bootstrapped with 'regen_schema' scripts (VANSTYN)
+    - Added new RapidDbic bootstrap options: (VANSTYN)
+        * --from-sqlite-ddl
+        * --blank-ddl
+    - New utility function RapidApp::Util::find_app_home() (VANSTYN)
+    - All new apps bootstrap with an app.psgi for 'plackup' (VANSTYN)
+
+1.1004 2015-12-17
+    - Fix the way the default allow_view is calculated (VANSTYN)
+
+1.1003 2015-12-14
+    - Tweaks/fixes to allow add/edit rules (VANSTYN)
+
+1.1002 2015-12-01
+    - AppDV: added option 'multi_editable_autofield' (VANSTYN)
+
+1.1001 2015-11-30
+    - Improve the way windows/dialogs limit to local Tab - #6 (VANSTYN)
+    - AppDV: experimental, dynamically generated stylesheets (VANSTYN)
+    - Minor tweaks to MimeIframe module (VANSTYN)
+    - Bugfix for normalize allow_add/allow_edit changes in 1.1000 (VANSTYN)
+    - Bugfix for dirty (changed but unsaved) single rel cols (VANSTYN)
+    - Misc AppDV bugfixes (VANSTYN)
+    - Require Catalyst::Controller::SimpleCAS 0.9982 (VANSTYN)
+    - Require Catalyst 5.90103 (VANSTYN)
+    - misc other bugfixes (VANSTYN)
+
+1.1000 2015-10-19
+    - Better handling for dirty (changed but unsaved) single rel cols (VANSTYN)
+    - FK single rel column ordering next to the physical FK - #163 (VANSTYN)
+    - MultiFilter dialog open animation + fixed race-condition bug (VANSTYN)
+    - Most windows/dialogs now limited to local Tab - #6 (VANSTYN)
+    - Ajax timeout now produces a single dialog (VANSTYN)
+    - AppDV: Expose column attrs in tpls via 'r.column_info' (VANSTYN)
+    - AppDV: expose 'resData' to JavaScript-side tempalte env (VANSTYN)
+    - AppDV: Fixes to enable/disable logic for store buttons (VANSTYN)
+    - AppDV: improvements to field controls show/hide rules (VANSTYN)
+    - AppDV: full-blown, per field validation monitoring (VANSTYN)
+    - AppDV: new attr feature options: (VANSTYN) 
+        - refresh_on_hash_change
+        - init_record_editable
+        - refresh_on_save
+    - AppDV: now allows normal browser behavior of form submits (VANSTYN)
+    - Lots of other fixes/tweaks/improvements to AppDV (VANSTYN)
+    - Misc improvements to the DbicDV subclass (VANSTYN)
+    - Improvements to dirty value rendering for date columns (VANSTYN)
+    - Refactoring/cleanup of column 'allow_' flags logic to backend (VANSTYN)
+    - Moved RapidApp::Column to RapidApp::Module::DatStor::Column (VANSTYN)
+    - Fix bug in filename in Excel/CSV export, + append timestamp (VANSTYN)
+    - New sugar func 'throw_prompt_ok' (custom prompt system) (VANSTYN)
+    - Virtual Columns /w 'set_function' auto call ->update, if dirty (VANSTYN)
+    - DataStorePlus 'firstload' event now available in all contexts (VANSTYN)
+    - More improvements to Date/Time editors (VANSTYN)
+    - Fixed display bug related to autoload_added_record - #161 (VANSTYN)
+    - Fix 'Useless bare catch' via TT (lost exceptions) (VANSTYN/RIBASUSHI)
+    - Fix bug MetaKeys::Loader subclass - PR #159 (ILMARI)
+    - New feature: ra-async-box (VANSTYN)
+    - New column property 'documentation' - shows up: (VANSTYN)
+       - Add/edit forms
+       - Column Properties menupoint (grid column hmenu)
+       - Default Property Grid (default row page)
+    - Fix overly thick borders in a number of dialog boxes (VANSTYN)
+    - Reauth dialog now utilizes queue to prevent duplicates (VANSTYN)
+    - Module attr trait 'ExtProp' auto applies extconfig (VANSTYN)
+    - DataStorePlus 'lastJsonData' saved in store obj for all CRUD reqs (VANSTYN)
+    - DataStorePlus: new attr option 'reload_on_save' (VANSTYN)
+    - CSS 'scopify' assets now support rule groups (VANSTYN)
+    - Moved JS renderer function collection into 530-renderers.js (VANSTYN)
+    - Require Catalyst::Controller::AutoAssets 0.33 (VANSTYN)
+    - Require Catalyst::Controller::SimpleCAS 0.9981 (VANSTYN)
+    - Require Template 2.26 (VANSTYN)
+    - Require Plack 1.0037 (VANSTYN)
+    - Require Catalyst 5.90101 (VANSTYN)
+    - Lots of other misc tweaks and bug fixes (VANSTYN)
+
+1.0601 2015-07-14
+    - DbicRowDV: fix bug in the way tt_include_path is parsed (VANSTYN)
+    - AppDV: fix rendering bug with zero records - #157 (VANSTYN)
+
+1.0600 2015-07-06
+    - Column Summaries on virtual (including multi-rel) columns - #93 (VANSTYN)
+    - Add Row via REST multi-rel pre-sets parent FK (rs_lock_keys') (VANSTYN)
+    - Multi-rel columns show open link even if the count is 0 (VANSTYN)
+    - Fix ability to set 'require_role' in grid_configs (VANSTYN)
+    - Add magic relative path keyword '_ra-rel-mnt_' - #153 (VANSTYN)
+    - Fix asset paths/links for odd module dispatch - also #153 (VANSTYN)
+    - Module 'printview' now shows loading indicator (VANSTYN)
+    - Fix misc Perl and JS warn bugs (VANSTYN)
+    - More 'datetime' column editor improvements (VANSTYN)
+    - Fix broken local app :Path() actions - ref PR #142 (VANSTYN)
+    - Fix bug in reauth when app is mounted at sub-url (VANSTYN)
+    - DirectCmp module dispatch refactors/improvements (VANSTYN)
+    - grid-toggle-edit-cells - initiation bugfixes (VANSTYN)
+    - total_count via pk col instead of count(*) in Pg (for speed) (VANSTYN)
+
+1.0502 2015-06-16
+    - rdbic.pl: ADDED EXPERIMENTAL limit/exclude OPTS - #152 (VANSTYN/TIMB)
+    - Require DBIx::Class::Schema::Loader 0.07043 (dist.ini)
+    - Fix subroutine redefine warnings (Dumper()) (VANSTYN)
+    - Misc POD spelling/typo fixes - PR #151 (SCROTTIE)
+
+1.0501 2015-06-15
+    - Support Postgres for m2m columns - PR #150 (TBSliver/MST)
+
+1.0500 2015-06-03
+    - Lots of fixes/improvements to AppDV (VANSTYN)
+    - DataStorePlus fixes and improvements (VANSTYN)
+    - Fix bug in drag/drop ordering in navtree (VANSTYN)
+    - factored out virtual column statement code to reduce duplication
+        - PR #148 (TBSliver)
+    - Fixes to DateTime field triggers (VANSTYN)
+    - Declare JS namespeace RA.ux officially for client apps (VANSTYN)
+    - Fixing _load_connect_schema in Model::CoreSchema - PR #147 (GETTY)
+    - RapidApp::Builder: new base_plugins/base_config for added (VANSTYN)
+    - CoreSchema fixes for PostgreSQL compatability - PR #146 (TBSliver)
+    - TabGui: expose main_module_(class|params) in cfg (VANSTYN)
+    - Add column profile 'cas_img' (VANSTYN)
+    - CSS tweaks and changes (VANSTYN)
+    - Module dispatch improvements + additions (VANSTYN)
+    - Require Catalyst::Controller::SimpleCAS 0.998 (VANSTYN/GETTY)
+    - New separate AppDV subclasses DbicDV and DbicRowDV (VANSTYN)
+    - DbicLnk: include_colspec now defaults to ['*'] (VANSTYN)
+    - Fix bug in rendering of SQLite date columns (VANSTYN)
+    - Lots of misc bug fixes (VANSTYN)
+    
+1.0401 2015-05-11
+    - Hotfix for wrong enforced alphabetical sorting of colspec (GETTY)
+
+1.0400 2015-05-11
+    - Require latest versions of key deps (VANSTYN)
+        - Catalyst 5.90091
+        - Catalyst::Controller::SimpleCAS 0.995
+        - Catalyst::Controller::AutoAssets 0.32
+        - SQL::Translator 0.11021
+        - Moose 2.1404, Moo 2.000001
+        - base 2.18, parent 0.232, namespace::autoclean  0.24 
+    - Switch to AUTHOR_TESTING for all release tests - PR #144 (GETTY)
+    - Introduce general 'RapidAppCache' - PR #143 (GETTY)
+        - General-purpose caching in tmpdir using CHI
+        - colspec calculations now cached for faster subsequent startups
+    - Internal controller dispatch now uses Chained - PR #142 (GETTY)
+    - 'sql' param of virtual_columns can now be a CodeRef - PR #141 (GETTY)
+    - Max width of TabGui tab titles now enforced - PR #140 (GETTY/VANSTYN)
+        - configurable with new 'tab_title_max_width' param (def 350px)
+    - Fix regression in 1.02 regarding 'load_modules' handling (VANSTYN)
+    - Misc other tweaks/bugfixes (VANSTYN/GETTY)
+
+1.0303 2015-04-29
+    - 'gridsearch_remote' option now only enabled in Module::DbicGrid, not the
+      parent Module::Grid - fixes #139 (VANSTYN)
+    - inject_components compat fix for new Catalyst 5.90090 - #138 (VANSTYN)
+
+1.0302 2015-04-28
+    - Fixing bug in order of logout/delete_session in Auth Controller (GETTY)
+    - Requires DBIx::Class::Schema::Diff 1.03 (dist.ini) - fixes #136 (VANSTYN)
+    - Drop JSON::DWIW (Michael Lackhoff)
+    - Added all missing stopwords for podspelling release test (GETTY)
+
+1.0301 2015-04-26
+    - Fix for the "Add to sort" functionality of Grid Multi-Sort (GETTY)
+
+1.0300 2015-04-23
+    - Grid Multi-Sort (#128, PR #133/#134) (GETTY)
+
+1.0205 2015-04-16
+    - Fix bug in relative date query handling
+    - login_logo_url now properly handles mount_url
+    - App name is now shown in the loaded time banner (console)
+
+1.0204 2015-03-27
+    - New ctx method $c->ra_builder returns RapidApp::Builder object - undef
+      unless the app was generated in that manner, such as Rapi::Fs
+    - New top-level Catalyst cfg option 'inject_components' (see below)
+    - New attr 'inject_components' available in RapidApp::Builder (see POD)
+    - Require Catalyst 5.90085 + DBIx::Class 0.082820
+
+1.0203 2015-03-24
+    - Fixes related to internal Ajax JS queues (added in 1.02)
+      this fixes broken direct linking/loading of a URL (from the outside)
+    - Fixes/improvements to browser title update
+
+1.0202 2015-03-17
+    - POD tweak
+    - Fix js undef err outside of nav context (tree click)
+    - Add Module util method local_url()
+    - Require Catalyst 5.90084 + Plack 1.0034
+
+1.0201 2015-03-14
+    - Add back dummy vers of previously deleted share dir files to ensure clean on 
+      systems out in the wild
+
+1.0200 2015-03-13
+    - NEW FEATURE/CLASS: RapidApp::Builder
+    - Simplified and more flexible cfg for favicon - 'default_favicon_url'
+    - Internal Ajax JS now queues and limits to 2 simultaneous requests
+    - Browser title update now works for all (TabGui) tabs (#117)
+    - Template::Controller cfg now supports 'include_paths' option
+    - local_assets_dir cfg no longer has to be relative to app home (which may not exist)
+    - Catalyst 'name' config now auto-applied if not already configured
+    - TabGui 'navtrees' cfg can now reference existing modules by path string
+    - auto_hashnav_redirect_current() can now override via Module
+    - Tree node expand state resets on load exception (#127)
+    - Loading mask shown for initial tree load (#126)
+    - Lots of fixes and improvements to Tree module internals
+    - CoreSchema model now properly enforces DBIC 'deploy' deps
+    - Misc CSS and icon asset additions + removal of unused CSS
+    - Misc bugfixes and improvements
+
+1.0010 2015-02-21
+    - rapidapp.pl now bootstraps 'Templates' to be editable by default (#125)
+    - Fix bug in rDbic with Sqlt files contraining dash '-' (#124)
+    - Fix Dumper sub redefine warning in Module class
+    - Minor doc tweaks (PR #122)
+    - Improvements to relationship column rendering for bad FKs:
+        - ommits "open" (tiny mag glass) links
+        - renders raw value only for physical columns, undef otherwise
+    - Now requires Catalyst::Controller::AutoAssets 0.31
+
+1.0000 2015-02-07 
+    - First official "1.0" release  ** API CHANGES **
+    - New internal class structure for Modules with significant cleanup (#74)
+    - Replaced RapidApp::Include with simple RapidApp::Util exporter (#115)
+    - upgr-rapidapp.pl script converts existing code bases (although these 
+      changes are not likely to impact most apps, as most of the changes are
+      internal -- the existing public config/plugin APIs remain the same)
+    - Lots of fixes and improvements related to apps mounted at sub-urls (#114)
+    - Added experimental "metakeys" feature (rdbic.pl)
+    - Fixed broken Load MHTML feature (HtmlEditor)
+       * Now works even with Word 2010 generated files and crazy unicode
+       * Fixes made within Catalyst::Controller::SimpleCAS 0.994
+    - Require Moo 1.007000 (although classes remain mostly Moose, but this
+      is planned to be changed in the near future)
+    - Misc forward-compat changes for a future conversion to Moo (see #75)
+    - Lots of misc bug fixes
+
+0.99700 2015-01-20
+    - Unfactor, consolidate & cleanup lots legacy code (#106)
+      (see commit logs for more details)
+    - Removed lots of CPAN deps
+    - Got all package files properly separated into their own pm files (#110)
+    - All remaining CPAN deps w/ version numbers now listed in dist.ini (#107)
+    - Setup separate Runtime/Test/Develop Prereqs sections (dist.ini)
+    - Require Catalyst::Controller::SimpleCAS 0.992 (fixes broken Insert Image)
+
+0.99664 2015-01-12
+    - Fix scrollbar issue in Organize Navtree (#104)
+    - Fix sort issue with single col rels sharing the real column name (#105)
+    - Handle special \'true' and \'false' ScalarRef vals in JSON MixedEncoder
+    - Require Catalyst 5.90080 (dist.ini)
+    - Properly handle the case of the Plack env var SCRIPT_NAME='/' (instead of '')
+
+0.99663 2015-01-01
+    - Auto retry on DBI LongReadLen exception (DbicLink)
+    - Improvements to Ajax error/warning dialogs
+    - AppCombo: improvements to "Enter" key event behavior
+    - DbicTemplate: fixes/improvements to 'tabify_data' mode
+    - Misc internal bug fixes
+
+0.99662 2014-12-30
+    - Fix possible Bareword exception in app cfgs generated via ForRapidDbic
+      bootstrap helper (discussed in PR #102)
+    - Fix bug in rel combos pre-initialized with a default value
+
+0.99661 2014-12-22
+    - Fix store exception handler regression from previoud release
+
+0.99660 2014-12-21
+    - Fix caching bug in perl 5.18+ (#100)
+    - Fixes for NavCore w/o AuthCore use case (in Organize Tree)
+
+0.99652 2014-12-18
+    - Removed hard requirement for 'quote_names' to be enabled on DBIC models (#99)
+
+0.99651 2014-12-16
+    - Added more flexible 'grid_class' param (RapidDbic)
+    - Support for reading model config from Model::NAME cnf key (RapidDbic)
+    - Misc POD updates
+
+0.99650 2014-12-09
+    - Added Plack::App::RapidApp::rDbic
+    - Misc Plack-specific fixes/improvements
+    - Requires Catalyst::Controller::AutoAssets 0.30
+
+0.99602 2014-12-07
+    - Fixed bug in app bootstrap with dsns w/o a user/pass
+    - Switched to Alien::Web::ExtJS::V3 for ExtJS sources
+    - AppPropertyGrid now has a 'Save' tool icon/control
+    - Fix bug in quick_search on integer columns
+    - New TableSpec column param 'search_operator_strf' - (#97)
+    - Add experimental --run-webapi option to rdbic.pl
+    - Really handle 'where' attrs - tmp conditional logic fallback (#95)
+
+0.99601 2014-12-03
+    - rdbic.pl - new db utility script/server for instant CRUD (#96)
+    - SQLite schemas now show a different top icon in navtree (RapidDbic)
+    - Relationships with 'where' attrs handled again (#95)
+    - Improvements to error messages in rapidapp.pl
+
+0.99600 2014-11-26
+    - Column data type 'ipaddr' set to 'unsearchable' (#81)
+    - The 'email' column profile now validates for emails in editor
+    - Cleanup crud POST params - remove 'create_columns' + rename
+      quicksearch params, and only sent when a quicksearch is active
+    - quick_search_mode can now be set via url qry string (#94)
+    - "Doesn't contain" now implies not NULL
+    - Fixed "null or empty" conditions (#89) (#88)
+    - Multiple fixes improvements to DbicLink2 rest_query/base_params, etc
+    - Added /rapidapp/module/printview/[path] (DirectCmp)
+    - Dedicated Add Form (#85)
+    - 'bigtext' column profile wraps long lines by default (incl grid cells)
+    - Fix bug in AutoPanel tab right-click reload
+    - Fixes/improvements to DataStorePlus
+    - Fixes to column profile logic for rel columns (#77)
+    - More improvements and fixes to generated combos (misc + #83)
+    - Lots of misc fixes
+
+0.99501 2014-11-1
+    - Combos behave properly on property grid page
+    - Random 'favicon.ico' requests handled (#57)
+    - Bad module paths now render 404 page instead of exception (#73)
+    - Name mismatch between source/table name working again (#72)
+    - Fix regression related to #68 changes for _resolve_condition calls
+    - Purge most code of buggy $1 calls (really fixes #70)
+    - Unit test for _binary_op_fuser() 
+
+0.99500 2014-10-31 🎃
+    - Apps now work properly when started via 'plackup' (#70)
+    - Major improvements to default 'combo' (fk/single rel) editors:
+       * Text/type filtering enabled by default
+       * New 'dropdown' auto_editor_type for the old/simple behavior
+    - Added special 'soft_rel' column profile
+    - Lots of fixes/improvements to AppCombo UI controls in general
+    - Fix bug in RapidDbic-generated urls when ->table('db.table') (#71)
+    - Fix bug in text filtering single rels w/ virtual display_column (#69)
+    - Fix deprecated usage of DBIC _resolve_condition method (#68)
+    - Fix _binary_op_fuser func to work with new SQLA 1.80 (thanks ribasushi)
+    - Better looking DB error dialogs
+    - Now requires Catalyst 5.90075
+    - Now requires DBIx::Class 0.082810
+    - Now requires SQL::Abstract 1.81
+    - Now requires SQL::Translator 0.11020
+    - Now requires Plack 1.0033
+    - Now requires DBIx::Class::Schema::Diff 1.02
+    - Lots of misc/minor bug fixes
+
+0.99402 2014-10-06
+    - Added a real "set password" dialog for setting user passwords in CoreSchema
+    - Improvements to CoreSchema interfaces (icons, headers, etc)
+    - Fixed bug in REST/nav logic with '0' value keys (#67)
+
+0.99401 2014-09-29
+    - Fixed bug in DbicAppCombo2 (#66)
+
+0.99400 2014-09-28
+    - DbicAppCombo2: Added fail-safe max rows (temp)
+    - Fix undef exception in 'duimp_these' (debug mode)
+    - formSubmitHandler: special handling for '_append_action_url'
+    - ClickActionField and cas-upload-field improvements
+    - TableSpec column profile 'cas_link' _ releated new editors/renderers
+    - AppDV css improvements for edit icons
+    - Officially require at least perl 5.10
+    - Require new Email::MIME::CreateHTML 1.040 - install on 5.18 works
+    - Started 'Rapi' namespace (future)
+    - Remove misc deprecated packages
+    - Require Catalyst 5.90071
+    - pod coverage/spelling/kwalitee tests
+    - Bumped dep ver for SQLT to 0.11018
+    - Unfactored SimpleCAS into external cpan pkg (#62)
+       prelim release: Catalyst::Controller::SimpleCAS 0.991
+    - Travis cfg improvements, Coveralls, 5.20 job
+    - Lots of misc/minor bug fixes
+
+0.99333 2014-07-17
+    - Fixed insert image (broken in v0.99310) - Github Issue #54
+
+0.99332 2014-07-16
+    - Properly support virtual column conditions (i.e. MultiFilters) under
+      PostgreSQL (Github Issue #51)
+
+0.99331 2014-07-08
+    - Editor for bool columns now correctly handles nullability (Github Issue #61)
+    - Proper support for PostgeSQL 'boolean' and 'double float' column types,
+      including Quick Search pre-validation (Github Issue #60)
+    - Tweak regex for numeric Quick Search pre-validation (Github PR #58)
+
+0.99330 2014-07-04
+    - Misc PostgreSQL-specific fixes and improvements:
+       * Additional TableSpec column profiles and known column data types
+       * Attempts to detect and safely handle special column types like array cols
+         and tsvector (currently just disables the unsupported features)
+       * Disabled quick searching date columns
+       * Pre-validation for numeric cols in quick search (Github Issue #52)
+       * Pre-validation for enum cols in quick search (Github Issue #56)
+
+0.99321 2014-06-22
+    - Bugfix for edge-case/random scenario in RapidDbic generation of 'auto_editor_type'
+      TableSpec config 
+
+0.99320 2014-06-21
+    - Grid export supports CSV, TSV and JSON as well as Excel
+    - POD tweaks
+
+0.99312 2014-06-17
+    - Updated documentation
+    - Improvements to default login redirect handling in AuthCore
+    - Requires Catalyst::Controller::AutoAssets 0.29 
+      (SHOULD *REALLY* RESTORE WINDOWS SUPPORT...)
+
+0.99311 2014-06-16
+    - Updated documentation
+    - Added 'load_modules' cfg option
+
+0.99310 2014-06-06
+    - All relationship columns now link to REST paths
+    - Virtualized and complex relationship columns now render with links
+    - Misc updates to POD and Manual
+    - Fixed default favicon
+    - Date renderers handle 0000-00-00 better
+    - Template controller aliases '/tpl' and '/tple' can be changed
+    - Added support for rendering columns containing binary image data
+    - Binary and blob columns now render in hex by default
+    - Added very simple hex editor for binary/blob columns (must be enabled)
+    - DBIC virtual sources (DBIx::Class::ResultSource::View) fully supported
+    - Default icons for virtual sources have different color
+    - Browser text select/highlight allowed in row page/property grid (copy/paste)
+    - RapidDbic helper now creates configs in the model instead of plugin config
+    - Misc other improvements to helper scripts
+    - Misc other bugfixes and improvements
+    - Removed dependency to CSS::Inliner
+    - Requires JavaScript::ExtJS::V3 3.4.11 (minor warning fix)
+    - Requires Catalyst::Controller::AutoAssets 0.28 
+      (SHOULD RESTORE WINDOWS SUPPORT!)
+
+0.99302 2014-05-27
+    - Fixed typo in dist.ini preventing proper script install
+
+0.99301 2014-05-26
+    - Added back $VERSION accidently removed from 2 classes which prevented proper
+      PAUSE/CPAN indexing for v0.99301
+
+0.99300 2014-05-26
+    - rapidapp.pl script now available using 'RapidApp::Helper' and friends
+    - RapidDbic config can now be read from model config (from config key 
+      'RapidDbic')
+    - Lots of improvements to CoreSchema + plugins
+    - CoreSchemaAdmin plugin now only sets up grids for CoreSchema sources actually 
+      in use (unless new option 'all_sources' is supplied)
+    - Improvements to RapidApp::View - now supports 'panel_cfg' option
+    - Lots of improvements to AuthCore - more restrictive defaults + generalized 
+      redirect logic
+    - Fixed delete_expired_sessions AuthCore bug
+    - Added 'DirectCmp' controller allowing direct module dispatch via special
+      paths '/rapidapp/module/direct/...' and '/rapidapp/module/navable/...'
+      which are useful for loading in iframes
+    - Public core/template dispatch in its own controller
+    - New 'module_root_namespace' option allows mounting the root module in
+      a path other than the main app root /
+    - Fixed issue in tree scrolling in TabGui (although not yet perfect)
+    - Many improvements/customizations to dispatch/exception handling
+    - Improvements to AutoPanel JS - now used for the main/first ajax loading
+    - Added new TabGui cnf options 'nav_title_iconcls' & 'navtree_init_width'
+    - Module loading and app start time now logged/displayed
+    - Misc performance improvements (faster startup)
+    - Removed NYTProf profiling classes from core
+    - Requires new module versions, fixing a number of bugs:
+        Catalyst::Controller::AutoAssets 0.27
+        Catalyst 5.90064
+        DBD::SQLite 1.42
+    - Lots of misc bug fixes
+    - Logging now utilizes/expects the upcoming Catalyst::Log 'autoflush'
+      feature (should be relased in Catalyst 5.90065). Prior to this feature,
+      nothing breaks, but the startup log messages will not display until
+      the startup sequence completes (only applies to dev/debug mode)
+    - Removed the 'disable_tabgui' option added in prev version (supplanted
+      by new 'module_root_namespace' option)
+
+0.99203 2014-05-04
+    - Added new 'disable_tabgui' config/session option
+
+0.99202 2014-05-02
+    - Added support for Travis CI
+    - Misc bug fixes
+    - Improvements to testing classes + expanded unit tests
+    - Misc kwalitee fixes + kwalitee unit tests
+    - Fixed POD syntax errors
+
+0.99201 2014-04-25
+    - Fixed build/install error from bad dependency (TestRA:: namespace)
+    - Expanded unit tests
+
+0.99200 2014-04-23
+    - Added preliminary working 'testapp' unit tests under t/
+    - Turned off last remaining non-debug mode console messages
+    - Now requires Catalyst::Controller::AutoAssets v 0.25
+    - Fixed/cleaned up misc asset controller code
+    - Fixed bug that prevented apps with no Catalyst home dir from starting
+    - Stopped using smartmatch (~~) operators in various places
+    - Refactored CoreSchema model class internals (fixing several bugs)
+    - Fixed misc JS race-condition bugs in AppPropertyGrid
+    - Now uses DBIx::Class::Schema::Diff to check for changes in the
+      coreschema (fixes Github Issue #47)
+
+0.99104 2014-04-15
+    - Enabled 'strict' in TableSpec class
+
+0.99103 2014-04-15
+    - Fixed scrolling issue with hash label links in tabs (GitHub Issue #46)
+    - Fixed bug clicking <a> links with no href at all
+    - Fixed utf8 bug when viewing templates (Template::Controller)
+
+0.99102 2014-03-15
+    - Removed all perl switch/case blocks (Github Issue #45)
+    - Removed a bunch more deprecated classes
+
+0.99101 2014-03-10
+    - Removed rouge/leftover classes referencing previously removed classes
+    - Fixed minor issue with LinkClickCatcher
+
+0.99100 2014-03-10
+    - Requires Catalyst::Runtime 5.90061 with bugfix
+    - Expanded Template Access class API (template_css_class + 
+      currently_viewing_template)
+    - Fixed bug in relative links within tabs (Github Issue #43)
+    - Major refactoring of dispatch and exception internals (Github Issue #41)
+    - Improvements and fixes to Unicode handling
+    - Removed GD as a dependency (Image::Resize) and refactored to use only if
+      already available at runtime (Github Issue #42)
+    - AutoPanel now supports auto refresh (autopanel_refresh_interval)
+    - Template::Controller dispatch/redirect fixes
+    - More fixes to TableSpec_cnf internals
+    - Refactored 'ra-scoped-reset' CSS behavior
+    - Misc other bugfixes
+    - Removed lots of old deprecated classes
+
+0.99031 2014-02-16
+    - Added JS render func Ext.ux.RapidApp.withFilenameIcon
+    - Misc fixes/improvements to RapidApp::AppExplorer
+    - Added Catalyst::Devel build/install dep (temp)
+    - All Carp funcs exported by: use RapidApp::Include qw(sugar perlutil);
+    - Misc TableSpec_cnf fixes/improvements
+
+0.99030 2014-02-08
+    - Relationships with complex conditions now supported (Github Issue #40)
+    - Refactored internal TableSpec_cnf format somewhat (no API changes)
+    - Started Changes file (this file). See commit history for change log prior
+      to this version (https://github.com/vanstyn/RapidApp)

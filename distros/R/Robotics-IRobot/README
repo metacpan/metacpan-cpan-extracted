@@ -1,0 +1,58 @@
+Robotics-IRobot
+
+Robotics::IRobot provides an interface for controlling and accessing
+sensor data from iRobot robots that support the OI Interface.
+
+This module provides on object oriented interface to the robot and allows
+for both event-driven and polling-based reading of sensor data. It provides
+all functionality defined in the OI Interface for Roomba 400 series and
+Create robots. Also provided is some additional functionality such as
+primative dead reckoning and enhanced use of the Create's song
+functionality.
+
+Currently this module will only run on linux systems.  This is
+because of a requirement on Device::SerialPort.  In the future,
+it may support windows systems via Win32::SerialPort.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Robotics::IRobot
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Robotics-IRobot
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Robotics-IRobot
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Robotics-IRobot
+
+    Search CPAN
+        http://search.cpan.org/dist/Robotics-IRobot/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Michael Ratliff
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,64 @@
+%# Surprise your boss.  Get to work on time.
+
+<%INIT>
+if ($Status eq 'unresolved') {
+    $MyTickets->LimitStatus(VALUE => $_) for RT::Queue->ActiveStatusArray;
+}
+elsif ($Status eq 'resolved') {
+    $MyTickets->LimitStatus(VALUE => $_) for
+    	grep !/deleted/, RT::Queue->InactiveStatusArray;
+}
+
+if ( $Owner ) {
+    $MyTickets->LimitOwner(
+	VALUE	    => $Owner,
+    );
+}
+
+$MyTickets->OrderBy(FIELD => 'Created', ORDER => 'DESC');
+
+return unless length($SearchFor);
+
+if ( $SearchOp eq 'Requestor' ) {
+    my $RequestorObj = RT::User->new($session{CurrentUser});
+    my $operator = 'LIKE';
+
+    $RequestorObj->LoadByCol( 'Name' => $SearchFor);
+    if (my $email = $RequestorObj->EmailAddress) {
+	$SearchFor = $email;
+	$operator  = '=';
+    }
+
+    $MyTickets->LimitWatcher(
+	TYPE	    => 'Requestor',
+	OPERATOR    => $operator,
+	VALUE	    => $SearchFor,
+    );
+}
+elsif ($SearchOp eq 'Subject') {
+    $MyTickets->LimitSubject(
+	VALUE	    => $SearchFor,
+	OPERATOR    => 'LIKE',
+    );
+}
+elsif ($SearchOp eq 'Content') {
+    $MyTickets->LimitContent(
+	VALUE	    => $SearchFor,
+	OPERATOR    => 'LIKE',
+    );
+}
+elsif ($SearchOp eq 'Id') {
+    $MyTickets->LimitId(
+	VALUE	    => $SearchFor,
+	OPERATOR    => '=',
+    );
+}
+
+</%INIT>
+<%ARGS>
+$MyTickets
+$Status		=> 'all'
+$SearchOp	=> ''
+$SearchFor	=> ''
+$Owner		=> ''
+</%ARGS>

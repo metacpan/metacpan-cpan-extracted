@@ -1,0 +1,34 @@
+---
+name: Regexp-MultiLanguage
+version: 0.03
+author:
+  - 'Robby Walker <robwalker@cpan.org>'
+abstract: |-
+  Convert common regular expressions checks
+  in to Perl, PHP, and JavaScript code.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Parse::RecDescent: 0
+  Test::More: 0
+provides:
+  Regexp::MultiLanguage:
+    file: lib/Regexp/MultiLanguage.pm
+    version: 0.03
+  Regexp::MultiLanguage::BaseDialect:
+    file: lib/Regexp/MultiLanguage/BaseDialect.pm
+    version: 0.03
+  Regexp::MultiLanguage::JavaScript:
+    file: lib/Regexp/MultiLanguage/JavaScript.pm
+    version: 0.03
+  Regexp::MultiLanguage::PHP:
+    file: lib/Regexp/MultiLanguage/PHP.pm
+    version: 0.03
+  Regexp::MultiLanguage::Perl:
+    file: lib/Regexp/MultiLanguage/Perl.pm
+    version: 0.03
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,18 @@
+Revision history for Perl extension Rose::DBx::Bouquet.
+
+1.04  Sun Feb 21 12:56:25 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.03  Wed Feb 10 13:53:01 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.02  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.01  Tue Jul 22 14:41:00 2008
+	  - Rename CHANGES to Changes.txt to match my other modules
+
+1.00  Tue Apr  8 13:30:00 2008
+	  - Original version

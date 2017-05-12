@@ -1,0 +1,39 @@
+[% META title = 'Persons' %]
+
+[% persons = s.get("${NS_LD}/Class#Person").rev_type.list %]
+
+<p>A person can only be deleted within the same session.</p>
+
+<table>
+[% FOREACH person = persons %]
+  <tr>
+    [% TRY %]
+      <td>[% person.arc_obj("${NS_LD}/Property#first_name").li.value %]
+      <td>[% person.arc_obj("${NS_LD}/Property#last_name").li.value %]
+    [% CATCH; CLEAR; reset %]
+      <td colspan="2">Bad person: $error.info
+    [% END %]
+
+    <td><input type="button" 
+               OnClick="f.r_person.value='$person.uri';
+                        go('person_view')"
+               value=" View ">
+    <td><input type="button"
+               OnClick="f.r_person.value='$person.uri';
+                        go('person_edit_form')"
+               value=" Edit ">
+    <td><input type="button"
+               OnClick="f.r_person.value='$person.uri';
+                        go('person_list', 'person_delete')"
+	       value=" Delete ">
+    <td><input type="button"
+               OnClick="f.r_person.value='$person.uri';
+                        go('person_list', 'person_login')"
+	       value=" Become this person ">
+  </tr> 
+[% END %]
+</table>
+
+<input type="hidden" name="r_person">
+
+

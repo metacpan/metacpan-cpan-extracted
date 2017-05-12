@@ -1,0 +1,34 @@
+Changes
+examples/eg1.pl
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/AutoManifest.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Package.pm
+inc/Module/Install/TrustMetaYml.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Package.pm
+inc/Module/Package/Dist/RDF.pm
+inc/Scalar/Util.pm
+inc/unicore/Name.pm
+inc/utf8.pm
+inc/YAML/Tiny.pm
+lib/RDF/Query/Functions/Buzzword/GB.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+meta/changes.pret
+meta/doap.pret
+meta/makefile.pret
+README
+t/01basic.t
+TODO
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,38 @@
+0.16	2009-11-11
+	Fixed handling of ambiguous search broken in 0.15's attempt to
+	sort results more robustly.	
+
+0.15	2009-08-28
+	SQL92 / Postgres compatability tweak by Ian Smith
+
+0.14	2009-08-06
+	Fixed do: to work as advertized.
+	/Search/Invoker?do= worked, but was not caught by the search callback.
+
+	Amended documentation again.
+
+0.13	2009-08-06
+	More explicit documentation.
+
+	Fixed bug masking locally created system saved searches.
+
+0.11	2009-08-05
+	Updated MANIFEST so that Simple Search operator description is included
+
+	Fix bungled versioning on CPAN (previous version showed up as mix of
+	0.06 and 0.10)
+
+	Minor tweaks to Invoker.
+
+0.10	2009-08-04
+	Altered Simple Search display text and location.
+
+	Fixed Invoker for users not in any groups,
+	and for users without SeeGroup.
+
+	Quotemeta do's operand for extra SQL-injection protection.
+
+	Removed pointless trailing slash from Invoker invocation.
+
+0.05	2009-08-03
+	Initial public release.

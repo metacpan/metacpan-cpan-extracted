@@ -1,0 +1,28 @@
+Revision history for RT-Extension-TicketLocking
+
+1.06 2016-10-21
+ - Update documentation
+
+1.05 2015-02-26
+ - Packaging updates
+ - Localization, thanks to Emmanuel Lacour
+
+1.00 2015-01-19
+ - Fix escaping in "locked by..."
+ - Bump dependency to 4.0 that contains l_unsafe
+ - Updated packaging
+
+0.12 2013-10-10
+ - port menu items over RT 4.0+
+
+0.11 2013-10-08
+ - update installer
+ - use ShowUser component in the message
+ - styling clean ups for MyLocks
+
+0.10 2008-09-15
+ - update installer
+
+0.09 2007-03-05
+ - added this file
+ - updated some metadata

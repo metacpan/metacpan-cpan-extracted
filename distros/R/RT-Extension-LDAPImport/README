@@ -1,0 +1,545 @@
+NAME
+    RT::Extension::LDAPImport - Import Users from an LDAP store
+
+SYNOPSIS
+    In RT_SiteConfig.pm:
+
+        Set($LDAPHost,'my.ldap.host')
+        Set($LDAPUser,'me');
+        Set($LDAPPassword,'mypass');
+        Set($LDAPFilter, '(&(cn = users))');
+        Set($LDAPMapping, {Name         => 'uid', # required
+                           EmailAddress => 'mail',
+                           RealName     => 'cn',
+                           WorkPhone    => 'telephoneNumber',
+                           Organization => 'departmentName'});
+    
+        # Add to any existing plugins
+        Set(@Plugins, qw(RT::Extension::LDAPImport));
+    
+        # If you want to sync Groups from LDAP into RT
+    
+        Set($LDAPGroupBase, 'ou=Groups,o=Our Place');
+        Set($LDAPGroupFilter, '(&(cn = Groups))');
+        Set($LDAPGroupMapping, {Name               => 'cn',
+                                Member_Attr        => 'member',
+                                Member_Attr_Value  => 'dn' });
+
+    Running the import:
+
+        # Run a test import
+        /opt/rt4/local/plugins/RT-Extension-LDAPImport/bin/rtldapimport \
+        --debug > ldapimport.debug 2>&1
+    
+        # Run for real, possibly put in cron
+        /opt/rt4/local/plugins/RT-Extension-LDAPImport/bin/rtldapimport \
+        --import
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::LDAPImport');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::LDAPImport));
+
+        or add RT::Extension::LDAPImport to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+    All of the configuration for the importer goes your RT_SiteConfig.pm
+    file. Some of these values pass through to Net::LDAP so you can check
+    there for valid values and more advanced options.
+
+    Set($LDAPHost,'our.ldap.host');
+        Hostname or ldap(s):// uri:
+
+    Set($LDAPUser, 'uid=foo,ou=users,dc=example,dc=com');
+        Your LDAP username or DN. If unset, we'll attempt an anonymous bind.
+
+    Set($LDAPPassword, 'ldap pass');
+        Your LDAP password.
+
+    Set($LDAPBase, 'ou=People,o=Our Place');
+        Base object to search from.
+
+    Set($LDAPFilter, '(&(cn = users))');
+        The LDAP search filter to apply (in this case, find all the users).
+
+    Set($LDAPMapping...
+            Set($LDAPMapping, {Name         => 'uid',
+                               EmailAddress => 'mail',
+                               RealName     => 'cn',
+                               WorkPhone    => 'telephoneNumber',
+                               Organization => 'departmentName'});
+
+        This provides the mapping of attributes in RT to attribute(s) in
+        LDAP. Only Name is required for RT.
+
+        The values in the mapping (i.e. the LDAP fields, the right hand
+        side) can be one of the following:
+
+        an attribute
+            LDAP attribute to use. Only first value is used if attribute is
+            multivalue. For example:
+
+                EmailAddress => 'mail',
+
+        an array reference
+            The LDAP attributes can also be an arrayref of LDAP fields, for
+            example:
+
+                WorkPhone => [qw/CompanyPhone Extension/]
+
+            which will be concatenated together with a space. First values
+            of each attribute are used in case they have multiple values.
+
+        a subroutine reference
+            The LDAP attribute can also be a subroutine reference that does
+            mapping, for example:
+
+                YYY => sub {
+                    my %args = @_;
+                    my @values = grep defined && length, $args{ldap_entry}->get_value('XXX');
+                    return @values;
+                },
+
+            The subroutine should return value or list of values. The
+            following arguments are passed into the function in a hash:
+
+            self
+                Instance of this class.
+
+            ldap_entry
+                Net::LDAP::Entry instance that is currently mapped.
+
+            import
+                Boolean value indicating whether it's import or a dry run.
+                If it's dry run (import is false) then function shouldn't
+                change anything.
+
+            mapping
+                Hash reference with the currently processed mapping, eg.
+                $LDAPMapping.
+
+            rt_field and ldap_field
+                The currently processed key and value from the mapping.
+
+            result
+                Hash reference with results of completed mappings for this
+                ldap entry. This should be used to inject that are not in
+                the mapping, not to inspect. Mapping is processed in literal
+                order of the keys.
+
+        The keys in the mapping (i.e. the RT fields, the left hand side) may
+        be a user custom field name prefixed with UserCF., for example
+        'UserCF.Employee Number' => 'employeeId'. Note that this only adds
+        values at the moment, which on single value CFs will remove any old
+        value first. Multiple value CFs may behave not quite how you expect.
+        If the attribute no longer exists on a user in LDAP, it will be
+        cleared on the RT side as well.
+
+        You may also prefix any RT custom field name with CF. inside your
+        mapping to add available values to a Select custom field. This
+        effectively takes user attributes in LDAP and adds the values as
+        selectable options in a CF. It does not set a CF value on any RT
+        object (User, Ticket, Queue, etc). You might use this to populate a
+        ticket Location CF with all the locations of your users so that
+        tickets can be associated with the locations in use.
+
+    Set($LDAPCreatePrivileged, 1);
+        By default users are created as Unprivileged, but you can change
+        this by setting $LDAPCreatePrivileged to 1.
+
+    Set($LDAPGroupName,'My Imported Users');
+        The RT Group new and updated users belong to. By default, all users
+        added or updated by the importer will belong to the 'Imported from
+        LDAP' group.
+
+    Set($LDAPSkipAutogeneratedGroup, 1);
+        Set this to true to prevent users from being automatically added to
+        the group configured by $LDAPGroupName.
+
+    Set($LDAPUpdateUsers, 1);
+        By default, existing users are skipped. If you turn on
+        LDAPUpdateUsers, we will clobber existing data with data from LDAP.
+
+    Set($LDAPUpdateOnly, 1);
+        By default, we create users who don't exist in RT but do match your
+        LDAP filter and obey $LDAPUpdateUsers for existing users. This
+        setting updates existing users, overriding $LDAPUpdateUsers, but
+        won't create new users who are found in LDAP but not in RT.
+
+    Set($LDAPGroupBase, 'ou=Groups,o=Our Place');
+        Where to search for groups to import.
+
+    Set($LDAPGroupFilter, '(&(cn = Groups))');
+        The search filter to apply.
+
+    Set($LDAPGroupMapping...
+            Set($LDAPGroupMapping, {Name               => 'cn',
+                                    Member_Attr        => 'member',
+                                    Member_Attr_Value  => 'dn' });
+
+        A mapping of RT attributes to LDAP attributes to identify group
+        members. Name will become the name of the group in RT, in this case
+        pulling from the cn attribute on the LDAP group record returned.
+        Everything besides Member_Attr_Value is processed according to rules
+        described in documentation for $LDAPMapping option, so value can be
+        array or code reference besides scalar.
+
+        Member_Attr is the field in the LDAP group record the importer
+        should look at for group members. These values (there may be
+        multiple members) will then be compared to the RT user name, which
+        came from the LDAP user record. See t/group-callbacks.t for a
+        complex example of using a code reference as value of this option.
+
+        Member_Attr_Value, which defaults to 'dn', specifies where on the
+        LDAP user record the importer should look to compare the member
+        value. A match between the member field on the group record and this
+        identifier (dn or other LDAP field) on a user record means the user
+        will be added to that group in RT.
+
+        id is the field in LDAP group record that uniquely identifies the
+        group. This is optional and shouldn't be equal to mapping for Name
+        field. Group names in RT must be distinct and you don't need another
+        unique identifier in common situation. However, when you rename a
+        group in LDAP, without this option set properly you end up with two
+        groups in RT.
+
+        You can provide a Description key which will be added as the group
+        description in RT. The default description is 'Imported from LDAP'.
+
+    Set($LDAPImportGroupMembers, 1);
+        When disabled, the default, LDAP group import expects that all LDAP
+        members already exist as RT users. Often the user import stage,
+        which happens before groups, is used to create and/or update group
+        members by using an $LDAPFilter which includes a memberOf attribute.
+
+        When enabled, by setting to 1, LDAP group members are explicitly
+        imported before membership is synced with RT. This enables
+        groups-only configurations to also import group members without
+        specifying a potentially long and complex $LDAPFilter using
+        memberOf. It's particularly handy when memberOf isn't available on
+        user entries.
+
+        Note that $LDAPFilter still applies when this option is enabled, so
+        some group members may be filtered out from the import.
+
+    Set($LDAPSizeLimit, 1000);
+        You can set this value if your LDAP server has result size limits.
+
+Mapping Groups Between RT and LDAP
+    If you are using the importer, you likely want to manage access via LDAP
+    by putting people in groups like 'DBAs' and 'IT Support', but also have
+    groups for other non-RT related things. In this case, you won't want to
+    create all of your LDAP groups in RT. To limit the groups that get
+    mirrored, construct your $LDAPGroupFilter as an OR (|) with all of the
+    RT groups you want to mirror from LDAP. For example:
+
+        Set($LDAPGroupBase, 'OU=Groups,OU=Company,DC=COM');
+        Set($LDAPGroupFilter, '(|(CN=DBAs)(CN=IT Support))');
+
+    The importer will then import only the groups that match. In this case,
+    import means:
+
+    *   Verifying the group is in AD;
+
+    *   Creating the group in RT if it doesn't exist;
+
+    *   Populating the group with the members identified in AD;
+
+    The import script will also issue a warning if a user isn't found in RT,
+    but this should only happen when testing. When running with --import on,
+    users are created before groups are processed, so all users (group
+    members) should exist unless there are inconsistencies in your LDAP
+    configuration.
+
+Running the Import
+    Executing rtldapimport will run a test that connects to your LDAP server
+    and prints out a list of the users found. To see more about these users,
+    and to see more general debug information, include the --debug flag.
+
+    That debug information is also sent to the RT log with the debug level.
+    Errors are logged to the screen and to the RT log.
+
+    Executing rtldapimport with the --import flag will cause it to import
+    users into your RT database. It is recommended that you make a database
+    backup before doing this. If your filters aren't set properly this could
+    create a lot of users or groups in your RT instance.
+
+RT Versions
+    The importer works with RT 4.0 and above.
+
+LDAP Filters
+    The ldapsearch
+    <http://www.openldap.org/software/man.cgi?query=ldapsearch&manpath=OpenL
+    DAP+2.0-Release> utility in openldap can be very helpful while refining
+    your filters.
+
+Developing
+    If you want to run tests for this extension, you should create the
+    inc/.author directory and will need to set RT_DBA_USER and
+    RT_DBA_PASSWORD environment variables to a database user that can
+    create/drop tests databases as needed.
+
+    Do not run tests in a production environment.
+
+METHODS
+  connect_ldap
+    Relies on the config variables $RT::LDAPHost, $RT::LDAPUser and
+    $RT::LDAPPassword being set in your RT Config files.
+
+     Set($LDAPHost,'my.ldap.host')
+     Set($LDAPUSER,'me');
+     Set($LDAPPassword,'mypass');
+
+    LDAPUser and LDAPPassword can be blank, which will cause an anonymous
+    bind.
+
+    LDAPHost can be a hostname or an ldap:// ldaps:// uri.
+
+  run_user_search
+    Set up the appropriate arguments for a listing of users.
+
+  _run_search
+    Executes a search using the provided base and filter.
+
+    Will connect to LDAP server using connect_ldap.
+
+    Returns an array of Net::LDAP::Entry objects, possibly consolidated from
+    multiple LDAP pages.
+
+  import_users import => 1|0
+    Takes the results of the search from run_search and maps attributes from
+    LDAP into RT::User attributes using $RT::LDAPMapping. Creates RT users
+    if they don't already exist.
+
+    With no arguments, only prints debugging information. Pass --import to
+    actually change data.
+
+    $RT::LDAPMapping> should be set in your RT_SiteConfig.pm file and look
+    like this.
+
+     Set($LDAPMapping, { RTUserField => LDAPField, RTUserField => LDAPField });
+
+    RTUserField is the name of a field on an RT::User object LDAPField can
+    be a simple scalar and that attribute will be looked up in LDAP.
+
+    It can also be an arrayref, in which case each of the elements will be
+    evaluated in turn. Scalars will be looked up in LDAP and concatenated
+    together with a single space.
+
+    If the value is a sub reference, it will be executed. The sub should
+    return a scalar, which will be examined. If it is a scalar, the value
+    will be looked up in LDAP. If it is an arrayref, the values will be
+    concatenated together with a single space.
+
+    By default users are created as Unprivileged, but you can change this by
+    setting $LDAPCreatePrivileged to 1.
+
+  _import_user
+    We have found a user to attempt to import; returns the RT::User object
+    if it was found (or created), undef if not.
+
+  _cache_user ldap_entry => Net::LDAP::Entry, [user => { ... }]
+    Adds the user to a global cache which is used when importing groups
+    later.
+
+    Optionally takes a second argument which is a user data object returned
+    by _build_user_object. If not given, _cache_user will call
+    _build_user_object itself.
+
+    Returns the user Name.
+
+  _check_ldap_mapping
+    Returns true is there is an LDAPMapping configured, returns false, logs
+    an error and disconnects from ldap if there is no mapping.
+
+  _build_user_object
+    Utility method which wraps _build_object to provide sane defaults for
+    building users. It also tries to ensure a Name exists in the returned
+    object.
+
+  _build_object
+    Internal method - a wrapper around "_parse_ldap_mapping" that flattens
+    results turning every value into a scalar.
+
+    The following:
+
+        [
+            [$first_value1, ... ],
+            [$first_value2],
+            $scalar_value,
+        ]
+
+    Turns into:
+
+        "$first_value1 $first_value2 $scalar_value"
+
+    Arguments are just passed into "_parse_ldap_mapping".
+
+   _parse_ldap_mapping
+    Internal helper method that maps an LDAP entry to a hash according to
+    passed arguments. Takes named arguments:
+
+    ldap_entry
+        Net::LDAP::Entry instance that should be mapped.
+
+    only
+        Optional regular expression. If passed then only matching entries in
+        the mapping will be processed.
+
+    only
+        Optional regular expression. If passed then matching entries in the
+        mapping will be skipped.
+
+    mapping
+        Hash that defines how to map. Key defines position in the result.
+        Value can be one of the following:
+
+        If we're passed a scalar or an array reference then value is:
+
+            [
+                [value1_of_attr1, value2_of_attr1],
+                [value1_of_attr2, value2_of_attr2],
+            ]
+
+        If we're passed a subroutine reference as value or as an element of
+        array, it executes the code and returned list is pushed into results
+        array:
+
+            [
+                @result_of_function,
+            ]
+
+        All arguments are passed into the subroutine as well as a few more.
+        See more in description of $LDAPMapping option.
+
+    Returns hash reference with results, each value is an array with
+    elements either scalars or arrays as described above.
+
+  create_rt_user
+    Takes a hashref of args to pass to RT::User::Create Will try loading the
+    user and will only create a new user if it can't find an existing user
+    with the Name or EmailAddress arg passed in.
+
+    If the $LDAPUpdateUsers variable is true, data in RT will be clobbered
+    with data in LDAP. Otherwise we will skip to the next user.
+
+    If $LDAPUpdateOnly is true, we will not create new users but we will
+    update existing ones.
+
+  add_user_to_group
+    Adds new users to the group specified in the $LDAPGroupName variable
+    (defaults to 'Imported from LDAP'). You can avoid this if you set
+    $LDAPSkipAutogeneratedGroup.
+
+  setup_group
+    Pulls the $LDAPGroupName object out of the DB or creates it if we need
+    to do so.
+
+   add_custom_field_value
+    Adds values to a Select (one|many) Custom Field. The Custom Field should
+    already exist, otherwise this will throw an error and not import any
+    data.
+
+    This could probably use some caching.
+
+   update_object_custom_field_values
+    Adds CF values to an object (currently only users). The Custom Field
+    should already exist, otherwise this will throw an error and not import
+    any data.
+
+    Note that this code only adds values at the moment, which on single
+    value CFs will remove any old value first. Multiple value CFs may behave
+    not quite how you expect.
+
+  import_groups import => 1|0
+    Takes the results of the search from run_group_search and maps
+    attributes from LDAP into RT::Group attributes using
+    $RT::LDAPGroupMapping.
+
+    Creates groups if they don't exist.
+
+    Removes users from groups if they have been removed from the group on
+    LDAP.
+
+    With no arguments, only prints debugging information. Pass --import to
+    actually change data.
+
+   run_group_search
+    Set up the appropriate arguments for a listing of users.
+
+  _import_group
+    The user has run us with --import, so bring data in.
+
+  create_rt_group
+    Takes a hashref of args to pass to RT::Group::Create Will try loading
+    the group and will only create a new group if it can't find an existing
+    group with the Name or EmailAddress arg passed in.
+
+    If $LDAPUpdateOnly is true, we will not create new groups but we will
+    update existing ones.
+
+    There is currently no way to prevent Group data from being clobbered
+    from LDAP.
+
+   find_rt_group
+    Loads groups by Name and by the specified LDAP id. Attempts to resolve
+    renames and other out-of-sync failures between RT and LDAP.
+
+   find_rt_group_by_ldap_id
+    Loads an RT::Group by the ldap provided id (different from RT's internal
+    group id)
+
+   add_group_members
+    Iterate over the list of values in the Member_Attr LDAP entry. Look up
+    the appropriate username from LDAP. Add those users to the group. Remove
+    members of the RT Group who are no longer members of the LDAP group.
+
+  _show_group
+    Show debugging information about the group record we're going to import
+    when the groups reruns us with --import.
+
+   disconnect_ldap
+    Disconnects from the LDAP server.
+
+    Takes no arguments, returns nothing.
+
+Utility Functions
+   screendebug
+    We always log to the RT log file with level 'debug'. This duplicates the
+    messages to the screen.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-LDAPImport@rt.cpan.org|mailto:bug-RT-Extension-LDAPImport@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-LDAPImport>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2007-2014 by Best Practical Solutions,
+    LLC
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

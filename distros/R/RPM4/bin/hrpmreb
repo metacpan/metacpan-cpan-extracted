@@ -1,0 +1,674 @@
+#!/usr/bin/perl
+
+##- Nanar <nanardon@zarb.org>
+##-
+##- This program is free software; you can redistribute it and/or modify
+##- it under the terms of the GNU General Public License as published by
+##- the Free Software Foundation; either version 2, or (at your option)
+##- any later version.
+##-
+##- This program is distributed in the hope that it will be useful,
+##- but WITHOUT ANY WARRANTY; without even the implied warranty of
+##- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##- GNU General Public License for more details.
+##-
+##- You should have received a copy of the GNU General Public License
+##- along with this program; if not, write to the Free Software
+##- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# $Id$
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use POSIX (qw/nice O_WRONLY O_CREAT O_APPEND/);
+my $ipcstat;
+
+if (($ARGV[0] || "") eq '--trap') {
+    shift @ARGV;
+    my $trap = shift(@ARGV) or die "No log file specified\n";
+    $0 = "hrpmreb [trapping]";
+    open (my $t, ">>", $trap) or exit(1);
+    printf $t "\n\nRunning: %s\n\n", join(" ", @ARGV);
+    my $cmd = join(" ", @ARGV);
+    open(my $htrap, '-|', "$cmd 2>&1") or do {
+        print $t "Can't run cmd $cmd: $!\n";
+        exit(1);
+    };
+    { $| = 1; my $oldfh = select($t); $| =1; select($oldfh); }
+    
+    while(<$htrap>) {
+        print $_;
+        print $t $_;
+    }
+    close($t);
+    exit(!close($htrap));
+}
+
+if (($ARGV[0] || '') eq '--stat') {
+    require IPC::ShareLite;
+    foreach my $k (1000 .. 1020) {
+        $ipcstat = new IPC::ShareLite (
+            -key => $k,
+            -create => 'no',
+            -destroy => 'no',
+        ) or last;
+        $ipcstat->lock();
+        my @ipcs = map { pack("h*", $_) } split(/ /, $ipcstat->fetch());
+        printf "Building: %s for %ds\n", shift(@ipcs), time - shift(@ipcs);
+        $ipcstat->unlock();
+        show_stat(@ipcs);
+    }
+    exit(0);
+}
+
+=head1 NAME
+
+hrpmreb
+
+=head1 DESCRIPTION
+
+A very powerful rpm rebuilder using perl-RPM4
+
+=head1 SYNOPSYS
+
+hrpmreb -m macros rpm.src.rpm
+
+=head1 OPTIONS
+
+=head2 -m|--macros macrosfile
+
+Read a rpm macros file and add it to rpm configuration.
+
+To read several macros files, use -m macro1 -m macro2 ...
+
+=head2 -D|--define "macro value"
+
+Add a new macro to rpm configuration:
+
+example: -D "_sourcedir /tmp"
+
+This option can be used several time.
+
+=head2 -b|--batch
+
+Rebuild rpms found in L<%bindir> instead of the one given on command line
+
+=head2 -v|--verbose LEVEL
+
+Set rpm verbosity level to LEVEL.
+
+LEVEL can be an integer value (0 to 8) or a string value like "ERR", "DEBUG" or "INFO".
+
+=head2 --noupload
+
+Don't upload rpm after build.
+
+This option has the same effect than defining L<%upload> to 0.
+
+=head2 --nochkbin
+
+Don't check if binary already exist
+
+This option has the same effect that defining L<%checkbinary> to 0.
+
+=head2 --noinstdep
+
+Don't install dependancies needed to build the rpm
+
+This option has the same effect than defining L<%installdep> to 0.
+
+=head2 --keepalllog
+
+Don't delete log if build was successful.
+
+This option has the same effect than defining L<%keepalllog> to 1.
+
+=head2 --nobuild
+
+Skip build (and upload) stage, usefull for testing
+
+=head2 --nosort
+
+Do not sort srpms by builddate.
+
+This option has the same effect than defining L<%sortbybuilddate> to 0.
+
+=head2 --livestat
+
+Enable livestat functionnalities, see L<%livestat>, L<--stat>.
+
+=head2 --stat
+
+Give the statistics of current hrpmreb running on the current computer if
+they has been started with livestat functionnality.
+
+=cut
+
+my (@define, @with, @without);
+
+GetOptions(
+    'm|macros=s' => \my @macros,
+    'D|define=s' => \@define,
+    'b|batch' => \my $batch,
+    'v|verbose=s' => \my $verbose,
+    'nobuild' => \my $nobuild,
+    'nosort' => sub { push @define, "sortbybuilddate 0"; },
+    'noupload' => sub { push @define, "upload 0"; },
+    'nochkbin' => sub { push @define, "checkbinary 0"; },
+    'noinstdep' => sub { push @define, "installdep 0"; },
+    'keepalllog' => sub { push @define, "keepalllog 1"; },
+    'trap=s' => sub { die "--trap should be first arg and you don't have to use it...\n" },
+    'livestat' => sub { push @define, "livestat 1"; },
+    'with=s' => \@with,
+    'without=s' => \@without,
+    'nofork' => \my $nofork,
+    'dump' => \my $dumpconfig,
+);
+
+push @define, "_with_$_ --with-$_" foreach (@with);
+push @define, "_without_$_ --without-$_" foreach (@without);
+
+=head1 MACROS
+
+=head2 %myself
+
+The program itself ($0)
+
+=head2 %checkbinary
+
+If set, check if binary does not exists in L<%bindir>
+
+=head2 %srcdir
+
+A list of path separated by ':' where src.rpm should be found
+
+=head2 %bindir
+
+A list of path separated by ':' where binary rpm should be found
+
+=head2 %installdep
+
+If set, try to install dependancies (see L<%installrpmcmd>)
+
+=head2 %installdepcmd
+
+The command to run to install dependancies (urpmi ...)
+
+=head2 %upload
+
+If set, run the L<%uploadcmd> command
+
+=head2 %uploadcmd
+
+The upload command to run to upload binary rpms
+
+=head2 %logdir
+
+Where logfile should be put
+
+=head2 %keepalllog
+
+Don't delete log even on build success
+
+=head2 %nice
+
+Renice the build process
+
+=head2 %createrpmsdir
+
+If set, it will try to create rpms build directory
+
+=head2 %sortbybuilddate
+
+If define, sort srpms by builddate before build
+
+=head2 %livestat
+
+if set, hrpmreb use IPC to store his status, then you'll be able
+to use hrpmreb --stat to immediatelly get status of the current build. 
+
+=cut
+
+require RPM4;
+RPM4::setverbosity($verbose || "INFO");
+
+my $hlog = undef;
+
+RPM4::setlogcallback(
+    sub {
+        my %arg = @_;
+        loging("%s", $arg{msg});
+    }
+);
+
+sub loging {
+    my ($fmt, @var) = @_;
+    printf STDERR $fmt, @var;
+    if ($hlog) {
+        printf $hlog $fmt, @var;
+    }
+}
+
+config_macros();
+
+if (RPM4::expandnumeric("%livestat")) {
+    require IPC::ShareLite;
+    foreach my $k (1000 .. 1020) {
+        $ipcstat = new IPC::ShareLite (
+            -key => $k,
+            -create => 'yes',
+            -destroy => 'no',
+            -mode => 0644,
+        ) and last;
+    }
+    $ipcstat or die "no IPC availlable\n";
+}
+
+my %status = (
+    srpmdone => 0,
+    srpmfailure => 0,
+    srpmtotal => 0,
+    steptime => time,
+    currentsrpms => 'Preparing build',
+    currentstep => '',
+);
+    
+my $passphrase = RPM4::expand('%{?gpgpass}');
+
+my @srcdir = split(':', RPM4::expand('%{?srcdir}'));
+print RPM4::expand("Source dir: %{?srcdir}%{?!srcdir:(none)}\n") if ($batch);
+
+!@srcdir && $batch and die "No src dir, please define \%srcdir\n";
+
+my @bindir = split(':', RPM4::expand('%{?bindir}'));
+if (RPM4::expandnumeric('%checkbinary')) {
+    if (@bindir) {
+        print RPM4::expand("Using binary dir: %{?bindir}%{?!bindir:(none)}\n");
+    } else {
+        die "No bin dir, please define \%bindir or unset \%checkbinary\n";
+    }
+}
+
+if ($dumpconfig) {
+    RPM4::dumprc(\*STDOUT);
+    exit 0;
+}
+
+-d RPM4::expand("%{?logdir}%{!?logdir:.}") or mkdir RPM4::expand("%{?logdir}%{!?logdir:.}")
+    or die "Can't create logdir ". RPM4::expand("%{?logdir}%{!?logdir:.}") . " $!\n";
+
+if (RPM4::expandnumeric('%createrpmsdir')) {
+    foreach my $macro (qw(%_topdir %_sourcedir %_builddir %_srpmdir %_rpmdir %_rpmdir/noarch %_rpmdir/%_target_cpu %_specdir %_tmppath)) {
+        -d RPM4::expand($macro) or mkdir RPM4::expand($macro)
+	    or die "Can't create dir " .  RPM4::expand($macro) . "($macro): $!";
+    }
+}
+
+set_ipc_status(currentstep => "searching srpms");
+
+my @srpmstobuild;
+my @specstobuild;
+
+if($batch) {
+   @srpmstobuild = map { glob("$_/*.src.rpm") } @srcdir;
+}
+
+foreach my $arg (@ARGV) {
+    -f $arg or do {
+        push(@srpmstobuild, map { glob("$_/$arg") } @srcdir);
+        next;
+    };
+    if ($arg =~ /\.src\.rpm$/) {
+        push @srpmstobuild, $arg;
+    } else {
+        push @specstobuild, $arg;
+    };
+}
+
+$status{srpmtotal} = scalar(@srpmstobuild) + scalar(@specstobuild);
+
+if (! $status{srpmtotal}) {
+    die sprintf("Nothing to do, %s\n", $batch ? "check \%srcdir value" : "give src.rpm too rebuild or use -b");
+}
+
+if (RPM4::expandnumeric("%sortbybuilddate")) {
+    loging("Sorting srpms by buildate\n");
+    set_ipc_status(currentstep => "sorting srpms");
+    @srpmstobuild = sort_srpms(@srpmstobuild);
+}
+
+# readjusting
+$status{srpmtotal} = scalar(@srpmstobuild) + scalar(@specstobuild);
+
+foreach my $specfile (@specstobuild) {
+    my $pid = fork();
+
+    if ($pid) {
+        parent_wait_child($pid);
+        $? and $status{srpmfailure}++;
+        
+        show_stat($status{srpmtotal}, ++$status{srpmdone}, $status{srpmfailure});
+        
+        config_macros();
+    } else {
+        my $oldcmd = RPM4::expand("%___build_cmd");
+        RPM4::add_macro("___build_cmd %myself --trap %_tmppath/%name-%version-%release.build.log $oldcmd");
+        exit(build_specfile($specfile));
+    }    
+}
+
+foreach my $srpm (@srpmstobuild) {
+    my $pid = fork();
+
+    if ($pid) {
+        parent_wait_child($pid);
+        $? and $status{srpmfailure}++;
+        
+        show_stat($status{srpmtotal}, ++$status{srpmdone}, $status{srpmfailure});
+        
+        config_macros();
+    } else {
+        my $oldcmd = RPM4::expand("%___build_cmd");
+        RPM4::add_macro("___build_cmd %myself --trap %_tmppath/%name-%version-%release.build.log $oldcmd");
+        exit(build_srcrpm($srpm));
+    }    
+}
+
+sub parent_wait_child {
+    my ($pid) = @_;
+    my $subdie = sub {
+        kill 15, $pid;
+        waitpid $pid, 0;
+        exit(1);
+    };
+    local $SIG{'TERM'} = $subdie;
+    local $SIG{'INT'} = $subdie;
+    waitpid $pid, 0;
+}
+
+sub show_advance {
+    my ($end, $total, $done) = @_;
+    printf(" %5d / %5d [%-50s] %3d %%%s", $done, $total, 
+        '#' x ($total ? ($done * 50 / $total) : 0), 
+        ($total ? ($done * 100 / $total) : 0), $end);
+}
+
+sub show_stat {
+    my ($total, $done, $failure) = @_;
+    print "\nDone:\n";
+    show_advance("\n", $total, $done);
+    print "Failed:\n";
+    show_advance("\n\n", $done, $failure);
+}
+
+sub set_ipc_status {
+    my (%val) = @_;
+    foreach (keys %val) {
+        $status{$_} = $val{$_};
+        /currentsrpms/ and do {
+            $status{steptime} = time;
+            $status{currentstep} = '';
+        };
+    }
+    $ipcstat or return;
+    $ipcstat->lock();
+    $ipcstat->store(sprintf(
+        "%s %s %s %s %s",
+        unpack("h*", "$status{currentsrpms} ($status{currentstep})"),
+        unpack("h*", $status{steptime}),
+        unpack("h*", $status{srpmtotal}), unpack("h*", $status{srpmdone}), unpack("h*", $status{srpmfailure})
+    ));
+    $ipcstat->unlock();
+}
+
+sub sort_srpms {
+    my %s;
+    my $db = RPM4::newdb();
+    $db->vsflags([ qw(NOSIGNATURES NOPAYLOAD NODIGESTS) ]);
+    my $done = 0;
+    my @specs;
+    foreach my $src (@_) {
+        my $h = $db->rpm2header($src) or next;
+        $s{$src} = $h->tag("BUILDTIME") || 0;
+        show_advance("\r", scalar(@_), ++$done);
+        
+    }
+    print "\n";
+    return sort { $s{$a} <=> $s{$b} } keys %s;
+}
+
+sub config_macros {
+    RPM4::resetmacros();
+
+    RPM4::add_macro("logfileformat %name.log");
+    
+    RPM4::readconfig();
+    
+    RPM4::loadmacrosfile($_) foreach (@macros); 
+    RPM4::add_macro($_) foreach(@define);
+
+    RPM4::add_macro("myself $0");
+}
+
+sub checkbinary {
+    my ($spec) = @_;
+    RPM4::expandnumeric('%checkbinary') or return 1;
+    my $missing = 0;
+    my @bin = $spec->binrpm();
+    foreach my $r (@bin) {
+        $r =~ s!^.*/!!;
+        my @rfake;
+        if (my ($rp) = $r =~ /^(.*)(?:amd64|x86_64)\.rpm/) {
+            push @rfake, $rp."x86_64.rpm", $rp."amd64.rpm";
+        } else {
+            push @rfake, $r;
+        }
+        my $ok = 0;
+        foreach my $rp (@rfake) {
+            if (grep  { -f "$_/$rp" } @bindir) {
+                loging("$rp found\n");
+                $ok = 1;
+                last;
+            }
+        }
+        if (!$ok) {
+            loging("$r not found (need build)\n");
+            $missing++;
+        }
+    }
+    return 0 if ($missing == 0);
+    return RPM4::expandnumeric('%checkbinary') <= ($missing == scalar(@bin) ? 2 : 1);
+}
+
+sub build_srcrpm {
+    my ($srpm) = @_;
+    my ($specf, $cookies) = RPM4::installsrpm($srpm) or return 1;
+    my $rc = 0;
+    
+    my $spec;
+    if ($spec = RPM4::specnew($specf, $passphrase, "/", $cookies, 0, 0)) {
+        open($hlog, ">", RPM4::expand('%{?logdir:%{logdir}/}%{logfileformat}'));
+        $0 = RPM4::expand("hrpmreb [%name-%version-%release]");
+        set_ipc_status(currentsrpms => RPM4::expand("%name-%version-%release"));
+        $SIG{'TERM'} = sub {
+            $spec && $spec->build(["RMSOURCE", "RMSPEC", "RMBUILD"]);
+            $spec && $spec->build(["CLEAN"]);
+        };
+        
+        if (checkbinary($spec)) {
+            $rc = build_spec($spec, $srpm);
+            upload_build($spec, 0) unless($rc);
+        } else {
+            loging("Found binary, skipping build\n");
+        }
+
+        if ($rc || RPM4::expandnumeric('%keepalllog')) {
+            if (open(my $buildlog, "<", RPM4::expand("%_tmppath/%name-%version-%release.build.log"))) {
+                while (<$buildlog>) {
+                    print $hlog $_;
+                }
+                close($buildlog);
+            }
+        } else {
+            unlink(RPM4::expand("\%{?logdir:%{logdir}/}%{logfileformat}"));
+        }
+        
+        close($hlog); $hlog = undef;
+    } else {
+        $rc = 1;
+    }
+
+    $spec ||= RPM4::specnew($specf, $passphrase, "/", $cookies, 1, 1);
+
+    if ($spec) {
+        set_ipc_status(currentstep => "cleaning");
+        loging("cleaning sources, spec\n");
+        $spec && $spec->build(["RMSOURCE", "RMSPEC", "RMBUILD"]);
+    }
+
+    unlink(RPM4::expand("%_tmppath/%name-%version-%release.build.log"));
+    return $rc;
+}
+
+sub build_specfile {
+    my ($specf) = @_;
+    my $rc = 0;
+    
+    my $spec;
+    if ($spec = RPM4::specnew($specf, $passphrase, "/", undef, 0, 0)) {
+        open($hlog, ">", RPM4::expand('%{?logdir:%{logdir}/}%{logfileformat}'));
+        $0 = RPM4::expand("hrpmreb [%name-%version-%release]");
+        set_ipc_status(currentsrpms => RPM4::expand("%name-%version-%release"));
+        $SIG{'TERM'} = sub {
+            $spec && $spec->build(["RMBUILD"]);
+        };
+        
+        $spec->build(["PACKAGESOURCE"]);
+        my $srpm = $spec->srcrpm();
+        
+        if (checkbinary($spec)) {
+            $rc = build_spec($spec, $srpm);
+            upload_build($spec, 1) unless($rc);
+        } else {
+            loging("Found binary, skipping build\n");
+        }
+
+        if ($rc || RPM4::expandnumeric('%keepalllog')) {
+            if (open(my $buildlog, "<", RPM4::expand("%_tmppath/%name-%version-%release.build.log"))) {
+                while (<$buildlog>) {
+                    print $hlog $_;
+                }
+                close($buildlog);
+            }
+        } else {
+            unlink(RPM4::expand("\%{?logdir:%{logdir}/}%{logfileformat}"));
+        }
+        
+        close($hlog); $hlog = undef;
+    } else {
+        $rc = 1;
+    }
+
+    $spec ||= RPM4::specnew($specf, $passphrase, "/", undef, 1, 1);
+
+    if ($spec) {
+        set_ipc_status(currentstep => "cleaning");
+        loging("cleaning sources, spec\n");
+        $spec && $spec->build(["RMBUILD"]);
+    }
+
+    unlink(RPM4::expand("%_tmppath/%name-%version-%release.build.log"));
+    return $rc;
+}
+
+
+sub build_spec {
+    my ($spec, $srpm) = @_;
+    my ($rc, $starttime, $chkdeptime, $installdeptime, $uploadtime, $buildtime, $endtime) = (0);
+
+    $starttime = time;
+    
+    if (RPM4::expandnumeric('%installdep') && $srpm) {
+        set_ipc_status(currentstep => "installing dep");
+        runmacro("%installdepcmd", $srpm);
+        $installdeptime = time;
+    }
+    
+    nice(RPM4::expand("%{?nice}")) if (RPM4::expandnumeric("%{?nice:1}"));
+    set_ipc_status(currentstep => "checking dep");
+    my $pbs;
+    {
+    my $db = RPM4::newdb();
+    my $sh = $spec->srcheader();
+
+    $db->transadd($sh, "", 0);
+    $db->transcheck;
+    $pbs = $db->transpbs();
+    }
+    $chkdeptime = time;
+    
+    if ($pbs) {
+        $pbs->init;
+        loging("\nMissing dependancies:\n");
+        while($pbs->hasnext) {
+            loging($pbs->problem() . "\n");
+        }
+        $rc = 1;
+    } elsif(! $nobuild) {
+        set_ipc_status(currentstep => "compiling");
+        $rc = $spec->build([ qw/PREP BUILD INSTALL CHECK FILECHECK PACKAGEBINARY/ ]);
+        $spec->build([ qw/CLEAN/ ]);
+        $buildtime = time;
+    }
+    $endtime = time;
+    
+    loging("\nBuild time in sec:\n");
+    loging("%20s %5s\n", 'installdepcmd: ', defined($installdeptime) ? $installdeptime - $starttime : "N/A");
+    loging("%20s %5s\n", 'check dep: ', $chkdeptime - ($installdeptime || $starttime));
+    loging("%20s %5s\n", 'build: ', defined($buildtime) ? $buildtime - $chkdeptime : "N/A");
+    loging("%20s %5s\n", 'Total: ', $endtime - $starttime);
+    
+    loging("Build exit code: $rc\n");
+    
+    return $rc;
+}
+
+sub upload_build {
+    my ($spec, $uploadsrc) = @_;
+    my @buildrpms = $spec->binrpm;
+    unshift @buildrpms, $spec->srcrpm if($uploadsrc);
+
+    my $noexist = 0;
+    foreach (@buildrpms) {
+        if(-f $_) {
+            loging("%s has been built\n", $_);
+        } else {
+            loging("%s has not been built\n", $_);
+            $noexist++;
+        }
+    }
+    $noexist and return 1;
+    if (RPM4::expandnumeric('%upload')) {
+        set_ipc_status(currentstep => "uploading");
+        !runmacro("%uploadcmd", @buildrpms) and unlink @buildrpms;
+    }
+    return 0;
+}
+
+sub runmacro {
+    my ($macro, @args) = @_;
+    my $cmd = RPM4::expand($macro. " " . join(' ', @args));
+    $cmd =~ /^\Q$macro/ and return 1;
+    loging("Executing(%%%s) %s\n", $macro, $cmd);
+    system($cmd)
+}
+
+__END__
+
+=head1 AUTHOR
+
+Olivier Thauvin <nanardon@zarb.org>
+
+=cut

@@ -1,0 +1,34 @@
+<%INIT>
+
+# Lifted from RT core Tabs template. Needed because the Feeds submenu
+# can appear on the search results page or in a submenu of Search if
+# there is a previous search.
+
+if ( $Has_Query ) {
+    my $search = Menu()->child('search')->child('tickets');
+
+    my $current_search_menu;
+    if ( $Path =~ m{^/Ticket} ) {
+        $current_search_menu = $search->child( current_search => title => loc('Current Search') );
+        $current_search_menu->path("/Search/Results.html$Search_Args") if $Has_Query;
+    } else {
+        $current_search_menu = PageMenu();
+    }
+
+    if ($current_search_menu && $current_search_menu->child('more')) {
+        $current_search_menu->child('more')->child(
+            'ms_excel',
+            title => loc('Microsoft Excel'),
+            description => loc("Export search as a Microsoft Excel XLSX file"),
+            path => "/Search/Results.xlsx$Search_Args",
+            );
+    }
+}
+
+</%INIT>
+<%ARGS>
+$Path
+# These require a patch to RT 4.2.12 and earlier
+$Search_Args => ''
+$Has_Query => ''
+</%ARGS>

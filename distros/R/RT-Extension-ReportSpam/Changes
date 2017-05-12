@@ -1,0 +1,36 @@
+1.00 2014-12-15
+ - Packaging and documentation updates
+
+0.13 2014-07-10
+ - 4.2 compatibility fixes
+ - Hover text when mousing over the S to help explain what it is
+
+0.12 2013-08-01T13:14:20Z
+ - Auto-delete threshold
+ - Use the first active status of the lifecycle instead of hardcoding open
+ - Don't try to delete already deleted tickets
+ - Quick command-line tool to gather spam report stats
+
+0.11 2013-08-01T13:12:11Z
+ - Improved usage docs
+ - Fix typo in error message when a ticket couldn't be undeleted
+
+0.10 2013-04-02T09:14:44Z
+ - RT 4.0 compatibility.  This release requires RT 4.0.  Users of 3.8
+   should not upgrade past version 0.03 of this extension.
+
+0.03 2009-07-01
+ - new images for buttons
+
+0.02 2009-12-12
+ - delete the ticket when it's reported as spam and user has rights
+ - open deleted ticket when it's un-reported by all and last person has
+   rights to change status
+ - Tools/Spam/ - simple spam handling interface
+ - ReportSpam for tickets search results
+ - icons for 'not spam' and 'spam'
+ - fixed un-reporting, DeleteAttrbute was called improperly
+
+0.01 2009-05-19
+ - intial release
+

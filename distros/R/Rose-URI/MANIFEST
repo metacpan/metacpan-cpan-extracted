@@ -1,0 +1,8 @@
+Changes
+lib/Rose/URI.pm
+Makefile.PL
+MANIFEST
+t/basic.t
+t/pod.t
+t/query.t
+META.yml                                 Module meta-data (added by MakeMaker)

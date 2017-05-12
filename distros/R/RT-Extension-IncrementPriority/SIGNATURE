@@ -1,0 +1,80 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7602e790f550e7613549292d1933d183260011b4 Changes
+SHA1 568c65b1e78445dded590b23076edc2116632195 MANIFEST
+SHA1 ecf78bada2d8f4a8ce313c14de6888f04e3a680d META.yml
+SHA1 8976dab52e01a1be602678fd890bc5017ded630d Makefile.PL
+SHA1 a0584898b3988cb741d05718029bcdc1092ee7d3 README
+SHA1 c4cd0a44bfc19d9af1520bea7da6de2ae4b7fea4 README.md
+SHA1 752f92f2ad52098dc4716895b59bbc32c44734ac RT-Extension-IncrementPriority-0.01/Changes
+SHA1 31d34c4c95a15e733e8a486cf7b33577e3facf7d RT-Extension-IncrementPriority-0.01/MANIFEST
+SHA1 db5952b9ff07075de51c3238ceed879db55e685e RT-Extension-IncrementPriority-0.01/META.yml
+SHA1 2ceac158d9ed0f7bf0097b9fa9b19d1afe56daa7 RT-Extension-IncrementPriority-0.01/MYMETA.json
+SHA1 b5f12a46613dfab2b6024655e79ebfb1d3808373 RT-Extension-IncrementPriority-0.01/MYMETA.yml
+SHA1 8976dab52e01a1be602678fd890bc5017ded630d RT-Extension-IncrementPriority-0.01/Makefile.PL
+SHA1 a0584898b3988cb741d05718029bcdc1092ee7d3 RT-Extension-IncrementPriority-0.01/README
+SHA1 c4cd0a44bfc19d9af1520bea7da6de2ae4b7fea4 RT-Extension-IncrementPriority-0.01/README.md
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 RT-Extension-IncrementPriority-0.01/SIGNATURE
+SHA1 90073cab0c0b3971e9dcc9e60b5d810b483bfae7 RT-Extension-IncrementPriority-0.01/etc/initialdata
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 RT-Extension-IncrementPriority-0.01/inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b RT-Extension-IncrementPriority-0.01/inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 RT-Extension-IncrementPriority-0.01/inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 RT-Extension-IncrementPriority-0.01/inc/Module/Install/Fetch.pm
+SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 RT-Extension-IncrementPriority-0.01/inc/Module/Install/Include.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 RT-Extension-IncrementPriority-0.01/inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe RT-Extension-IncrementPriority-0.01/inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a RT-Extension-IncrementPriority-0.01/inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 RT-Extension-IncrementPriority-0.01/inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f RT-Extension-IncrementPriority-0.01/inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 RT-Extension-IncrementPriority-0.01/inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a RT-Extension-IncrementPriority-0.01/inc/Module/Install/WriteAll.pm
+SHA1 4afcd32d7a733dcf0d21f2cda456fed47012cd9c RT-Extension-IncrementPriority-0.01/inc/YAML/Tiny.pm
+SHA1 47722d00cdeff8e38a27022db736d3d20dd84485 RT-Extension-IncrementPriority-0.01/lib/RT/Action/IncrementPriority.pm
+SHA1 5bf4b082b292e380e8bd195008ae6815cf2e3750 RT-Extension-IncrementPriority-0.01/lib/RT/Extension/IncrementPriority.pm
+SHA1 90073cab0c0b3971e9dcc9e60b5d810b483bfae7 etc/initialdata
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 4afcd32d7a733dcf0d21f2cda456fed47012cd9c inc/YAML/Tiny.pm
+SHA1 47722d00cdeff8e38a27022db736d3d20dd84485 lib/RT/Action/IncrementPriority.pm
+SHA1 5adf072a286ad0f5caa82193138d32e027b1353f lib/RT/Extension/IncrementPriority.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJVChuvAAoJELLAeXvrY6JacL8QAME3MvuzVSbLCmNk6R+m11JJ
+dld0KuelDlm/fVqmCG3jthIXNI6X0DaGkkKH0bquNRovvMfq6rDloWxB5ZTP1CLU
+FxXIsyaHpHk8WQ66OkOTpCjZOvsNDT8TUimkPw8v10GA5AkZ4UfBe2KgnfGhRsf3
+XQJGNomClArbqIbxtaiWoIcHlMoeDAxZS9h26LyTL3W6cG5SJ8+myCmbVcNGoJxe
+Rc9SuNanYiC9EUvL5L/KNwE3TbNTCZYqUyI7CCeIY9nSpBHgYc7PZagkYem1b9gQ
+ZgdA666Gv2Pe3PAV+5zbXhNwSgO80GklXP6fqHKvieHqrzaC5RMMLdCRGBj6wYpI
+0SwhCgb4hqA119eZU05amxU+Jo942LpRgpc43gQkWUFozldetHpyTOuerXEBEM+W
+y0fkodG8ffcmISOWzrO44Da0WfcFHP1IPajkv0oWCCaVQnGeJQv/c8T92GWdkR63
+k7hi6oDtpQTXkl2AcKOXjS1WrgFzLArLT/d5NAiCjJ48qbVEV/ZtCtQb5qhsqES5
+Dbu8G99tSoVMs+cRLGZcD3497KAjNaO72oohaAjsp+yHcskS2S08PVzZUd5nmxVm
+zJ3Ph2NmGzbgQrXxoNEyJpP7XvIG/i15qKTDlrgD8YMhCFD1TNZqhlR9X+zoGSJk
+W7F5lYMRBv/2TAeqsWtL
+=zBSE
+-----END PGP SIGNATURE-----

@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+use common::sense;
+use Rhetoric;
+use Getopt::Long;
+
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+  \%_,
+  "help|h",
+  "quiet|q",
+  "output|o=s",
+);
+
+say "storage";
+my $blog = Rhetoric::storage('File');
+$blog->install;
+say "rh import-themes";
+system("rh import-themes");
+say "rh psgi";
+system("rh psgi > rhetoric.psgi");

@@ -1,0 +1,31 @@
+---
+abstract: 'tools for working with the SIO ontology'
+author:
+  - 'Mark D Wilkinson <markw@illuminae.com>'
+build_requires:
+  Data::Dumper: 0
+  English: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.132140'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RDF-SIO-Utils
+requires:
+  Carp: 0
+  Exporter: 0
+  RDF::Trine: 0
+  RDF::Trine::Node::Literal: 0
+  RDF::Trine::Node::Resource: 0
+  RDF::Trine::Statement: 0
+  RDF::Trine::Statement::Quad: 0
+  constant: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+version: 0.003

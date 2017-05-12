@@ -1,0 +1,26 @@
+Revision history for Perl extension Redis::ScriptCache
+
+0.05  Fri Dec 30 17:42 2016
+  - load scripts on demand by trying evalsha first, falling back to eval so
+    cached scripts survive a redis flush/crash
+
+0.04  Mon Oct 12 15:11 2015
+  - Fixed a bug in run_script for context-aware returns
+
+0.03  Thu Sep 10 15:48 2015
+  - Fixed META files for proper dependency declaration
+
+0.02  Thu Sep 10 10:36 2015
+  - not fully backwards compatible anymore
+  - run_script doesn't take SHA1s anymore, but script_name as specified by
+    register_script, so the caller no longer needs to keep track of sha1s
+  - better test suite
+  - script_dir capability, either in new() or in register_all_scripts(), so
+    register_file now possible as well as register_script
+  - script_cache checks are all local, no more Redis roundtrips to check for
+    script existence
+  - flush_all_scripts() option, to flush remote Redis and local script_cache
+
+0.01  Fri Oct 12 15:00 2012
+  - original version
+

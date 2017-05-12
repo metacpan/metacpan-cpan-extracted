@@ -1,0 +1,23 @@
+Revision history for RT-Extension-Tags
+
+0.04 2017-02-20
+
+ - Update tag input elements to be consistent with usage in RT 4.2, 4.4
+
+0.03 2016-08-08
+
+ - Create a new RT custom field type for tags to use in place of
+   RT's multiple select type. Add javascript tagit library to enhance
+   UI when selecting tags.
+
+   Note: the CF type change requires manual updates if you installed
+   previous versions. See the Upgrade notes for details.
+
+0.02 2016-07-13
+
+ - Contributions from Alex Vandiver to remove the custom condition,
+   remove an incorrect error check, refactor the tag search query
+   generation, and various other clean-ups.
+
+0.01 2016-07-11
+ - Initial version

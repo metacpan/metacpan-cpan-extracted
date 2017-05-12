@@ -1,0 +1,26 @@
+Revision history for RT::Extension::SideBySideView
+
+1.01 2016-08-15
+ - update Module::Install and friends
+ - update for RT 4.4 compatibility
+ - bump Perl version to 5.10.1
+
+1.00 2015-02-06
+ - update Module::Install and friends
+ - move config option to 'Ticket display' section
+ - use JavaScript to change ticket display
+
+0.03 2015-02-02
+ - update for RT 4.0 compatibility
+ - update for RT 4.2 compatibility
+ - move option to 'Ticket Display as SideBySideView' section
+
+0.02 2010-10-07
+ - fix some bugs
+ - using RT internal preferences system
+ - Added Christian Loos as Co Author
+ - rename extension to RT::Extension::SideBySideView
+ - add 'LinksExtra' callback for JSGantt extension
+
+0.01 2010-04-03
+ - Initial release (as RT-Extension-SideBySideView-CustomView)

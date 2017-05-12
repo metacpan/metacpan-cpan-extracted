@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Rubberband
+version:      0.01
+version_from: lib/Rubberband.pm
+installdirs:  site
+requires:
+    Class::DBI::BaseDSN:           0
+    Class::DBI::DATA::Schema:      0
+    Maypole:                       1.5
+    Module::Pluggable::Ordered:    1.2
+    SQL::Translator:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

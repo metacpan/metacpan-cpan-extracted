@@ -1,0 +1,15 @@
+<& /Elements/ShowLock, %ARGS &>
+<%ARGS>
+$Duration => undef
+$Actions => undef
+</%ARGS>
+<%INIT>
+#A somewhat inelegant hack to get around /Ticket/Display.html's redirect, which nukes all
+#variables except for id
+unless($Duration) {
+    my $msg = (grep defined && m{You have unlocked this ticket\. It was locked for (\d+) seconds\.}i, @$Actions)[-1];
+    if ( $msg && $msg =~ /(You have unlocked this ticket\.) It was locked for (\d+) seconds\./i ) {
+        $ARGS{'Duration'} = $2 if $2 && $2 !~ /\./;
+    }
+}
+</%INIT>

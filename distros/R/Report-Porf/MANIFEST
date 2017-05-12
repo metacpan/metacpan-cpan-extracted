@@ -1,0 +1,33 @@
+Changes
+lib/Report/Porf.pm
+lib/Report/Porf/examples/demo.pl
+lib/Report/Porf/examples/example_array.pl
+lib/Report/Porf/examples/example_hash.pl
+lib/Report/Porf/examples/example_object.pl
+lib/Report/Porf/examples/minimal.pl
+lib/Report/Porf/examples/minimal_array.pl
+lib/Report/Porf/examples/minimal_hash.pl
+lib/Report/Porf/examples/minimal_object.pl
+lib/Report/Porf/examples/Person.pm
+lib/Report/Porf/examples/presentation_mini.pl
+lib/Report/Porf/examples/run_all.bat
+lib/Report/Porf/examples/run_all.sh
+lib/Report/Porf/examples/short_array.pl
+lib/Report/Porf/examples/short_hash.pl
+lib/Report/Porf/examples/short_object.pl
+lib/Report/Porf/Framework.pm
+lib/Report/Porf/rename_list.pl
+lib/Report/Porf/rename_subs.pl
+lib/Report/Porf/Table/Simple.pm
+lib/Report/Porf/Table/Simple/AutoColumnConfigurator.pm
+lib/Report/Porf/Table/Simple/CsvReportConfigurator.pm
+lib/Report/Porf/Table/Simple/HtmlReportConfigurator.pm
+lib/Report/Porf/Table/Simple/TextReportConfigurator.pm
+lib/Report/Porf/Util.pm
+Makefile.PL
+MANIFEST
+README
+t/Porf.t
+t/Report-Porf.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

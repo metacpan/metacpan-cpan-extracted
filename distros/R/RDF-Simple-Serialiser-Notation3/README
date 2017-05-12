@@ -1,0 +1,10 @@
+
+RDF::Simple::Serialiser::Notation3
+RDF::Simple::Serialiser::NTriples
+
+This collection of Perl modules enables you to output Notation3 (N3)
+format and N-Triples format from your RDF::Simple triples.
+
+It is very rudimentary, please send comments and suggestions
+(and even code contributions) to the author
+Martin Thurn <mthurn@cpan.org>

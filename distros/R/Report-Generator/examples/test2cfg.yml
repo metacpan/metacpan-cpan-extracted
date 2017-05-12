@@ -1,0 +1,12 @@
+---
+Report::Generator::Render::TT2:
+  config:
+    ABSOLUTE: 1
+    INCLUDE_PATH:
+      - share
+  options: {}
+  output: demo.sql
+  template: test2.tt2
+  vars:
+    ADD_TIMESTAMP: 1
+renderer: Report::Generator::Render::TT2

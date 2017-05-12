@@ -1,0 +1,60 @@
+<h1>Key Generation</h1>
+<form method="post">
+<table>
+    <tr>
+        <td>User ID</td>
+        <td><input size=30 type="text" name='userid' value="<% $session{'CurrentUser'}->UserObj->Name() %>"></td>
+    </tr>
+    <tr>
+        <td>Key Description</td>
+        <td><input type='text' name='key_description' size=30 value='myapp'/></td>
+    </tr>
+    <tr>
+        <td>Group ID</td>
+        <td align="right"><select name="group">
+% foreach(@sorted){
+% my $selected = ($sorted[0] eq $_) ? " selected='selected'" : '';
+                <option value='<% $_ %>'<% $selected %>><% $_ %></option>
+% }
+            </select>
+
+        </td>
+    </tr>
+    <tr>
+        <td>Data Type</td>
+        <td align="right"><select name="access">
+                <option value="all" selected="selected">all</option>
+                <option value="infrastructure">infrastructure/ip</option>
+                <option value="domain">domain</option>
+                <option value="url">url</option>
+                <option value="hash">hashes</option>
+                <option value="email">email</option>
+            </select>
+        </td>
+    </tr>
+% if($session{'CurrentUser'}->UserObj->Privileged()){
+    <tr>
+        <td>Write Access</td>
+        <td align="right"><input type="checkbox" name='writeaccess'>
+    </tr>
+% }
+    <tr>
+        <td></td>
+        <td>
+            <& /Elements/Submit, Name => 'GenerateKey', Label => loc('Generate Key') &>
+        </td>
+    </tr>
+</table>
+
+<%INIT>
+my @sorted = sort { $groups{$a} <=> $groups{$b} } keys(%groups);
+my @guid = map { CIF::Utils::genSourceUUID($_) } @sorted;
+
+</%INIT>
+
+<%ARGS>
+$GenerateKey => undef
+$key_description => undef
+@results => undef
+%groups
+</%ARGS>

@@ -1,0 +1,1 @@
+[% PROCESS crud/show_relationships.tt %]

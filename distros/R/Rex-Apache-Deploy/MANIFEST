@@ -1,0 +1,29 @@
+ChangeLog
+lib/Rex/Apache/Build.pm
+lib/Rex/Apache/Build/Base.pm
+lib/Rex/Apache/Build/deb.pm
+lib/Rex/Apache/Build/rpm.pm
+lib/Rex/Apache/Build/tgz.pm
+lib/Rex/Apache/Deploy.pm
+lib/Rex/Apache/Deploy/Git.pm
+lib/Rex/Apache/Deploy/JBoss.pm
+lib/Rex/Apache/Deploy/Package.pm
+lib/Rex/Apache/Deploy/Package/Base.pm
+lib/Rex/Apache/Deploy/Package/deb.pm
+lib/Rex/Apache/Deploy/Package/rpm.pm
+lib/Rex/Apache/Deploy/Package/tgz.pm
+lib/Rex/Apache/Deploy/Symlink.pm
+lib/Rex/Apache/Deploy/Tomcat.pm
+lib/Rex/Apache/Deploy/Tomcat7.pm
+lib/Rex/Apache/Inject.pm
+lib/Rex/Apache/Inject/Command.pm
+lib/Rex/Apache/Inject/Properties.pm
+lib/Rex/Apache/Inject/Template.pm
+lib/Rex/Apache/Inject/YAML.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/01.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

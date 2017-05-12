@@ -1,0 +1,130 @@
+                       Rosetta-Utility-SQLBuilder
+----------------------------------------------------------------------
+
+by Darren Duncan <perl@DarrenDuncan.net>
+
+CONTENTS
+
+* Preface
+* Keeping Up To Date
+* Dependencies
+* Support
+* License And Copyright
+* Acknowledgements
+
+PREFACE
+
+This distribution features the Perl 5 module named
+"Rosetta::Utility::SQLBuilder"; see the file lib/Rosetta/Utility/SQLBuilder.pm for
+the main documentation, which is in POD format.  The distribution also
+includes a ChangeLog file to say what changes already happened, and a TODO
+file to say what changes have yet to happen.  The file INSTALL should help
+with installation issues.  Read below for how to get support or keep up to
+date, know this distribution's dependencies, or read the credits or
+copyright and license.
+
+KEEPING UP TO DATE
+
+My module set is constantly under development.  The canonical copies are
+all linked to through my website, "http://www.DarrenDuncan.net/", on the
+page called "Perl Libraries I Made" (name subject to change).
+
+For those of you that are interested in the bleeding edge, I now have a
+public Subversion repository at "http://svn.utsl.gen.nz/trunk/Rosetta/";
+this repository contains all of my newer modules (whose problem domain is
+databases), but not my older modules (which are not about databases).
+
+You can download slightly older but more stable versions of all of my
+modules in standard tarred and gzipped distributions, either from the
+public CPAN archives, "http://www.cpan.org/authors/id/D/DU/DUNCAND/", or
+from my own web server, "http://www.DarrenDuncan.net/d/perl/".
+
+CPAN also extracts the POD from modules and maintains that documentation in
+an organized and searchable fashion.  Their main search site is
+"http://search.cpan.org/", and my own DUNCAND author page is
+"http://search.cpan.org/~duncand/"; distributions are also there.
+
+You can download my oldest distributions from BACKPAN, at
+"http://history.perl.org/backpan/authors/id/D/DU/DUNCAND/", or from my web
+server, at "http://www.DarrenDuncan.net/d/perl/archives/".
+
+DEPENDENCIES
+
+This distribution requires any version of Perl 5.x.y that is at least
+5.8.1.
+
+It also requires the Perl modules 'version' and 'only', which would
+conceptually be built-in to Perl, but aren't, so they are on CPAN instead.
+
+It also requires the Perl module List::MoreUtils '0.12-', which would
+conceptually be built-in to Perl, but isn't, so it is on CPAN instead.
+
+It also requires these modules that are on CPAN: Locale::KeyedText '1.6.0-'
+(for error messages), Rosetta::Model '0.71.0-'.
+
+This distribution also requires Test::More for its test suite, and that
+module is bundled with Perl.
+
+SUPPORT
+
+Currently I don't have any support arranged with other people, lists,
+newsgroups, or otherwise.  Feel free to ask me if you can't figure things
+out on your own, or another person whom you know has used this.  I may
+start a mailing list for support issues later, so that users of my modules
+can help each other with them.
+
+LICENCE AND COPYRIGHT
+
+This file is part of the Rosetta::Utility::SQLBuilder reference implementation
+of a SQL:2003 string builder that uses the Rosetta::Model database
+portability library.
+
+Rosetta::Utility::SQLBuilder is Copyright (c) 2002-2005, Darren R. Duncan.  All
+rights reserved.  Address comments, suggestions, and bug reports to
+perl@DarrenDuncan.net, or visit http://www.DarrenDuncan.net/ for more
+information.
+
+Rosetta::Utility::SQLBuilder is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License (GPL) as
+published by the Free Software Foundation (http://www.fsf.org/); either
+version 2 of the License, or (at your option) any later version.  You
+should have received a copy of the GPL as part of the
+Rosetta::Utility::SQLBuilder distribution, in the file named "GPL"; if not,
+write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+Boston, MA  02110-1301, USA.
+
+Linking Rosetta::Utility::SQLBuilder statically or dynamically with other
+modules is making a combined work based on Rosetta::Utility::SQLBuilder.  Thus,
+the terms and conditions of the GPL cover the whole combination.  As a
+special exception, the copyright holders of Rosetta::Utility::SQLBuilder give
+you permission to link Rosetta::Utility::SQLBuilder with independent modules,
+regardless of the license terms of these independent modules, and to copy
+and distribute the resulting combined work under terms of your choice,
+provided that every copy of the combined work is accompanied by a complete
+copy of the source code of Rosetta::Utility::SQLBuilder (the version of
+Rosetta::Utility::SQLBuilder used to produce the combined work), being
+distributed under the terms of the GPL plus this exception.  An independent
+module is a module which is not derived from or based on
+Rosetta::Utility::SQLBuilder, and which is fully useable when not linked to
+Rosetta::Utility::SQLBuilder in any form.
+
+Any versions of Rosetta::Utility::SQLBuilder that you modify and distribute
+must carry prominent notices stating that you changed the files and the
+date of any changes, in addition to preserving this original copyright
+notice and other credits.  Rosetta::Utility::SQLBuilder is distributed in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+While it is by no means required, the copyright holders of
+Rosetta::Utility::SQLBuilder would appreciate being informed any time you
+create a modified version of Rosetta::Utility::SQLBuilder that you are willing
+to distribute, because that is a practical way of suggesting improvements
+to the standard version.
+
+ACKNOWLEDGEMENTS
+
+None besides myself so far.
+
+FIN
+
+Share and Enjoy!

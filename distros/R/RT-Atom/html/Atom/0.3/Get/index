@@ -1,0 +1,11 @@
+%# [GET EditURI]
+%# Retrieve a representation of an object or property.
+%# 200: Success.  Body is the serialized item.
+%# 400: Request failed.  Body is error message.
+%# 404: There is no object matching the specified URI.
+<%INIT>
+return $m->comp($Resource, %ARGS);
+</%INIT>
+<%ARGS>
+$Resource
+</%ARGS>

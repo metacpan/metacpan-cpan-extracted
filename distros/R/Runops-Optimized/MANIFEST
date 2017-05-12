@@ -1,0 +1,15 @@
+lib/Runops/Optimized.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+Optimized.xs
+pod/design.pod
+pp_sljit.h
+sljit/sljitConfig.h
+sljit/sljitConfigInternal.h
+sljit/sljitLir.h
+t/01.load.t
+t/02.loops.t
+t/10.bench.t
+unroll.h
+META.yml                                 Module meta-data (added by MakeMaker)

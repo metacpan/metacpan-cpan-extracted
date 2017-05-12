@@ -1,0 +1,44 @@
+---
+abstract: 'Faster facility for creating read-only scalars, arrays, hashes'
+author:
+  - 'Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ReadonlyX
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  ReadonlyX:
+    file: lib/ReadonlyX.pm
+    version: '1.04'
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/sanko/readonly/issues
+  homepage: https://github.com/sanko/readonly
+  repository: git://github.com/sanko/readonly.git
+version: '1.04'
+x_contributors:
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Peter Valdemar Mørch <pm@capmon.dk>'
+  - 'vti <viacheslav.t@gmail.com>'
+  - 'Ronald Schmidt <ronaldxs@software-path.com>'
+  - 'Michael Ivanchenko <ivanchenko.michael.work@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

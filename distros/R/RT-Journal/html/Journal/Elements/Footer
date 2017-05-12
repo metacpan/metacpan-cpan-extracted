@@ -1,0 +1,14 @@
+</div>
+<div class="menu">
+<& Sidebar, %ARGS &>
+</div>
+<div class="powered">
+Powered by<br /><a href="http://bestpractical.com/rt">RT 3.0 Journals (beta)</a><br />    
+(And a skin from movabletype.org)
+</div>
+</body>
+</html>
+<%ARGS>
+$User	=> undef
+</%ARGS>
+</%init>

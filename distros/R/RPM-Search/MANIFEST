@@ -1,0 +1,17 @@
+Changes
+lib/RPM/Search.pm
+Makefile.PL
+ignore.txt
+SIGNATURE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+META.yml
+t/0-signature.t
+t/00-load.t
+t/01-basic.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test/bar.sqlite
+t/test/db/0A6358CF-0BEC-46A8-B3D5-8D5CE49C28F7primary.sqlite

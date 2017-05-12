@@ -1,0 +1,41 @@
+---
+abstract: 'Redis protocol parser'
+author:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+build_requires:
+  Test::FailWarnings: '0'
+  Test::More: '0.94'
+  Test::Most: '0.22'
+configure_requires:
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::MakeMaker: '6.3002'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - redis
+  - protocol
+  - parser
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RedisDB-Parser
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - README.pod
+requires:
+  Encode: '2.1'
+  Try::Tiny: '0'
+  perl: '5.008004'
+resources:
+  bugtracker: https://github.com/trinitum/perl-RedisDB-Parser/issues
+  homepage: https://github.com/trinitum/perl-RedisDB-Parser
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trinitum/perl-RedisDB-Parser
+version: '2.22'
+x_contributors:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

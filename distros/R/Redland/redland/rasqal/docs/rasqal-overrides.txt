@@ -1,0 +1,20 @@
+<TYPEDEF>
+<NAME>rasqal_graph_pattern</NAME>
+rasqal_graph_pattern* graph_pattern;
+</TYPEDEF>
+
+<TYPEDEF>
+<NAME>rasqal_query</NAME>
+rasqal_graph_query* query;
+</TYPEDEF>
+
+<TYPEDEF>
+<NAME>rasqal_query_results</NAME>
+rasqal_graph_query_results* query_results;
+</TYPEDEF>
+
+<TYPEDEF>
+<NAME>rasqal_query_results_formatter</NAME>
+rasqal_graph_query_results_formatter* query_results_formatter;
+</TYPEDEF>
+

@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 7abf9bb693a9d0e355dc3b387f1e4e89977df15c COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 8b59c1d00925cd58148e36d698d5a1ac60951945 Changes
+SHA1 436c914303f9b088f302a86f9b62b4991f2ddcbd INSTALL
+SHA1 47870123f373f5185d6893cb98bf06a8a05510aa LICENSE
+SHA1 090136f6943db95ed9d5adc2dd2395b79a2889db MANIFEST
+SHA1 51dc0e113b463e8804f8dab6cd7834f3935b5f97 META.json
+SHA1 12613f414713e2f3a02bcc33c71cc427cbf7018a META.yml
+SHA1 27076c6ef1a410b1039d92180f114f71bf42750d Makefile.PL
+SHA1 a73377fe72e922e65e64a5d12c6f3944f68a57b5 README
+SHA1 6a1882292f2b5182a16326bf84bf62ed070ece6d bin/rt-grabbugs
+SHA1 b34a1a1ffdc0c357fd70dcd530c129b920787878 dist.ini
+SHA1 7770ab374222fc5b8d90d9fb95ee7aeda3525b19 doap.ttl
+SHA1 39f99f8ba762c84902bc22d3127605b5bb3b5858 lib/RT/ClientX/GrabBugs.pm
+SHA1 617d8c46dec1d7f27f12661665456599da6e517e t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlLfvrkACgkQzr+BKGoqfTna1QCfUOxK9qh+r9zKX8GH+tbNn6bt
+3XkAoIWK/rAc9pvlKoUhyJOlock4l2gY
+=M/Zg
+-----END PGP SIGNATURE-----

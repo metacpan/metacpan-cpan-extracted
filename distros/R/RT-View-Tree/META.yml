@@ -1,0 +1,11 @@
+name: RT-View-Tree
+version: 1.4
+abstract: RT View-Tree Extension
+author: Jesse Vincent <jesse@bestpractical.com>
+license: GPL version 2
+distribution_type: module
+no_index:
+  directory:
+    - html
+    - inc
+generated_by: Module::Install version 0.36

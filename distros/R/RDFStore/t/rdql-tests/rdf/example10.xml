@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE rdf:RDF SYSTEM "http://eun.org/etb/elements.dtd">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dcq="http://purl.org/dc/terms/"
+        xmlns:etb="http://eun.org/etb/elements/"
+        xmlns:etbthes="http://eun.org/etb/thesaurus/elements/">
+    <rdf:Description rdf:bagID="urn:etb:netlab:6776.llpost">
+     <dc:title rdf:parseType="Resource">
+      <rdf:value>Fråga museet</rdf:value>
+      <dc:language rdf:parseType="Resource">       <dcq:RFC1766>sv</dcq:RFC1766>
+</dc:language>
+
+     </dc:title>
+     <dc:subject rdf:parseType="Resource">
+      <etbthes:ETBT rdf:parseType="Resource">
+       <rdf:value>http://eun.org/etb/thesaurus/en/history</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>en</dcq:RFC1766>
+</dc:language>
+
+      </etbthes:ETBT>
+
+     </dc:subject>
+     <dc:subject rdf:parseType="Resource">
+      <etbthes:ETBT rdf:parseType="Resource">
+       <rdf:value>http://eun.org/etb/thesaurus/en/oral history</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>en</dcq:RFC1766>
+</dc:language>
+
+      </etbthes:ETBT>
+
+     </dc:subject>
+     <dc:subject rdf:parseType="Resource">
+      <etbthes:ETBT rdf:parseType="Resource">
+       <rdf:value>http://eun.org/etb/thesaurus/en/archaeological site</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>en</dcq:RFC1766>
+</dc:language>
+
+      </etbthes:ETBT>
+
+     </dc:subject>
+     <dc:subject rdf:parseType="Resource">
+      <etbthes:ETBT rdf:parseType="Resource">
+       <rdf:value>http://eun.org/etb/thesaurus/en/archaeology</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>en</dcq:RFC1766>
+</dc:language>
+
+      </etbthes:ETBT>
+
+     </dc:subject>
+     <dc:subject rdf:parseType="Resource">
+      <etb:Keywords rdf:parseType="Resource">
+       <rdf:value>arkeologi</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>sv</dcq:RFC1766>
+</dc:language>
+
+      </etb:Keywords>
+
+     </dc:subject>
+     <dc:subject rdf:parseType="Resource">
+      <etb:Keywords rdf:parseType="Resource">
+       <rdf:value>historia</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>sv</dcq:RFC1766>
+</dc:language>
+
+      </etb:Keywords>
+
+     </dc:subject>
+     <dc:subject rdf:parseType="Resource">
+      <etb:Keywords rdf:parseType="Resource">
+       <rdf:value>Stockholm</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>sv</dcq:RFC1766>
+</dc:language>
+
+      </etb:Keywords>
+
+     </dc:subject>
+     <dc:description rdf:parseType="Resource">
+      <rdf:value>Här kan du ställa frågor om hur människor levt, bott och arbetat i Stockholms län.
+Frågorna besvaras av arkeologer med flera på Stockholms läns museum och kommer senare att läggas in i en
+sökbar databas.
+</rdf:value>
+      <dc:language rdf:parseType="Resource">       <dcq:RFC1766>sv</dcq:RFC1766>
+</dc:language>
+
+     </dc:description>
+     <dc:identifier rdf:resource="http://www.lansmuseum.a.se/fraga/fraga.html"></dc:identifier>
+     <dc:language rdf:parseType="Resource">      <dcq:RFC1766>sv</dcq:RFC1766>
+</dc:language>
+     <dcq:audience  rdf:parseType="Resource">
+      <etb:level rdf:parseType="Resource">
+       <rdf:value>primary education</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>en</dcq:RFC1766>
+</dc:language>
+
+      </etb:level>
+
+     </dcq:audience>
+     <dcq:audience  rdf:parseType="Resource">
+      <etb:level rdf:parseType="Resource">
+       <rdf:value>lower secondary</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>en</dcq:RFC1766>
+</dc:language>
+
+      </etb:level>
+
+     </dcq:audience>
+     <dcq:audience  rdf:parseType="Resource">
+      <etb:level rdf:parseType="Resource">
+       <rdf:value>upper secondary</rdf:value>
+       <dc:language rdf:parseType="Resource">        <dcq:RFC1766>en</dcq:RFC1766>
+</dc:language>
+
+      </etb:level>
+
+     </dcq:audience>
+
+    </rdf:Description>
+    <rdf:Description rdf:about="urn:etb:netlab:6776.llpost">
+     <dcq:created rdf:parseType="Resource">
+      <dcq:W3CDTF>2001-11-05</dcq:W3CDTF>
+
+     </dcq:created>
+     <dcq:isPartOf rdf:resource="http://lankskafferiet.skolverket.se/"></dcq:isPartOf>
+
+    </rdf:Description>
+
+   </rdf:RDF>

@@ -1,0 +1,60 @@
+RDF-Generator-Void
+==================
+
+Created:      2012-06-15
+Home page:    <https://metacpan.org/module/RDF::Generator::Void>
+Bug tracker:  <https://github.com/kjetilk/RDF-Generator-Void/issues>
+Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
+
+0.16	2016-02-15	Minor fixes.
+
+ [ Bug Fixes ]
+ - Exclude README.pod from CPAN dist
+   Jonas Smedegaard++
+ - Fix tests when App::Cmd::Tester is not installed.
+ - Wrong link in TODO list
+   Mohammad S Anwar++
+
+0.14	2016-02-09	Migrate to Dist::Inkt.
+
+ - Updated: Migrate to Dist::Inkt, fixes install problems caused by bundled
+   Scalar::Util.
+
+0.13	2013-08-05	Test bugfix.
+
+ [ Bug Fixes ]
+ - Missing EXLOCK caused problems with SQLite on some platforms (again...).
+
+0.12	2013-07-07	Some provenance and command line tool.
+
+ - Added: Author tests changes.
+ - Added: Command-line usage through perlrdf.
+ - Added: Use provenance ontology to assert that this module generated the
+   description.
+
+0.10	2012-09-11	Big refactoring.
+
+ [ Bug Fixes ]
+ - Make sure it works on old Perls
+   Toby Inkster++
+
+ [ Other ]
+ - Added: Add funny disclaimer.
+ - Added: Add more tests, especially for different levels.
+ - Added: Add object and subject counts on property partitions
+ - Make most attributes private.
+ - RDF-based packaging.
+ - Use a trait to fix awful verbosity in attribute names.
+   Konstantin Baierer++
+
+0.06	2012-08-22	More statistics.
+
+ - Added: Add class and property partitioning data.
+ - Added: Add detail level method.
+ - Added: Large test dataset.
+ - Added: More tests (for partitioning in particular).
+ - Some cosmetic fixes.
+
+0.04	2012-06-30	Read static file.
+
+0.02	2012-06-20	Initial release.

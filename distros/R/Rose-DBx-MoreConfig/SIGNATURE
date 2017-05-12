@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4f0840ef16ef75fdac93b9accff74a39c5f42fa3 Build.PL
+SHA1 6ec77451b705e71f1f43cddae105d4b6fe067a72 Changes
+SHA1 c43bee5f4c4468a43d587c3f66e8c082be91f795 INSTALL
+SHA1 37ae646a8ccb5ac6186866bbfe3899e75715586c MANIFEST
+SHA1 635c8a3f2e0d228bf1b6a3861d39aee2e32d553f META.json
+SHA1 f744830c4b2b7fbaa7c2a68a5e648a10e8ddb1c2 Makefile.PL
+SHA1 041d7e6dd1046651585e8a3768618975c56dbf87 README
+SHA1 c6fd7dc2cde248ed38c164023c15a2492c327553 lib/Rose/DBx/MoreConfig.pm
+SHA1 d08354f00342f4e3a2588db8dca9a477f9592884 t/.rosedbrc
+SHA1 8a759da011b81810b1d9db84c6bad80e01f88cb3 t/00load.t
+SHA1 3256063a4e7fa27b6d890d396a0da16ccb9dce26 t/dist.t
+SHA1 80cb0dbca24e97765a97fa0271806f45afeb6c62 t/env.t
+SHA1 556646711839012b726aad2cbbcc1f188c6bdbeb t/home.t
+SHA1 f39d8ef9ec741b3ef526dc0eeb21823015e55e1d t/lib/.rosedbrc
+SHA1 d732b45e71794623d077f36985fb0eb998b38e88 t/lib/File/HomeDir.pm
+SHA1 c4e92e2ac6a96a6addc0ab1a111df33375844a42 t/lib/My/Dist/.rosedbrc
+SHA1 1b6c71b2d8a4e6fb7e7ee848a4527c41aa2d48c6 t/lib/My/Dist/Test.pm
+SHA1 60d48009d2637326cd3bf8de6ab067deaf23373c t/lib/My/EnvTest.pm
+SHA1 9f4f54f11fa2cf1f83f518c16205b84b6e8abd81 t/lib/My/HomeTest.pm
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJVChItAAoJEFXmkwhreRSJquMH+wbfJKYHuIlPteOmL2uEQM3s
+fp1UtVX4DViSnm65XFaXtaumcdCInF+ar3HOSQjguK9rN8z/0DPKUnLqOodr5Bk4
+wAJUNLD+VfIVVcqIZkOMX0TUGIyUM+RwmNnNb6aosRaQNlBIWlNn20sDcsYIPQLs
+h18+OkIL3lEDva/vVTMuknwa4Qp2xz9gW/YrNZCGtbggARuuyzcWVM4mB+BmPr+5
+Ia6neepTJYmCVr3KE7ezDuTn2xMHvmVNqXFas4bXf6zhj/gtr7Rq5459bf6dwQ9J
+AcG2yJpau0FeC1JSZzr5O+lMifXM2fBAiOmM8iYvGwT7XtA3SgeQAQhDh33nBg8=
+=+JyO
+-----END PGP SIGNATURE-----

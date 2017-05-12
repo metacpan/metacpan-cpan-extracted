@@ -1,0 +1,20 @@
+c/c.pl.pm
+Changes
+docs/breadboard/.placeholder
+docs/datasheet/mcp4xxxx.pdf
+docs/fritzing/.placeholder
+docs/schematic/.placeholder
+lib/RPi/DigiPot/MCP4XXXX.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/boilerplate.t
+t/bytes.t
+t/init.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,15 @@
+[%  USE CSV -%]
+[%  MACRO csvtable(d)
+    BLOCK;
+	IF ADD_TIMESTAMP;
+	    d.cols.push(TIMESTAMP_COLNAME);
+	END;
+	CSV.dump(d.cols); %]
+[%	FOREACH line IN d.data;
+	    NEXT UNLESS line.size() > 0;
+	    IF ADD_TIMESTAMP;
+		line.push(TIMESTAMP_COLVALUE);
+	    END;
+	    CSV.dump(line); %]
+[%	END;
+    END -%]

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE rdf:RDF [
+	<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+	<!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+	<!ENTITY dc "http://purl.org/dc/elements/1.1/" >
+	<!ENTITY dcq "http://purl.org/dc/terms/" > 
+	<!ENTITY dctypes "http://purl.org/dc/dcmitype/" > 
+  	<!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+  	<!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+  	<!ENTITY foaf "http://xmlns.com/foaf/0.1/" >
+  	<!ENTITY abc "http://metadata.net/harmony#" >
+  	<!ENTITY rdfstore "http://rdfstore.sourceforge.net/contexts/">
+	]>
+	
+<!-- ISC RDF Schema configuration file -->
+	
+<rdf:RDF 
+	xml:lang="en" 
+	xmlns:rdf="&rdf;" 
+	xmlns:rdfs="&rdfs;" 
+	xmlns:dc="&dc;" 
+	xmlns:dcq="&dcq;" 
+	xmlns:dctypes="&dctypes;" 
+	xmlns:foaf="&foaf;"
+	xmlns:xsd="&xsd;"
+	xmlns:owl="&owl;"
+	xml:base="&rdfstore;"
+	>
+	
+	<!-- Description of this schema. -->
+	
+	<rdf:Description rdf:about="&rdfstore;">
+		<rdfs:comment xml:lang="en">RDF Schema for simple RDFStore context support</rdfs:comment>
+		<rdfs:label xml:lang="en">RDF Schema for simple RDFStore context support</rdfs:label>
+		<dc:title xml:lang="en">RDF Schema for simple RDFStore context support</dc:title>
+		<dc:publisher>
+			<foaf:Organisation foaf:homepage="http://www.asemantics.com" />
+		</dc:publisher>
+		<dc:description xml:lang="en">ISC RDF Schema configuration file</dc:description>
+		<dc:creator>
+			<foaf:Person foaf:homepage="http://reggiori.webweaving.org" />
+		</dc:creator>
+		<dcq:modified>2004-02-18</dcq:modified>
+	</rdf:Description>
+	
+	<rdfs:Class rdf:about="&rdfstore;Context">
+		<rdfs:comment xml:lang="en">Context</rdfs:comment>
+		<rdfs:label xml:lang="en">Context</rdfs:label>
+		<!-- perhaps add the ABC schema here as father... - also to look at GK context schema perhaps -->
+		<rdfs:subClassOf rdf:resource="&abc;Situation"/>
+		<rdfs:isDefinedBy rdf:resource="&rdfstore;"/>
+	</rdfs:Class>
+
+	<rdfs:Class rdf:about="&rdfstore;EmptyContext">
+		<rdfs:comment xml:lang="en">Empty (NULL) Context</rdfs:comment>
+		<rdfs:label xml:lang="en">Empty (NULL) Context</rdfs:label>
+		<!-- perhaps add the ABC schema here as father... - also to look at GK context schema perhaps -->
+		<rdfs:subClassOf rdf:resource="&abc;Situation"/>
+		<rdfs:isDefinedBy rdf:resource="&rdfstore;"/>
+	</rdfs:Class>
+
+</rdf:RDF>

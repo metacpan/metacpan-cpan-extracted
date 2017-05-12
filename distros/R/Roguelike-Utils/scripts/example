@@ -1,0 +1,371 @@
+#!/usr/bin/perl
+
+use strict;
+use Games::Roguelike::Utils qw(:all);
+use Games::Roguelike::World;
+use Games::Roguelike::Console;
+use Getopt::Long;
+
+our $opt_console='';
+our $opt_debugmap=0;
+our $opt_layout=1;
+our $opt_mobs=5;
+our $opt_nomobs=0;
+our $opt_size = 'large';
+
+GetOptions("mobs=i", "console=s", "debugmap", "layout=i", "size=s", "nomobs") || die;
+$opt_mobs = 0 if $opt_nomobs;
+
+srand($ARGV[0]) if $ARGV[0];
+
+my $r = Games::Roguelike::World->new(
+	w=>120,
+	h=>60,
+	dispw=>60,
+	disph=>22,					# to match windows default
+	dispx=>0,
+	dispy=>3,
+	msgh=>3,
+	debug=>1,
+	console_type=>$opt_console
+);
+
+$r->setdebugmap(1) if $opt_debugmap;
+
+if ($opt_size eq 'small') {
+	$r->{w} = 40;
+	$r->{h} = 20;
+}
+
+if ($opt_layout == 2) {
+	# put message box on the bottom
+	$r->dispy(0);
+	$r->msgy(23);
+}
+
+my $level = newarea(1);
+
+my ($cx,$cy) = $level->findfeature('<');
+
+my $char = mychar->new($level,
+	sym=>'@',
+	world=>$r,
+	color=>'bold yellow',
+	x=>$cx,
+	y=>$cy,
+	type=>'char',
+	hp=>10,
+	maxhp=>10,
+	at=>4,
+	pov=>8,
+);
+
+$r->setvp($char);
+my $c;
+while (1) {
+	$r->{con}->addstr(1, 64, " -------");
+	$r->{con}->addstr(2, 64, " HP: $char->{hp}    ");
+	$r->{con}->addstr(3, 64, " AT: $char->{at}    ");
+	$r->{con}->addstr(4, 64, " -------");
+
+	$r->drawmap();
+
+	$c = $r->{con}->getch();
+	$r->dprint("read char '$c' (". ord($c) .")");
+	if ($char->{hp} > 0) {
+	  my $moved;
+	  if ($c eq 'o') {
+		$char->autoex($r);
+	  } elsif ($c eq 'g') {
+		$char->doget();
+	  } elsif ($c eq '>') {
+		$char->movelev($c);
+	  } elsif ($c eq '<') {
+		$char->movelev($c);
+	  } elsif ($c eq 'i') {
+		$char->doinv();
+	  } elsif ($c eq 'R') {
+		$r->{con}->redraw();
+	  } elsif ($c eq 'S') {
+		$char->{world}->save();
+		$r->showmsg("Saved.");
+	  } elsif ($c eq 'L') {
+		$r = $r->load();
+		$char = $r->{vp};
+		$r->showmsg("Loaded.");
+	  } elsif ($c eq 'q') {
+		my $c = $r->prompt("Really quit?");
+		if ($c =~ /y/i) {
+			last;
+		} else {
+			$r->showmsg("Nevermind.");
+		}
+	  } else {
+		$moved = $char->kbdmove($c);  # auto-process standard move keys
+	  }
+	}
+	last if $c eq 'q';
+}
+undef $r;		# win32 doesn't always call DESTROY on program exit, unless explicitly undef'ed
+
+sub newarea {
+	my ($name, $char) = @_;
+	my $level = new Games::Roguelike::Area(name=>$name, world=>$r);
+
+	if ($name >= 3) {
+		# maze map
+		$level->generate('maze', with=>['<','>']);
+	} elsif ($name >= 2) {
+		# cave map
+		$level->generate('cavelike', with=>['<','>']);
+	} else {
+		# room map
+		$level->generate('rooms', with=>['<','>']);
+	}
+	
+	## This works nicely now
+	#
+	# use Games::Roguelike::Caves;
+	# my $yx = generate_cave($r->{w},$r->{h}, 12, .46, '#', '.');
+	# $level->load(yxarray=>$yx);
+	# $level->addfeature('>');
+	# $level->addfeature('<');
+
+	for (my $i = 0; $i < $opt_mobs; ++$i) {
+        my $kob = mymob->new($level,
+                sym=>'k',
+                color=>'green',
+                type=>'mon',
+                hp=>4+randi(2),
+                maxhp=>4+randi(2),
+                at=>2+randi(2),
+        );
+	}
+
+	my $ITEMS = 5;
+	for (my $i = 0; $i < $ITEMS; ++$i) {
+        my $item = myitem->new($level,
+                sym=>'!',
+                color=>'bold blue',
+                istack=>8,                      # if gt 0 then item can stack in inventory (default is 0, no stacking)
+                gstack=>1,                      # 1 = infinite stacking on ground (the default) >1 = stack max 0 = no stack
+                name=>'healing potion',
+                power=>4+randi(2),
+        );
+	}
+	return $r->area($level);
+}
+
+package mychar;
+use Games::Roguelike::Utils qw(:all);
+use Games::Roguelike::Console;
+use base 'Games::Roguelike::Mob';
+
+sub itemmsgstring {
+	my ($items) = @_;
+	my $msg;
+	my %items;
+	for (@{$items}) {
+		$items{$_->{name}}++;
+	}
+	for (keys(%items)) {
+		if ($items{$_} == 1) {
+			$msg .= "a $_,";
+		} else {
+			$msg .= "$items{$_} ${_}s,";
+		}
+	}
+	$msg = substr($msg, 0, -1);
+}
+
+sub aftermove {
+	my $char = shift;
+	for (@{$char->{area}->mobs}) {
+		if ($_->{type} eq 'mon') {
+			$_->movetoward($char->x, $char->y, 0);
+		}
+	}
+	if ((++$char->{healcount} > 5) && ($char->{hp} > 0)) {
+		$char->{hp} = min($char->{maxhp}, $char->{hp}+1);
+		$char->{healcount} = 0;
+	}
+
+	my $items = $char->{area}->items($char->{x},$char->{y});
+	if (@$items) {
+		my $msg = itemmsgstring($items);
+		$char->{world}->showmsg("You see ${msg}.");
+	}
+}
+
+# can be done by overriding things, or passing functions as params
+# i like the option of both where possible
+
+sub checkmove {
+	my ($char, $x, $y, $mob) = @_;
+	my $mapsym = $char->{area}->{map}->[$x][$y];
+	return 0 if $mapsym eq '';
+	return 0 if $mapsym eq '#';
+	return 1 if $char eq $mob;
+
+	if ($mapsym eq '+') {
+		# door locked? return 0
+                $char->{area}->setmap($x,$y,'/', 'yellow');
+	}
+
+	if ($mob) {
+		if ($char->{at} >= randi(6)) {
+			$mob->{hp}-= 1;
+			if ($mob->{hp} <= 0) {
+				$r->pushmsg("It died.", "bold red");
+				$r->area->delmob($mob);
+				$char->{xp}+=1;
+				return 1;
+			} else {
+				$r->pushmsg("You hit!", "bold");
+			}
+		} else {
+			$r->pushmsg("You missed.", "bold");
+			$char->{skillp}+=1;
+		}
+		return -1;
+	}
+	return 1;
+}
+
+
+sub doget {
+# example code... just picks up all items and adds them to char
+	my $char = shift;
+	my $items = $char->{area}->items($char->{x},$char->{y});
+	if (@$items) {
+		my @added;
+		for (@$items) {
+			push @added,$_ if $char->additem($_);
+		}
+		my $msg = itemmsgstring(\@added);
+		$char->{world}->showmsg("You pick up ${msg}.");
+	}
+}
+
+sub movelev {
+        my $char = shift;
+	my $area = $char->{area};
+	my ($dir) = @_;
+
+	if ($area->map($char->x,$char->y) eq $dir) {
+		if ($area->{name} == 1 && $dir eq '<') {
+			my $c = $r->prompt("Leave already?");
+			if ($c =~ /y|Y/) {
+				exit 0;
+			} else {
+				$r->showmsg("Nevermind.");
+			}
+		} else {
+			my $level = $area->{name};
+			my $new;
+			$level += ($dir eq '>') ? 1 : -1;
+			if (!$r->area($level)) {
+				$new = main::newarea($level);
+			} else {
+				$new = $r->area($level);
+			} 
+			my ($cx,$cy) = $new->findfeature($dir eq '>' ? '<' : '>');
+			$char->{x} = $cx;
+			$char->{y} = $cy;
+			$char->area($new);
+			$r->area($new);
+		}
+	} else {
+		$r->showmsg("You can't go that way.");
+		return 0;
+	}
+}
+
+sub doinv {
+# example code... clear map and show inv screen
+        my $char = shift;
+        my $items = $char->{items};
+	my $world = $char->{world};
+        if ($items && @$items) {
+		my $icnt = $char->drawinv();
+		while ($icnt > 0) {
+		    my $c = $world->getch();
+		    my $i = ord($c) - ord('a');
+		    if ($i >= 0 && $i < $icnt) {
+			$c = $world->prompt("(u)se, (d)rop, e(x)amine, ESC/SP = go back");
+			my $item = $items->[$i];
+			     if ($c eq 'd') {
+				$char->dropitem($item);	
+				$world->showmsg("Dropped the " . $item->{name});
+			} elsif ($c eq 'u') {
+				$char->delitem($item);
+				$world->showmsg("You use the " . $item->{name});
+			} elsif ($c eq 'x') {
+				$world->showmsg("It's just a " . $item->{name});
+			}
+			$icnt = $char->drawinv();
+		    } else {
+			last;
+		    }
+		}
+		
+        } else {
+		$world->showmsg("You don't have anything.");
+	}
+}
+
+sub drawinv {
+        my $char = shift;
+        my $items = $char->{items};
+	my $r = $char->{world};
+        $r->dispclear();
+        $r->dispstr("<bold white>--- Inventory: ");
+        $r->dispstr("<bold white>| ");
+        my $icnt = 0;
+        for (@$items) {
+                my $letter = chr(ord('a')+($icnt++));
+                $r->dispstr("<bold white>| " . $letter . ") <" . $_->{color} . ">" . $_->{name});
+        }
+        $r->dispstr("<bold white>---");
+	$r->{con}->refresh();
+	return $icnt;
+}
+
+package mymob;
+use Games::Roguelike::Utils qw(:all);
+use base 'Games::Roguelike::Mob';
+
+sub checkmove {
+        my ($mob, $x, $y, $other) = @_;
+	my $mapsym = $mob->{area}->{map}->[$x][$y];
+        return 0 if $mapsym eq '';
+        return 0 if $mapsym eq '#';
+        return 0 if $mapsym eq '+';
+	return 1 if $mob eq $other;
+	if ($other) {
+      		return 0 unless $other->{type} eq 'char';
+      		return 0 if $other->{hp} <= 0;
+
+                if ($mob->{at} >= randi(6)) {
+                        $other->{hp}-= 1;
+                        if ($other->{hp} <= 0) {
+                                $r->pushmsg("You died.", "bold red");
+				$other->{color} = 'red';
+				return -1;
+                        } else {
+                                $r->pushmsg("It hit you! ($other->{hp})", "bold");
+                        }
+                } else {
+                        $r->pushmsg("It missed you.", "bold");
+                        $mob->{skillp}+=1;
+                }
+                return -1;
+	}
+        return 1;
+}
+
+
+package myitem;
+use Games::Roguelike::Utils qw(:all);
+use base 'Games::Roguelike::Item';
+

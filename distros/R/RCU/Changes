@@ -1,0 +1,11 @@
+Revision history for Perl extension RCU.
+
+0.021 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+0.02  Sun Apr  7 02:37:13 CEST 2002
+	- fix memory allocation bug in Lirc.xs, reported by Kees Cook.
+
+0.01  Tue Aug  1 09:43:46 CEST 2000
+	- original version; created by cp -rp.
+

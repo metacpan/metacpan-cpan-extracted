@@ -1,0 +1,43 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/RDF-KML-Exporter/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-001 .
+my:v_0-001
+	a               :Version ;
+	dc:issued       "2011-01-15"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-KML-Exporter-0.001.tar.gz> ;
+	rdfs:label      "Initial release"@en .
+
+my:project :release my:v_0-002 .
+my:v_0-002
+	a               :Version ;
+	dc:issued       "2011-10-11"^^xsd:date ;
+	:revision       "0.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-KML-Exporter-0.002.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-001 ;
+		dcs:item   [ a dcs:Documentation ; rdfs:label "Remove some nonsense that I accidentally copied from the POD of another module." ] ;
+		dcs:item   [ rdfs:label "use 5.010" ] ;
+		dcs:item   [ a dcs:Packaging ; rdfs:label "Declare dependency on namespace::clean." ] ;
+		dcs:item   [ a dcs:Packaging ; rdfs:label "Switch to Module::Package::RDF build system." ] 
+	] .
+
+my:project :release my:v_0-003 .
+my:v_0-003
+	a               :Version ;
+	dc:issued       "2012-05-30"^^xsd:date ;
+	:revision       "0.003"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-KML-Exporter-0.003.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-002 ;
+		dcs:item   [ rdfs:label "General clean-up; use PerlX::Maybe." ] ;
+		dcs:item   [ rdfs:label "Drop dependency on RDF::TrineShortcuts; use RDF::TrineX::Functions." ] ;
+		dcs:item   [ rdfs:label "Drop dependency on common::sense; use strict." ] ;
+	] .

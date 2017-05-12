@@ -1,0 +1,6 @@
+<%init>
+$App->redirect( uri => $App->config->uri_root . '/' )
+    unless $App->is_admin;
+
+$m->call_next;
+</%init>

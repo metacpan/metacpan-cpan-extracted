@@ -1,0 +1,43 @@
+Rinchi-Outlook version 0.02
+===========================
+
+This package provides the means to persist Microsoft Outlook® objects as XML. This module should 
+run on any platform. The first of the two sample scripts accesses Outlook using Win32::OLE which
+is only available on a Windows box.  Once the desired objects have been persisted, they become platform
+independent.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  Class::ISA
+  XML::DOM
+  XML::Parser
+  
+These additional modules are used by the samples shown in the synopsis:
+
+  Win32::OLE
+  Win32::OLE::Const
+  Win32::OLE::NLS
+  Digest::MD5
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Brian M. Ames
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

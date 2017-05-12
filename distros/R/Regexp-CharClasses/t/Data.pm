@@ -1,0 +1,57 @@
+package main;
+
+use strict;
+use warnings;
+no warnings 'syntax';
+
+our ($VERSION) = q $Revision: 1.2 $ =~ /[\d.]+/g;
+
+our @data;
+
+$data [0] = [qw [00030  00660  006F0  007C0  00966  009E6  00A66  00AE6
+                 00B66  00BE6  00C66  00CE6  00D66  00E50  00ED0  00F20
+                 01040  017E0  01810  01946  019D0  01B50  0FF10  104A0
+                 1D7CE  1D7D8  1D7E2  1D7EC  1D7F6]];
+$data [1] = [qw [00031  00661  006F1  007C1  00967  009E7  00A67  00AE7
+                 00B67  00BE7  00C67  00CE7  00D67  00E51  00ED1  00F21
+                 01041  017E1  01811  01947  019D1  01B51  0FF11  104A1
+                 1D7CF  1D7D9  1D7E3  1D7ED  1D7F7]];
+$data [2] = [qw [00032  00662  006F2  007C2  00968  009E8  00A68  00AE8
+                 00B68  00BE8  00C68  00CE8  00D68  00E52  00ED2  00F22                          01042  017E2  01812  01948  019D2  01B52  0FF12  104A2
+                 1D7D0  1D7DA  1D7E4  1D7EE  1D7F8]];
+$data [3] = [qw [00033  00663  006F3  007C3  00969  009E9  00A69  00AE9
+                 00B69  00BE9  00C69  00CE9  00D69  00E53  00ED3  00F23
+                 01043  017E3  01813  01949  019D3  01B53  0FF13  104A3
+                 1D7D1  1D7DB  1D7E5  1D7EF  1D7F9]];
+$data [4] = [qw [00034  00664  006F4  007C4  0096A  009EA  00A6A  00AEA
+                 00B6A  00BEA  00C6A  00CEA  00D6A  00E54  00ED4  00F24
+                 01044  017E4  01814  0194A  019D4  01B54  0FF14  104A4
+                 1D7D2  1D7DC  1D7E6  1D7F0  1D7FA]];
+$data [5] = [qw [00035  00665  006F5  007C5  0096B  009EB  00A6B  00AEB
+                 00B6B  00BEB  00C6B  00CEB  00D6B  00E55  00ED5  00F25
+                 01045  017E5  01815  0194B  019D5  01B55  0FF15  104A5
+                 1D7D3  1D7DD  1D7E7  1D7F1  1D7FB]];
+$data [6] = [qw [00036  00666  006F6  007C6  0096C  009EC  00A6C  00AEC
+                 00B6C  00BEC  00C6C  00CEC  00D6C  00E56  00ED6  00F26
+                 01046  017E6  01816  0194C  019D6  01B56  0FF16  104A6
+                 1D7D4  1D7DE  1D7E8  1D7F2  1D7FC]];
+$data [7] = [qw [00037  00667  006F7  007C7  0096D  009ED  00A6D  00AED
+                 00B6D  00BED  00C6D  00CED  00D6D  00E57  00ED7  00F27
+                 01047  017E7  01817  0194D  019D7  01B57  0FF17  104A7
+                 1D7D5  1D7DF  1D7E9  1D7F3  1D7FD]];
+$data [8] = [qw [00038  00668  006F8  007C8  0096E  009EE  00A6E  00AEE
+                 00B6E  00BEE  00C6E  00CEE  00D6E  00E58  00ED8  00F28
+                 01048  017E8  01818  0194E  019D8  01B58  0FF18  104A8
+                 1D7D6  1D7E0  1D7EA  1D7F4  1D7FE]];
+$data [9] = [qw [00039  00669  006F9  007C9  0096F  009EF  00A6F  00AEF
+                 00B6F  00BEF  00C6F  00CEF  00D6F  00E59  00ED9  00F29
+                 01049  017E9  01819  0194F  019D9  01B59  0FF19  104A9
+                 1D7D7  1D7E1  1D7EB  1D7F5  1D7FF]];
+
+__END__
+
+$Log: Data.pm,v $
+Revision 1.2  2008/01/12 00:21:33  abigail
+- Added $VERSION
+- Added "no warnings 'syntax'"
+

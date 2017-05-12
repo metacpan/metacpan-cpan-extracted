@@ -1,0 +1,13 @@
+Changes
+lib/Redis/Queue.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/start.t
+META.yml                                 Module meta-data (added by MakeMaker)

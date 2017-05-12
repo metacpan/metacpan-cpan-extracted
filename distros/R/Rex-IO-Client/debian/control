@@ -1,0 +1,19 @@
+Source: rex-io-client
+Section: admin
+Priority: optional
+Maintainer: Jan Gehring <jan.gehring@gmail.com>
+Build-Depends: debhelper (>= 7),
+                  perl (>= 5.10.0),
+                  libmojolicious-perl (>= 3.90),
+                  libyaml-perl
+Standards-Version: 3.9.1
+Homepage: http://rex.io/
+
+Package: rex-io-client
+Architecture: all
+Depends: ${misc:Depends},
+            ${perl:Depends},
+            libmojolicious-perl (>= 3.90),
+            libyaml-perl
+Description: Rex.IO Client
+ This is the Client Component of Rex.

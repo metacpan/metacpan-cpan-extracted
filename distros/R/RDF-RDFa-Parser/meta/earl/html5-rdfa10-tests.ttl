@@ -1,0 +1,1515 @@
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix dist: <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Parser/> .
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rrp: <tag:buzzword.org.uk,2012:RDF-RDFa-Parser:> .
+@prefix test: <http://rdfa.info/vocabs/rdfa-test#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[] dc:date "2012-06-05T23:02:19Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0001.xhtml> .
+[] dc:date "2012-06-05T23:02:20Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0006.xhtml> .
+[] dc:date "2012-06-05T23:02:20Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0007.xhtml> .
+[] dc:date "2012-06-05T23:02:20Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0008.xhtml> .
+[] dc:date "2012-06-05T23:02:20Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0009.xhtml> .
+[] dc:date "2012-06-05T23:02:20Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0010.xhtml> .
+[] dc:date "2012-06-05T23:02:20Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0014.xhtml> .
+[] dc:date "2012-06-05T23:02:20Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0015.xhtml> .
+[] dc:date "2012-06-05T23:02:21Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0017.xhtml> .
+[] dc:date "2012-06-05T23:02:21Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0018.xhtml> .
+[] dc:date "2012-06-05T23:02:21Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0019.xhtml> .
+[] dc:date "2012-06-05T23:02:21Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0020.xhtml> .
+[] dc:date "2012-06-05T23:02:21Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0021.xhtml> .
+[] dc:date "2012-06-05T23:02:21Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0023.xhtml> .
+[] dc:date "2012-06-05T23:02:21Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0025.xhtml> .
+[] dc:date "2012-06-05T23:02:22Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0026.xhtml> .
+[] dc:date "2012-06-05T23:02:22Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0027.xhtml> .
+[] dc:date "2012-06-05T23:02:22Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0029.xhtml> .
+[] dc:date "2012-06-05T23:02:22Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0030.xhtml> .
+[] dc:date "2012-06-05T23:02:22Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0031.xhtml> .
+[] dc:date "2012-06-05T23:02:22Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0032.xhtml> .
+[] dc:date "2012-06-05T23:02:23Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0033.xhtml> .
+[] dc:date "2012-06-05T23:02:23Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0034.xhtml> .
+[] dc:date "2012-06-05T23:02:23Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0035.xhtml> .
+[] dc:date "2012-06-05T23:02:23Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0036.xhtml> .
+[] dc:date "2012-06-05T23:02:23Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0037.xhtml> .
+[] dc:date "2012-06-05T23:02:23Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0038.xhtml> .
+[] dc:date "2012-06-05T23:02:23Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0039.xhtml> .
+[] dc:date "2012-06-05T23:02:24Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0041.xhtml> .
+[] dc:date "2012-06-05T23:02:24Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0048.xhtml> .
+[] dc:date "2012-06-05T23:02:24Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0049.xhtml> .
+[] dc:date "2012-06-05T23:02:24Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0050.xhtml> .
+[] dc:date "2012-06-05T23:02:24Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0051.xhtml> .
+[] dc:date "2012-06-05T23:02:24Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0052.xhtml> .
+[] dc:date "2012-06-05T23:02:24Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0053.xhtml> .
+[] dc:date "2012-06-05T23:02:25Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0054.xhtml> .
+[] dc:date "2012-06-05T23:02:25Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0055.xhtml> .
+[] dc:date "2012-06-05T23:02:25Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0056.xhtml> .
+[] dc:date "2012-06-05T23:02:26Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0057.xhtml> .
+[] dc:date "2012-06-05T23:02:26Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0058.xhtml> .
+[] dc:date "2012-06-05T23:02:26Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0059.xhtml> .
+[] dc:date "2012-06-05T23:02:26Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0060.xhtml> .
+[] dc:date "2012-06-05T23:02:26Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0063.xhtml> .
+[] dc:date "2012-06-05T23:02:27Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0064.xhtml> .
+[] dc:date "2012-06-05T23:02:27Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0065.xhtml> .
+[] dc:date "2012-06-05T23:02:27Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0066.xhtml> .
+[] dc:date "2012-06-05T23:02:27Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0067.xhtml> .
+[] dc:date "2012-06-05T23:02:27Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0068.xhtml> .
+[] dc:date "2012-06-05T23:02:27Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0069.xhtml> .
+[] dc:date "2012-06-05T23:02:27Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0070.xhtml> .
+[] dc:date "2012-06-05T23:02:28Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0071.xhtml> .
+[] dc:date "2012-06-05T23:02:28Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0072.xhtml> .
+[] dc:date "2012-06-05T23:02:28Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0073.xhtml> .
+[] dc:date "2012-06-05T23:02:28Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0074.xhtml> .
+[] dc:date "2012-06-05T23:02:28Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0075.xhtml> .
+[] dc:date "2012-06-05T23:02:28Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0078.xhtml> .
+[] dc:date "2012-06-05T23:02:29Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0079.xhtml> .
+[] dc:date "2012-06-05T23:02:29Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0080.xhtml> .
+[] dc:date "2012-06-05T23:02:29Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0081.xhtml> .
+[] dc:date "2012-06-05T23:02:29Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0082.xhtml> .
+[] dc:date "2012-06-05T23:02:30Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0083.xhtml> .
+[] dc:date "2012-06-05T23:02:30Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0084.xhtml> .
+[] dc:date "2012-06-05T23:02:30Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0085.xhtml> .
+[] dc:date "2012-06-05T23:02:31Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0087.xhtml> .
+[] dc:date "2012-06-05T23:02:31Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0088.xhtml> .
+[] dc:date "2012-06-05T23:02:32Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0089.xhtml> .
+[] dc:date "2012-06-05T23:02:32Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0091.xhtml> .
+[] dc:date "2012-06-05T23:02:32Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0093.xhtml> .
+[] dc:date "2012-06-05T23:02:32Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0099.xhtml> .
+[] dc:date "2012-06-05T23:02:32Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0104.xhtml> .
+[] dc:date "2012-06-05T23:02:32Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0106.xhtml> .
+[] dc:date "2012-06-05T23:02:33Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0107.xhtml> .
+[] dc:date "2012-06-05T23:02:33Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0109.xhtml> .
+[] dc:date "2012-06-05T23:02:33Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0110.xhtml> .
+[] dc:date "2012-06-05T23:02:33Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0111.xhtml> .
+[] dc:date "2012-06-05T23:02:33Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0112.xhtml> .
+[] dc:date "2012-06-05T23:02:34Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0114.xhtml> .
+[] dc:date "2012-06-05T23:02:34Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0115.xhtml> .
+[] dc:date "2012-06-05T23:02:34Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0117.xhtml> .
+[] dc:date "2012-06-05T23:02:34Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0118.xhtml> .
+[] dc:date "2012-06-05T23:02:34Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0119.xhtml> .
+[] dc:date "2012-06-05T23:02:35Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0120.xhtml> .
+[] dc:date "2012-06-05T23:02:35Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0122.xhtml> .
+[] dc:date "2012-06-05T23:02:35Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0126.xhtml> .
+[] dc:date "2012-06-05T23:02:35Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0131.xhtml> .
+[] dc:date "2012-06-05T23:02:35Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0134.xhtml> .
+[] dc:date "2012-06-05T23:02:35Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:info "wilful violation pending spec ref" ;
+		earl:outcome earl:notTested
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0140.xhtml> .
+[] dc:date "2012-06-05T23:02:36Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0147.xhtml> .
+[] dc:date "2012-06-05T23:02:36Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0174.xhtml> .
+[] dc:date "2012-06-05T23:02:36Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0181.xhtml> .
+[] dc:date "2012-06-05T23:02:36Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0197.xhtml> .
+[] dc:date "2012-06-05T23:02:36Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0207.xhtml> .
+[] dc:date "2012-06-05T23:02:37Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0209.xhtml> .
+[] dc:date "2012-06-05T23:02:37Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0210.xhtml> .
+[] dc:date "2012-06-05T23:02:37Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0211.xhtml> .
+[] dc:date "2012-06-05T23:02:37Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:info "in contradiction of RDFa 1.0 spec" ;
+		earl:outcome earl:notTested ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0212.xhtml> .
+[] dc:date "2012-06-05T23:02:37Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0215.xhtml> .
+[] dc:date "2012-06-05T23:02:37Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0258.xhtml> .
+[] dc:date "2012-06-05T23:02:37Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0262.xhtml> .
+[] dc:date "2012-06-05T23:02:38Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0291.xhtml> .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0001.xhtml> dc:identifier "0001" ;
+	dc:title "Predicate establishment with @property" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0006.xhtml> dc:identifier "0006" ;
+	dc:title "@rel and @rev" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0007.xhtml> dc:identifier "0007" ;
+	dc:title "@rel, @rev, @property, @content" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0008.xhtml> dc:identifier "0008" ;
+	dc:title "empty string @about" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0009.xhtml> dc:identifier "0009" ;
+	dc:title "@rev" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0010.xhtml> dc:identifier "0010" ;
+	dc:title "@rel, @rev, @href" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0014.xhtml> dc:identifier "0014" ;
+	dc:title "@datatype, xsd:integer" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0015.xhtml> dc:identifier "0015" ;
+	dc:title "meta and link" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0017.xhtml> dc:identifier "0017" ;
+	dc:title "Related blanknodes" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0018.xhtml> dc:identifier "0018" ;
+	dc:title "@rel for predicate" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0019.xhtml> dc:identifier "0019" ;
+	dc:title "@about for subject" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0020.xhtml> dc:identifier "0020" ;
+	dc:title "Inheriting @about for subject" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0021.xhtml> dc:identifier "0021" ;
+	dc:title "Subject inheritance with no @about" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0023.xhtml> dc:identifier "0023" ;
+	dc:title "@id does not generate subjects" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0025.xhtml> dc:identifier "0025" ;
+	dc:title "simple chaining test" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0026.xhtml> dc:identifier "0026" ;
+	dc:title "@content" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0027.xhtml> dc:identifier "0027" ;
+	dc:title "@content, ignore element content" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0029.xhtml> dc:identifier "0029" ;
+	dc:title "markup stripping with @datatype" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0030.xhtml> dc:identifier "0030" ;
+	dc:title "omitted @about" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0031.xhtml> dc:identifier "0031" ;
+	dc:title "simple @resource" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0032.xhtml> dc:identifier "0032" ;
+	dc:title "@resource overrides @href" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0033.xhtml> dc:identifier "0033" ;
+	dc:title "simple chaining test with bNode" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0034.xhtml> dc:identifier "0034" ;
+	dc:title "simple img[@src] test" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0035.xhtml> dc:identifier "0035" ;
+	dc:title "@src/@href test" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0036.xhtml> dc:identifier "0036" ;
+	dc:title "@src/@resource test" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0037.xhtml> dc:identifier "0037" ;
+	dc:title "@src/@href/@resource test" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0038.xhtml> dc:identifier "0038" ;
+	dc:title "@rev - img[@src] test" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0039.xhtml> dc:identifier "0039" ;
+	dc:title "@rev - @src/@href test" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0041.xhtml> dc:identifier "0041" ;
+	dc:title "@rev - @src/@href/@resource test" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0048.xhtml> dc:identifier "0048" ;
+	dc:title "@typeof with @about and @rel present, no @resource" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0049.xhtml> dc:identifier "0049" ;
+	dc:title "@typeof with @about, no @rel or @resource" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0050.xhtml> dc:identifier "0050" ;
+	dc:title "@typeof without anything else" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0051.xhtml> dc:identifier "0051" ;
+	dc:title "@typeof with a single @property" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0052.xhtml> dc:identifier "0052" ;
+	dc:title "@typeof with @resource and nothing else" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0053.xhtml> dc:identifier "0053" ;
+	dc:title "@typeof with @resource and nothing else, with a subelement" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0054.xhtml> dc:identifier "0054" ;
+	dc:title "multiple @property" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0055.xhtml> dc:identifier "0055" ;
+	dc:title "multiple @rel" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0056.xhtml> dc:identifier "0056" ;
+	dc:title "@typeof applies to @about on same element with hanging rel" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0057.xhtml> dc:identifier "0057" ;
+	dc:title "hanging @rel creates multiple triples" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0058.xhtml> dc:identifier "0058" ;
+	dc:title "hanging @rel creates multiple triples, @typeof permutation; RDFa 1.0 version" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0059.xhtml> dc:identifier "0059" ;
+	dc:title "multiple hanging @rels with multiple children" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0060.xhtml> dc:identifier "0060" ;
+	dc:title "UTF-8 conformance" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0063.xhtml> dc:identifier "0063" ;
+	dc:title "@rel in head using reserved XHTML value and empty-prefix CURIE syntax" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0064.xhtml> dc:identifier "0064" ;
+	dc:title "@about with safe CURIE" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0065.xhtml> dc:identifier "0065" ;
+	dc:title "@rel with safe CURIE" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0066.xhtml> dc:identifier "0066" ;
+	dc:title "@about with @typeof in the head" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0067.xhtml> dc:identifier "0067" ;
+	dc:title "@property in the head" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0068.xhtml> dc:identifier "0068" ;
+	dc:title "Relative URI in @about" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0069.xhtml> dc:identifier "0069" ;
+	dc:title "Relative URI in @href" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0070.xhtml> dc:identifier "0070" ;
+	dc:title "Relative URI in @resource" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0071.xhtml> dc:identifier "0071" ;
+	dc:title "No explicit @about" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0072.xhtml> dc:identifier "0072" ;
+	dc:title "Relative URI in @about (with XHTML base in head)" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0073.xhtml> dc:identifier "0073" ;
+	dc:title "Relative URI in @resource (with XHTML base in head)" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0074.xhtml> dc:identifier "0074" ;
+	dc:title "Relative URI in @href (with XHTML base in head)" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0075.xhtml> dc:identifier "0075" ;
+	dc:title "Reserved word 'license' in @rel with no explizit @about" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0078.xhtml> dc:identifier "0078" ;
+	dc:title "Multiple incomplete triples, RDFa 1.0 version" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0079.xhtml> dc:identifier "0079" ;
+	dc:title "@resource and @href in completing incomplete triples" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0080.xhtml> dc:identifier "0080" ;
+	dc:title "@about overrides @resource in incomplete triples" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0081.xhtml> dc:identifier "0081" ;
+	dc:title "multiple ways of handling incomplete triples (with @rev); RDFa 1.0 version" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0082.xhtml> dc:identifier "0082" ;
+	dc:title "multiple ways of handling incomplete triples (with @rel and @rev); RDFa 1.0 version" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0083.xhtml> dc:identifier "0083" ;
+	dc:title "multiple ways of handling incomplete triples (merged)" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0084.xhtml> dc:identifier "0084" ;
+	dc:title "multiple ways of handling incomplete triples, this time with both @rel and @rev" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0085.xhtml> dc:identifier "0085" ;
+	dc:title "@resource and @href in completing incomplete triples" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0087.xhtml> dc:identifier "0087" ;
+	dc:title "All reserved XHTML @rel values (with :xxx)" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0088.xhtml> dc:identifier "0088" ;
+	dc:title "Interpretation of the CURIE \"_:\"" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0089.xhtml> dc:identifier "0089" ;
+	dc:title "@src sets a new subject (@typeof)" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0091.xhtml> dc:identifier "0091" ;
+	dc:title "Non-reserved, un-prefixed CURIE in @property" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0093.xhtml> dc:identifier "0093" ;
+	dc:title "Tests XMLLiteral content with explicit @datatype (user-data-typed literal)" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0099.xhtml> dc:identifier "0099" ;
+	dc:title "Preservation of white space in literals" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0104.xhtml> dc:identifier "0104" ;
+	dc:title "rdf:value" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0106.xhtml> dc:identifier "0106" ;
+	dc:title "chaining with empty value in inner @rel" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0107.xhtml> dc:identifier "0107" ;
+	dc:title "no garbage collecting bnodes" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0109.xhtml> dc:identifier "0109" ;
+	dc:title "Tests to ensure @xml:base is ignored" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0110.xhtml> dc:identifier "0110" ;
+	dc:title "bNode generated even though no nested @about exists" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0111.xhtml> dc:identifier "0111" ;
+	dc:title "two bNodes generated after three levels of nesting" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0112.xhtml> dc:identifier "0112" ;
+	dc:title "plain literal with datatype=\"\"" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0114.xhtml> dc:identifier "0114" ;
+	dc:title "Relative URI dot-segment removal" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0115.xhtml> dc:identifier "0115" ;
+	dc:title "XML Entities must be supported by RDFa parser" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0117.xhtml> dc:identifier "0117" ;
+	dc:title "Fragment identifiers stripped from BASE" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0118.xhtml> dc:identifier "0118" ;
+	dc:title "empty string \"\" is not equivalent to NULL - @about" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0119.xhtml> dc:identifier "0119" ;
+	dc:title "\"[prefix:]\" CURIE format is valid" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0120.xhtml> dc:identifier "0120" ;
+	dc:title "\"[:]\" CURIE format is valid" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0122.xhtml> dc:identifier "0122" ;
+	dc:title "resource=\"[]\" does not set the object" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0126.xhtml> dc:identifier "0126" ;
+	dc:title "Multiple @typeof values" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0131.xhtml> dc:identifier "0131" ;
+	dc:title "Whitespace alternatives in attributes" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0134.xhtml> dc:identifier "0134" ;
+	dc:title "Uppercase reserved words" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0140.xhtml> dc:identifier "0140" ;
+	dc:title "Blank nodes identifiers are not allowed as predicates" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0147.xhtml> dc:identifier "0147" ;
+	dc:title "xmlns prefix 'xmlzzz' (reserved)" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0174.xhtml> dc:identifier "0174" ;
+	dc:title "Support single character prefix in CURIEs" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0181.xhtml> dc:identifier "0181" ;
+	dc:title "Test default XHTML vocabulary" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0197.xhtml> dc:identifier "0197" ;
+	dc:title "Test TERMorCURIEorAbsURI requires an absolute URI" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0207.xhtml> dc:identifier "0207" ;
+	dc:title "Vevent using @typeof" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0209.xhtml> dc:identifier "0209" ;
+	dc:title "@prefix should be ignored with version set to 1.0" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0210.xhtml> dc:identifier "0210" ;
+	dc:title "@prefix should be ignored with version set to 1.0, and @xmlns should prevail" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0211.xhtml> dc:identifier "0211" ;
+	dc:title "@vocab should be ignored with version set to 1.0" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0212.xhtml> dc:identifier "0212" ;
+	dc:title "Datatype generation for a literal with XML content, version 1.0" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0215.xhtml> dc:identifier "0215" ;
+	dc:title "Character encoding detection with large header" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0258.xhtml> dc:identifier "0258" ;
+	dc:title "The underscore character is not allowed as a prefix or in xmlns" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0262.xhtml> dc:identifier "0262" ;
+	dc:title "Predicate establishment with @property, with white spaces before and after the attribute value" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+<http://rdfa.info/test-suite/test-cases/rdfa1.0/html5/0291.xhtml> dc:identifier "0291" ;
+	dc:title "@href as subject overridden by @about" ;
+	test:hostLanguage "html5" ;
+	test:rdfaVersion "1.0" ;
+	a earl:TestCase .
+rrp:xt a earl:Software ;
+	foaf:name "RDF-RDFa-Parser Author Tests" ;
+	foaf:page <https://bitbucket.org/tobyink/p5-rdf-rdfa-parser/src/tip/xt> .

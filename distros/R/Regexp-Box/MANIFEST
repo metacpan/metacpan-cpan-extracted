@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Regexp-Box.t
+lib/Regexp/Box.pm
+t/01_box_std.t
+t/02_box_bio.t
+t/03_box_db.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+{
+   "abstract" : "A very simplistic read-only method of accessing RPM spec files",
+   "author" : [
+      "Chris Weyl <cweyl@alumni.drew.edu>"
+   ],
+   "build_requires" : {
+      "Test::More" : 0
+   },
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.42"
+   },
+   "distribution_type" : "module",
+   "generated_by" : "Module::Install version 0.91",
+   "license" : "lgpl",
+   "meta-spec" : {
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html",
+      "version" : "1.4"
+   },
+   "name" : "RPM-Spec",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "provides" : {
+      "RPM::Spec" : {
+         "file" : "lib/RPM/Spec.pm",
+         "version" : "0.05"
+      }
+   },
+   "requires" : {
+      "Moose" : "0.92",
+      "MooseX::Types::Moose" : 0,
+      "MooseX::Types::Path::Class" : 0,
+      "Path::Class" : 0,
+      "namespace::autoclean" : 0
+   },
+   "resources" : {
+      "license" : "http://opensource.org/licenses/lgpl-license.php"
+   },
+   "version" : "0.05"
+}

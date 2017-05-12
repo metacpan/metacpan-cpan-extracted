@@ -1,0 +1,67 @@
+// [[[ HEADER ]]]
+using std::cout;  using std::cerr;  using std::endl;
+
+#ifndef __CPP__INCLUDED__RPerl__Algorithm__Inefficient_cpp
+#define __CPP__INCLUDED__RPerl__Algorithm__Inefficient_cpp 0.011_000
+
+// [[[ INCLUDES ]]]
+#include "RPerl/Algorithm/Inefficient.h"
+
+# ifdef __PERL__TYPES
+
+Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# elif defined __CPP__TYPES
+
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+
+// [[[ SUBROUTINES & OO METHODS ]]]
+
+void RPerl__Algorithm__Inefficient::inherited__Inefficient(string person) {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Inefficient->inherited__Inefficient(), have ::class($self) = " + classname(this) + (const string) " and $person = " + person + (const string) ", FLUFFY" + (const string) "\n");
+}
+
+string RPerl__Algorithm__Inefficient::inherited__Inefficient_bar_get() {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Inefficient->inherited__Inefficient_bar_get(), have ::class($self) = " + classname(this) + (const string) ", FLUFFY" + (const string) "\n");
+    return this->bar;
+}
+
+void RPerl__Algorithm__Inefficient::inherited__Inefficient_bar_set(string bar_new) {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Inefficient->inherited__Inefficient_bar_set(), have ::class($self) = " + classname(this) + (const string) " and $bar_new = " + bar_new + (const string) ", FLUFFY" + (const string) "\n");
+    this->bar = bar_new;
+}
+
+string RPerl__Algorithm__Inefficient::inherited__Inefficient_foo_get() {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Inefficient->inherited__Inefficient_foo_get(), have ::class($self) = " + classname(this) + (const string) ", FLUFFY" + (const string) "\n");
+    return this->foo;
+}
+
+void RPerl__Algorithm__Inefficient::inherited__Inefficient_foo_set(string foo_new) {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Inefficient->inherited__Inefficient_foo_set(), have ::class($self) = " + classname(this) + (const string) " and $foo_new = " + foo_new + (const string) ", FLUFFY" + (const string) "\n");
+    this->foo = foo_new;
+}
+
+void RPerl__Algorithm__Inefficient::inherited(string person) {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Inefficient->inherited(), have ::class($self) = " + classname(this) + (const string) " and $person = " + person + (const string) ", INCOMPATIBLE" + (const string) "\n");
+}
+
+string RPerl__Algorithm__Inefficient__uninherited__Inefficient(string person) {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Inefficient::uninherited__Inefficient(), received $person = " + person + (const string) ", MESSY" + (const string) "\n");
+    return (const string) "Inefficient::uninherited__Inefficient() RULES! CPPOPS_CPPTYPES";
+}
+
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+
+# else
+
+Purposefully_die_from_a_compile-time_error,_due_to_neither___PERL__TYPES_nor___CPP__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# endif
+
+#endif
+
+// end of class

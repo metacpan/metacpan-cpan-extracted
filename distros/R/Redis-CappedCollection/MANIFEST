@@ -1,0 +1,55 @@
+Changes                             History of this package
+coverage.sh                         Control code coverage
+MANIFEST                            This file
+Makefile.PL                         Makefile generator
+README                              Get you started with this package
+lib/Redis/CappedCollection.pm
+lib/Redis/CappedCollection/Util.pm
+benchmark_capped.pl                 Redis::CappedCollection benchmark
+example.pl                          Redis::CappedCollection demonstration
+dump_collection                     Dump collection data
+restore_collection                  Restore collection data
+redis_durations.plx                 Log analysing
+t/00_compile.t
+t/00_CappedCollection/00_compile.t
+t/00_CappedCollection/01_new.t
+t/00_CappedCollection/02_insert.t
+t/00_CappedCollection/03_update.t
+t/00_CappedCollection/04_receive.t
+t/00_CappedCollection/05_collection_info.t
+t/00_CappedCollection/06_pop_oldest.t
+t/00_CappedCollection/07_exists.t
+t/00_CappedCollection/08_lists.t
+t/00_CappedCollection/09_drop_collection.t
+t/00_CappedCollection/10_quit.t
+t/00_CappedCollection/11_max_datasize.t
+t/00_CappedCollection/12_last_errorcode.t
+t/00_CappedCollection/13_name.t
+t/00_CappedCollection/14_max_list_items.t
+t/00_CappedCollection/15_cleanup_bytes.t
+t/00_CappedCollection/17_cleanup_items.t
+t/00_CappedCollection/18_info.t
+t/00_CappedCollection/19_drop.t
+t/00_CappedCollection/20_cleaning.t
+t/00_CappedCollection/21_rollback.t
+t/00_CappedCollection/22_alarm.t
+t/00_CappedCollection/23_cleaning_bench.t
+t/00_CappedCollection/24_timeout.t
+t/00_CappedCollection/25_cleaning_correctness.t
+t/00_CappedCollection/26_script_variable_protection.t
+t/00_CappedCollection/27_fork.t
+t/00_CappedCollection/28_data_dependency.t
+t/tlib/Redis/CappedCollection/Test/Utils.pm
+xt/author/.perlcritic.rc
+xt/author/92_vars.t
+xt/author/94_fixme.t
+xt/author/95_critic.t
+xt/release/95_kwalitee.t
+xt/release/96_kwalitee_extra.t
+xt/release/97_distribution.t
+xt/release/98_pod.t
+xt/release/99_pod_coverage.t
+xt/release/00_CappedCollection/98_pod.t
+xt/release/00_CappedCollection/99_pod_coverage.t
+META.yml                            Module meta-data (added by MakeMaker)
+META.json                           Module meta-data (added by MakeMaker)

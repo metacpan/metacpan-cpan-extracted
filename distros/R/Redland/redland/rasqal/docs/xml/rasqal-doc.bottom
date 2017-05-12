@@ -1,0 +1,13 @@
+    <xi:include href="xml/section-general.xml"/>
+    <xi:include href="xml/section-data.xml"/>
+    <xi:include href="xml/section-expression.xml"/>
+    <xi:include href="xml/section-graph_pattern.xml"/>
+    <xi:include href="xml/section-literal.xml"/>
+    <xi:include href="xml/section-prefix.xml"/>
+    <xi:include href="xml/section-query.xml"/>
+    <xi:include href="xml/section-query_results.xml"/>
+    <xi:include href="xml/section-query_results_formatter.xml"/>
+    <xi:include href="xml/section-triple.xml"/>
+    <xi:include href="xml/section-variable.xml"/>
+    <xi:include href="xml/section-triples_source.xml"/>
+    <xi:include href="xml/section-unused.xml"/>

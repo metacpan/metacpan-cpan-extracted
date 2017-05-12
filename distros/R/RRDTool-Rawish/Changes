@@ -1,0 +1,23 @@
+Revision history for Perl extension RRDTool::Rawish
+
+0.040 2016-06-11T13:19:00Z
+    - Added feature flushcached for rrdcached #2 (by rhaen)
+
+0.032 2013-06-23T13:16:00Z
+    - Fix failure test.
+
+0.031  Wed Feb 13 02:52:50 2013
+    - Fix failure test.
+
+0.03   Wed Feb 13 02:52:50 2013
+    - Add version method.
+    - Fix test dependant on the presence of rrdtool command.
+
+0.021  Sat Feb 09 02:31:32 2013
+    - Fix documentation.
+
+0.02   Sat Feb 09 01:45:38 2013
+    - Update documentation.
+
+0.01   Mon Jan 21 09:36:38 2013
+    - Initial release.

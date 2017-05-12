@@ -1,0 +1,118 @@
+Revision history for RT-Extension-LDAPImport
+
+0.36 2014-09-22
+ - Update documenation to no imply RT -> LDAP syncing
+ - Allow importing of users as-needed when importing groups
+ - Don't attempt to add disabled users into groups they already belong
+   to
+ - Treat undef and empty CF values identically
+ - Ensure that user custom fields are applied in consistent order
+ - Updated packaging
+
+0.35
+ - Implement better way to use functions in mappings. Old way was mostly
+ - useless. It's not expected that somebody used them. See description of
+ - C<$LDAPMapping> option for details.
+ - Adds id to $LDAPGroupMapping to allow the importer to keep up with group
+ - renames in LDAP.
+ - Change tests to be author-only because they tended to cause confusion
+   and
+ - attempt to create/drop a database.  This is not something you want
+   happening
+ - on your production machine when using a cpan client to install.
+
+0.34
+ - Bug fix: Revert changes in 0.33_01 and _02; RT::Authen::ExternalAuth
+   0.13 is using RT::Record->Update now
+ - Tests: Compatibility with Net::LDAP::Server::Test 0.16
+
+0.33_02
+ - Documentation for function added in 0.33_01
+
+0.33_01
+ - Bug fix: Avoid flip flopping fields back and forth with
+ - RT::Authen::ExternalAuth by using our own update function instead of
+ - RT::Record->Update
+
+0.33
+ - Bug fix: Actually disable RT::Authen::ExternalAuth while importing users
+   from LDAP
+
+0.32_06
+ - Bug fix: Allow 0 as a valid object CF value
+ - Usability: Lower log level to debug for skipped numeric users/groups
+
+0.32_05
+ - Bug fix: Restore the old uncached group member search logic when
+   Member_Attr_Value is DN
+ - Bug fix: Ensure the users cache is defined before we use it
+ - Feature: Support skipping users or groups during import
+
+0.32_04
+ - Doc: Cleaned up documention into a single place
+ - Feature: Sync single value user CFs
+
+0.32_03
+ - Flush output immediately
+ - Disable RT::Authen::ExternalAuth to avoid double info fetching
+
+0.32_02
+ - Support for paging results from your LDAP source
+ - Use the same perl that ran Makefile.PL in the shebang of
+   bin/rtldapimport
+
+0.32_01
+ - Clarify $LDAPGroupName option
+ - Support for group membership attributes which don't contain a list of
+   user DNs
+
+0.31_03
+ - Upgrade Module::Install::RTx so it can find RT.pm
+ - and version check properly.
+
+0.31_02
+ - packaging fix since Module::Install doesn't support
+ - require(RT => '3.6.3'); as well as it could
+ - doc updates
+
+0.31_01
+ - Many new features, primary among them, we now support
+ - importing groups from LDAP and managing group memberships
+
+0.31
+ - Further upgrades to MIRTx for RT4 compat
+ - Warn and skip numeric users and groups
+ - Add an $LDAPCreatePrivileged flag to create imported users as Privileged
+ - Add an optimization for adding new groups; if we just created it, we
+   know it is empty, so skip the member query
+
+0.20_01
+ - Integrate a number of patches and suggestions from Robert Nesius
+
+0.07
+ - Documentation fixes
+
+0.06
+ - 3.8 compatibility fixes 
+
+0.05
+ - Handle importing Custom Fields
+
+0.04
+ - fix logging bug
+
+0.03
+ - Added support for concatenation in LDAP fields
+ - Consequently, the mapping in your config has changed, it now
+ - goes RT Field => LDAP Field.  See the readme and the POD
+ - for import_user for more information
+ - Added support for adding all new users to a single group
+ - on Import
+ - Added support for clobbering user data with LDAP data
+
+0.02
+ - fix missing executable bits
+
+0.01 2007-06-07T13:35:41Z
+ - Initial release.
+

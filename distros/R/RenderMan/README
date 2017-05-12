@@ -1,0 +1,107 @@
+=======================================================================
+                RenderMan Module v0.04 for Perl 5.6
+             Glenn M. Lewis, http://www.gmlewis.com/
+=======================================================================
+ 
+COPYRIGHT
+=========
+ 
+   Copyright (c) 1997-2000 Glenn M. Lewis. All rights reserved.
+   This program is free software; you can redistribute it and/or
+   modify it under the same terms as Perl itself.
+ 
+ 
+INTRODUCTION
+============
+ 
+This module acts as a Perl 5.6 interface to the Blue Moon Rendering Tools
+(BMRT) RenderMan-compliant client library, written by Larry Gritz:
+	    http://www.bmrt.org/
+
+
+REQUIREMENTS
+============
+ 
+This module requires Perl 5.6, a C compiler, and BMRT.  It works under
+WinNT and Windows 2000 as well as Unix.
+
+ 
+INSTALLATION
+============
+ 
+After un-compressing/archiving the file, please edit Makefile.PL
+and point it to the include and lib directories of your BMRT installation.
+
+Then, if your version of BMRT supplies a shared-library version of the
+client library, simply type the following:
+ 
+   % perl Makefile.PL
+   % make
+   % make test
+
+You should see 241 successful tests related to the RenderMan binding.
+
+Now install the module with:
+
+   % make install
+
+If, however, your version of BMRT only supplies a static version of the
+client library, you will need to do the following instead:
+
+   % perl Makefile.PL
+   % make perl
+   % make test_static
+   % make -f Makefile.aperl inst_perl MAP_TARGET=perl
+   % make doc_install
+
+This last line will install a new version of "perl" which includes
+the RenderMan module linked in statically.
+
+In either case, you should now be able to 'use RenderMan;' in your
+scripts to take advantage of this module.
+
+To get documentation on the module, type:
+
+   % perldoc RenderMan
+ 
+
+EXAMPLES
+========
+ 
+Some extra code has been added to the examples directory that should
+enable you to convert LightWave objects to RIB or to a Perl script
+using the RenderMan binding.  More useful examples will be provided
+in future releases.
+ 
+
+FEEDBACK
+========
+ 
+I'm looking for any feedback regarding this module or how you use this
+module.  If you've got other good examples or such, please send them my
+way and I'll include them.
+ 
+ 
+UPDATES
+=======
+ 
+Updates will be uploaded to PAUSE, and will be posted to my personal
+home page at:
+        http://www.gmlewis.com/
+
+ 
+BUGS
+====
+ 
+Function callbacks (for error handling and filtering) are not supported.
+RiTransformPoints is not supported by the client library, and is therefore
+not supported by this Perl 5.6 binding.
+RiBlobby is not supported by BMRT 2.5.0.8, and is therefore not supported.
+ 
+
+AUTHOR
+======
+
+Glenn M. Lewis
+mailto:glenn@gmlewis.com
+http://www.gmlewis.com/

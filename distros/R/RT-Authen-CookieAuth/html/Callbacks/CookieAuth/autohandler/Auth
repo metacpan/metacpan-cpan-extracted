@@ -1,0 +1,114 @@
+<%init>
+    
+# If the user is logging in, let's authenticate; if they can auth but don't load
+# (e.g. they don't have an account but external auth succeeds), we'll autocreate
+# their account.
+unless ($session{'CurrentUser'}) {
+    
+    # Check to see if we've been asked to authenticate from cookies
+    # If so, confirm the username authenticated by the cookies
+    if ($RT::UseExternalCookieAuthService){
+        $RT::Logger->debug( "Cookie Authentication (",
+                            $RT::UseExternalCookieAuthService,
+                            ") requested");
+        
+        # Use the package we need for cookie authentication
+        use RT::Authen::CookieAuth;
+
+        my ($cookie_user, $confirmed_by_cookie) = RT::Authen::CookieAuth::CheckCookies();
+        
+        # If CheckCookies gave us a user, set it as the global user.
+        $user = $cookie_user if defined($cookie_user);
+        
+        # If CheckCookies is happy the user it gave us is authenticated...
+        if ($confirmed_by_cookie) {
+            
+            # This WAS used to stop a pointless LookupExternalUserInfo 
+            # called by UpdateFromExternal later on since it's already
+            # called by RT::User::Create if the user is autocreated
+            # but this has been deprecated pending a little bit of a 
+            # rewrite since I realised that we're not calling
+            # CanonicalizeUserInfo but UpdateFromExternal which is the
+            # only code that checks whether the user is externally
+            # marked as disabled.
+            my $user_autocreated = 0;
+
+            # Create a new CurrentUser for the session and try and load
+            # a known user with the username given by the cookie check.
+            $session{'CurrentUser'} = RT::CurrentUser->new();
+            $session{'CurrentUser'}->Load($user);
+
+            # Unless we loaded a valid user with a UserID,
+            # autocreate a new user
+            unless ($session{'CurrentUser'}->Id) {
+                
+                # Start with a new SystemUser
+                my $UserObj = RT::User->new($RT::SystemUser);
+                
+                # Set the user's name to the one we were given
+                my ($val, $msg) = $UserObj->SetName($user);
+
+                # Commit the created user to the DB
+                ($val, $msg) = 
+                  $UserObj->Create(%{ref($RT::AutoCreate) ? $RT::AutoCreate : {}},
+                                   Name   => $user,
+                                   Gecos  => $user,
+                                  );
+                                   
+                # Log the creation
+                $RT::Logger->info(  "Autocreated authenticated user",
+                                    $UserObj->Name,
+                                    "(",
+                                    $UserObj->Id,
+                                    ")");
+                
+                # Mark that user was created here so that we 
+                # don't bother looking up their information
+                $user_autocreated = 1;
+
+                # Load the newly-created user as the CurrentUser in $session
+                # To RT, this means we now have a valid, authenticated user
+                $session{'CurrentUser'}->Load($user) if $UserObj->Id;
+            }
+        
+        
+            # If we now have a completely valid RT user to play with,
+            # and the user is not disabled in RT, then...
+            if ($session{'CurrentUser'} && $session{'CurrentUser'}->Id) {
+                    
+                # ALWAYS call UpdateFromExternal otherwise externally-disabled
+                # users could be allowed in.
+                $session{'CurrentUser'}->UserObj->UpdateFromExternal();
+
+                # Now their information is up to date,
+                # check if the user is disabled.
+                
+                # If the user is disabled, kill their session,
+                # otherwise, authentication is successful.
+                if($session{'CurrentUser'}->UserObj->Disabled) {
+                    delete $session{'CurrentUser'};
+                } else {     
+                    # Do not delete the session. User stays logged in.
+                    # Log the success.
+                    $RT::Logger->info(  "Successful login for",
+                                        $user,
+                                        "from",
+                                        $ENV{'REMOTE_ADDR'});
+                }
+            } else {
+                # If we have no complete user.
+                delete $session{'CurrentUser'};
+            }
+        }
+    } else {
+        $RT::Logger->debug("RT is capable of External Cookie Auth, but it has not been enabled.");
+    }
+}
+return;
+</%init>
+
+<%ARGS>
+$user => undef
+$pass => undef
+$menu => undef
+</%ARGS>

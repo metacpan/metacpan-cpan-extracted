@@ -1,0 +1,26 @@
+<div id="content">
+<div class="blog">
+  <div class="blogbody">
+
+  <a id="entry"></a>
+[% IF is_admin %]
+  <h1>[% page_id %]</h1>
+
+<div class="upper-nav">
+<a href="[% script %]?SiteAdmin">[% loc_top_page %]</a> | 
+<!-- <a href="blog.html">[% loc_blog_page %]</a> | -->
+<a href="[% script %]?[% changes_page %]">[% loc_changes_page %]</a> | 
+<a href="[% script %]?action=prefs">[% loc_preferences_page %]</a> | 
+<a href="[% script %]?{{KwikiHelpIndex}}">{{KwikiHelpIndex}}</a> | 
+<form method="post" action="[% script %]" enctype="application/x-www-form-urlencoded" style="display: inline">
+<input type="text" name="search" size="15" value="{{Search}}" onfocus="this.value=''" />
+<input type="hidden" name="action" value="search" />
+</form>
+<form method="post" action="[% script %]" enctype="application/x-www-form-urlencoded" style="display: inline">
+<input type="hidden" name="action" value="import" />
+</form>
+</div><!-- close "upper-nav" -->
+<a id="skip-upper-nav"></a>
+
+  <hr />
+[% END %]

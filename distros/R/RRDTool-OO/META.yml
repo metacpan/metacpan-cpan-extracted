@@ -1,0 +1,26 @@
+---
+abstract: 'Object-oriented interface to RRDTool'
+author:
+  - 'Mike Schilli <m@perlmeister.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RRDTool-OO
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Log4perl: '0.40'
+  RRDs: '0'
+  Storable: '0'
+resources:
+  repository: http://github.com/mschilli/rrdtool-oo-perl
+version: '0.36'

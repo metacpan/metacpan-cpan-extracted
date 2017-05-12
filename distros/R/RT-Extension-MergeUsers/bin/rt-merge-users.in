@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+my $usage = "usage: perl $0 <user> <into>";
+
+my ($from, $into) = @ARGV;
+die "\n$usage\n" unless $from && $into;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+my $merge = RT::User->new( $RT::SystemUser );
+$merge->Load( $from );
+die "Couldn't load user using '$from'" unless $merge->id;
+
+my $user = RT::User->new( $RT::SystemUser );
+$user->Load( $into );
+die "Couldn't load user using '$into'" unless $user->id;
+
+print "Going to merge user #". $merge->id ." into user #". $user->id ."\n";
+exit 0 unless prompt_yN("Are you sure you want to do that?");
+
+my ($status, $msg) = $merge->MergeInto( $user );
+die "Couldn't merge users: $msg" unless $status;
+
+print "DONE.\n";
+exit 0;
+
+sub prompt_yN {
+    my $msg = shift;
+    print $msg ." [N]: ";
+    my $a = <STDIN>;
+    return 1 if $a =~ /^(y|yes)$/i;
+    return 0;
+}

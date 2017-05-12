@@ -1,0 +1,51 @@
+Revision history for Perl extension Regexp::English.
+
+1.00 Sun Jul 10 23:13:33 UTC 2005
+	- bumped up version number
+	- migrate to Module::Build
+	- autogenerate Makefile.PL
+	- add README
+	- moved module to lib/Regexp/
+	- added POD, POD coverage, and signature tests
+	- avoid use of ref() and UNIVERSAL::isa() -- I've grown as a programmer
+	- reformatted some code
+	- added some negations and plurals
+	- added /s modifier on newline*()
+	- marked helper-building functions with leading underscores
+	- added documentation for undocumented methods
+	- improved some phrasings in the documentation
+	- clarified what "multiple" means
+
+0.21  Wed Jan 16 22:56:43 MST 2002
+	- improved or() support
+	- added more tests for or() to t/basic.t
+	- fixed bug in group(), added test to t/basic.t
+	- allow character methods to be called as class methods
+	- improved class/object method checking in remember() and chars()
+	- cleaned up end() slightly
+
+0.20  Tue Jan 15 16:18:34 MST 2002
+	- finished documentation
+	- improved method calls of Quantifiers and Groupings
+	- added wantarray() support to match()/capture()
+	- added or() test to t/basic.t
+	- added t/example.t
+	- added test for Quantifier method calls in t/quantifiers.t
+	- added test for wantarray() support in match()/capture() to t/basic.t
+	- added captured variable tests to t/remember.t (sanity check)
+
+0.12  Mon Jan 14 22:28:16 MST 2002
+	- added some documentation to English.pm
+	- added t/export.t
+	- added @EXPORT_OK, be more selective about exports
+	- added %EXPORT_TAGS ('all', 'chars', 'standard')
+	- added tests for plural chars in t/chars.t
+
+0.11  Thu Sep 13 23:12:00 2001
+	- revised method names on suggestions from Damian Conway and Vahe Sarkissian
+	- autogenerate more methods
+	- add several methods suggested by Damian Conway
+
+0.01  Thu Aug 23 11:23:32 2001
+	- original version; created by h2xs 1.19
+

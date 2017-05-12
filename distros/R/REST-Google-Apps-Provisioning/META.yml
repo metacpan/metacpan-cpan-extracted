@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                REST-Google-Apps-Provisioning
+version:             1.1.10
+abstract:            A Perl library to Google's RESTful Apps Provisioning API 
+license:             perl
+author:
+    - Scott Schneider <sschneid@gmail.com>
+distribution_type:   module
+requires:
+    Carp:               0
+    LWP::UserAgent:     0
+    Test::More:         0
+    XML::Simple:        0
+

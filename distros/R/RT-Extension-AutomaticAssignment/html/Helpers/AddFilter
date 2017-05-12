@@ -1,0 +1,16 @@
+<%ARGS>
+$Name => undef
+$i => 0
+$Queue => undef
+</%ARGS>
+<%INIT>
+$m->abort unless grep { $Name eq $_ } RT->Config->Get('AutomaticAssignmentFilters');
+
+my $QueueObj = RT::Queue->new($session{'CurrentUser'});
+$QueueObj->Load( $Queue );
+
+my $path = "/Admin/Queues/Elements/Filter/$Name";
+my $prefix = "Filter_${Name}_$i";
+</%INIT>
+% $m->comp($path, prefix => $prefix, config => {}, queue => $QueueObj);
+% $m->abort;

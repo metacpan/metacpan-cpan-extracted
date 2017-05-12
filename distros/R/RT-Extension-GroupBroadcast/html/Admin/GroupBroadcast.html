@@ -1,0 +1,116 @@
+<%ARGS>
+    $From    => undef
+    $Group   => undef
+    $Subject => undef
+    $Message => undef
+    $Send    => undef
+    $result  => undef
+</%ARGS>
+<& /Elements/Header, Title => 'Broadcast Message' &>
+<& /Elements/Tabs &>
+
+
+<script src="http://ajax.microsoft.com/ajax/jQuery.Validate/1.6/jQuery.Validate.min.js"></script>
+<script>
+    jQuery(document).ready(function(){
+        var $=jQuery;
+        $('#broadcast-form').validate({
+            errorClass: "required",
+            rules : {
+                Group: "required",
+                From: { required: true, email: true },
+                Subject: "required",
+                Message: "required"
+            }
+        });
+    });
+</script>
+<style>
+    input.required, textarea.required, select.required {background: #EAA}
+    label.required {color:red}
+</style>
+
+
+% if ($result) {
+<div class="results">
+    <div class="titlebox" id="">
+        <div class="titlebox-title">
+            <span class="left">Results</span>
+            <span class="right-empty"></span>
+        </div>
+        <div class="titlebox-content ">
+            <ul class="action-results">
+% $m->out( $result );
+            </ul>
+            <hr class="clear">
+        </div>
+    </div>
+</div>
+% }
+<div class="broadcast-message">
+    <&| /Widgets/TitleBox, title => loc('Broadcast Message') &>
+    <form id="broadcast-form" method="post" action="">
+        <table>
+            <tr class="input-row">
+                <td class="label"><&|/l&>From</&>:</td>
+                <td colspan="3" class="value">
+                    <& /Elements/EmailInput, Name => 'From', Size => '40', Default => $ARGS{From} || $session{CurrentUser}->EmailAddress &>
+                </td>
+            </tr>
+            <tr class="input-row">
+                <td class="label"><&|/l&>Group</&>:</td>
+                <td class="value"><& /Search/Elements/SelectGroup, Name => 'Group', Default => $ARGS{Group} &></td>
+            </tr>
+            <tr class="input-row">
+                <td class="label"><&|/l&>Subject</&>:</td>
+                <td colspan="3" class="value"><input type="text" size="50" name="Subject" value="<% $Subject %>" /></td>
+            </tr>
+            <tr class="input-row">
+                <td class="labeltop"><&|/l&>Message</&>:</td>
+                <td colspan="3" class="value"><textarea name="Message" cols="80" rows="20"><% $Message %></textarea></td>
+            </tr>
+        </table>
+        <& /Elements/Submit, Label => loc('Send'), Name => 'Send' &>
+    </form>
+    </&>
+</div>
+<%INIT>
+    use Encode;
+    use MIME::Entity;
+    use RT::Interface::Email;
+
+    # /Admin/autohandler does this - but it never hurts to double check :)
+    if (! $session{'CurrentUser'}->UserObj->HasRight( Right => 'ShowConfigTab', Object => $RT::System ) ) {
+        $m->out("You don't have permissions to view this page");
+        return;
+    }
+
+    #
+    # Send out a group email.
+    #
+    if ($Send) {
+        if ($From && $Group && $Subject && $Message) {
+
+            my $group_obj = RT::Group->new( $RT::SystemUser );
+            $group_obj->LoadUserDefinedGroup( $Group );
+            my @emails = $group_obj->MemberEmailAddresses;
+
+            my $To = join(', ', @emails);
+            my $mime = MIME::Entity->build(
+                'From'        => Encode::encode_utf8($From),
+                'To'          => Encode::encode_utf8($From),
+                'Bcc'         => Encode::encode_utf8($To),
+                'Subject'     => Encode::encode_utf8($Subject),
+                'Data'        => Encode::encode_utf8($Message)
+            );
+            my $ok = RT::Interface::Email::SendEmail( Entity => $mime );
+
+            $result .= "You sucessfully sent your message to ". scalar(@emails) . " users:\n";
+            $result .= join "\n", map { "<li>$_</li>" } @emails;
+        }
+        else {
+            $result = "Error: You must enter all fields to broadcast";
+        }
+    }
+    # vim: syn=mason
+</%INIT>

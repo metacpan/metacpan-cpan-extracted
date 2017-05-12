@@ -1,0 +1,87 @@
+% use DateTime;
+% layout 'job';
+% title 'Execute Job';
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h2>Execute <%= $job->name %></h2>
+      <p><%== $job->description %></p>
+    </div>
+    <div class="col-md-4" style="margin-bottom: 55px;">
+      <h4 style="margin-top: 30px; margin-left: 12px;">Statistics</h4>
+
+    <div>
+      <div class="col-xs-5">
+        Last execution
+      </div>
+      <div class="col-xs-7">
+        % my $dt = DateTime->from_epoch(epoch => $job->last_execution);
+        % if ($job->last_execution == 0) {
+        -
+        % } else {
+        <%= $dt->ymd("-") %> <%= $dt->hms(":") %>
+        % } 
+      </div>
+
+    </div>
+
+    <div>
+      <div class="col-xs-5">
+        Last status
+      </div>
+      <div class="col-xs-7">
+        <%= $job->last_status %>
+      </div>
+
+    </div>
+
+    </div>
+  </div>
+</div>
+
+<form action="/project/<%= $project->directory %>/job/<%= $job->directory %>/execute" method="post">
+
+  <div class="panel panel-default">
+
+    <div class="panel-heading">Select Servers</div>
+    <div class="panel-body">
+
+      <table id="server" class="display" cellspacing="0" width="100%">
+        <thead>
+          <tr>
+            <th style="width: 20px;"></th>
+            <th>Name</th>
+            <th>Group</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Group</th>
+          </tr>
+        </tfoot>
+        <tbody>
+      % for my $srv (@{ $all_server }) {
+          <tr>
+            <td><input type="checkbox" name="sel_server" value="<%= $srv->{name} %>" /></td>
+            <td><%= $srv->{name} %></td>
+            <td><%= $srv->{group} %></td>
+          </tr>
+      % }
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <button class="btn btn-sm btn-danger" type="submit">Execute</button>
+</form>
+
+<script>
+$(document).ready(function() {
+    $('#server').dataTable();
+} );
+</script>
+

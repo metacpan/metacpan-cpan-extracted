@@ -1,0 +1,12 @@
+Copyright 1998, Washington University School of Medicine,
+Institute for Biomedical Computing. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. 
+
+The RCGI library allows calling Perl subroutines in modules on remote computers
+with load balancing.
+
+INSTALLATION: 
+
+Please run perldoc RCGI.pm to read the installation documentation.

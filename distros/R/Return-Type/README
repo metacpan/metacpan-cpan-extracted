@@ -1,0 +1,103 @@
+NAME
+    Return::Type - specify a return type for a function (optionally with
+    coercion)
+
+SYNOPSIS
+       use Return::Type;
+       use Types::Standard qw(Int);
+   
+       sub first_item :ReturnType(Int) {
+          return $_[0];
+       }
+   
+       my $answer = first_item(42, 43, 44);     # returns 42
+       my $pie    = first_item(3.141592);       # throws an error!
+
+DESCRIPTION
+    Return::Type allows you to specify a return type for your subs. Type
+    constraints from any Type::Tiny, MooseX::Types or MouseX::Types type
+    library are supported.
+
+    The simple syntax for specifying a type constraint is shown in the
+    "SYNOPSIS". If the attribute is passed a single type constraint as shown,
+    this will be applied to the return value if called in scalar context, and
+    to each item in the returned list if called in list context. (If the sub
+    is called in void context, type constraints are simply ignored.)
+
+    It is possible to specify different type constraints for scalar and list
+    context:
+
+       sub foo :ReturnType(scalar => Int, list => HashRef[Num]) {
+          if (wantarray) {
+             return (pie => 3.141592);
+          }
+          else {
+             return 42;
+          }
+       }
+
+    Note that because type constraint libraries are really aimed at validating
+    scalars, the type constraint for the list is specified as a *hashref* of
+    numbers and not a hash of numbers! For the purposes of validation against
+    the type constraint, we slurp the returned list into a temporary arrayref
+    or hashref.
+
+    For type constraints with coercions, you can also pass the option `coerce
+    => 1`:
+
+       use Return::Type;
+       use Types::Standard qw( Int Num );
+   
+       # Define a subtype of "Int" at compile time, which can
+       # coerce from "Num" by rounding to nearest integer.
+       use constant Rounded => Int->plus_coercions(Num, sub { int($_) });
+   
+       sub first_item :ReturnType(scalar => Rounded, coerce => 1) {
+          return $_[0];
+       }
+   
+       my $answer = first_item(42, 43, 44);     # returns 42
+       my $pie    = first_item(3.141592);       # returns 3
+
+    The options `coerce_scalar` and `coerce_list` are also available if you
+    wish to enable coercion only in particular contexts.
+
+  Power-user Inferface
+    Rather than using the `:ReturnType` attribute, it's possible to wrap a
+    coderef like this:
+
+       my $wrapped = Return::Type->wrap_sub($orig, %options);
+
+    The accepted options are `scalar`, `list`, `coerce`, `coerce_list`, and
+    `coerce_scalar`, as per the attribute-based interface.
+
+    There is an additional option `scope_upper` which will load and use
+    Scope::Upper so that things like `caller` used within the wrapped sub are
+    unaware of being wrapped. This behaviour was the default prior to
+    Return::Type 0.004, but is now optional and disabled by default.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Return-Type>.
+
+SUPPORT
+    IRC: support is available through in the *#moops* channel on irc.perl.org
+    <http://www.irc.perl.org/channels.html>.
+
+SEE ALSO
+    Attribute::Contract, Sub::Filter, Sub::Contract.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

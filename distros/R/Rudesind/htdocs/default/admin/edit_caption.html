@@ -1,0 +1,26 @@
+<h2>Edit caption for "<% $thing->title | h %>"</h2>
+
+<form action="<% $App->config->uri_root %>/submit/edit_caption" method="POST">
+<input type="hidden" name="redirect_to" value="<% $App->config->uri_root %>/<% $thing->uri %>" />
+<input type="hidden" name="path" value="<% $thing->uri | h %>" />
+<textarea name="caption" cols="50" rows="5" class="Rudesind-textarea"><% $thing->caption || '' | h %></textarea>
+<br />
+<input type="submit" value="Submit" class="Rudesind-submit-button" />
+</form>
+
+<p>
+Submitting an empty value will delete the caption entirely.
+</p>
+
+<p>
+Captions may contain <a href="<% $App->config->uri_root %>/wiki.html">Wiki markup</a>.
+</p>
+
+<%args>
+$path
+</%args>
+
+<%init>
+my ( $dir, $image ) = Rudesind::UI::new_from_path( $path, $App->config );
+my $thing = $image ? $image : $dir;
+</%init>

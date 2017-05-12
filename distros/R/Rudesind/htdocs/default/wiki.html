@@ -1,0 +1,84 @@
+<p>
+This formatting works as follows:
+</p>
+
+<p>
+= Heading =
+</p>
+
+<p>
+== Sub-heading ==
+</p>
+
+<p>
+A regular plain old paragraph.
+</p>
+
+<p>
+'''Triple-quoted text is bold.'''
+</p>
+
+<p>
+''Double-quoted text is italicized.''
+</p>
+
+<p>The quotes are <b>single quotes</b>(').</p>
+
+<p>
+[http://www.vegguide.org/] - a bare link
+</p>
+
+<p>
+[http://www.vegguide.org/|VegGuide] - a link with a title.  The link and
+title are separated by a vertical bar (|).
+</p>
+
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;* An unordered list item<br />
+&nbsp;&nbsp;&nbsp;&nbsp;* Another unordered list item
+</p>
+
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;1. An ordered list item<br />
+&nbsp;&nbsp;&nbsp;&nbsp;2. Another ordered list item
+</p>
+
+<p>Note that list items must indented at least 4 spaces.</p>
+
+<p>
+----<br />
+Four or more hyphens make a line
+</p>
+
+<p>
+Here's what it looks like when formatted:
+</p>
+
+<% Rudesind::text_to_html( q{
+
+= Heading =
+
+== Sub-heading ==
+
+A regular plain old paragraph.
+
+'''Triple-quoted text is bold.'''
+
+''Double-quoted text is italicized.''
+
+[http://www.vegguide.org/] - a bare link
+
+[http://www.vegguide.org/|VegGuide] - a link with a title
+
+    * An unordered list item
+    * Another unordered list item
+
+    1. An ordered list item
+    2. Another ordered list item
+
+Note that list items must indented at least 4 spaces.
+
+----
+
+Four or more hyphens make a line
+} ) %>

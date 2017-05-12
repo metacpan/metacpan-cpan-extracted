@@ -1,0 +1,11 @@
+abstract: RT Extension-BrandedQueues Extension
+distribution_type: module
+generated_by: Module::Install version 0.59
+license: Perl
+name: RT-Extension-BrandedQueues
+no_index:
+  directory:
+    - html
+    - inc
+    - t
+version: 0.1

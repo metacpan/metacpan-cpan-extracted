@@ -1,0 +1,46 @@
+---
+abstract: 'leader board using Redis'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::RedisServer: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-LeaderBoard
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Redis::LeaderBoard:
+    file: lib/Redis/LeaderBoard.pm
+    version: '1.11'
+  Redis::LeaderBoard::Member:
+    file: lib/Redis/LeaderBoard/Member.pm
+recommends:
+  Redis::Fast: '0'
+requires:
+  Mouse: '0'
+  Redis: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-Redis-LeaderBoard/issues
+  homepage: https://github.com/Songmu/p5-Redis-LeaderBoard
+  repository: git://github.com/Songmu/p5-Redis-LeaderBoard.git
+version: '1.11'
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'

@@ -1,0 +1,89 @@
+Regexp-Log-Common
+=================
+
+Regexp::Log::Common enables simple parsing of log files created using the
+Common Log Format or the Extended Common Log Format, such as the logs generated
+by the httpd web server using the keyword 'common'.
+
+Regexp::Log::Common uses Regexp::Log as a base class, to generate regular
+expressions for performing the usual data munging tasks on log files that
+cannot be simply split().
+
+For more information on how to use this module, please see Regexp::Log.
+
+LOG FORMATS
+
+The Common Log Format is made up of several fields to record requests and
+responses by a webserver. There are two traditional layouts, refered to as the
+common and extended layouts. However, you may wish to create a log format of
+your own, using the field specifiers as defined by the Common Log Format
+Specification [1]. 
+
+With this module you may define your log format as common or extended, for
+example:
+
+    my $foo = Regexp::Log::Common->new( format  => ':common' );
+
+or you can define your own format, such as:
+
+    my $foo = Regexp::Log::Common->new(
+        format  => '%host %rfc %authuser %date %request %status %bytes' .
+                   '%referer %useragent %time %servername',
+        capture => [qw( host rfc authuser ts request status bytes
+                        referer useragent time servername)],
+    );
+
+[1] see http://httpd.apache.org/docs/2.2/mod/mod_log_config.html#formats
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these modules:
+
+  Regexp::Log
+
+For testing the module requires these modules:
+
+  IO::File
+  Test::More
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Log-Common
+
+AUTHOR
+
+Barbie <<barbie@cpan.org>>
+for Miss Barbell Productions, http://www.missbarbell.co.uk
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2005-2014 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

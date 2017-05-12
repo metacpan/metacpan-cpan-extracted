@@ -1,0 +1,29 @@
+0.0.8 Tue Apr 14 11:17 CST 2015
+  - "add log report switch"
+
+0.0.7 Tue Apr 14 10:36 CST 2015
+  - "add log report to log file"
+
+0.0.6 Wen Apr 8 10:01 CST 2015
+  - "force use SSH instead OpenSSH"
+
+0.0.5 Thu Apr 2 18:10 CST 2015
+  - "update document"
+
+0.0.4 Thu Apr 2 17:58 CST 2015
+  - "add <user> <password> <private_key> <public_key> Attr, Now you can set default authentication in <new>"
+
+0.0.3 Thu Apr 2 12:45 CST 2015
+  - "add <add_auth> METHOD to add default authentication"
+  - "add <report_as_yaml> METHOD to reports as yaml"
+  - "add <report_as_json> METHOD to reports as json"
+  - "add <print_as_yaml> METHOD to print as yaml"
+  - "add <print_as_json> METHOD to print as json"
+
+0.0.2 Wen Apr 1 18:00 CST 2015
+  - "update document"
+  - "add example"
+  - "a hash_ref can pass to <add_task> METHOD"
+
+0.0.1 Tue Mar 31 19:00 CST 2015
+  - "upload to cpan"

@@ -1,0 +1,31 @@
+This RT extension will install into your RT local library directory.
+
+  perl Makefile.PL
+  make
+
+Then with appropriate permissions for your RT installation (probably sudo)
+
+  make install
+
+This extension needs to add a the custom "Age" field and scrips to
+your RT database. Again, with the approrpriate RT permissions:
+
+  make initdb
+
+Shredder is used for Destroyed age, so you have to create directory
+for backups in the RT's 'var' directory. See also description
+of the TicketAgingFilenameTemplate option in the docs.
+
+  mkdir /opt/rt3/var/data/RT-Shredder/
+
+Add 'use RT::Extension::TicketAging;' line to the bottom of the RT
+site config.
+
+Next step is optional and MUST be skipped in productions environment
+as during this step data is created in the current RT DB. Many tests
+may fail if you didn't initialize DB or the directory for backups
+doesn't exist.
+
+  make test
+
+Check README to get pointers to documentation about this extension.

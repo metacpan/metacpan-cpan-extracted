@@ -1,0 +1,286 @@
+---
+version: 2009-10-21
+tecan:
+  genesis:
+    tips:
+      type: 
+        1: coupling
+        2: coupling
+        3: coupling
+        4: coupling
+        5: coupling
+        6: coupling
+        7: coupling
+        8: coupling
+    points:
+      roma0:
+        magnet-hover: '14056,1850,980,1800'
+        magnet-place: '14056,1850,687,1800'
+        sampletray-hover: '14057,2828,980,1800'
+        sampletray-place: '14057,2828,582,1800'
+        shaker-hover: '1780,3569,1535,1800'
+        shaker-put: '1780,3569,865,1800'
+        shaker-take: '1780,3569,865,1800'
+        shakerlock-1: '1762,1177,1535,900'
+        shakerlock-2: '1762,1177,815,900'
+        shakerlock-3: '1191,1177,808,900'
+        shakerlock-4: '1762,1177,815,900'
+        shakerlock-5: '1762,1177,1535,900'
+        shakerlock-6: '1780,3569,1535,1800'
+        shakerlock-hover: '1780,3569,1535,1800'
+        HOME1: '11165,2525,980,1800'
+      liha0:
+        well1-dispense: 2618,748,90,695,2080,2080,2080,2080,2080,2080,2080
+        well1-aspirate: 2612,743,90,695,2080,2080,2080,2080,2080,2080,2080
+    arm_offset:
+      roma0:
+        x:
+        y:
+        z:
+        r:
+        g:
+    objects:
+      # genesis liha: x-axis is left->right, y-axis is rear->front, z-axis is top/high->bottom/low
+      #         origin (0,0,0) is left rear corner with pipettes high.
+      # genesis roma: x-axis is left->right, y-axis is rear->front, z-axis is top/high->bottom/low,
+      #         r-axis is clockwise degree viewed from above, g-axis is narrow->wide
+      #         origin (0,0,0,0,0) is left rear highest corner with gripper rotated to front.
+      initialization: # human places objects at these points
+        JCplateholder: [ JCgreinerUbottom96 ]
+      origin:
+        # Add 0,0,0 origin entry here
+      tips:
+        tip200:
+          type: coupling
+          maxvol: 220  # microliters
+          z:
+            offset: -50  # 0.1mm unit
+            length: 730
+      fixed:
+        origin:
+          numpositions:
+            x: 61
+            y: 8
+            z: 8
+          x:
+            0: 0
+            11: 14000
+          y:
+            0: 0
+          z:
+            0: 0
+        tiptray200:
+          shape: rect
+          numpositions: 
+            x: 12
+            y: 8
+            z: 1
+          firstsite: topleft
+          freetravel:
+            z: 1262
+          barcode: 022
+          barcodexyz: 5,40,62.5
+          move:
+            relativeto: 
+              fixed: none
+              x: 0
+              y: 0
+              z: 0
+            speedxyz: 400
+            x: 
+              1: 135
+              12: 1125
+            y:
+              1: 38
+              8: 670
+            z:
+              free: 1262
+              aspirate: 1332
+              dispense: 1320
+              max: 1542
+          contains: tip200
+        JCplateholder: 
+          shape: rect
+          numpositions: 
+            x: 3
+            y: 4
+            z: 1
+          firstsite: topleft
+          size: 417,313,62.5
+          freetravel:
+            z: 1500
+          barcode: 022
+          barcodexyz: 5,40,62.5
+          move:
+            relativeto: 
+              # 'relativeto' defines the "grid" position
+              fixed: origin
+              x: 11 #14051.5
+              y: 0 #2728
+              z: 0 #900
+            speedxyz: 400
+            x: 
+              1: 5.5 
+              2: 144
+              3: 283
+            y:
+              1: 5
+              2: 100
+              3: 196
+              4: 295
+            z:
+              1: 1898
+            r:
+              1: 1800
+          contains: JCgreinerUbottom96 JCgreinerVbottom96
+        JCmagholder: 
+          shape: rect
+          numpositions: 
+            x: 1
+            y: 1
+            z: 1
+          firstsite: topleft
+          size: 417,313,178
+          freetravel:
+            z: 1500
+          barcode: 022
+          barcodexyz: 5,40,62.5
+          move:
+            relativeto: 
+              fixed: JCplateholder
+              x: 0
+              y: 0
+              z: 0
+            x: 
+              1: 5.5 
+              2: 144
+              3: 283
+            y:
+              1: 5
+              2: 100
+              3: 196
+              4: 295
+            z:
+              1: 1793 # needs offset -141
+            r:
+              1: 1800
+          # VbottomMAGSTACK @ 1,2,1: well1=(2618,743), well96=(3607,1369)
+          contains: JCgreinerUbottom96 JCgreinerVbottom96
+        JCShaketable:
+          shape: rect
+          numpositions: 
+            x: 1
+            y: 2
+            z: 1
+          firstsite: topleft
+          size: 140,300,85
+          barcode: 080
+          barcodexyz: 7.5,24.7,85
+          move:
+            x:
+              1: 5.5 
+            y:
+              1: 75
+              2: 205
+            g:
+              open: 120
+              close: 110
+              force: 40
+              speed: 150
+          contains: JCgreinerUbottom96
+      movable:
+        JCgreinerUbottom96:
+          shape: rect
+          actions: basic  
+          numpositions: 
+            x: 12
+            y: 8
+            z: 1
+            shape: grid
+          firstsite: topleft
+          barcode: 090
+          barcodexyz: 
+          move:
+            relativeto: 
+              fixed: JCplateholder
+              x: 1
+              y: 2
+              z: 1
+            x:
+              1: 2606
+              12: 3603
+            y:
+              1: 753 # relativeto=JCplateholder@1,2,1
+              #1: -197 # relativeto=JCplateholder@1,1,1
+              8: 1380 # relativeto=JCplateholder@1,2,1
+            ys: 
+              1: 90
+              8: 90
+            # If relativeto=JCplateholder@1,1,1 then x1=2606,x12=3603,y1=-197,y8=430
+            z:
+              free: 2080
+              travel: 1390
+              aspirate: 1440
+              dispense: 1405
+              max: 1547
+            g: 
+              open: 120
+              close: 112
+              force: 40
+              speed: 150
+            r: 
+              landscape: 1800
+              portrait: 900
+          piercespeed: 10
+          moveto: JCplateholder JCShaketable    
+        JCgreinerVbottom96:
+          shape: rect
+          actions: basic  
+          numpositions: 
+            x: 12
+            y: 8
+            z: 1
+            shape: grid
+          firstsite: topleft
+          barcode: 090
+          barcodexyz: 
+          move:
+            relativeto: # defines site num position
+              fixed: JCplateholder
+              x: 1
+              y: 2
+              z: 1
+            x: # x,y,z define well position offsets
+              1: 2618
+              12: 3613
+            y:
+              1: 748 # relativeto=JCplateholder@1,2,1
+              8: 1380 # relativeto=JCplateholder@1,2,1
+            # If relativeto=JCplateholder@1,2,1 then y1=748,y8=1380
+            # If relativeto=JCplateholder@1,1,1 then y1=-202,y8=430
+            ys: 
+              1: 90
+              2: 90
+              3: 90
+              4: 90
+              5: 90
+              6: 90
+              7: 90
+              8: 90
+            z:
+              free: 2080
+              travel: 1390
+              aspirate: 1440
+              dispense: 1405
+              max: 1547
+            g: 
+              open: 120
+              close: 112
+              force: 40
+              speed: 150
+            r: 
+              landscape: 1800
+              portrait: 900
+          piercespeed: 10
+          moveto: JCplateholder JCShaketable JCmagholder 
+...

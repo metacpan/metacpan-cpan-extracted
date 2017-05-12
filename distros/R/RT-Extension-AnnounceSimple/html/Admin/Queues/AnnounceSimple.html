@@ -1,0 +1,52 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+
+<& /Elements/AnnounceSimple, Object => $QueueObj &>
+
+<& /Elements/ListActions, actions => \@results &>
+
+<form method="post" enctype="multipart/form-data" action="<% RT->Config->Get('WebPath') %>/Admin/Queues/AnnounceSimple.html">
+<input type="hidden" class="hidden" name="id" value="<% $id %>" />
+
+<input type="text" name="announce" style="width: 50%;" value="<% $announce %>" />
+
+<div>
+% if ($attr) {
+<input type="submit" name="delete" value="<&|/l&>Delete</&>" />
+% }
+<input type="submit" name="save" value="<&|/l&>Save</&>" />
+</div>
+
+</form>
+<%init>
+my $QueueObj = RT::Queue->new( $session{'CurrentUser'} );
+$QueueObj->Load($id) || Abort( loc("Couldn't load queue [_1]", $id) );
+
+$QueueObj->CurrentUserHasRight('AdminQueue') || Abort( loc('Permission Denied') );
+
+my $title = loc("Announce for Queue [_1]", $QueueObj->Name);
+
+my @results;
+
+if ( $ARGS{save} and length $ARGS{announce} ) {
+    my ($status, $msg) = $QueueObj->SetAttribute(
+        Name        => 'AnnounceSimple',
+        Description => 'AnnounceSimple text',
+        Content     => $ARGS{announce},
+    );
+
+    push @results, loc("Unable to update Announce text: [_1]", $msg)
+        unless $status;
+} elsif ( $ARGS{delete} ) {
+    my ($status, $msg) = $QueueObj->DeleteAttribute('AnnounceSimple');
+
+    push @results, loc("Unable to delete Announce text: [_1]", $msg)
+        unless $status;
+}
+
+my $attr = $QueueObj->FirstAttribute('AnnounceSimple');
+my $announce = $attr ? $attr->Content : '';
+</%init>
+<%args>
+$id => undef
+</%args>

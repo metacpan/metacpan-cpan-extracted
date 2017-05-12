@@ -1,0 +1,46 @@
+---
+abstract: 'Yet another XS implemented Redis Client'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  Test::LeakTrace: '0.15'
+  Test::More: '0.98'
+  Test::RedisServer: '0.20'
+  Test::TCP: '2'
+configure_requires:
+  Devel::CheckCompiler: '0.04'
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-Jet
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Redis::Jet:
+    file: lib/Redis/Jet.pm
+    version: '0.08'
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kazeburo/Redis-Jet/issues
+  homepage: https://github.com/kazeburo/Redis-Jet
+  repository: git://github.com/kazeburo/Redis-Jet.git
+version: '0.08'
+x_authority: cpan:KAZEBURO
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'ToshiakiYokoda <adokoy001@gmail.com>'
+  - 'itsusony <itsusony@fout.jp>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,11 @@
+use inc::Module::Install;
+RTx('RTx-AttachmentZip');
+license('GPL Version 2');
+author('Richard G Harman Jr <rtx-attachmentszip+richard@richardharman.com>');
+version_from('lib/RTx/AttachmentZip.pm');
+my ($lib_path) = $INC{'RT.pm'} =~ /^(.*)[\\\/]/;
+my $local_lib_path = "$RT::LocalPath/lib";
+unshift @INC, $local_lib_path, $lib_path;
+requires('Archive::Zip');
+auto_install();
+WriteAll();

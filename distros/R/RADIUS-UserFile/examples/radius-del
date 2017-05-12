@@ -1,0 +1,58 @@
+#!/usr/local/bin/perl -Tw
+
+use 5.004;
+use strict;
+use vars qw($USERS_FILE);
+use RADIUS::UserFile 0.98;
+
+##
+# radius-del:  remove the named users from the RADIUS users file.
+# 
+# All arguments are expected to be usernames.  The users file should
+# be defined in the variable $USERS_FILES in the BEGIN {} block below.
+##
+
+
+BEGIN {
+    # Since we'll probably be running as root, and we want taint checking
+    # on (the -T switch at the top), clean things up a little.
+    $ENV{PATH} = '';
+    $0 = 'radius-del';
+
+    $USERS_FILE = '/etc/raddb/users';
+}
+
+
+my (@users, @bogus, @found, @notfound, $radius);
+
+# Verify arguments
+#
+scalar @ARGV or die("$0: No users specified.\n");
+foreach my $arg (@ARGV) {
+    $arg =~ /^([^\s#,]+)$/ and push(@users, $1) or push(@bogus, $arg);
+}
+@bogus and
+die("$0: I don't recognize usernames with whitespace, pound, or comma chars:\n",
+    "$0:", map(sprintf(" `%s'", $_), @bogus), "\n");
+
+# Load the users file
+#
+$radius = new RADIUS::UserFile(File => $USERS_FILE)
+ or die("$0: Apparently $USERS_FILE isn't a valid RADIUS users file.\n");
+
+# Verify that all of the users exist, and warn about ones we didn't find.
+#
+foreach my $u (@users) {
+    $radius->user($u) and push(@found, $u) or push(@notfound, $u);
+}
+print STDERR "$0: I couldn't find these users in $USERS_FILE:\n",
+             "$0: @notfound\n"
+ if @notfound;
+
+if (@found) {
+    $radius->remove(@found);
+    $radius->update
+     or die("$0: There was a problem updating $USERS_FILE.\n");
+}
+
+exit 0;

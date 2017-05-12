@@ -1,0 +1,8 @@
+<%init>
+my $queue = RT::Queue->new($RT::SystemUser);
+$queue->Load('General');
+die "Could not find the queue " unless $queue->id;
+$m->notes( queue => $queue);
+$m->notes(page_title => 'Account Request');
+$m->call_next();
+</%init>

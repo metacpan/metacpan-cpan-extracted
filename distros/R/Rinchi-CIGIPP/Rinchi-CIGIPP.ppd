@@ -1,0 +1,13 @@
+<SOFTPKG NAME="Rinchi-CIGIPP" VERSION="0,01,0,0">
+    <TITLE>Rinchi-CIGIPP</TITLE>
+    <ABSTRACT>Perl extension for the Common Image Generator Interface.</ABSTRACT>
+    <AUTHOR>Brian M. Ames &lt;bames@localdomain&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Carp" VERSION="1,0,0,0" />
+        <DEPENDENCY NAME="IO-Select" VERSION="1,0,0,0" />
+        <DEPENDENCY NAME="IO-Socket" VERSION="1,0,0,0" />
+        <OS NAME="linux" />
+        <ARCHITECTURE NAME="i386-linux-thread-multi-5.8" />
+        <CODEBASE HREF="" />
+    </IMPLEMENTATION>
+</SOFTPKG>

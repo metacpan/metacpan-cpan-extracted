@@ -1,0 +1,50 @@
+%# [GET EditURI]
+%# Retrieve a representation of an object.
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="<% $BaseURI %>/NoAuth/feed.css"?>
+<entry xmlns="http://purl.org/atom/ns#" xmlns:html="http://www.w3.org/1999/xhtml">
+  <& $ShowEntry, %ARGS, Object => $Object, IsChild => 0 &>
+  <content type="text/xml" mode="xml">
+    <% $xml|n %>
+  </content>
+  <html:dl>
+% foreach my $key (keys %$struct) {
+%   my $value = $struct->{$key};
+%   my $is_feed = ref($value);
+%   my $sym = $is_feed ? '/' : '.';
+      <html:dt><& $ShowLink, Relation => "service.".($is_feed ? 'feed' : 'edit'), URI => "$BaseURI/$Path$sym$key", Title => $key, IsChild => 1, Text => $key &></html:dt>
+%   next if $session{AtomClient};
+%   foreach my $text ($is_feed ? @$value : $value) {
+      <html:dd><% $text %></html:dd>
+%   }
+% }
+  </html:dl>
+</entry>
+<%INIT>
+my $type = lc(ref($Object));
+$type =~ s/.*:://g;
+
+$session{CurrentUser}->LanguageHandle('en-us');
+my $handler = "/REST/1.0/Forms/$type/default";
+my $struct = eval { $m->comp($handler, id => $Object->Id, fields => {})->[2] };
+$struct ||= {
+    map +($_ => $Object->$_),
+    grep $Object->_ClassAccessible->{$_}{read},
+    keys %{$Object->_ClassAccessible}
+};
+delete $session{CurrentUser}{LangHandle};
+
+my $xml = $X->XMLout($struct);
+$xml =~ s/"Not set"/""/g;
+$xml =~ s/" "/"\n"/g;
+</%INIT>
+<%ARGS>
+$ShowLink
+$ShowEntry
+$BaseURI
+$Path
+$CollectionClass
+$X
+
+$Object
+</%ARGS>

@@ -1,0 +1,302 @@
+#! /app/unido-i06/share/lang/perl/default/bin/perl -w
+######################### -*- Mode: Perl -*- #########################
+##
+## File          : reprec
+##
+## Author        : Norbert Goevert
+## Created On    : Mon Nov  9 17:08:12 1998
+## Last Modified : Time-stamp: <2003-12-08 17:32:00 goevert>
+##
+## Description   : 
+##
+## $Id: reprec,v 1.30 2003/12/08 16:39:57 goevert Exp $
+##
+######################################################################
+
+
+use strict;
+
+use Pod::Usage;
+use Getopt::Long;
+
+require RePrec::PRR;
+require RePrec::Average;
+require RePrec::Collection;
+require RePrec::Searchresult;
+
+our $VERSION;
+'$Name: release_0_32 $ 0_0' =~ /(\d+)[-_](\d+)/; $VERSION = sprintf '%d.%03d', $1, $2;
+
+
+my %OPT = ( average => 1,
+            maxdocs => 0,
+            output  => '/tmp/RP',
+            recall  => 100,
+            single  => 0,
+	    gnuplot => 1,
+          );
+
+GetOptions( \%OPT,
+            # default options
+            qw(help version),
+            # application specific options
+            qw( average!
+		gnuplot!
+                collection=s
+                output=s
+                numdocs=i
+                recall=i
+                searchresult=s
+                single!
+                maxdocs=i
+              )
+          ) or pod2usage(2);
+
+pod2usage(-verbose => 2) if $OPT{help};
+print $VERSION, "\n" and exit if $OPT{version};
+
+pod2usage( -verbose => 1,
+           -exitval => 1,
+         ) unless $OPT{collection} and $OPT{numdocs} and $OPT{searchresult};
+
+print STDERR "Reading collection file `$OPT{collection}'... ";
+my $collection = RePrec::Collection->new( file    => $OPT{collection},
+                                          numdocs => $OPT{numdocs},
+                                          qid     => 0,
+                                          docid   => 2,
+                                          judge   => 3,
+                                        );
+print STDERR "done.\n";
+
+my $fh;
+if ($OPT{searchresult} =~ /\.(gz|Z)$/) {
+  $fh = IO::File->new("gunzip -c $OPT{searchresult} |")
+} else {
+  $fh = IO::File->new($OPT{searchresult})
+}
+die "Couldn't read search result file `$OPT{searchresult}': $!\n"
+  unless $fh;
+
+my @reprecs;
+my $actual_qid;
+my $actual_runid;
+my @result;
+
+my $doc = 0;
+while (<$fh>) {
+
+  my($qid, $docid, $weight, $runid) = (split)[0, 2, 4, 5];
+  $actual_runid = defined $actual_runid ? $actual_runid : $runid;
+  $actual_qid   = defined $actual_qid   ? $actual_qid   : $qid;
+  warn("Differing runids in search result: $actual_runid, $runid\n")
+    if defined $runid and $runid ne $actual_runid;
+
+  if ($qid != $actual_qid) {
+    # handle result
+    my $result = RePrec::Searchresult->new($actual_qid, \@result);
+    my $reprec = RePrec::PRR->new($result->distribution($collection));
+    printf( "query id %2d: results %6d; total relevant %6d; relevant found %6d\n",
+            $actual_qid,
+            scalar @result,
+            $collection->get_numrels($actual_qid),
+            $result->rels,
+          );
+    if ($collection->get_numrels($actual_qid)) {
+      if ($OPT{single}) {
+        $reprec->calculate($OPT{recall});
+        my $output = $OPT{output};
+        $output .= '_' . $actual_runid if $actual_runid;
+	if ($OPT{gnuplot}) {
+	  $reprec->gnuplot(output => $output . '_' . $actual_qid);
+	} else {
+	  $reprec->write_rpdata($output . '_' . $actual_qid);
+	}
+      }
+      push @reprecs, $reprec if $OPT{average};
+    }
+
+    # clear result
+    @result = ();
+    $actual_qid = $qid;
+    $doc = 0;
+  }
+
+  push @result, [$weight, $docid] if $OPT{maxdocs} == 0 or ++$doc <= $OPT{maxdocs};
+}
+
+# handle last result
+my $result = RePrec::Searchresult->new($actual_qid, \@result);
+my $reprec = RePrec::PRR->new($result->distribution($collection));
+printf( "query id %2d: results %6d; total relevant %6d; relevant found %6d\n",
+        $actual_qid,
+        scalar @result,
+        $collection->get_numrels($actual_qid),
+        $result->rels,
+      );
+if ($collection->get_numrels($actual_qid)) {
+  if ($OPT{single}) {
+    $reprec->calculate($OPT{recall});
+    my $output = $OPT{file};
+    $output .= '_' . $actual_runid if $actual_runid;
+    if ($OPT{gnuplot}) {
+      $reprec->gnuplot(output => $output . '_' . $actual_qid);
+    } else {
+      $reprec->write_rpdata($output . '_' . $actual_qid);
+    }
+  }
+  push @reprecs, $reprec if $OPT{average};
+}
+
+# handle average
+if ($OPT{average}) {
+  my $average = RePrec::Average->new(@reprecs);
+  $average->calculate($OPT{recall});
+  my $output = $OPT{output} . '_average';
+  $output .= '_' . $actual_runid if $actual_runid;
+  if ($OPT{gnuplot}) {
+    $average->gnuplot(output => $output);
+  } else {
+    $average->write_rpdata($output, 1);
+  }
+}
+
+
+## ###################################################################
+## subs
+## ###################################################################
+
+
+__END__
+## ###################################################################
+## pod
+## ###################################################################
+
+=head1 NAME
+
+reprec - calculate recall precision curves for TREC style retrieval results
+
+=head1 SYNOPSIS
+
+B<reprec>
+  B<-numdocs> I<numdocs>
+  B<-collection> I<collection>
+  B<-searchresult> I<searchresult>
+  B<-maxdocs> I<maxdocs>
+  [B<-output> I<output>]
+  [B<-(no)single>] [B<-(no)average>]  [B<-recall> I<recall-points>]
+  [B<-(no)gnuplot>]
+B<reprec>
+  [B<-help>] [B<-version>]
+
+=head1 DESCRIPTION
+
+With B<reprec> one can calculate recall precision curves using TREC
+style result and relevance judgements files. The judgements file
+(option B<-collection>) must be in the following format: each line
+represents the relevance judgement for a single document w. r. t. a
+single query: column 1 holds the query id, column 3 the document id
+and column 4 the relevance judgement (1 if relevant, 0 else). Column 2
+is not used, the columns are seperatet by blanks or tabs.
+
+In the search result files again each line represents the rank of a
+single document w. r. t. a single query. Column 1 holds the query id,
+column 2 is unused, column 3 the document id, column 4 the rank
+(unused), column 5 the retrieval status value (rsv), column 6 the run
+identifier (used in the output files if present). The file must be
+sorted by query id, i. e. lines representing the results for a given
+query must be blcked together. For each query the results must be
+sorted by decreasing RSVs.
+
+=head1 OPTIONS
+
+Option names may be abbreviated to uniqueness.
+
+=over
+
+=item B<-numdocs> I<numdocs>
+
+Give number of documents in collection. Needed to compute the very
+last rank.
+
+=item B<-collection> I<collection>
+
+Specify file with collection relevance judgements.
+
+=item B<-searchresult> I<searchresult>
+
+Specify file with search results.
+
+=item B<-maxdocs> maxdocs
+
+consider the top I<maxdocs> result documents for each query only in
+order to derive recall precision curves.
+
+=item B<-output> I<output>
+
+Specify prefix for output files. Defaults to F</tmp/RP>.
+
+=item B<-single>
+
+Compute recall-precision graphs for individula results (default is not
+to do that, equivalent to B<-nosingle>).
+
+=item B<-gnuplot>
+
+Tells reprec to show the calculated RP graph(s) with gnuplot
+(default). This may not be desirable when e.g. the computation is done
+remotely. Use B<-nognuplot> to turn this off and only write the gnuplot
+data files.
+
+=item B<-average>
+
+Compute recall-precision graph by averaging individual results. This
+is the default, use B<-noaverage> in order to avoid averaging.
+
+=item B<-recall> I<recall-points>
+
+Specify number of recall points for which precision is to be computed.
+Default is 100.
+
+=item B<-help>
+
+Show this manual.
+
+=item B<-version>
+
+Show program version.
+
+=back
+
+=head1 EXAMPLES
+
+        % reprec -collection t/data/collection_girt \
+            -searchresult t/data/searchresult_girt \
+            -numdocs 76128
+
+computes recall precision curve for the averaged individual results in
+F</tmp/RP*>.
+
+=head1 BUGS
+
+Yes. Please let me know!
+
+=head1 SEE ALSO
+
+RePrec(3),
+RePrec::PRR(3),
+RePrec::Searchresult(3),
+RePrec::Collection(3),
+RePrec::Average(3),
+perl(1).
+
+=head1 AUTHOR
+
+Norbert GE<ouml>vert E<lt>F<goevert@ls6.cs.uni-dortmund.de>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003 Norbert GE<ouml>vert. All rights reserved. This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

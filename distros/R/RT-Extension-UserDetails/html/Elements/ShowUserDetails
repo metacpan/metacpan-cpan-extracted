@@ -1,0 +1,56 @@
+<span id="toggleuserdetails-<% $id %>">
+% if ( $Toggle ) {
+<a href="<% $url %>" onclick="ahah('<% $url |n %>&Toggle=0', 'toggleuserdetails-<% $id |n %>'); return false;"><img src="<% RT->Config->Get('WebImagesURL') %>/RT-Extension-UserDetails/userdetails.png" alt="<% loc('Details') %>" title="<% loc('Details') %>" style="border-style: none" /></a>
+<div id="userdetails">
+<a href="<% $url %>" onclick="ahah('<% $url |n %>&Toggle=0', 'toggleuserdetails-<% $id |n %>'); return false;"><img src="<% RT->Config->Get('WebImagesURL') %>/RT-Extension-UserDetails/close.png" alt="<% loc('Close') %>" title="<% loc('Close') %>" style="border-style: none" /></a>
+<ul>
+% foreach my $sort (sort { $a <=> $b } keys %attributes) {
+% my $attr_name = $attributes{$sort}{'AttributeName'};
+% my $display_name = $attributes{$sort}{'DisplayName'};
+<li><% loc($display_name) %>: <% $User->$attr_name || '' %></li>
+% }
+</ul>
+</div>
+% } else {
+<a href="<% $url %>" onclick="ahah('<% $url |n %>&Toggle=1', 'toggleuserdetails-<% $id |n %>'); return false;"><img src="<% RT->Config->Get('WebImagesURL') %>/RT-Extension-UserDetails/userdetails.png" alt="<% loc('Details') %>" title="<% loc('Details') %>" style="border-style: none" /></a>
+% }
+</span>
+
+<%init>
+my $url = RT->Config->Get('WebPath') ."/Helpers/Toggle/UserDetails?id=". $id;
+
+# Default Attributes to display
+# SortOrder => { AttributeName => '',
+#                DisplayName   => '', }
+my %attributes;
+if ( RT->Config->Get('UserDetailsAttributes') ) {
+    %attributes = RT->Config->Get('UserDetailsAttributes');
+} else {
+    %attributes = ( 
+        1 => { AttributeName => 'RealName',
+               DisplayName => 'Real Name',
+             },
+        2 => { AttributeName => 'EmailAddress',
+               DisplayName => 'Email',
+             },
+        3 => { AttributeName => 'Organization',
+               DisplayName => 'Organization',
+             }, 
+        );
+}
+
+my $User;
+
+# Load User only if needed
+if ( $Toggle ) {
+    $User = RT::User->new( $session{'CurrentUser'} );
+    $User->Load( $id );
+}
+
+</%init>
+
+<%args>
+$id
+$Toggle => 0
+</%args>
+

@@ -1,0 +1,67 @@
+{
+   "abstract" : "Offers functionality of Debian's run-parts tool in Perl",
+   "author" : [
+      "Axel Beckert <abe@deuxchevaux.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Run-Parts",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Easy" : "0",
+            "File::Slurp" : "9999.17",
+            "Scalar::Util" : "0",
+            "Taint::Util" : "0",
+            "autodie" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Trap" : "0",
+            "Test::Warnings" : "0.005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-run-parts@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Run-Parts"
+      },
+      "homepage" : "https://github.com/xtaran/run-parts",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/xtaran/run-parts.git",
+         "web" : "https://github.com/xtaran/run-parts"
+      }
+   },
+   "version" : "0.09"
+}
+

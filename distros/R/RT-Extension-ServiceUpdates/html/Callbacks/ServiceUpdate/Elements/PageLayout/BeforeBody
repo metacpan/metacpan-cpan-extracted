@@ -1,0 +1,5 @@
+<%init>
+$m->comp('/ServiceUpdate/Elements/Banner');
+return();
+</%init>
+

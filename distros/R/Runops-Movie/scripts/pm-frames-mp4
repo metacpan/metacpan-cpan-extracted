@@ -1,0 +1,17 @@
+#!perl
+use strict;
+use warnings;
+use autodie qw( chdir system );
+use Getopt::Long qw( GetOptions );
+use Carp::Always;
+
+GetOptions(
+  help => sub { die },
+  'frames=s' => \my$frames,
+  'movie=s'  => \my$movie,
+)
+  or die;
+
+system "find @{[ $frames =~ m{^(/tmp/[^/]+)} ]} -ls";
+
+exec "ffmpeg -y -v 0 -qscale 5 -r 20 -b 9600 -i $frames $movie >/dev/null </dev/null";

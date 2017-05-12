@@ -1,0 +1,77 @@
+Revision history for Regexp-Wildcards
+
+1.05    2013-08-24 20:15 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 1.04 can skip this update.
+        + Doc : POD headings are now properly linkable.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+        + Upd : Package metadata overhaul.
+
+1.04    2011-08-25 12:50 UTC
+        + Chg : Minor code cleanups.
+        + Fix : Use Scalar::Util::blessed() to check objects classes.
+                Scalar::Util is required.
+        + Fix : Work around Kwalitee test misfailures.
+        + Upd : The distribution metadata was updated to modern standards.
+
+1.03    2009-02-26 15:35 UTC
+        + Add : Translating both 'jokers' and 'sql' at the same time.
+        + Doc : Cleanups.
+        + Fix : The ->type forgot how to really accept $^O since the rewrite.
+                Reported by Bruce McKenzie in RT #43643.
+        + Upd : META.yml spec updated to 1.4.
+
+1.02    2008-08-23 09:15 UTC
+        + Add : The 'anchor' metacharacter class.
+
+1.01    2008-08-19 15:20 UTC
+        + Fix : Now we can do both SQL and brackets.
+        + Tst : Add tests for embedded newlines.
+
+1.00    2008-08-18 17:20 UTC
+        + Chg : Rewritten the module in an OO way. It's now easier to specify
+                what you want to translate.
+        + Tst : 100% coverage reached.
+
+0.08    2008-03-09 15:55  UTC
+        + Add : ':funcs' export tag.
+        + Doc : Copyright update.
+        + Fix : Correct dependencies listing in META.yml.
+        + Tst : Author tests overhaul.
+        + Tst : t/95-portability-files.t.
+
+0.07    2007-08-28 12:35 UTC
+        + Fix : Tests are now strict.
+        + Fix : Complete dependencies.
+
+0.06    2007-06-26 12:40 UTC
+        + Add : SQL '%' and '_' wildcards (with corresponding pod & tests).
+        + Fix : Typos in pod (looks like this will never end...).
+
+0.05    2007-06-22 14:40 UTC
+        + Add : Windows strange behaviours caveat.
+        + Chg : Simplified bracket prefix.
+        + Fix : Typos in pod.
+
+0.04    2007-06-20 19:00 UTC
+        + Add : You can supply $^O as the type for wc2re, which will wrap to
+                wc2re_win32 for 'dos', 'os2', 'MSWin32', 'cygwin', and to
+                wc2re_unix in all the other cases.
+        + Add : Generated regexps can now capture the interesting bits of the
+                wildcard expression via the configuration variables
+                $CaptureSingle, $CaptureAny and $CaptureBrackets (see pod)
+        + Add : Corresponding pod & tests
+
+0.03    2007-06-17 14:45 UTC
+        + Fix : Missing PREREQ_PM in Makefile.PL
+        + Fix : Typos in pod.
+
+0.02    2007-06-16 09:15 UTC
+        + Fix : wc2re_unix should escape top-level commas.
+        + Fix : added missing samples/wc2re.pl
+        + Add : tests descriptions in t/12-brackets.t
+
+0.01    2007-06-14
+        First version, released on an unsuspecting world.
+

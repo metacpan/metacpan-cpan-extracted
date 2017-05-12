@@ -1,0 +1,110 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Ryu::Async
+at lib/Ryu/Async.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Ryu::Async - use L<Ryu> with L<IO::Async>
+
+=head1 SYNOPSIS
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ 
+ use IO::Async::Loop;
+ use Ryu::Async;
+ 
+ use Log::Any::Adapter qw(Stdout), log_level => 'trace';
+ 
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+ 	my $ryu = Ryu::Async->new
+ );
+ 
+ {
+ 	my $timer = $ryu->timer(
+ 		interval => 0.10,
+ 	)->take(10)
+ 	 ->each(sub { print "tick\n" });
+ 	warn $timer->describe;
+ 	$timer->get;
+ }
+
+=head1 DESCRIPTION
+
+This is an L<IO::Async::Notifier> subclass for interacting with L<Ryu>.
+
+=head1 METHODS
+
+=head2 from
+
+Creates a new L<Ryu::Source> from a thing.
+
+The exact details of this are likely to change in future, but a few things that are expected to work:
+
+ $ryu->from($io_async_stream_instance)
+     ->by_line
+     ->each(sub { print "Line: $_\n" });
+ $ryu->from([1..1000])
+     ->sum
+     ->each(sub { print "Total was $_\n" });
+
+=head2 timer
+
+Provides a L<Ryu::Source> which emits an empty string at selected intervals.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * interval - how often to trigger the timer, in seconds (fractional values allowed)
+
+=item * reschedule - type of rescheduling to use, can be C<soft>, C<hard> or C<drift> as documented
+in L<IO::Async::Timer::Periodic>
+
+=back
+
+Example:
+
+ $ryu->timer(interval => 1, reschedule => 'hard')
+     ->combine_latest(...)
+
+=head2 source
+
+Returns a new L<Ryu::Source> instance.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Ryu>
+
+=item * L<IO::Async>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2017. Licensed under the same terms as Perl itself.
+

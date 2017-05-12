@@ -1,0 +1,14 @@
+<%args>
+$ARGSRef
+</%args>
+<%init>
+if ($$ARGSRef{'TimeTrackingAutomatic'} && $$ARGSRef{id} eq 'new') {
+	use Data::Dumper;
+	RT->Logger->debug(Dumper($ARGSRef));
+	my $adjustment = RT->Config->Get("TimeTrackingAdjustment") || 0;
+	my $worked = POSIX::ceil((time - $$ARGSRef{'TimeTrackingAutomatic'})/60) + $adjustment;	# at least 1 minute
+	$$ARGSRef{'TimeWorked'} = $worked;
+	RT->Logger->debug("time tracking automatic " . $$ARGSRef{'TimeTrackingAutomatic'});
+	RT->Logger->debug("time worked " . $$ARGSRef{'TimeWorked'});
+}
+</%init>

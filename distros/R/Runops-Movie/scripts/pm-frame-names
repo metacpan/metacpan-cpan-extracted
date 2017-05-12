@@ -1,0 +1,293 @@
+#!perl
+use strict;
+use warnings;
+use 5.010_000;
+use feature ':5.10';
+use Getopt::Long qw( GetOptions );
+use Runops::Movie::Util qw( pretty_size  rood );
+use File::Spec::Functions qw( catfile );
+use Carp::Always;
+use Alien::Judy;
+use Judy::Mem;
+use Judy::L;
+use Inline
+    C => 'DATA',
+    ( # Config:
+	OPTIMIZE => '-g',
+	CLEAN_AFTER_BUILD => 1,
+	INC => join( ' ',
+		     map { "-I$_" }
+		     Alien::Judy::inc_dirs()
+	),
+	LIBS => join( ' ',
+		      (
+		          map { "-L$_" }
+		          Alien::Judy::lib_dirs()
+		      ),
+		      '-lJudy'
+	),
+    );
+    
+# Read options
+#
+my ( %in, %out );
+GetOptions(
+    help         => sub { die 'pod2usage( -verbose => 2 )' },
+    'dir=s'      => \my($dir),
+    'edge=s'     => \my($in_edge),
+    'vertices=s' => \my($in_vertices),
+    'stash=s'    => \my($in_stash),
+    'function=s' => \my($in_function),
+    'name=s'     => \my($out_name),
+)
+  or die 'pod2usage( -verbose => 2 )';
+
+# --dir automagic
+#
+if ( $dir ) {
+    $in_edge     //= catfile( $dir, 'frame.edge' );
+    $in_vertices //= catfile( $dir, 'frame.vertex' );
+    $in_stash    //= catfile( $dir, 'frame.stash' );
+    $in_function //= catfile( $dir, 'frame.function' );
+    $out_name    //= catfile( $dir, 'frame.name' );
+}
+
+say "Read $in_edge (@{[ pretty_size( -s $in_edge ) ]})";
+open my($in_edge_fh), '<', $in_edge
+    or die "Can't open $in_edge: $!";
+open my($in_vertices_fh), '<', $in_vertices
+    or die "Can't open $in_vertices: $!";
+open my($ofh), '>', $out_name
+    or die "Can't open $out_name for writing: $!";
+
+sub read_names {
+    my $ifh = $_[2];
+    
+    my %names;
+    $_[1] = 0;
+    while (my $line = <$ifh>) {
+        my ( $x, $nm ) = $line =~ /^\w+\(([[:xdigit:]]+),(.*)\)\.$/
+            or die $line;
+
+        if ( $nm =~ s/^'// ) {
+            $nm =~ s/'$//;
+        }
+        $nm =~ s/\\(.)/$1/g;
+        $nm =~ s/([^`~!\@#\$%^&*()\-_=+\[{\]|;:'",<.>\/?\w]+)/sprintf "\\x%02x", ord $1/ge;
+        
+        my $num;
+        if ( exists $names{$nm} ) {
+            $num = $names{$nm};
+        }
+        else {
+            $num = 1 + keys %names;
+            $names{$nm} = $num;
+        }
+        
+        Judy::L::Set($_[1],hex "0x$x",$num);
+    }
+
+    # Copy the #->name table out
+    $_[0] = 0;
+    for ( sort { $names{$a} <=> $names{$b} } keys %names ) {
+        my $ptr = Judy::Mem::String2Ptr( pack 'i/a*', $_ );
+        Judy::L::Set($_[0],$names{$_},$ptr);
+    }
+}
+
+
+my $redgedb  = read_edge_as_redge( rood($in_edge)     );
+my $vertexdb = read_vertices(      rood($in_vertices) );
+read_names(  my($stash_numbering),    my($stashdb),    rood($in_stash) );
+read_names(  my($function_numbering), my($functiondb), rood($in_function) );
+resolve_names(
+    $redgedb,
+    $vertexdb,
+    $stash_numbering    => $stashdb,
+    $function_numbering => $functiondb,
+    $ofh );
+
+close $ofh
+    or die "Can't flush $out_name for writing: $!";
+say "Wrote $out_name (@{[ pretty_size( -s $out_name ) ]})";
+
+__DATA__
+__C__
+#include <Judy.h>
+
+#if 0
+#define MyJLG(a,b,c) do {\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d JLG(0x%x,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+    JLG(a,b,c);\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d JLG(0x%x,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+  } while (0);
+#define MyJLI(a,b,c) do {\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d JLI(0x%x,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+    JLI(a,b,c);\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d JLI(0x%x,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+  } while (0);
+#define MyJ1S(a,b,c) do {\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1S(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+    J1S(a,b,c);\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1S(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+  } while (0);
+#define MyJ1U(a,b,c) do {\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1U(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+    J1U(a,b,c);\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1U(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+  } while (0);
+#define MyJ1F(a,b,c) do {\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1F(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+    J1F(a,b,c);\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1F(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+  } while (0);
+#define MyJ1N(a,b,c) do {\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1N(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+    J1N(a,b,c);\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1N(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+  } while (0);
+#define MyJ1T(a,b,c) do {\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1T(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+    J1T(a,b,c);\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1T(%d,0x%x,0x%x)\n",__FILE__,__LINE__,a,b,c);\
+  } while (0);
+#define MyJ1FA(a,b) do {\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1FA(%d,0x%x)\n",__FILE__,__LINE__,a,b);\
+    J1FA(a,b);\
+    PerlIO_printf(PerlIO_stdout(),"%s:%d J1FA(%d,0x%x)\n",__FILE__,__LINE__,a,b);\
+  } while (0);
+#else
+#define MyJLI(a,b,c) JLI(a,b,c)
+#define MyJLG(a,b,c) JLG(a,b,c)
+#define MyJ1S(a,b,c) J1S(a,b,c)
+#define MyJ1U(a,b,c) J1U(a,b,c)
+#define MyJ1F(a,b,c) J1F(a,b,c)
+#define MyJ1N(a,b,c) J1N(a,b,c)
+#define MyJ1T(a,b,c) J1T(a,b,c)
+#define MyJ1FA(a,b)  J1FA(a,b)
+#endif
+
+void*
+read_edge_as_redge(PerlIO *fh) {
+    SV *line_sv;
+    char *line;
+    PWord_t px;
+    Word_t x, y;
+    Pvoid_t redge = 0;
+    STRLEN line_len;
+    int Rc_int;
+
+    line_sv = newSVpv("",0);
+    while (sv_gets(line_sv,fh,0)) {
+        line = SvPV(line_sv,line_len);
+        if ( 2 != sscanf(line,"edge(%x,%x).",&x,&y) ) {
+            croak(line);
+        }
+
+        MyJLI(px,redge,y);
+        *px = x;
+    }
+    SvREFCNT_dec(line_sv);
+
+    return redge;
+}
+
+void*
+read_vertices(PerlIO *fh) {
+    SV *line_sv;
+    char *line;
+    Pvoid_t vertices = 0;
+    STRLEN line_len;
+    int was_nil, x;
+
+    line_sv = newSVpv("",0);
+    while (sv_gets(line_sv,fh,0)) {
+        line = SvPV(line_sv,line_len);
+        if ( 1 != sscanf(line,"vertex(%x).",&x) ) {
+            croak(line);
+        }
+
+        MyJ1S(was_nil,vertices,x);
+    }
+    SvREFCNT_dec(line_sv);
+
+    return vertices;
+}
+
+char*
+resolve_name( void *redgedb, void *vertexdb, void *stashtbl, void *stashdb, void *functiontbl, void *functiondb, Word_t vertex) {
+    Pvoid_t todo_parent, seen_parent;
+    PWord_t pnum, pname, pparent;
+    int trash, already_seen;
+
+    /* Look upward (inclusively) from vertex to find a parent that has a name */
+    todo_parent = seen_parent = 0;
+    MyJ1S( trash, todo_parent, vertex );
+
+    do {
+        /* Shift a vertex off the todo list */
+        vertex = 0;
+        MyJ1F( trash, todo_parent, vertex );
+        MyJ1U( trash, todo_parent, vertex );
+
+        /* Look up this vertex in the function db */
+        MyJLG( pnum, functiondb, vertex );
+        if ( pnum ) {
+            MyJLG( pname, functiontbl, *pnum );
+            if ( ! pname ) croak("zomg");
+            MyJ1FA( trash, todo_parent );
+            MyJ1FA( trash, seen_parent );
+            return (char*)*pname;
+        }
+
+        /* Look up this vertex in the stash db */
+        MyJLG( pnum, stashdb, vertex );
+        if ( pnum ) {
+            MyJLG( pname, stashtbl, *pnum );
+            if ( ! pname ) croak("wtfbbz");
+            MyJ1FA( trash, todo_parent );
+            MyJ1FA( trash, seen_parent );
+            return (char*)*pname;
+        }
+
+        /* Add this node's parent to the todo list */
+        MyJLG( pparent, redgedb, vertex);
+        if ( pparent ) {
+            already_seen = 0;
+            MyJ1T( already_seen, seen_parent, *pparent );
+            if ( ! already_seen ) {
+                MyJ1S( trash, seen_parent, *pparent );
+                MyJ1S( trash, todo_parent, *pparent );
+            }
+        }
+    } while ( todo_parent);
+
+    /* Discard my bookkeeping */
+    MyJ1FA( trash, seen_parent );
+    MyJ1FA( trash, todo_parent );
+
+    return NULL;
+}
+
+void
+resolve_names( void *redgedb, void *vertexdb, void *stashtbl, void *stashdb, void *functiontbl, void *functiondb, PerlIO *fh) {
+    char *name;
+    Word_t vertex;
+    int read_a_vertex;
+    STRLEN name_len;
+
+    /* For all vertices */
+    read_a_vertex = vertex = 0;
+    MyJ1F( read_a_vertex, vertexdb, vertex );
+    while ( read_a_vertex ) {
+        name = resolve_name( redgedb, vertexdb, stashtbl, stashdb, functiontbl, functiondb, vertex );
+        if ( name ) {
+            PerlIO_printf(fh,"name(%x,\"",vertex);
+            PerlIO_write(fh,name+sizeof(int),*name);
+            PerlIO_puts(fh,"\").\n");
+        }
+
+        /* Continue looking for another vertex */
+        MyJ1N( read_a_vertex, vertexdb, vertex );
+    }
+}

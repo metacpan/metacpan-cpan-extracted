@@ -1,0 +1,37 @@
+[%|l(path, revision)%]browsing %1 (of revision %2)[%END%]
+<a href="[% script %]/[% repos %]/log[% path %]">[%|l%](history of this directory)[%END%]</a>
+[% IF branchto %]
+<hr>
+[%|l%]Branch to:[%END%]
+[% FOR branchto %]
+<a href="[% script %]/[% repos %]/browse[% dst %]">[% dst %]</a>:
+<a href="[% script %]/[% repos %]/revision/?rev=[% dstrev %]">[% dstrev %]</a> [%|l(srcrev)%](from revision %1)[%END%]
+[% END %]
+[% END %]
+[% IF branchfrom %]
+<hr>
+[%|l%]Branch from:[%END%]
+[% FOR branchfrom %]
+<a href="[% script %]/[% repos %]/browse[% src %]">[% src %]</a>:[% srcrev %] <a href="[% script %]/[% repos %]/revision/?rev=[% dstrev %]">[%|l(dstrev)%](to revision %1)[%END%]</a>
+[% END %]
+[% END %]
+<table border=0 width="90%" class="entries">
+<tr><td>[%|l%]name[%END%]</td><td>[%|l%]revision[%END%]</td><td>[%|l%]age[%END%]</td><td>[%|l%]size[%END%]</td></tr>
+[% FOREACH entries %]
+<tr>
+<td class="name">
+[% IF isdir %]
+<img border="0" src="/icons/dir.gif" />
+<a href="[% script %]/[% repos %]/browse[% path %][% name %]/">[% name %]</a>
+[% ELSE %]
+<a href="[% script %]/[% repos %]/checkout[% path %][% name %]?rev=[% rev %]"><img border="0" src="/icons/[% type || 'text' %].gif" /></a>
+<a href="[% script %]/[% repos %]/log[% path %][% name %]">[% name %]</a>
+[% END %]</td>
+<td class="revision">[% rev %]</td>
+<td class="age"></td>
+<td class="size">[% size %]</td>
+</tr>
+[% END %]
+
+</table>
+

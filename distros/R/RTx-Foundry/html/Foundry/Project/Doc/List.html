@@ -1,0 +1,19 @@
+<%INIT>
+our ($Get, $Post, $ua, $wws);
+my $args = { map { $_ => Encode::encode_utf8($ARGS{$_}) } grep !ref($ARGS{$_}), keys %ARGS };
+
+return unless ($r->path_info =~ m{^/?(.*)});
+my $remote = $1;
+
+if ($ENV{REQUEST_METHOD} =~ /post/i) {
+    my $out = $Post->("$remote?action=$args->{action}&page=$args->{page}", $args);
+    $m->print($out);
+}
+else {
+    require URI;
+    my $url = URI->new('http:');
+    $url->query_form(%$args);
+    my $out = $Get->("$remote?" . $url->query);
+    $m->print($out);
+}
+</%INIT>

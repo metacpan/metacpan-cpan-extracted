@@ -1,0 +1,51 @@
+=head1 NAME
+
+Repository::Simple::Type - Summary of the typing system
+
+=head1 DESCRIPTION
+
+The typing system provides a rich set of descriptions for the nature of nodes on several different levels. Since there are three levels to this system, I will try to give an overview here to hopefully head off any confusion.
+
+There are three levels in the type system. From highest to lowest, the levels are:
+
+=over
+
+=item 1.
+
+B<Node Type.> Node types are represented by L<Repository::Simple::Type::Node>. These define the overall organization of nodes in the system. A node is a collection of child nodes and properties. A node type determines what structures are expected or permissible for nodes.
+
+=item 2.
+
+B<Property Type.> Property types are represented by L<Repository::Simple::Type::Property>. These define the overall nature of each property. A property is a key/value pair. A property type determines what type is expected for a given property value and if that property can be added, changed, or removed.
+
+=item 3.
+
+B<Value Type.> Value types are represented by L<Repository::Simple::Type::Value>. These define the acceptable format and storage of values.
+
+=back
+
+See the documentation associated with each of the above for details.
+
+=head1 SEE ALSO
+
+L<Repository::Simple::Type::Node>, L<Repository::Simple::Type::Property>, L<Repository::Simple::Type::Value>
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp, E<lt>hanenkamp@cpan.orgE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2006 Andrew Sterling Hanenkamp E<lt>hanenkamp@cpan.orgE<gt>.  All 
+Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.
+
+=cut
+
+1

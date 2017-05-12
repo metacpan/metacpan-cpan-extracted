@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Rest/Client/Builder.pm
+t/0000_use.t
+t/0001_new.t
+t/0003_inheritance.t

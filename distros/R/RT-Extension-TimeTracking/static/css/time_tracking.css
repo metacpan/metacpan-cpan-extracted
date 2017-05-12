@@ -1,0 +1,39 @@
+div.time_tracking {
+    clear: both;
+    margin-right: 20px;
+}
+
+div.day_entry {
+    clear: both;
+    position: relative;
+}
+
+div.day_entry .update-time {
+    white-space: nowrap;
+}
+
+div.submit_day_time_button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+div.time_worked_day {
+    position: absolute;
+    bottom: -20px;
+    right: 5px;
+}
+
+div.time_worked_week {
+    text-align: right;
+}
+
+div.add_new_time_entry {
+    text-align: left;
+}
+
+div.time_tracking h2 {
+    text-align: left;
+    margin-top: 30px;
+}
+

@@ -1,0 +1,22 @@
+# -----------------------------------------------------------------------------
+#
+#   DOMAIN_CONFIG: Data source definitions used to build data source registry
+#                  (custom representation for SQLite)
+# -----------------------------------------------------------------------------
+# The following representation is recognized by an alternative
+# Rose::DBx::RegistryConfig domain parser (which knows that unspecified database
+# names are derived from type names with prefixes and suffixes added):
+dev-local-sqlite:
+    defaults:
+        driver:         sqlite
+        host:           localhost
+        connect_options:
+                        ShowErrorStatement: 0
+        database:
+                        db_prefix: t/db/
+                        db_suffix: .sqlite
+    taxonomy:
+    art_gallery:
+    some_other_db1:
+    some_other_db2:
+    some_other_db3:

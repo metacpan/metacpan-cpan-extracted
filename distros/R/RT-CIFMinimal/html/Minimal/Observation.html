@@ -1,0 +1,18 @@
+<& Elements/Header, Title => $Title &>
+
+% if($assessment || $advanced){
+<& Elements/Observation, %ARGS &>
+% } else {
+<& Elements/ObservationSimple, %ARGS &>
+% }
+
+<%init>
+my $Title = loc('New Observation');
+$Title .= ' -- '.$assessment if($assessment);
+</%init>
+
+<%ARGS>
+$advanced => undef
+$assessment => undef
+</%ARGS>
+

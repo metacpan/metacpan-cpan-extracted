@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+#
+# rtsp-request: Command Line RTSP Tool 0.1
+# http://www.kosho.org/tools/rtsp-request/
+# 
+
+$|=0;
+my $VERSION=0.1;
+
+use Getopt::Std;
+use RTSP::Lite;
+
+getopts('cbdphvm:');
+
+$url = $ARGV[0];
+
+if ($opt_h) {
+    print STDERR "Command Line RTSP tool $VERSION\n";
+    print STDERR "Usage: rtsp-request [OPTION]... -m method-name URL [optional-request-header]...\n";
+    print STDERR "  -m method-name (OPTIONS, DESCRIBE, SETUP, PLAY, ...)\n";
+    print STDERR "  -c display response code and message\n";
+    print STDERR "  -b display received response body\n";
+    print STDERR "  -p display received response headers\n";
+    print STDERR "  -v display separators\n";
+    print STDERR "  -d display network read and write (debug)\n";
+    print STDERR "  -h display help\n";
+    print STDERR "  optional-request-header, cf. \"User-Agent=rtsp-request\"\n";
+    print STDERR "  return-code, 0: response code is 200, -1: others\n";
+    exit (0);
+}
+
+($protocol,$host,$junk,$port,$object) = 
+    $url =~ /^([^:\/]+):\/\/([^\/:]*)(:(\d+))?(\/.*)$/;
+
+if (!defined($port)) {
+  $port = 554;
+}
+
+if ($protocol ne "rtsp") {
+  print STDERR "This tool only supports rtsp \n";
+  exit (-1);
+}
+
+$rtsp = new RTSP::Lite;
+
+if ($opt_d) {
+  $rtsp->debug(1);
+}
+
+if (!($req = $rtsp->open($host,$port))) {
+  print "Unable to open: $!\n";
+  exit (0);
+}
+
+$rtsp->method($opt_m);
+$rtsp->user_agent("rtsp-request:$VERSION");
+
+shift @ARGV;
+
+while ($header_string = shift @ARGV) {
+  ($header, $param) = $header_string =~ /^([^=]+)=(.*)/;
+  $rtsp->add_req_header($header,$param);
+}
+
+
+$rtsp->request($url);
+
+if ($opt_c) {
+    if ($opt_v) {
+	print "--- Status ---\n";
+    }
+    print $rtsp->status." ".$rtsp->status_message();
+}
+
+if ($opt_p) {
+  my @headers = $rtsp->headers_array();
+
+  if ($opt_v) {
+      print "--- Received Headers ---\n";
+  }
+  foreach $header (@headers)
+  {
+    print "$header\n";
+  }
+}
+
+if ($opt_b) {
+    if ($opt_v) {
+	print "--- Received Body ---\n";
+    }
+    print $rtsp->body();
+}
+
+exit(0);
+
+
+

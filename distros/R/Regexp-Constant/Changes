@@ -1,0 +1,6 @@
+Revision history for Perl extension Regexp::Constant.
+
+0.01  Mon Oct 25 12:28:08 2004
+	- original version; created by h2xs 1.22 with options
+		-X Regexp::Constant
+

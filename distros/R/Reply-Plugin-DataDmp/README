@@ -1,0 +1,36 @@
+NAME
+    Reply::Plugin::DataDmp - Format results using Data::Dmp
+
+VERSION
+    This document describes version 0.01 of Reply::Plugin::DataDmp (from
+    Perl distribution Reply-Plugin-DataDmp), released on 2014-12-01.
+
+SYNOPSIS
+     ; .replyrc
+     [DataDmp]
+
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Reply-Plugin-DataDmp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Reply-Plugin-DataDmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Reply-Plugin-DataDmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

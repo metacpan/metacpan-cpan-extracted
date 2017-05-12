@@ -1,0 +1,16 @@
+Changes
+lib/Redis/DistLock.pm
+Makefile.PL
+MANIFEST
+README.md
+t/000_load.t
+t/001_repeat.t
+t/002_timeout.t
+t/003_workers.t
+t/004_release.t
+t/005_version.t
+t/006_quorum.t
+t/007_logger.t
+t/008_extend.t
+t/lib/My/Redis.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+<%ARGS>
+$Ticket => undef
+$actions => {}
+</%ARGS>
+<%INIT>
+return unless $Ticket;
+return unless $Ticket->CurrentUserHasRight('ModifyTicket');
+
+my $current = $Ticket->QueueObj;
+
+my @queues = RT::Extension::MoveRules->Possible(
+    Ticket => $Ticket, WithAction => 1, SkipThis => 1,
+);
+
+my $i = 0;
+foreach my $qid ( @queues ) {
+    my $queue  = RT::Queue->new( $session{'CurrentUser'} );
+    $queue->Load( $qid );
+    unless ( $queue->id ) {
+        $RT::Logger->error(
+            "Not existing queue '$qid'"
+            ." listed in \@MoveRules option"
+        );
+        next;
+    }
+    next unless $queue->CurrentUserHasRight('CreateTicket');
+
+    my ($status, $msg) = RT::Extension::MoveRules->CheckPossibility(
+        From => $current, To => $queue,
+        Ticket => $Ticket,
+    );
+    next unless $status;
+    ($status, $msg) = RT::Extension::MoveRules->CheckRule(
+        From => $current, To => $queue,
+        Ticket => $Ticket,
+    );
+    next unless $status;
+
+    $actions->{ 'Q'. $i++ } = {
+        title => loc('to [_1]', $queue->Name),
+        path  => "Ticket/Display.html?id=". $Ticket->id ."&Queue=" . $queue->id,
+    };
+}
+</%INIT>

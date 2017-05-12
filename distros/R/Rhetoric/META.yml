@@ -1,0 +1,45 @@
+---
+abstract: 'a simple blogging system for perl'
+author:
+  - 'John BEPPU <beppu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Rhetoric
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  CGI: 1.30
+  Data::Page: 0
+  File::Find::Rule: 0
+  File::Path::Tiny: 0
+  File::Which: 0
+  IO::All: 0
+  Memoize: 0
+  Method::Signatures::Simple: 0
+  Module::Find: 0
+  Ouch: 0.03
+  Pod::Simple: 0
+  Squatting: 0.81
+  Squatting::On::PSGI: 0.05
+  Template: 0
+  Text::Markdown: 0
+  Text::Textile: 0
+  Try::Tiny: 0
+  XML::Atom: 0
+  aliased: 0
+  common::sense: 0
+  perl: 5.10.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.06

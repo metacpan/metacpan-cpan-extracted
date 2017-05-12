@@ -1,0 +1,17 @@
+---
+abstract: 'Resource::Pack resource for the jQuery Javascript library'
+author:
+  - 'Jesse Luehrs <doy at tozt dot net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.100960'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Resource-Pack-jQuery
+recommends: {}
+requires:
+  Resource::Pack: 0.01
+version: 0.01

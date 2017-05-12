@@ -1,0 +1,300 @@
+NAME
+    Resource::Loader - Load different resources depending...
+
+SYNOPSIS
+      use Resource::Loader;
+
+      $loader = Resource::Loader->new(
+        testing => 0,
+        verbose => 0,
+        cont    => 0,
+        resources =>
+          [
+            { name => 'never',
+              when => sub { 0 },
+              what => sub { die "this will never be loaded" },
+            },
+            { name => 'sometimes 50%',
+              when => sub { int rand 2 > 0 },
+              what => sub { "'sometimes' was loaded. args: [@_]" },
+              whatargs => [ qw/foo bar baz/ ],
+            },
+            { name => 'sometimes 66%',
+              when => sub { int rand @_ },
+              whenargs => [ 0, 1, 2 ],
+              what => sub { "'sometimes' was loaded. args: [@_]" },
+              whatargs => [ qw/foo bar baz/ ],
+            },
+            { name => 'always',
+              when => sub { 1 },
+              what => sub { "always' was loaded" },
+            },
+          ],
+      );
+
+      $loaded = $loader->load;
+      $status = $loader->status;
+
+DESCRIPTION
+    Resource::Loader is simple at its core: You give it a list of resources.
+    Each resource knows when it should be triggered and if it's triggered,
+    will run its code segment.
+
+    Both the *when* and the *what* are coderefs, so you can be as devious as
+    you want in determining when a resource will be loaded and what,
+    exactly, it does.
+
+    I originally wrote this to solve a simple problem but realized that the
+    class is probably applicable to a whole slew of problems. I look forward
+    to hearing to what devious ends you push this module. Really, send me an
+    email - I love hearing about people using my toys.
+
+    Want to know what my 'simple problem' was? See the EXAMPLES.
+
+METHODS
+  new()
+    Create a new object.
+
+      $loader = Resource::Loader->new(
+        testing => 0,
+        verbose => 0,
+        cont    => 0,
+        resources =>
+          [
+            { name => 'never',
+              when => sub { 0 },
+              what => sub { die "this will never be loaded" },
+            },
+            { name => 'sometimes 50%',
+              when => sub { int rand 2 > 0 },
+              what => sub { "'sometimes' was loaded. args: [@_]" },
+              whatargs => [ qw/foo bar baz/ ],
+            },
+            { name => 'sometimes 66%',
+              when => sub { int rand @_ },
+              whenargs => [ 0, 1, 2 ],
+              what => sub { "'sometimes' was loaded. args: [@_]" },
+              whatargs => [ qw/foo bar baz/ ],
+            },
+            { name => 'always',
+              when => sub { 1 },
+              what => sub { "always' was loaded" },
+            },
+          ],
+      );
+
+    Note: *testing*, *verbose*, *cont* all default to zero.
+
+  resources()
+    What to run and when to run it.
+
+      # arrayref style
+      $loader->resources(
+        [
+         { name => 'never',
+           when => sub { 0 },
+           what => sub { die "this will never be loaded" },
+         },
+         { name => 'sometimes 50%',
+           when => sub { int rand 2 > 0 },
+           what => sub { "'sometimes' was loaded. args: [@_]" },
+           whatargs => [ qw/foo bar baz/ ],
+         },
+         { name => 'sometimes 66%',
+           when => sub { int rand @_ },
+           whenargs => [ 0, 1, 2 ],
+           what => sub { "'sometimes' was loaded. args: [@_]" },
+           whatargs => [ qw/foo bar baz/ ],
+         },
+         { name => 'always',
+           when => sub { 1 },
+           what => sub { "always' was loaded" },
+         }
+        ]
+       );
+
+      # list style
+      $loader->resources(
+         { name => 'never',
+           when => sub { 0 },
+           what => sub { die "this will never be loaded" },
+         },
+         { name => 'sometimes 50%',
+           when => sub { int rand 2 > 0 },
+           what => sub { "'sometimes' was loaded. args: [@_]" },
+           whatargs => [ qw/foo bar baz/ ],
+         },
+         { name => 'sometimes 66%',
+           when => sub { int rand @_ },
+           whenargs => [ 0, 1, 2 ],
+           what => sub { "'sometimes' was loaded. args: [@_]" },
+           whatargs => [ qw/foo bar baz/ ],
+         },
+         { name => 'always',
+           when => sub { 1 },
+           what => sub { "always' was loaded" },
+         }
+       );
+
+    Each resource is a hashref that takes the same arguments:
+
+    name      what is this resource called?
+
+    when      a coderef that controls whether the resource will be activated
+
+    whenargs  an optional arrayref of arguments that are passed to the
+              *when*.
+
+    what      a coderef that is only run if the *when* coderef returns true
+
+    whatargs  an optional arrayref of arguments that are passed to the
+              *what*.
+
+    Note: using colons in your *name*s is not recommended. It will break the
+    $ENV{RMSTATES} handling. Keep It Simple.
+
+  load()
+      $loaded = $loader->load;
+
+    Load the resources.
+
+    Walks through the resources() in order. For each resource, if the *when*
+    coderef returns true, then the *what* coderef will be run as well.
+
+    That behaviour can be changed with the cont() and testing() methods as
+    well as the analagous *RMCONT* and *RMTESTING* environment variables.
+
+    load() returns the output of loaded(); a hashref of *name*s that loaded
+    successfully and the respective return values.
+
+    Note: Running this method will overwrite any preexisting status() and
+    loaded() tables with current info.
+
+    Note: Don't confuse this with loaded(). load() loads the resources,
+    loaded() tells you what loaded.
+
+  cont()
+      $will_continue = $loader->cont( 1 );
+      $will_continue = $loader->cont( 0 ); # default
+      $will_continue = $loader->cont;
+
+    Do you want to continue loading resources after the first one is loaded?
+    Sometimes you want the first successful resource to load and then skip
+    all the others. That's the default behaviour. If you set cont() to 1,
+    then load() will keep checking (and loading resources).
+
+    When true, all states with true *when* coderefs will be loaded.
+
+    When false, execution of states will stop after the first. (default)
+
+    The *RMCONT* environment variable value takes precedence to any value
+    that this method is set to.
+
+    cont() will return true if either *$ENV{RMCONT}* or this method has been
+    set to true.
+
+  testing()
+      $is_testing = $loader->testing( 1 );
+      $is_testing = $loader->testing( 0 ); # default
+      $is_testing = $loader->testing;
+
+    When true, don't actually run the *what* resources.
+
+    When false, it will.
+
+    The *RMTESTING* environment variable value takes precedence to any value
+    that this is set to. It will return true if either *$ENV{RMTESTING}* or
+    this method has been set to true.
+
+    When testing() is on, status() results will be set to *skipped* if the
+    *when* coderef if true but the *what* coderef wasn't run.
+
+  verbose()
+      $is_verbose = $loader->verbose( 1 );
+      $is_verbose = $loader->verbose( 0 ); # default
+      $is_verbose = $loader->verbose;
+
+    When true, print internal processing messages to STDOUT
+
+    When false, run quietly.
+
+    The *RMVERBOSE* environment variable value takes precedence to any value
+    that this is set to. It will return true if either *$ENV{RMVERBOSE}* or
+    this method has been set to true.
+
+  status()
+      $status = $loader->status;
+
+    Returns a hashref of which resources loading stati. Maps *name*s to one
+    of these values: Don't forget to call load() first!
+
+    loaded    The *when* succeeded so *what* was run
+
+    skipped   *$ENV{RMSTATES}* is defined but this state *name* wasn't isn't
+              in it so neither *when* nor *what* was run
+
+    notrun    *when* succeeded and but *what* wasn't run because we're in
+              testing mode.
+
+    inactive  *what* wasn't run.
+
+  loaded()
+      $loaded = $loader->loaded;
+
+    Returns a hashref that maps state *name*s to the return values of loaded
+    resources.
+
+    Note: Don't confuse this with load(). load() loads the resources,
+    loaded() tells you what loaded.
+
+  env()
+      $env = $loader->env;
+
+    Returns a hashref of the Resource::Loader-related environment variables
+    and their current values. Probably only useful for debugging.
+
+ENVIRONMENT
+    Use these environment variables to override the local behavior of the
+    object (e.g. to test your Resource::Loader's responses)
+
+  RMSTATES
+    Colon-separated list of states to run resources for. The *when* coderefs
+    won't even be run if the state *name*s aren't listed here.
+
+  RMCONT
+    See cont()
+
+  RMTESTING
+    See testing()
+
+  RMVERBOSE
+    See verbose()
+
+EXAMPLES
+    I originally wrote this to handle our software deployment needs. The
+    software starts its life on our development machine. From there, it's
+    pushed to a test machine. If it tests clean there, we pushed it to one
+    or more production machine(s). The test and production machines are
+    supposed to be as similar as possible to prevent surprises when the
+    software hits production.
+
+    We don't want to mix environments by, say, testing code on the dev box
+    with the production database. Accidentally mangling a production
+    database would be, how you say, dumb.
+
+    The source code for this is in the examples/ directory.
+
+    There are other examples in that directory, check them out!
+
+SEE ALSO
+    Abstract Factory design pattern. This isn't a factory but it's similar.
+
+AUTHOR
+    Joshua Keroes, <skunkworks@eli.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Joshua Keroes
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,5 @@
+快紀 (Kwiki) 能夠備份每一次的頁面變更，所以妳可以很輕易地就把每一個頁面回復成早先的版本。目前唯一的備份模組是 CGI::Kwiki::Backup::Rcs ，這個模組使用 RCS 來備份。大致上任何當前的 Unix 系統裡都可以找到 RCS 。
+
+[備份快紀]預設並不會啟用。如果妳要啟用這個功能的話，請編輯妳的 config.yaml 檔案，然後加入這一列：
+
+    backup_class: CGI::Kwiki::Backup::Rcs

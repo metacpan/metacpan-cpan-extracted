@@ -1,0 +1,26 @@
+---
+abstract: 'Refine an instance with new methods'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Refine
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 0
+resources:
+  bugtracker: https://github.com/jhthorsen/refine/issues
+  homepage: https://github.com/jhthorsen/refine
+  repository: https://github.com/jhthorsen/refine.git
+version: 0.01

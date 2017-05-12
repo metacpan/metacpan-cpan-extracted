@@ -1,0 +1,25 @@
+=for layout widget
+
+[% label %] [% field %] [% message %]
+
+=for layout field
+
+TODO
+
+=for layout label
+
+<!-- This conditional goes away when mst comes up with something better -->
+[% content_str = GET content; %]
+[% IF content_str.length; %]
+  <span class="time_range_label"><label> [% content_str | html %]: </label></span>
+[% END; %]
+
+=for layout message
+
+<!-- This conditional goes away when mst comes up with something better -->
+[% content_str = GET content; %]
+[% IF content_str.length; %]
+  <span class="time_range_message"> [% content_str | html %] </span>
+[% END %]
+
+=cut

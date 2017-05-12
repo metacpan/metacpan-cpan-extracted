@@ -1,0 +1,40 @@
+/.cvsignore/1.1/Mon Jun 17 10:51:50 2002//
+/AUTHORS/1.2/Mon Jun 17 16:06:57 2002//
+/fraenkel_compress.c/1.2/Thu Aug 28 13:35:14 2003//
+/rdfstore_ap_sha1.c/1.1/Mon May  5 17:57:39 2003//
+/sfl-license.txt/1.1/Sun Aug 10 22:44:27 2003//
+/sflcomp.c/1.2/Tue Aug 12 14:37:57 2003//
+/typemap/1.8/Sun Dec 12 17:07:52 2004//
+D/dbms////
+D/doc////
+D/include////
+D/lib////
+D/samples////
+D/t////
+D/test////
+D/utils////
+D/vocabularies////
+/CHANGES/1.71/Mon Jun 19 10:10:21 2006//
+/INSTALL/1.8/Mon Jun 19 10:10:21 2006//
+/LICENSE/1.4/Mon Jun 19 10:10:21 2006//
+/Makefile.PL/1.61/Mon Jun 19 10:10:21 2006//
+/RDFStore.pm/1.5/Mon Jun 19 10:00:51 2006//
+/RDFStore.xs/1.59/Mon Jun 19 10:00:51 2006//
+/README/1.7/Mon Jun 19 10:10:21 2006//
+/TODO/1.9/Mon Jun 19 10:00:51 2006//
+/VERSION/1.5/Mon Jun 19 10:00:51 2006//
+/arch_conf.in/1.6/Mon Jun 19 10:00:51 2006//
+/backend_bdb_store.c/1.21/Mon Jun 19 10:10:21 2006//
+/backend_caching_store.c/1.13/Mon Jun 19 10:10:21 2006//
+/backend_dbms_store.c/1.10/Mon Jun 19 10:10:21 2006//
+/my_compress.c/1.5/Mon Jun 19 10:10:21 2006//
+/rdfstore_bits.c/1.16/Mon Jun 19 10:10:21 2006//
+/rdfstore_compress.c/1.12/Mon Jun 19 10:10:21 2006//
+/rdfstore_digest.c/1.12/Mon Jun 19 10:10:21 2006//
+/rdfstore_flat_store.c/1.25/Mon Jun 19 10:10:21 2006//
+/rdfstore_iterator.c/1.16/Mon Jun 19 10:10:21 2006//
+/rdfstore_kernel.c/1.113/Mon Jun 19 10:10:21 2006//
+/rdfstore_log.c/1.7/Mon Jun 19 10:10:22 2006//
+/rdfstore_serializer.c/1.9/Mon Jun 19 10:10:22 2006//
+/rdfstore_utf8.c/1.7/Mon Jun 19 10:10:22 2006//
+/rdfstore_xsd.c/1.2/Mon Jun 19 10:00:51 2006//

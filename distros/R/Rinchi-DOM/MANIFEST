@@ -1,0 +1,9 @@
+Changes
+lib/Rinchi/DOM.pm
+Makefile.PL
+MANIFEST
+README
+t/Rinchi-DOM.t
+test.pl
+test_src/bisect.f90
+META.yml                                 Module meta-data (added by MakeMaker)

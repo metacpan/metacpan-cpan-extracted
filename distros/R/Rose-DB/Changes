@@ -1,0 +1,591 @@
+0.778 (06.28.2016) - John Siracusa <siracusa@gmail.com>
+
+    * Added mysql_enable_utf8mb4 attribute. (Patch by Alexander Karelas.)
+    * Updated tests for the latest versions of MySQL and DateTime::Format::Pg.
+
+0.777 (03.17.2015) - John Siracusa <siracusa@gmail.com>
+
+    * Updated more project URLs.
+
+0.776 (03.17.2015) - John Siracusa <siracusa@gmail.com>
+
+    * Updated project URLs.
+
+0.775 (01.18.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Improved automated installation detection (RT 92254)
+
+0.774 (11.01.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed typos.
+
+0.773 (10.28.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed bad skip count on test file.
+
+0.772 (10.28.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused nested arrays to be incorrectly formatted by 
+      Rose::DB::Pg's format_array() method.  (Patch by Brian Duggan.)
+    * Updated contributors list.
+
+0.771 (08.04.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Documented the behavior of the dsn attribute when it has an explicit
+      value and attributes that contribute to the dsn are also set (RT 87487)
+
+0.770 (11.24.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed "DBD::Informix::st execute failed: SQL: -255: Not in transaction"
+      errors in the test suite.  (Patch by Sergey Leschenko.)
+
+0.769 (05.25.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed (more) test failures due to DBD::SQLite not being installed.
+
+0.768 (05.12.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed test failures due to DBD::SQLite not being installed.
+
+0.767 (05.01.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed some bugs that could cause connect_options not to be honored.
+    * Fixed some incorrectly failing handle_error tests.
+    * Updated Rose::DB::Oracle to honor NLS_*_FORMAT environment variables
+      for dates.
+
+0.766 (01.05.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed tests that might try to load DBD::* modules that aren't installed.
+
+0.765 (01.04.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Added handle_error attribute (RT 63377)
+    * Added mysql_bind_type_guessing attribute.
+    * Added sqlite_unicode attribute.
+
+0.764 (10.18.2011) - John Siracusa <siracusa@gmail.com>
+
+    * Use ENGINE=InnoDB instead of TYPE=InnoDB in MySQL table creation
+      statements to avoid an incompatibility with MySQL 5.5 (RT 71757)
+
+0.763 (12.30.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Support for Rose::DB::Object 0.794
+    * Return from rollback() early if AutoCommit is set.
+
+0.762 (06.23.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Support for Rose::DB::Object 0.789.
+
+0.761 (05.22.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Support for Rose::DB::Object 0.788.
+    * Detect and report problems caused by DBD::mysql versions that fail to
+      set the Active database handle attribute back to a true value when
+      mysql_auto_reconnect is set.  (Reported by Matt S. Trout and Kostas
+      Chatzikokolakis)
+
+0.760 (04.28.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Moved version number back to three places after the decimal in order to
+      placate Unix package management systems.  (Suggested by Matt S. Trout)
+
+0.7591 (04.27.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected skip counts in MySQL tests.
+
+0.759 (04.27.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed some inheritance dead ends (Reported by Matt S. Trout)
+    * Corrected parse_array()'s value unescaping (RT 56112)
+    * Added timestamp with time zone parsing/formating methods.
+    * Improved Oracle date/time parsing and formatting.
+    * DateTime::Format::Oracle is now a prerequisite (see above).
+
+0.758 (01.26.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Added workaround for DateTime::Duration bug (RT 53985) 
+
+0.757 (01.23.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Support for Rose::DB::Object 0.786.
+
+0.756 (12.31.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Support for Rose::DB::Object 0.785.
+    * Made fork- and thread-safe (though some databases, notably Oracle, 
+      don't support passing a database connection across a fork at all).
+    * Updated mysql_enable_utf8() to run "SET NAMES utf8" id a database
+      handle already exists.
+    * Updated the various validate_*_keywords() methods to no longer accept
+      anything that "looks like a function call."  This was done to avoid 
+      possible SQL injection attacks, and because the now-pervasive support
+      for scalar-reference literals in Rose::DB::Object obviates the need 
+      for such permissive SQL inlining.  To restore the old behavior, use
+      the default_keyword_function_calls() class method or the 
+      keyword_function_calls() object method.
+
+0.755 (10.16.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug in Rose::DB::Oracle that caused the port to be omitted
+      from the DSN.  (Reported by llama)
+    * Updated eval blocks to avoid stomping on $@ from an outer scope.
+
+0.754 (09.14.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Removed outdated warning about Oracle support.
+    * Clarified the return value and error handling for do_transaction().
+
+0.753 (07.09.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Detect enum-like columns in PostgreSQL.  (RT 46214)
+    * Added support for the "sslmode" DSN option for PostgreSQL.
+      (Reported by foudfou)
+
+0.752 (05.08.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Added workaround for the lack of getpwuid() on Windows.
+    * SQLite column and table names are now properly unquoted when
+      necessary.  (RT 45836)
+    * Indicate that MySQL 5.0.45 and later supports selecting from
+      a subselect.
+
+0.751 (04.19.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Worked around a mod_perl 2 issue related to PerlOptions +Parent
+      http://bit.ly/160jLN (Reported by Anton)
+    * Updated test suite to consider DBD::SQLite 1.19+ non-broken.
+
+0.750 (02.26.2009) - Peter Karman <perl@peknet.com>
+
+    * Added pg_enable_utf8 attribute.
+
+0.749 (12.12.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for many more registry entry attributes.
+    * More mod_perl 2.x fixes for Rose::DB::Cache. (Reported by 
+      Kostas Chatzikokolakis)
+    * Added apache_has_started attribute to Rose::DB::Cache to support
+      mod_perl 2.x users who do not have the ability to run code on
+      server startup.  (Suggested by Kostas Chatzikokolakis)
+
+0.748 (12.09.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed mod_perl 2.x support in Rose::DB::Cache. (Reported by 
+      Kostas Chatzikokolakis)
+    * Resolved ambiguous driver_class link in POD.
+
+0.747 (10.22.2008) - Justin Ellison <justin@techadvise.com>
+
+    * Changed to require YAML instead of YAML::Syck, though YAML::Syck
+      will be used in preference to YAML if it's present.  (RT 31535)
+
+0.746 (09.16.2008) - Justin Ellison <justin@techadvise.com>
+
+    * Fixed support for TIMESTAMP WITH TIME ZONE column in Oracle.
+
+0.745 (09.12.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for Oracle date/time column keywords.
+    * Added methods to list cached db entries and keys.
+
+0.744 (05.28.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added fixup() class method call to auto_load_fixups().
+      (Suggested by Justin Ellison)
+    * Skip the interactive part of the test suite when the
+      AUTOMATED_TESTING environment variable is set.
+
+0.743 (04.02.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed some warnings and made nice with the CPAN version extractor.
+
+0.742 (04.01.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added warning for ancient DBD::mysql versions.
+    * Support for Rose::DB::Object 0.769.
+
+0.741 (02.25.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Changed mailing list URLs.
+
+0.740 (02.15.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for Rose::DB::Object 0.767's new hints features.
+
+0.739 (02.08.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Caching of db objects during mod_perl server start-up is now turned
+      off by default, with new API to turn it back on and do the necessary
+      pre-fork clean-up that this entails.  This change solved a segmentation
+      fault problem triggered in DBD::Informix when database handles created
+      in the parent were not properly disconnected prior to the first fork of
+      the apache process.
+
+0.738 (02.06.2008) - John Siracusa <siracusa@gmail.com>
+
+    * The Informix INT8 column type is now detected and mapped to "bigint"
+      on behalf of Rose::DB::Object.
+    * Fixed a bug that prevented format_array() and parse_array() from
+      correctly handling arrays containing undef or NULL, respectively.
+      (Reported by Derek Watson)
+
+0.737 (12.13.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Altered the behavior of connect() and disconnect() to account
+      for the possibility that dbi_connect() may return a DBI $dbh
+      that is already connected and has already been initialized.
+    * Added optional (on by default) coercion of column type metadata
+      from (big)int auto-increment to (big)serial for MySQL and SQLite.
+    * Added support for the current_timestamp keyword to SQLite.
+    * Added a dozen or so new MySQL connection attributes that must be
+      inlined into the DSN rather than passed as connect() options.
+
+0.736 (11.13.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Added new_or_cached() method and associated caching framework.
+    * Added dbi_connect() method.  (Patch by Peter Karman)
+    * Removed mistakenly checked in breakpoint.
+
+0.735 (07.21.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Improved parsing of SET values.
+    * Fixed the test suite's detection of the broken DBD::SQLite 1.13.
+
+0.734 (05.04.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Added the in_transaction() object method.
+    * Added support for YAML and Perl-based fix-up files.
+    * Fixed a dbh reference counting bug that was triggered when a Rose::DB
+      object was given a $dbh that was generated elsewhere.
+    * Improved detection of SKIP ... FIRST ... support in Informix.
+    * Fixed a bug that prevented certain reserved words from being detected 
+      as primary key columns in PostgreSQL.  (Reported by Fred Cox)
+
+0.733 (02.23.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Schema support enabled for MySQL.
+    * Added support for Informix's "datetime year to month" column type.
+    * Tweaked handling of doubled quotes in PostgreSQL default column values.
+
+0.732 (01.15.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Oracle support improved significantly.
+    * Added MySQL $dbh attributes: mysql_auto_reconnect, mysql_enable_utf8,
+      and mysql_use_result.
+    * Rose::DB objects can now be constructed by specifying only a driver,
+      even if no data sources are registered.
+    * Documented new() behavior when parameters beyond just type and 
+      domain are passed.  (Suggested by Christopher H. Laco)
+    * Fixed a bug that prevented foreign keys with columns that use
+      reserved words from being auto-initialized correctly.
+      (Reported by Clayton Scott)
+    * Improved DSN parsing.
+
+0.731 (11.22.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for MySQL's SET data type. (Patch by Ask Bjørn Hansen)
+    * Fixed an Informix DSN construction bug.
+    * Corrected the skip-counts for Informix tests.
+
+0.730 (11.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Documented the ability to set the dbh().
+
+0.729 (10.29.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added a description attribute and a clone() method to
+      Rose::DB::Registry::Entry.
+
+0.728 (10.20.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added the registered_domains(), registered_types(), and dump()
+      methods to Rose::DB::Registry.
+    * Added a dump() method to Rose::DB::Registry::Entry.
+    * Clone::PP is now a prerequisite.
+
+0.727 (10.06.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added the has_dbh() method.
+    * Changes to support Rose::DB::Object 0.754.
+    * Fixed some Informix date/time parsing bugs.
+    * The test suite now refuses to run SQLite tests if the buggy 
+      DBD::SQLite version 1.13 is installed.
+
+0.726 (09.17.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused primary_key_column_names() and list_tables()
+      to fail in Oracle.
+    * Changes to support Rose::DB::Object 0.753.
+
+0.725 (09.06.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added time column support for Informix.
+
+0.724 (08.29.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected the number of tests in oracle.t and subclass-oracle.t.
+      (Reported by Michael Lackhoff)
+    * Failure to load a driver class is now a fatal error.
+    * Fixed parsing of empty string default values in PostgreSQL.
+
+0.723 (08.10.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Delegate to SQL::ReservedWords to determine which words are reserved.
+    * Correctly indicate that Oracle supports schemas.
+
+0.722 (07.21.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Support for Rose::DB::Object 0.742.
+
+0.721 (07.14.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added end-of-month mode parameter to parse_interval()
+    * Added to the list of reserved words for PostgreSQL and MySQL.
+
+0.72 (06.30.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for the time data type.
+
+0.71 (06.12.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed broken Storable support and documented serialization caveats.
+      (Reported by Drew Taylor)
+
+0.70 (06.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added primary_key_column_names() and has_primary_key() methods.
+    * Added Storable hooks.
+    * Driver classes no longer inherit from Rose::DB.
+    * Improved Oracle DSN generation and quoting.  (Suggested by Todd Lorenz)
+    * Improved parsing of default column values in PostgreSQL databases.
+
+0.673 (05.12.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added partial support for Oracle databases.  (Code by Ron Savage)
+    * Fixed a bug that could cause list_tables() to fail when using
+      the "generic" fall-back database driver.
+
+0.672 (04.14.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Translate PostgreSQL's "real" type to the standard "float" type.
+      (Patch from Lucian Dragus)
+
+0.671 (04.04.2006) - John Siracusa <siracusa@gmail.com>
+
+    * The war against stray "._*" files continues!
+
+0.67 (04.04.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for the interval data type.  (Patch provided by
+      Lucian Dragus.)
+    * Prevent post_connect_sql from running more than once per DBI 
+      database handle when using Apache::DBI.
+    * Added work-around for interval formatting bug in DateTime::Format::Pg 
+      version 0.10 and earlier.
+
+0.66 (03.28.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Date parsing now passes DateTime objects through immediately 
+      instead of trying to parse them as strings and then failing 
+      over to Rose::DateTime::Util's parse_date() function.
+    * Updated the test suite to avoid buggy behavior in DBD::Pg 1.43+.
+    * The database password attribute is now stored in a closure to 
+      prevent it from appearing in Data::Dumper output.
+
+0.65 (02.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Actually release the changes that were supposed to be in 0.64.
+
+0.64 (02.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Small revisions to the tutorial.
+
+0.63 (02.02.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Support for Rose::DB::Object 0.66.
+
+0.62 (01.27.2006) - John Siracusa <siracusa@gmail.com>
+
+    * More MySQL 5 BIT column tweaks.
+
+0.61 (01.19.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Changes to support MySQL 5's brain-dead new BIT column type.
+    * Changed SQLite's bitfield representation to use strings instead
+      of integers to avoid numification that strips leading zeros.
+
+0.60 (01.08.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a serious bug in parse_datetime() and parse_timestamp().
+      (Reported by Sean Davis)
+
+0.59 (01.06.2006) - John Siracusa <siracusa@gmail.com>
+
+    * The type and domain parameters to register_db() now default to
+      the default_type() and default_domain().
+
+0.58 (01.05.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Improved parsing of default column values in PostgreSQL.
+
+0.57 (12.31.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Changes to support Rose::DB::Object 0.60
+
+0.56 (12.19.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for prepended PostgreSQL arrays (e.g., "[0:3]={3,4,5,6}")
+
+0.55 (12.15.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Changes to support Rose::DB::Object 0.58
+
+0.54 (12.03.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Changes to support Rose::DB::Object 0.55
+
+0.53 (11.30.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added SQLite support.
+    * Driver classes are now loaded on demand.
+    * Changes to support Rose::DB::Object 0.54
+
+0.52 (11.22.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a few identifier quoting issues.
+    * Changes to support Rose::DB::Object 0.53
+
+0.51 (11.21.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a limit-with-offset bug when connected to Informix 10+.
+    * Changes to support Rose::DB::Object 0.52
+
+0.50 (11.20.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added list_tables() method.
+
+0.032 (11.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Driver names are now case-insensitive.
+    * Added generic fallback class for unsupported databases.
+    * Added the use_private_registry() convenience method.
+    * Added some tweaks to support PostgreSQL 8.1.
+
+0.031 (10.25.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Support for Rose::DB::Object 0.079.
+
+0.03 (10.05.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Rejiggered magic re-blessing to make private registries to work.
+    * Added support for MySQL's weird "all-zeros" date/time keywords.
+    * Added tutorial.
+
+0.0264 (09.15.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Changes to support Rose::DB::Object 0.074.
+
+0.0263 (09.07.2005) - John Siracusa <siracusa@gmail.com>
+
+    * The war against stray "._*" files rages on :-/
+
+0.0262 (09.07.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected Informix limit-with-offset support version detection.
+
+0.0261 (08.20.2005) - John Siracusa <siracusa@gmail.com>
+
+    * POD fixes.
+
+0.026 (08.19.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added quote_column_name() method.
+
+0.025 (08.14.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed support for "all zeros" timestamp defaults in MySQL auto-init.
+
+0.024 (08.12.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Case-sensitivity fixes for PostgreSQL.
+    * Added tentative support for Informix 10's "limit with offset" feature.
+
+0.023 (08.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Deleted stray ._ files.  Blah.
+
+0.022 (08.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed PostgreSQL column default value parsing.
+
+0.021 (08.05.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Sigh.  Forgot to add the catalog attribute to registry entries.
+
+0.02 (08.05.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added more granular column types for Pg and Informix datetimes.
+    * Substantial update to support auto-initialization.
+
+0.0154 (06.22.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Abstracted limit-with-offset syntax.
+
+0.0153 (06.17.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added Bit::Vector::Overload to the prerequisites.
+    * Added links to the POD.
+
+0.0152 (05.31.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected number of tests to skip in trx.t.
+
+0.0151 (05.29.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a PostgreSQL transactions test in trx.t.
+
+0.015 (05.12.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added proper data source registry and registry entry objects.
+    * Changed behavior of dsn() method to reflect the fact that DBI's
+      parse_dsn() method rarely extracts the information I need.
+    * Added warning to documentation about DSN/attribute sync.
+
+0.0143 (05.04.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Avoid trying to truncate undefined dates.
+
+0.0142 (04.07.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Documented connect_options() method.
+    * Added db_exists() method.
+
+0.0141 (03.15.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed tests to account for versions of DBI without the 
+      parse_dsn() method.
+
+0.014 (03.15.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added alias_db() class method.
+
+0.013 (03.13.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Changes dsn() method to clear possibly changed DSN components,
+      and also try to parse the DSN.
+
+0.012 (03.11.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed incorrect skip amount in pg.t.  Sigh.
+
+0.011 (03.11.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Correct misplaced _ in number.
+    * Fixed bad return value from empty { } method.  Perl 5.8.x
+      treats it as I expect, but perl 5.6.1 requires a bare return;
+
+0.01 (03.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Initial release.

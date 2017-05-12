@@ -1,0 +1,118 @@
+#!perl
+use strict;
+use warnings;
+use 5.010_000;
+use feature ':5.10';
+use Getopt::Long qw( GetOptions );
+use Runops::Movie::Util qw( pretty_size );
+use File::Spec::Functions qw( catfile );
+use Carp::Always;
+use Alien::Judy;
+use Inline
+    C => 'DATA',
+    ( # Config:
+        OPTIMIZE => '-g',
+        CLEAN_AFTER_BUILD => 1,
+        INC => join( ' ',
+            map { "-I$_" }
+            Alien::Judy::inc_dirs()
+        ),
+        LIBS => join( ' ',
+            (
+                map { "-L$_" }
+                Alien::Judy::lib_dirs()
+            ),
+            '-lJudy'
+        )
+    );
+
+GetOptions(
+    help      => sub { die 'pod2usage( -verbose => 2 )' },
+    'dir=s'   => \my($dir),
+    'edge=s'  => \my($in_edge),
+    'redge=s' => \my($out_redge),
+)
+  or die 'pod2usage( -verbose => 2 )';
+
+
+# --dir automagic
+#
+if ( $dir ) {
+    $in_edge   //= catfile( $dir, 'frame.edge' );
+    $out_redge //= catfile( $dir, 'frame.redge' );
+}
+
+open my($ifh), '<', $in_edge
+    or die "Can't open $in_edge: $!";
+open my($ofh), '>', $out_redge
+    or die "Can't open $out_redge: $!";
+
+my $redge = read_edge_as_redge($ifh);
+write_redge($redge,$ofh);
+free_redge($redge);
+
+__DATA__
+__C__
+#include <Judy.h>
+
+void*
+read_edge_as_redge(PerlIO *fh) {
+    SV *line_sv;
+    char *line;
+    Pvoid_t redge = 0;
+    Pvoid_t *pxedge;
+    STRLEN line_len;
+    int Rc_int, x, y;
+
+    line_sv = newSVpv("",0);
+    while (sv_gets(line_sv,fh,0)) {
+        line = SvPV(line_sv,line_len);
+        if ( 2 != sscanf(line,"edge(%x,%x).",&x,&y) ) {
+            croak("%s\n",line);
+        }
+
+        JLI(pxedge,redge,y);
+        J1S(Rc_int,*pxedge,x);
+    }
+    SvREFCNT_dec(line_sv);
+
+    return redge;
+}
+
+void
+write_redge( void *redge, PerlIO *ofh ) {
+    PWord_t pxedge;
+    Word_t x, y;
+    int found_x;
+
+    pxedge = y = 0;
+    JLF(pxedge,redge,y);
+    while ( pxedge ) {
+       found_x = x = 0;
+       J1F(found_x,(Pvoid_t)*pxedge,x);
+       while (found_x) {
+           PerlIO_printf(ofh,"redge(%x,%x).\n",x,y);
+
+           J1N(found_x,(Pvoid_t)*pxedge,x);
+       }
+
+       JLN(pxedge,redge,y);
+    }
+}
+
+void
+free_redge(void *redge) {
+    PWord_t pxedge;
+    PWord_t xedge;
+    Word_t y;
+    int freed;
+
+    y = 0;
+    JLF(pxedge,redge,y);
+    while (pxedge) {
+	xedge = *(PWord_t)pxedge;
+        J1FA(freed,xedge);
+        JLN(pxedge,redge,y);
+    }
+    JLFA(freed,redge);
+}

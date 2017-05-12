@@ -1,0 +1,95 @@
+<%INIT>
+
+use Text::CSV_XS;
+
+my $Tickets = RT::Tickets->new($session{'CurrentUser'});
+$Tickets->FromSQL($ARGS{'Query'});
+
+$Format ||= $RT::DefaultSearchResultFormat;
+# Scrub the html of the format string to remove any potential nasties.
+$Format = $m->comp('/Elements/ScrubHTML', Content => $Format);
+my (@Format) = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => $Format);
+
+$r->content_type('application/vnd.ms-excel');
+
+my @header=();
+
+# used to store m->comp output - prevents the output from being 
+# written to the output stream. That's because we are not interested in the
+# output for these comp() calls, we are interested in the return value.
+my $mason_output;  
+
+foreach my $column (@Format) {
+    next if $column->{title} eq 'NEWLINE';
+
+    # Determine the column titles
+    my $title = $column->{title};
+    $title =~ s/^__(.*)__$/$1/o;
+    my $ret = undef;
+    $ret = 
+        $m->comp( { store => \$mason_output },
+                        '/Elements/RT__Ticket/ColumnMap',
+                        Name => $title,
+                        Attr => 'title'
+                        )
+         ;
+    $title = $ret ? $ret : $title;
+    push @header, $title;
+}
+
+my $csv = Text::CSV_XS->new( { sep_char => "\t", binary => 1, eol => "\012" } );
+
+$csv->combine(@header);
+$m->out( $csv->string() );
+
+while ( my $Ticket = $Tickets->Next()) {
+    my @row;
+    foreach my $column (@Format) {
+        next if $column->{title} eq 'NEWLINE';
+
+        my $column_value = '';
+
+        foreach my $subcol ( @{ $column->{output} } ) {
+            if ( $subcol =~ /^__(.*?)__$/o ) {
+                my $col = $1;
+                my $value = $m->comp({ store => \$mason_output }, 
+                                     '/Elements/RT__Ticket/ColumnMap', 
+                                     Name => $col, Attr => 'value');
+                if ( $value && ref($value)) {
+                    my @x = &{ $value }( $Ticket, 0 );
+                    $column_value .= join('', map { ref($_) ? $$_ : $_ } @x);
+                } else {
+                    $column_value .=  $value;
+                }
+            }
+            else {
+                $column_value .= $subcol;
+            }
+        }
+
+        $column_value =~ s{<br(\s+/)?>}{, }g;
+        $column_value =  $scrubber->scrub( $column_value );
+        $column_value =~ s{, $}{}g;    # ColumnMap is putting a trailing br
+
+        push @row, $column_value;
+    }
+    $csv->combine(@row);
+    $m->out( $csv->string() );
+    $m->flush_buffer();
+}
+
+$m->abort();
+</%INIT>
+<%ARGS>
+$Query => undef
+$Format => undef 
+$HideResults => 0
+$Rows => 50
+$Page => 1
+$OrderBy => 'id'
+$Order => 'ASC'
+</%ARGS>
+<%once>
+my $scrubber = HTML::Scrubber->new();
+$scrubber->deny(qw[*]);
+</%once>

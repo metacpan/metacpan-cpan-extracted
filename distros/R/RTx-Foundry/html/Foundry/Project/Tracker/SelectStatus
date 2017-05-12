@@ -1,0 +1,31 @@
+%# Every solution breeds new problems.
+
+<SELECT ID="<%$Name%>" NAME="<%$Name%>" style="width:150px" <% $ReadOnly ? 'disabled' : '' %>
+onchange="
+var val = this.options[this.selectedIndex].value;
+var obj = document.getElementById('SelectResolution');
+if (val == 'resolved' || val == 'rejected') {
+    obj.disabled = false;
+} else {
+    obj.selectedIndex = 5;
+    obj.disabled = true;
+}
+if (val == 'resolved' && obj.selectedIndex > 1) obj.selectedIndex = 0;
+if (val == 'rejected' && (obj.selectedIndex < 2 || obj.selectedIndex > 3)) obj.selectedIndex = 2;
+%# You are not expected to understand the above logic.
+">
+<OPTION VALUE=""></OPTION>
+%foreach my $status (@status) {
+<OPTION VALUE="<%$status%>" <%($Default eq $status) && 'SELECTED'%>><%loc($status)%></OPTION>
+% }
+</SELECT>
+<%ONCE>
+my $queue = new RT::Queue($session{'CurrentUser'});
+my @status = $queue->StatusArray();
+</%ONCE>
+<%ARGS>
+$Name => undef
+$Default => undef
+$ReadOnly => undef
+$id => undef
+</%ARGS>

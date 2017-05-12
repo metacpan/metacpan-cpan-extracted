@@ -1,0 +1,17 @@
+%# Love cannot be much younger than the lust for murder.
+%#                 -- Sigmund Freud
+<%INIT>
+$RT::Foundry = 1;
+
+unless (
+    $RT::Reentrant == 1 or
+    $r->uri =~ m{^/REST/|^/Foundry/|^/Work/Tickets/Attachment/} or
+    eval { $session{CurrentUser}->UserObj->HasRight(
+	Right => 'SuperUser', Object => $RT::System
+    ) }
+) {
+    local $RT::Reentrant = 1;
+    $m->subexec('/Foundry/index.html');
+    $m->abort;
+}
+</%INIT>

@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f2a8489f34c03b3b40f64008556507f233a928e6 Changes
+SHA1 2627d8d0eeaaa5de232520a259de6e35c7292fdd MANIFEST
+SHA1 638077b93d5360183193ab918ea9489fc0019f94 MANIFEST.SKIP
+SHA1 4d47aba4d897a6e39af1f00cae86d137ca6f9427 META.yml
+SHA1 3cdafab1d54207579e26f71ddd85887e76a21061 Makefile.PL
+SHA1 b49d48de40cb0f8f17d0862bbcf7da0cedb75420 README
+SHA1 46ff42e7e02b856e15106163cd77b1a55fc08fb9 inc/ExtUtils/AutoInstall.pm
+SHA1 b26ac27e5a57677aa210c0e908b28ff3ba28f03b inc/Module/Install.pm
+SHA1 947ab0384bbdeaa591bbfa6f82deb4f367822b54 inc/Module/Install/AutoInstall.pm
+SHA1 fd56d5c793014bccac2cd1e61926c4da8538ef99 inc/Module/Install/Base.pm
+SHA1 9ce6768a7b8f7032ec89594b773fafd58c6feb1d inc/Module/Install/Can.pm
+SHA1 b6c8f0f22c4c8ba48a7bac2c5e4bd61803a7b097 inc/Module/Install/Fetch.pm
+SHA1 7023c3cdd07f5042c31b6cdae926d75865cf3cdf inc/Module/Install/Include.pm
+SHA1 aabcd47178e4e7b27e340ff5273269c93697c9c1 inc/Module/Install/Makefile.pm
+SHA1 207dfa13341a374fc78325fbeb99bc36659aef2d inc/Module/Install/Metadata.pm
+SHA1 aff9341a15c04faec47089851e43d9d4061337e7 inc/Module/Install/Win32.pm
+SHA1 8e0d347ca21bc18b380d9d1aa5910b8d078a76b7 inc/Module/Install/WriteAll.pm
+SHA1 e7f3122abc4c82d1c7b6583fa7ddfc219b6eea95 lib/LWP/UserAgent/RTClient.pm
+SHA1 1f94351ac135237bee06e961a8f7bec876422f8f lib/RT/Client.pm
+SHA1 3c5b3439c70ed082cd4cc2aaf4f7c8e06ff6549b lib/RT/Client/Base.pm
+SHA1 9aee244696053a5d47485723d9ca7645c5c94106 lib/RT/Client/Container.pm
+SHA1 2c1e10fc4279cf6c01e197d66427443ef8c7916f lib/RT/Client/Object.pm
+SHA1 b5dbcd88da2027a73adc89277fb2ba9d3a296e29 lib/RT/Client/Property.pm
+SHA1 c48c539fdbf388da1092211ab45f9ae677f39880 lib/RT/Client/ResultSet.pm
+SHA1 63c7ea0cfdd7643aa113c260eec9c9bf0a6ee8a0 t/0-signature.t
+SHA1 80fc9416c63c4e231627c2983ee8d87ed9e75b8c t/1-procedural.t
+SHA1 edd16bb1d239c5e76c36f52e4b6fb4913d599d06 t/2-oo.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (FreeBSD)
+
+iD8DBQFBLMlqtLPdNzw1AaARAiNXAJ9KFivnVhleeWLFmgO/thi4ie8buACgsJ5b
+YlNtvE+5jNGK+oVcQK99N7M=
+=oS0Q
+-----END PGP SIGNATURE-----

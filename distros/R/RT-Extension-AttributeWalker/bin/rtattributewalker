@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib '/opt/rt3/lib';
+use Data::Dumper;
+use Getopt::Long;
+my $user_name;
+my $result = GetOptions( 'user=s' => \$user_name );
+
+die "Must pass a --user name or id" unless $user_name;
+
+use RT;
+RT::LoadConfig;
+RT::Init;
+
+my $user = RT::User->new($RT::SystemUser);
+$user->Load($user_name);
+
+die "$user_name is not a valid user" unless $user->Id;
+
+my $attributes = RT::Attributes->new($RT::SystemUser);
+$attributes->Limit( FIELD => 'Creator', VALUE => $user->Id );
+
+while (my $attr = $attributes->Next) {
+    print Data::Dumper->Dump([$attr->Content],[$attr->Name]);
+}

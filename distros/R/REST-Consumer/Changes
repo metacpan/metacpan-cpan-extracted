@@ -1,0 +1,72 @@
+Revision history for REST::Consumer
+
+1.02 2014-05-16
+  * Don't return erroneous values for last_request and last_response if a
+	  request throws an exception due to a timeout.
+	* Upgrade Time::HiRes dependency so that retry delays work on NetBSD.
+
+1.01 2014-03-04
+  * better documentation on response handlers
+	* fix default_headers behavior which ensures that the UA is set properly
+	* fix hash randomization issues in test suite; tests should pass on 5.18
+
+1.00 2014-01-22
+  * Response handlers: a new strategy for reacting to your API's responses.
+
+0.16 2014-01-08
+	* Add retry_delay option
+
+0.15 2013-09-27
+	* Fix broken release
+
+0.14 2013-09-27
+	* Bug fix: avoid a memory leak in Net::DNS which is used by Paranoid.
+
+0.13 2013-09-04
+	* Use LWP::UserAgent::Paranoid by default for improved timeout behavior
+	* Ensure that Sinatra-style parameters are encoded when substituted
+	* Fix a dangerous use of sprintf
+	* Add an accessor for the retry option
+
+0.12		2013-03-20
+	* Not released
+	* Deserialize PUT request responses
+
+0.11		2013-02-19
+	* Not released
+	*	Made the "retrying" error message more informative
+
+0.10		2012-10-18
+	* Not released
+	* Allow overriding the user_agent
+
+0.09		2012-09-13
+	* Not released
+
+0.08		2012-09-12
+	* Not released
+
+0.07		2012-09-06
+	* First release to public CPAN
+
+0.06    2012-09-06
+	* Fix boilerplate tests
+
+0.05    2012-08-08
+	* Fix manifest
+
+0.04    2012-08-08
+	* First version as REST::Consumer
+
+0.03    2012-06-26
+	* Fixed error message that was throwing an error
+
+0.02    2012-05-08
+
+	* Added support for keep-alive
+	* Refactored to facilitate future changes
+	* Added unit test suite
+	* Allows headers to be sent in request
+
+0.01    2012-ish
+	First version

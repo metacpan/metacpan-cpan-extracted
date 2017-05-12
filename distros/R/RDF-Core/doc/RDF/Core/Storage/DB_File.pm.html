@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RDF::Core::Storage::DB_File - Berkeley DB 1.x implementation of RDF::Core::Storage</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#interface">Interface</a></li>
+	</ul>
+
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>RDF::Core::Storage::DB_File - Berkeley DB 1.x implementation of RDF::Core::Storage</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  require RDF::Core::Storage::DB_File;
+  my $storage = new RDF::Core::Storage::DB_File(Name =&gt;'./rdfdata',
+                                                 MemLimit =&gt; 5000,
+                                                );
+  my $model = new RDF::Core::Model (Storage =&gt; $storage);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The storage is based on DB_File module and is using tie mechanism to access data.</p>
+<p>
+</p>
+<h2><a name="interface">Interface</a></h2>
+<ul>
+<li><strong><a name="item_new"><code>new(%options)</code></a></strong><br />
+</li>
+Available options are:
+<ul>
+<li><strong><a name="item_name">Name</a></strong><br />
+</li>
+The name of the storage. Several files will be created beginning with the Name.
+If Name is undef, storage is held in memory. Default value is null.
+<p></p>
+<li><strong><a name="item_flags_2c_mode">Flags, Mode</a></strong><br />
+</li>
+The options is passed to DB_File module when tying variables. Default values are O_CREAT|O_RDWR for Flags and 0666 for Mode.
+<p></p>
+<li><strong><a name="item_memlimit">MemLimit</a></strong><br />
+</li>
+When statements are retrieved from the storage, they are passed as an in-memory implementation of enumerator RDF::Core::Enumerator::Memory or less-in-memory implementation RDF::Core::Enumerator::DB_File. Setting MemLimit to non-zero says that storage should never return Memory enumerator for number of statements larger then MemLimit. As the decision of what to return is made before the accurate count of statements returned is known, DB_File enumerator may be returned even if MemLimit is not exceeded.
+<p></p>
+<li><strong><a name="item_sync">Sync</a></strong><br />
+</li>
+A number of write operations to process before synchronizing storage data cache with disk. 0 means don't force synchronizing.
+<p></p></ul>
+</ul>
+<p>The rest of the interface is described in RDF::Core::Storage.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is subject to the MPL (or the GPL alternatively).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ginger Alliance, <a href="mailto:rdf@gingerall.cz">rdf@gingerall.cz</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>DB_File, RDF::Core::Storage, RDF::Core::Enumerator::Memory, RDF::Core::Enumerator::DB_File, RDF::Core::Model</p>
+
+</body>
+
+</html>

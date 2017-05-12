@@ -1,0 +1,32 @@
+---
+abstract: 'Client Role for handling PostgreSQL Roles'
+author:
+  - 'Kaare Rasmussen <kaare at cpan dot net>'
+build_requires:
+  Module::Build: '0.3601'
+  Moose: '0'
+  Test::Class: '0'
+  Test::More: '0'
+  Test::Pod::Coverage: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Role-Pg-Roles
+requires:
+  DBD::Pg: '3'
+  DBI: '0'
+  Digest::MD5: '0'
+  Moose::Role: '0'
+  perl: '5.010'
+resources:
+  repository: git://github.com/kaare/Role-Pg-Roles.git
+version: '0.002'

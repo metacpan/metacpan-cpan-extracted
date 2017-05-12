@@ -1,0 +1,362 @@
+# ABSTRACT: Riap over HTTP
+# PODNAME: Riap::HTTP
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Riap::HTTP - Riap over HTTP
+
+=head1 VERSION
+
+This document describes version 1.2.4 of Riap::HTTP (from Perl distribution Riap), released on 2015-09-04.
+
+=head1 SYNOPSIS
+
+This document specifies using HTTP/HTTPS as the transport layer for L<Riap>, or
+Riap::HTTP for short.
+
+=head1 DESCRIPTION
+
+Riap::HTTP is designed to be implemented by API service providers. It allows
+features like custom URL layout, multiple serialization format, and logging;
+while depends on HTTP for other features like authentication, encryption
+(HTTPS), etc. For a more lightweight alternative, look at L<Riap::Simple>.
+
+Server listens to HTTP requests, parses them into Riap requests, executes the
+Riap requests, and sends the results to clients.
+
+=head2 Additional Riap request keys
+
+=over 4
+
+=item * fmt => STR
+
+Specify output serialization format to use. The format names are decided by the
+implementation, but server MUST support C<json> as the fallback. If unspecified,
+default in most cases should also be C<json>, but server can default to other
+format, like say L<HTML> or L<text>, for viewing convenience of certain clients
+like GUI browser. Server should detect appropriate default output format from
+C<Accept> HTTP request header.
+
+To find out what serializations are supported, client can perform an C<srvinfo>
+action.
+
+Server should fallback to C<json> if requested result format is not supported.
+
+=back
+
+=head2 Additional actions
+
+=head3 Action: B<srvinfo>
+
+Just like C<info> action, but get information about the server instead. Server
+MUST at least return the following keys in the result hash.
+
+ {
+  // server's absolute URL
+  "srvurl": "http://localhost:5000/",
+
+  // supported formats
+  "fmt": ["Console","HTML","JSON","PHPSerialization","YAML","json"],
+ }
+
+=head2 Parsing Riap request from HTTP request
+
+Server can provide defaults for some/all Riap request keys, so client does not
+need to explicitly set a Riap request key. But server MUST provide a way for
+client to set any Riap request key.
+
+First, server MUST parse Riap request keys from HTTP C<X-Riap-*> request
+headers, e.g. C<X-Riap-Action> header for setting the C<action> request key. In
+addition, the server MUST parse the C<X-Riap-*-j-> headers for JSON-encoded
+value (notice the ending C<->), e.g.
+
+ X-Riap-Args-j-: {"arg1":"val1","arg2":[1,2,3],"arg3:base64":"AAAA"}
+
+This allows the server to have its own URL scheme, while allowing a way for a
+common access mechanism.
+
+If HTTP header C<Content-Range> presents (partial content upload) then the Riap
+request keys C<arg_len>, C<arg_part_start>, and C<arg_part_len> will be
+accordingly set. Partial argument value will then be retrieved from HTTP body.
+For example this HTTP request:
+
+ PUT /api/?filename=myvideo.mp4 HTTP/1.1
+ Host: example.com
+ X-Riap-uri: /MyApp/upload_file
+ Content-Type: application/octet_stream
+ Content-Length: 124496
+ Content-Range: bytes 409-124904/124905
+
+when function metadata at /MyApp/upload_file is:
+
+ {
+     "v":1.1,
+     "args":{
+         "filename":{"schema":"str*", "req":1},
+         "data":{"schema":"buf*", "req":1, "partial":1}
+     }
+ }
+
+will send these arguments to function:
+
+ {
+     "filename":"myvideo.mp4",
+     "data":"...data from upload...",
+     "-arg_len":124905,
+     "-arg_part_start":409,
+     "-arg_part_len":124496
+ }
+
+Or, if HTTP request header C<Transfer-Encoding: chunked> is present, then server
+will assume streaming input. Function eill
+
+Otherwise, if there is no partial content upload, the server MUST also accept
+C<args> from HTTP request body. The server MUST accept at least body of type
+C<application/json>, but it can accept other types. The server MUST not
+interpret C<application/x-www-form-urlencoded> for this purpose (and interpret
+it as a normal web form). Server MUST return response 400 if document type is
+not recognized.
+
+The server can also accept Riap request keys or function arguments using other
+means. For example, L<Plack::Middleware::PeriAHS::ParseRequest>, from Perl
+server implementation, allows parsing Riap request keys like C<uri> from URI
+path, and C<args> keys (as well as other Riap request keys, using C<-riap-*>
+syntax) from request variables. For example:
+
+ http://HOST/api/PKG/SUBPKG/FUN?a1=1&a2:j=[1,%202]&a3:base64=AAAA
+
+might result in the following Riap request (note that JSON does not support
+binary data, but below a binary data "\0\0\0" is represented):
+
+ {
+  "uri": '/PKG/SUBPKG/FUN',
+  "action": 'call',
+  "args": {"a1":1, "a2":[1,2], "a3":"\0\0\0"}
+ }
+
+Another example:
+
+ http://HOST/api/PKG/FUN?-riap-action=complete_arg_val&-riap-arg=a1&-riap-word=x
+
+will result in the following Riap request:
+
+ {
+  "uri": '/PKG/FUN',
+  "action": 'complete_arg_val',
+  "arg": 'a1',
+  "word": 'x',
+ }
+
+=head1 SPECIFICATION VERSION
+
+ 1.2
+
+=head1 HTTP RESPONSE
+
+HTTP response status MUST be 200 for success.
+
+There are some HTTP response headers related to Riap::HTTP: C<X-Riap-V> is
+REQUIRED and gives information on the Riap::HTTP protocol version supported by
+the server. C<X-Riap-Logging> is optional and advertises loglevel server support
+(see L</LOGGING>).
+
+The response body is an enveloped result (as described in L<Rinci::function>)
+encoded in JSON or other requested format.
+
+=head1 LOGGING
+
+Riap over HTTP also allows a mechanism to pass logging messages during function
+calls by using HTTP chunked response.
+
+Server can opt NOT to support this feature. Server supporting this feature MUST
+advertise the fact by sending HTTP response header C<X-Riap-Logging> with a Perl
+true value.
+
+Additional Riap request key B<loglevel> is recognized for this, an integer
+number with value either 0 (for none, the default), 1 (for sending fatal
+messages), 2 (error), 3 (warn), 4 (info), 5 (debug), and 6 (trace). When a value
+larger than 0 is specified, server supporting this feature must return chunked
+HTTP response and each log message should be sent as a separate chunk. Each log
+message must be prepended with "l" followed by number of bytes of content (e.g.
+"20") followed by a single space character followed by the content (in this
+example, exactly 20 bytes of it). Result is similarly prepended but with "r"
+instead of "l".
+
+=head1 OUTPUT STREAM
+
+Rinci supports function returning output stream. This is marked by the result
+being a filehandle or an object that has a getline()/getitem() method and result
+metadata property C<stream> is set to true.
+
+In Riap::HTTP, this is translated to chunked transfer. The first data chunk will
+be something like (in JSON): C<< [200,"OK","stream",{"stream":1}] >> and the
+next chunks will contain the data for the output stream. A Riap::HTTP client can
+convert the "stream" part into an object that has a getline()/getitem() method
+to retrieve data from these chunks.
+
+=head1 EXAMPLES
+
+Below are some examples of what is sent and received over the wire. For these
+examples, the server has the following URL scheme http://example.org/api/<URI>.
+Server also assume the default values for these Riap request keys so they do not
+have to be specified by client: C<v> (1.1), C<action> (call).
+
+Call a function, passing function arguments via query parameter, unsuccessfully
+because of missing argument:
+
+ --- Request ---
+ GET /api/Math/multiply2?a=2&-riap-v=1.2 HTTP/1.0
+ Accept: application/json
+
+ --- Response ---
+ HTTP/1.0 200 OK
+ Date: Thu, 23 Oct 2014 06:02:40 GMT
+ Server: PeriAHS/0.50
+ X-Riap-V: 1.2.0
+ Content-Type: application/json
+
+ [400,"Missing required argument: b",null,{"riap.v":1.2}]
+
+Call the same function, successfully this time (using Riap 1.1). As a variation
+we pass function arguments through the X-Riap-Args HTTP header:
+
+ --- Request ---
+ GET /api/Math/multiply2 HTTP/1.0
+ X-Riap-Args-j-: {"a":2,"b":3}
+ Accept: application/json
+
+ --- Response ---
+ HTTP/1.0 200 OK
+ Date: Thu, 23 Oct 2014 06:02:50 GMT
+ Server: PeriAHS/0.50
+ X-Riap-V: 1.1.24
+ Content-Type: application/json
+
+ [200,"OK",6]
+
+Another example demonstrating C<loglevel>. Note that if server does not send
+C<X-Riap-Logging> response header, it means the server does not support logging
+and send 'unlogged' response.
+
+ --- Request ---
+ GET /Perinci/Examples/call_randlog?-riap-loglevel=6&n=3 HTTP/1.1
+ User-Agent: curl/7.30.0
+ Host: localhost:5000
+ Accept: */*
+
+ --- Response ---
+ HTTP/1.1 200 OK
+ Server: Gepok/0.26
+ Content-Type: text/plain
+ Date: Thu, 23 Oct 2013 06:02:55 GMT
+ Connection: Keep-Alive
+ Transfer-Encoding: chunked
+ X-Riap-V: 1.1.24
+ X-Riap-Logging: 1
+
+ l96 [critical][Sat Dec 21 13:18:13 2013] (1/3) This is random log message #1, level=1 (fatal): 2185
+ l93 [trace][Sat Dec 21 13:18:13 2013] (2/3) This is random log message #2, level=6 (trace): 5845
+ l93 [trace][Sat Dec 21 13:18:13 2013] (3/3) This is random log message #3, level=6 (trace): 3479
+
+=head1 FAQ
+
+=head2 Why not directly return status from enveloped result as HTTP response status?
+
+Since enveloped result is modeled somewhat closely after HTTP message,
+especially the status code, it might make sense to use the status code directly
+as HTTP status. But this means losing the ability to differentiate between the
+two. We want the client to be able to differentiate whether the 500 (Internal
+server error) or 404 (Not found) code it is getting is from the HTTP
+server/proxies/client or from the enveloped result.
+
+=head2 Riap/Riap::HTTP vs REST? Which one to choose for my web service?
+
+Riap maps code entities (packages and functions), while REST maps resources
+(like business entities) to URI's. For example:
+
+ # Riap
+ /User/             # package
+ /User/list_users   # function
+ /User/create_user  # function
+
+ # REST (verb + URI)
+ GET /user          # list users
+ GET /user/123      # get specific user
+ POST /user         # create a new user
+ PATCH /user/123    # modify user
+ DELETE /user/123
+
+Riap is more RPC style, and it is more straightforward if you want to export a
+set of code modules and functions as API. But it also defines standard and
+extensible "verbs" (actions). It also helps service discoverability and
+self-description due to the C<list> action and the rich Rinci metadata.
+Riap::HTTP can also use custom routing so if you want you can make it use REST
+style, while still fulfilling request with Riap in the backend. For example, see
+L<Serabi> in Perl.
+
+=head2 How to do Rinci's partial input data on Riap::HTTP?
+
+To send partial argument value, you can send HTTP headers C<Content-Range> which
+will be translated to C<arg_part_start> and C<arg_part_len> Riap request keys,
+which will then be passed to function as C<-arg_part_start> and
+C<-arg_part_len>.
+
+=head2 How to do Rinci's partial result on Riap::HTTP?
+
+To request partial result, you can send HTTP headers C<Range> which will be
+translated to C<res_part_start> and C<res_part_len> Riap request keys, which
+will then be passed to function as C<-res_part_start> and C<-res_part_len>.
+
+Normal HTTP response (without any C<Range> HTTP response headers) will be
+returned. If function supports partial result, the enveloped response contained
+in the HTTP response will be something like C<< [206, "Partial content",
+"...partial data...", {"riap.v":1.2, "len":TL, "part_start":S, "part_len":L}] >>
+where the numbers represented by S, L will correspond to the range requested.
+
+=head2 How to do Rinci's streaming input on Riap::HTTP?
+
+Client can send a chunked transfer. See L</"Parsing Riap request from HTTP
+request"> for more details.
+
+=head2 How to do Rinci's streaming output on Riap::HTTP?
+
+Send can send a chunked transfer. See L</"OUTPUT STREAM"> for more details.
+
+=head1 SEE ALSO
+
+L<Riap::Simple>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Riap>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Riap>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Riap>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

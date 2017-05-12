@@ -1,0 +1,75 @@
+<%INIT>
+  use Net::OpenID::Consumer;
+
+  my $openid_url = ref($ARGS{openid}) ? $ARGS{openid}->[0] : $ARGS{openid};
+  my $user;
+  my $check_url;
+	my $csr = Net::OpenID::Consumer->new(
+           ua    => LWP::UserAgent->new,
+           args  => \%ARGS,
+           consumer_secret => "oongai7A",
+           required_root => "http://rt.livejournal.org/",
+         );
+
+  if($openid_url) {
+	my $claimed_identity = $csr->claimed_identity("$openid_url");
+        $check_url = $claimed_identity->check_url(
+           return_to  => "http://rt.livejournal.org/",
+           trust_root => "http://rt.livejournal.org/",
+         );
+        $m->redirect($check_url);
+  }
+
+  if($ARGS{"openid.mode"}) {
+	 if (my $setup_url = $csr->user_setup_url) {
+              # redirect/link/popup user to $setup_url
+              $m->redirect($setup_url);
+         } elsif ($csr->user_cancel) {
+         } elsif (my $vident = $csr->verified_identity) {
+              $user = $vident->url;
+         } else {
+              die "Error validating identity: " . $csr->err;
+         }
+   }
+
+
+
+  # if the user isn't logged in and we got credentials from Bitcard, load them
+  if ( (! $session{'CurrentUser'}) && ($user) ) {
+
+      # set a global user so we know elsewhere we're using Bitcard for auth
+      $session{'OpenID'} = $user;
+
+      # Bitcard has verified that the user has control of this e-mail address,
+      # so it's okay to use it to get a valid RT user
+
+      # we've got a valid user, so try to load
+      $session{'CurrentUser'} = RT::CurrentUser->new();
+      $session{'CurrentUser'}->LoadByName( $user );
+      if ( not $session{'CurrentUser'}->id ) {
+          my $UserObj = RT::User->new($RT::SystemUser);
+          my ($id, $msg) 
+              = $UserObj->Create(
+                                  Name => $user,
+                                  #RealName => $user->{'name'},
+                                  #EmailAddress => $user->{'email'},
+                                  Privileged => 1,
+                                );
+          if ( $UserObj->id ) {
+              # created the user, now load them as the current user
+              $session{'CurrentUser'}->Load($UserObj->id);
+
+              # redirect the user to their preference page to add more info
+              $m->redirect($RT::WebPath . '/User/Prefs.html');
+          }
+          else {
+              # we couldn't create the user.  abort abort abort!
+              delete $session{'CurrentUser'};
+              my $qs = $m->comp('/Elements/QueryString',
+                                 Error => loc("Cannot create user: [_1]", $msg));
+              $m->redirect($RT::WebPath . '/?' . $qs);
+              $m->abort();
+          }
+      }
+  } 
+</%INIT>

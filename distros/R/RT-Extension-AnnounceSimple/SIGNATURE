@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 c5db51ee0f3d31c1927c88540b29fddcda9efedb Changes
+SHA1 9325776f7e4bc11989465738bfbf4236f44e8adb MANIFEST
+SHA1 5a487354f08f43988f4327ba5af17c32a0d2eae0 META.yml
+SHA1 f8a9176a83239387688308e328d87c4d07e54d5d Makefile.PL
+SHA1 24fdb8e65c998ae5453c1a390b40857aa751bed8 README
+SHA1 653560b72606d49c2f2a514c949087aaba9d3888 html/Admin/Queues/AnnounceSimple.html
+SHA1 fbb0d3bd6ad6660781a72641b3e63fe126f9474e html/Admin/Tools/AnnounceSimple.html
+SHA1 de2b2030a619d02723ac0d72ca8aaab5d58fad94 html/Callbacks/AnnounceSimple/Elements/PageLayout/BeforeBody
+SHA1 508b604f3b9848938d64d217954303454f4a4877 html/Callbacks/AnnounceSimple/Elements/Tabs/Privileged
+SHA1 de12dfe74228e8fe289e174f48912f65c436ca78 html/Callbacks/AnnounceSimple/Elements/Tabs/PrivilegedQueue
+SHA1 40bbb1d465eb997639ee26f214da86b92a5b0f9a html/Callbacks/AnnounceSimple/Ticket/Display.html/BeforeActionList
+SHA1 c8e11247bfadf7129500ac0ce91ad450b61f463b html/Elements/AnnounceSimple
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 b8327eb9da32000b3fe1abf481a0368f8b6cc33b lib/RT/Extension/AnnounceSimple.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJW2DF+AAoJEKq6dEXbZ7Zr7QUP/2dDtNPyZEnjjbGn/gz2QOL+
+bGIkh3/zC7nwBxC7hC1maPgRbc9IVYsyOfCoi98yy4CysUgdyA37vCDBAwezbAVm
+FvdTqbJP811AXkXctqhY/LbgcCWL/iFKJgLNM102tGXTRQVmvI5N8tTZp+hl1FsH
+dK29p1jvWGw1jzL1RX8ajh7yJJNDitWPhovhxmAqVGn/Z8Jrd4LYlEF8j/rtgspr
+B3a7lIpvq5kJXnCNXcJ/aFgInZAqpray5+H9wRBD+6rZMM4WJR+PeAK8T3gd10Ee
+GjiWZ6MQobbNwGAJstnLNgwxnhsS3Izux29I4LV1L+P2GWu2KoFtMg7wfzTubQge
+tFjGKacKodBf+/Y8PTcLFzdHqBcuWtunoERC6/Xmlcm57dt2ZIaUTFie1ahPEqeu
+YRT64Q3vkVogacePL7FYbcRs92pXG+PRgVLTSHqgQyJmtGPAMQ+83b0ANEtLJZGe
+1WPwyayL8MvyDibIGrBRRdMYf54sVxPPFEQRXUG/n+jCT2kjNxXm7qohqB6jTkdx
+roOP1qPi/4IvezsprEgTL6CPD64x/xTXYf+3mkvrJqLObhFNaFI8kKs9aoPBvcys
+VPsYf2HvjQd2YwOLLBRY4ayoRX/tf+fk1vcgG0s64yRB40dK4m3qF199HFR3zqy/
+9HVwejt05eW4xF9YypCm
+=yBBL
+-----END PGP SIGNATURE-----

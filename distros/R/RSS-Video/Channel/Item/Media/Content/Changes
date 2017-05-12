@@ -1,0 +1,6 @@
+Revision history for Perl extension RSS::Video::Google::Channel::Item::Media::Content.
+
+0.01  Sat Jan 20 22:56:14 2007
+	- original version; created by h2xs 1.20 with options
+		-AXn RSS::Video::Google::Channel::Item::Media::Content
+

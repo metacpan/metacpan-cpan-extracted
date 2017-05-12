@@ -1,0 +1,99 @@
+Revision history for Perl extension RTF::Writer
+                                        Time-stamp: "2003-11-04 02:20:02 AST"
+
+2003-11-04  Sean M. Burke  sburke@cpan.org
+	* Release 1.11
+	* Minor bugfix version
+	* Vitor Hugo reports a problem where ->image and ->image_paragraph
+	when called with a picspecs parameter would forget to put
+	whitespace before the start of the picture data.  Fixed!
+	* A few little doc typoes fixed.
+	
+2003-10-14  Sean M. Burke  sburke@cpan.org
+	* Release 1.10
+	* Loïc Bourgeois catches a nasty error with $rtf->image -- it
+	generates one more } than {'s, unbalancing the whole document!
+	(No problem with image_paragraph, though.)
+	Fixed!
+
+	* Tests rewritten to use File::Spec instead of chdir'ing.
+	* Added tests for well-formedness ({}-matching).
+	
+2003-09-26  Sean M. Burke  sburke@cpan.org
+	* Release 1.09
+	* Just fixed the Makefile.PL to declare the Image::Size dependency.
+	
+2003-09-23  Sean M. Burke  sburke@cpan.org
+	* Release 1.08
+
+	* Now supports borders and alignment in table cells.
+
+	* Now supports embedding images, thanks to some pointers from
+	David Thielen.
+	
+	* CHANGE: previously tables by default had no borders.  Now they
+	have a thin solid-line border, by default.  (The original
+	behavior was an accident on my part, by the way.)
+
+	* More tests.
+	
+	* No longer requires utf8, thanks to a hack adapted from Slaven Rezic:
+         BEGIN { eval {require utf8}; $INC{"utf8.pm"} = "dummy_value" if $@ }
+	 use utf8;
+	
+	
+2002-12-07  Sean M. Burke  sburke@cpan.org
+	* Release 1.07
+
+	Bugfix: changed internal object %Escape to @Escape, to get around
+	some utf8 bugs in hash lookups on utf8-strings.
+
+	Bugfix: Now handles Unicode characters.  But now requires
+	the utf8 module.  Probably won't work under versions before 5.6 --
+	altho you could always create a utf8.pm consisting of just "1;".
+
+	Bugfix: minor change to the code that inserts newlines in the
+	output RTF.  Previous versions could erroneously change
+	"\foo \bar" to "\foo[NL] \bar".  Now correctly changes to
+	"\foo [NL]\bar".
+
+	Bugfix: the pod documented a new_to_handle, but the routine was
+	previously called new_to_fh.  Now there's a new new_to_handle
+	aliases to new_to_handle.
+
+	Added compile-time assertion that module is running in an ASCII
+	world.  It never worked right under EBCDIC (etc) anyway.
+
+	Full Unicode support doesn't really turn on unless you're under
+	Perl 5.7 or later.  Altho you can force it by turning on
+	$RTF::Writer::Unicode.  I do this to get around some segfaulty
+	errors under 5.6.
+	
+2001-07-27  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.06 -- bugfix: TableRowDecl would emit pointless
+	warnings because of int()ing an undefined value.  Fixed.
+	
+2001-06-21  Sean M. Burke  sburke@cpan.org
+	
+	* Release 1.05 -- bugfix: on failure, new_to_file stupidly
+	reported $1 instead of $!.  Ironic, huh?  Fixed.
+	
+2001-05-27  Sean M. Burke  sburke@cpan.org
+	
+	* Release 1.04 -- fixing some doc typos caught by
+	Matt Olson <matto@advanis.ca> and "David D. Kilzer"
+	<ddkilzer@theracingworld.com>
+	
+2001-05-16  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.03 -- Just fixing minor typos in the docs.
+	
+2001-04-26  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.02 -- no substantive changes; just fixing the
+	horribly screwed up makefile.
+	
+2001-04-24  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.01 -- first public release

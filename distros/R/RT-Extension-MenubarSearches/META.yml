@@ -1,0 +1,11 @@
+abstract: RT lib/RT/Extension/MenubarSearches.pm Extension
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: Perl
+name: RT-Extension-MenubarSearches
+no_index: 
+  directory: 
+    - html
+    - inc
+    - t
+version: 0.05

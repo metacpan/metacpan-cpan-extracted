@@ -1,0 +1,41 @@
+---
+abstract: 'Lexer for regular expression of perl'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-Lexer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Regexp::Lexer:
+    file: lib/Regexp/Lexer.pm
+    version: '0.05'
+  Regexp::Lexer::TokenType:
+    file: lib/Regexp/Lexer/TokenType.pm
+requires:
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/moznion/Regexp-Lexer/issues
+  homepage: https://github.com/moznion/Regexp-Lexer
+  repository: git://github.com/moznion/Regexp-Lexer.git
+version: '0.05'
+x_authority: cpan:MOZNION

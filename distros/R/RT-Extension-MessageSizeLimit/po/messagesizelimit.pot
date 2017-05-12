@@ -1,0 +1,5 @@
+msgid "Message size limit exceeded"
+msgstr ""
+
+msgid "please reduce message size or remove attachments"
+msgstr ""

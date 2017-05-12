@@ -1,0 +1,40 @@
+---
+abstract: 'Router::Simple equipped with reverse routing'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Router-Simple-Reversible
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Router::Simple::Reversible:
+    file: lib/Router/Simple/Reversible.pm
+    version: '0.01'
+requires:
+  Router::Simple: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/motemen/perl5-Router-Simple-Reversible/issues
+  homepage: https://github.com/motemen/perl5-Router-Simple-Reversible
+  repository: git://github.com/motemen/perl5-Router-Simple-Reversible.git
+version: '0.01'
+x_authority: cpan:MOTEMEN
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

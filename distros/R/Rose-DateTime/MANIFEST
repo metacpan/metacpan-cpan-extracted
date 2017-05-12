@@ -1,0 +1,12 @@
+Changes
+lib/Rose/DateTime.pm
+lib/Rose/DateTime/Parser.pm
+lib/Rose/DateTime/Util.pm
+Makefile.PL
+MANIFEST
+t/basic.t
+t/locale.t
+t/parser.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

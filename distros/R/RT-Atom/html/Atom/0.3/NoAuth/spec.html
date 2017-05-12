@@ -1,0 +1,22 @@
+<%INIT>
+require lib;
+lib->import($m->base_comp->source_dir . '/../../../../lib');
+
+require RT::Atom;
+require Pod::Html;
+require File::Temp;
+
+my ($fh, $filename) = File::Temp::tempfile();
+my $infile = $INC{'RT/Atom.pm'};
+$infile =~ s/pm$/pod/i;
+
+Pod::Html::pod2html(
+    "--infile=$infile",
+    "--outfile=$filename",
+    "--cachedir=" . File::Spec->tmpdir,
+    "--css=pod.css",
+);
+
+seek $fh, 0, 0;
+print <$fh>;
+</%INIT>

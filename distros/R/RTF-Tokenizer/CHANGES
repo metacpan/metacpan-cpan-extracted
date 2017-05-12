@@ -1,0 +1,140 @@
+Revision history for Perl extension RTF::Tokenizer.
+
+1.20  Tue Jul 12 08:45:00 2016
+    - Removed unescaped left-brace re:
+      http://www.cpantesters.org/cpan/report/68825326
+
+1.19  Tue Dec 23 15:34:00 2014
+    - Allowed preservation of whitespace, and thus the ability to
+      round-trip a document. Based on the work in:
+      https://rt.cpan.org/Ticket/Display.html?id=82698
+
+1.18  Sun Apr 20 13:55:00 2014
+    - Moved the RTF corpus in to one place
+    - Added a get_all_tokens method
+
+1.17  Sat Apr 19 17:05:00 2014
+    - Added implicit dependencies
+    - Perltidied the whole thing
+    - Fixed a small bug with line endings
+
+1.16  Sat Apr 19 15:55:00 2014
+    - Use "no warnings" instead of localizing ^W
+    - Made the dependency on a new MakeMaker explicit
+
+1.15  Mon Apr 14 01:10:00 2014
+    - Fixed noisy EOF issue: https://rt.cpan.org/Ticket/Display.html?id=82697
+
+1.14  Sat Jan 25 16:25:00 2014
+    - Stopped noisy regular expression matching
+
+1.13  Sat Jan 01 14:40:00 2010
+    - Made the test code a little cleaner, although there's still
+      quite some work to be done there
+    - Run cleanly under warnings
+    - Shebang line in tests as a source-highlighter hint
+
+1.12  Fri Dec 31 16:30:00 2010
+    - Fixed source formatting and duplicated incorrect VERSION
+      data
+
+1.11  Fri Dec 31 16:00:00 2010
+    - Tidied up the distro and removed some files that shouldn't have
+      been included
+
+1.10  Sun Apr 22 23:00:00 2007
+    - Fixed a bug in the handling of too little binary data
+    - Reworked the code documentation
+
+1.09  Tue Apr 17 14:30:00 2007
+    - We can now use objects that are IO::File subclasses, thanks to
+      a patch from Richard Balint
+
+1.08  Tue Jan 04 14:40:00 2005
+    - Allow for 'sloppy' RTF to be handled if the user wants it
+
+1.07    Fri Apr 02 21:45:00 2004
+    - Added a note about unicode parsing
+    - Corrected dates in the documentation
+    - Fixed some warnings to do with line endings
+
+1.06    Mon Jan 05 18:00:00 2004
+    - Fixed some brainos with tests, and skipping if IO::Scalar wasn't
+      installed.
+    - Corrected this file...
+
+1.05    Mon Oct 27 13:00:00 2003
+    * Added the ability to return tokens, to make XML::RTF::SAX a little
+      more sane. See the docs for details.
+    * Removed the syntax-highlighting modules from the core (will be
+      released seperately)
+
+1.04    Fri Oct 03 18:30:00 2003
+    * Removed all the cruft added in 1.03 (signatures, Module::Build)
+    * Added syntax-highlighting modules
+    * Reworked eg/ - added rtfdiff, removed rtf2rtf, renamed rtfdump
+    * Support for \uc
+    * Added optional differentiation between control words and escapes
+    - Bunch more tests
+
+1.03    Never released...
+    * Use Module::Build
+    * Sign the distro...
+    - Recovery will go to either group
+
+1.02   Sun Aug 31 16:10:00 2003
+    * We now try to recover from badly-formed control words, meaning
+      that embeded file paths no longer cause fatal errors.
+    * Escaped tabs now return '\tab'
+    * Tabs are now handled correctly in text
+    * \; returns an error, but no longer a fatal one
+    * Text that spans multiple lines is now treated as one token
+    - Removed remnants of TODO list from module...
+
+1.01   Sun Apr 10 22:00:00 2003
+    * We no longer trash $/, which is good
+    * The tokenizer can be sub-classed! Yay!
+    * \bin data now handled
+    * new() can now invoke read_file and read_string
+    * IO::File objects now accepted in read_file()
+    - Added some debugging to read_file() to catch weirdness
+    - Sanitized regular expressions
+    - Created the _get_line() subroutine
+    - Corrected documentation about read_file() behaviour
+    - Stopped the {_BUFFER} being overwritten on read
+    - Various bits of POD cleaned up
+    - Ability to control how many characters are read determining IRS
+    - Removed IO::Scalar dependency
+    - Added numerous new tests (mainly to tests above features)
+
+1.00   Wed Mar 26 14:00:00 2003
+    - Complete internal rewrite
+    - Removal of RTF::Tokenizer::FontTable
+    - Removal of RTF::Tokenizer::ControlWords
+    - Removal of bookmark() function
+    - Removal of jump_to_control_word() function
+    - Control symbols and entities are now correctly handled
+      as control words, which removes the need for an
+      entity handler.
+
+0.04   Mon Mar 10 14:00:00 2003 (never released)
+    - Carry RTF::Tokenizer::ControlWords, a Control Word glossary
+
+0.03   Thu Oct 17 21:25:00 2002
+    - Now we handle unprintables (like non-breaking spaces)
+
+0.02.1 Mon Oct  7 10:02:00 2002
+    - Corrected a mistake in the README
+    - Fixed versions to be correct
+    - Re-added a MANIFEST file(!)
+
+0.02  Wed Jul  3 12:09:09 2002
+    - Fixed some bugs
+    - Added some more documentation
+    - Added rtf2css.pl, an example script
+    - Added RTF::Tokenizer::FontTable, to pull font table info into
+      a data structure.
+
+0.01  Mon Jul  1 12:00:00 2002
+    - original version; created by h2xs 1.19
+

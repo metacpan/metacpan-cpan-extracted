@@ -1,0 +1,105 @@
+<html>
+<head>
+<title><%$post->Subject%></title>
+<link rel="stylesheet" href="<%$RT::WebURL%>/Journal/clean.css" type="text/css" />
+
+</head>
+<body>
+<div id="banner"><&Attr, Name=>'Title', User=> $User&><br />
+<span class="description"></span>
+</div>
+
+<div id="container">
+
+<div class="blog">
+
+<div id="menu"><a href="<&Attr, Name=>'BaseURL', User=> $User&>"><&Attr, Name=>'Title', User=> $User&></a>
+</div>
+</div>
+
+<div class="blog">
+
+<div class="date"><%$post->CreatedObj->AsString%></div><br>
+
+<span class"title"><%$post->Subject%></span><br />
+<%$post->FirstCustomFieldValue('Category')%>
+% my $content;
+% $post->Transactions->First && ($content = $post->Transactions->First->Content);
+% $content =~ s/-- (.*)$//gism;
+% $content =~ s/\n/<br>/gi;
+<div class="blogbody">
+<%$content|n%>
+% my $refto = $post->RefersTo;
+<div align="right">
+% while( my $link = $refto->Next ) {
+<A href="<%$link->TargetURI->Resolver->HREF%>"><%$link->TargetURI->Resolver->HREF%></a><br>
+% }
+</div>
+% if ($session{'CurrentUser'} && $session{'CurrentUser'}->Id == $post->OwnerObj->Id) {
+[<a href="<&Attr, Name=>'BaseURL', User=> $User&>/Entry/<%$post->id%>/Edit">Edit</a>]
+% }
+<hr>
+% my $history = $post->Transactions();
+% while (my $comment = $history->Next) {
+% next unless ($comment->Type eq 'Correspond');
+% my $attach = $comment->Attachments;
+% my $header = $comment->Attachments->First->Headers;
+% my ($subject, $sender);
+% if ($header =~ /^From: (.*?)$/m) {  $sender = $1};
+% if ($header =~ /^Subject: (.*?)$/m) {  $subject = $1};
+<div class="comments-head"><%$subject||loc( 'no subject')%></div>
+<span class="comments-post">Posted by <%$sender%> at <%$comment->CreatedObj->AsString%></span><br />
+<div class="comments-body">
+<%$comment->Content%>
+</div>
+%# $attach->Limit(FIELD => 'ContentType', OPERATOR => 'LIKE', VALUE => 'image/jpeg');
+% while (my $file = $attach->Next) {
+Found :<%$file->id%> / <%$file->Filename%>
+% }
+<hr>
+% }
+<hr>
+<form action="<&Attr, Name=>'BaseURL', User=> $User&>/Entry/<%$post->id%>" method="post">
+<input type=hidden name="id" value="<%$post->id%>">
+Subject: <input size="60" name="Subject"><br>
+Name: <input size="40" name="From"> (ex: Bob Dobbs &lt;sendmespam@example.com&gt;)<br>
+<textarea name="comment" rows=10 cols=70></textarea>
+<input type="submit">
+</form>
+</div>
+</div>
+</body>
+</html>
+
+<%INIT>
+my $guest = RT::CurrentUser->new('RT::Journal-guest');
+my $post = RT::Ticket->new( $guest );
+$post->Load($id);
+unless ($post->id) {
+$m->comp("Abort", Message => "Invalid post id" );
+	
+}
+
+
+  unless 
+    ( $post->OwnerObj->id == $User->Id )  {
+$m->comp("Abort", Message => "Not a post in this blog ".$post->OwnerObj->id . " is not ".$User->id );
+}
+	my $args = $m->request_args;
+if ($args->{'comment'}) {
+	# comment on the ticket 
+	my $entity = MIME::Entity->build(Subject => $args->{'Subject'},
+				         From => $args->{'From'},
+					 'X-IP-Address' => $ENV{'REMOTE_ADDR'},
+					 Data => $args->{'comment'});
+
+	$post->Correspond(MIMEObj => $entity);
+
+}
+
+
+</%INIT>
+<%ARGS>
+$id	    => undef
+$User 	=> undef
+</%ARGS>

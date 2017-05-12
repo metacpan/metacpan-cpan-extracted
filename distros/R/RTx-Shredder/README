@@ -1,0 +1,242 @@
+NAME
+    RTx::Shredder - DEPRECATED Cleanup RT database
+
+SYNOPSIS
+    RTx::Shredder has been part of the RT core since RT 3.8.0 was released
+    in 2008. Do not attempt to install or make use of this extension on a
+    modern release of RT, it will not work and may well corrupt your
+    database.
+
+    Read more about the core version of
+    <http://bestpractical.com/docs/rt/latest/rt-shredder.html|RT::Shredder>
+
+  CLI
+      rtx-shredder --force --plugin 'Tickets=queue,general;status,deleted'
+
+  API
+    Same action as in CLI example, but from perl script:
+
+      use RTx::Shredder;
+      RTx::Shredder::Init( force => 1 );
+      my $deleted = RT::Tickets->new( $RT::SystemUser );
+      $deleted->{'allow_deleted_search'} = 1;
+      $deleted->LimitQueue( VALUE => 'general' );
+      $deleted->LimitStatus( VALUE => 'deleted' );
+      while( my $t = $deleted->Next ) {
+          $t->Wipeout;
+      }
+
+DESCRIPTION
+    RTx::Shredder is extention to RT API which allow you to delete data from
+    RT database. Now Shredder support wipe out of almost all RT objects
+    (Tickets, Transactions, Attachments, Users...)
+
+  Command line tools(CLI)
+    rtx-shredder script that is shipped with the distribution allow you to
+    delete objects from command line or with system tasks scheduler(cron or
+    other).
+
+  Web based interface(WebUI)
+    Shredder's WebUI integrates into RT's WebUI and you can find it under
+    Configuration->Tools->Shredder tab. This interface is similar to CLI and
+    give you the same functionality, but it's available from browser.
+
+  API
+    RTx::Shredder modules is extension to RT API which add(push) methods
+    into base RT classes. API is not well documented yet, but you can find
+    usage examples in rtx-shredder script code and in t/* files.
+
+CONFIGURATION
+  $RT::DependenciesLimit
+    Shredder stops with error if object has more then $RT::DependenciesLimit
+    dependencies. By default this value is 1000. For example: ticket has
+    1000 transactions or transaction has 1000 attachments. This is
+    protection from bugs in shredder code, but sometimes when you have big
+    mail loops you may hit it. You can change default value, in
+    RT_SiteConfig.pm add "Set( $DependenciesLimit, new_limit );"
+
+  $ShredderStoragePath
+    By default shredder saves dumps in
+    /path-to-RT-var-dir/data/RTx-Shredder, with this option you can change
+    path, but note that value should be absolute path to the dir you want.
+
+API DESCRIPTION
+    RTx::Shredder class implements interfaces to objects cache, actions on
+    the objects in the cache and backups storage.
+
+  Dependencies
+  GENERIC
+   Init( %options )
+    Sets shredder defaults, loads RT config and init RT interface.
+
+    NOTE that this is function and must be called with
+    "RTx::Shredder::Init();".
+
+    TODO: describe possible shredder options.
+
+   new( %options )
+    Shredder object constructor takes options hash and returns new object.
+
+   CastObjectsToRecords( Objects => undef )
+    Cast objects to the "RT::Record" objects or its ancesstors. Objects can
+    be passed as SCALAR (format "<class>-<id>"), ARRAY, "RT::Record"
+    ancesstors or "RT::SearchBuilder" ancesstor.
+
+    Most methods that takes "Objects" argument use this method to cast
+    argument value to list of records.
+
+    Returns array of the records.
+
+    For example:
+
+        my @objs = $shredder->CastObjectsToRecords(
+            Objects => [             # ARRAY reference
+                'RT::Attachment-10', # SCALAR or SCALAR reference
+                $tickets,            # RT::Tickets object (isa RT::SearchBuilder)
+                $user,               # RT::User object (isa RT::Record)
+            ],
+        );
+
+  OBJECTS CACHE
+   PutObjects( Objects => undef )
+    Puts objects into cache.
+
+    Returns array of the cache entries.
+
+    See "CastObjectsToRecords" method for supported types of the "Objects"
+    argument.
+
+   PutObject( Object => undef )
+    Puts record object into cache and returns its cache entry.
+
+    NOTE that this method support only "RT::Record" object or its ancesstor
+    objects, if you want put mutliple objects or objects represented by
+    different classes then use "PutObjects" method instead.
+
+   GetObject, GetState, GetRecord( String => ''| Object => '' )
+    Returns record object from cache, cache entry state or cache entry
+    accordingly.
+
+    All three methods takes "String" (format "<class>-<id>") or "Object"
+    argument. "String" argument has more priority than "Object" so if it's
+    not empty then methods leave "Object" argument unchecked.
+
+    You can read about possible states and thier meaning in
+    RTx::Shredder::Constants docs.
+
+  DEPENDENCIES RESOLVERS
+  DATA STORAGE AND BACKUPS
+    Shredder allow you to store data you delete in files as scripts with SQL
+    commands.
+
+   SetFile( FileName => '<ISO DATETIME>-XXXX.sql', FromStorage => 1 )
+    Calls "GetFileName" method to check and translate file name, then checks
+    if file is empty, opens it. After this you can dump records with
+    "DumpSQL" method.
+
+    Returns name and handle.
+
+    NOTE: If file allready exists then file content would be overriden. Also
+    in this situation method prints warning to the STDERR unless "force"
+    shredder's option is used.
+
+    Examples: # file from storage with default name format my ($fname, $fh)
+    = $shredder->SetFile; # file from storage with custom name format my
+    ($fname, $fh) = $shredder->SetFile( FileName => 'shredder-XXXX.backup'
+    ); # file with path relative to the current dir my ($fname, $fh) =
+    $shredder->SetFile( FromStorage => 0, FileName => 'backups/shredder.sql'
+    ); # file with absolute path my ($fname, $fh) = $shredder->SetFile(
+    FromStorage => 0, FileName => '/var/backups/shredder-XXXX.sql' );
+
+   GetFileName( FileName => '<ISO DATETIME>-XXXX.sql', FromStorage => 1 )
+    Takes desired "FileName" and flag "FromStorage" then translate file name
+    to absolute path by next rules: * Default "FileName" value is "<ISO
+    DATETIME>-XXXX.sql"; * if "FileName" has "XXXX" (exactly four uppercase
+    "X" letters) then it would be changed with digits from 0000 to 9999
+    range, with first one notexistant value; * if "FromStorage" argument is
+    true then result path would always be relative to "StoragePath"; * if
+    "FromStorage" argument is false then result would be relative to the
+    current dir unless it's allready absolute path.
+
+    Returns file absolute path.
+
+    See example for method "SetFile"
+
+   StoragePath
+    Returns absolute path to storage dir. By default it's
+    /path-to-RT-var-dir/data/RTx-Shredder/ (in default RT install would be
+    /opt/rt3/var/data/RTx-Shredder), but you can change this value with
+    config option $RT::ShredderStoragePath. See "CONFIGURATION" sections in
+    this doc.
+
+    See "SetFile" and "GetFileName" methods description.
+
+NOTES
+  Database indexes
+    To speed up shredding you can add several indexes to your DB.
+
+        CREATE INDEX SHREDDER_CGM1 ON CachedGroupMembers(MemberId, GroupId, Disabled);
+        CREATE INDEX SHREDDER_CGM2 ON CachedGroupMembers(ImmediateParentId, MemberId);
+
+        CREATE UNIQUE INDEX SHREDDER_GM1 ON GroupMembers(MemberId, GroupId);
+
+        CREATE INDEX SHREDDER_TXN1 ON Transactions(ReferenceType, OldReference);
+        CREATE INDEX SHREDDER_TXN2 ON Transactions(ReferenceType, NewReference);
+        CREATE INDEX SHREDDER_TXN3 ON Transactions(Type, OldValue);
+        CREATE INDEX SHREDDER_TXN4 ON Transactions(Type, NewValue);
+
+    If shredding is slow anyway then you have to get list of slow queries,
+    for example mysql has special options to turn on log of slow queries,
+    queries that takes more than one second can be considered as slow, then
+    send the log to the "AUTHOR".
+
+  Database transactions support
+    Since RTx-Shredder-0.03_01 extension uses database transactions and
+    should be much safer to run on production servers.
+
+  Foreign keys
+    Mainstream RT doesn't use FKs, but at least I posted DDL script that
+    creates them in mysql DB, note that if you use FKs then this two valid
+    keys don't allow delete Tickets because of bug in MySQL:
+
+      ALTER TABLE Tickets ADD FOREIGN KEY (EffectiveId) REFERENCES Tickets(id);
+      ALTER TABLE CachedGroupMembers ADD FOREIGN KEY (Via) REFERENCES CachedGroupMembers(id);
+
+    <http://bugs.mysql.com/bug.php?id=4042>
+
+BUGS AND HOW TO CONTRIBUTE
+    I need your feedback in all cases: if you use it or not, is it works for
+    you or not.
+
+  Testing
+    Don't skip "make test" step while install and send me reports if it's
+    fails. Add your own tests, it's easy enough if you've writen at list one
+    perl script that works with RT. Read more about testing in t/utils.pl.
+
+  Reporting
+    Send reports to "AUTHOR" or to the RT mailing lists.
+
+  Documentation
+    Many bugs in the docs: insanity, spelling, gramar and so on. Patches are
+    wellcome.
+
+  Todo
+    Please, see Todo file, it has some technical notes about what I plan to
+    do, when I'll do it, also it describes some problems code has.
+
+  Repository
+    You can find repository of this project at
+    <https://opensvn.csie.org/rtx_shredder>
+
+AUTHOR
+        Ruslan U. Zakirov <Ruslan.Zakirov@gmail.com>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the Perl distribution.
+
+SEE ALSO
+    rtx-shredder, rtx-validator
+

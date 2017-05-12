@@ -1,0 +1,28 @@
+RDF-Helper-Properties
+=====================
+
+Created:      2010-08-18
+Bug tracker:  <https://github.com/kjetilk/RDF-Helper-Properties/issues>
+Maintainer:   Kjetil Kjernsmo <mailto:kjetilk@cpan.org>
+
+0.24  2016-12-29  Update to Moo.
+
+ - (Update) Update to Moo.
+   ++$haarg
+
+0.22  2012-08-13
+
+ - (Addition) 'title' method called in list context now also returns
+   literal datatype and language.
+
+0.20  2012-08-10  Refactoring
+
+ - (Addition) 'page_properties' and 'title_properties' attributes allow
+   list of properties understood to be customized.
+ - (Update) Drop dependency on deprecated Error.pm; use Carp::confess
+   instead.
+ - Expose 'cache' attribute publicly, and allow it to accept
+   CHI/Cache::Cache objects.
+ - Refactored module.
+ - use Any::Moose
+

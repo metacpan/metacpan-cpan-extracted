@@ -1,0 +1,82 @@
+%# Dare to be naive.
+%#                 -- R. Buckminster Fuller
+<table border="0" cellspacing="0" cellpadding="2" width="100%">
+<tr>
+    <td class="tableTitle"><&|/l&>Overview</&></td>
+    <td class="tableTitle"><&|/l&>Pending issues</&></td>
+    <td class="tableTitle"><&|/l&>Resolved issues</&></td>
+</tr>
+<tr valign="top"><td>
+<br>
+<ul>
+<li><&|/l&>Admins</&>: <% $QueueObj->AdminCc->MembersObj->Count || 0 %></li>
+<li><&|/l&>Members</&>: <% $QueueObj->Cc->MembersObj->Count || 0 %></li>
+<li><&|/l&>Download #</&>: <% $QueueObj->Attribute('Download') || 0 %></li>
+<li><&|/l&>Requested issues</&>: <% $req || 0 %></li>
+<li><&|/l&>Resolved issues</&>: <% $res || 0 %></li>
+<li><&|/l&>Source checkin</&>: <% $checkin %></li>
+<li><&|/l&>Source checkout</&>: <&|/l&>n/a</&></li>
+</ul>
+<br>
+<table border="0" cellspacing="1" cellpadding="2" width=100%>
+<tr><td colspan="4" class="tableTitle"><&|/l&>Tracker Statistics</&></td></tr>
+<tr><td class="tableTitle">&nbsp;</td>
+    <td width="30%" class="tableTitle"><&|/l&>Pending</&></td>
+    <td width="30%" class="tableTitle"><&|/l&>Resolved</&></td>
+    <td width="30%" class="tableTitle"><&|/l&>Total #</&></td></tr>
+% foreach my $type (qw(defect patch task feature enhancement), 'Total #') {
+<tr><td class="tableTitle"><nobr><% loc($type) %></nobr></td>
+%     my $t = lc($type); $t =~ s/ .*//;
+%     foreach my $status (qw(pending resolved total)) {
+    <td bgcolor="white" align="right">
+	<% $stat{$status}{$t} || 0 %>
+    </td>
+%     }
+% }
+</table>
+
+</td><td>
+<& ByName, Data => $by_name{pending} &>
+</td><td>
+<& ByName, Data => $by_name{resolved} &>
+</td></tr>
+</table>
+
+<%INIT>
+my $TicketsObj = RT::Tickets->new($session{CurrentUser});
+$TicketsObj->LimitQueue(VALUE => $QueueObj->Id);
+$TicketsObj->LimitStatus(OPERATOR => '!=', VALUE => 'deleted');
+my $req = $TicketsObj->Count;
+
+my (%by_name, %stat);
+while (my $TicketObj = $TicketsObj->Next) {
+    my $RequestorObj = $TicketObj->FirstRequestor or next;
+    my $type = $TicketObj->CustomFieldValue('Type') or next;
+    my $name = $RequestorObj->Name or next;
+    next if $name eq 'RT_System';
+    my $status = (RT::Queue->IsActiveStatus($TicketObj->Status))
+	? 'pending' : 'resolved';
+
+    $by_name{$status}{$name}++;
+    $stat{$status}{$type}++;
+    $stat{$status}{total}++;
+    $stat{total}{$type}++;
+    $stat{total}{total}++;
+}
+
+$TicketsObj = RT::Tickets->new($session{CurrentUser});
+$TicketsObj->LimitQueue(VALUE => $QueueObj->Id);
+$TicketsObj->LimitStatus(VALUE => $_) for
+    grep !/deleted/, RT::Queue->InactiveStatusArray;
+my $res = $TicketsObj->Count;
+
+require LWP::Simple;
+my $src = eval {
+    $m->scomp('/Foundry/Project/Source/index.html', QueueObj => $QueueObj)
+};
+my $checkin = loc('n/a');
+$checkin = ($1 - 1) if $src =~ /of revision (\d+)/;
+</%INIT>
+<%ARGS>
+$QueueObj
+</%ARGS>

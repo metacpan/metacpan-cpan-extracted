@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d87101c3ae985c8e9e32dad68f755d4974318d54 MANIFEST
+SHA1 894dd9c427ac5a945db0c2fe999a17b4a62a14c2 META.yml
+SHA1 5fa44a1dbd53c9f2d70b1de26c7ac0a17eed6fab Makefile.PL
+SHA1 9acb52ec6b162e602899b8a86f1a409e521efe7c README
+SHA1 731d3184f2e696c2f3f06569f47c86f4115bc352 ex/RT-Example-FormTools/Makefile.PL
+SHA1 a9b93638716e36271211c07f0699e1dfcb400c0f ex/RT-Example-FormTools/etc/initialdata
+SHA1 c9a6d3a7a2f7dc647d7d8b873f09adec07602035 ex/RT-Example-FormTools/html/Example/autohandler
+SHA1 c9c6e0982484945b025aad2807784570276e7f31 ex/RT-Example-FormTools/html/Example/confirm
+SHA1 47b2c3108820fe71122c142a20d7f2de64a0be22 ex/RT-Example-FormTools/html/Example/index.html
+SHA1 126324b941c9865e5cac83e027c1dd9384f40912 ex/RT-Example-FormTools/html/Example/submit
+SHA1 b0611dea5f8696c0f5d8e32ac7a17a685186e533 ex/RT-Example-FormTools/html/Example/user_info
+SHA1 8d03b9df28ea25633d9b214edd271477b29d4f36 ex/RT-Example-FormTools/lib/RT/Example/FormTools.pm
+SHA1 5f7fe68e12015b34ecf40b8adb6c7969066983e6 html/Callbacks/FormTools/Elements/Header/Head
+SHA1 f2a89e163abf26d48b065ee740b20fcc6d9e6fdd html/FormTools/Field
+SHA1 5de806cd0c2eceb7ef9667382a9fe0b86319a39f html/FormTools/Form
+SHA1 2a1bf0215b6700e36ed091b56dc4eb467b160973 html/FormTools/Next
+SHA1 bbd6b34d3c1f1287877f4fbcabbb71c4ce4d4647 html/FormTools/ShowChoices
+SHA1 469dec74d77ce21fb10baf9bdc61009a8dd99f09 html/NoAuth/js/form_tools.js
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 6e010ba20a9d0ae23d8d0ff516868c1e571c2d44 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 b12e35d3aa6524a698d353f5bc264b40edf73654 lib/RT/Extension/FormTools.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSQpHIACgkQMflWJZZAbqB+sQCgwkLH712A1fpCvCkkA9LlrB1w
+w78AnA9NUQWqjtfyZJ7MlQ4yu71DUYUp
+=e7cB
+-----END PGP SIGNATURE-----

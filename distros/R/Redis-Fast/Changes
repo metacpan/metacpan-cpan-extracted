@@ -1,0 +1,88 @@
+Revision history for Redis
+
+0.20 2017-02-25T22:48:26Z
+    - Fix build issue on newer Perl
+
+0.19 2016-12-20T11:33:33Z
+    - support reconnecting on the specified error (thanks @yoheimuta)
+    - experimental support of IPv6
+    - fix automatic refresh errors of sentinels list
+
+0.18 2016-01-26T13:09:12Z
+    - add missing dependencies (Test::UNIXSock, Parallel::ForkManager)
+
+0.17 2016-01-23T06:29:53Z
+    - use poll(2) instead of select(2)
+    - hiredis is v0.13.3 now
+    - fix some compiling warnings
+
+0.16 2015-03-12T02:17:45Z
+    - fix bad connection error handling #39 thx @celogeek
+
+0.15 2015-03-10T14:10:54Z
+    - use gmake for DragonflyBSD(thanks @nise-nabe)
+    - support topic "0" in psubscribe
+    - hiredis is v0.12.1 now
+    - default connection unlimited time (-1)
+    - use cnx_timeout for the connection instead of every
+
+0.14 2014-12-07T13:34:06Z
+    - Redis::Fast is now compatible with Redis.pm 1.976
+    - fix a link in pod because hiredis has moved(thanks @Csson !)
+    - fix the test of password
+    - fix inconsistency with binary strings
+
+0.13 2014-10-16T11:07:31Z
+    - support password option
+    - fix deep recursion when maxclients is reached and reconnect, name, on_connect parameters used #21
+    - fix reconnect disabled inside transaction #22
+
+0.12 2014-09-08T16:19:11Z
+    - every option is in microseconds now
+    - fix some tests
+    - add missing dependencies (Try::Tiny, Test::SharedFork)
+    - quit returns 1 if connection is available
+
+0.11 2014-07-16T02:27:40Z
+    - fix wrong read timeout
+    - do not reconnect with read timeout
+
+0.10 2014-07-16T00:55:29Z
+    - no change
+    - I release it by mistake
+
+0.09 2014-07-08T15:46:39Z
+    - fix double free
+    - fix signal handling
+
+0.08 2014-05-31T03:46:58Z
+    - remove enconding/decoding feature
+    - fix select database bug after reconnect
+
+0.07 2014-05-17T07:19:34Z
+    - Redis::Fast is now compatible with Redis.pm 1.974
+    - fix reconnect during transaction
+    - Sentinel features (connections, timeouts, etc) support
+
+0.06 2014-01-31T16:44:53Z
+    - Fix memory leak of callback functions
+    - Fix issue #5 does not play way with signals
+
+0.05 2013-12-20T02:22:09Z
+    - Fix memory leak of lists
+    - PING commands trigers reconnect
+
+0.04 2013-12-10T02:56:46Z
+    - Fix memory leak
+    - Fix dependance
+
+0.03 2013-10-16T12:14:58Z
+    - wait_for_messages will block forever if parameters are not given
+
+0.02 2013-10-13T13:27:37Z
+    - Remove needless module
+    - Use gmake for building library on BSD platform except KFreeBSD
+    - Improve reconnection
+
+0.01 2013-10-10T16:46:27Z
+    - First version

@@ -1,0 +1,36 @@
+RT-Extension-ReassignOwner version 0.0.1
+
+This extension adds an action that moves the Owner to
+AdminCc on a ticket's queue change
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make initdb
+    make install
+
+Add the following to your RT_HOME/etc/RT_SiteConfig.pm
+
+ Set($UseTransactionBatch,1);
+
+Apply the included modify.diff file
+This is a change that will be in RT3.6.4 but is needed
+to properly display the results of this extension
+
+stop apache, clear the var/mason_data dir, start apache
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

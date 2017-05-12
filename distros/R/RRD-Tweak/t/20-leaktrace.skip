@@ -1,0 +1,55 @@
+use strict;
+use warnings;
+
+use Test::More tests => 3;
+use Test::LeakTrace;
+
+
+use File::Temp qw/tmpnam/;
+use RRDs;
+use Data::Dumper;
+
+BEGIN {
+  use_ok('RRD::Tweak', "use RRD::Tweak") or
+    BAIL_OUT("cannot load the module");
+}
+
+diag("Testing RRD::Tweak $RRD::Tweak::VERSION, Perl $], $^X");
+
+my $filename1 = tmpnam();
+
+# 1326585600 = Sun Jan 15 01:00:00 2012
+RRDs::create($filename1, '--step', '300',
+             '--start', '1326585600',
+             'DS:x1:GAUGE:600:-1e10:1e15',
+             'DS:x2:GAUGE:600:0.0001:U',
+             'DS:x3:GAUGE:600:0.0001:U',
+             'RRA:AVERAGE:0:1:20',
+             'RRA:AVERAGE:0.17:6:20');
+
+
+my $err = RRDs::error();
+ok((not $err), "creating RRD file: $filename1") or
+  BAIL_OUT("Cannot create RRD file: " . $err);
+
+leaks_cmp_ok{
+    for my $x (0..3) {
+        my $rrd = RRD::Tweak->new();
+        $rrd->load_file($filename1);
+    }
+} '<', 1;
+
+
+unlink $filename1;
+
+
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-continued-statement-offset: 4
+# cperl-continued-brace-offset: -4
+# cperl-brace-offset: 0
+# cperl-label-offset: -2
+# End:

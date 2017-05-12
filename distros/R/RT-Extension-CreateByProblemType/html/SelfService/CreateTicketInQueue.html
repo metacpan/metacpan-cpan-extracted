@@ -1,0 +1,23 @@
+<& Elements/Header, Title => loc("Create a ticket") &>
+
+<h1><&|/l&>Select a queue for your new ticket</&></h1>
+
+% while (my $q = $queues->Next) {
+%     next unless $q->CurrentUserHasRight('CreateTicket');
+<h3><a href="<%RT->Config->Get('WebPath')%>/SelfService/Create.html?Queue=<%$q->id%>">
+    <% $q->Name %>
+    <% $q->Description ? " - ".$q->Description : "" %></a></h3>
+%     my $cf = $q->CustomField("Problem Type");
+%     next unless $cf->Id;
+%     my $values = $cf->Values;
+<ul>
+%     while (my $v = $values->Next) {
+<li><a href="<%RT->Config->Get('WebPath')%>/SelfService/Create.html?Queue=<%$q->id%>&CustomField-<%$cf->id%>=<%$v->Name%>&Subject=<%$v->Name%>"><%$v->Name%></a></li>
+%     }
+</ul>
+% }
+</ul>
+<%init>
+my $queues = RT::Queues->new($session{'CurrentUser'});
+$queues->UnLimit;
+</%init>

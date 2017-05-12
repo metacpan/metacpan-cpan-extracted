@@ -1,0 +1,72 @@
+---
+abstract: 'flexible RDFa parser'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  HTTP::Response: 0
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - Atom
+  - HTML
+  - 'HTML 3.2'
+  - 'HTML 4'
+  - HTML5
+  - Metadata
+  - ODF
+  - OGP
+  - 'Open Document'
+  - 'Open Graph Protocol'
+  - OpenGraphProtocol
+  - RDF
+  - RDFa
+  - SVG
+  - 'Semantic Web'
+  - XHTML
+  - XML
+  - ccREL
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: RDF::RDFa::Parser
+name: RDF-RDFa-Parser
+no_index:
+  directory:
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Archive::Zip: 0
+requires:
+  Carp: 0
+  Data::UUID: 0
+  File::ShareDir: 0
+  File::Temp: 0.17
+  HTML::HTML5::Parser: 0
+  HTML::HTML5::Sanity: 0
+  LWP::UserAgent: 0
+  RDF::Trine: 0.130
+  Scalar::Util: 0
+  Storable: 0
+  URI: 0
+  URI::Escape: 0
+  URI::file: 0
+  XML::LibXML: 1.66
+  XML::RegExp: 0
+  common::sense: 0
+  parent: 0
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDFa-Parser
+  homepage: https://metacpan.org/release/RDF-RDFa-Parser
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-rdf-rdfa-parser
+version: 1.097

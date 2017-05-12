@@ -1,0 +1,681 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Path;
+use File::Spec::Functions;
+use Getopt::Long;
+use List::MoreUtils qw< uniq >;
+use RackMan;
+use RackMan::Config;
+use RackMan::Tasks;
+use RackMan::Utils;
+use Socket;
+
+
+$::PROGRAM = "RackTables consistency check";
+$::VERSION = "1.02";
+$::COMMAND = basename($0);
+
+
+use constant {
+    CONFIG_SECTION  => "racktables-check",
+
+    OP_EQUAL        => "=",
+    OP_REGEXP       => "~",
+    OP_FUNCTION     => "%",
+
+    PROP_ATTRIBUTE  => "attribute",
+    PROP_GATEWAY    => "default_ipv4_gateway",
+    PROP_INTERFACES => "interfaces",
+    PROP_IPV4ADDRS  => "regular_ipv4addrs",
+    PROP_MACADDRS   => "regular_mac_addrs",
+};
+
+use constant {
+    RE_ALL_OPS  => join("|", OP_EQUAL, OP_REGEXP, OP_FUNCTION),
+};
+
+my %alias = (
+    addresses   => PROP_IPV4ADDRS,
+    addrs       => PROP_IPV4ADDRS,
+    attr        => PROP_ATTRIBUTE,
+    gateway     => PROP_GATEWAY,
+    interfaces  => PROP_INTERFACES,
+    ipv4_addrs  => PROP_IPV4ADDRS,
+    mac_addrs   => PROP_MACADDRS,
+    tag         => "explicit_tags",
+    type        => "object_type",
+);
+
+my %check_func = (
+    check_dns   => \&check_dns,
+);
+
+
+#
+# main
+#
+MAIN: {
+    if (not caller()) {
+        run();
+        exit RackMan->status;
+    }
+}
+
+
+#
+# run()
+# ---
+sub run {
+    # detect if stdout is connected to a terminal
+    (-t STDOUT ? $Term::ANSIColor::AUTORESET : $ENV{ANSI_COLORS_DISABLED}) = 1;
+    $|++;
+
+    # default options
+    my %options = (
+        config  => "/usr/local/etc/rack.conf",
+        format  => "yaml",
+    );
+
+    # parse options
+    Getopt::Long::Configure(qw< no_auto_abbrev no_ignore_case >);
+    GetOptions(\%options, qw{
+        help|usage|h!  man!  version|V!
+        verbose|v!  config|c=s  filter|F=s  output|o=s  format|t=s
+    }) or pod2usage(0);
+
+    # handle --version, --help and --man
+    $options{man}       and pod2usage(2);
+    $options{help}      and pod2usage(1);
+    $options{version}   and print "$::PROGRAM v$::VERSION\n" and exit;
+
+    # read configuration file
+    my $config = RackMan::Config->new(-file => $options{config});
+
+    # instanciate the backend object
+    my $rackman = RackMan->new({ options => \%options, config => $config });
+
+    # do the actual work
+    process($rackman, @ARGV);
+}
+
+
+#
+# pod2usage()
+# ---------
+sub pod2usage {
+    my ($n) = @_;
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ -exitval => 0, -verbose => $n, -noperldoc => 1 });
+}
+
+
+#
+# process()
+# -------
+sub process {
+    my ($rackman, @args) = @_;
+
+    my @results;
+    my $n;
+
+    # parse the rules
+    my @rule_defs = $rackman->config->val(CONFIG_SECTION, "rule");
+    my @rules;
+
+    for my $rule_def (@rule_defs) {
+        next if not defined $rule_def or $rule_def =~ /^\s+$/;
+        my $rule = $rule_def;
+        my (%enforce, %selector);
+
+        # extract an optional selector
+        if ($rule =~ s/\s*\[\s*([^\]]+)\s*\]\s*//) {
+            my ($prop, $value) = split / *= */, $1, 2;
+            my @values = split /\|/, $value;
+            $prop = ":$prop" unless index($prop, ":") >= 0;
+            my ($type, $name)  = split /:/, $prop;
+            %selector = (
+                proptype => $alias{$type} || $type || "",
+                propname => $alias{$name} || $name,
+                propval  => { map { $_ => 1 } @values },
+            );
+        }
+
+        # extract an optional operator and second operand
+        if ($rule =~ s/\s*(@{[RE_ALL_OPS]})\s*(.+)$//) {
+            ($enforce{operator}, $enforce{operand}) = ($1, $2);
+
+            # compile the regexp to detect errors early
+            if ($enforce{operator} eq OP_REGEXP) {
+                ($enforce{operand}, my $err) = parse_regexp($enforce{operand});
+                RackMan->error("invalid regexp: $err") if $err;
+            }
+
+            # verify that the check function is actually known
+            if ($enforce{operator} eq OP_FUNCTION) {
+                RackMan->error("unknown check function '$enforce{operand}'")
+                    unless exists $check_func{$enforce{operand}};
+            }
+        }
+
+        # what is left should be the property to check
+        s/^\s+//g, s/\s+$//g for $rule;
+        $rule = ":$rule" unless index($rule, ":") >= 0;
+        my ($type, $name) = split /:/, $rule;
+        $enforce{proptype} = $alias{$type} || $type || "";
+        $enforce{propname} = $alias{$name} || $name;
+
+        push @rules, {
+            string      => $rule_def,
+            enforce     => \%enforce,
+           (selector    => \%selector)x!! keys %selector,
+        };
+    }
+
+    # construct the filter
+    my %filter;
+    my $filter = $rackman->options->{filter}
+            || $rackman->config->val(CONFIG_SECTION, "filter", "");
+    if ($filter) {
+        for my $token (split / *, */, $filter) {
+            if (index($token, "tag:") == 0) {
+                $filter{tag}{ lc substr($token, 4) } = 1;
+                next
+            }
+
+            if (index($token, "=") > 0) {
+                my ($name, $value) = split /=/, $token;
+                push @{ $filter{attr}{$name} }, $value;
+                next
+            }
+        }
+    }
+
+    my $enforce_interface_match
+        = $rackman->config->val(CONFIG_SECTION, "enforce_interface_match");
+
+    # fetch the list of devices
+    my @devices = @args
+        ? map +{ name => $_ }, @args
+        : RackMan::Tasks->task_list({ rackman => $rackman, type => "all" });
+
+    DEVICE:
+    for my $device (@devices) {
+        next if $device->{name} eq "(null)";
+        my $rackdev = exists $device->{id}
+            ? $rackman->device_by_id($device->{id})
+            : $rackman->device_by_name($device->{name});
+        my $type = $rackdev->object_type;
+        my @problems;
+
+        # fetch the tags for this RackObject, filter them if needed
+        my @tags = map { s/\W+/_/g; $_ } map lc,
+            @{ $rackdev->explicit_tags },
+            @{ $rackdev->implicit_tags };
+        next unless @tags;
+
+        # fetch the attributes of this RackObject
+        my %attr = %{ $rackdev->attributes };
+
+        # filter out devices without the requested tags or attributes
+        if ($filter) {
+            # filter on tags
+            if (exists $filter{tag}) {
+                next unless grep $filter{tag}{$_}, @tags;
+            }
+
+            # filter on attributes
+            if (exists $filter{attr}) {
+                my $keep = 0;
+
+                ATTR:
+                for my $name (keys %{ $filter{attr} }) {
+                    for my $value (@{ $filter{attr}{$name} }) {
+                        next unless exists $attr{$name} and defined $attr{$name};
+                        $keep ||= $value eq $attr{$name};
+                        last ATTR if $keep;
+                    }
+                }
+
+                next unless $keep;
+            }
+        }
+
+        RULE:
+        for my $rule (@rules) {
+            # apply selector filter, if any
+            if (exists $rule->{selector}) {
+                my $propval = property_value($rackdev, $rule->{selector}) || "";
+                next RULE unless $rule->{selector}{propval}{$propval};
+            }
+
+            # fetch the property values
+            my $enforce  = $rule->{enforce};
+            my $propname = $enforce->{propname};
+            my @propvals = property_value($rackdev, $enforce);
+
+            VALUE:
+            for my $propval (@propvals) {
+                # check if the property is defined
+                push @problems, "property '$propname' not defined"
+                    and next RULE unless defined $propval;
+
+                # if there is an operation to apply, do it
+                if (exists $enforce->{operator}) {
+                    my $op  = $enforce->{operator};
+                    my $val = $enforce->{operand};
+
+                    if ($op eq OP_EQUAL) {
+                        push @problems, "property '$propname' value '$propval'"
+                            . " != '$val'"
+                            and next unless $propval eq $val;
+                    }
+                    elsif ($op eq OP_REGEXP) {
+                        push @problems, "property '$propname' value '$propval'"
+                            . " does not match $val"
+                            and next unless $propval =~ /$val/;
+                    }
+                    elsif ($op eq OP_FUNCTION) {
+                        # $val contains the function name
+                        my @errs = $check_func{$val}->($propval);
+                        push @problems, map "property '$propname' $_", @errs
+                            and next if @errs;
+                    }
+                }
+            }
+        }
+
+        # specific rule: check if each network interface is associated
+        # (at least, logically) with a port of the same name
+        if ($enforce_interface_match) {
+            my %port = map { $_->{name} => $_ } @{ $rackdev->ports };
+
+            for my $interface ($rackdev->physical_interfaces) {
+                my $name = $interface->{iface};
+
+                push @problems,
+                    "interface '$name' has no associated port"
+                    and next unless exists $port{$name};
+
+                push @problems,
+                    "interface '$name' associated port has no MAC address"
+                    and next unless defined $port{$name}{l2address}
+                    and $port{$name}{l2address} =~ /^\w+$/;
+
+                push @problems,
+                    "interface '$name' associated port is not linked"
+                    and next unless defined $port{$name}{peer_port_id}
+                    and $port{$name}{peer_port_id} > 0;
+            }
+        }
+
+        $n += @problems;
+        push @results, {
+            name        => $device->{name},
+            type        => $device->{type},
+            problems    => \@problems,
+        } if @problems;
+    }
+
+    # print the results
+    if ($n) {
+        my $out;
+        my $format  = $rackman->options->{format};
+        my $path    = $rackman->options->{output};
+
+        if ($format eq "yaml") {
+            eval "use YAML::XS; 1" or RackMan->error("can't load YAML::XS");
+            $out = YAML::XS::Dump(\@results);
+        }
+        elsif ($format eq "json") {
+            eval "use JSON::XS; 1" or RackMan->error("can't load JSON::XS");
+            $out = encode_json(\@results);
+        }
+
+        if ($path) {
+            print "$n problems detected.\n";
+            open my $fh, ">", $path
+                or RackMan->error("can't write to $path: $!");
+            print {$fh} $out;
+            close $fh;
+        }
+        else {
+            print $out;
+        }
+    }
+    else {
+        print "You have been well trained, my young apprentice.\n",
+              "They will be no match for you.\n"
+    }
+}
+
+
+#
+# property_value()
+# --------------
+sub property_value {
+    my ($rackdev, $prop) = @_;
+    my $proptype = $prop->{proptype};
+    my $propname = $prop->{propname};
+
+    if ($proptype eq PROP_ATTRIBUTE) {
+        return $rackdev->attributes->{$propname}
+    }
+    elsif (defined $propname) {
+        if ($propname eq PROP_GATEWAY) {
+            return $rackdev->$propname->{addr}
+        }
+        elsif ($propname eq PROP_INTERFACES) {
+            return map $_->{iface}, $rackdev->physical_interfaces
+        }
+        elsif ($propname eq PROP_IPV4ADDRS) {
+            return map $_->{addr}, $rackdev->$propname
+        }
+        elsif ($propname eq PROP_MACADDRS) {
+            return map $_->{l2address_text}, $rackdev->$propname
+        }
+        elsif ($rackdev->can($propname)) {
+            return $rackdev->$propname
+        }
+        else {
+            RackMan->error("unknown property '$propname'");
+        }
+    }
+    else {
+        RackMan->error("empty property name");
+    }
+}
+
+
+#
+# check_dns()
+# ---------
+sub check_dns {
+    my ($name) = @_;
+
+    # try to resolve the given name
+    my (undef, undef, $addrtype, $length, @addrs) = gethostbyname($name);
+    return "- '$name' can't be resolved" unless @addrs;
+
+    # try to reverse resolve the address
+    my $fqdn = gethostbyaddr($addrs[0], $addrtype);
+    my $addr_str = inet_ntoa($addrs[0]);
+    return "- $addr_str has no PTR" unless $fqdn;
+
+    # check that the resulting FQDN matches the original name
+    return "- '$name' -> $addr_str -> '$fqdn'" unless $fqdn eq $name;
+
+    return
+}
+
+
+1
+
+__END__
+
+=head1 NAME
+
+racktables-check - Perform various consistency checks on RackTables objects
+
+=head1 SYNOPSIS
+
+    racktables-check [--config /etc/rack.conf] ...
+    racktables-check { --help | --man | --version }
+
+
+=head1 OPTIONS
+
+=head2 Program options
+
+=over
+
+=item B<-c>, B<--config> I<path>
+
+Specify the path to the configuration file.
+Default to F</usr/local/etc/rack.conf>
+
+=item B<-F>, B<--filter> I<list of tokens>
+
+Specify a comma-separated list of tokens, defining tags and attribute
+values. This option overrides the C<[cfengine-tags]/filter> config
+parameter. See the corresponding documentation for more details.
+
+=item B<-t>, B<--format> I<json|yaml>
+
+Specify the format for printing or storing the results.
+Available formats are C<json> and C<yaml>. Default is C<yaml>.
+
+=item B<-o>, B<--output> I<path>
+
+Specify the file to store the results. If none is specified,
+the results are printed on standard output.
+
+=item B<-v>, B<--verbose>
+
+Run the program in verbose mode.
+
+=back
+
+=head2 Help options
+
+=over
+
+=item B<-h>, B<--help>
+
+Print a short usage description, then exit.
+
+=item B<--man>
+
+Print the manual page of the program, then exit.
+
+=item B<-V>, B<--version>
+
+Print the program name and version, then exit.
+
+=back
+
+=head2 Arguments
+
+The rest of the argument, if any, are used as device names to perform the
+checks upon. If none is given, process all known devices (minus the filter).
+
+
+=head1 DESCRIPTION
+
+This program is a small consistency checking engine for RackTables objects.
+You can control what to check and how by defining rules in the configuration
+file.
+
+
+=head1 CONFIGURATION
+
+racktables-check's configuration is stored in rack(1)'s configuration,
+with the following additional definitions.
+
+
+=head2 Section [racktables-check]
+
+=over
+
+=item *
+
+C<filter> - specify a filter; will be overridden by the C<--filter>
+option. See L<"FILTER SYNTAX"> for details and examples.
+
+When defined, only the devices with the matching tags and attributes
+will be included in the input lists. When no tag or attribute
+pair is defined, the filtering fot that particular type is disabled.
+
+=item *
+
+C<rule> - define a rule; see L<"RULES SYNTAX">
+
+=item *
+
+C<enforce_interface_match> - make the program check if each logical network
+interface (that is, with a defined IP address) has a corresponding physical
+interface (a "port", in RackTables terminology) with the same name
+
+=back
+
+
+=head1 RULES SYNTAX
+
+The general syntax of a rule is:
+
+    [selector] property-name operator operand
+
+The B<I<property-name>> is the only mandatory part. It defines the RackObject
+property (in a very broad sense of the term) to check. Valid properties are:
+
+=over
+
+=item *
+
+any RackTables attribute, written as C<attr:I<name>>
+
+=item *
+
+any L<RackMan::Device> attribute, like C<object_name> or C<object_type>
+
+=item *
+
+C<addresses>, C<addrs> or C<ipv4_addrs> return the list
+
+=item *
+
+C<gateway> returns the IP address, in quad form, of the default IPv4 gateway
+
+=item *
+
+C<interfaces> returns the list of the names of the regular network interfaces
+
+=item *
+
+C<mac_addrs> returns the list of the MAC addresses (as a big hex number,
+not colon-separated)
+
+=back
+
+When a property returns a list of values, the rule simply is applied to
+each value. In case of failure, the value is indicated in the message.
+
+The B<I<selector>> makes the rule only check objects corresponding to the
+given criterion, written as C<[I<property-name>=I<value>]>. valid properties
+are the same as in the main part of the rule. Multiple values can be given
+by separating them with a pipe (C<|>).
+
+For example, C<[type=Server]> selects only the servers, C<[type=PDU|Switch]>
+selects both PDUs and switches. C<[attr:Use=prod]> selects objects with the
+attribute C<Use> set to C<prod>.
+
+The B<I<operator>> and I<operand> defines the check operation. If none is
+given, the property is checked to have a defined value. Valid operators are:
+
+=over
+
+=item *
+
+C<=> - check for equality against the value given in operand
+
+=item *
+
+C<~> - check for matching against the pattern given in operand; the pattern
+follows usual Perl regular expression syntax and must be bounded in slashes
+(C</.../>); flags, like C</i>, are also recognized.
+
+=item *
+
+C<%> - check with a function call, whose name is given as operand; currently
+available check functions are:
+
+=over
+
+=item *
+
+C<check_dns> - for a given name, checks that it can be resolved, that the
+resulting IP address can be reverse resolved, and that the resulting name
+is the same as the one originally given. For example, C<attr:FQDN % check_dns>
+applies this check function to the C<FQDN> attribute.
+
+=back
+
+=back
+
+B<Note:> To keep the code simple, all names and values in the rules are
+case I<sensitive>, and must match the way they are entered in RackTables.
+
+
+=head1 EXAMPLES
+
+This set of rules makes sure that most network properties of servers are
+correctly defined. It only assumes that servers have a C<FQDN> attribute
+which contains, obviously, their FQDN:
+
+    [racktables-check]
+    enforce_interface_match = 1
+    rule = [type=Server] attr:FQDN %check_dns
+    rule = [type=Server] gateway
+    rule = [type=Server] addresses
+    rule = [type=Server] interfaces ~ /(bce|bge|em|eth|fxp|lagg|re|vlan|xl)\d+/
+
+
+=head1 FILTER SYNTAX
+
+A filter is a comma-separated list of tokens, defining tags and
+attribute values used as criteria to determine which device to keep.
+The general syntax is:
+
+    token, token, ...
+
+with no arbitrary limits on the number of tokens.
+The syntax of a token works like this:
+
+=over
+
+=item *
+
+a token in the form C<tag:name> defines the tag with the given name
+
+=item *
+
+a token in the form C<attr=value> defines the pair (attribute, value)
+
+=back
+
+=head2 Examples
+
+=over
+
+=item *
+
+only keep the devices with the tags C<generic> and C<infra> (no attribute
+filtering):
+
+    tag:generic, tag:infra
+
+=item *
+
+only keep the devices with the attribute C<Use> set to C<prod> or C<preprod>
+(no tag filtering):
+
+    Use=prod, Use=preprod
+
+=item *
+
+only keep the devices with the tag C<cfengine> and the attribute C<Use>
+set to C<prod> or C<preprod>:
+
+    tag:cfengine, Use=prod, Use=preprod
+
+=back
+
+
+=head1 AUTHOR
+
+Sebastien Aperghis-Tramoni (sebastien@aperghis.net)
+
+=cut
+

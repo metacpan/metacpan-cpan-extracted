@@ -1,0 +1,10 @@
+Revision history for Perl extension Rinchi::XMLSchema.
+
+0.01  Thu Jun 12 06:28:20 2008
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Rinchi::XMLSchema
+  
+0.02  Fri Jun 27 23:27:45 2008
+	- Makefile.PL fixed to properly show prerequisites
+	- POD amplified.
+

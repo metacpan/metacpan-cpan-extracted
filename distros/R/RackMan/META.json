@@ -1,0 +1,73 @@
+{
+   "abstract" : "Main interface for accessing a RackTables database",
+   "author" : [
+      "Sebastien Aperghis-Tramoni <sebastien@aperghis.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RackMan",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Diff" : "0",
+            "Carp" : "0",
+            "Config::IniFiles" : "0",
+            "Cwd" : "0",
+            "DBD::mysql" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Class::Schema::Loader" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Template" : "2.0",
+            "HTML::Template::Filter::TT2" : "0.03",
+            "IPC::Run" : "0",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "List::MoreUtils" : "0",
+            "Moose" : "1.00",
+            "MooseX::NonMoose" : "0",
+            "Net::FTP" : "0",
+            "Net::ILO" : "0.54",
+            "Net::SNMP" : "0",
+            "Net::Telnet::Cisco" : "0",
+            "NetAddr::IP" : "4.000",
+            "Path::Class" : "0",
+            "Socket" : "0",
+            "Term::ANSIColor" : "0",
+            "Test::More" : "0.45",
+            "YAML" : "0",
+            "YAML::XS" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.19",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

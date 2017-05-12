@@ -1,0 +1,49 @@
+%# What this world needs is a good five-dollar plasma weapon.
+<& /Edit/Elements/List,
+    %ARGS,
+    Data  => [
+	[ '5%', loc("Id"),		    sub { $_[0]->Id }, "align='right'" ],
+	[ '40%', loc("Subject"),	    sub { $_[0]->Subject }, '', 25 ],
+	[ '8%', loc("Created"),	    sub { $_[0]->CreatedObj->AsDate } ],
+	[ '8%', loc("Last Updated"),	    sub { $_[0]->LastUpdatedObj->AsDate } ],
+	[ '5%', loc("Status"),		    sub {
+	    $m->comp('/Work/Tickets/Elements/ShowApprovals', Ticket => $_[0], NoUI => 1)
+		? loc('(pending approval)')
+		: loc($_[0]->Status || ' ')
+	} ],
+($ARGS->{Type} ? () : (
+	[ '10%', loc("Type"),		    sub { loc($_[0]->CustomFieldValue('Type')) } ],
+)),
+($Hide eq 'Requestor') ? () : (
+	[ '8%', loc("Requestor"),	    sub { $_[0]->FirstRequestor->Name } ],
+),
+($Hide eq 'Owner') ? () : (
+	[ '8%', loc("Owner"),		    sub {
+	    my $name = $_[0]->OwnerObj->Name;
+	    ($name eq 'Nobody') ? '('.loc('none').')' : $name
+	} ] ,
+),
+($Hide) ? (
+	[ '8%', loc("Project"),		    sub {
+	    $_[0]->QueueObj->OriginObj->CustomFieldValue('UnixName');
+	} ] ,
+) : (),
+    ],
+    Link    => sub { "$URL?Queue=" . $_[0]->QueueObj->Id . "&id=" . $_[0]->Id },
+    Style   => 'height: 420px',
+    Size    => 16,
+    Index   => 1,
+    BG	=> sub {
+	return "#cccccc" if $_[0] and RT::Queue->IsInactiveStatus( $_[0]->Status );
+	my $severity = $_[0] && $_[0]->CustomFieldValue(22) or return '#ffffff';;
+	return '#ff' . (chr(97 + $severity) x 4);
+    },
+&>
+<%ARGS>
+$URL	=> ''
+$Role	=> ''
+$IDMap	=> {}
+$Hide	=> ''
+$Begin	=> 0
+$ARGS	=> {}
+</%ARGS>

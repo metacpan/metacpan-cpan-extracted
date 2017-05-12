@@ -1,0 +1,21 @@
+@ScripActions = (
+    {
+        Name        => 'Notify Additional Addresses', # loc
+        Description => 'Notify additional addresses defined for distribution', # loc
+        ExecModule  => 'NotifyAdditionalAddresses',
+    },
+);
+
+@Scrips = (
+    {
+        Description => "On create and corresponds notify additonal addresses", # loc
+        ScripCondition => 'User Defined',
+        CustomIsApplicableCode => q[
+            my $type = $self->TransactionObj->Type;
+            return 0 if $type ne 'Create' && $type ne 'Correspond';
+            return 1;
+        ],
+        ScripAction    => 'Notify Additional Addresses',
+        Template       => 'Transaction',
+    },
+);

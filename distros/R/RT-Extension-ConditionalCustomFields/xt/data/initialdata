@@ -1,0 +1,38 @@
+@CustomFields = (
+    {
+        Name => 'Condition',
+        Type => 'SelectSingle',
+        RenderType => 'Dropdown',
+        Queue => [ 'General' ],
+        LookupType => 'RT::Queue-RT::Ticket',
+        Values => [
+            { Name => 'Passed', SortOrder => 0 },
+            { Name => 'Failed', SortOrder => 1 },
+        ],
+        Pattern => '(?#Mandatory).',
+        DefaultValues => [ 'Failed' ],
+    },
+    {
+        Name => 'Conditioned with cf and value',
+        Type => 'FreeformSingle',
+        Queue => [ 'General' ],
+        LookupType => 'RT::Queue-RT::Ticket',
+        ConditionedByCF => 'Condition',
+        ConditionedBy => 'Passed',
+    },
+    {
+        Name => 'Conditioned with cf id and value',
+        Type => 'FreeformSingle',
+        Queue => [ 'General' ],
+        LookupType => 'RT::Queue-RT::Ticket',
+        ConditionedByCF => 3,
+        ConditionedBy => 'Passed',
+    },
+    {
+        Name => 'Conditioned with cf value id',
+        Type => 'FreeformSingle',
+        Queue => [ 'General' ],
+        LookupType => 'RT::Queue-RT::Ticket',
+        ConditionedBy => 1,
+    },
+);

@@ -1,0 +1,75 @@
+RDF-Sesame version 0.17
+========================
+
+DESCRIPTION
+
+A Perl module to interact with the Sesame RDF server (http://openrdf.org).
+For more complete documentation, please see the module's POD.
+
+TESTING
+
+The tests are designed to interact with a working Sesame server.  If you
+don't set the environment variables listed below, the tests should
+still pass, but will have skipped a great deal, therefore, you
+wouldn't know if your installation actually works.
+
+The tests will DESTROY ANY DATA in the repository you provide.  It is
+recommended that you specifically create a repository to use with the
+tests or use the default mem-rdf-db repository that comes with a default
+Sesame installation.  The repository must have inferencing DISABLED.
+RDF::Sesame works correctly when repositories have inferencing
+enabled, but the tests are written on the assumption that Sesame will
+not add extra triples to the store.
+
+If you've made it through all that, here are the secret code words you
+need to get the tests working.  You must set the following environment
+variables:
+
+   SESAME_URI=http://<user>:<password>@<server>:<port>/<directory>
+   SESAME_REPO=<repository>
+
+In the above settings, the items in <> are patterns for which you
+should substitute.
+
+   user      : the name of a user with permission to read and write
+   password  : the password of the user
+   server    : the hostname or IP address of the Sesame server
+   port      : the port on which Sesame is listening
+   directory : this is almost always 'sesame'
+   repository: the Sesame repository to run tests against.  If you're
+               using the default, in-memory repository, this would
+               be 'mem-rdf-db'
+
+KNOWN ISSUES
+
+There is a problem with the implementation of Native repositories in
+Sesame 1.2.0.  The RDF::Sesame tests will fail on a native repository
+under that Sesame version. The bug is fixed in Sesame 1.2.1
+
+INSTALLATION
+
+Installation uses Module::Build.  The mantra for installation is as
+follows.
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+DEPENDENCIES
+
+   Carp            - standard module
+   Data::Table
+   LWP::UserAgent
+   Test::More      - version 0.31 or higher
+   URI
+   XML::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2006 by Michael Hendricks
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

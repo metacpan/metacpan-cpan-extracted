@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+use common::sense;
+use Rhetoric;
+use Template;
+use Cwd;
+use Getopt::Long;
+
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+  \%_,
+  "help|h",
+  "quiet|q",
+  "output|o=s",
+);
+
+my $tt     = Template->new({ POST_CHOMP => 1 });
+my $cwd    = getcwd;
+my $config = {
+  base       => $cwd,
+  theme_base => "$cwd/htdocs/theme",
+  hostname   => 'zzzzzzzz.rhetoric.al',
+  since      => (localtime)[5] + 1900,
+};
+$tt->process(\*DATA, $config);
+
+__DATA__
+#!/usr/bin/env perl
+use Plack;
+use Plack::Builder;
+use Rhetoric 'On::PSGI';
+%Rhetoric::CONFIG = (
+  %Rhetoric::CONFIG,
+  'base'                => '[% base %]',
+  'hostname'            => '[% hostname %]',
+  'since'               => [% since %],
+  'user'                => undef,                 # (optional) name of blog owner
+  'time_format'         => '%b %e, %Y %I:%M%P',
+  'archive_format'      => '%B %Y',
+  'posts_per_page'      => 4,
+  'login'               => 'admin',
+  'password'            => 'admin',
+
+  'theme'               => 'BrownStone',
+  'theme.base'          => '[% theme_base %]',
+
+  'storage'             => 'File',                # Rhetoric::Storage::____
+  'storage.file.path'   => '[% base %]',
+);
+Rhetoric->init();
+
+my $app = sub {
+  my $env = shift;
+  Rhetoric->psgi($env);
+};
+
+builder {
+  enable 'Session::Cookie';
+  enable 'Static',
+    path => qr{^/(theme|css|js|images)|favicon\.ico}x,
+    root => "[% base %]/htdocs";
+  $app;
+};

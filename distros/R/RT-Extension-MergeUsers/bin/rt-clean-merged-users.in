@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+my $Attributes = RT::Attributes->new($RT::SystemUser);
+$Attributes->Limit( FIELD => 'Name', VALUE => 'EffectiveId' );
+$Attributes->Limit( FIELD => 'ObjectType', VALUE => 'RT::User' );
+
+my $primary_user = RT::User->new($RT::SystemUser);
+
+while ( my $Attr = $Attributes->Next ) {
+    $primary_user->LoadById($Attr->Content);
+
+    # Was the primary user deleted/shredded?
+    unless ( $primary_user and $primary_user->Id ){
+        RT::Logger->debug("Primary user missing. Clearing merge relationship for user id "
+            . $Attr->Content);
+        my $deleted_id = $Attr->Content; # Save for removing from content later
+        my ($ret, $msg) = $Attr->Delete;
+        RT::Logger->debug("Unable to delete attribute for " . $Attr->Content)
+            unless $ret;
+
+        my $secondary_user = RT::User->new($RT::SystemUser);
+        ($ret, $msg) = $secondary_user->LoadById($Attr->ObjectId);
+        RT::Logger->debug("Unable to load merged user " . $Attr->ObjectId . " $msg")
+            unless $ret;
+
+        my $merged_users = $secondary_user->GetMergedUsers;
+        if ( not $merged_users->Content ){
+            # Content is empty, delete attribute
+            $merged_users->Delete;
+        }
+        else{
+            # Clear the deleted user id
+            my @content = grep { $_ != $deleted_id } @{$merged_users->Content};
+            if ( scalar(@content) ){
+                $merged_users->SetContent(\@content);
+            }
+            else{
+                # It's now empty, so delete
+                $merged_users->Delete;
+            }
+        }
+    }
+}
+
+print "DONE.\n";
+exit 0;

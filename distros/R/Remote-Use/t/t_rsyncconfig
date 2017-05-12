@@ -1,0 +1,17 @@
+package t::t_rsyncconfig;
+use warnings;
+use strict;
+
+sub getarg {
+  my ($class, $self) = @_;
+
+  my $cache = -e '.orion.installed.modules' ? '.orion.installed.modules' : 't/.orion.installed.modules';
+  return (
+    host => 'orion:',
+    prefix => '/tmp/perl5lib/',
+    command => 'rsync -i -vaue ssh',
+    ppmdf => $cache,
+  );
+}
+
+1;

@@ -1,0 +1,80 @@
+=head1 NAME
+
+ResourcePool::Factory::Net::LDAP - A L<Net::LDAP|Net::LDAP> Factory for L<ResourcePool|ResourcePool>
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Factory::Net::LDAP;
+ 
+ my $factory = ResourcePool::Factory::Net::LDAP->new($hostname,
+ 				[NewOptions]);
+
+=head1 DESCRIPTION
+
+
+This class is a factory class for L<Net::LDAP|Net::LDAP> resources to be used with the L<ResourcePool|ResourcePool>.
+
+Please have a look at the L<ResourcePool::Factory|ResourcePool::Factory> documentation to learn about the purpose of such a factory.
+
+=head2 S<ResourcePool::Factory::Net::LDAP-E<gt>new($hostname, @NewOptions)>
+
+The arguments for the new method are passed to the new method of L<Net::LDAP|Net::LDAP>.
+
+=over 4
+
+=item $hostname
+
+The LDAP server name.
+
+=item @NewOptions - Optional
+
+The additional options to be passed to the new method of L<Net::LDAP|Net::LDAP>.
+
+=back
+
+=head2 S<$factory-E<gt>bind(@BindOptions)>
+
+The arguments to be passed to the bind() method of L<Net::LDAP|Net::LDAP>.
+
+Please not that this module will always do a bind to the LDAP server, if you do not specify any bind arguments the bind will be anonymously. The bind() call is used to check the vitality of the LDAP connection, if it fails L<ResourcePool|ResourcePool> will throw it away..
+
+
+=head2 S<$factory-E<gt>start_tls(@TLSOptions)>
+
+If you call this method, the L<Net::LDAP|Net::LDAP> connections created through this factory will be upgraded to TLS directly after the establishment.
+
+The options to this method are the same as for the same named method of the L<Net::LDAP|Net::LDAP> module.
+
+If you specify this option, the start_tls operation will always be performed BEFORE L<bind()|/bind> is called. This is even true if you call the start_tls() operation of the factory after the bind() method. This ensures the the bind credentials are encrypted if you use TLS.
+
+The L<ResourcePool|ResourcePool> design does not allow the mixture of encrypted/unencrypted connections in one pool. Even if it's possible it is not recommended to use the start_tls() method of L<Net::LDAP|Net::LDAP> directly when you use L<ResourcePool|ResourcePool> to manage your connections. In the rare cases where you need to mix encrypted and not encrypted connections (e.g. to use encrypted for authentication and a plain connection for other operations) you should use two separate L<ResourcePool|ResourcePool>s, one configured with start_tls, the other without.
+
+
+=head1 EXAMPLES
+
+
+ 
+ use ResourcePool;
+ use ResourcePool::Factory::Net::LDAP;
+ 
+ my $factory =  ResourcePool::Factory::Net::LDAP->new("ldaphost",
+ 		version => 2);
+ $factory->bind('cn=Manager,dc=fatalmind,dc=com',
+                    password => 'secret');
+
+=head1 SEE ALSO
+
+L<Net::LDAP|Net::LDAP>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Factory|ResourcePool::Factory>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2003 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

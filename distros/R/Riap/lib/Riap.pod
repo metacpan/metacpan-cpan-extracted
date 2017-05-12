@@ -1,0 +1,585 @@
+# ABSTRACT: Rinci access protocol
+# PODNAME: Riap
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Riap - Rinci access protocol
+
+=head1 VERSION
+
+This document describes version 1.2.4 of Riap (from Perl distribution Riap), released on 2015-09-04.
+
+=head1 SYNOPSIS
+
+This document specifies a simple, extensible, client/server, request/response
+protocol for requesting metadata and performing actions on code entities.
+
+Examples are written in JSON (sometimes with added comments), but data
+structures can actually be encoded using other formats.
+
+=head1 DESCRIPTION
+
+Rinci access protocol (Riap for short), is a client/server, request/response
+protocol for requesting metadata and performing actions on code entities. It is
+modeled closely after HTTP, but is a different protocol. It can be layered on
+top of HTTP (as its transport protocol) but can also use other transports,
+including direct TCP.
+
+The server side is viewed as being a tree of code entities, with a package
+entity at the root. Other entities (such as subpackages, functions, variables)
+are discoverable by performing C<list> actions on package entities. Entity's
+metadata can be retrieved using the C<meta> action. There are other actions
+defined in the specification; and the protocol can be extended by introducing
+more actions.
+
+One of the main use-cases of this protocol is to provide self-descriptive,
+self-documenting, machine-discoverable API service, much like the goal of SOAP
+and WSDL. However it is much simpler and programmer-friendly than those
+protocols.
+
+=head1 SPECIFICATION VERSION
+
+ 1.2
+
+=head1 STATUS
+
+The 1.2 series does not guarantee full backward compatibility between revisions,
+so caveat implementor. However, major incompatibility will bump the version to
+1.3 or 2.0.
+
+=head1 TERMINOLOGIES
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
+
+=over 4
+
+=item * Server
+
+=item * Client
+
+=item * Response
+
+Response is an enveloped result as defined in the L<Rinci::function>
+specification.
+
+=item * Request
+
+A Riap request is modelled after HTTP request. It consists of an action
+(analogous to HTTP request method), code entity URI, protocol version, and zero
+or more extra arguments (analogous to HTTP headers). Some extra arguments might
+be required, depending on the action.
+
+For simplicity, the request can be expressed as a hash (or dictionary) of
+key/value pairs. There should at least be these keys: C<action>, C<uri>, and
+C<v> (for protocol version). This also means the extra arguments cannot have
+those names. They must also start with letters or underscores followed by zero
+or more letters/underscores/digits.
+
+Server should return 400 status if required keys are missing, unknown keys are
+sent, or keys contain invalid values.
+
+=back
+
+=head1 RIAP URI SCHEMES
+
+To refer to code entities on the Riap server, a new URI scheme C<riap> is
+defined. The URI path describes path to code entities while the URI host
+describes the host language. Examples:
+
+ # refer to Text::sprintfn Perl module
+ riap://perl/Text/sprintfn/
+
+ # refer to sprintf function in Text::sprintfn Perl module
+ riap://perl/Text/sprintfn/sprintfn
+
+ # refer to PHP variable
+ riap://php/$var
+
+ # UNDECIDED: refer to class metadata
+ riap://perl/My/Class/:class
+
+ # UNDECIDED: refer to distribution metadata
+ riap://perl/My/Dist/:distribution
+
+There are some other schemes recognized.
+
+B<pl>. The C<pl> hostless scheme refers to code entities in Perl. This is
+preferred in many L<Perinci> modules because the C<riap> scheme is more verbose.
+Examples:
+
+ # refer to Text::sprintfn Perl module
+ pl:/Text/sprintfn/
+
+ # refer to sprintf function in Text::sprintfn Perl module
+ pl:/Text/sprintfn/sprintfn
+
+B<riap+tcp>. This scheme is for L<Riap::Simple> over TCP socket. The host
+(+port) part describes TCP host (+port), and the path part describes path to
+code entity. Currently there is no default port so please always specify port
+number. Examples:
+
+ riap+tcp://localhost:5000/Text/sprintfn/
+ riap+tcp://localhost:5000/Text/sprintfn/sprintfn
+
+B<riap+unix>. This scheme is for Riap::Simple over Unix socket. There is no host
+part (Unix socket is localhost-only). The path part describes path to the socket
+and path to code entity (separated by C<//>).
+
+ riap+unix:/path/to/unix/socket
+ riap+unix:/path/to/unix/socket//Text/sprintfn/sprintfn
+
+B<riap+pipe>. This scheme is for Riap::Simple over pipe, to refer to starting a
+program and talking the protocol over the pipe. There is no host. The path part
+describes path to program, C<//> separator, arguments separated by C</>,
+C<//separator>, and path to code entity.
+
+ # refer to accessing code entity via executing "/path/to/program"
+ riap+pipe:/path/to/program////Text/sprintfn/sprintfn
+
+ # refer to via accessing code entity via executing "/path/to/program arg1 arg2"
+ riap+pipe:/path/to/program//arg1/arg2//Text/sprintfn/sprintfn
+
+=head1 RIAP OVER HTTP/HTTPS
+
+For Riap over HTTP/HTTPS as the transport layer, the standard URI scheme
+B<http>/B<https> is used. The URI path for these do not necessarily map directly
+to code entities like in C<riap> or C<pl> URIs, they may also support additional
+features, as each service provider can choose custom URL layout. Example:
+
+ # access tax::id::validate_npwp function, call with arguments
+ http://gudangapi.com/ga/tax.id.npwp/validate_npwp?npwp=123456
+
+ # namespace/module can also be omitted when function name is unique. arguments
+ # can also be specified by position
+ http://gudangapi.com/ga/validate_npwp/123456
+
+However, any Riap request and any code entity URI can still be requested from
+any http/https URL following the L<Riap::HTTP> protocol..
+
+=head1 THE REQUEST
+
+As mentioned previously, the Riap request is a mapping of request keys and their
+values. Common request keys:
+
+=over 4
+
+=item * v => FLOAT
+
+Specify Riap protocol version. If not specified, default is C<1.1>. Server
+should return 501 status if it does not support requested protocol version.
+
+=item * uri => STR
+
+Required. Specify the location to code entity. It is either a schemeless URI
+(e.g. C</Package/SubPackage/func>) to refer to "local" code entity or URI with a
+scheme to refer to a remote entity, e.g. C<http://example.org/api/Foo/Bar/func>,
+in which case the server can decide to proxy it for the client or not.
+
+The server should return 404 status if B<uri> does not map to an existing code
+entity, or 403 if C<uri> is forbidden.
+
+=item * action => STR
+
+Required. Specify action to perform on the code entity.
+
+The server should return 501 status if an action is unknown for the specified
+URI. The server should return 401/403 status if authentication is required or
+action is not allowed for the specified code entity, respectively.
+
+=item * tx_id => STR
+
+Optional. Transaction ID. Only needed if you want to execute request inside
+transaction scope. See L<Riap::Transaction> for more details.
+
+=back
+
+Additional keys might be recognized and/or required according to the action.
+
+=head1 COMMON ACTIONS
+
+Below are the actions which can be implemented by the server. Server can choose
+to not implement any action, or implement additional actions. But for actions
+mentioned below, the specification must be followed.
+
+=head2 Action: B<info>
+
+Get general information and information about the code entity. This action
+requires no additional request keys. Upon success, the server must return a hash
+result with at least the following keys (remember that the result is actually
+enveloped with a 200 status):
+
+ [200,"OK",
+  {
+   // entity's type
+   "type": "function",
+
+   // canonical URI for the entity
+   "uri": "/Package/SubPkg/",
+  },
+  {"riap.v": 1.2}
+ ]
+
+Server may add additional information keys.
+
+=head2 Action: B<actions>
+
+List available actions for code entity. The server should return a list of
+action names:
+
+ [200,"OK",
+  ["info","actions","meta","call","complete_arg_val"],
+  {"riap.v":1.2}
+ ]
+
+Additional request key: B<detail> (bool, optional, default false, can be set to
+true to make server return a list of records instead).
+
+Under B<detail>, server should return something like this:
+
+ [200,"OK",
+  [
+   {"name":"info", "summary":"Get general information about code entity"},
+   {"name":"actions","summary":"List available actions for code entity"},
+   {"name":"meta","summary":"Get metadata for code entity"},
+   {"name":"call","summary":"Call function"},
+   {"name":"complete_arg_val","summary":"Complete function's argument value"}
+  ],
+  {"riap.v":1.2}
+ ]
+
+It can return additional field like C<keys> to explain additional
+required/optional request keys (XXX not yet specified).
+
+=head2 Action: B<meta>
+
+Return Rinci metadata for the code entity. When the entity does not have
+metadata, server should return 404 status or better yet 534 (metadata not
+found).
+
+=head1 ACTIONS FOR C<package> ENTITIES
+
+Below are actions that must be supported by the C<package> entities.
+
+=head2 Action: B<list>
+
+List entities contained in this package. Additional request keys are: B<type>
+(string, optional, to limit only listing entities of a certain type; default is
+undef which means list all kinds of entities), B<recursive> (bool, optional, can
+be set to true to search subpackages; default is false which means only list
+entities in this namespace), B<q> (string, search terms, to only return matching
+some search terms; default is undef which means return all entities), B<detail>
+(bool, optional, whether to return just a list of code entity URIs or a detailed
+record for each entry, defaults to false; if true, then server must return info
+hash for each entry, where each info hash like that returned by the C<info>
+action).
+
+The server should return 200 status or 206 if partial list is returned. If
+B<detail> is true, for each entry a hash must be returned containing at least
+B<uri> and B<type>. Server may add additional information like B<summary>,
+B<description>, etc.
+
+Example, a C<list> action on the top namespace C</> might return the following:
+
+ [200,"OK",
+  ["Math/","Utils/"],
+  {"riap.v":1.2}
+ ]
+
+Another example, a C<list> action on the C<pl:/Math> namespace, with C<type>
+set to C<function> and C<q> to C<multiply>, and C<detail> set to true:
+
+ [200,"OK",
+  [
+   {"uri": "multiply2",
+    "type": "function",
+    "summary": "Multiply two numbers"},
+
+   {"uri": "multmany",
+    "type": "function",
+    "summary": "Multiply several numbers"}
+  ],
+  {"riap.v":1.2}
+ ]
+
+An C<abs_uri> can also be provided by server for each record.
+
+=head2 Action: B<child_metas>
+
+Get metadata for all the children entities of the package entity.
+
+This action can reduce the number of round-trips, as opposed to client
+performing C<list> action followed by C<meta> for each child.
+
+Example, an C<child_metas> action on the top namespace C</> might return the
+following:
+
+ [200,"OK",
+  {
+   "Math/":  {"v":1.1, "summary":"This is metadata for Math"},
+  ,"Utils/": {"v":1.1, "summary":"This is metadata for Utils"}
+  },
+  {"riap.v":1.2}
+ ]
+
+=head1 ACTIONS FOR C<function> ENTITIES
+
+Below are actions that are available for the C<function> entities. At least
+C<call> must be implemented by the server.
+
+=head2 Action: B<call>
+
+Call a function and return its result. Additional request keys include:
+
+=over 4
+
+=item * B<args>
+
+Hash, optional, function arguments, defaults to C<{}>.
+
+In general, do not pass special arguments (arguments prefixed by dash C<->) as
+they might be stripped/removed prior to processing. Some special arguments can
+be passed through other means (e.g. see C<confirm> and C<dry_run> below).
+
+=item * B<confirm> => BOOL
+
+Optional. If set to true, will pass special argument C<< -confirm => 1 >> to
+function. This is used as confirmation when function can return status 331
+(requires confirmation). See L<Rinci::function> for more details on status 331.
+
+=item * B<dry_run> => BOOL
+
+Optional. If set to true, will either pass C<< -dry_run => 1 >> to function
+supporting dry run, or C<< -tx_action => 'check_state' >> to function supporting
+transaction (can more or less be regarded as the dry run equivalent).
+
+=item * B<arg_len> => int
+
+Will be passed to function as special argument C<-arg_len> to send partial
+argument value.
+
+=item * B<arg_part_start> => int
+
+Will be passed to function as special argument C<-arg_part_start> to send
+partial argument value.
+
+=item * B<art_part_len> => int
+
+Will be passed to function as special argument C<-arg_part_len> to send partial
+argument value.
+
+=item * B<res_part_start> => int
+
+Will be passed to function as special argument C<-res_part_start> to request
+partial result.
+
+=item * B<res_part_len> => int
+
+Will be passed to function as special argument C<-res_part_len> to request
+partial result.
+
+=item * B<stream_arg> => bool
+
+Optional. If set to true, then will provide a filehandle or an iterable object
+as argument value for the function, where the function can read data from. And
+will also send special argument C<< -arg_stream => 1 >> to function. Note that
+the function must have exactly a single argument that has its C<streaming>
+property set to true. Otherwise, server MUST send 501 (unimplemented) response.
+
+=back
+
+=head2 Action: B<complete_arg_val>
+
+Complete function argument value, a la Bash tab completion where you have a
+semicompleted word and request possible values started by that word. Additional
+Riap request keys include:
+
+=over 4
+
+=item * B<arg>
+
+String, required, the name of function argument to complete.
+
+=item * B<word>
+
+String, optional, word that needs to be completed. Defaults to empty string.
+
+=back
+
+The server should return a list of possible completions. Example, when
+completing a C<delete_user> function for the argument C<username>, and C<word>
+is "st", the server might return:
+
+ [200,"OK",
+  ["stella","steven","stuart"],
+  {"riap.v":1.2}
+ ]
+
+When there is no completion, the server should return an empty list:
+
+ [200,"OK",
+  [],
+  {"riap.v":1.2}
+ ]
+
+=head2 Action: B<complete_arg_elem>
+
+This is just like C<complete_arg_val>, except this tries to complete the value
+of an element of an array argument, instead of the value of the argument itself.
+This is useful for example when completing this command-line:
+
+ % somecmd --category foo --category <tab>
+
+where C<category> is argument of type array and its element contain some
+restricted value. The command-line option C<--category> can be specified
+multiple times to set the array elements.
+
+=over 4
+
+=item * B<arg>
+
+String, required, the name of function argument to complete.
+
+=item * B<index>
+
+Integer, required, which element to complete for (starts from 0 for the first
+element).
+
+=item * B<word>
+
+String, optional, word that needs to be completed. Defaults to empty string.
+
+=back
+
+=head1 ACTIONS FOR C<variable> ENTITIES
+
+Below are actions that are available for the C<variable> entities.
+
+=head2 Action: B<get>
+
+Get variable value.
+
+=head1 FAQ
+
+=head2 Why no actions to modify metadata/code entities?
+
+Since the specification is extensible by adding more actions, you can implement
+this on your system. These actions are not specified by this specification
+because currently the main goal of the protocol is to provide API service and
+read-only access to the metadata.
+
+Alternatively, modifying metada/code entities can be implemented using calls to
+functions on the server which can perform the modifications.
+
+There are also some issues which need to be considered when adding these
+actions. First of all, security. Second, you need to decide whether to modify
+the running/in-memory copy or the actual source code/files (as the code entities
+are usually stored as). When modifying the in-memory copy, the server-side
+architecture may have multiple copies (multiple processes and machines). Do you
+want to modify all those copies or just one the one process?
+
+=head2 The name?
+
+B<Riap> stands for Rinci access protocol, but it is also an Indonesian word
+meaning: to gain in size or number.
+
+=head1 THE RESPONSE
+
+Server must return an enveloped response as specified in L<Rinci::function>
+specification, namely a 4-element array: C<< [STATUS, MESSAGE, RESULT, META] >>.
+C<STATUS> is an integer, C<MESSAGE> is a string, C<RESULT> is of any type and is
+the actual result, and C<META> is a hash.
+
+Starting from Riap 1.2, server must return C<META> which contains at least
+C<riap.v> key, containing the Riap protocol version. Client must recognize and
+remove all C<riap.*> keys from the response before returning the final result to
+user. If there is an unknown C<riap.*> keys or an unrecognized value, it must
+fail by returning 501 status to user. This is to handle/detect
+incompatibilities/new features in future versions.
+
+=head1 HISTORY
+
+=head2 1.2 (Oct 2014)
+
+Version bumped to 1.2. This version addresses sending/receiving binary data over
+JSON. In this version, client can send base64-encoded binary data in arguments
+using C<ARGNAME:base64> key. Server can return base64-encoded binary data in
+result, this is hinted by the C<riap.result_encoding> attribute in result
+medatata. To detect/handle incompatibilities in future versions, client now must
+check C<riap.v> and all C<riap.*> properties in result metadata, and fail if it
+can't recognize an attribute.
+
+=head2 1.1 (Jan 2012)
+
+Rename specification to Riap. Version bumped to 1.1 to various
+backward-incompatible adjustments to Rinci's terminologies.
+
+=head2 1.0 (Aug 2011)
+
+Split specification to L<Sub::Spec::HTTP>.
+
+=head2 May 2011
+
+First release of L<Sub::Spec::HTTP::Server>.
+
+=head1 SEE ALSO
+
+L<Rinci>
+
+JSON RPC, (version 1 at L<http://json-rpc.org>, version 2 at
+L<http://jsonrpc.org>). First developed 2005, major revision to version 2 in
+2009. Similar to Riap in several aspects: 1) request and response are a single
+hash (JSON objects); 2) transport-independent. Differences to Riap: 1) JSON RPC
+has a narrower scope, it only deals with RPC/method calls and the other things
+like metadata access/exchange, etc; 2) JSON RPC is tied to the JSON format,
+while Riap is serialization-format-independent; 3) JSON RPC mandates a request
+ID ("id") on every request, to allow pipelining (i.e. client sends an array of
+requests at once, answers will come potentially out of order). This could be
+added later to the Riap protocol when necessary.
+
+SPORE,
+L<https://github.com/SPORE/specifications/blob/master/spore_description.pod>.
+
+B<SOAP, WSDL>. Popular in the early 2000's, with similar goals (easier service
+discovery, "simple" request/response protocol which can utilize HTTP or other
+transport layer). Fell out of favor along with the rise of JavaScript and REST
+and increased criticism against the complexity of XML. Which is ironic because
+SOAP was originally created to be the simpler alternative to CORBA.
+
+B<CORBA>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Riap>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Riap>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Riap>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

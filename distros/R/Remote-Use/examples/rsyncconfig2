@@ -1,0 +1,20 @@
+package rsyncconfig2;
+# used by ut1rsync.pl
+use warnings;
+use strict;
+
+sub getarg {
+  my ($class, $self) = @_;
+
+  my @orionINC = Remote::Use::Rsync::findINC(host => 'orion');
+  #my @orionINC = ();
+  return (
+    root => [ '/home/casiano/public_html/cpan', #@orionINC, 
+              ],
+    prefix => '/tmp/perl5lib/',
+    command => 'rsync -i -vaue ssh',
+  );
+}
+
+1;
+

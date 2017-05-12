@@ -1,0 +1,43 @@
+---
+abstract: 'RDF data flow pipeline'
+author:
+  - 'Jakob Voß <voss@gbv.de>'
+build_requires:
+  English: 0
+  RDF::Trine::Iterator: 0
+  RDF::Trine::Serializer::Turtle: 0
+  Test::More: 0.88
+  Test::RDF: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RDF-Flow
+requires:
+  Carp: 0
+  Exporter: 0
+  File::Spec::Functions: 0
+  Log::Contextual: 0
+  Log::Contextual::WarnLogger: 0
+  POSIX: 0
+  RDF::Trine: 0
+  RDF::Trine::Model: 0
+  RDF::Trine::Parser: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  URI: 0
+  URI::Escape: 0
+  base: 0
+  parent: 0
+  perl: 5.010
+  re: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/nichtich/RDF-Flow/issues
+  repository: https://github.com/nichtich/RDF-Flow
+version: 0.178

@@ -1,0 +1,49 @@
+ResourcePool::Resource::DBI - DBI bindings for ResourcePool
+
+Copyright (c) 2001-2004 by Markus Winand <mws@fatalmind.com>
+
+See COPYRIGHT section in the ResourcePool::Resource::DBI(3pm) manpage.
+
+Recent Changes
+--------------
+  *  changed use of $sth->errstr() to $dbh->errstr() which seems to 
+     have wider support. Thx to Pavel Shmidt. 
+
+Installation
+------------
+    This modules requires ResourcePool to be pre installed.
+    ResourcePool and this package are a pure perl implemented
+    modules and should therefore run everywhere where perl is
+    already installed.
+
+    The well known procedure is:
+        perl Makefile.PL
+        make
+        make test
+        make install 
+
+Examples
+--------
+    Are included in the manpages which come with this distribution.
+    To start with ResourcePool read the ResourcePool::BigPicture(3pm)
+    manpage, to learn something about the DBI bindings included
+    in this package visit the ResourcePool::Factory::DBI(3pm) manpage.
+
+Obtaining the most recent version
+---------------------------------
+    This package and subsequent updates is available on CPAN. Please
+    use a mirror close to you when downloading from CPAN.
+
+        http://www.cpan.org/SITES.html
+
+How to contribute?
+------------------
+    Submit patches for bugs you discovered (or report the at least),
+    upload your own resource bindings to CPAN.
+
+Authors contact
+---------------
+       e-mail: mws@fatalmind.com
+     homepage: http://www.fatalmind.com/
+    whishlist: http://www.amazon.de/exec/obidos/wishlist/1JW6LC92SAK62/
+               http://amazon.com/gp/registry/3BXRJP9W3WMDX

@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 2b96437fc8d3282480935f4785b3861017efb509 COPYRIGHT
+SHA1 12bd5d450465a575299e4bc1f24a1e257f45b793 CREDITS
+SHA1 baa4e20c9338fa25b797efce487246fd67de9459 Changes
+SHA1 a545b0fdb29256f6b04bd794e34de8e0aa421a99 INSTALL
+SHA1 7afae05d67ecea9c5e9328c4c29442c9d343da86 LICENSE
+SHA1 9ca1266ae555493f1df2e17cfa5a0c4a03ab9eea MANIFEST
+SHA1 61ff66173059ad4a6f384c581510bfd30e712105 META.json
+SHA1 b16c495fa47332ff0130a6c75913024d5f431b99 META.yml
+SHA1 95821212271e2bc570802b732e44fb140e869344 Makefile.PL
+SHA1 568c261249cdf9eb591412a213dd8e8c89ee9648 README
+SHA1 157d43e84e6d5cfd366437aee68e9ef433d697b7 dist.ini
+SHA1 1f46bf9adbd0767d2bee9861c0244a032e2fb0d9 doap.ttl
+SHA1 bfb8e33b4287b32ec6b609273dccbfc7951ff0b2 lib/Plack/App/RDF/LinkedData.pm
+SHA1 18308f8166c9efd654076592ffbd58c1fb72063b lib/RDF/LinkedData.pm
+SHA1 7890d0364e0d89d03b38f8de3f086c36be390e57 rdf_linkeddata.json
+SHA1 aa0b64a76a4334edeea1c39212fce4a94b2f5a36 rdf_linkeddata_acl.json
+SHA1 48e075eb90e32fda410fffbeba517c3bbb3adea3 rdf_linkeddata_dev.json
+SHA1 4f9198217c1a849b4d9c8713b017f34039789b2c rdf_linkeddata_end.json
+SHA1 c6f589ed77ca675ad6c6fecc79f2f42707d3f02f rdf_linkeddata_void.json
+SHA1 30e091ff92a851e46b9fa8579fc5adbe2512d943 script/linked_data.psgi
+SHA1 af175eb27d75d4dc2890b917d845a2e2b04b5d49 t/00-load.t
+SHA1 281696a176bc56e8708f0dd6d2061319d81aa325 t/10-basic.t
+SHA1 e627ae83c66dacec243ae55d2cd6f0f646673a2c t/11-constructor.t
+SHA1 07a936b5092abacc87f5d9596c802855fef30c7b t/15-process.t
+SHA1 b2fc72ecc1e56d05e22a4bc4e88ff3f1d08f0f7b t/16-void.t
+SHA1 d394241593b25c82738b880fa796e02c908e1d14 t/17-hypermedia-ro.t
+SHA1 e96e69a2b4dd4c2c20376a9980a60ff7b81f1c59 t/18-fragments.t
+SHA1 2d9cf5d5d1cf5f586edf8e6252abeeac7fdc8013 t/19_config_file.t
+SHA1 41989ce21743bfa80840ee4b178b2489b0f17d74 t/20-psgi-basic.t
+SHA1 ba54d582869401364ae391276633b0fbecb88d4d t/25-psgi-endpoint.t
+SHA1 f09cf8ca9ac37026540bc3652c2a29c2a3a8edba t/28-psgi-void.t
+SHA1 f637dccab2e10c22988378721c189153468a0846 t/data/add.ttl
+SHA1 a0946a1631578df073be5dbef1e81694bcd83fd2 t/data/basic.ttl
+SHA1 262ba8c31b0d06304f5cdd1dbfcf1e6ad8e189d5 t/data/fragments.ttl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIVAwUBWGvVhH++6N86nkqlAQjl3xAAoI3hj0nqtDkBZmB4BGYUQN7dZRkD4QLi
+ndTqNWfdvHYf1Pgey4vu25NcCNmeSwWpXQciPgPaeRAxXE9sCs4iJ91YfJUQm9oB
+1aX4GGOQ8/G8PnpaX6jiqRn/Cw9nV/4fvYPi8jVtorzGwJcsmDUsouL0qmh33yWT
+rhZs7Zz0Ko/JRANfYHMo1p1cBkacW2UbzKbtQ+tFcrWF2AxD6Hz+xnut5eUP6Ky+
+ZB0zkyrWWpkCm8Tkjtik/1HEPloNSkh3B9bY19GD3vUWXe1kwb9yrfUBLn+t3vxo
+yVLc8PQsJegy0ckah7KvUHaVTzy5dOQue6VV79VMwD1BHNM1EwqJfOyVBV9kLCD/
+mAfqPMARJfse0DnF1znNRjJbF1T51nBRY6XwVQXSc6x0vDULaehISteQekvw1Dus
+l78J5lz9HW0V9rlDGz+orr8iyBcS8FXiWwy3ZHGvuG9A4CZKtzemonbtXAyb7O1g
+oCvpqN42FjObIZKAEdkvM2PCf80qPk8s+TOAkVPXUKl0YQ2rHiYEx6jviEDdwg3t
+BE+VBAKC6EsuMJ6cwq4cCVurRWOEKr6NsP9INidr9eFiaAcGASi9shyJxx/+Z8zb
+nSKoIeml6yWcWvS/iesXRAobXrq4vcGGWGkN4n1UX967C4doowAAMl96Sx8J6h+s
+2xvNRj6wxyQ=
+=srpn
+-----END PGP SIGNATURE-----

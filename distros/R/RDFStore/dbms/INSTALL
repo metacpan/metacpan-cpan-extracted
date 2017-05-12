@@ -1,0 +1,21 @@
+
+(you should stop any other DBMS running on this machine on port 1234)
+
+Edit the file 'arch.conf' for any platform specific things, in particular
+the location od your db1/db2 libraries on linux.
+
+Type:
+
+make;
+make test;
+make install;
+
+By default the dbmsd get installed under the /RDFStore branch
+ 
+
+NOTE for Linux or no-BSD platforms:
+----------------------------------
+
+The dbmsd(8) TCP/IP deamon code is actually under development and has only been tested on FreeBSD platforms using old Berkeley DB 1.x style interface. Most Linux distributions today come with newer BerkeleyDB >>1.85 (2.x or better) bundled installations and db185 compatibility API and code compiled in. To properly compile dbmsd(8) you must have libdb1 and db_185.h properly installed on your machine. Then edit the deamon/Makefile (LIBS = -ldb1) and compile the package.
+
+If you can not get it to compile, do not disperate and try to use BerkleyDB, DB_File or SDBM_File styles instead :-)

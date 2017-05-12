@@ -1,0 +1,520 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>General library facilities</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Rasqal RDF Query Library Manual">
+<link rel="up" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="prev" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="next" href="rasqal-section-data.html" title="Data Graphs">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="rasqal.html" title="Rasqal Overview">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="pt01.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt01.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Rasqal RDF Query Library Manual</th>
+<td><a accesskey="n" href="rasqal-section-data.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2588450" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2502382" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="rasqal-section-general"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2588450"></a><span class="refentrytitle">General library facilities</span>
+</h2>
+<p>General library facilities &#8212; Startup and shutdown, memory handling, version checks and misc functions.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+extern      const unsigned int <a href="rasqal-section-general.html#rasqal-version-decimal">rasqal_version_decimal</a>;
+extern      const unsigned int <a href="rasqal-section-general.html#rasqal-version-major">rasqal_version_major</a>;
+extern      const unsigned int <a href="rasqal-section-general.html#rasqal-version-minor">rasqal_version_minor</a>;
+extern      const unsigned int <a href="rasqal-section-general.html#rasqal-version-release">rasqal_version_release</a>;
+void        <a href="rasqal-section-general.html#rasqal-init">rasqal_init</a>                     (void);
+void        <a href="rasqal-section-general.html#rasqal-finish">rasqal_finish</a>                   (void);
+enum        <a href="rasqal-section-general.html#rasqal-feature">rasqal_feature</a>;
+int         <a href="rasqal-section-general.html#rasqal-language-name-check">rasqal_language_name_check</a>      (const char *name);
+int         <a href="rasqal-section-general.html#rasqal-languages-enumerate">rasqal_languages_enumerate</a>      (unsigned int counter,
+                                             const char **name,
+                                             const char **label,
+                                             unsigned char **uri_string);
+void*       <a href="rasqal-section-general.html#rasqal-alloc-memory">rasqal_alloc_memory</a>             (size_t size);
+void*       <a href="rasqal-section-general.html#rasqal-calloc-memory">rasqal_calloc_memory</a>            (size_t nmemb,
+                                             size_t size);
+void        <a href="rasqal-section-general.html#rasqal-free-memory">rasqal_free_memory</a>              (void *ptr);
+<a href="rasqal-section-general.html#rasqal-feature">rasqal_feature</a> <a href="rasqal-section-general.html#rasqal-feature-from-uri">rasqal_feature_from_uri</a>      (<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *uri);
+int         <a href="rasqal-section-general.html#rasqal-feature-value-type">rasqal_feature_value_type</a>       (const <a href="rasqal-section-general.html#rasqal-feature">rasqal_feature</a> feature);
+int         <a href="rasqal-section-general.html#rasqal-features-enumerate">rasqal_features_enumerate</a>       (const <a href="rasqal-section-general.html#rasqal-feature">rasqal_feature</a> feature,
+                                             const char **name,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> **uri,
+                                             const char **label);
+unsigned int <a href="rasqal-section-general.html#rasqal-get-feature-count">rasqal_get_feature_count</a>       (void);
+#define     <a href="rasqal-section-general.html#RASQAL-DEPRECATED:CAPS">RASQAL_DEPRECATED</a>
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2502382"></a><h2>Description</h2>
+<p>
+The functions in this section cover general library features such
+as startup and shutdown, checking the current library version and
+dealing with memory allocation and freeing.  It also provides
+functions to enumerate and check the supported query languages,
+their names, labels and URI.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2502403"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2502414"></a><h3>
+<a name="rasqal-version-decimal"></a>rasqal_version_decimal</h3>
+<a class="indexterm" name="id2502425"></a><pre class="programlisting">extern const unsigned int rasqal_version_decimal;
+</pre>
+<p>
+Library full version as a decimal integer.
+</p>
+<p>
+See also <span class="type">rasqal_version_string</span>.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2570174"></a><h3>
+<a name="rasqal-version-major"></a>rasqal_version_major</h3>
+<a class="indexterm" name="id2570185"></a><pre class="programlisting">extern const unsigned int rasqal_version_major;
+</pre>
+<p>
+Library major version number as a decimal integer.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2570205"></a><h3>
+<a name="rasqal-version-minor"></a>rasqal_version_minor</h3>
+<a class="indexterm" name="id2570216"></a><pre class="programlisting">extern const unsigned int rasqal_version_minor;
+</pre>
+<p>
+Library minor version number as a decimal integer.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2570237"></a><h3>
+<a name="rasqal-version-release"></a>rasqal_version_release</h3>
+<a class="indexterm" name="id2570248"></a><pre class="programlisting">extern const unsigned int rasqal_version_release;
+</pre>
+<p>
+Library release version number as a decimal integer.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2570269"></a><h3>
+<a name="rasqal-init"></a>rasqal_init ()</h3>
+<a class="indexterm" name="id2570281"></a><pre class="programlisting">void        rasqal_init                     (void);</pre>
+<p>
+Initialise the rasqal library.
+</p>
+<p>
+MUST be called before using any of the rasqal APIs.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2570310"></a><h3>
+<a name="rasqal-finish"></a>rasqal_finish ()</h3>
+<a class="indexterm" name="id2570322"></a><pre class="programlisting">void        rasqal_finish                   (void);</pre>
+<p>
+Terminate the rasqal library.
+</p>
+<p>
+Must be called to clean up any resources used by the library.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2570351"></a><h3>
+<a name="rasqal-feature"></a>enum rasqal_feature</h3>
+<a class="indexterm" name="id2570364"></a><pre class="programlisting">typedef enum {
+  RASQAL_FEATURE_NO_NET,
+  RASQAL_FEATURE_LAST = RASQAL_FEATURE_NO_NET
+} rasqal_feature;
+</pre>
+<p>
+Query features.
+</p>
+<p>
+None currently defined.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a name="RASQAL-FEATURE-NO-NET:CAPS"></a><code class="literal">RASQAL_FEATURE_NO_NET</code></span></td>
+<td> Deny network requests.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-FEATURE-LAST:CAPS"></a><code class="literal">RASQAL_FEATURE_LAST</code></span></td>
+<td> Internal.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2502536"></a><h3>
+<a name="rasqal-language-name-check"></a>rasqal_language_name_check ()</h3>
+<a class="indexterm" name="id2502547"></a><pre class="programlisting">int         rasqal_language_name_check      (const char *name);</pre>
+<p>
+Check name of a query language.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> the query language name
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 if name is a known query language
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2502606"></a><h3>
+<a name="rasqal-languages-enumerate"></a>rasqal_languages_enumerate ()</h3>
+<a class="indexterm" name="id2502617"></a><pre class="programlisting">int         rasqal_languages_enumerate      (unsigned int counter,
+                                             const char **name,
+                                             const char **label,
+                                             unsigned char **uri_string);</pre>
+<p>
+Get information on query languages.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>counter</code></em>&#160;:</span></td>
+<td> index into the list of syntaxes
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> pointer to store the name of the syntax (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>label</code></em>&#160;:</span></td>
+<td> pointer to store syntax readable label (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri_string</code></em>&#160;:</span></td>
+<td> pointer to store syntax URI string (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure of if counter is out of range
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2502743"></a><h3>
+<a name="rasqal-alloc-memory"></a>rasqal_alloc_memory ()</h3>
+<a class="indexterm" name="id2502756"></a><pre class="programlisting">void*       rasqal_alloc_memory             (size_t size);</pre>
+<p>
+Allocate memory inside rasqal.
+</p>
+<p>
+Some systems require memory allocated in a library to
+be deallocated in that library.  This function allows
+memory to be allocated inside the rasqal shared library
+that can be freed inside rasqal either internally or via
+<a href="rasqal-section-general.html#rasqal-free-memory"><code class="function">rasqal_free_memory()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>size</code></em>&#160;:</span></td>
+<td> size of memory to allocate
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the address of the allocated memory or NULL on failure
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2503107"></a><h3>
+<a name="rasqal-calloc-memory"></a>rasqal_calloc_memory ()</h3>
+<a class="indexterm" name="id2503118"></a><pre class="programlisting">void*       rasqal_calloc_memory            (size_t nmemb,
+                                             size_t size);</pre>
+<p>
+Allocate zeroed array of items inside rasqal.
+</p>
+<p>
+Some systems require memory allocated in a library to
+be deallocated in that library.  This function allows
+memory to be allocated inside the rasqal shared library
+that can be freed inside rasqal either internally or via
+<a href="rasqal-section-general.html#rasqal-free-memory"><code class="function">rasqal_free_memory()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>nmemb</code></em>&#160;:</span></td>
+<td> number of members
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>size</code></em>&#160;:</span></td>
+<td> size of item
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the address of the allocated memory or NULL on failure
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2503216"></a><h3>
+<a name="rasqal-free-memory"></a>rasqal_free_memory ()</h3>
+<a class="indexterm" name="id2503229"></a><pre class="programlisting">void        rasqal_free_memory              (void *ptr);</pre>
+<p>
+Free memory allocated inside rasqal.
+</p>
+<p>
+Some systems require memory allocated in a library to
+be deallocated in that library.  This function allows
+memory allocated by rasqal to be freed.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>ptr</code></em>&#160;:</span></td>
+<td> memory pointer
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2503285"></a><h3>
+<a name="rasqal-feature-from-uri"></a>rasqal_feature_from_uri ()</h3>
+<a class="indexterm" name="id2503296"></a><pre class="programlisting"><a href="rasqal-section-general.html#rasqal-feature">rasqal_feature</a> rasqal_feature_from_uri      (<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *uri);</pre>
+<p>
+Turn a feature URI into an feature enum.
+</p>
+<p>
+The allowed feature URIs are available via <a href="rasqal-section-general.html#rasqal-features-enumerate"><code class="function">rasqal_features_enumerate()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> feature URI
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> &lt; 0 if the feature is unknown
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2503369"></a><h3>
+<a name="rasqal-feature-value-type"></a>rasqal_feature_value_type ()</h3>
+<a class="indexterm" name="id2503380"></a><pre class="programlisting">int         rasqal_feature_value_type       (const <a href="rasqal-section-general.html#rasqal-feature">rasqal_feature</a> feature);</pre>
+<p>
+Get the type of a features.
+</p>
+<p>
+The type of the <em class="parameter"><code>feature</code></em> is 0=integer , 1=string.  Other values are
+undefined.  Most features are integer values and use
+rasqal_query_set_feature <a href="rasqal-section-query.html#rasqal-query-get-feature"><code class="function">rasqal_query_get_feature()</code></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>feature</code></em>&#160;:</span></td>
+<td> rasqal query feature
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the type of the feature or &lt;0 if <em class="parameter"><code>feature</code></em> is unknown
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2604656"></a><h3>
+<a name="rasqal-features-enumerate"></a>rasqal_features_enumerate ()</h3>
+<a class="indexterm" name="id2604666"></a><pre class="programlisting">int         rasqal_features_enumerate       (const <a href="rasqal-section-general.html#rasqal-feature">rasqal_feature</a> feature,
+                                             const char **name,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> **uri,
+                                             const char **label);</pre>
+<p>
+Get list of rasqal features.
+</p>
+<p>
+If uri is not NULL, a pointer to a new raptor_uri is returned
+that must be freed by the caller with <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-free-uri"
+><code class="function">raptor_free_uri()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>feature</code></em>&#160;:</span></td>
+<td> feature enumeration (0+)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> pointer to store feature short name (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> pointer to store feature URI (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>label</code></em>&#160;:</span></td>
+<td> pointer to feature label (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> 0 on success, &lt;0 on failure, &gt;0 if feature is unknown
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2604794"></a><h3>
+<a name="rasqal-get-feature-count"></a>rasqal_get_feature_count ()</h3>
+<a class="indexterm" name="id2604806"></a><pre class="programlisting">unsigned int rasqal_get_feature_count       (void);</pre>
+<p>
+Get the count of features defined.
+</p>
+<p>
+This is prefered to the compile time-only symbol <a href="rasqal-section-general.html#RASQAL-FEATURE-LAST:CAPS"><span class="type">RASQAL_FEATURE_LAST</span></a>
+and returns a count of the number of features which is
+<a href="rasqal-section-general.html#RASQAL-FEATURE-LAST:CAPS"><span class="type">RASQAL_FEATURE_LAST</span></a>+1.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> count of features in the <a href="rasqal-section-general.html#rasqal-feature"><span class="type">rasqal_feature</span></a> enumeration
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2604873"></a><h3>
+<a name="RASQAL-DEPRECATED:CAPS"></a>RASQAL_DEPRECATED</h3>
+<a class="indexterm" name="id2604885"></a><pre class="programlisting">#define     RASQAL_DEPRECATED</pre>
+<p>
+When defined before a function, indicates that the function
+has been deprecated and may be replaced in a future release.
+With some versions of gcc this may give a compilation warning.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

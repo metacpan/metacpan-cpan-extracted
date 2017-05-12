@@ -1,0 +1,23 @@
+RTx-Converter version 0.0.1
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+You may need to set PERL5LIB=/opt/rt3/lib (or wherever RT is installed)
+for this module to test and install properly
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

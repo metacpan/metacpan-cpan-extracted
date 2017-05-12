@@ -1,0 +1,21 @@
+Version 0.001
+=============
+
+Initial release.
+
+Version 0.002
+=============
+
+Significant changes to the interface.  The new interface is more
+general, and should allow different readers to be addressed with
+roughly the same interface, much like accessing different databases
+with DBI drivers.  An attempt at backwards compatibility has been
+made, but it's half-hearted at best.  See the perldoc for details.
+Now built on top of general classes from RFID::Base and RFID::EPC.
+
+Support for continuous reading mode has been removed, at least
+temporarily.  I found it unreliable, and there isn't a way to fit it
+into the new driver model yet.  The code is still there if anybody
+wants to try turning it back on.
+
+

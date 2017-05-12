@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Regexp-Log-WMS.t
+lib/Regexp/Log/WMS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

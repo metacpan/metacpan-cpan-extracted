@@ -1,0 +1,36 @@
+--- 
+abstract: toolkit for building RDF servers
+author: James Smith, C<< <jsmith@cpan.org> >>
+build_requires: 
+  Path::Class::File: 0
+  Test::Moose: 0.01
+  Test::More: 0.72
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: RDF-Server
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::MOP: 0.53
+  Data::UUID: 1.148
+  DateTime: 0.42
+  HTTP::Request: 1.4
+  HTTP::Response: 1.53
+  HTTP::Status: 1.28
+  Iterator::Simple: 0.04
+  Log::Log4perl: 1.15
+  Moose: 0.4
+  MooseX::Types: 0.04
+  Sub::Exporter: 0.978
+  Sub::Name: 0.03
+  XML::LibXML: 1.66
+  XML::Simple: 2.18
+  perl: 5.8.0
+tests: t/*.t t/*/*.t xt/*.t
+version: 0.08

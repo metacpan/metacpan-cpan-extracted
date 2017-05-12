@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+# PODNAME: rdfdot
+# ABSTRACT: Create dot graph diagrams from RDF data.
+
+use RDF::Trine::Parser;
+use RDF::Trine::Model;
+use RDF::Trine::Exporter::GraphViz;
+use RDF::NS;
+use Pod::Usage;
+use Getopt::Long;
+
+my $FORMATS = \%RDF::Trine::Exporter::GraphViz::FORMATS;
+
+my ($help, $base_uri, $informat, $outformat, $parser, $outlist);
+GetOptions(
+    "help|?" => \$help,
+    "I=s"    => \$base_uri,
+    "output" => \$outlist,
+    map ({ $_ => sub { $informat = shift } }
+      keys %RDF::Trine::Parser::file_extensions),
+    map { $_ => sub { $outformat = shift } } keys %$FORMATS
+) or pod2usage();
+pod2usage() if $help;
+
+if ($outlist) {
+    print "$_\t" . $FORMATS->{$_} . "\n" for (sort keys %$FORMATS);
+    exit;
+}
+
+my $infile  = shift @ARGV || '-';
+my $outfile = shift @ARGV || '-';
+
+my ($in, $out) = (\*STDIN, \*STDOUT);
+
+if ( $informat ) {
+    $parser = $RDF::Trine::Parser::file_extensions{ $informat };
+} elsif ( $infile ne '-' ) {
+    $parser = RDF::Trine::Parser->guess_parser_by_filename( $infile );
+}
+
+if ($infile eq '-') {
+    $infile = \*STDIN;
+    binmode $infile, ':encoding(UTF-8)';
+}
+
+if ($outfile ne '-') {
+    open ($out, ">", $outfile) or die "failed to open $outfile";
+    $outformat ||= $1 if $outfile =~ /\.([^.]+)$/;
+}
+
+my $exporter = RDF::Trine::Exporter::GraphViz->new(
+    as => ($outformat || 'dot')
+);
+
+my $model = RDF::Trine::Model->new;
+$base_uri ||= "file:///" . $infile;
+unless ($parser) {
+    print STDERR "please specify input format or -h for help!\n";
+    exit;
+}
+
+$parser->parse_file_into_model ( $base_uri, $infile, $model );
+$exporter->serialize_model_to_file( $out, $model );
+
+
+
+__END__
+=pod
+
+=head1 NAME
+
+rdfdot - Create dot graph diagrams from RDF data.
+
+=head1 VERSION
+
+version 0.141
+
+=head1 SYNOPSIS
+
+rdfdot [ <OPTIONS> ] [ [ <RDF> ] <GRAPH> ]
+
+Arguments:
+
+    RDF      RDF input filename with known extension (.ttl, .nt etc.),
+             default is '-' for standard input.
+    GRAPH    Graph output filename with known extension (.png, .svg etc.),
+             default is '-' for standard output.
+
+Options:
+
+    -ttl             input is Turtle format
+    -rdf|xrdf|rdfx   input is RDF/XML
+    -js|json         input is RDF/JSON format
+    -htm|html|xhtml  input is HTML with RDFa
+    -nt              input is NTriples format
+    -nq              input is NQuads format
+    -trig            input is TriG format
+
+    -png             output is PNG format
+    -svg             output is SVG format
+    -...             output is ... format (see -output)
+    -output          list all output formats and their mime type
+
+    -I BASE          set base URI for input
+
+=head1 DESCRIPTION
+
+This command line client is installed with L<RDF::Trine::Exporter::GraphViz>
+to create nice graph diagrams from RDF data. Namespace prefixes are taken
+from L<RDF::NS>.
+
+=head1 EXAMPLES
+
+    rdfdot myrdf.xml                     # output as DOT
+    rdfdot -svg data.ttl                 # ouptput as SVG
+    rdfdot myrdf.xml graph.png           # create PNG file
+    cat myrdf.nt | rdfdot -nt graph.gif  # RDF from STDIN to GIF file
+
+=head1 AUTHOR
+
+Jakob Voß <voss@gbv.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 218008017c7cd37b737f188899e8e330c53b1863 Changes
+SHA1 58f29e370a9576199d6ed7625bbdddb4088a0ba4 MANIFEST
+SHA1 7981ce3aeacf4e6b816ab1b1a023af9d33a69c81 META.yml
+SHA1 32768d7c9ffdbcff85f58e3d8b0688b6bc2a4280 Makefile.PL
+SHA1 506550b235b50b9585cac9237ec792f9f5e3db53 README
+SHA1 5b03181ca867957e137fa95751736ca0263418a3 etc/handle_action_pass_currentuser.patch
+SHA1 9d3b2104a620fbaa1e5291400cb14385b205c8da inc/Module/AutoInstall.pm
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 93283b6d98078acdd04b242b3e994258821f4fe5 inc/Module/Install/AutoInstall.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 20a581abea5172df43191ba3ce9f2060ae9f0af1 lib/RT/Extension/CommandByMail.pm
+SHA1 2089bc6a5c586718799b2cade5d18df9c54230a4 lib/RT/Extension/CommandByMail/Test.pm
+SHA1 2089bc6a5c586718799b2cade5d18df9c54230a4 lib/RT/Extension/CommandByMail/Test.pm.in
+SHA1 be782a0695a8eaf0591467f8aa5d991a17e6445d lib/RT/Interface/Email/Action/CommandByMail.pm
+SHA1 880966000509f58961fbd5951224f9f2717039c3 lib/RT/Interface/Email/Filter/TakeAction.pm
+SHA1 7b14cdd290b7e3699fc38ebc75a41e6d17daa79d xt/create.t
+SHA1 65f029228f967e069ccbcda4fe52cc486709527d xt/internals.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 xt/tmp/ports
+SHA1 fce1b50987553948bc50be84a7f5477b9c0626b3 xt/txn-cfs.t
+SHA1 097788c06bf8ba0900d578422ea239a25744b85d xt/update.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJX0vUOAAoJEDdW4lQxRAUg3OQP/iy0fEEMoUZ15BKkkevVaFql
+BC7JtPLziC+FDejtUeCY4WT+ryM7u1vQfXiw21upcK+CSl2vZlAMmxBpXtsYqKSi
+movD6TQCwcXjeqr2y1ifCkBpXI2kmOWxe1Z0wqkrRb2ePAhllD9Wcz+t9Z0SlOis
+J3EXt08xM9t0QXSKpWykSraCdqCcmjRppgLGKtiPS/0SmilZfCnKx19GBv72jp74
+mYmNneMAdn8QOFRWEcIaoHlPuyS/aaAfWTKLDCKSq5Px1M5k3wUy5Y3b0dhF2hQQ
+LJ6raIytTDvuBjKIJiUGYO0n+4LcfPrEvN2R3EI4DMkLZpQIfPInTFW48qP2lHLc
+/M5n8eClwqOqxXShkZgRXcLyQp8dR5gDq3QoznR8OdpoNpySvKeg9ONOyTmr/6eg
++nt1nEYQ3jz9rZzfpqS0qVvl3ctmZhuH+Et34PswwJoBWcHb5MMgwLR1NARP3Bwj
+L+G6br1UXyZPXX0DNxASOuiyLjyZ7HYD0JXxryjUYShvrRWk/gGt6ZowsKA/MgYf
+KqM08LhIKqERJYjrxfZbiTY0pezack4vDlc/jF1wxOmMng7sJh2vjKw8y/Ctf4j3
+xU9A/ovikNzNmFkzWyCMXwyil15fuIvPqzW4lNlIDtkYqBfJZLhS7XE+SKOQkrXb
+sf+4IcT8O7GhIOZofE51
+=rOSI
+-----END PGP SIGNATURE-----

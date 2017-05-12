@@ -1,0 +1,30 @@
+<%init>
+my $request_path = $HTML::Mason::Commands::r->path_info;
+if ( $request_path =~ m{^/Ticket/} ) {
+    if ( ( $DECODED_ARGS->{'id'} || '' ) =~ /^(\d+)$/ ) {
+        my $id  = $1;
+        my $obj = RT::Ticket->new( $session{'CurrentUser'} );
+        $obj->Load($id);
+        my $cf = RT::CustomField->new($session{CurrentUser});
+        $cf->Load('Original Ticket');
+        return unless $cf->id && ( $cf->can('IsAdded') ? ( $cf->IsAdded(0) || $cf->IsAdded($obj->Queue) ) : ( $cf->IsApplied(0) || $cf->IsApplied($obj->Queue) ));
+
+        my $tabs = PageMenu();
+
+        my %can = %{ $obj->CurrentUser->PrincipalObj->HasRights( Object => $obj ) };
+        $can{'_ModifyOwner'} = $can{'OwnTicket'} || $can{'TakeTicket'} || $can{'StealTicket'};
+        my $can = sub {
+            unless ($_[0] eq 'ExecuteCode') {
+                return $can{$_[0]} || $can{'SuperUser'};
+            } else {
+                return !RT->Config->Get('DisallowExecuteCode')
+                    && ( $can{'ExecuteCode'} || $can{'SuperUser'} );
+            }
+        };
+
+        if ( $can->('ModifyTicket') ) {
+            $tabs->child( repeat => title => loc('Recurrence'), path => "/Ticket/ModifyRecurrence.html?id=" . $id );
+        }
+    }
+}
+</%init>

@@ -1,0 +1,28 @@
+<tr>
+  <td class="label" valign="top"><&|/l&>Include attachments</&>:</td>
+  <td><& /Ticket/Elements/AddAttachmentsFromTransactions, Attachments => \%documents &></td>
+</tr>
+<%init>
+# for RT version 4.0.18 and above we use a different callback
+return if RT::Handle::cmp_version($RT::VERSION, '4.0.18') >= 0;
+
+return unless $TicketObj;
+
+# NOTE: we can't use here $m->comp_exists('/Ticket/Elements/FindAttachments')
+#       because if you upgrade RT 4.0 to 4.2 then the component still exists
+#       but is unused by RT 4.2
+my $Attachments = $TicketObj->can('Attachments')
+    ? $TicketObj->Attachments                                             # RT 4.2
+    : $m->comp('/Ticket/Elements/FindAttachments', Ticket => $TicketObj); # RT 4.0
+
+my %documents;
+while ( my $attach = $Attachments->Next() ) {
+    next unless defined $attach->Filename && length $attach->Filename;
+    unshift( @{ $documents{ $attach->Filename } }, $attach );
+}
+
+return unless keys %documents;
+</%init>
+<%args>
+$TicketObj => undef
+</%args>

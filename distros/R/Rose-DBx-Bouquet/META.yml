@@ -1,0 +1,33 @@
+---
+abstract: 'Generate a set of Rose::DB::Object- and Rose::HTML::Form-based classes'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Rose-DBx-Bouquet
+provides:
+  Rose::DBx::Bouquet:
+    file: lib/Rose/DBx/Bouquet.pm
+    version: 1.04
+  Rose::DBx::Bouquet::Config:
+    file: lib/Rose/DBx/Bouquet/Config.pm
+    version: 1.04
+requires:
+  Carp: 0
+  Config::IniFiles: 0
+  File::Path: 0
+  File::Spec: 0
+  Getopt::Long: 0
+  HTML::Template: 0
+  Pod::Usage: 0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.04

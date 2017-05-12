@@ -1,0 +1,11 @@
+<%INIT>
+if (($CustomField->ConditionedByAsString||'') ne ($ARGSRef->{ConditionedBy}||'')) {
+    my ($good, $msg) = $CustomField->SetConditionedBy($ARGSRef->{ConditionedBy});
+    push @$Results, $msg;
+}
+</%INIT>
+<%ARGS>
+$CustomField
+$Results => undef
+$ARGSRef => undef
+</%ARGS>

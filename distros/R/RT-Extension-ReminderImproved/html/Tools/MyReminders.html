@@ -1,0 +1,9 @@
+<& /Elements/Header, Title => $title &>
+<& /Tools/Elements/Tabs, current_tab => 'Tools/MyReminders.html', Title => $title &>
+
+<& /Elements/ShowReminders, OnlyOverdue => 0 &>
+
+<%init>
+return unless RT->Config->Get('EnableReminders');
+my $title = loc('My reminders');
+</%init>

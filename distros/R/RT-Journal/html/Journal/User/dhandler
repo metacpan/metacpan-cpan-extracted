@@ -1,0 +1,89 @@
+<%args>
+$Count => 25
+$Page => 1
+</%args>
+<%flags>
+inherit => 0
+</%flags>
+<%init>
+$m->comp('../Elements/_SetDefaults');
+
+my $argument = $m->dhandler_arg;
+my $username;
+my $category;
+my $mode;
+my $entry;
+if ($argument =~ /^(.*?)\/Logout/) {
+ 	tied(%session)->delete;
+	$username = $1;
+}
+if ($argument =~ /^(.*?)\/RSS$/) {
+	$username = $1;
+	$category = 'RSS';
+} elsif ($argument =~ /^(.*?)\/Prefs/) {
+	$username = $1;
+	$mode = 'prefs';
+} elsif ($argument =~ /^(.*?)\/Category\/(.*)$/) {
+	$username = $1;
+	$category = $2;
+} elsif ($argument =~ /^(.*?)\/Entry\/(.*)$/) {
+	$username = $1;
+	$entry = $2;
+} else {
+	$username = $argument;	
+	$username =~ s!/!!g;
+}
+
+if ($category =~ qr{^(.*)RSS$}i) {
+	$category = $1;
+	$mode = 'rss';
+}
+$category =~ s#/$##;
+
+my $user = RT::User->new($RT::SystemUser);
+$user->Load($username);
+unless($user->Id) {
+	$m->comp("../Elements/Abort", Message =>"User not found");
+	
+}
+
+
+if ($mode eq 'prefs') {
+	 $m->comp('/Journal/Prefs.html');
+	$m->abort();
+
+}
+
+my $guest_user = RT::CurrentUser->new('guest');
+my $q = RT::Queue->new($RT::SystemUser);
+$q->Load($RT::JournalQueue);
+
+my $cat = RT::CustomField->new($RT::SystemUser);
+$cat->LoadByNameAndQueue(Name => 'RT::Journal-Category', Queue => $q->Id);
+
+my $tix = RT::Tickets->new($guest_user);
+$tix->LimitQueue(VALUE => $RT::JournalQueue);
+$tix->OrderBy(FIELD=>'Created', ORDER => 'DESC');
+if ($username) {
+	$tix->LimitOwner(VALUE => $username);
+}
+if ($category) {
+	$tix->LimitCustomField(CUSTOMFIELD => $cat->Id, OPERATOR => 'LIKE', VALUE => $category."%");
+}
+
+
+
+if ($entry) { 
+	$m->comp("../Elements/Entry", id => $entry, User => $user);
+
+}
+elsif ($mode eq 'rss') {
+	$tix->RowsPerPage($Count);
+	$m->comp("../Elements/BlogAsRSS", EntriesObj => $tix, user => $username, User => $user);
+} else {
+	$tix->RowsPerPage($Count);
+	$tix->GotoPage($Page-1);
+	$m->comp("../Elements/BlogAsHTML", EntriesObj => $tix, user => $username, User => $user, Page => $Page);
+
+} 
+</%init>

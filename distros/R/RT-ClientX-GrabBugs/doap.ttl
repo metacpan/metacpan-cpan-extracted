@@ -1,0 +1,73 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [
+		doap-deps:on "RDF::TrineX::Serializer::MockTurtleSoup"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "Getopt::Long"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine 0.130"^^doap-deps:CpanId ], [ doap-deps:on "RT::Client::REST"^^doap-deps:CpanId ], [
+		doap-deps:on "RT::Client::REST::Queue"^^doap-deps:CpanId;
+	], [ doap-deps:on "Path::FindDev"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.010"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.0600"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 0.038"^^doap-deps:CpanId;
+	], [ doap-deps:on "Getopt::ArgvFile"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RT-ClientX-GrabBugs>;
+	doap:created         "2012-01-29"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/RT-ClientX-GrabBugs>;
+	doap:homepage        <https://metacpan.org/release/RT-ClientX-GrabBugs>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "RT-ClientX-GrabBugs";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rt-clientx-grabbugs>;
+	];
+	doap:shortdesc       "download bugs from an RT queue and dump them as RDF".
+
+<http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "RT-ClientX-GrabBugs-0.001"^^xsd:string;
+	dc:issued            "2012-01-29"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RT-ClientX-GrabBugs-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Mark II";
+	dc:identifier        "RT-ClientX-GrabBugs-0.002"^^xsd:string;
+	dc:issued            "2014-01-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Almost total rewrite, using RT::Client::REST to do the bulk of the work interfacing with RT.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RT-ClientX-GrabBugs-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster".
+

@@ -1,0 +1,11 @@
+1.01 2015-01-27
+ - Fix Mandatory custom fields on 4.2 (patch from Emmanuel Lacour)
+
+1.00 2013-12-16
+ - Packaging and documentation updates
+
+0.02 2014-04-07
+ - 4.2 compatibility
+
+0.01 2013-10-22
+ - Initial version

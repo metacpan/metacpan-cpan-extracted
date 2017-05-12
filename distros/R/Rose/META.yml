@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Rose
+version:             0.10
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Rose::DateTime:                0
+    Rose::DB:                      0
+    Rose::DB::Object:              0
+    Rose::HTML::Objects:           0
+    Rose::Object:                  0
+    Rose::URI:                     0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

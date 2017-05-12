@@ -1,0 +1,46 @@
+NAME
+    RT-Extension-DeactiveActionPref - Deactive action user pref
+
+DESCRIPTION
+    This extension allow user to specify the action (Respond or Comment) of
+    links that change a ticket to an inactive status, e.g. the default
+    "Resolve" and "Reject" links.
+
+RT VERSION
+    Works with RT 4.2
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::DeactiveActionPref');
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-DeactiveActionPref@rt.cpan.org|mailto:bug-RT-Extension-DeactiveActionPref@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-DeactiveActionPref>.
+
+COPYRIGHT
+    This extension is Copyright (C) 2014 Best Practical Solutions, LLC.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

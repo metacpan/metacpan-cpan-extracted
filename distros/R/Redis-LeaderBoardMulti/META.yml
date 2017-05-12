@@ -1,0 +1,47 @@
+---
+abstract: 'Redis leader board considering multiple scores'
+author:
+  - '@gmail.com>'
+build_requires:
+  Redis: '0'
+  Test::More: '0.98'
+  Test::RedisServer: '0'
+  Test::Warn: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-LeaderBoardMulti
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Redis::LeaderBoardMulti:
+    file: lib/Redis/LeaderBoardMulti.pm
+    version: '0.02'
+  Redis::LeaderBoardMulti::Member:
+    file: lib/Redis/LeaderBoardMulti/Member.pm
+requires:
+  Carp: '0'
+  Redis::Script: '0'
+  Redis::Transaction: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/shogo82148/p5-Redis-LeaderBoardMulti/issues
+  homepage: https://github.com/shogo82148/p5-Redis-LeaderBoardMulti
+  repository: git://github.com/shogo82148/p5-Redis-LeaderBoardMulti.git
+version: '0.02'
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

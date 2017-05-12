@@ -1,0 +1,33 @@
+Revision history for Perl extension RADIUS::Users.
+
+0.01  Tue Jan 13 11:07:55 1998
+	- original version; created by h2xs 1.18
+
+0.90  Thu Jan 15 17:36:14 PST 1998
+    - first public release
+
+0.99  Fri Aug 18 03:04:56 PDT 2000
+    - applied bug fixes from Burkhard Weeber:
+      Fixed documentation of the comment facility.  It was saying to
+      use "Comments" for the field name, when "Comment" is actually
+      correct.  Also, the Password attribute is now always put first
+      in the user entry if it exists.  Finally, the columnar alignment
+      of attributes was changed so that longer usernames would still
+      look nice and wouldn't screw up the file.
+
+1.00 Thu Dec 13 16:57:00 PST 2001
+   - Strange, I thought I fixed this before (in v0.99), but it was still
+     messed up:  long usernames don't mess up the first attribute in a
+     record any more.  Thanks to James Golovich for helping with this.
+   - Some records were getting blank comments.  Fix from James Golovich.
+   - Serious bug fix:  after update(), re-reading the same file would no
+     longer work correctly because $/ was making each record be read in
+     as a single line, and then it would get skipped as if it were a
+     comment.  Whoops!
+   - Added Check_Items field for new() so that the list of checkable
+     attributes can be customized.
+
+1.01 Thu Dec 13 18:50:56 PST 2001
+   - Updated the README to be more current.  Looks like I never took a
+     look at it after I first created it.
+   - Updated my contact address to oevans@cpan.org.

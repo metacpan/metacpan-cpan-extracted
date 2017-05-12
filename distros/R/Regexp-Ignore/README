@@ -1,0 +1,59 @@
+                            Regexp::Ignore
+
+  Copyright (c) 2002 Ockham Technology N.V. & Rani Pinchuk. All rights 
+  reserved. This package is free software; you can redistribute it and/or 
+  modify it under the same terms as Perl itself. 
+
+      ***   THIS IS AN ALPHA CODE   ***
+      ***   THIS IS AN ALPHA CODE   ***
+      ***   THIS IS AN ALPHA CODE   ***
+
+You have been warned. See also the author notes below.
+
+DESCRIPTION
+  
+  Markup languages, like HTML, are difficult to parse. The reason is that
+  you can have a line like:
+
+    <font size=+1>H</font>ello <font size=+1>W</font>orld
+
+  How can we find the string "Hello World", in the above line, and replace 
+  it by "Hello Universe" (which is a lot deeper)? Or how can we run a speller 
+  on the text and replace the mistakes with suggestions for the correct 
+  spelling?
+
+  This module come to help you doing exactly that. 
+
+  Actually the module let you first split the text to the parts you are
+  interested in and the unwanted parts. For example, all the HTML tags
+  can be taken as unwanted parts. 
+
+  Then it let you parse the part you are interested in (while totally
+  ignoring the unwanted parts). 
+
+  In the end it let you merge back the unwanted parts with the possibly
+  changed parts you were interested in. 
+
+INSTALLATION
+
+  Follow the standard installation procedure for Perl modules, which is to
+  type the following commands:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+  You'll probably need to do the last as root.  
+
+AUTHOR NOTES
+
+  This is an alpha code. Really. It was written in the end of 2001. It is 
+  not yet checked much. The only reason I submit it to CPAN that early is 
+  to get feedback about the idea, and hopefully to get some help in finding
+  the many bugs that must still be in it.
+  In our company we use this code, though, and for _our_ needs it runs well. 
+
+Rani Pinchuk
+rani@cpan.org
+

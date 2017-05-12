@@ -1,0 +1,30 @@
+Revision history of REST::Google
+
+1.0.8  Fri Sep 18 09:38:00 UTC 2009
+    - fixed test t/05_translate.t (thanks to jonallen)
+
+1.0.7  Fri Jul 17 11:52:30 EEST 2009
+    - tests added for Feeds and Translate API;
+    - minor POD fixes applied
+
+1.0.6  Tue Jul 14 14:52:28 EEST 2009
+    - fixed bug in SYNOPSIS section of Search.pod
+    - added Patent search support
+    - some search result classes updated according to new spec
+
+1.0.5  Fri Jan 16 13:53:56 EET 2009
+    - fixed #42011: Why does responseData->cursor->pages force scalar? (Dave Wolfe)
+    - fixed #42031: Why does responseData->results return a list? (Dave Wolfe)
+
+1.0.4  Tue Jul  1 15:01:47 UTC 2008
+    - #37213 fixed. Thanks to Xuerui Wang;
+
+1.0.3  Sun May 11 12:49:28 EEST 2008
+    - POD improved;
+    - MANIFEST.SKIP added to git repo;
+
+1.0.2  Wed Apr 30 12:44:42 UTC 2008
+    - added support for Search, Feeds and Translate services;
+
+1.0.1  Tue Apr 29 18:09:42 UTC 2008
+    - initial release.

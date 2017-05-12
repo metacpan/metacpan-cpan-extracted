@@ -1,0 +1,77 @@
+Revision history for Regexp-RegGrp
+
+2.01       2017-04-18
+    - Makefile.PL moved to ExtUtils::MakeMaker to fix no . in @INC (perl 5.25.11+)
+
+2.00       2015-05-29
+    - New maintainer: LEEJO
+    - Repoint issue tracker/repo at leejo's fork
+    - Add .travis.yml for CI goodness
+    - Add Changes test
+    - Add MYMETA.json to .gitignore
+
+1.002001   2012-02-18
+    - Use gnutar to build distribution.
+
+1.002   2011-05-18
+    - Changed version number.
+
+1.001_002   2011-04-14
+    - Fixed tests for perl > 5.13.5
+
+1.001_001   2011-04-05
+    - Splited up RegGrp.pm.
+    - Added tests.
+
+1.000001    2011-02-27
+    - Fixed "undefined submatches bug" (Thanks to Dan Thomas).
+
+1.000   2011-01-17
+    - Changed versioning.
+    - Raised major version due to changes in versioning.
+    - Changed required perl version to 5.8.9.
+
+0.04    2010-12-02
+    - Changed version number.
+
+0.03_01 2010-10-29
+    - Fixed (?^: regexp syntax handling for perl 5.14.
+    - Changed backreferences handling.
+    - Fixed POD.
+
+0.0203  2010-09-17
+    - Fixed zero-length submatch bug for perl 5.8.
+    - Added unit test for zero-length submatch.
+
+0.0202  2010-09-13
+    - Moved documentation for modifier option to the right place.
+
+0.0201  2010-09-12
+    - Fixed POD.
+
+0.02    2010-09-11
+    - Changed version number.
+
+0.01_05 2010-09-07
+    - Changed modifier option.
+    - Added unit tests for modifier option.
+
+0.01_04 2010-09-02
+    - Added modifier option.
+    - Updated documentation.
+
+0.01_03 2010-08-23
+    - Updated Changes.
+    - Fixed package.
+    - Removed obsolete condition.
+
+0.01_02 2010-08-22
+    - Changed version.
+    - Added opts parameter to store function.
+    - Fixed abstract.
+    - Fixed .gitignore and .cvsignore.
+    - Switched to Module::Install.
+    - Updated MANIFEST.
+
+0.01_01 2010-07-29
+    - First version, released on an unsuspecting world.

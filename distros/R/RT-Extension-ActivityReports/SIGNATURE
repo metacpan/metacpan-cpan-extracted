@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 163f5392efa5b286af93f4e2f3e764d2186cee03 Changes
+SHA1 d6201c269829966ca3631fec733f0845c229586c MANIFEST
+SHA1 9d4e20740302170a7c510bfd093450922f321c31 META.yml
+SHA1 f81d157a55d0ad66b36b915f7bd8b1a61e668e59 Makefile.PL
+SHA1 7f579f25fe0b127a4f481a9319c10dcc5a1a1188 README
+SHA1 4491788c49479c75bd86f73add6d83416388a3c0 html/Callbacks/ActivityReports/Elements/Tabs/Default
+SHA1 238c9a068e3837fe215539852bc34690467bea43 html/Callbacks/ActivityReports/Elements/Tabs/Privileged
+SHA1 4499fc03fed0451e7bde59e0481c316ce4753f3c html/Callbacks/ActivityReports/Search/Results.html/SearchActions
+SHA1 75c9aa2338af4d2a2c5c59f378de708f651fc1f3 html/NoAuth/css/activity-reports.css
+SHA1 f9f52a667998532dc0e2cf9a972bc34c1005ba7d html/Reports/Activity/ActivityDetail.html
+SHA1 49b8308e0050b4eff04c2f109342dea695872ae2 html/Reports/Activity/ActivitySummary.html
+SHA1 bd09d896a8e68cfb0c1bacf74a76e504a8f897a8 html/Reports/Activity/Elements/ActivityDetail
+SHA1 8d010c32b9c66e0c17923075d73274a203e6ecd1 html/Reports/Activity/Elements/ActivitySummary
+SHA1 f700cac2906a5262059dd1b22d25e93b570092d8 html/Reports/Activity/Elements/LimitReport
+SHA1 cf423ffbcffacbfe53660a5f16178d9afe37675f html/Reports/Activity/Elements/MiniPlot
+SHA1 cb1fd3c3be5ecd758c332599cb8ca22a3802cfb3 html/Reports/Activity/Elements/PrintFooter
+SHA1 fa4bd3e8cedac02a3dcf7951cf252696f7009cad html/Reports/Activity/Elements/PrintHeader
+SHA1 becd88ce5ee791499bb349c6786045a7b8e6c178 html/Reports/Activity/Elements/ResolutionComments
+SHA1 1dc4ebfaf28ed66ae308a694143f2a32431b4c4c html/Reports/Activity/Elements/ResolutionStatistics
+SHA1 6590f7425d164d2ff33322bff789d9a159c37fba html/Reports/Activity/Elements/ScreenFooter
+SHA1 57bf863316e336668c7da3310c0a3f0e99af9390 html/Reports/Activity/Elements/ScreenHeader
+SHA1 e7a62b82fa45f106bbbdab6297b4be24fa2b1923 html/Reports/Activity/Elements/Tabs
+SHA1 c4953a096b64d9b2d14d6c50edaad932ce760063 html/Reports/Activity/Elements/WorkedStatistics
+SHA1 65cde0a130ab1cedc69b4b5b0c8d610873a78caa html/Reports/Activity/Elements/Wrapper
+SHA1 6d90ba4f3db245c7d79753b73346377916111063 html/Reports/Activity/ResolutionComments.html
+SHA1 7ca2f5696fceac83b0d68f090199de66081f4cae html/Reports/Activity/ResolutionStatistics.html
+SHA1 6a5081222366f8c28ceb86afc1389ba99efd08b2 html/Reports/Activity/WorkedStatistics.html
+SHA1 ff489ecd741f6fb6d23c617aa26db3481cfd73a7 html/Reports/Activity/index.html
+SHA1 dc002c56de1216c031c040d6f9d0df43fc6c3e9f html/Search/ActivityReport.html
+SHA1 141cda7e042e6ff73e47ce906e500127b73b83b6 html/Search/Elements/ActivityReport
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 780e868167858840d454ef6ad6bc2a2206f845e7 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 14897f8f52662d7c7361d85336d5dcf668bc984e lib/RT/Extension/ActivityReports.pm
+SHA1 75c9aa2338af4d2a2c5c59f378de708f651fc1f3 static/css/activity-reports.css
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXqfnzAAoJEBXncVGnZqUU/sEIAIGL8Ds0l5yVA9oGEKlrLsHk
+zYxGDeweehRz0Y1v8DR2ZVhamEckqg0S7NeofsS6Nn3l/JN0XRW/+KOxRAfYN/By
+zVcjG5f/tMcuy4j+D1ZVMrwMjkaLU8g+U9tU7oJsSwiCWwPrkjh/8OFct0wXWW6a
+rjwp8WQ2u0L/ZTTJDPS3pdaFTBFyA1tvhbiq7j3k6b9KKzQHhOsNuI9TjMCafqXa
+jbBlNBX60IwhUDeyvIrayoD6AZQWS26nQFZkTAoRbcK2TamhQlEo1VU7iuDbQrH6
+BuCiS7dZF1XOLPgLUUKRcNjP3MSQGQODu34UF5cxqmJ/S+dKlRd//jUD5oZVsIQ=
+=LREl
+-----END PGP SIGNATURE-----

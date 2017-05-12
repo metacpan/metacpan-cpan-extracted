@@ -1,0 +1,6 @@
+name = "Resque-Plugin-Retry"
+# badges = ["travis"]
+authority="cpan:MERU"
+
+module_maker="ModuleBuildTiny"
+

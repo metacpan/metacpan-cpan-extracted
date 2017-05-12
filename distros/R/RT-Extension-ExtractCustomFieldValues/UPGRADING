@@ -1,0 +1,13 @@
+Upgrading from 3.05 or earlier
+
+3.06 added a new Scrip Action that will need to be added
+to your database.  You can do this with the rt-setup-database
+tool:
+
+  /opt/rt3/sbin/rt-setup-database --action insert --datadir etc/upgrade/3.06/
+
+This will prompt for your rt database password and then add a new
+scrip action that you can use to add Text::Template preprocessing to 
+your ECFV templates.
+
+-kevin

@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+@ScripActions = (
+    {  Name        => '[SMSNotify] SMS Queue and Ticket AdminCcs plus Owner', # loc
+       Description => 'Send SMS to all Queue and Ticket AdminCcs and theticket Owner, but not requestor or Ccs' , # loc
+       ExecModule  => 'SMSNotify',
+       Argument    => 'TicketAdminCc,QueueAdminCc,TicketOwner'
+    },
+    {  Name        => '[SMSNotify] SMS Queue and Ticket AdminCcs', # loc
+       Description => 'Send SMS to all Queue and Ticket AdminCcs, but not requestor or Ccs' , # loc
+       ExecModule  => 'SMSNotify',
+       Argument    => 'TicketAdminCc,QueueAdminCc'
+    },
+    {  Name        => '[SMSNotify] SMS Ticket AdminCcs', # loc
+       Description => 'Send SMS to all Ticket AdminCcs, but not requestor or Ccs' , # loc
+       ExecModule  => 'SMSNotify',
+       Argument    => 'TicketAdminCc'
+    },
+    {  Name        => '[SMSNotify] SMS Ticket All Contents', # loc
+       Description => 'Send SMS to all contacts for a ticket' , # loc
+       ExecModule  => 'SMSNotify',
+       Argument    => 'TicketAdminCc,TicketRequestors,TicketOwner,TicketCc'
+    },
+    {
+       Name        => '[SMSNotify] SMS Ticket and Queue Cc/AdminCc ignoring shifts',
+       Description => 'Send SMS to all ticket and queue ccs and adminccs with no filter function',
+       ExecModule  => 'SMSNotify',
+       Argument    => 'TicketAdminCc,TicketOwner,TicketCc,filtermodule:RT::Extension::SMSNotify::PagerForUser'
+    }
+)

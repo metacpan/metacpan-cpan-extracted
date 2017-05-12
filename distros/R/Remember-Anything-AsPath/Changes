@@ -1,0 +1,10 @@
+Revision history for Remember-Anything-AsPath
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.04    Date/time
+        use 'Sereal' to gain some performance
+0.05    Date/time
+        use 'canonical' instead of 'sort_keys' to ensure
+        equality between serialized obects

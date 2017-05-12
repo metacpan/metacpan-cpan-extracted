@@ -1,0 +1,58 @@
+RDF-iCalendar
+=============
+
+Created:      2011-01-21
+Home page:    <https://metacpan.org/release/RDF-iCalendar>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-iCalendar>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-17
+
+ [ Packaging ]
+ - Add IRC link.
+ - Switch to Dist::Inkt.
+
+ [ Other ]
+ - use warnings
+
+0.004	2013-05-17
+
+ [ Bug Fixes ]
+ - Explicitly require RDF::vCard.
+   Fixes RT#85188.
+   JONASS++
+   <https://rt.cpan.org/Ticket/Display.html?id=85188>
+ - Remove references to paths on TOBYINK's local computer from example
+   script.
+   Fixes RT#78050.
+   JONASS++
+   <https://rt.cpan.org/Ticket/Display.html?id=78050>
+ - Stop claiming to be able to convert between RDF and iCalendar; right now
+   it's only one-way.
+   Fixes RT#85190.
+   JONASS++
+   <https://rt.cpan.org/Ticket/Display.html?id=85190>
+
+ [ Other ]
+ - Added: Add a vaguely decent test case.
+
+0.003	2011-02-04
+
+ [ Packaging ]
+ - Module::Package::RDF.
+
+ [ Other ]
+ - Drop some dependencies.
+ - Various minor cleanups.
+
+0.002	2011-02-04
+
+ [ Bug Fixes ]
+ - Minor bugfixes and cleanups.
+
+ [ Other ]
+ - Added: Support for VALARM.
+ - Added: Support for VFREEBUSY.
+ - Added: Support for VJOURNAL.
+
+0.001	2011-01-23	First release

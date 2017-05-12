@@ -1,0 +1,3 @@
+127.0.0.1 - - [19/Jan/2005:21:42:43 +0000] "POST /cgi-bin/brum.pl?act=evnt-edit&eventid=24 HTTP/1.1" 200 11435 "http://birmingham.pm.org/" "Mozilla/2.0GoldB1 (Win95; I)"
+127.0.0.1 - - [19/Jan/2005:21:43:29 +0000] "GET /images/perl_id_313c.gif HTTP/1.1" 304 0 "http://birmingham.pm.org/" "Mozilla/2.0GoldB1 (Win95; I)"
+127.0.0.1 - - [19/Jan/2005:21:47:11 +0000] "GET /brum.css HTTP/1.1" 304 0 "http://birmingham.pm.org/" "Mozilla/2.0GoldB1 (Win95; I)"

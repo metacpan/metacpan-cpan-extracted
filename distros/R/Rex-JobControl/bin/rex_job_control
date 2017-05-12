@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# load lib overwrites from default install
+BEGIN {
+  if(-d "/usr/lib/rex/perl") {
+    unshift @INC, "/usr/lib/rex/perl/share/perl5/vendor_perl";
+  }
+}
+
+use FindBin;
+BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+
+# Start command line interface for application
+require Mojolicious::Commands;
+Mojolicious::Commands->start_app('Rex::JobControl');

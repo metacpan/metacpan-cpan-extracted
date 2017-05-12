@@ -1,0 +1,80 @@
+%# What this world needs is a good five-dollar plasma weapon.
+
+<input type="hidden" name="id" value="<% eval { $Item->Id } %>">
+  <table width="100%" border="0" cellspacing="1" cellpadding="2" bgcolor="#AAE3DE">
+    <tr> 
+      <td colspan="4" class="tableTitle"><nobr><&|/l&>Version</&></nobr></td>
+    </tr>
+    <tr><td align="left" colspan="4">
+	<nobr><&|/l&>Version Number</&>: <input name="Subject" value="<% eval{ $Item->Subject } %>" size="10"></nobr>
+% my $Now = RT::Date->new($session{'CurrentUser'}); $Now->SetToNow;
+	<nobr><&|/l&>Release Date</&>: <input name="Starts" style="cursor: hand" size=10 value="<% eval{ $Item->StartsObj->AsDate } || $Now->AsDate %>" <& /Work/Elements/Date &> ></nobr>
+% my $status = eval { $Item->Status };
+% if ($status and $status ne 'new') {
+	<br>
+	<nobr><&|/l&>Status</&>:
+	<select name="Status">
+%           foreach my $key ('open', 'resolved', 'deleted') {
+	    <option value="<% $key %>" <% ($status eq $key) ? 'selected' : '' %>>
+		<% loc($StatusMap{$key}) %>
+	    </option>
+%           }
+	</select></nobr>
+% }
+	<input type="submit" value="<&|/l&>Submit</&>">
+    </td></tr>
+    <tr> 
+      <td colspan="4" class="tableTitle"><nobr><&|/l&>Existing Versions</&></nobr></td>
+    </tr>
+    <tr> 
+      <td class="tableTitle" width="40"><nobr><&|/l&>Version Number</&></nobr></td>
+      <td class="tableTitle" width="120"><nobr><&|/l&>Release Date</&></nobr></td>
+      <td class="tableTitle" width="100"><nobr><&|/l&>Status</&></nobr></td>
+    </tr>
+% foreach my $item (@{$List}[$Begin .. $Begin + $Size - 1]) {
+%     my $bg = (($Item and $item and $item->Id == $Item->Id) ? '#ffffcc' : 'ffffff');
+%     my $url = "$URL?Queue=$Queue&id=" . ($IDMap->{$item->Id} || $item->Id) if $item;
+    <tr bgcolor='<% $bg %>'
+%     if ($item) {
+	onMouseOver="this.style.backgroundColor='#D1FAFC'" 
+        onMouseOut="this.style.backgroundColor='<% $bg %>'"
+	style="cursor:hand" 
+	onClick="MM_goToURL('self','<% $url %>');return document.MM_returnValue"
+%     } else { $item = $RT::Nothing }
+    > 
+%     my $status = $StatusMap{$item->Status};
+      <td height="20" align="right"><a href="<% $url %>"><% $item->Subject %></a>&nbsp;</td>
+      <td height="20"><% eval { $item->StartsObj->AsDate } %></td>
+      <td height="20"><% loc($status) %></td>
+    </tr>
+% }
+  </table>
+<%INIT>
+if (UNIVERSAL::isa($List, 'DBIx::SearchBuilder')) {
+    my $Count = $List->Count;
+    $List->FirstRow($Begin + 1);
+    $List->RowsPerPage($Size);
+    $List->RedoSearch;
+    my $CurList = $List->ItemsArrayRef || [];
+    $List = [ ((undef) x $Begin ), @$CurList, ((undef) x ($Count - @$CurList - $Begin )) ];
+}
+$List ||= [];
+$Size = @$List if @$List > $Size;
+my %StatusMap = (
+    resolved	=> 'released',
+    open	=> 'preparing',
+    new		=> 'empty',
+    deleted	=> 'deleted',
+);
+</%INIT>
+<%ARGS>
+$Size	=> 14
+$List	=> []
+$Role	=> ''
+$Begin	=> 0
+$IDMap	=> {}
+$URL	=> ''
+$ARGS	=> {}
+$Item	=> $RT::Nothing
+$Queue
+</%ARGS>

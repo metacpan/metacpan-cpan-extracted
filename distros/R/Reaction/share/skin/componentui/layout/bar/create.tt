@@ -1,0 +1,10 @@
+=widget Action
+
+=extends action
+
+=for layout container_list
+
+<input type="hidden" name="return_to_uri" value="[% return_to_uri %]">
+[% call_next %]
+
+=cut

@@ -1,0 +1,66 @@
+CGI::Kwiki 內建了一個像 !PowerPoint 的投影片展示功能。試試看吧。
+
+*請按這裡開始投影片展示*:
+[&SLIDESHOW_SELECTOR]
+----
+[&title 快紀投影片展示功能簡介]
+== 歡迎來到快紀投影片範例 ==
+* 你可以按下空白鍵來換到下一張投影片
+* 妳也可以在投影片上點擊來繼續前進
+----
+== 它如何運作 ==
+* 你可以把所有的投影片都建立在一個 Wiki 頁面裡
+* 投影片間以一條水平線隔開
+----
+== 控制 ==
+[&img http://www.google.com/images/logo.gif]
+這是一張圖片，擺在這兒祇是好玩罷了。
+* 按下空白鍵跳到下一張投影片
+* 按下退格鍵 (backspace) 回到前一張投影片
+* 按下 '1' 從頭開始
+* 按下 'q' 結束
+----
+== 調整 ==
+* 妳應該適切地調整妳的字型
+* Mozilla 也可以用 <ctl>+ 和 <ctl>-
+* 臨時再機動調整吧
+----
+[&lf]
+[&subtitle 動畫]
+== 逐列顯示動畫
+* 這張投影片
+* 一次祇會
+* 顯示
+* 一列
+----
+[&lf]
+== 更多動畫
+* 這張投影片也是一次
+* 祇會顯示一列
+----
+[&subtitle]
+[&bgcolor red]
+== Bugs ==
+* 一切在 Mozilla 和 IE 上都運作良好
+* 有些瀏覽器似乎對於按鍵事件不會有正確的反應。
+** 不過無論如何妳還是可以用退格鍵 (backspace) 或刪除鍵 (delete) 來回到前一張投影片。
+----
+[&bgcolor]
+== 顯示源碼 ==
+* 以下是一些 Javascript 程式碼:
+    function changeSlide(i) {
+        var myForm = document.getElementsByTagName("form")[0];
+        var myNum = myForm.getElementsByTagName("input")[0];
+        i = i * 1;
+        myVal = myNum.value * 1;
+        myNum.value = myVal + i;
+        myForm.submit();
+    }
+* 以下是一些 Perl 程式碼:
+    sub process {
+        my ($self) = @_;
+        return $self->cgi->size ? $self->open_window 
+                                : $self->slide;
+    }
+----
+== 結束 ==

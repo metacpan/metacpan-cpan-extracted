@@ -1,0 +1,48 @@
+#!/usr/bin/env perl
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+use strict;
+use warnings;
+
+use File::Spec;
+use File::Path qw(make_path);
+use autodie;
+
+use RT;
+RT::LoadConfig();
+
+if ( RT->Config->Get('WebPath') ) {
+    die sprintf
+        "Only empty WebPath is supported at the moment,"
+        ." eg serving RT from http://rt.%s/,"
+        ." not http://%s%s/",
+        RT->Config->Get('WebDomain'),
+        RT->Config->Get('WebDomain'),
+        RT->Config->Get('WebPath'),
+    ;
+}
+
+my @plugins = RT->Config->Get('Plugins');
+push @plugins, 'RT::Extension::Nginx';
+RT->Config->Set('Plugins' => @plugins);
+RT::InitPluginPaths();
+require RT::Extension::Nginx;
+
+my %stash;
+
+@stash{'web_uid', 'web_user'} = RT::Extension::Nginx->GetWebUser;
+@stash{'web_gid', 'web_group'} = RT::Extension::Nginx->GetWebGroup;
+
+$stash{'nginx_root'}   = RT::Extension::Nginx->RootPath;
+$stash{'nginx_conf'}   = RT::Extension::Nginx->NginxConfigPath;
+$stash{'fcgi_storage'} = RT::Extension::Nginx->FcgiStoragePath;
+$stash{'fcgi_temp'}    = RT::Extension::Nginx->FcgiTempPath;
+
+foreach my $file ( RT::Extension::Nginx->Templates ) {
+    RT::Extension::Nginx->GenerateFile( $file, \%stash );
+    print "Generated $file config\n";
+}
+
+RT::Extension::Nginx->SetupRights;

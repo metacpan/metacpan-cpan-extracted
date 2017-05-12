@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use RT -init;
+
+my $attributes = RT::Attributes->new( RT->SystemUser );
+$attributes->Limit( FIELD => 'Name',       VALUE => 'SpamReports' );
+$attributes->Limit( FIELD => 'ObjectType', VALUE => 'RT::Ticket' );
+
+my $tickets = $attributes->Join(
+    FIELD1  => 'ObjectId',
+    TABLE2  => 'Tickets',
+    FIELD2  => 'id',
+);
+$attributes->Limit(
+    ALIAS       => $tickets,
+    FIELD       => 'Status',
+    OPERATOR    => '!=',
+    VALUE       => 'deleted',
+);
+
+my $deleted = 0;
+my $autodelete = RT->Config->Get("SpamAutoDeleteThreshold") || 0;
+
+die "SpamAutoDeleteThreshold is unset or 0\n"
+    unless $autodelete;
+
+while (my $attr = $attributes->Next) {
+    my $users = $attr->Content || [];
+    next unless @$users >= $autodelete;
+    print "Deleting ticket ", $attr->ObjectId, " with ", scalar @$users, " reports\n";
+
+    my ($ok, $msg) = $attr->Object->SetStatus("deleted");
+    if ($ok) {
+        $deleted++;
+    } else {
+        warn "  Failed to delete ", $attr->ObjectId, ": $msg\n";
+    }
+}
+
+print "Deleted $deleted tickets.\n";

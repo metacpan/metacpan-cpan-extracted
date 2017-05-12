@@ -1,0 +1,14 @@
+0.03 2012-11-07
+
+    * update Module::Install*
+    * doc updates
+
+0.02 2011-11-22
+
+    * set 10 years expiration date on squished content (CSS and JS)
+    * set 1 month expiration date on other static things
+
+0.01 2011-11-21
+
+    * initial release
+

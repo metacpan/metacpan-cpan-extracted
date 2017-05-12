@@ -1,0 +1,13 @@
+## Rules for '<% $name %>' queue
+:0
+* ^(From|To|Cc).*(<% join("|", $name, @aliases) %>)@
+| <% $RT::BinPath %>/rt-mailgate --queue <% $name %> --action correspond --url <% $RT::WebURL %>
+
+:0
+* ^(From|To|Cc).*(<% join("|", $name, @aliases) %>).comment@
+| <% $RT::BinPath %>/rt-mailgate --queue <% $name %> --action comment    --url <% $RT::WebURL %>
+
+<%args>
+$name
+@aliases => ()
+</%args>

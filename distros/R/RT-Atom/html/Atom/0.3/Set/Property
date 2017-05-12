@@ -1,0 +1,32 @@
+%# [PUT EditURI]
+%# Modifies a property with the serialization in the request body.
+<%INIT>
+my $content;
+$content = $r->content if $r->can('content');
+$content = do { local $/; <STDIN> } unless defined $content;
+chomp($content);
+
+my ($status, $msg) = $m->comp(
+    '../Elements/SetProperty',
+    Object => $Object, 
+    Property => $Property,
+    Value => $content,
+);
+
+return $m->comp($ShowError, Status => 403) unless defined $msg;
+
+$r->content_type('text/plain');
+
+if ($status == 200) {
+    print $Object->$Property, "\n";
+}
+else {
+    $r->status(400);
+    print $msg, "\n";
+}
+</%INIT>
+<%ARGS>
+$Object
+$Property
+$ShowError
+</%ARGS>

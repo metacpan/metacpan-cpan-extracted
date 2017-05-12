@@ -1,0 +1,22 @@
+%# COBOL programs are an exercise in Artificial Inelegance.
+
+<SPAN class="search">
+<TR bgcolor="white">
+<TD align="center" ROWSPAN="2"><A HREF="/Foundry/Project/Tracker/Display.html?Queue=<%$Ticket->QueueObj->Id%>&id=<%$Ticket->Id%>"><%$Ticket->Id%></a></TD>
+<TD><B><A HREF="/Foundry/Project/Tracker/Display.html?Queue=<%$Ticket->QueueObj->Id%>&id=<%$Ticket->Id%>"><%$Ticket->Subject%></a></B></TD>
+<TD><%loc($Ticket->Status)%></TD>
+<TD><%$Ticket->QueueObj->Name%></TD>
+<TD><%$Ticket->Owner == $RT::Nobody->Id ? loc('Nobody') : $Ticket->OwnerObj->Name%></TD>
+<TD><%$Ticket->Priority%></TD>
+</TR>
+<TR bgcolor="white"><TD><%$Ticket->Requestors->MemberEmailAddressesAsString%></TD>
+<TD><%$Ticket->CreatedObj->AgeAsString || '-'%></TD>
+<TD><%$Ticket->ToldObj->AgeAsString || '-'%></TD>
+<TD><%$Ticket->LastUpdatedObj->AgeAsString || '-'%></TD>
+<TD><%$Ticket->TimeLeft%></TD>
+</TR>
+</SPAN>
+<%ARGS>
+$Ticket => undef
+$i => undef
+</%ARGS>

@@ -1,0 +1,26 @@
+=head1 NAME
+
+RocksDB::Snapshot - rocksdb::Snapshot object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $db = RocksDB->new('/path/to/db');
+  my $snapshot = $db->get_snapshot;
+  my $val = $db->get('key', { snapshot => $snapshot });
+  my $iter = $db->new_iterator({ snapshot => $snapshot });
+
+=head1 DESCRIPTION
+
+B<RocksDB::Snapshot> is a rocksdb::Snapshot object.
+
+=head1 SEE ALSO
+
+L<RocksDB>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trackers type="array">
+  <tracker>
+    <id>1</id>
+    <name>Bug</name>
+  </tracker>
+  <tracker>
+    <id>2</id>
+    <name>Feature</name>
+  </tracker>
+  <tracker>
+    <id>3</id>
+    <name>Support</name>
+  </tracker>
+  <tracker>
+    <id>4</id>
+    <name>SEO</name>
+  </tracker>
+  <tracker>
+    <id>7</id>
+    <name>Payd</name>
+  </tracker>
+  <tracker>
+    <id>8</id>
+    <name>Immediate</name>
+  </tracker>
+</trackers>

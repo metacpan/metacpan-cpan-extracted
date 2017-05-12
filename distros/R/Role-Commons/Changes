@@ -1,0 +1,37 @@
+Role-Commons
+============
+
+Created:      2012-10-12
+Home page:    <https://metacpan.org/release/Role-Commons>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Role-Commons>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.104	2014-10-24	Happy Birthday, Elliott!
+
+ [ Packaging ]
+ - Add dependency on Test::Exception.
+
+0.103	2014-10-18
+
+ [ Packaging ]
+ - Fix dependency information.
+
+ [ Other ]
+ - Recommend Object::Tap/Object::Util over Role::Commons::Tap.
+ - Removed: The obsolete Object::Tap module is now gone (though the
+   namespace has been recycled by MSTROUT).
+ - Removed: The obsolete authority::shared module is now gone.
+ - Stop using Scalar::Does.
+ - use match::simple.
+
+0.102	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.101	2012-10-26
+
+ - Added: Provide &Object::AUTHORITY::AUTHORITY function. It seems
+   Web::Magic was relying on it.
+
+0.100	2012-10-26	Initial release

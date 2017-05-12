@@ -1,0 +1,200 @@
+NAME
+    RT::Extension::RepeatTicket - Repeat tickets based on schedule
+
+DESCRIPTION
+    The RepeatTicket extension allows you to set up recurring tickets so new
+    tickets are automatically created based on a schedule. The new tickets
+    are populated with the subject and initial content of the original
+    ticket in the recurrence.
+
+    After you activate the plugin by adding it to your RT_SiteConfig.pm
+    file, all tickets will have a Recurrence tab on the create and edit
+    pages. To set up a repeating ticket, click the checkbox to "Enable
+    Recurrence" and fill out the schedule for the new tickets.
+
+    New tickets are created when you initially save the recurrence, if new
+    tickets are needed, and when your daily cron job runs the
+    rt-repeat-ticket script.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        Only run this the first time you install this module.
+
+        If you run this twice, you may end up with duplicate data in your
+        database.
+
+        If you are upgrading this module, check for upgrading instructions
+        in case changes need to be made to your database.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::RepeatTicket');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::RepeatTicket));
+
+        or add RT::Extension::RepeatTicket to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Add bin/rt-repeat-ticket to the daily cron job.
+    Restart your webserver
+
+CONFIGURATION
+  $RepeatTicketCoexistentNumber
+    The $RepeatTicketCoexistentNumber determines how many tickets can be in
+    an active status for a recurrence at any time. A value of 1 means one
+    ticket at a time can be active. New tickets will not be created until
+    the current active ticket is resolved or set to some other inactive
+    status. You can also set this value per recurrence, overriding this
+    config value. The extension default is 1 ticket.
+
+  $RepeatTicketLeadTime
+    The $RepeatTicketLeadTime becomes the ticket Starts value and sets how
+    far in advance of a ticket's Due date you want the ticket to be created.
+    This essentially is how long you want to give people to work on the
+    ticket.
+
+    For example, if you create a weekly recurrence scheduled on Mondays and
+    set the lead time to 7 days, each Monday a ticket will be created with
+    the Starts date set to that Monday and a Due date of the following
+    Monday.
+
+    The value you set in RT_SiteConfig.pm becomes the system default, but
+    you can set this value on each ticket as well. The extension default is
+    14 days.
+
+  $RepeatTicketSubjectFormat
+    By default, repeated tickets will have the same subject as the original
+    ticket. You can modify this subject by setting a format with the
+    $RepeatTicketSubjectFormat option. This option accepts formats in the
+    same form as formats for RT searches. The placeholders take values from
+    the repeated ticket, not the original ticket, so you can use the format
+    to help differentiate the subjects in repeated tickets.
+
+    For example, if you wanted to put the due date in the subject, you could
+    set the format to:
+
+        Set($RepeatTicketSubjectFormat, '__Due__ __Subject__');
+
+    You'll want to use values that you don't expect to change since the
+    subject won't change if the ticket value (e.g., Due) is changed.
+
+    Since this uses RT formats, you can create a custom format by creating a
+    new RT ColumnMap. You can see the available formats by looking at the
+    columns available in the Display Columns portlet on the RT ticket search
+    page.
+
+  rt-repeat-ticket
+    The rt-repeat-ticket utility evaluates all of your repeating tickets and
+    creates any new tickets that are needed. With no parameters, it runs for
+    "today" each day. You can also pass a --date value in the form
+    YYYY-MM-DD to run the script for a specific day.
+
+        bin/rt-repeat-ticket --date 2012-07-25
+
+    This can be handy if your cron job doesn't run for some reason and you
+    want to make sure no repeating tickets have been missed. Just go back
+    and run the script for the days you missed. You can also pass dates in
+    the future which might be handy if you want to experiment with
+    recurrences in a test environment.
+
+USAGE
+  Initial Tickets
+    The initial ticket you create for a recurrence stores the schedule and
+    other details for the recurrence. If you need to change the recurrence
+    in the future, to make it more frequent or less frequent or anything
+    else, make the changes on the original ticket. To help you find this
+    initial ticket, which may have been resolved long ago, a custom field is
+    created on each ticket in the recurrence with link called "Original
+    Ticket."
+
+    When setting up the recurrence, you can use the original ticket as an
+    actual work ticket. When doing this, you'll need to set the Starts and
+    Due dates when you create the ticket. Scheduled tickets created
+    subsequently will set these values based on the recurrence. Resolving
+    the original ticket does not cancel the recurrence.
+
+  Start Value
+    You can set a Start date for a new recurrence. If you don't, it defaults
+    to the day you create the recurrence.
+
+  Cancelling Recurrences
+    You can cancel or end a recurrence in two ways:
+
+    *   Go to the original ticket in the recurrence and uncheck the Enable
+        Recurrence checkbox.
+
+    *   Set ending conditions on the recurrence with either a set number of
+        recurrences or an end date.
+
+  Recursive Recurrences
+    Creating recurrences on recurrences isn't supported and may do strange
+    things.
+
+FAQ
+    I'm not seeing new recurrences. Why not?
+        A few things to check:
+
+        *   Do you have rt-repeat-tickets scheduled in cron? Is it running?
+
+        *   Do you have previous tickets still in an active state? Resolve
+            those tickets or increase the concurrent active tickets value.
+
+        *   Is it the right day? Remember to subtract the lead time value to
+            determine the day new tickets should be created.
+
+        *   If you set a start date and another criteria like day of the
+            week, the new ticket will be created on the first time that day
+            of the week occurs after the start date you set (if the start
+            date isn't on that day of the week).
+
+METHODS
+  Run( RT::Attribute $attr, DateTime $checkday )
+    Repeat the ticket if $checkday meets the repeat settings. It also tries
+    to repeat more to meet config RepeatTicketCoexistentNumber.
+
+    Return ids of new created tickets.
+
+  Repeat ( RT::Attribute $attr, DateTime $checkday_1, DateTime $checkday_2, ... )
+    Repeat the ticket for the check days that meet repeat settings.
+
+    Return ids of new created tickets.
+
+  MaybeRepeatMore ( RT::Attribute $attr )
+    Try to repeat more tickets to meet the coexistent ticket number.
+
+    Return ids of new created tickets.
+
+  SetRepeatAttribute ( RT::Ticket $ticket, %args )
+    Save %args to the ticket's "RepeatTicketSettings" attribute.
+
+    Return ( RT::Attribute, UPDATE MESSAGE )
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-RepeatTicket@rt.cpan.org|mailto:bug-RT-Extension-RepeatTicket@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-RepeatTicket>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2014 by Best Practical Solutions
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

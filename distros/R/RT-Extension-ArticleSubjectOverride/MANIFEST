@@ -1,0 +1,22 @@
+html/Callbacks/RT-Extension-ArticleSubjectOverride/Admin/Articles/Classes/Modify.html/AttributeList
+html/Callbacks/RT-Extension-ArticleSubjectOverride/Admin/Articles/Classes/Modify.html/BeforeSubmit
+html/Callbacks/RT-Extension-ArticleSubjectOverride/Ticket/Create.html/Default
+html/Callbacks/RT-Extension-ArticleSubjectOverride/Ticket/Update.html/Initial
+html/Elements/SubjectOverride
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RT/Extension/ArticleSubjectOverride.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+patches/0001-Add-two-new-callbacks.patch
+README
+SIGNATURE                                Public-key signature (added by MakeMaker)

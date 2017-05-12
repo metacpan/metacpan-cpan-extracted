@@ -1,0 +1,70 @@
+NAME
+    RT-Extension-HistoryOnChange - Show history on ticket modify page
+
+DESCRIPTION
+    Displays ticket history at the bottom of the the Basics page when you
+    modify values on a ticket.
+
+RT VERSIONS
+    Works with RT 4.2.
+
+INSTALLATION
+    "perl Makefile.PL"
+    "make"
+    "make install"
+        May need root permissions
+
+    For RT 4.2.1, apply etc/history_on_change.diff
+        patch /path/to/rt/share/html/Ticket/Modify.html <
+        etc/history_on_change.diff
+
+        Not needed for RT 4.2.2 and later.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Set(@Plugins, qw(RT::Extension::HistoryOnChange));
+
+        or add "RT::Extension::HistoryOnChange" to your existing @Plugins
+        line. Starting with RT 4.2 you can also use:
+
+            Plugin( "RT::Extension::HistoryOnChange" );
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+  @HistoryOnChangeTransactionTypes
+    By default, all history will be shown. You can limit the types of
+    history transactions displayed with this configuration option:
+
+        Set(@HistoryOnChangeTransactionTypes, 'Create', 'Correspond');
+
+    Valid values are transaction types from the RT Transactions table. For
+    example, Create, Correspond, and Comment would get you all messages on
+    the ticket, but omit other transactions like added links (AddLink),
+    status changes (Status), etc.
+
+    This option changes only the history on the Modify (Basics) page. The
+    main ticket display history will continue to show the full history.
+
+AUTHOR
+    sunnavy <sunnavy@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+    bug-RT-Extension-HistoryOnChange@rt.cpan.org
+    <mailto:bug-RT-Extension-HistoryOnChange@rt.cpan.org> or via the web at
+    rt.cpan.org
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-HistoryOn
+    Change>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright 2014 Best Practical Solutions, LLC.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

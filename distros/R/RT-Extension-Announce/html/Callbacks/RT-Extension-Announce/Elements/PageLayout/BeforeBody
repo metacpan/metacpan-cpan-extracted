@@ -1,0 +1,137 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%# 
+%# COPYRIGHT:
+%# 
+%# This software is Copyright (c) 2012 Best Practical Solutions, LLC
+%#                                          <sales@bestpractical.com>
+%# 
+%# (Except where explicitly superseded by other copyright notices)
+%# 
+%# 
+%# LICENSE:
+%# 
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%# 
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%# 
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+%# 02110-1301 or visit their web page on the internet at
+%# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+%# 
+%# 
+%# CONTRIBUTION SUBMISSION POLICY:
+%# 
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%# 
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%# 
+%# END BPS TAGGED BLOCK }}}
+
+<div id="announce">
+<table class="announce">
+%my $rows = 1;
+%foreach my $ticket ( @tickets ){
+  <tr><td class="announce_subject">
+% if( $show_ticket_links{$ticket->Id} ){
+  <a class="announce_subject"
+     href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->Id %>">
+  <% $ticket->Subject %></a>
+% }else{
+  <% $ticket->Subject %>
+% }
+  </td>
+  <td>
+<%perl>
+  my $txns = $ticket->Transactions;
+  for my $type ( qw(Create Correspond) ){
+      $txns->Limit( FIELD => 'Type', VALUE => $type );
+  }
+  $txns->OrderBy( FIELD => 'Created', ORDER => 'DESC' );
+  $txns->RowsPerPage(1);
+  my $content = $txns->First->Content(Type => 'text/plain');
+  if( length $content > $MaxMessageLength ){
+    $content = substr($content, 0, $MaxMessageLength);
+    # Try to break at a word boundary.
+    $content =~ s/^(.*)\b\w+$/$1/g;
+    $content =~ s/\s+$//g; # Remove trailing space
+    $content .= chr(8230); # Ellipsis character
+  }
+</%perl>
+<% $content %>
+%if( $show_ticket_links{$ticket->Id} ){
+ (<a class="announcements_detail" href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->Id %>">more</a>)
+%}
+</td>
+<td class="date">
+<% $ticket->LastUpdatedObj->AsString %>
+</td>
+</tr>
+% if( $rows == $ShowTickets && (scalar @tickets) > $ShowTickets ){
+%   # More announcements, initially hidden.
+<tr><td colspan=2 class="toggle_announcements">
+<a href='#' class="toggle_announcements" id="toggle_announcements">More Announcements</a>
+</td>
+</tr>
+<tbody id="more_announcements">
+% }
+%$rows++;
+%}
+%if( $rows >= $ShowTickets ){
+</tbody>
+%}
+</table></div>
+<%INIT>
+# Only display on Homepage
+if ( RT->Config->Get('ShowAnnouncementsInSelfService') ) {
+    return
+      unless ( $m->request_comp->path =~ m{^/(?:SelfService/)?index\.html$} );
+}
+else {
+    return unless ( $m->request_comp->path =~ m{^/index\.html$} );
+}
+
+my @tickets = RT::Extension::Announce::GetAnnouncements($session{CurrentUser});
+
+# Current user isn't in any groups that can see tickets.
+return if @tickets == 0;
+
+# Don't show links if users can't view the announce tickets.
+my %show_ticket_links;
+
+my $who = $session{CurrentUser}->Name;
+foreach my $ticket ( @tickets ){
+    if ( $ticket->HasRight( Right     => 'ShowTicket',
+                            Principal => $session{'CurrentUser'} )){
+        $show_ticket_links{$ticket->Id} = 1;
+    }
+    else{
+        $RT::Logger->debug("User $who does not have "
+          . "the ShowTicket right for ticket " . $ticket->Id . "  and will not see links to "
+          . 'this announcement ticket.');
+    }
+}
+
+</%INIT>
+<%ARGS>
+$ShowTickets => 2
+$MaxMessageLength => 300
+</%ARGS>

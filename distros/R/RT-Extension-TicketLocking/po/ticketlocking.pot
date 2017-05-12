@@ -1,0 +1,97 @@
+msgid ""
+msgstr ""
+
+#: html/Elements/ShowLock:47
+#. ($TicketLabel, $u_str, $ago)
+msgid "%1 has been locked by %2 for %3"
+msgstr ""
+
+#: html/Callbacks/RT-Extension-TicketLocking/Elements/Tabs/Privileged:27 html/Callbacks/RT-Extension-TicketLocking/RTIR/Elements/QueueTabs/Default:17 html/Callbacks/RT-Extension-TicketLocking/Ticket/Elements/Tabs/Default:21
+msgid "Break lock"
+msgstr ""
+
+#: html/Elements/MyLocks:56
+msgid "Expires in"
+msgstr ""
+
+#: html/Callbacks/RT-Extension-TicketLocking/Elements/Tabs/Privileged:34 html/Callbacks/RT-Extension-TicketLocking/RTIR/Elements/QueueTabs/Default:24 html/Callbacks/RT-Extension-TicketLocking/Ticket/Elements/Tabs/Default:27
+msgid "Lock"
+msgstr ""
+
+#: html/Elements/MyLocks:58
+msgid "Subject"
+msgstr ""
+
+#: lib/RT/Extension/TicketLocking.pm:351
+msgid "There is a lock with a higher priority on this ticket."
+msgstr ""
+
+#: html/Elements/ShowLock:43
+msgid "This ticket"
+msgstr ""
+
+#: lib/RT/Extension/TicketLocking.pm:346
+msgid "This ticket was not locked."
+msgstr ""
+
+#: html/Elements/ShowLock:26
+#. ($Id)
+msgid "Ticket #%1"
+msgstr ""
+
+#: html/Elements/MyLocks:49
+msgid "Tickets locked by you"
+msgstr ""
+
+#: html/Elements/MyLocks:58
+msgid "Time Locked"
+msgstr ""
+
+#: html/Callbacks/RT-Extension-TicketLocking/Elements/Tabs/Privileged:21 html/Callbacks/RT-Extension-TicketLocking/RTIR/Elements/QueueTabs/Default:12 html/Callbacks/RT-Extension-TicketLocking/Ticket/Elements/Tabs/Default:16 html/Elements/MyLocks:77
+msgid "Unlock"
+msgstr ""
+
+#: html/Elements/MyLocks:51
+msgid "Unlock All"
+msgstr ""
+
+#: lib/RT/Extension/TicketLocking.pm:347
+msgid "You cannot unlock a ticket locked by another user."
+msgstr ""
+
+#: html/Elements/ShowLock:31
+#. ($TicketLabel, $ago)
+msgid "You had %1 locked for %2. It is now unlocked"
+msgstr ""
+
+#: html/Callbacks/RT-Extension-TicketLocking/RTIR/Display.html/ProcessArguments:27 html/Callbacks/RT-Extension-TicketLocking/RTIR/Incident/Display.html/ProcessArguments:26 html/Callbacks/RT-Extension-TicketLocking/Ticket/Display.html/ProcessArguments:26
+msgid "You have broken the lock on this ticket"
+msgstr ""
+
+#: html/Elements/ShowLock:37
+#. ($TicketLabel, $ago)
+msgid "You have had %1 locked for %2"
+msgstr ""
+
+#: html/Elements/ShowLock:35
+#. ($TicketLabel)
+msgid "You have locked %1"
+msgstr ""
+
+#: lib/RT/Extension/TicketLocking.pm:356
+#. ($duration)
+msgid "You have unlocked this ticket. It was locked for %1 seconds."
+msgstr ""
+
+#: html/Callbacks/RT-Extension-TicketLocking/RTIR/Display.html/ProcessArguments:12 html/Callbacks/RT-Extension-TicketLocking/RTIR/Incident/Display.html/ProcessArguments:12 html/Callbacks/RT-Extension-TicketLocking/Ticket/Display.html/ProcessArguments:12
+msgid "You now have a lock on this ticket"
+msgstr ""
+
+#: html/Callbacks/RT-Extension-TicketLocking/RTIR/Display.html/ProcessArguments:14 html/Callbacks/RT-Extension-TicketLocking/RTIR/Incident/Display.html/ProcessArguments:14 html/Callbacks/RT-Extension-TicketLocking/Ticket/Display.html/ProcessArguments:14
+msgid "Your attempt to lock this ticket failed"
+msgstr ""
+
+#: html/Elements/ShowLock:26 html/Elements/ShowLock:43
+msgid "this ticket"
+msgstr ""
+

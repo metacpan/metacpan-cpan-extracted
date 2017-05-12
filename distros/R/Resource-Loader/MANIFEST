@@ -1,0 +1,16 @@
+.cvsignore
+Changes
+Loader.pm
+MANIFEST			This list of files
+Makefile.PL
+README
+examples/DTP.pl
+examples/subclass/Preload.pm
+examples/subclass/preload.pl
+examples/synopsis.pl
+t/00_ini.t
+t/10_new.t
+t/20_resources.t
+t/30_testing.t
+t/40_env.t
+t/50_whenargs.t

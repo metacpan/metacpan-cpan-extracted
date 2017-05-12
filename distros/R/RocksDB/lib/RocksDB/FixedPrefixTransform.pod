@@ -1,0 +1,26 @@
+=head1 NAME
+
+RocksDB::FixedPrefixTransform - rocksdb::FixedPrefixTransform object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $prefix = 'rocksdb:';
+  my $prefix_extractor = RocksDB::FixedPrefixTransform->new(length($prefix));
+  my $db = RocksDB->new('/path/to/db', { prefix_extractor => $prefix_extractor });
+  my $iter = $db->new_iterator({ prefix => $prefix });
+
+=head1 DESCRIPTION
+
+B<RocksDB::FixedPrefixTransform> is a rocksdb::FixedPrefixTransform object.
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::SliceTransform>, L<RocksDB::Iterator>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,19 @@
+% use DateTime;
+% layout 'job';
+% title "Project " . $project->name . " / Job " . $job->name;
+
+<h3><%= $job->name %> - Log</h3>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">output.log</div>
+    <div class="panel-body">
+
+      <div>
+        <pre><code><%= join("\n", @{ $job->get_output_log(param("job_id")) }) %></code></pre>
+      </div>
+
+    </div>
+  </div>
+
+
+<a href="/project/<%= $project->directory %>/job/<%= $job->directory %>" class="btn btn-sm btn-primary">Back</a>

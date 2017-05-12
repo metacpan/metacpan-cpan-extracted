@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Role-LibXSLT-Extender,
+version 1.140260:
+
+  A Moose Role to simplify creating/registering Perl extension functions for LibXSLT
+
+This software is copyright (c) 2014 by Kip Hampton.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

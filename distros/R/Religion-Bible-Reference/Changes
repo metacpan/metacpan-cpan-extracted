@@ -1,0 +1,31 @@
+Revision history for Religion-Bible-Reference
+
+0.016     2014-07-25 18:31:30-04:00 America/New_York
+        - correct the number of verses in James 5
+          (thanks, Héctor Daniel Cortés González)
+
+0.015     2013-10-15 21:59:34 America/New_York
+          update changelog and repo
+
+0.015     2011-10-31
+          allow iteration of complete chapters ("Jn 1") -- Thanks, Simon Cozens!
+
+0.014     2009-03-16
+          simplify the data structure storing book definitions (partial patch by
+          Otto Hirr)
+
+          remove prereq on Class::Accessor
+
+0.013     2008-08-09
+          added stringify_short (suggested by Rohan Carly)
+
+0.012     2008-06-14
+          correct chapter/verse counts in Ex, 1Sam, Zec, Ps, Acts, 2Cor
+          (thanks to Joshua Barratt for noticing and (!) patching)
+
+0.011     2006-11-10
+          some cleanup
+          still not suitable for much
+
+0.01      2006-03-16
+          still not suitable for much

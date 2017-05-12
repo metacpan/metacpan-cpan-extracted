@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Rinchi-CIGIPP
+version:             0.02
+abstract:            Perl extension for the Common Image Generator Interface.
+license:             ~
+author:              
+    - Brian M. Ames <bames@localdomain>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          1
+    IO::Select:                    1
+    IO::Socket:                    1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,13 @@
+//#define DEFINE_OPTION(longName, shortName, argInfo, arg, val, descript, argDescript)
+//DEFINE_OPTION(output, 'o', POPT_ARG_STRING, ofilepath,    CL_OPT_OUT, "Specify output file.", "file")
+DEFINE_OPTION(depend, 'd', POPT_ARG_STRING, dfilepath,    CL_OPT_DEP, "Specify dependency output file.", "file")
+DEFINE_OPTION(define, 'D', POPT_ARG_STRING, defbuf,       CL_OPT_DEF, "Define an object macro.", "identifier")
+DEFINE_OPTION(use,    'U', POPT_ARG_STRING, uocbuf,       CL_OPT_UOC, "Specify a use on code.", "code")
+DEFINE_OPTION(incldir,'I', POPT_ARG_STRING, incbuf,       CL_OPT_INC, "Specify a directory to search for include.", "directory")
+DEFINE_OPTION(comment,'C', POPT_ARG_NONE,   out_comments, 0, "Output comments.", "Comment option")
+DEFINE_OPTION(locate, 'P', POPT_ARG_NONE,   out_location, 0, "Output locations.", "Location option")
+DEFINE_OPTION(exclude,'e', POPT_ARG_NONE,   drop_lines,   0, "Drop excluded lines.", "Exclude option")
+DEFINE_OPTION(modtime,'m', POPT_ARG_NONE,   mod_time,     0, "Inherit mod time.", "Mod time inherit option")
+DEFINE_OPTION(debug, '\0', POPT_ARG_NONE,   yypp_debug,   0, "Output parser debugging info.", "Debug option")
+DEFINE_OPTION(treebug,'\0',POPT_ARG_NONE,   tree_debug,   0, "Output tree debugging info.", "Debug option")
+

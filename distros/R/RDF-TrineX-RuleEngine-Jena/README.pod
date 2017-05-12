@@ -1,0 +1,337 @@
+=head1 SYNOPSIS
+
+    use RDF::Trine::Namespace qw(rdf rdfs);
+
+    my $one_triple = "<test/classA> <${rdfs}domain> <test/ClassB> .";
+
+    my $reasoner = RDF::TrineX::RuleEngine::Jena->new;
+    my $model_inferred = $reasoner->apply_rules(
+        input => \ $one_triple,
+        rules => 'rdfs-fb',
+        purge_schemas => ':all',
+    );
+
+    print $model_inferred->size;    
+    # 7
+
+    my $serializer = RDF::Trine::Serializer->new('turtle' , namespaces => { rdf => $rdf, rdfs => $rdfs });
+    print $serializer->serialize_model_to_string( $model_inferred );
+
+    # <test/ClassB> rdfs:subClassOf rdfs:Resource, <test/ClassB> ;
+    #     a rdfs:Class .
+    # <test/classA> rdfs:domain <test/ClassB> ;
+    #     a rdf:Property, rdfs:Resource .
+
+=head1 DESCRIPTION
+
+This module is a convenience wrapper around a call to Jena's C< jena.RuleMap >
+command line rule-engine interface. It transparently handles serialization and
+creation of temporary files, but it relies on a working Java installation and knowledge
+of the location of the Jena framework.
+
+=head2 Finding Jena
+
+When building this module, the Jena framework can be downloaded or a path to an
+existing Jena installation can be specified. This path is stored in a shared
+file. If you can't or don't want to specify it at build time, you can set the
+JENAROOT environment variable to the location of the extracted Jena download.
+Finally you can pass the path to it at runtime to the constructor.
+
+=head2 RDF::Trine vs. Jena Format names
+
+    Trine    | Jena
+    ---------+----------------------------
+    ntriples | N-TRIPLE
+    turtle   | TURTLE
+    rdxml    | RDF/XML, RDF/XML-ABBREV
+    n3       | N3-PP, N3-PLAIN, N3-TRIPLE
+
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item JENAROOT
+
+A L<Path::Class::Dir|Path::Class::Dir> object of the Jena directory.
+
+=item JENA_VERSION
+
+The Version of Jena used, determined from the C<< jena-X.X.X-sources.jar >>
+file.
+
+=item JENA_SOURCES_JAR
+
+L<Archive::Zip|Archive::Zip> object for the C<< jena-X.X.X-sources.jar >> file.
+Contains the predefined rulesets.
+
+=item JENA_CLASSPATH
+
+Array reference holding the paths to all the C<<jar>> files required for Jena
+to run.
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+Returns a new L<RDF::TrineX::RuleEngine::Jena|RDF::TrineX::RuleEngine::Jena>
+object. Before 
+
+The optional C<JENAROOT> argument holds the path to the extracted Jena source.
+If not set, C<JENAROOT> is determined as described in L</JENAROOT>.
+
+
+=head2 apply_rules
+
+Applies a set of Jena rules to RDF input and adds the inferred statements to
+the output model.
+
+=over 4
+
+=item C<< input => $input_data >> 
+
+B<required>
+
+C<$input_data> is serialized, written to a temporary file and fed to
+L</exec_jena_rulemap> as the C<filename_input> argument. Currently, the
+following data types are handled:
+
+=over 4
+
+=item * L<RDF::Trine::Model|RDF::Trine::Model>.
+
+    my $model = RDF::Trine::Model->temporary_model;
+    RDF::Trine::Parser->new('turtle')->parse_file_into_model('my_file.ttl');
+    $reasoner->apply_rules(
+        input => $model,
+        rules => ...,
+    );
+
+=item * String: Treated as the path to a file containing a serialized RDF graph.
+    
+    $reasoner->apply_rules(
+        input => 'my_file.nt',
+        rules => ...,
+    );
+
+=item * Scalar reference: Treated as a reference to a serialized RDF graph.
+
+    my $input_ttl = <'EOF';
+    @prefix rdfs:http://www.w3.org/2000/01/rdf-schema# .
+    <Tiny> rdfs:subClassOf <Small> .
+    EOF
+    $reasoner-apply_rules(
+        input => \ $input_ttl,
+        input_format => 'TURTLE',
+        rules => ...,
+    );
+
+=back
+
+=item C<< rules => $rules_data >> 
+
+B<required>
+
+C<< $rules_data >> can be any of the following:
+
+=over 4
+
+=item * String matching one of the L</available_rulesets>: The appropriate rules file is
+loaded from L</JENA_SOURCES_JAR>.
+
+    $reasoner->apply_rules(
+        input => ...,
+        rules => 'rdfs',
+    );
+
+=item * Scalar reference: The dereferenced value is treated as a string of rules.
+
+    my $rules = "[dummy: (?a ?b ?c) -> (?a rdfs:label "This is stupid") ]";
+    $reasoner->apply_rules(
+        input => ...,
+        rules => \ $rules,
+    );
+
+=item * Any other string: Treat C<$rules_data> as a filename and load rules from there.
+
+    $reasoner->apply_rules(
+        input => ...,
+        rules => '/path/to/my/ruleset.rules',
+    );
+
+=back
+
+=item C<< output => ($model|":fh"|":filename"|":string"|$string) >>
+
+If specified, inferred statements are written to this model, otherwise a
+temporary model is created. If you set output to the same value as input,
+inferred statements are added to the original model.
+
+=over 4
+
+=item * C<< $model >>: The statements are added to this L<RDF::Trine::Model>.
+Setting this to the same model as in C<< input >> will cause all rule-based
+statement removals to be ignored since there currently is no way of tracking
+which statements I<were> by applying the rules.
+
+=item * C<":fh">: If this special string (case-insensitive) is supplied, a readable filehandle
+to the raw output of jena.RuleMap is returned. C<< purge_schemas >> is ignored.
+
+    my $fh = $reasoner->apply_rules(
+        input => ...,
+        rules => ...,
+        output => ':FH',
+    );
+    while (<$fh>) {
+        my ($s, $p, $o ) = $_ =~ m/^\s*<([^>]+>\s+<([^>]+>\s+<([^>]+>\s*.$/;
+    }
+
+=item * C<":filename">: If this special string (case-insensitive) is supplied, the filename of the
+temporary file containing the raw output of jena.rulemap is returned .
+C<purge_schemas> is ignored.
+
+    use File::Slurp;
+    my $fname = $reasoner->apply_rules(
+        input => ...,
+        rules => ...,
+        output => ':filename',
+    );
+    my $contents = read_file $fname;
+
+=item * C<":string">: If this special string (case-insensitive) is supplied,
+the complete raw output of jena.RuleMap is returned. C<< purge_schemas >> is
+ignored.
+
+    my $serialized = $reasoner->apply_rules(
+        input => ...,
+        rules => ...,
+        output => ':sTRing',
+    );
+
+=item * C<$string>: Any other string is treated as a filename to write the raw
+output of jena.RuleMap to. C<< purge_schemas >> is ignored.
+
+    my $serialized = $reasoner->apply_rules(
+        input => 'data.nt',
+        rules => ...,
+        output => 'data_inferred.nt',
+    );
+
+=back
+
+=item C<< purge_schemas => (\@list_of_schemanames|":all") >>
+
+Jena's rule engine adds lots and lots of schema statements about rdf, rdfs, owl,
+xsd plus some internals. You can tell RDF::TrineX::RuleEngine::Jena to purge those
+statements by supplying an array ref of schema names to purge_schemas.
+
+Specifying C<:all> removes all schema statements, RDF::TrineX::RuleEngine::Jena knows
+about.
+
+    $reasoner->apply_rules(
+        input => ...,
+        rules => ...,
+        purge_schemas => ':all',
+    );
+
+is equivalent to
+
+    $reasoner->apply_rules(
+        input => ...,
+        rules => ...,
+        purge_schemas => [qw( rdf rdfs daml xsd owl jena )],
+    );
+
+=back
+
+=head2 exec_jena_rulemap
+
+Sets and resets CLASSPATH and runs C<< java jena.RuleMap ... >> using a
+L<system|perlfunc/system> call.  This is all this function does, capturing STDIN and
+STDERR and parsing/serializing happens in L<< apply_rules >>.
+
+Arguments:
+
+=over 4
+
+=item filename_rules
+
+Filename of the C<< .rules >> file
+
+=item filename_input
+
+File name of the file containing the assertions.
+
+=item input format
+
+The format of the input file, in Jena notation (i.e. 'N-TRIPLE', 'TURTLE', 'RDF/XML'...)
+
+=item output_format
+
+Format of the result printed to STDOUT, again in Jena notation.
+
+=item additions_only
+
+When this flag is set, Jena will only return deduced and schema statements, as
+opposed to the original model with added and removed statements when the flag
+is not set.
+
+=back
+
+=head2 _model_difference
+
+Given two models A and B, remove all statements from A that are also in B.
+
+=head2 _remove_tautologies
+
+Remove all statements of the form C<X owl:equivalentProperty X>.
+
+=head2 available_rulesets
+
+Lists the available predefined rulesets shipped with Jena that aren't broken. Currently, these are:
+
+=over 4
+
+=item * B<daml-micro>
+
+=item * B<owl-fb>
+
+=item * B<owl-fb-micro>
+
+=item * B<owl-fb-mini>
+
+=item * B<rdfs>
+
+=item * B<rdfs-b>
+
+=item * B<rdfs-b-tuned>
+
+=item * B<rdfs-fb>
+
+=item * B<rdfs-fb-lp-expt>
+
+=item * B<rdfs-fb-tgc>
+
+=item * B<rdfs-fb-tgc-noresource>
+
+=item * B<rdfs-noresource>
+
+=back
+
+=head2 get_ruleset_filename
+
+Get the filename of a predefined ruleset within L</JENA_SOURCES_JAR>.
+
+=head1 AUTHOR
+
+Konstantin Baierer <kba@cpan.org>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L< http://answers.semanticweb.com/questions/1453/reasoning-and-sparql-through-arq-command-line >
+
+=back

@@ -1,0 +1,33 @@
+# Chinese localization catalog
+msgid ""
+msgstr ""
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Autrijus Tang <autrijus@autrijus.org>\n"
+"Language-Team: Chinese <autrijus@autrijus.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: html/Developer/AuthTool/index.html:72
+msgid "Action"
+msgstr "动作"
+
+#: html/Callbacks/RT-AuthTool/Elements/Tabs/Default:7
+msgid "Auth Tools"
+msgstr "认证工具"
+
+#: html/Developer/AuthTool/index.html:1
+msgid "Authentication Tools"
+msgstr "认证权限设定工具"
+
+#: html/Developer/AuthTool/index.html:15
+msgid "Back"
+msgstr "返回"
+
+#: html/Developer/AuthTool/index.html:74
+msgid "Grant"
+msgstr "赋予"
+
+#: html/Developer/AuthTool/index.html:75
+msgid "Revoke"
+msgstr "撤消"

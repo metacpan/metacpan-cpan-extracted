@@ -1,0 +1,63 @@
+my $queue = ( $RT::JournalQueue || 'RT::Journal');
+
+@Queues = ( {Name => $queue,
+	    Description => 'Queue for user journal entries',
+	    Disabled => 2});
+
+@CustomFields = ( { Queue => $queue,
+		  Name => 'RT::Journal-Category',
+		  Type => 'FreeformSingle' }
+		  
+		  );
+
+@Users = ( { Name => 'RT::Journal-Guest',
+	   Privileged => 0 } );
+
+
+@Scrips = (
+
+	{ Queue => $queue,
+	  ScripCondition => 'On Correspond',
+	  ScripAction => 'Notify Owner',
+	  Template => 'Correspondence',
+	}
+	);
+
+@ACL = ( 
+	{
+		Queue => $queue,
+		GroupDomain => 'RT::Queue-Role',
+		GroupType => 'Owner',
+		Right => 'CreateTicket'
+
+	},
+
+	{
+		Queue => $queue,
+		GroupDomain => 'RT::Queue-Role',
+		GroupType => 'Owner',
+		Right => 'ModifyTicket'
+
+	},
+
+
+	{
+		Queue => $queue,
+		GroupDomain => 'SystemInternal',
+		GroupType => 'Everyone',
+		Right => 'ShowTicket'
+
+	},
+
+
+	{
+		Queue => $queue,
+		GroupDomain => 'SystemInternal',
+		GroupType => 'Everyone',
+		Right => 'ReplyToTicket'
+
+	},
+
+
+
+	);

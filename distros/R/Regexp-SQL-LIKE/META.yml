@@ -1,0 +1,39 @@
+---
+abstract: 'Translate SQL LIKE pattern to a regular expression'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.92
+  re: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Regexp-SQL-LIKE
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Regexp::SQL::LIKE:
+    file: lib/Regexp/SQL/LIKE.pm
+    version: 0.001
+requires:
+  Sub::Exporter: 0
+  autodie: 2.00
+  perl: 5.010
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-SQL-LIKE
+  homepage: http://github.com/dagolden/regexp-sql-like
+  repository: http://github.com/dagolden/regexp-sql-like
+version: 0.001

@@ -1,0 +1,6 @@
+<%init>
+$m->call_next;
+</%init>
+<%flags>
+inherit=>'/autohandler'
+</%flags>

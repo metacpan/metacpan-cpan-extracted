@@ -1,0 +1,49 @@
+{
+   "abstract" : "Store objects, index by object, tag by objects - all without",
+   "author" : [
+      "M. Nunberg, <mnunberg@haskalah.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ref-Store",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "InlineX::C2XS" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::XSAccessor" : 0,
+            "Constant::Generate" : "0.03",
+            "Devel::FindRef" : "1.422",
+            "Devel::GlobalDestruction" : "0.04",
+            "Dir::Self" : 0,
+            "Module::Stubber" : "0.02",
+            "Task::Weaken" : 0,
+            "Test::More" : 0,
+            "Variable::Magic" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.20"
+}

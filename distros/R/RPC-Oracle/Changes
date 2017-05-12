@@ -1,0 +1,16 @@
+Revision history for Perl extension RPC::Oracle.
+
+1.3 Apr 18 2008
+  - Fixed Makefile.PL dependencies
+
+1.2 Apr 17 2008
+  - Fixed test to be CPANTS-compliant
+
+1.1  Aug 23 2007
+  - Added $schema argument to constructor to accept default schema
+  - Support package global public constants in AUTOLOAD
+
+1.0  Tue Jan 10 16:30:13 2006
+	- original version; created by h2xs 1.23 with options
+		-PX -b 5.6.1 RPC::Oracle
+

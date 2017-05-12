@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# https://buildkite.com/docs/guides/writing-build-scripts
+set -eo pipefail
+
+source ~/perl5/perlbrew/etc/bashrc
+
+# install dist-zilla!
+cpanm --notest Dist::Zilla
+
+# make sure git doesn't get upset with detatched HEAD / tags in similar builds
+# http://stackoverflow.com/questions/4848607/git-fatal-no-such-ref-head#comment5384969_4848607
+git symbolic-ref HEAD refs/heads/master

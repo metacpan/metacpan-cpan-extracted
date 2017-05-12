@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 75b20a5f95d287757fc64ee5d05aea3e777e0c03 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 8f6341375f2d419b2bf3608d6241aa2e86a2468e Changes
+SHA1 a598621641edf67a9622fd4302102708764c2c3e INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 dd1aaf805f802a9b7cf1b6c1d8cf4cec6e50a0d6 MANIFEST
+SHA1 3d934638e9e61a1151da180ee40ea6612f4c6f69 META.json
+SHA1 4e8e4404768fa43a9eeb40d82612505d97c7202a META.yml
+SHA1 41dae7f240ad1bd4828414b6be175a5746fb5a61 Makefile.PL
+SHA1 89ead43deca012d4db626561be7e8af41a98a696 README
+SHA1 e7b4cdb9240d10ce3548d19c1a5332e90a2905ca dist.ini
+SHA1 cc135effeb08b8d132091749cf2626da51318630 doap.ttl
+SHA1 6be64a59eaea1e54f6b1ffc5c32028be4c06136c lib/Role/Inspector.pm
+SHA1 e8e84b5d1e09dd62ff134418ddf8a7a99fd37237 t/01basic.t
+SHA1 75e389cb7abde5b29eb64437965f4b8646d95ac9 t/02mooserole.t
+SHA1 85515e5927e338bf2c9f2ef682f1a30d2c290e2c t/03mouserole.t
+SHA1 42e38830772ad50da34a30345b2a4abd255ad7be t/04moorole.t
+SHA1 72aaee5d165555fccb5497dd5c4bd3f262cb8a63 t/05roletiny.t
+SHA1 3ea9fcaa0c3a91eaf06bb4daa002e58284dece07 t/06rolebasic.t
+SHA1 e7cf8a2994437b9ec1eb306d51df0585f342b41f t/07moprole.t
+SHA1 79e7157c3dd4b6755213ebc1bad1342494e5ad20 t/08customrole.t
+SHA1 d235cf407e6d6ea5f0cf10a1c57028ec96c03647 t/09mooplusmoose.t
+SHA1 a9718323dfe7820840c78363f2465a4b8208b64c t/lib/Local/CustomRole.pm
+SHA1 987c95be850f8607ac0145153a870a908842e6d2 t/lib/Local/MooClass.pm
+SHA1 9e8ff17399ab5ac8fb2fe96811b0e43ca77f5e68 t/lib/Local/MooClass2.pm
+SHA1 154cefc5dc989d78d19e3402648552ec828c48c3 t/lib/Local/MooRole.pm
+SHA1 a767940be4fd78fed4cbbece3e0081128d24d2f0 t/lib/Local/MooRole2.pm
+SHA1 0d9526aedf4804cbf3b3982fa9f3889f452eca0e t/lib/Local/MooRole3.pm
+SHA1 de6f5b591b126ab8b4691fc487363e91f2d42160 t/lib/Local/MooseClass.pm
+SHA1 75ed4615216f746727aa2428987fe0da96a61770 t/lib/Local/MooseClass2.pm
+SHA1 8fef0ea091866d2bdfec141a18328f4eefe52419 t/lib/Local/MooseRole.pm
+SHA1 2fcc96c5a17d84698b93a63041ed59dd3c5701f5 t/lib/Local/MooseRole2.pm
+SHA1 65f5d900ce0fe92f846deff0228a0d2410515f8c t/lib/Local/MooseRole3.pm
+SHA1 6b5454bfd4037473a1deb918fdbf464f1d350e8a t/lib/Local/MopRole.pm
+SHA1 3363cb6be8791b0e03c2a9776cbc9859e98f8795 t/lib/Local/MouseClass.pm
+SHA1 3529478356404b00d04a8d2c355c6467db44cd99 t/lib/Local/MouseRole.pm
+SHA1 dfcf4a5988a461057a7de3483aced1e4aa9936a0 t/lib/Local/MouseRole2.pm
+SHA1 792dfabdd6ad4788335efc9eac8b978e8746d4a6 t/lib/Local/RoleBasic.pm
+SHA1 a389c7108245efa4f2fbeee96656adcc5e5b459c t/lib/Local/RoleBasic2.pm
+SHA1 907ad20259aae1551892fb296b43199513dc2e8a t/lib/Local/RoleTiny.pm
+SHA1 548dbaf0393aef0b93cf3e7a60d998dee8c652ef t/lib/Local/RoleTiny2.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQm87MACgkQzr+BKGoqfTkVNgCcDA5TJ1y62jhzkz+cYENBrmOt
+y6EAoIfARbjXdwaCiQNvbq3Hs9Hy/xfO
+=J1Zr
+-----END PGP SIGNATURE-----

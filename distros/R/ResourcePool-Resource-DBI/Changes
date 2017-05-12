@@ -1,0 +1,19 @@
+Changelog for ResourcePool::Resource::DBI
+
+V1.0101 - 2004-05-02
+
+  *  changed use of $sth->errstr() to $dbh->errstr() which seems to 
+     have wider support. Thx to Pavel Shmidt. 
+
+V1.0100 - 2003-02-27
+
+  *  The three commands Execute, Select and SelectRow have been 
+     added. This release is a preview, the features are not yet fully 
+     implemented and might therefore not sufficient for you needs 
+     right now. 
+
+V1.0000 - 2003-01-02
+
+  *  This package was previously included in the ResourcePool core 
+     distribution. 
+

@@ -1,0 +1,36 @@
+---
+abstract: 'A simple, unified interface to XML-RPC and JSON-RPC.'
+author:
+  - 'Max Kanat-Alexander <mkanat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::More: 0.82
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: RPC::Any
+name: RPC-Any
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JSON: 0
+  JSON::RPC::Common: 0.07
+  LWP: 5.827
+  MIME::Base64: 0
+  Moose: 0.65
+  RPC::XML::ParserFactory: 0
+  Scalar::Util: 0
+  Taint::Util: 0
+  perl: 5.8.1
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+  repository: bzr://bzr.everythingsolved.com/rpc-any/trunk
+version: 1.00

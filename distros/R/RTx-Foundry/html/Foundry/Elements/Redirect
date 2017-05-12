@@ -1,0 +1,9 @@
+%# Hire the morally handicapped.
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+<META HTTP-EQUIV="refresh" CONTENT='0;URL="<% $URL %>"'>
+</head><body></body></html>
+% return 0;
+<%ARGS>
+$URL
+</%ARGS>

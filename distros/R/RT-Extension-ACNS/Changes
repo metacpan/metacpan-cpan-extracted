@@ -1,0 +1,15 @@
+1.00 2014-12-17
+ - Packaging and documentation updates
+
+0.04 2013-04-25
+ - add support for functions in the map
+
+0.03 2013-04-11
+ - extract from a verified emails (gpg strips some bits)
+
+0.02 2013-03-26
+ - extract from XML in an attachment
+
+0.01 2011-02-04
+ - initial release
+

@@ -1,0 +1,53 @@
+=extends collection/grid
+
+=for layout widget
+
+[% pager_fragment %]
+
+[% call_next %]
+
+[% pager_fragment %]
+
+[% actions %]
+
+=for layout sortable_header_cell
+
+<a href="[% order_uri %]">[% header_cell_contents %]</a>
+
+=for layout header_cell
+
+[% maybe_sortable_header_cell %]
+
+=for layout actions
+
+[% call_next %]
+
+=for layout action
+
+[% call_next %]
+
+=for layout pager
+
+[% first_page %]
+[% previous_page %]
+[% page_list %]
+[% next_page %]
+[% last_page %]
+
+=for layout numbered_page_this_page
+
+[% page_number %]
+
+=for layout numbered_page
+
+<a href="[% page_uri %]">[% page_number %]</a>
+
+=for layout named_page
+
+<a href="[% page_uri %]">[% page_name %]</a>
+
+=for layout named_page_no_page
+
+[% page_name %]
+
+=cut

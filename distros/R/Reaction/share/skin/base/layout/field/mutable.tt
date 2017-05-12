@@ -1,0 +1,27 @@
+=for layout widget
+
+[% label_fragment %] [% field %] [% message_fragment %]
+
+=for layout label
+
+<label for="[%field_id%]" [% field_is_required %]>[% label %]:</label>
+
+=for layout field_is_required_yes
+
+class="required_field"
+
+=for layout field_is_required_no
+
+=for layout message
+
+<span class="field_mutable_message">[% message %]</span>
+
+=for layout field
+
+<input type="[% field_type %]" name="[% field_name %]" id="[% field_id %]" [% field_body %] />
+
+=for layout field_body
+
+value="[% field_value %]"
+
+=cut

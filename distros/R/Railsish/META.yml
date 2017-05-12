@@ -1,0 +1,33 @@
+--- 
+abstract: A web application framework.
+author: 
+  - Liu Kang-min <gugod@gugod.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.006
+license: mit
+name: Railsish
+requires: 
+  Any::Moose: 0.07
+  Binding: 0.04
+  Class::Implant: 0.01
+  Data::Visitor: 0.24
+  Devel::Symdump: 2.08
+  File::Spec::Functions: 3.29
+  HTTP::Engine: 0.1.7
+  Hash::Merge: 0.10
+  JSON::XS: 2.232
+  Lingua::En::Inflect::Number: 0
+  Log::Dispatch: 2.22
+  Module::Loaded: 0.01
+  Module::Refresh: 0.13
+  Moose: 0.75
+  MooseX::Types: 0.10
+  Mouse: 0.22
+  MouseX::Types: 0.01
+  Path::Router: 0.06
+  Perl6::Junction: 1.4000
+  String::CamelCase: 0.01
+  Template: 2.20
+  UNIVERSAL::require: 0
+  XML::Simple: 2.18
+  YAML::Any: 0.67
+version: 0.21

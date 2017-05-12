@@ -1,0 +1,13 @@
+# This file acts as the project's changelog.
+
+`RDF-Query-Functions-Buzzword-DateTime 0.001 cpan:TOBYINK`
+	issued  2011-01-05;
+	label   "Initial release".
+
+`RDF-Query-Functions-Buzzword-DateTime 0.002 cpan:TOBYINK`
+	issued  2012-09-11;
+	changeset [
+		item "Modernize."^^Packaging;
+		item "Drop common::sense dependency."^^Packaging;
+		item "Don't use deprecated RDF::TrineShortcuts in examples."^^Documentation;
+	].

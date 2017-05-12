@@ -1,0 +1,41 @@
+
+                    Redland RDF Library Perl Binding - News
+
+2006-11-30 Redland Perl Version 1.0.5.4 Released
+
+   Try harder to make the internal Redland build first when needed.
+
+   See the [1]1.0.5.4 Release Notes for the full details of the changes.
+
+   Added Redland 1.0.5 source into the distribution which is
+
+2006-11-28 Redland Perl Version 1.0.5.3 Released
+
+   Added Redland 1.0.5 source into the distribution which is built if it
+   is not installed system-wide.
+
+   See the [2]1.0.5.3 Release Notes for the full details of the changes.
+
+2006-11-27 Redland Perl Version 1.0.5.2 Released
+
+   Pulled out from [3]Redland Bindings and restored to a CPAN
+   configuration.
+
+   See the [4]1.0.5.2 Release Notes for the full details of the changes.
+     _________________________________________________________________
+
+   For older changes see the [5]Redland Bindings News
+     _________________________________________________________________
+
+   Copyright (C) 2004-2006 [6]Dave Beckett
+   Copyright (C) 2004-2005 [7]University of Bristol
+
+References
+
+   1. file://localhost/home/dajobe/dev/redland/perl/RELEASE.html#rel1_0_5_4
+   2. file://localhost/home/dajobe/dev/redland/perl/RELEASE.html#rel1_0_5_3
+   3. http://librdf.org/
+   4. file://localhost/home/dajobe/dev/redland/perl/RELEASE.html#rel1_0_5_2
+   5. http://librdf.org/NEWS.html
+   6. http://purl.org/net/dajobe/
+   7. http://www.bristol.ac.uk/

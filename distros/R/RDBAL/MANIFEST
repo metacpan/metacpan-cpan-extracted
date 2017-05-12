@@ -1,0 +1,17 @@
+ChangeLog			 History of this package
+MANIFEST			 This file
+Makefile.PL			 Makefile generator
+RDBAL/Layer/ApacheSybaseDBlib.pm Apache::Sybase::DBlib middle layer
+RDBAL/Layer/SybaseDBlib.pm       Sybase::DBlib middle layer
+RDBAL/Layer/ODBC.pm              ODBC middle layer
+RDBAL/Layer/DBI.pm               DBI middle layer
+README				 Get you started with this package
+TODO				 The To-Do list for the library
+RDBAL/Config.pm		         RDBAL::Config module for configuration
+RDBAL/Schema.pm                  RDBAL::Schema module and documentation
+RDBAL.pm                         RDBAL module and documentation
+msql_rdbal_schema                Schema cache creater for mSQL
+cache/make_cache_dir.pl		 Script to make schema cache directory
+test.pl                          Run tests
+pg_schema.pl			 Convert from T-SQL DDL to PostgreSQL DDL
+pg_rules.patch			 Patch for PostgreSQL 6.5.1 to correctly report rules (fully qualified field names)

@@ -1,0 +1,27 @@
+0.06 Thu May  5 10:41:07 PDT 2011
+  - added an atom feed for posts
+  - delegated search to google for now.
+  - made functions for reading and writing lines from text files more robust
+
+0.05 Sat Apr 30 14:25:28 PDT 2011
+  - fixed bug in regex for static files in rhetoric.psgi
+
+0.04 Fri Apr 29 14:52:06 PDT 2011
+  - added more missing dependencies
+  - added some basic tests for syntax
+  - tweaked rh-init a bit to make it easier for people
+    to have a place to put their own static content.
+
+0.03 Wed Apr 27 17:12:26 PDT 2011
+  - comment formatting
+
+0.02 Wed Apr 27 15:11:36 PDT 2011
+  - slightly less horrible
+  - added a missing dependency on Squatting::On::PSGI thanks to Mateu
+  - You can create posts from ze web.  amazing...
+    goto /admin -- the login is in %CONFIG
+  - rh-export is so bad but it works
+    you can statically export the site
+
+0.01 Wed Apr 27 04:41:15 PDT 2011
+  - initial release of horror

@@ -1,0 +1,87 @@
+{
+   "abstract" : "get data from W3C SPARQL Protocol 1.0 servers",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "HTTP",
+      "Protocol",
+      "Query",
+      "RDF",
+      "REST",
+      "SPARQL"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-Query-Client",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "HTTP::LRDD" : "0"
+         },
+         "requires" : {
+            "HTTP::Request" : "0",
+            "LWP::UserAgent" : "0",
+            "RDF::Trine" : "0.133",
+            "URI::Escape" : "0",
+            "namespace::clean" : "0.20"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61",
+            "Test::RequiresInternet" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "RDF::Query::Client" : {
+         "file" : "lib/RDF/Query/Client.pm",
+         "version" : "0.114"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-Query-Client/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=RDF-Query-Client"
+      },
+      "homepage" : "https://metacpan.org/release/RDF-Query-Client",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-rdf-query-client.git",
+         "web" : "https://github.com/tobyink/p5-rdf-query-client"
+      }
+   },
+   "version" : "0.114",
+   "x_contributors" : [
+      "Jonas Smedegaard",
+      "TOBYINK"
+   ]
+}

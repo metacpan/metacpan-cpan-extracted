@@ -1,0 +1,61 @@
+=head1 NAME
+
+RocksDB::CompactionFilter - rocksdb::CompactionFilter object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $handler = MyCompactionFilter->new;
+  my $db = RocksDB->new('/path/to/db', {
+      create_if_missing => 1,
+      compaction_filter => RocksDB::CompactionFilter->new($handler),
+  });
+
+=head1 DESCRIPTION
+
+B<RocksDB::CompactionFilter> is a utility class to make rocksdb::CompactionFilter object.
+
+=head1 CONSTRUCTOR
+
+=head2 C<< RocksDB::CompactionFilter->new($handler :Object) :RocksDB::CompactionFilter >>
+
+Create and return a new RocksDB::CompactionFilter object.
+
+The $handler must respond to 'filter'.
+
+See 'HANDLER METHODS' section for more details.
+
+=head1 HANDLER METHODS
+
+=head2 C<< $handler->filter($level :Int, $key :Str, $existing_value :Maybe[Str], $new_value_ref :Str) :Bool >>
+
+The compaction process invokes this method for kv that is being compacted.
+A return value of false indicates that the kv should be preserved in the
+output of this compaction run and a return value of true indicates that
+this key-value should be removed from the output of the compaction.
+The application can inspect the existing value of the key and make
+decision based on it.
+
+When the value is to be preserved, the application has the option
+to modify the existing_value and pass it back through new_value_ref.
+
+If multithreaded compaction is being used *and* a single CompactionFilter
+instance was supplied via compaction_filter, this method may be
+called from different threads concurrently.  The application must ensure
+that the call is thread-safe.
+
+If the CompactionFilter was created by a factory, then it will only ever
+be used by a single thread that is doing the compaction run, and this
+call does not need to be thread-safe.  However, multiple filters may be
+in existence and operating concurrently.
+
+=head1 SEE ALSO
+
+L<RocksDB>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

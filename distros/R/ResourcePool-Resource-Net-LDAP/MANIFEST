@@ -1,0 +1,12 @@
+Makefile.PL
+Changes
+README
+MANIFEST
+lib/ResourcePool/Resource/Net/LDAP.pm
+lib/ResourcePool/Resource/Net/LDAP.pod
+lib/ResourcePool/Factory/Net/LDAP.pm
+lib/ResourcePool/Factory/Net/LDAP.pod
+t/02FactorySingleton.t
+t/03ResourcePoolSingleton.t
+t/40LDAP.t
+t/41TLS.t

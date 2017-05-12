@@ -1,0 +1,120 @@
+NAME
+    RT::Condition::Complex - build complex conditions out of other
+    conditions
+
+DESCRIPTION
+    This extension adds new type of conditions to the RT. It's like User
+    Defined condition, shipped with RT, but you don't have to write any
+    code, but instead you use simple syntax to check properties of the
+    ticket and transaction or run other conditions you have.
+
+    There are several goals this extension tries to solve:
+
+    code reusing - complex conditions still need coding, but often you want
+    to reuse them with additinal simple conditions or reuse some condition
+    many times with other. In RT you have to use User Defined condition or
+    module based condition to tie everything together and each time you copy
+    code around. With this condition you can check other module based
+    conditins, so you can re-use some of them many times in different
+    combinations.
+    simplicity - make things more simple for poeple who don't know how to
+    program in perl, some complex things have to be programmed, but now then
+    can be reused.
+
+INSTALLATION
+    Since version 0.02 this extension depends on RT::Extension::ColumnMap,
+    first of all install it.
+
+        # install RT::Extension::ColumnMap
+
+        perl Makefile.PL
+        make
+        make install
+
+        # in RT_SiteConfig.pm
+        Set( @Plugins,
+            ... more plugin ...
+            RT::Extension::ColumnMap
+            RT::Condition::Complex
+        );
+
+HOW TO USE
+    You open the web interface in a browser, goto configuration, the global
+    or to specific queue and then scrips. Create a new scrip, on the
+    creation page you select 'Complex' condition and in the 'Custom is
+    applicable code' text box you write a pseudo code. For example:
+
+        Type = 'Create' OR StatusChange{open}
+
+    Below you can read details on the syntax.
+
+  Basic syntax
+    Syntax is similar to TicketSQL and you can use AND/OR and parentheses
+    "(" and ")" to group checks and build custom logic of your condition. As
+    checks you can use either "Expressions" or "Calls".
+
+  Expressions
+    Expression is comparision of a field with a constant. For example "is
+    type of a transaction equal to "Create" can be writen as:
+
+        Type = 'Create'
+
+    On the left you write field you want to check, then goes comparision
+    function and a constant.
+
+  Comparision functions
+    At this moment the following comparision functions are supported:
+
+    =, !=, >, >=, <, <= - basic comparisions, work for strings and numbers,
+    depends if constant is a string or number, string comparision is cases
+    insensetive.
+    contains, not contains - the constant is substring of the field and
+    negative variant.
+    starts with, not starts with - the constant is beginning of the field.
+    ends with, not ends with.
+
+  Fields
+    Fields are based on RT::Extension::ColumnMap. At this moment not many
+    fields are available, but it's easy to add more. Patches for the
+    RT::Extension::ColumnMap are welcome.
+
+    The current transaction has no prefix, so 'Type' is type of the current
+    transaction. 'Ticket.' is prefix for the current ticket.
+
+  Constants
+    Constant is a number or a quoted string. Strings can be quoted using '
+    or " characters. Character you're using for quoting should be escaped
+    with \ and \ should be escaped as well. For example:
+
+        "Don't need to escape ' when string is quoted with double quotes."
+        'But can escape \' with \\.'
+
+  Calls
+    It's possible to call another module based condition. For example you
+    have RT::Conditon::XXX that implements some complex condition then you
+    can use the following syntax to call 'XXX':
+
+        XXX
+        !XXX
+
+    If the condition is controlled by its argument then you can use:
+
+        XXX{'quoted argument'}
+        !XXX{'negation with argument'}
+
+    As you can see argument should be quoted, you can read about quoting
+    rules above in </Constants> section.
+
+AUTHOR
+    Ruslan Zakirov <Ruslan.Zakirov@gmail.com>
+
+LICENSE
+    Under the same terms as perl itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 37:
+        You forgot a '=back' before '=head1'
+

@@ -1,0 +1,2 @@
+%# RT 4.0 and 4.2
+<& /Callbacks/Gravatar/Prefs/AboutMe.html/FormLeftColumn, %ARGS &>

@@ -1,0 +1,106 @@
+RPM-Packager
+
+Building RPMs should be easy.
+
+This is a manifest approach to easily create custom RPMs.  Once this module is installed, building RPMs should be as
+simple as writing a YAML file that looks like the following:
+
+    ---
+    name: testpackage
+    version: grep Changelog             # version string or some command to retrieve it
+    os: el6
+    dependencies:
+      - perl-YAML > 0.5
+      - perl-JSON
+    files:
+      bin: /usr/local/bin               # directory-based mapping.  RPM will install CWD/bin/* to /usr/local/bin.
+    user: apache                        # specify the owner of files.  default: root
+    group: apache                       # specify the group owner of files.  default: root
+    sign:                               # optionally, gpg signing of RPM
+      gpg_name: ED16CAB                 # provide the GPG key ID
+      passphrase_cmd: cat secret_file   # command to retrieve the secret
+    after_install: path/to/script       # shellscript to run after the package is installed (%post)
+    architecture: noarch                # specify the architecture for this package (default: x86_64)
+
+Then run:
+
+    rpm_packager.pl <path_to_manifest.yml>
+
+Note : You need to have fpm available in PATH.  For GPG signing, you need to have proper keys imported.
+
+Note2: The 'iteration' field of RPM will be determined by the BUILD_NUMBER env variable plus 'os' field, like '150.el7'.
+If BUILD_NUMBER is unavailable, 1 will be used.
+
+You may also interact with the library directly as long as you pass in the manifest information in a hash:
+
+    use RPM::Packager;
+
+    my %args = (
+        name    => 'testpackage',
+        version => 'grep Changelog',
+        files   => { bin => '/usr/local/bin' },
+        dependencies => [
+            'perl-YAML > 0.5',
+            'perl-JSON'
+        ],
+        os      => 'el6',
+        user    => 'apache',
+        group   => 'apache',
+        sign    => {
+            'gpg_name' => 'ED16CAB',
+            'passphrase_cmd' => 'cat secret_file'
+        },
+        after_install => 'foo/bar/baz.sh',
+        architecture => 'noarch'
+    );
+
+    my $obj = RPM::Packager->new(%args);
+    $obj->create_rpm();                           # RPM produced in CWD
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc RPM::Packager
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=RPM-Packager
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/RPM-Packager
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/RPM-Packager
+
+    Search CPAN
+        http://search.cpan.org/dist/RPM-Packager/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Satoshi Yagi
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.

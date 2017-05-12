@@ -1,0 +1,59 @@
+---
+name: REST-Google
+version: 1.0.8
+author:
+  - 'Eugen Sobchenko <ejs@cpan.org>'
+abstract: access Google REST (aka AJAX) API from Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor: 0.31
+  Class::Data::Inheritable: 0.06
+  JSON::Any: 1.16
+  LWP::UserAgent: 2.033
+  Test::More: 0.47
+  URI: 1.35
+  perl: 5.6.1
+  version: 0.50
+provides:
+  REST::Google:
+    file: lib/REST/Google.pm
+    version: 1.0.8
+  REST::Google::Feeds:
+    file: lib/REST/Google/Feeds.pm
+    version: 1.0.8
+  REST::Google::Search:
+    file: lib/REST/Google/Search.pm
+    version: 1.0.8
+  REST::Google::Search::Blogs:
+    file: lib/REST/Google/Search/Blogs.pm
+    version: 1.0.8
+  REST::Google::Search::Books:
+    file: lib/REST/Google/Search/Books.pm
+    version: 1.0.8
+  REST::Google::Search::Images:
+    file: lib/REST/Google/Search/Images.pm
+    version: 1.0.8
+  REST::Google::Search::Local:
+    file: lib/REST/Google/Search/Local.pm
+    version: 1.0.8
+  REST::Google::Search::News:
+    file: lib/REST/Google/Search/News.pm
+    version: 1.0.8
+  REST::Google::Search::Patent:
+    file: lib/REST/Google/Search/Patent.pm
+    version: 1.0.8
+  REST::Google::Search::Video:
+    file: lib/REST/Google/Search/Video.pm
+    version: 1.0.8
+  REST::Google::Search::Web:
+    file: lib/REST/Google/Search/Web.pm
+    version: 1.0.8
+  REST::Google::Translate:
+    file: lib/REST/Google/Translate.pm
+    version: 1.0.8
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

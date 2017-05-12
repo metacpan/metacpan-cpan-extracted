@@ -1,0 +1,13 @@
+#defaults
+^Makefile$
+^Makefile.old$
+^blib/
+^blibdirs$
+^pm_to_blib$
+^.cvsignore
+^.git/
+~$
+.bak$
+.tar.gz$
+^script/templates/
+^MYMETA.*

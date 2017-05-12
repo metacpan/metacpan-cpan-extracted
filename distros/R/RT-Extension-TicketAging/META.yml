@@ -1,0 +1,28 @@
+---
+abstract: 'allows tickets to be made inaccessable'
+author:
+  - 'Ruslan Zakirov <ruz@bestpractical.com>'
+build_requires:
+  Test::More: 0.62
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-TicketAging
+no_index:
+  directory:
+    - etc
+    - html
+    - po
+    - var
+    - inc
+    - t
+requires:
+  File::Temp: 0
+  Hook::LexWrap: 0
+  perl: 5.8.3
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.12

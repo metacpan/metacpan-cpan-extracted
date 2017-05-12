@@ -1,0 +1,16 @@
+    <TMPL_IF EXPR="like(HOST,'gametrust') || like(LIKE,'gametrust') || like(HTTP_HOST,'gametrust')">
+      <a href="<TMPL_VAR self_url>?template=by_host.tmpl&LIKE=gametrust"><img src="<TMPL_VAR rrd_url>/images/small_gtlogo.gif" style="position:absolute; top:5px; right:15px;"></a>
+    </TMPL_IF>
+    <div class="footer">
+      <TMPL_IF EXPR="template ne 'index.tmpl'">
+        <a href="<TMPL_VAR self_url>">Return to index</a> |
+        <a href="<TMPL_VAR self_url>?REFRESH_CACHE=1">Refresh cache</a> - 
+      </TMPL_IF>
+      Created with <a href="http://search.cpan.org/~nicolaw/RRD-Simple/">RRD::Simple</a>,
+      written by <a href="http://perlgirl.org.uk">Nicola Worthington</a>. &nbsp; &nbsp; &nbsp;
+      <a href="http://www.amazon.co.uk/gp/registry/1VZXC59ESWYK0?sort=priority">Donate something nice
+      to the author!</a>
+    <TMPL_IF DEBUG><pre><TMPL_VAR DEBUG></pre></TMPL_IF>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`RDF-Query-Functions-Buzzword-DateTime`
+	:programming-language "Perl" ;
+	:shortdesc            "plugin for buzzword.org.uk datetime functions";
+	:homepage             <https://metacpan.org/release/RDF-Query-Functions-Buzzword-DateTime>;
+	:download-page        <https://metacpan.org/release/RDF-Query-Functions-Buzzword-DateTime>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Query-Functions-Buzzword-DateTime>;
+	:repository           [ a :HgRepository; :browse <https://bitbucket.org/tobyink/p5-rdf-query-functions-buzzword-datetime> ];
+	:created              2011-01-05;
+	:license              <http://dev.perl.org/licenses/>;
+	seealso               <http://buzzword.org.uk/2011/functions/datetime>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+
+cpan:TOBYINK
+	foaf:name  "Toby Inkster";
+	foaf:mbox  <mailto:tobyink@cpan.org>.
+

@@ -1,0 +1,22 @@
+# -*- perl -*-
+push @Scrips, (
+    {
+        Description        => 'Move Owner to AdminCC',
+        ScripCondition     => 'On Queue Change',
+        ScripAction        => 'Reassign Owner',
+        Template           => 'Blank',
+        Stage              => 'TransactionBatch',
+    },
+);
+
+@ScripActions = (
+
+    { 
+      Name        => 'Reassign Owner',
+      Description => 'Makes the owner of a task into an AdminCC',
+      ExecModule  => 'ReassignOwner',
+    }
+
+);
+
+1;

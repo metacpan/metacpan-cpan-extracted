@@ -1,0 +1,303 @@
+%# RT::Extension::ReferenceIDoitObjects
+%#
+%# Copyright (C) 2011-17 synetics GmbH, <https://i-doit.com/>
+%#
+%# This program is free software: you can redistribute it and/or modify
+%# it under the terms of the GNU Affero General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# This program is distributed in the hope that it will be useful,
+%# but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%# GNU Affero General Public License for more details.
+%#
+%# You should have received a copy of the GNU Affero General Public License
+%# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%#
+%# Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+<div id="idoitObjectBrowser" style="position: relative; min-width: 400px;">
+    <div id="dataStore" style="display: none;"></div>
+    <div id="idoitNotice" class="ui-corner-all" style="display: none;"></div>
+    <div id="idoitObjectBrowserContent" style="display: none;">
+        <ul>
+            <li><a href="#idoitAllObjectsTab"><% loc('All objects') %></a></li>
+            <li><a href="#idoitWorkplacesTab"><% loc('Workplaces') %></a></li>
+            <li><a href="#idoitDevicesTab"><% loc('Devices') %></a></li>
+            <li><a href="#idoitSelectedObjectsTab"><% loc('Selected objects') %></a></li>
+        </ul>
+
+        <a href="<% RT->Config->Get('IDoitURL') %>" title="<% loc('Go to i-doit') %>" target="_blank">
+            <img src="<% RT->Config->Get('WebPath') %>/static/images/i-doit.png" alt="i-doit" style="position: absolute; top: 5px; right: 8px; height: 28px;" border="0" />
+        </a>
+
+        <img id="idoitLoadingSign" src="<% RT->Config->Get('WebPath') %>/static/images/ui-anim_basic_16x16.gif" alt="<% loc('Loading...') %>" height="16" width="16" style="position: absolute; opacity: 0; z-index: 100; right: 80px; top: 12px;" border="0" />
+
+        <div id="idoitAllObjectsTab">
+            <label>
+                <% loc('Object type') %> <select id="idoitObjectTypeSelector" class="chosen-select"></select>
+            </label>
+            <br />
+            <table id="idoitAllObjectsTable" class="compact" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th width="5%" style="text-align: left;"><input type="checkbox" id="idoitCheckAllObjects" name="idoitCheckAllObjects"></th>
+                        <th width="15%"><% loc('ID') %></th>
+                        <th width="70%"><% loc('Name') %></th>
+                        <th width="10%"><% loc('Link') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="idoitWorkplacesTab">
+            <div class="workplaces"></div>
+            <a href="javascript:void(null);" id="idoitCustomerReload"><% loc('Refresh') %></a>
+        </div>
+
+        <div id="idoitDevicesTab">
+            <div id="idoitDevicesInfo"></div>
+            <table id="idoitDevicesTable" class="compact" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th width="5%" style="text-align: left;"><input type="checkbox" id="idoitCheckAllDevices" name="idoitCheckAllDevices"></th>
+                        <th width="10%"><% loc('ID') %></th>
+                        <th width="20%"><% loc('Name') %></th>
+                        <th width="20%"><% loc('Type') %></th>
+                        <th width="20%"><% loc('Role') %></th>
+                        <th width="15%"><% loc('Installed software') %></th>
+                        <th width="10%"><% loc('Link') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <br>
+            <div id="idoitInstalledSoftware" style="display:none;">
+                <div id="idoitInstalledSoftwareInfo"><% loc('Installed software') %> (<span style="font-weight:bold;"></span>):</div>
+                <table id="idoitInstalledSoftwareTable" class="compact" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th width="5%" style="text-align: left;"><input type="checkbox" id="idoitCheckAllApps" name="idoitCheckAllApps"></th>
+                            <th width="10%"><% loc('ID') %></th>
+                            <th width="40%"><% loc('Name') %></th>
+                            <th width="35%"><% loc('Type') %></th>
+                            <th width="10%"><% loc('Link') %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="idoitSelectedObjectsTab">
+            <table id="idoitSelectedObjectsTable" class="compact" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th width="10%" style="text-align: left;"><a id="idoitRemoveAllObjects" href="#"><% loc('Clear') %></a></th>
+                        <th width="15%"><% loc('ID') %></th>
+                        <th width="40%"><% loc('Name') %></th>
+                        <th width="25%"><% loc('Type') %></th>
+                        <th width="10%"><% loc('Link') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="<% RT->Config->Get('WebPath') %>/NoAuth/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<% RT->Config->Get('WebPath') %>/NoAuth/js/chosen.jquery.min.js"></script>
+<script type="text/javascript" src="<% RT->Config->Get('WebPath') %>/NoAuth/js/referenceidoitobjects.js"></script>
+
+<script type="text/javascript">
+    var referenceIDoitObjects = {},
+        showCustomFields = <% $IDoitShowCustomFields %>;
+
+    window.addEventListener('load', function load (event) {
+        "use strict";
+
+        $ = $ || jQuery;
+
+        // Hide custom fields:
+        if (showCustomFields === 0) {
+            $('textarea[name="<% $IDoitObjects %>"]').parent().parent().hide();
+            $('select[name="<% $IDoitTenant %>"]').parent().parent().hide();
+        }
+
+        referenceIDoitObjects = new ReferenceIDoitObjects({
+            'type': 'rt',
+            'url': '<% $IDoitURL %>',
+            'api': '<% $IDoitAPI %>',
+            'language': '<% $Language %>',
+            'tenantKeys': <% $IDoitTenantKeysAsJSON |n %>,
+            'defaultTenant': '<% $IDoitDefaultTenant %>',
+            'defaultView': <% $IDoitView %>,
+            'installedSoftware': '<% $IDoitInstalledSoftware %>',
+            'objects': 'textarea[name="<% $IDoitObjects %>"]',
+            'tenant': 'select[name="<% $IDoitTenant %>"]',
+            'ticket': {
+                'id': <% $ticketID %>,
+                'title': 'input[name="Subject"]'
+            },
+            'customers': '#Requestors',
+            'l10n': {
+                'Loading...': '<% loc("Loading...") %>',
+                'Show _MENU_ objects': '<% loc("Show _MENU_ objects") %>',
+                'No objects has been selected yet.': '<% loc("No objects has been selected yet.") %>',
+                '_START_ to _END_ of _TOTAL_ objects': '<% loc("_START_ to _END_ of _TOTAL_ objects") %>',
+                '0 to 0 of 0 objects': '<% loc("0 to 0 of 0 objects") %>',
+                '(filtered from _MAX_ objects)': '<% loc("(filtered from _MAX_ objects)") %>',
+                'Filter': '<% loc("Filter") %>',
+                'Error while loading objects by email': '<% loc("Error while loading objects by email") %>',
+                'Error while loading pre-selected objects': '<% loc("Error while loading pre-selected objects") %>',
+                'Given customer(s) could not be found in i-doit.': '<% loc("Given customer(s) could not be found in i-doit.") %>',
+                'show installed software': '<% loc("show installed software") %>',
+                'Go to i-doit': '<% loc("Go to i-doit") %>',
+                'Show': '<% loc("Show") %>',
+                'Error while loading object types': '<% loc("Error while loading object types") %>',
+                'Error while loading objects by object type': '<% loc("Error while loading objects by object type") %>',
+                'Error while loading relation objects': '<% loc("Error while loading relation objects") %>',
+                'Clear': '<% loc("Clear") %>',
+                'Please select an i-doit tenant.': '<% loc("Please select an i-doit tenant.") %>',
+                'Ticket was edited.': '<% loc("Ticket was edited.") %>',
+                'Ticket was created.': '<% loc("Ticket was created.") %>',
+                'Error while creating i-doit logbook entry': '<% loc("Error while creating i-doit logbook entry") %>',
+                'There is no customer selected.': '<% loc("There is no customer selected.") %>'
+            }
+        });
+    }, false);
+</script>
+
+<%INIT>
+use JSON;
+
+$IDoitURL = RT->Config->Get('IDoitURL');
+unless($IDoitURL) {
+    my $msg = loc('URL for i-doit is not configured.');
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+$IDoitAPI = RT->Config->Get('IDoitAPI');
+unless($IDoitAPI) {
+    my $msg = loc("URL for i-doit's API is not configured.");
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+%IDoitTenantKeys = RT->Config->Get('IDoitTenantKeys');
+unless(%IDoitTenantKeys) {
+    my $msg = loc("Tenant keys for i-doit's API are not configured.");
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+my $IDoitTenantKeysAsJSON = encode_json \%IDoitTenantKeys;
+
+my $ticketID = '';
+if ($TicketObj) {
+    $ticketID = $TicketObj->Id;
+}
+
+my $cfTenant = 'i-doit tenant';
+my $cf = RT::CustomField->new($RT::SystemUser);
+$cf->LoadByName(Name => $cfTenant);
+unless($cf->id) {
+    my $msg = sprintf(loc("Custom field %s does not exist."), $cfTenant);
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+$IDoitTenant = 'Object-RT::Ticket-' . $ticketID . '-CustomField-' . $cf->id . '-Values';
+
+$IDoitDefaultTenant = RT->Config->Get('IDoitDefaultTenant');
+unless($IDoitDefaultTenant) {
+    my $msg = loc("Default tenant for i-doit is not configured.");
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+my $cfObjects = 'i-doit objects';
+$cf = RT::CustomField->new($RT::SystemUser);
+$cf->LoadByName(Name => $cfObjects);
+unless($cf->id) {
+    my $msg = sprintf(loc("Custom field %s does not exist."), $cfObjects);
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+$IDoitObjects = 'Object-RT::Ticket-' . $ticketID . '-CustomField-' . $cf->id . '-Values';
+
+unless ($ticketID) {
+    $ticketID = 'undefined';
+}
+
+$IDoitDefaultView = RT->Config->Get('IDoitDefaultView');
+unless($IDoitDefaultView) {
+    my $msg = loc("Default view for referenced i-doit objects is not configured.");
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+for ($IDoitDefaultView) {
+    if(/objects/) { $IDoitView = 0; }
+    elsif(/workplaces/) { $IDoitView = 1; }
+    elsif(/devices/) { $IDoitView = 2; }
+    elsif(/selected/) { $IDoitView = 3; }
+    # Deprecated:
+    elsif(/object/) { $IDoitView = 0; }
+    elsif(/tree/) { $IDoitView = 1; }
+    elsif(/item/) { $IDoitView = 3; }
+}
+
+$IDoitInstalledSoftware = RT->Config->Get('IDoitInstalledSoftware');
+unless ($IDoitInstalledSoftware) {
+    my $msg = loc('Definition which type of objects will be shown for the installed software is not set.');
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+$IDoitShowCustomFields = RT->Config->Get('IDoitShowCustomFields');
+if ($IDoitShowCustomFields < 0 || $IDoitShowCustomFields > 1) {
+    my $msg = loc('Configuration option to show/hide i-doit related custom fields is not set.');
+    RT::Logger->error($msg);
+    $$skip_create = 1;
+    push @{$results}, $msg;
+}
+
+$Language = substr($session{CurrentUser}->UserObj->Lang, 0, 2);
+unless ($Language) {
+    $Language = 'en';
+}
+</%INIT>
+
+<%ARGS>
+$skip_create => undef
+$results => undef
+
+$TicketObj => undef
+$Language => undef
+
+$IDoitURL => undef
+$IDoitAPI => undef
+%IDoitTenantKeys => undef
+$IDoitTenant => undef
+$IDoitDefaultTenant => undef
+$IDoitObjects => undef
+$IDoitDefaultView => undef
+$IDoitView => undef
+$IDoitInstalledSoftware => undef
+$IDoitShowCustomFields => undef
+</%ARGS>

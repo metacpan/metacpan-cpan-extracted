@@ -1,0 +1,66 @@
+NAME
+    Regexp::SQL::LIKE - Translate SQL LIKE pattern to a regular expression
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+       use Regexp::SQL::LIKE 'to_regexp';
+ 
+       my $re = to_regexp( "Hello %" ); # returns qr/^Hello .*/
+
+DESCRIPTION
+    This module converts an SQL LIKE pattern to its Perl regular expression
+    equivalent.
+
+    Currently, only "%" and "." wildcards are supported and only "\" is
+    supported as an escape character.
+
+    No functions are exported by default. You may rename a function on
+    import as follows:
+
+       use Regexp::SQL::Like to_regexp => { -as => 'regexp_from_like' };
+
+    See Sub::Exporter for more details on import customization.
+
+FUNCTIONS
+  to_regexp
+      my $re = to_regexp( "Hello %" );
+
+    This function converts an SQL LIKE pattern into an equivalent regular
+    expression. A "%" character matches any number of characters like ".*"
+    and a "." character matchs a single character. Backspaces may be used to
+    escape "%", "." and "\" itself:
+
+      to_regexp( "Match literal \%" );
+
+    All other characters are run through "quotemeta()" to sanitize them.
+
+    The function returns a compiled regular expression.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to
+    "bug-regexp-sql-like at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-SQL-LIKE>. You
+    will be automatically notified of any progress on the request by the
+    system.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <http://github.com/dagolden/regexp-sql-like>
+
+      git clone http://github.com/dagolden/regexp-sql-like
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

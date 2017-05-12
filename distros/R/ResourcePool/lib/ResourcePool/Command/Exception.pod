@@ -1,0 +1,41 @@
+=head1 NAME
+
+ResourcePool::Command::Exception - An Exception for L<ResourcePool|ResourcePool> commands.
+
+=head1 SYNOPSIS
+
+
+ 
+ 
+ eval {
+ 	$pool->execute($cmd);
+ };
+ 
+ if ($@) { # an exception happend
+ 	my $ex = $@;
+ 	my $rootException = $ex->rootException();
+ 	my $nofailed = $ex->getExecutions();
+ }
+
+=head2 S<$ex-E<gt>rootException>
+
+This method returns the exception which cause the execute to fail.
+
+If the execution was started more then once (e.g. because of the MaxExecTry setting) this method returns the exception which occurred during the last attempt.
+
+
+=head2 S<$ex-E<gt>getExecutions>
+
+This method returns the number of executions done before the exception was propagated to the client.
+
+This is usually 1 for L<ResourcePool::Command::NoFailoverExceptions|ResourcePool::Command::NoFailoverException> or equal to MaxExecTry for other exceptions.
+
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

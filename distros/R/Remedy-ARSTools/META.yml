@@ -1,0 +1,25 @@
+---
+abstract: 'a perl wrapper to the ARSperl project, providing a simplified object interface with field definition caching.'
+author:
+  - 'Andrew N. Hicox <andrew@hicox.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Remedy-ARSTools
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ARS: '1.72'
+  Data::DumpXML: '1.03'
+  Date::Parse: '2.3'
+  Time::Interval: '1.233'
+version: 1.21

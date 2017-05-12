@@ -1,0 +1,33 @@
+---
+abstract: "Offers functionality of Debian's run-parts tool in Perl"
+author:
+  - 'Axel Beckert <abe@deuxchevaux.org>'
+build_requires:
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  Test::Trap: '0'
+  Test::Warnings: '0.005'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Run-Parts
+requires:
+  Exporter::Easy: '0'
+  File::Slurp: '9999.17'
+  Scalar::Util: '0'
+  Taint::Util: '0'
+  autodie: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Run-Parts
+  homepage: https://github.com/xtaran/run-parts
+  repository: https://github.com/xtaran/run-parts.git
+version: '0.09'

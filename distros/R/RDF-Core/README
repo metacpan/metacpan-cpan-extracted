@@ -1,0 +1,86 @@
+                             ***CAUTION***
+
+If you are installing over older version (below 0.50), you will need
+to re-create your storages (both DB_File and Postgres).
+
+                             *************
+
+
+This is the README file for RDF::Core, a package for handling RDF data.
+
+1. What is it RDF::Core?
+2. Licensing
+3. Warranty
+4. Installation
+
+
+1. What is RDF::Core?
+========================================
+
+RDF::Core is a pure perl implementation of RDF storage, parser, serializer 
+and query. 
+
+The storage functionality is basic - store, delete, query statements, where 
+query means ask about existence or count or retrieve statements conforming 
+given mask of (subject, predicate, object). Three storages are available - 
+in memory, file (DB_File) and DBMS (PostgreSQL). 
+
+The parser supports full RDF/XML syntax including aboutEach attribute (though 
+it became obsolete). The serializer attempts to preserve anonymous nodes and 
+to compact xml a bit grouping statements with common subject.
+
+The query language is rather focused on resources than on statements. The 
+typical pattern is me->neighbor->child->age to express neighbour's children's 
+age, not (me,neighbour, him) && (him, child, it) && (it, age, value). 
+It contains some shortcuts to express things, that are (possibly) expressed 
+often, like object->rdf:type = someClass. Functions are another enhancement
+of the language. They can be used instead of resource or property. Functions 
+are implemented in a separated library, so that it's easy to create new or 
+modify existing ones.
+
+Original creator of RDF::Core is Ginger Alliance (www.gingerall.com).
+
+
+2. Licensing
+========================================
+
+RDF::Core is an Open Source project released under the MPL (Mozilla Public 
+License). Alternatively you may use RDF::Core under the GNU's GPL license.
+
+Please, look at http://www.mozilla.org/MPL or
+http://www.gnu.org/copyleft/gpl.html for further info.
+
+
+3. Warranty
+========================================
+
+We offer NO WARRANTY for using RDF::Core in any conditions.
+
+
+4. Installation
+========================================
+
+You need XML::Parser, version 2.3 or above and URI 1.03 or above to install 
+RDF::Core. Optionally you need DBI (1.14) if you want Postgres data storage
+and DB_File (1.72) for file data storage.
+
+
+perl Makefile.PL
+make test
+make
+make install (may require the root privileges)
+
+DBMS storage installation (optional):
+
+Create a PostgreSQL database. 
+Load PL/pgSQL procedural language.
+Change working directory to ./dbmodel/pgsql
+Execute sql script in rdf-pgsql.sql
+
+Of course, we're not able to test it on all Unix machines, so if you
+meet any problem, feel free to contact us.
+
+
+
+GA
+rdf@gingerall.cz

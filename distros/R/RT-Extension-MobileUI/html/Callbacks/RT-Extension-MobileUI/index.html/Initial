@@ -1,0 +1,7 @@
+<%init>
+if ( RT::Extension::MobileUI->MobileClient()) {
+    RT::Interface::Web::Redirect(RT->Config->Get('WebURL') ."m")
+} else { 
+return
+}
+</%init>

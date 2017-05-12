@@ -1,0 +1,61 @@
+<%args>
+$receipt           # receipt being acknowledged
+$acknowledged      # boolean, 1 = acknowledged
+$acknowledged_at   # unix time of acknowledgement
+</%args>
+<%INIT>
+#
+# This callback routine accepts acknowledgement callbacks from Pushover.com and records
+# them in the RT database. See perldoc RT::Action::PushoverNotify . Also posts an RT::Comment
+# to confirm receipt.
+#
+use RT::Extension::PushoverNotify::PushoverNotifications;
+use RT::Extension::PushoverNotify::PushoverNotification;
+
+if ($acknowledged_at == 0 || !defined($receipt)) {
+    $RT::Logger->error("callback.html invoked with no receipt or acknowledged_at parameter");
+} else {
+    my $notifications = RT::Extension::PushoverNotify::PushoverNotifications->new( $RT::SystemUser );
+    $notifications->Limit( FIELD => 'ReceiptId', VALUE => $receipt );
+    my $notification = $notifications->Next;
+    if (!defined($notification)) {
+        RT::Logger->info("Got pushover callback for unknown receipt $receipt");
+        print("Acknowledgement for receipt $receipt received, but receipt code is not known");
+    } else {
+        if (defined($notification->AcknowledgedAt)) {
+            RT::Logger->info("Already-acknowledged receipt $receipt at " . $notification->AcknowledgedAt . "; repeat acknowledgement received");
+            print("Acknowledgement for receipt $receipt already received at " . $notification->AcknowledgedAt);
+        } else {
+            my $dt = RT::Date->new( $RT::SystemUser );
+            $dt->Set( Format => 'unix', Value => $acknowledged_at );
+
+            $RT::Handle->BeginTransaction;
+            $notification->SetAcknowledgedAt($dt->ISO);
+            $RT::Handle->Commit;
+            
+            my $u;
+            if (defined($notification->UserId)) {
+                $u = RT::User->new( RT::SystemUser );
+                my ($result, $msg) = $u->Load( $notification->UserId );
+                if (!$result) {
+                    RT::Logger->warning("Unable to load user " . $notification->UserId . " when accepting notification: $msg.");
+                    $u = RT::SystemUser;
+                }
+            } else {
+                $u = RT::SystemUser;
+            }
+            my $ticket = RT::Ticket->new( $u );
+            $ticket->Load( $notification->TicketId );
+            if (!$ticket->Id) {
+                RT::Logger->debug("Ticket " . $notification->TicketId . " acknowledged, but it no longer seems to exist");
+            } else {
+                $ticket->Comment(
+                    Content => ('Pushover notification ' . $notification->RequestId . ' acknowledged')
+                );
+            }
+
+            print("Acknowledgement for receipt $receipt (request id " . $notification->RequestId . ") saved");
+        }
+    }
+}
+</%INIT>

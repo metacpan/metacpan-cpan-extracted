@@ -1,0 +1,20 @@
+%# One way to stop a runaway horse is to bet on him.
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr> 
+                      <td bgcolor="#A3DEF1"> 
+                        <table border="0" cellspacing="0" cellpadding="0" align="center" width="100%">
+			  <tr> 
+			    <td bgcolor="#C4E1F0">
+% $m->call_next(%ARGS);
+			    </td>
+			  </tr>
+			</table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+<%ATTR>
+Tab2	=> 'Wiki'
+</%ATTR>

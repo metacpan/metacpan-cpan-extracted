@@ -1,0 +1,56 @@
+%# Spend extra time on hobby.  Get plenty of rolling papers.
+
+<table border="0" cellspacing="1" cellpadding="2">
+% if (@lists) {
+<tr><td class="tableTitle"><&|/l&>Current mailing lists</&></td></tr>
+% foreach my $list (@lists) {
+<TR><TD bgcolor="white">
+%     if ($is_admin{$list}) {
+<A HREF="<% $admin %><% $list %>"><% $list %></A>
+%     } else {
+<% $list %>
+%     }
+</TD></TR>
+% }
+<TR><TD>&nbsp;</td></tr>
+% }
+
+<tr><td class="tableTitle"><&|/l&>New mailing list</&></td></tr>
+<tr><td>
+% $m->print($new);
+</td></tr>
+</table>
+
+<%INIT>
+my $topic = $QueueObj->OriginObj->CustomFieldValue('UnixName');
+
+our ($Get, $Post);
+my $current = $Get->("/lists");
+my @lists;
+my %is_admin;
+my $admin = "/Foundry/Project/Admin/Forum/List.html/wws/admin/";
+while ($current =~ m{<A HREF="$admin(?=\Q$topic\E-)([^"]+)}g) {
+    $is_admin{$1}++;
+}
+my $info = "/Foundry/Project/Admin/Forum/List.html/wws/info/";
+while ($current =~ m{<A HREF="$info(?=\Q$topic\E-)([^"]+)}g) {
+    push @lists, $1;
+}
+
+my $new = $Get->("/create_list_request");
+$new =~ s/.*<!-- \$Id: create_list_request.tt2 [^>]* -->//s;
+$new =~ s/<\/FORM>.*/<\/FORM>/s;
+$new =~ s/(<TD>)(<INPUT TYPE="text" NAME="listname") SIZE=[\d+]*/$1$topic-$2 SIZE=10/;
+$new =~ s{<TR>\s*<TD NOWRAP>.*\s*<TD><SELECT NAME="topics">[\d\D]*?<\/TR>}
+	 {<INPUT TYPE="HIDDEN" NAME="topics" VALUE="$topic">};
+$new =~ s{<TR>\s*<TD valign=top NOWRAP>.*\s*<TD>\s*[\d\D]*?<\/TR>}
+	 {<INPUT TYPE="HIDDEN" NAME="template" VALUE="public_web_forum">};
+$new =~ s/(<TEXTAREA COLS=60 ROWS=)10( NAME="info">)/$1"5"$2/g;
+</%INIT>
+<%ATTR>
+Action	=> 'List.html'
+Method	=> 'Post'
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>

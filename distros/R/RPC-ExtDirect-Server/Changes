@@ -1,0 +1,25 @@
+1.21  Mon Oct 10 19:42:43 PDT 2016
+    - Do not apply older CGI.pm compatibility patch with HTTP::Server::Simple >= 0.51
+    - Do not use File::MimeInfo if shared-mime-info database is missing
+    - Misc documentation fixes
+
+1.20  Thu May 14 20:50:02 PDT 2015
+    - Updated to support metadata handling feature in RPC::ExtDirect 3.20+
+
+1.01  Fri Jun 20 20:51:34 2014
+    - Better compatibility with CGI.pm < 3.36
+    - Test scripts will clean %ENV to avoid connecting to proxies
+    - Minor fixes
+
+1.00  Thu Jun 12 21:32:00 2014
+    - Updated to accommodate for the changes in RPC::ExtDirect 3.0 and
+      CGI::ExtDirect 3.0
+    - maybe_start_server for @ARGV handling, and other helpful stuff
+    - Many bug fixes and improvements
+    - Tons of documentation added
+    - More tests that use HTTP::Tiny now instead of WWW::Mechanize
+    - Most of the dependencies made optional
+
+0.01  Wed Jun 20 10:42:25 2012
+	- original version; code works and tests pass but lacks documentation
+

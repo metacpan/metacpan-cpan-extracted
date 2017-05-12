@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/RPM2-LocalInstalled.t
+lib/RPM2/LocalInstalled.pm
+doc/example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

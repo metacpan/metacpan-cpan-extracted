@@ -1,0 +1,8 @@
+# FTP masters
+allow * by key 1234ABCD
+
+# Autobuilders
+allow architectures 'i386'|'amd64'|'all' by key 12AB34CD
+
+# Perl dev
+allow architectures 'source' and source 'lib*-perl' by key ABCD1234

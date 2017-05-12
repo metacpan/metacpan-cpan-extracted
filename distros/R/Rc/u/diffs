@@ -1,0 +1,516 @@
+--- /home/joshua/rc-1.5b2/rc.h	Mon Jul  7 11:43:52 1997
++++ ../rc.h	Fri Oct 23 15:21:32 1998
+@@ -1,40 +1,37 @@
+ #include "config.h"
+ 
+-#if HAVE_SYS_TYPES_H
+-#include <sys/types.h>
++#if defined HAS_QUAD
++typedef Quad_t align_t;
++#else
++typedef long align_t;
+ #endif
+ 
+-#if HAVE_UNISTD_H
+-#include <unistd.h>
++#ifdef I_STDARG
++#  include <stdarg.h>
++#else
++#  ifdef I_VARARGS
++#    include <varargs.h>
++#  endif
+ #endif
+ 
+-#include "proto.h"
++#include <sys/types.h>
++
++#if defined(I_STRING) || defined(__cplusplus)
++#   include <string.h>
++#else
++#   include <strings.h>
++#endif
+ 
+ /* datatypes */
+ 
+ /* braindamaged IBM header files #define true and false */
+ #undef FALSE
+ #undef TRUE
++#undef bool
++#undef yyerror
++#undef YYSTYPE
+ 
+-#include <stdarg.h>
+-
+-#if HAVE_SETPGRP
+-
+-#if SETPGRP_VOID
+-/* Smells like POSIX: should all be ok. */
+-#else
+-/* BSD: fake it. */
+-#define setpgid(pid, pgrp) setpgrp(pid, pgrp)
+-#define tcsetpgrp(fd, pgrp) ioctl((fd), TIOCSPGRP, &(pgrp))
+-#endif
+-
+-#else /* HAVE_SETPGRP */
+-
+-/* Nothing doing. */
+-#define setpgid
+-#define tcsetpgrp
+-
+-#endif /*HAVE_SETPGRP */
++extern int interactive;
+ 
+ typedef void builtin_t(char **);
+ typedef struct Block Block;
+@@ -172,22 +169,25 @@ enum {
+ 
+ /* macros */
+ #define EOF (-1)
++
+ #ifndef NULL
+ #define NULL 0
+ #endif
++
+ #define a2u(x) n2u(x, 10)
+ #define o2u(x) n2u(x, 8)
+ #define arraysize(a) ((int)(sizeof(a)/sizeof(*a)))
+-#define memzero(s, n) memset(s, 0, n)
+ #define enew(x) ((x *) ealloc(sizeof(x)))
+ #define ecpy(x) strcpy((char *) ealloc(strlen(x) + 1), x)
+ #define lookup_fn(s) ((Function *) lookup(s, fp))
+ #define lookup_var(s) ((Variable *) lookup(s, vp))
+ #define nnew(x) ((x *) nalloc(sizeof(x)))
+ #define ncpy(x) (strcpy((char *) nalloc(strlen(x) + 1), x))
++
+ #ifndef offsetof
+ #define offsetof(t, m) ((size_t) (((char *) &((t *) 0)->m) - (char *)0))
+ #endif
++
+ #define streq(x, y) (*(x) == *(y) && strcmp(x, y) == 0)
+ #define conststrlen(x) (sizeof (x) - 1)
+ 
+@@ -195,31 +195,8 @@ enum {
+ 
+ /* main.c */
+ extern char *prompt, *prompt2;
+-extern Rq *redirq;
+-extern bool dashdee, dashee, dashvee, dashex, dashell,
+-	dasheye, dashen, dashpee, interactive;
+-extern pid_t rc_pid;
+ extern int lineno;
+ 
+-/* builtins.c */
+-extern builtin_t *isbuiltin(char *);
+-extern void b_exec(char **), funcall(char **), b_dot(char **), b_builtin(char **);
+-extern char *which(char *, bool);
+-
+-/* except.c */
+-extern bool nl_on_intr;
+-extern bool outstanding_cmdarg(void);
+-extern void pop_cmdarg(bool);
+-extern void rc_raise(ecodes);
+-extern void except(ecodes, Edata, Estack *);
+-extern void unexcept(void);
+-extern void rc_error(char *);
+-extern void sigint(int);
+-
+-/* exec.c */
+-extern void exec(List *, bool);
+-extern void doredirs(void);
+-
+ /* footobar.c */
+ extern char **list2array(List *, bool);
+ extern char *get_name(char *);
+@@ -228,26 +205,6 @@ extern Node *parse_fn(char *, char *);
+ extern void initprint(void);
+ extern void rc_exit(int); /* here for odd reasons; user-defined signal handlers are kept in fn.c */
+ 
+-/* getopt.c */
+-extern int rc_getopt(int, char **, char *);
+-
+-extern int rc_optind, rc_opterr, rc_optopt;
+-extern char *rc_optarg;
+-
+-/* glob.c */
+-extern bool lmatch(List *, List *);
+-extern List *glob(List *);
+-
+-/* glom.c */
+-extern void assign(List *, List *, bool);
+-extern void qredir(Node *);
+-extern List *append(List *, List*);
+-extern List *flatten(List *);
+-extern List *glom(Node *);
+-extern List *concat(List *, List *);
+-extern List *varsub(List *, List *);
+-extern List *word(char *, char *);
+-
+ /* hash.c */
+ extern Htab *fp, *vp;
+ extern void *lookup(char *, Htab *);
+@@ -284,17 +241,15 @@ extern Hq *hq;
+ 
+ /* input.c */
+ extern void initinput(void);
+-extern Node *parseline(char *);
++extern Node *parseline(char *extdef, int len);
+ extern int gchar(void);
+ extern void ugchar(int);
+-extern Node *doit(bool);
++extern Node *doit();
+ extern void flushu(void);
+ extern void pushfd(int);
+-extern void pushstring(char **, bool);
+ extern void popinput(void);
+ extern void closefds(void);
+ extern int last;
+-extern bool rcrc;
+ 
+ /* lex.c */
+ extern int yylex(void);
+@@ -355,28 +310,6 @@ extern Node *parsetree;
+ extern int yyparse(void);
+ extern void initparse(void);
+ 
+-/* redir.c */
+-extern void doredirs(void);
+-
+-/* signal.c */
+-extern void initsignal(void);
+-extern void catcher(int);
+-extern void sigchk(void);
+-extern void (*rc_signal(int, void (*)(int)))(int);
+-extern void (*sighandlers[])(int);
+-extern volatile SIG_ATOMIC_T slow, interrupt_happened;
+-
+-/* status.c */
+-extern int istrue(void);
+-extern int getstatus(void);
+-extern void set(bool);
+-extern void setstatus(pid_t, int);
+-extern List *sgetstatus(void);
+-extern void setpipestatus(int [], int);
+-extern void statprint(pid_t, int);
+-extern void ssetstatus(char **);
+-extern char *strstatus(int s);
+-
+ /* tree.c */
+ extern Node *mk(int /*nodetype*/,...);
+ extern Node *treecpy(Node *, void *(*)(size_t));
+@@ -393,14 +326,8 @@ extern void panic(char *);
+ extern void uerror(char *);
+ extern void writeall(int, char *, size_t);
+ 
+-/* wait.c */
+-extern pid_t rc_fork(void);
+-extern pid_t rc_wait4(pid_t, int *, bool);
+-extern List *sgetapids(void);
+-extern void waitforall(void);
+-extern bool forked;
+-
+-/* walk.c */
+-extern bool walk(Node *, bool);
+-extern bool cond;
++void	Perl_warn(const char* pat,...);
++#define warn Perl_warn
++#define panic Perl_croak
+ 
++extern void walk(Node *nd);
+--- /home/joshua/rc-1.5b2/footobar.c	Mon Jul  7 11:43:52 1997
++++ ../footobar.c	Fri Oct 23 15:19:17 1998
+@@ -264,7 +264,7 @@ extern Node *parse_fn(char *name, char *
+ 		return NULL;
+ 	memcpy(old, s -= (PRELEN-1), PRELEN);
+ 	memcpy(s, PREFIX, PRELEN);
+-	def = parseline(s);
++	def = parseline(s, strlen(s));
+ 	memcpy(s, old, PRELEN);
+ 	return (def == NULL || def->type != nNewfn) ? NULL : def->u[1].p;
+ }
+--- /home/joshua/rc-1.5b2/input.c	Mon Jul  7 11:43:52 1997
++++ ../input.c	Fri Oct 23 15:21:27 1998
+@@ -1,9 +1,6 @@
+ /* input.c: i/o routines for files and pseudo-files (strings) */
+ 
+-#include <errno.h>
+-#include <setjmp.h>
+ #include "rc.h"
+-#include "jbwrap.h"
+ 
+ /*
+    NB: character unget is supported for up to two characters, but NOT
+@@ -20,19 +17,11 @@ typedef struct Input {
+ 
+ #define BUFSIZE ((size_t) 256)
+ 
+-#if READLINE
+-extern char *readline(char *);
+-extern void add_history(char *);
+-static char *rlinebuf;
+-#endif
+-
+ char *prompt, *prompt2;
+-bool rcrc;
+ 
+ static int dead(void);
+ static int fdgchar(void);
+ static int stringgchar(void);
+-static void history(void);
+ static void ugdead(int);
+ static void pushcommon(void);
+ 
+@@ -82,79 +71,7 @@ static void ugalive(int c) {
+ /* get the next character from a string. */
+ 
+ static int stringgchar() {
+-	return last = (inbuf[chars_out] == '\0' ? EOF : inbuf[chars_out++]);
+-}
+-
+-/* signal-safe readline wrapper */
+-
+-#if READLINE
+-#ifndef HAVE_RESTARTABLE_SYSCALLS
+-static char *rc_readline(char *prompt) {
+-	char *r;
+-	interrupt_happened = FALSE;
+-	if (!setjmp(slowbuf.j)) {
+-		slow = TRUE;
+-		if (!interrupt_happened)
+-			r = readline(prompt);
+-		else
+-			r = NULL;
+-	} else
+-		r = NULL;
+-	slow = FALSE;
+-	if (r == NULL)
+-		errno = EINTR;
+-	sigchk();
+-	return r;
+-}
+-#else
+-#define rc_readline readline
+-#endif /* HAVE_RESTARTABLE_SYSCALLS */
+-#endif /* READLINE */
+-
+-/*
+-   read a character from a file-descriptor. If GNU readline is defined, add a newline and doctor
+-   the buffer to look like a regular fdgchar buffer.
+-*/
+-
+-static int fdgchar() {
+-	if (chars_out >= chars_in + 2) { /* has the buffer been exhausted? if so, replenish it */
+-		while (1) {
+-#if READLINE
+-			if (interactive && istack->fd == 0) {
+-				rlinebuf = rc_readline(prompt);
+-				if (rlinebuf == NULL) {
+-					chars_in = 0;
+-				} else {
+-					if (*rlinebuf != '\0')
+-						add_history(rlinebuf);
+-					chars_in = strlen(rlinebuf) + 1;
+-					efree(inbuf);
+-					inbuf = ealloc(chars_in + 3);
+-					strcpy(inbuf+2, rlinebuf);
+-					strcat(inbuf+2, "\n");
+-					efree(rlinebuf);
+-				}
+-			} else
+-#endif
+-				{
+-				long /*ssize_t*/ r = rc_read(istack->fd, inbuf + 2, BUFSIZE);
+-				sigchk();
+-				if (r < 0) {
+-					uerror("read");
+-					rc_exit(1);
+-				}
+-				chars_in = (size_t) r;
+-			}
+-			break;
+-		}
+-		if (chars_in == 0)
+-			return last = EOF;
+-		chars_out = 2;
+-		if (dashvee)
+-			writeall(2, inbuf + 2, chars_in);
+-		history();
+-	}
+-	return last = inbuf[chars_out++];
++	return last = (chars_out == chars_in ? EOF : inbuf[chars_out++]);
+ }
+ 
+ /* set up the input stack, and put a "dead" input at the bottom, so that yyparse will always read eof */
+@@ -188,21 +105,12 @@ static void pushcommon() {
+ 	chars_in = 0;
+ }
+ 
+-extern void pushfd(int fd) {
++extern void pushstring(char *a, int len) {
+ 	pushcommon();
+-	istack->t = iFd;
++	chars_in = len;
++	chars_out = 0;
+ 	save_lineno = TRUE;
+-	istack->fd = fd;
+-	realgchar = fdgchar;
+-	inbuf = ealloc(BUFSIZE + 2);
+-	lineno = 1;
+-}
+-
+-extern void pushstring(char **a, bool save) {
+-	pushcommon();
+-	istack->t = iString;
+-	save_lineno = save;
+-	inbuf = mprint("..%A", a);
++	inbuf = a;
+ 	realgchar = stringgchar;
+ 	if (save_lineno)
+ 		lineno = 1;
+@@ -217,7 +125,7 @@ extern void popinput() {
+ 		close(istack->fd);
+ 	efree(inbuf);
+ 	--istack;
+-	realgchar = (istack->t == iString ? stringgchar : fdgchar);
++	realgchar = stringgchar;
+ 	if (istack->t == iFd && istack->fd == -1) { /* top of input stack */
+ 		realgchar = dead;
+ 		realugchar = ugdead;
+@@ -248,116 +156,30 @@ extern void flushu() {
+ 
+ /* the wrapper loop in rc: prompt for commands until EOF, calling yyparse and walk() */
+ 
+-extern Node *doit(bool execit) {
++extern Node *doit() {
+ 	bool eof;
+-	Jbwrap j;
+-	Estack e1, e2;
+-	Edata jerror;
+-
+-	if (dashen)
+-		execit = FALSE;
+-	setjmp(j.j);
+-	jerror.jb = &j;
+-	except(eError, jerror, &e1);
+ 	for (eof = FALSE; !eof;) {
+ 		Edata block;
+-		block.b = newblock();
+-		except(eArena, block, &e2);
+-		sigchk();
+-		if (dashell) {
+-			char *fname[3];
+-			fname[1] = concat(varlookup("home"), word("/.rcrc", NULL))->w;
+-			fname[2] = NULL;
+-			rcrc = TRUE;
+-			dashell = FALSE;
+-			b_dot(fname);
+-		}
+-		if (interactive) {
+-			List *s;
+-			if (!dashen && fnlookup("prompt") != NULL) {
+-				static char *arglist[] = { "prompt", NULL };
+-				funcall(arglist);
+-			}
+-			if ((s = varlookup("prompt")) != NULL) {
+-#if READLINE
+-				prompt = s->w;
+-#else
+-				fprint(2, "%s", s->w);
+-#endif
+-				prompt2 = (s->n == NULL ? "" : s->n->w);
+-			}
+-		}
++	        block.b = newblock();
+ 		inityy();
+-		if (yyparse() == 1 && execit)
+-			rc_raise(eError);
+-		eof = (last == EOF); /* "last" can be clobbered during a walk() */
+-		if (parsetree != NULL) {
+-			if (execit)
+-				walk(parsetree, TRUE);
+-			else if (dashex && dashen)
+-				fprint(2, "%T\n", parsetree);
++		if (yyparse() == 1)
++		  return 0; /* should return errsv XXX */
++		eof = (last == EOF);
++		if (parsetree) {
++		  walk(parsetree);
+ 		}
+-		unexcept(); /* eArena */
++		restoreblock(block.b); /*savefree XXX*/
+ 	}
+ 	popinput();
+-	unexcept(); /* eError */
+ 	return parsetree;
+ }
+ 
+ /* parse a function imported from the environment */
+ 
+-extern Node *parseline(char *extdef) {
+-	int i = interactive;
+-	char *in[2];
++extern Node *parseline(char *extdef, int len) {
+ 	Node *fun;
+-	in[0] = extdef;
+-	in[1] = NULL;
+-	interactive = FALSE;
+-	pushstring(in, TRUE);
+-	fun = doit(FALSE);
+-	interactive = i;
++	pushstring(extdef, len);
++	fun = doit();
+ 	return fun;
+ }
+ 
+-/* write last command out to a file if interactive && $history is set */
+-
+-static void history() {
+-	List *hist;
+-	size_t a;
+-
+-	if (!interactive || (hist = varlookup("history")) == NULL)
+-		return;
+-
+-	for (a = 0; a < chars_in; a++) {
+-		char c = inbuf[a+2];
+-
+-		/* skip empty lines and comments */
+-		if (c == '#' || c == '\n')
+-			break;
+-
+-		/* line matches [ \t]*[^#\n] so it's ok to write out */
+-		if (c != ' ' && c != '\t') {
+-			char *name = hist->w;
+-			int fd = rc_open(name, rAppend);
+-			if (fd < 0) {
+-				uerror(name);
+-				varrm(name, TRUE);
+-			} else {
+-				writeall(fd, inbuf + 2, chars_in);
+-				close(fd);
+-			}
+-			break;
+-		}
+-	}
+-}
+-
+-/* close file descriptors after a fork() */
+-
+-extern void closefds() {
+-	Input *i;
+-	for (i = istack; i != itop; --i)	/* close open scripts */
+-		if (i->t == iFd && i->fd > 2) {
+-			close(i->fd);
+-			i->fd = -1;
+-		}
+-}
+--- /home/joshua/rc-1.5b2/parse.y	Mon Jul  7 11:43:52 1997
++++ ../parse.y	Fri Oct 23 14:09:17 1998
+@@ -75,7 +75,7 @@ paren	: '(' body ')'		{ $$ = $2; }
+ assign	: first '=' word	{ $$ = mk(nAssign,$1,$3); }
+ 
+ epilog	:			{ $$ = NULL; }
+-	| redir epilog		{ $$ = mk(nEpilog,$1,$2); }
++	| redir epilog		{ $$ = ($2? mk(nEpilog,$1,$2) : $1); }
+ 
+ /* a redirection is a dup (e.g., >[1=2]) or a file redirection. (e.g., > /dev/null) */
+ redir	: DUP			{ $$ = mk(nDup,$1.type,$1.left,$1.right); }

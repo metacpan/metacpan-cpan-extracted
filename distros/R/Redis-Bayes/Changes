@@ -1,0 +1,13 @@
+Revision history for Redis-Bayes
+
+0.010   Date/time
+        First version, released on an unsuspecting world.
+
+0.022   2014-02-24
+        Allow dependency injection for tokenizer
+
+0.023   2014-03-10
+        Docs
+
+0.024   2015-01-17
+        Docs

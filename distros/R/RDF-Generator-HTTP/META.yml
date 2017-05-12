@@ -1,0 +1,47 @@
+---
+abstract: 'Generate RDF from a HTTP request'
+author:
+  - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
+build_requires:
+  Test::More: 0.96
+  Test::RDF: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.133380'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RDF-Generator-HTTP
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  RDF::Generator::HTTP:
+    file: lib/RDF/Generator/HTTP.pm
+    version: 0.003
+requires:
+  Carp: 0
+  HTTP::Message: 0
+  Moo: 0
+  RDF::Trine: 0
+  Types::Standard: 0
+  URI: 0
+  URI::NamespaceMap: 0
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  Identifier: http://purl.org/NET/cpan-uri/dist/RDF-Generator-HTTP/project
+  Mailinglist: http://lists.perlrdf.org/listinfo/dev
+  Wiki: http://wiki.perlrdf.org/
+  bugtracker: https://github.com/kjetilk/p5-rdf-generator-http/issues
+  homepage: https://metacpan.org/release/RDF-Generator-HTTP
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kjetilk/p5-rdf-generator-http.git
+version: 0.003

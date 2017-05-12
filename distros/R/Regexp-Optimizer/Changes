@@ -1,0 +1,87 @@
+#
+# $Id: Changes,v 0.23 2013/02/26 05:47:41 dankogai Exp dankogai $
+#
+$Revision: 0.23 $ $Date: 2013/02/26 05:47:41 $
+! lib/Regexp/Optimizer.pm
+  + Support for (?|pattern)
+! t/02-optimizer.t
+  + more testing
+
+0.22 2013/02/26 04:51:15
+! t/02-optimizer.t
+  Since qr// happens compile time, SKIP: is not good enough to make
+  older perls (which do not support named captures) to make them skip.
+
+0.21 2013/02/26 04:51:15
+! lib/Regexp/Optimizer.pm t/02-optimizer.t
+  + Clearner Codes
+  + More Tests
+  + More Documents
+
+0.20 2013/02/23 13:43:59
+! *
+  Completely rewritten.
+  + uses Regexp::Assemble to optimize alteration
+  + uses ??{CODE} to parse nested parens
+  Thanks to these changes, this module is now much simpler.
+
+0.16 2013/02/20 17:54:59
+! lib/Regexp/Optimizer.pm lib/Regexp/List.pm
+  Marked obsolete.  Use Regexp::Assemble instead.
+
+0.15 2004/12/05 16:07:34
+! lib/Regexp/Optimizer.pm lib/Regexp/List.pm
+  Pod fixed accordingly to RT # 8733
+  http://rt.cpan.org/NoAuth/Bug.html?id=8733
+
+0.14 2004/11/05 12:44:48
+! t/02-list.t
+  Addressed test failure that was raised by Perl 5.8.5
+  http://rt.cpan.org/NoAuth/Bug.html?id=8165
+
+0.13 2004/05/08 05:55:35
+! lib/Regexp/Optimizer.pm
+  Document bug, reported by Frederick in the mail below, fixed.
+! Makefile.PL
+! Regexp/ -> lib/Regexp/
+  Module hierarchy realigned so cygwin is happy.  
+  Reported by Frederick Weiland
+  <30F579C44E1598429167C5E20E307BA19D807D@atlmsg01.raremedium.net>
+
+0.12 2004/05/04 17:12:14
+! Regexp/Optimizer.pm
+  Perl 5.8.4 and later corrected a bug so it is fatal to go
+    my $x = qr{ ... (??{ $x }) ... };
+  under "use strict".  Unfortunately Regexp/Optimizer.pm had two
+  occurances thereof.  Now fixed.
+
+0.11 2004/05/03 15:09:14
+! Regexp/List.pm
+  Deep recursion addressed and corrected by yoz@yoz.com
+  https://rt.cpan.org/Ticket/Display.html?id=4937
+
+0.10 2003/06/02 20:11:07
+! *
+  Version jumps to 0.10 do to radical changes, especially in
+  $Regexp::Optimize.
+! Regexp/Optimizer.pm t/02-list.t t/03-utf8.t
+  Aagh!  Why didn't I come up with such a simple idea !?
+  ->optimize is completely rewritten.
+  t/*.t is streamlined to reflect changes.
+  Now ->optimize() *really* optimizes even for
+  qr/(?:1|12)|123/.  Used to return qr/1(?:2?|23)/ but now it
+  returns qr/1(?:23?)?/o
+! Regexp/Optimizer.pm  Regexp/List.pm
+  POD enhanced.
+
+0.02 2003/06/01 00:11:26
+! Regexp/Optimizer.pm  Regexp/List.pm
+  * Lots of bug fixes regarding $o->optimize() for nested parens
+! t/02-list.t
+  Test data for #21 corrected
+! t/03-utf8.t
+  buggy SKIP: sections fixed.
+
+0.01 2003/05/31 10:44:41
++ *
+  0th release

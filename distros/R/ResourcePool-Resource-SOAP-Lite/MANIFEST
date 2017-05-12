@@ -1,0 +1,13 @@
+Makefile.PL
+Changes
+README
+MANIFEST
+lib/ResourcePool/Resource/SOAP/Lite.pm
+lib/ResourcePool/Factory/SOAP/Lite.pm
+lib/ResourcePool/Factory/SOAP/Lite.pod
+lib/ResourcePool/Command/SOAP/Lite/Call.pm
+lib/ResourcePool/Command/SOAP/Lite/Call.pod
+t/02FactorySingleton.t
+t/30SOAP.t
+t/40CallCmd.t
+META.yml                                 Module meta-data (added by MakeMaker)

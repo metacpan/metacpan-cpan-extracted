@@ -1,0 +1,10 @@
+This extension require a callback that is not yet present (at RT 4.0.0 time) in share/html/Ticket/Display.html.
+
+To add it, got to /path/to/your/rt, then run the following command:
+
+For RT 4.0.0:
+patch -p1 < /path/to/this/extension/rt-4.0.0-AfterMessageBox.patch
+
+For RT 3.8.10:
+patch -p1 < /path/to/this/extension/rt-3.8.10-AfterMessageBox.patch
+

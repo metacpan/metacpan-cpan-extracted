@@ -1,0 +1,11 @@
+[% IF ADD_TIMESTAMP; PROCESS timestamp.tt2; END -%]
+[% PROCESS csv.tt2 -%]
+[% USE DBI -%]
+[% USE Dumper -%]
+[% USE dbh = DBI( 'DBI:Sys:' ) -%]
+[% st = dbh.query( 'SELECT * FROM alltables' ) -%]
+[% r = {
+    cols = st.get_colnames()
+    data = st.get_all_list()
+    } -%]
+[% csvtable(r) -%]

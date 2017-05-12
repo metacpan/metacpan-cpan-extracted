@@ -1,0 +1,16 @@
+html/Search/Bulk.html
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RTx/RT34/Bulk/CF/Edit.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+SIGNATURE

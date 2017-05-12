@@ -1,0 +1,26 @@
+Regexp::HTMLify
+===============
+
+INTRODUCTION
+
+This module provides (limited) functionality to highlight regexp 
+capture buffers using HTML and CSS.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   CGI.pm
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Niels van Dijke, http://PerlBoy.net
+
+

@@ -1,0 +1,32 @@
+# Change file for RDF::Flow
+
+0.178 2012-02-23
+    Minor fixes
+
+0.177 2011-11-22
+    Fixed test failure because timestamp differs among OSes
+
+0.176 2011-10-12
+    Support reading all RDF files from a directory as source
+    
+0.175 2011-08-30
+    Added guarded caches. First release at CPAN
+
+0.174 2011-08-17
+    New source option 'match' instead of 'url'
+    Introduced 'init' and renamed 'trigger_retrieved' and 'trigger_error'
+
+0.172 2011-08-11
+    Support reading from file and minor fixes
+
+0.170 2011-08-04
+    Refactoring and cleanup (RDF::Flow::Source, retrieve_rdf, etc.)
+
+0.16 2011-07-21
+    Renamed to RDF::Flow
+
+0.15 2011-07-14
+    Renamed to RDF::Source with focus on data flow
+
+0.01 2011-05-31
+    Inital public version as RDF::Light

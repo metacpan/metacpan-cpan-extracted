@@ -1,0 +1,111 @@
+{
+   "abstract" : "convert between RDF and vCard",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "Contacts",
+      "Directory",
+      "RDF",
+      "SemWeb",
+      "Semantic Web",
+      "XML",
+      "hCard",
+      "vCard"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-vCard",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "RDF::Trine" : "0.135",
+            "RDF::TrineX::Functions" : "0",
+            "Text::vFile::asData" : "0.07",
+            "URI" : "0",
+            "XML::LibXML" : "1.70",
+            "namespace::clean" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "RDF::vCard" : {
+         "file" : "lib/RDF/vCard.pm",
+         "version" : "0.012"
+      },
+      "RDF::vCard::Entity" : {
+         "file" : "lib/RDF/vCard/Entity.pm",
+         "version" : "0.012"
+      },
+      "RDF::vCard::Entity::WithXmlSupport" : {
+         "file" : "lib/RDF/vCard/Entity/WithXmlSupport.pm",
+         "version" : "0.012"
+      },
+      "RDF::vCard::Exporter" : {
+         "file" : "lib/RDF/vCard/Exporter.pm",
+         "version" : "0.012"
+      },
+      "RDF::vCard::Importer" : {
+         "file" : "lib/RDF/vCard/Importer.pm",
+         "version" : "0.012"
+      },
+      "RDF::vCard::Line" : {
+         "file" : "lib/RDF/vCard/Line.pm",
+         "version" : "0.012"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=RDF-vCard"
+      },
+      "homepage" : "https://metacpan.org/release/RDF-vCard",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-rdf-vcard.git",
+         "web" : "https://github.com/tobyink/p5-rdf-vcard"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perlrdf",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-vCard/project"
+   },
+   "version" : "0.012",
+   "x_provides_scripts" : {
+      "vcard2rdf" : {
+         "file" : "bin/vcard2rdf"
+      },
+      "vcard2xml" : {
+         "file" : "bin/vcard2xml"
+      }
+   }
+}

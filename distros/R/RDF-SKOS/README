@@ -1,0 +1,62 @@
+RDF::SKOS
+=========
+
+SKOS is one of the knowledge organisations systems, simpler, less
+semantically committed that RDF and even less than Topic Maps.
+
+This suite of packages provides the SKOS model itself (mostly
+read-only, sorry), but also implementations holding concrete SKOSes
+out there. Here nothing of the RDFishness is visible, but there is
+also an implementation on top of RDF::Redland. Others can be added via
+subclassing.
+
+Current Limitations (this is work in progress)
+
+  - no concept matching facilities
+  - only read-only
+  - no collections
+
+Other TODOs:
+
+  - follow all property subsumptions from the reference
+  - follow all the entailments from the reference
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc RDF::SKOS
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=RDF-SKOS
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/RDF-SKOS
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/RDF-SKOS
+
+    Search CPAN
+        http://search.cpan.org/dist/RDF-SKOS
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Robert Barta
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

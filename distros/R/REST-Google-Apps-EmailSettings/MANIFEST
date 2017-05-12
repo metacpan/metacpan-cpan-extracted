@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+lib/REST/Google/Apps/EmailSettings.pm
+lib/REST/Google/Apps/EmailSettings.pod
+t/001-load.t
+

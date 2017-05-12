@@ -1,0 +1,22 @@
+
+  <h1>New Post</h1>
+  <div id="new_post">
+    <form method="POST" action="[% R('NewPost') %]">
+      <h3>Title</h3>
+      <input type="text" name="title"></input>
+      <h3>Body</h3>
+      <textarea name="body" rows="10" cols="50"></textarea>
+      <h3>Format</h3>
+      <select id="" name="format">
+        <option value="pod">POD</option>
+        <option value="textile">Textile</option>
+        <option value="markdown">Markdown</option>
+        <option value="raw">RAW</option>
+      </select>
+      <div>
+      <input type="submit" />
+      </div>
+    </form>
+  </div>
+
+

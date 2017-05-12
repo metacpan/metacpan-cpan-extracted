@@ -1,0 +1,44 @@
+#!perl
+use 5.010_000;
+use strict;
+use warnings;
+use feature ':5.10';
+use autodie ':all';
+use Carp::Always;
+
+use IPC::Run 'run';
+use File::Temp 'tempdir';
+use Getopt::Long 'GetOptions';
+
+Getopt::Long::Configure( 'pass_through' );
+GetOptions(
+  help => sub { die },
+  'tmp=s'   => \ my $dir,
+  'movie=s' => \ my $movie,
+)
+  or die;
+if ( ! $movie ) {
+  my ( $program ) = grep /^[[:alpha:]][-\w]+$/, @ARGV;
+  $movie = $program ? "$program.mp4" : 'movie.mp4';
+}
+
+$dir //= tempdir( CLEANUP => 1 );
+my $log = "$dir/movie.log";
+
+say "Working in $dir";
+
+# Capture the raw data
+run(
+  [ $^X, '-d:Movie', @ARGV ],
+  '2>', $log,
+  '1>&2'
+);
+
+
+# Now it's time to bake a cake!
+run(
+  [ 'pm-frame-runner', '--dir', $dir, '--movie', $movie ],
+  '<', $log
+);
+
+say "Your movie is ready: $movie";

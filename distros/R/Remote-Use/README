@@ -1,0 +1,1294 @@
+NAME
+    Remote::Use::Tutorial - An introduction to Remote::Use
+
+SYNOPSIS
+      $ cat -n prime3.pl
+         1  #!/usr/bin/perl -I../lib -w
+         2  # The module Math::Prime::XS isn't installed in the machine
+         3  # but will be downloaded from some remote server
+         4  use Math::Prime::XS qw{:all};
+         5
+         6  @all_primes   = primes(9);
+         7  print "@all_primes\n";
+         8
+         9  @range_primes = primes(4, 9);
+        10  print "@range_primes\n";
+
+      $ cat -n rsyncconfig
+         1  package rsyncconfig; # Configuration file
+         2
+         3  sub getarg {
+         4    my ($class, $self) = @_;
+         5
+         6    return (
+         7      host => 'orion:',
+         8      prefix => '/tmp/perl5lib/',
+         9      command => 'rsync -i -vaue ssh',
+        10      ppmdf => '/tmp/perl5lib/.orion.installed.modules',
+        11    );
+        12  }
+        13
+        14  1;
+
+      $ time perl -MRemote::Use=config,rsyncconfig prime3.pl
+      receiving file list ... done
+      >f+++++++++ XS.so
+
+      sent 42 bytes  received 16141 bytes  10788.67 bytes/sec
+      total size is 16043  speedup is 0.99
+      receiving file list ... done
+      >f+++++++++ XS.bs
+
+      sent 42 bytes  received 94 bytes  90.67 bytes/sec
+      total size is 0  speedup is 0.00
+      receiving file list ... done
+      >f+++++++++ XS.pm
+
+      sent 42 bytes  received 5733 bytes  11550.00 bytes/sec
+      total size is 5635  speedup is 0.98
+      2 3 5 7
+      5 7
+
+      real    0m2.349s
+      user    0m0.116s
+      sys     0m0.060s
+
+      # Second time: the modules have already been loaded
+      $ time perl -MRemote::Use=config,rsyncconfig prime3.pl
+      2 3 5 7
+      5 7
+
+      real    0m0.066s
+      user    0m0.056s
+      sys     0m0.008s
+
+SUMMARY AND MOTIVATIONS
+    At the institution I work the student laboratories contain hundreds of
+    computers that can be started in Linux or Windows. The OS is replicated
+    from a master copy in a server. The administrators are reluctant to
+    install all the Perl Modules I need for teaching. The problem is that I
+    keep discovering interesting new modules and introducing them in my
+    lectures, which means I am continuously bothering them, asking for a new
+    module to be introduced in the master copy/computer. However, I can
+    still install that modules in a machine that is accesible to the
+    students. Remote::Use helps to solve these sort of problems. It provides
+    a way to succesfully run a Perl program even if some libraries aren't
+    availables at start time. The libraries will be downloaded from a
+    specified server using a specified application that runs on top of some
+    protocol. The clients must be binary compatibles with the server if
+    binary libraries - as the Math::Prime::XS example script used in the
+    SYNOPSIS section - are involved. Typical downloaders are "rsync" and
+    "wget" but any suitable alternative like lwp-mirror or "Curl" can be
+    used. This means that many different protocols can be used for the
+    transference: SSH, SFTP, HTTP, HTTPS, FTP, etc. This way, the students
+    can download the modules their programs use to a scratch directory. Once
+    the modules are downloaded they will not be downloaded again, unless the
+    modules are removed from the scratch disk.
+
+    There are many ways of setting a Machine to serve its installed Perl
+    Modules to other clients. The process implies the creation of a file
+    that describes the modules you want to make public. We will consider
+    here only two ways: Setting a server that is accesible via SSH and
+    setting a server that is accesible via HTTP. The next section deals with
+    the case where the clients have automatic SSH access to the server. See
+    the "APPENDIX: AUTOMATIC AUTHENTICATION" if you aren't familiar with
+    automatic SSH authentication. Later we will study the case when the
+    server is accesible via HTTP or HTTPS. After reading these sections the
+    use of Remote::Use with other protocols (FTP, SFTP, etc.) must be
+    straightforward. See also the "examples" directory in the accompanying
+    distribution. The discussion of a more detailed control of the
+    downloaded files - with special emphasis in how to download the
+    executables associated with some module - is studied in section
+    "DOWNLOADING EXECUTABLES WITH wget".
+
+USING REMOTE MODULES WITH "rsync" VIA SSH
+  CREATING A PERL PUBLIC MODULES DESCRIPTOR FILE
+    To use remote modules, the clients need to have accesible a *Perl Public
+    Modules Descriptor File* (*PPMDF*). Such file describes (in Perl) the
+    set of Modules in the server that are visible/public to the clients. The
+    script pminstalled.pl that accompanies the distribution of Remote::Use
+    simplifies the process of writing such *PPMDF* files.
+
+    Along this document we will assume that machine "nereida" is the client
+    and machine "orion" is the Perl Modules Server. In this particular
+    section we will also assume that automatic SSH autentification has been
+    set between client and server.
+
+    We start by copying the pminstalled.pl script to the server:
+
+      pp2@nereida:$ scp pminstalled.pl orion:
+      pminstalled.pl                                                       100% 1551     1.5KB/s   00:00
+
+    and then run it in the server, saving the output in the client:
+
+      pp2@nereida:$ ssh orion perl pminstalled.pl > /tmp/perl5lib/.orion.installed.modules
+      Duplicated module 'Test/Builder.pm':
+      Is in:
+             /usr/local/share/perl/5.8.8/Test/Builder.pm
+      and in:
+             /usr/local/share/perl/5.8.4/Test/Builder.pm
+      only the first will be considered.
+
+      Duplicated module 'Test/Simple.pm':
+      Is in:
+             /usr/local/share/perl/5.8.8/Test/Simple.pm
+      and in:
+             /usr/local/share/perl/5.8.4/Test/Simple.pm
+      only the first will be considered.
+
+      ..... etc, etc.
+
+      pp2@nereida:$           
+
+    The execution of "pminstalled.pl" warns the user about those modules
+    that appear more than once in the server @INC path. The warning message
+    tell us that only the first copy will be transferred to the client.
+
+    To redirect the warning messages to a file use the "log" option of
+    "pminstalled.pl":
+
+      pp2@nereida:$ ssh orion perl pminstalled.pl -log /tmp/dups > /tmp/perl5lib/.orion.installed.modules
+
+    Now the warning messages are in the file "/tmp/dups" in the machine
+    "orion":
+
+      pp2@nereida:$ ssh orion head /tmp/dups
+      Duplicated module 'Test/Builder.pm':
+      Is in:
+             /usr/local/share/perl/5.8.8/Test/Builder.pm
+      and in:
+             /usr/local/share/perl/5.8.4/Test/Builder.pm
+      only the first will be considered.
+
+      Duplicated module 'Test/Simple.pm':
+      Is in:
+             /usr/local/share/perl/5.8.8/Test/Simple.pm
+
+    Running "pminstalled.pl" without options send to STDOUT a *Perl Public
+    Module Descriptor File* (PPMDF). Since STDOUT has been redirected in the
+    former example, we have the PPMDF file
+    "/tmp/perl5lib/.orion.installed.modules" that describes the set of
+    modules found in the server @INC path. The descriptor file
+    "/tmp/perl5lib/.orion.installed.modules" is written in Perl itself. It
+    is an array, that for each module found, has a hash entry. See the first
+    lines of such file:
+
+      $ head -15 /tmp/perl5lib/.orion.installed.modules
+      (
+      'CPAN/Config.pm' => { dir => '/etc/perl', files => [
+              '/etc/perl/CPAN/Config.pm' ] },
+      'IO/Tty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+              '/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.so',
+              '/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.bs',
+              '/usr/local/lib/perl/5.8.8/IO/Tty.pm' ] },
+      'IO/Pty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+              '/usr/local/lib/perl/5.8.8/IO/Pty.pm' ] },
+      'IO/Tty/Constant.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+              '/usr/local/lib/perl/5.8.8/IO/Tty/Constant.pm' ] },
+      'Math/Prime/XS.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+              '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' ] },
+
+    Thus, for example for module "Math::Prime::XS" we have the entry:
+
+      'Math/Prime/XS.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/.packlist',
+              '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' ] },
+
+    The key for such entry is the file name 'Math/Prime/XS.pm' associated
+    with the "use Math::Prime::XS" of the module Math::Prime::XS. The value
+    is a HASH reference that describes what files must be downloaded.
+
+    The value associated with the key "dir" of such hash,
+
+                '/usr/local/lib/perl/5.8.8' 
+
+    is the path where the file 'Math/Prime/XS.pm' was found. The items in
+    the list corresponding to the key "file" contain files that are
+    associated with the module and must be downloaded when this modules are
+    used:
+
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/.packlist',
+              '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm'
+
+    the last element in such list is the full path to the module itself:
+
+              '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' 
+
+    Of course, you can edit and modify such file at your convenience or use
+    your own "PPMDF" generator instead of pminstalled.pl.
+
+    If you want to make public modules that aren't in the official @INC
+    path, just add the corresponding "-I" options to the perl interpreter
+    executing "pminstalled.pl":
+
+     $ ssh orion perl -I/home/casiano/public_html/cpan pminstalled.pl \
+                 > /tmp/perl5lib/.orion.plus.public.installed.modules
+      Duplicated module 'Parse/Eyapp.pm':
+      Is in:
+             /home/casiano/public_html/cpan/Parse/Eyapp.pm
+      and in:
+             /usr/local/share/perl/5.8.8/Parse/Eyapp.pm
+      only the first will be considered.
+
+      ......, etc, etc.
+
+      $                                   
+
+    Now the "PPMDF" generated also contains the modules in
+    "/home/casiano/public_html/cpan":
+
+      pp2@nereida:$ head /tmp/perl5lib/.orion.plus.public.installed.modules
+      (
+      'Trivial.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+              '/home/casiano/public_html/cpan/Trivial.pm' ] },
+      'Tintin/Trivial.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+              '/home/casiano/public_html/cpan/Tintin/Trivial.pm' ] },
+      'Parse/Eyapp.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+              '/home/casiano/public_html/cpan/Parse/Eyapp.pm' ] },
+      'Parse/Eyapp/Lalr.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+              '/home/casiano/public_html/cpan/Parse/Eyapp/Lalr.pm' ] },
+      'Parse/Eyapp/YATW.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+
+    What if we want an entirely different search path alternative to @INC?
+    For that we execute "pminstalled.pl" with the list of directories where
+    to look at:
+
+     $ ssh orion perl pminstalled.pl /home/casiano/public_html/cpan -o /home/casiano/public_html/.orion.via.web
+
+    The option "-o" of "pminstalled.pl" saves the output in the specified
+    file "/tmp/.orion.via.web". Since we are using a "ssh" command the file
+    was saved in the remote machine:
+
+      $ ssh orion head /home/casiano/public_html/.orion.via.web
+      (
+      'Trivial.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+              '/home/casiano/public_html/cpan/Trivial.pm' ] },
+      'Tintin/Trivial.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+              '/home/casiano/public_html/cpan/Tintin/Trivial.pm' ] },
+      'Parse/Eyapp.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+              '/home/casiano/public_html/cpan/Parse/Eyapp.pm' ] },
+      'Parse/Eyapp/Lalr.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+              '/home/casiano/public_html/cpan/Parse/Eyapp/Lalr.pm' ] },
+      'Parse/Eyapp/YATW.pm' => { dir => '/home/casiano/public_html/cpan', files => [
+      pp2@nereida:~$                                                                       
+
+    The PPDF file "/home/casiano/public_html/.orion.via.web" describes the
+    modules in the directory
+
+                           /home/casiano/public_html/cpan 
+
+    See the tree hierarchy:
+
+      $ ssh orion tree /home/casiano/public_html/cpan
+      /home/casiano/public_html/cpan
+      |-- Math
+      |   `-- Prime
+      |       `-- XS.pm
+      |-- Parse
+      |   |-- Eyapp
+      |   |   |-- Base.pm
+      |   |   |-- Driver.pm
+      |   |   |-- Grammar.pm
+      |   |   |-- Lalr.pm
+      |   |   |-- Node.pm
+      |   |   |-- Options.pm
+      |   |   |-- Output.pm
+      |   |   |-- Parse.pm
+      |   |   |-- Scope.pm
+      |   |   |-- Treeregexp.pm
+      |   |   |-- YATW.pm
+      |   |   `-- _TreeregexpSupport.pm
+      |   `-- Eyapp.pm
+      |-- Tintin
+      |   `-- Trivial.pm
+      |-- Trivial.pm
+      |-- auto
+      |   `-- Math
+      |       `-- Prime
+      |           `-- XS
+      |               |-- XS.bs
+      |               `-- XS.so
+      `-- bin
+          |-- eyapp
+          `-- treereg
+
+      10 directories, 20 files
+
+  LOADING REMOTE MODULES WITH "rsync"
+    Once we have saved the PPMDF somewhere inside the client machine, we
+    have to create a *configuration package*. Such configuration package is
+    a Perl package describing the connection with the Perl Modules Server.
+    While the PPMDF file tell us where are the files to transfer, the
+    configuration package says how they will be transferred. The
+    configuration package specifies, among other things, where the PPMDF
+    file is and what application will be used for the transference of files,
+    In this section we will use "rsync", an application that synchronizes
+    files and directories between two machines optimizing the volume of data
+    to transfer using delta encoding.
+
+    Start by writing a configuration file similar to this:
+
+      pp2@nereida:~/LRemoteUse/examples$ cat -n rsyncconfig
+         1  package rsyncconfig;
+         2
+         3  sub getarg {
+         4    my ($class, $self) = @_;
+         5
+         6    return (
+         7      host => 'orion:',
+         8      prefix => '/tmp/perl5lib/',
+         9      command => 'rsync -i -vaue ssh',
+        10      ppmdf => '/tmp/perl5lib/.orion.installed.modules',
+        11    );
+        12  }
+        13
+        14  1;
+
+    The configuration file must have a subroutine named "getarg". Such
+    subroutine sets the attributes of the Remote::Use object that lead the
+    behavior of Remote::Use during downloading. It receives as arguments the
+    configuration package identifier and a reference to the Remote::Use
+    object. Let us describe each of the attributes returned by "getarg":
+
+    * The "command" argument of "getarg" specifies the driver command
+    (executable) that will be used to download the files.
+                    command => 'rsync -i -vaue ssh'
+
+      In this example we use "rsync". See "rsync" man pages for more
+      information. The "-e ssh" option tells "rsync" to use "SSH" to connect
+      to the remote machine. The "-v" option increases the level of
+      verbosity. The "-u" option makes "rsync" to skip files that are newer
+      on the receiver. The "-a" option says you want recursion and want to
+      preserve most of the attributes of the source file.
+
+    * The "host" argument describes the *host descriptor* in terms of the
+    application used to connect.
+      Remote::Use calls the specified "command" (in this case "rsync -i
+      -vaue ssh") to download by asking the operating system to execute a
+      line that can be decomposed in the following components:
+
+       "$command $host$sourcefile $commandoptions $targetfile"
+
+      Where $sourcefile is the file being downloaded and $targetfile is the
+      name of the file in the target machine. The $targetfile name is
+      deduced from the source file name and the hints given by the user in
+      the configuration package. Usually the $command part includes the
+      options, but if more options are needed after the "$host$sourcefile"
+      they can be specified using the "commandoptions" argument. See section
+      "HTTPS/FTP" in USING REMOTE MODULES WITH "wget" VIA HTTP for an
+      example.
+
+      For "rsync" connections must be the name of the SSH connection
+      followed by a colon:
+
+                               host => 'orion:'
+
+      This is because, to download using "rsync" a file like
+
+        /usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so
+
+      placed at the remote server ("orion") we use a command like:
+
+        rsync -aue ssh orion:/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so XS.so
+
+      The "$host$sourcefile" argument of the full command line can be
+      divided into two parts: the host descriptor that includes the colon
+      separator "orion:" and the file descriptor
+      "/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so".
+
+      I usually set the multiple parameters of a connection in the
+      "~/.ssh/config" file that governs the "SSH" connection. As an example
+      here is the paragraph in "~/.ssh/config" that refers to the connection
+      named 'orion':
+
+        Host orion orion.pcg.ull.es orion.deioc.ull.es chum
+        user casiano
+        # The real name of the machine
+        Hostname orion.pcg.ull.es
+        ForwardX11 yes
+
+      See "APPENDIX: AUTOMATIC AUTHENTICATION" and the "SEE ALSO" sections
+      to know more about SSH configuration files.
+
+    * The "prefix" argument describes the path in the client machine where
+    modules will be stored. The downloaded modules will be stored below this
+    path. Thus, the setting:
+                 prefix => '/tmp/perl5lib/'
+
+      stores the "files" for module "Math::Prime::XS"
+
+        'Math/Prime/XS.pm' => { 
+           dir => '/usr/local/lib/perl/5.8.8', 
+           files => [
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+              '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/.packlist',
+              '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' 
+           ] 
+        },
+
+      respectively in:
+
+                '/tmp/perl5lib/auto/Math/Prime/XS/XS.so'
+                '/tmp/perl5lib/auto/Math/Prime/XS/XS.bs'
+                '/tmp/perl5lib/auto/Math/Prime/XS/.packlist'
+                '/tmp/perl5lib/Math/Prime/XS.pm' 
+
+      That is: the "dir" prefix ('/usr/local/lib/perl/5.8.8') is eliminated
+      from the file specification. Thus
+
+        '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so'
+
+      becomes 'auto/Math/Prime/XS/XS.so' and is later prefixed with the
+      value of "prefix" ('/tmp/perl5lib/'). This is why the remote file
+
+        '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so'
+
+      is finally locally stored in
+
+        '/tmp/perl5lib/auto/Math/Prime/XS/XS.so'
+
+      Be sure you add that path specified in "prefix" to the environment
+      variable "PERL5LIB" so that any Perl scripts that don't make use of
+      Remote::Use can still have access to the downloaded modules.
+
+    * The "ppmdf" option tells Remote::Use where is the PPMDF file:
+          ppmdf => '/tmp/perl5lib/.orion.installed.modules',
+
+  RUNNING A SCRIPT THAT MAKES USE OF REMOTE MODULES
+    Once we have the PPMDF file "/tmp/perl5lib/.orion.installed.modules" and
+    the configuration package "rsyncconfig" we can make automatic the
+    downloading of remote modules:
+
+      pp2@nereida:~/LRemoteUse/examples$ cat -n prime2.pl
+         1  #!/usr/bin/perl -I../lib -w
+         2  use Remote::Use config => 'rsyncconfig';
+         3  use Math::Prime::XS qw{:all};
+         4
+         5  @all_primes   = primes(9);
+         6  print "@all_primes\n";
+         7
+         8  @range_primes = primes(4, 9);
+         9  print "@range_primes\n";
+
+    Notice line 2 in the listing above: Remote::Use push an object reference
+    into the @INC array. After all the previous paths in @INC have been
+    searched, the "Remote::Use::INC" method is executed. Such method
+    attempts to open a connection to the remote server and to download the
+    required files. Therefore, for performance reasons, it is convenient to
+    be sure that the "Remote::Use" object reference is the last in the @INC
+    list.
+
+    The first time we run "prime2.pl" the files specified in the PPMDF for
+    Math::Prime::XS are downloaded:
+
+      pp2@nereida:~/LRemoteUse/examples$ time prime2.pl
+      receiving file list ... done
+      >f+++++++++ XS.so
+
+      sent 42 bytes  received 16141 bytes  10788.67 bytes/sec
+      total size is 16043  speedup is 0.99
+      receiving file list ... done
+      >f+++++++++ XS.bs
+
+      sent 42 bytes  received 94 bytes  272.00 bytes/sec
+      total size is 0  speedup is 0.00
+      receiving file list ... done
+      >f+++++++++ XS.pm
+
+      sent 42 bytes  received 5733 bytes  3850.00 bytes/sec
+      total size is 5635  speedup is 0.98
+      2 3 5 7
+      5 7
+
+      real    0m2.506s
+      user    0m0.148s
+      sys     0m0.052s
+
+    Since the files are now cached, the second run does not involves
+    additional overhead:
+
+      pp2@nereida:~/LRemoteUse/examples$ time prime2.pl
+      2 3 5 7
+      5 7
+
+      real    0m0.073s
+      user    0m0.052s
+      sys     0m0.012s
+
+    An alternative to introduce the explicit "use" of Remote::Use inside the
+    script is to call the perl interpreter from the command line with the
+    "-M" option:
+
+      pp2@nereida:~/LRemoteUse/examples$ perl -MRemote::Use=config,rsyncconfig prime3.pl
+
+    Another alternative to the configuration file is to explictly set the
+    options in the "use" directive like in:
+
+      pp2@nereida:~/LRemoteUse/examples$ cat -n primeex.pl
+         1  #!/usr/bin/perl -I../lib -w
+         2  use Remote::Use
+         3      host => 'orion:',
+         4      prefix => '/tmp/perl5lib/',
+         5      command => 'rsync -i -vaue ssh',
+         6      ppmdf => '/tmp/perl5lib/.orion.installed.modules',
+         7  ;
+         8  use Math::Prime::XS qw{:all};
+         9
+        10  @all_primes   = primes(9);
+        11  print "@all_primes\n";
+        12
+        13  @range_primes = primes(4, 9);
+        14  print "@range_primes\n";
+
+USING REMOTE MODULES WITH "wget" VIA HTTP/HTTPS/FTP
+    "Wget" is a non-interactive free software application for retrieving
+    files using HTTP, HTTPS and FTP protocols. It runs on most UNIX-like
+    operating systems as well as Microsoft Windows, Mac OS X, OpenVMS and
+    AmigaOS. An alternative to "wget" is "cURL".
+
+    To mannually download a file like "XS.pm" using "wget" we use a command
+    like:
+
+      $ wget -o /tmp/wget.log http://orion.pcg.ull.es/~casiano/cpan/Math/Prime/XS.pm -O XS.pm
+
+    This will download the file
+    "/home/casiano/public_html/cpan/Math/Prime/XS.pm" from the machine
+    "orion.pcg.ull.es" using the "HTTP" protocol. The downloaded file will
+    be stored as "XS.pm" in the current directory. The application "wget"
+    not only supports HTTP transfers but also HTTPS and FTP. "cURL" is even
+    richer, supporting FTP, FTPS, HTTP, HTTPS, SCP, SFTP, TFTP, TELNET,
+    DICT, LDAP, LDAPS and FILE.
+
+    The way of working is similar to "rsync" but a few things change. We
+    will see them in detail in the following paragraphs.
+
+  THE "-relative" OPTION OF "pminstalled.pl"
+    The "pminstalled.pl" script has the option "-relative somepath". If used
+    it will produce a PPMDF in which the prefix "somepath" is supressed from
+    the "dir" attribute. The following comand:
+
+     $ ssh orion perl pminstalled.pl -r /home/casiano/public_html/cpan /home/casiano/public_html/cpan > /tmp/perl5lib/.orion.via.web
+
+    executes "pminstalled.pl" in the server "orion" via "ssh". The second
+    "/home/casiano/public_html/cpan" argument tells "pminstalled.pl" to
+    publish in the PPMDF file the modules in that directory
+    "/home/casiano/public_html/cpan" (but not those in @INC). The
+    consequence of using "-r /home/casiano/public_html/cpan" is that the
+    "dir" entries in the PPMDF file "/tmp/perl5lib/.orion.via.web" are
+    empty:
+
+     $ cat -n /tmp/perl5lib/.orion.via.web
+         1  (
+         2  'Trivial.pm' => { dir => '', files => [
+         3          '/Trivial.pm' ] },
+         4  'Tintin/Trivial.pm' => { dir => '', files => [
+         5          '/Tintin/Trivial.pm' ] },
+         6  'Parse/Eyapp.pm' => { dir => '', files => [
+         7          '/Parse/Eyapp.pm' ] },
+         8  'Parse/Eyapp/Lalr.pm' => { dir => '', files => [
+         9          '/Parse/Eyapp/Lalr.pm' ] },
+        10  'Parse/Eyapp/YATW.pm' => { dir => '', files => [
+        11          '/Parse/Eyapp/YATW.pm' ] },
+        12  'Parse/Eyapp/Treeregexp.pm' => { dir => '', files => [
+        13          '/Parse/Eyapp/Treeregexp.pm' ] },
+        14  'Parse/Eyapp/Parse.pm' => { dir => '', files => [
+        15          '/Parse/Eyapp/Parse.pm' ] },
+        16  'Parse/Eyapp/Scope.pm' => { dir => '', files => [
+        17          '/Parse/Eyapp/Scope.pm' ] },
+        18  'Parse/Eyapp/Options.pm' => { dir => '', files => [
+        19          '/Parse/Eyapp/Options.pm' ] },
+        20  'Parse/Eyapp/Output.pm' => { dir => '', files => [
+        21          '/Parse/Eyapp/Output.pm' ] },
+        22  'Parse/Eyapp/Node.pm' => { dir => '', files => [
+        23          '/Parse/Eyapp/Node.pm' ] },
+        24  'Parse/Eyapp/Grammar.pm' => { dir => '', files => [
+        25          '/Parse/Eyapp/Grammar.pm' ] },
+        26  'Parse/Eyapp/Driver.pm' => { dir => '', files => [
+        27          '/Parse/Eyapp/Driver.pm' ] },
+        28  'Parse/Eyapp/Base.pm' => { dir => '', files => [
+        29          '/Parse/Eyapp/Base.pm' ] },
+        30  'Parse/Eyapp/_TreeregexpSupport.pm' => { dir => '', files => [
+        31          '/Parse/Eyapp/_TreeregexpSupport.pm' ] },
+        32  'Math/Prime/XS.pm' => { dir => '', files => [
+        33          '/auto/Math/Prime/XS/XS.bs',
+        34          '/auto/Math/Prime/XS/XS.so',
+        35          '/Math/Prime/XS.pm' ] },
+        36  );
+
+    That mostly maches the contents of the directory
+    "/home/casiano/public_html/cpan/" in the server machine:
+
+      casiano@orion:~$ tree /home/casiano/public_html/cpan/
+      /home/casiano/public_html/cpan/
+      |-- Math
+      |   `-- Prime
+      |       `-- XS.pm
+      |-- Parse
+      |   |-- Eyapp
+      |   |   |-- Base.pm
+      |   |   |-- Driver.pm
+      |   |   |-- Grammar.pm
+      |   |   |-- Lalr.pm
+      |   |   |-- Node.pm
+      |   |   |-- Options.pm
+      |   |   |-- Output.pm
+      |   |   |-- Parse.pm
+      |   |   |-- Scope.pm
+      |   |   |-- Treeregexp.pm
+      |   |   |-- YATW.pm
+      |   |   `-- _TreeregexpSupport.pm
+      |   `-- Eyapp.pm
+      |-- Tintin
+      |   `-- Trivial.pm
+      |-- Trivial.pm
+      |-- auto
+      |   `-- Math
+      |       `-- Prime
+      |           `-- XS
+      |               |-- XS.bs
+      |               `-- XS.so
+      `-- bin
+          |-- eyapp
+          `-- treereg
+
+  A CONFIGURATION FILE FOR "wget"
+    Let us now write a program that makes use of this PPMDF file to download
+    the modules it needs:
+
+      pp2@nereida:~/LRemoteUse/examples$ cat -n prime2wget.pl
+         1  #!/usr/bin/perl -I../lib -w
+         2  use Remote::Use config => 'wgetconfig';
+         3  use Math::Prime::XS qw{:all};
+         4
+         5  @all_primes   = primes(9);
+         6  print "@all_primes\n";
+         7
+         8  @range_primes = primes(4, 9);
+         9  print "@range_primes\n";
+
+    The module "Math::Prime::XS" (line 3) is in the remote machine
+    ("orion"). The configuration file now makes use of the program "wget" to
+    download the files;
+
+      pp2@nereida:~/LRemoteUse/examples$ cat -n wgetconfig
+         1  package wgetconfig;
+         2  use strict;
+         3  use warnings;
+         4
+         5  sub getarg {
+         6    return (
+         7      command => 'wget -o /tmp/wget.log',
+         8      commandoptions => '-O',
+         9      host => 'http://orion.pcg.ull.es/~casiano/cpan',
+        10      prefix => '/tmp/perl5lib/',
+        11      ppmdf => '/tmp/perl5lib/.orion.via.web',
+        12    );
+        13  }
+        14
+        15  1;
+
+    Let us see the meaning of the different arguments of "getarg":
+
+    * "command"
+      Specifies the command and the options for tha command:
+
+                  wget -o /tmp/wget.log
+
+      Option "-o" of "wget" tell the file where the log messages go.
+
+    * "commandoptions"
+      Specifies the options for the command that go between the
+      "$host$sourcefile" and the $targetfile. Remember that the downloading
+      command produced by Remote::Use has the form:
+
+       "$command $host$sourcefile $commandoptions $targetfile"
+
+      The "-O file" and "--output-document=file" options of "wget" says
+      where to store the downloaded file. By default "wget" has its own way
+      to deduce the file name of the target. We use option "-O" to disable
+      such mechanism.
+
+    * "host"
+      To mannually download a file like "XS.pm" using "wget" we use a
+      command like:
+
+        $ wget -o /tmp/wget.log http://orion.pcg.ull.es/~casiano/cpan/Math/Prime/XS.pm -O XS.pm
+
+      Since the shape of the produced command is:
+
+       "$command $host$sourcefile $commandoptions $targetfile"
+
+      here the file descriptor is "Math/Prime/XS.pm" and the host descriptor
+      is "http://orion.pcg.ull.es/~casiano/cpan":
+
+          host => 'http://orion.pcg.ull.es/~casiano/cpan'
+
+    * "prefix"
+      As it was mentioned, the "prefix" argument describes the path in the
+      client machine where modules will be stored. The downloaded modules
+      will be stored below this path. Thus, the setting:
+
+                 prefix => '/tmp/perl5lib/'
+
+      stores the "files" for module "Math::Prime::XS"
+
+        Math/Prime/XS.pm' => { dir => '', files => [
+              '/auto/Math/Prime/XS/XS.bs',
+              '/auto/Math/Prime/XS/XS.so',
+              '/Math/Prime/XS.pm' ] },
+
+      respectively in:
+
+        pp2@nereida:~/LRemoteUse/examples$ tree /tmp/perl5lib/
+        /tmp/perl5lib/
+        |-- Math
+        |   `-- Prime
+        |       `-- XS.pm
+        `-- auto
+            `-- Math
+                `-- Prime
+                    `-- XS
+                        |-- XS.bs
+                        `-- XS.so
+
+      That is: the "dir" prefix (i.e. '' nothing in this case) is eliminated
+      from the file specification. Thus
+
+           '/auto/Math/Prime/XS/XS.so'
+
+      is not changed and is prefixed with the value of "prefix":
+
+           '/tmp/perl5lib/'
+
+  DOWNLOADING AND RUNNING WITH "wget"
+    when it is executed it silently downloads the files:
+
+      pp2@nereida:~/LRemoteUse/examples$ time prime2wget.pl
+      2 3 5 7
+      5 7
+
+      real    0m0.084s
+      user    0m0.052s
+      sys     0m0.028s
+
+    The second time the module has been loaded and it takes less time:
+
+      pp2@nereida:~/LRemoteUse/examples$ time prime2wget.pl
+      2 3 5 7
+      5 7
+
+      real    0m0.044s
+      user    0m0.024s
+      sys     0m0.020s
+
+    The option "-o /tmp/wget.log" redirects the log messages to the file
+    "/tmp/wget.log":
+
+      pp2@nereida:~/LRemoteUse/examples$ cat /tmp/wget.log
+      --12:04:24--  http://orion.pcg.ull.es/~casiano/cpan/Math/Prime/XS.pm
+                 => `/tmp/perl5lib//Math/Prime/XS.pm'
+      Resolviendo orion.pcg.ull.es... 193.145.105.17
+      Connecting to orion.pcg.ull.es|193.145.105.17|:80... conectado.
+      Petición HTTP enviada, esperando respuesta... 200 OK
+      Longitud: 5,635 (5.5K) [text/x-perl]
+
+          0K .....                                      100%    7.29 MB/s
+
+      12:04:24 (7.29 MB/s) - `/tmp/perl5lib//Math/Prime/XS.pm' saved [5635/5635]
+
+    The files are now in the directory "/tmp/perl5lib/":
+
+      pp2@nereida:~/LRemoteUse/examples$ tree /tmp/perl5lib/
+      /tmp/perl5lib/
+      |-- Math
+      |   `-- Prime
+      |       `-- XS.pm
+      `-- auto
+          `-- Math
+              `-- Prime
+                  `-- XS
+                      |-- XS.bs
+                      `-- XS.so
+
+      6 directories, 3 files
+
+DOWNLOADING EXECUTABLES WITH "wget"
+    May be your program wants to execute some script that comes with one of
+    the used Perl Modules. By default, the PPMDF generated by
+    "pminstalled.pl" does not generate information about the scripts used by
+    a module.
+
+    As an example of this kind of scenario let us consider the following
+    (trivial/non sense) example:
+
+      p2@nereida:~/LRemoteUse/examples$ cat usinganexecutable.pl
+      #!/usr/bin/perl -I../lib -w
+      use strict;
+      use Remote::Use config => 'wgetwithbinconfig';
+      use Parse::Eyapp;
+      use Parse::Eyapp::Treeregexp;
+
+      system('eyapp -h');
+
+    The distribution of Parse::Eyapp provides two executables eyapp (the
+    yacc-like grammar compiler) and treereg (the compiler for the tree
+    transformation language).
+
+    Of course the first thing is to have the executables in the *published*
+    plcaae in server machine ("orion" in our examples). Observe the
+    directory "bin" of the "~/public_html/cpan" directory containing the two
+    executables:
+
+      casiano@orion:~/public_html/cpan$ tree -a
+      .
+      |-- .orion.via.web
+      |-- Math
+      |   `-- Prime
+      |       `-- XS.pm
+      |-- Parse
+      |   |-- Eyapp
+      |   |   |-- Base.pm
+      |   |   |-- Driver.pm
+      |   |   |-- Grammar.pm
+      |   |   |-- Lalr.pm
+      |   |   |-- Node.pm
+      |   |   |-- Options.pm
+      |   |   |-- Output.pm
+      |   |   |-- Parse.pm
+      |   |   |-- Scope.pm
+      |   |   |-- Treeregexp.pm
+      |   |   |-- YATW.pm
+      |   |   `-- _TreeregexpSupport.pm
+      |   `-- Eyapp.pm
+      |-- Tintin
+      |   `-- Trivial.pm
+      |-- Trivial.pm
+      |-- auto
+      |   `-- Math
+      |       `-- Prime
+      |           `-- XS
+      |               |-- XS.bs
+      |               `-- XS.so
+      `-- bin
+          |-- eyapp
+          `-- treereg
+
+    Remote::Use downloads whatever is specified in the associated PPMDF
+    file. By default, pminstall.pl does not include the executable scripts
+    associated with a module in the PPMDF file. Thus, we edit the PPMDF file
+    generated by pminstall.pl and insert line 8:
+
+      pp2@nereida:~/LRemoteUse/examples$ head /tmp/perl5lib/.orion.via.web | cat -n
+         1  (
+         2  'Trivial.pm' => { dir => '', files => [
+         3          '/Trivial.pm' ] },
+         4  'Tintin/Trivial.pm' => { dir => '', files => [
+         5          '/Tintin/Trivial.pm' ] },
+         6  'Parse/Eyapp.pm' => { dir => '',
+         7    files => [ '/Parse/Eyapp.pm' ],
+         8    bin => [ '/bin/eyapp', '/bin/treereg' ]
+         9  },
+        10  'Parse/Eyapp/Lalr.pm' => { dir => '', files => [
+
+    In any entry for a module like "Some/Module.pm" we can add couples with
+    the syntax
+
+            tag => [ 'd1/f1', 'd2/f2', ... ]
+
+    to the hash entry. The "tag" is arbitrary and defines a *family* of
+    files related with the module. A typical entry may have the form:
+
+        'Module/Something.pm' => { 
+             dir   => '/some/path',
+             files => [ 'file1', 'file2', ... ],
+             bin   => [ 'binexec1', 'binexec2', ... ]
+             man   => [ 'manfile1', 'manfile2', ... ]
+           },
+
+    While the "dir" and "files" tags are compulsory, the others are
+    optional. The behavior of Remote::Use for a family "tag" like
+
+            tag => [ 'd1/f1', 'd2/f2', ... ]
+
+    is as follows: the family of files 'd1/f1', 'd2/f2', etc. associated
+    with the "tag" will be by default downloaded to 'prefix/tag/f1',
+    'prefix/tag/f2', etc. Where "prefix" is the directory specified in the
+    "prefix" option of "getarg" inside the configuration package. See the
+    listing of the configuration package "wgetwithbinconfig":
+
+      pp2@nereida:~/LRemoteUse/examples$ cat wgetwithbinconfig
+      package wgetwithbinconfig;
+      use strict;
+      use warnings;
+
+      sub getarg {
+        return (
+          command => 'wget -o /tmp/wget.log',
+          commandoptions => '-O',
+          host => 'http://orion.pcg.ull.es/~casiano/cpan',
+          prefix => '/tmp/perl5lib/',
+          ppmdf => '/tmp/perl5lib/.orion.via.web',
+        );
+      }
+
+      sub postbin {
+        my $class = shift;
+
+        chmod 0755, @_;
+      }
+
+      1;
+
+    Thus, when Remote::Use sees the line 8 of "/tmp/perl5lib/.orion.via.web"
+    (see above the full contents of the file):
+
+       8    bin => [ '/bin/eyapp', '/bin/treereg' ]
+
+    it will transfer the file
+    "http://orion.pcg.ull.es/~casiano/cpan/bin/eyapp" to the file
+    "/tmp/perl5lib/bin/eyapp" in the local machine.
+
+    There is an additional problem that does not occur when using "rsync"
+    for the file transference. While the transference with "rsync" usually
+    preserves the permisions, the files transferred with "wget" do not have
+    the execution bit set. This is the reason to define the hook "postbin"
+    in the configuration package:
+
+      sub postbin {
+        my $class = shift;
+
+        chmod 0755, @_;
+      }
+
+    If a subroutine with name "posttag" exists in the configuration package
+    it will be executed for each file specified in the "tag" family just
+    after the file was downloaded. The "posttag" subroutine receives as
+    arguments the configuration package name and the name of the downloaded
+    file (i.e. "wgetwithbinconfig" and "/tmp/perl5lib/bin/eyapp" in the
+    example).
+
+    Of course, to be sure that the new executables and that the just
+    downloaded libraries will be found by the client script
+    "usinganexecutable.pl" we have to properly set the "PATH" and "PERL5LIB"
+    environment variables:
+
+      pp2@nereida:~/LRemoteUse/examples$ export PATH=${PATH}:/tmp/perl5lib/bin/
+      pp2@nereida:~/LRemoteUse/examples$ export PERL5LIB=/tmp/perl5lib/
+
+    Now we can succesfully execute the script that makes use of the remote
+    scripts:
+
+      pp2@nereida:~/LRemoteUse/examples$ time usinganexecutable.pl
+
+      Usage:  eyapp [options] grammar[.yp]
+        or    eyapp -V
+        or    eyapp -h
+
+          -m module   Give your parser module the name <module>
+                      default is <grammar>
+          -v          Create a file <grammar>.output describing your parser
+          -s          Create a standalone module in which the driver is included
+          -n          Disable source file line numbering embedded in your parser
+          -o outfile  Create the file <outfile> for your parser module
+                      Default is <grammar>.pm or, if -m A::Module::Name is
+                      specified, Name.pm
+          -t filename Uses the file <filename> as a template for creating the parser
+                      module file.  Default is to use internal template defined
+                      in Parse::Eyapp::Output
+          -b shebang  Adds '#!<shebang>' as the very first line of the output file
+
+          grammar     The grammar file. If no suffix is given, and the file
+                      does not exists, .yp is added
+
+          -V          Display current version of Parse::Eyapp and gracefully exits
+          -h          Display this help screen
+
+      real    0m0.358s
+      user    0m0.224s
+      sys     0m0.100s
+
+    As a consequence of the execution the directory "bin/" and the
+    executables have been added to the "prefix" directory:
+
+      pp2@nereida:~/LRemoteUse/examples$ tree /tmp/perl5lib/
+      /tmp/perl5lib/
+      |-- Math
+      |   `-- Prime
+      |       `-- XS.pm
+      |-- Parse
+      |   |-- Eyapp
+      |   |   |-- Base.pm
+      |   |   |-- Driver.pm
+      |   |   |-- Grammar.pm
+      |   |   |-- Lalr.pm
+      |   |   |-- Node.pm
+      |   |   |-- Options.pm
+      |   |   |-- Output.pm
+      |   |   |-- Parse.pm
+      |   |   |-- Treeregexp.pm
+      |   |   `-- YATW.pm
+      |   `-- Eyapp.pm
+      |-- Trivial.pm
+      |-- auto
+      |   `-- Math
+      |       `-- Prime
+      |           `-- XS
+      |               |-- XS.bs
+      |               `-- XS.so
+      |-- bin
+      |   |-- eyapp
+      |   `-- treereg
+      `-- orion.via.web
+
+THE "pretag" METHOD
+    Adding executables when using "rsync" is much simpler since "rsync"
+    preserves the attributes. Just change the configuration file in the
+    former example:
+
+      pp2@nereida:~/LRemoteUse/examples$ cat -n usinganexecutablewithrsync.pl
+         1  #!/usr/bin/perl -w
+         2  use strict;
+         3  use Remote::Use config => 'rsyncconfigsilent';
+         4  use Parse::Eyapp;
+         5  use Parse::Eyapp::Treeregexp;
+         6
+         7  system('eyapp -h');
+
+    The configuration files is similar to the presented in the "USING REMOTE
+    MODULES WITH rsync VIA SSH" section.
+
+      pp2@nereida:~/LRemoteUse/examples$ cat -n rsyncconfigsilent
+         1  package rsyncconfigsilent;
+         2
+         3  sub getarg {
+         4    my ($class, $self) = @_;
+         5
+         6    return (
+         7      host => 'orion:',
+         8      prefix => '/tmp/perl5lib/',
+         9      command => 'rsync -aue ssh',
+        10      ppmdf => '/tmp/perl5lib/.orion.installed.modules',
+        11    );
+        12  }
+        13
+        14  # Store executable in current directory
+        15  sub prebin {
+        16    my ($package, $url, $file, $self) = @_;
+        17
+        18    # Remove path
+        19    print "downloading $url. Default place: $file ";
+        20    $file =~ s{.*/}{};
+        21    print "final place: $file\n";
+        22    $file;
+        23  }
+        24
+        25  1;
+
+    If for a given "tag" a subroutine with name "pretag" exists in the
+    configuration package it will be executed for each file specified in the
+    "tag" family just before the file is downloaded. The "pretag" subroutine
+    receives as arguments the configuration package name, the full
+    description of the file to download in the server (something like
+    "orion:/usr/local/bin/eyapp"), the default name of the file in the
+    client (i.e. something like " /tmp/perl5lib/bin/eyapp") and a reference
+    to the "Remote::Use" object. It must return the definitive full name of
+    the file in the client (i.e. something like "/home/mylogin/bin/eyapp").
+
+    For this example to work, we have to edit the PPMDF file and add the
+    "bin" entry to the descriptor of Parse::Eyapp. Notice line 19:
+
+      pp2@nereida:~/LRemoteUse/examples$ head -20 /tmp/perl5lib/.orion.installed.modules | cat -n
+         1  (
+         2  'CPAN/Config.pm' => { dir => '/etc/perl', files => [
+         3          '/etc/perl/CPAN/Config.pm' ] },
+         4  'IO/Tty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+         5          '/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.so',
+         6          '/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.bs',
+         7          '/usr/local/lib/perl/5.8.8/IO/Tty.pm' ] },
+         8  'IO/Pty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+         9          '/usr/local/lib/perl/5.8.8/IO/Pty.pm' ] },
+        10  'IO/Tty/Constant.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+        11          '/usr/local/lib/perl/5.8.8/IO/Tty/Constant.pm' ] },
+        12  'Math/Prime/XS.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+        13          '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+        14          '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+        15          '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' ] },
+        16  'Parse/Eyapp.pm' => {
+        17     dir => '/usr/local/share/perl/5.8.8',
+        18     files => [ '/usr/local/share/perl/5.8.8/Parse/Eyapp.pm' ],
+        19     bin => [ '/usr/local/bin/eyapp', '/usr/local/bin/treereg' ]
+        20   },
+
+    When the script is executed for the first time we get an output like:
+
+      pp2@nereida:~/LRemoteUse/examples$ usinganexecutablewithrsync.pl
+      downloading orion:/usr/local/bin/eyapp. Default place: /tmp/perl5lib//bin/eyapp final place: eyapp
+      downloading orion:/usr/local/bin/treereg. Default place: /tmp/perl5lib//bin/treereg final place: treereg
+
+      ....
+
+    Now the executables are available in the current directory:
+
+      pp2@nereida:~/LRemoteUse/examples$ ls -ltr eyapp treereg
+      -r-xr-xr-x 1 pp2 pp2 9984 2007-11-02 12:40 treereg
+      -r-xr-xr-x 1 pp2 pp2 7102 2007-11-02 12:40 eyapp
+
+APPENDIX: AUTOMATIC AUTHENTICATION
+    SSH includes the ability to authenticate users using public keys.
+    Instead of authenticating the user with a password, the SSH server on
+    the remote machine will verify a challenge signed by the user's *private
+    key* against its copy of the user's *public key*. To achieve this
+    automatic ssh-authentication you have to:
+
+    * Generate a public key use the "ssh-keygen" utility. For example:
+        local.machine$ ssh-keygen -t rsa -N ''
+
+      The option "-t" selects the type of key you want to generate. There
+      are three types of keys: *rsa1*, *rsa* and *dsa*. The "-N" option is
+      followed by the *passphrase*. The "-N ''" setting indicates that no
+      pasphrase will be used. This is useful when used with key restrictions
+      or when dealing with cron jobs, batch commands and automatic
+      processing which is the context in which this module was designed. If
+      still you don't like to have a private key without passphrase, provide
+      a passphrase and use "ssh-agent" to avoid the inconvenience of typing
+      the passphrase each time. "ssh-agent" is a program you run once per
+      login sesion and load your keys into. From that moment on, any "ssh"
+      client will contact "ssh-agent" and no more passphrase typing will be
+      needed.
+
+      By default, your identification will be saved in a file
+      "/home/user/.ssh/id_rsa". Your public key will be saved in
+      "/home/user/.ssh/id_rsa.pub".
+
+    * Once you have generated a key pair, you must install the public key on
+    the remote machine. To do it, append the public component of the key in
+                 /home/user/.ssh/id_rsa.pub
+
+      to file
+
+                 /home/user/.ssh/authorized_keys
+           
+      on the remote machine. If the "ssh-copy-id" script is available, you
+      can do it using:
+
+        local.machine$ ssh-copy-id -i ~/.ssh/id_rsa.pub user@remote.machine
+
+      Alternatively you can write the following command:
+
+        $ ssh remote.machine "umask 077; cat >> .ssh/authorized_keys" < /home/user/.ssh/id_rsa.pub
+
+      The "umask" command is needed since the SSH server will refuse to read
+      a "/home/user/.ssh/authorized_keys" files which have loose
+      permissions.
+
+    * Edit your local configuration file "/home/user/.ssh/config" (see "man
+    ssh_config" in UNIX) and create a new section for connections to that
+    host. Here follows an example:
+       ...
+
+       # A new section inside the config file: 
+       # it will be used when writing a command like: 
+       #                     $ ssh gridyum 
+
+       Host gridyum
+
+       # My username in the remote machine
+       user my_login_in_the_remote_machine
+
+       # The actual name of the machine: by default the one provided in the
+       # command line
+       Hostname real.machine.name
+
+       # The port to use: by default 22
+       Port 2048
+
+       # The identitiy pair to use. By default ~/.ssh/id_rsa and ~/.ssh/id_dsa
+       IdentityFile /home/user/.ssh/yumid
+
+       # Useful to detect a broken network
+       BatchMode yes
+
+       # Useful when the home directory is shared across machines,
+       # to avoid warnings about changed host keys when connecting
+       # to local host
+       NoHostAuthenticationForLocalhost yes
+
+       # Another section ...
+       Host another.remote.machine an.alias.for.this.machine
+       user mylogin_there
+
+       ...
+
+      This way you don't have to specify your *login* name on the remote
+      machine even if it differs from your *login* name in the local
+      machine, you don't have to specify the *port* if it isn't 22, etc.
+
+    * Once the public key is installed on the server you should be able to
+    authenticate using your private key
+        $ ssh remote.machine
+        Linux remote.machine 2.6.15-1-686-smp #2 SMP Mon Mar 6 15:34:50 UTC 2006 i686
+        Last login: Sat Jul  7 13:34:00 2007 from local.machine
+        user@remote.machine:~$                                 
+
+      You can also automatically execute commands in the remote server:
+
+        local.machine$ ssh remote.machine uname -a
+        Linux remote.machine 2.6.15-1-686-smp #2 SMP Mon Mar 6 15:34:50 UTC 2006 i686 GNU/Linux
+
+ACKNOWLEDGMENTS
+    This work has been supported by CEE (FEDER) and the Spanish Ministry of
+    *Educacion y Ciencia* through *Plan Nacional I+D+I* number
+    TIN2005-08818-C04-04 (ULL::OPLINK project <http://www.oplink.ull.es/>).
+    The University of La Laguna has also supported my work in many ways and
+    for many years.
+
+    Finally, thanks to Juana, Coro and my students at La Laguna.
+
+SEE ALSO
+    * Remote::Use
+    * Remote::Use::Tutorial
+    * pminstalled.pl
+    * DVI version of Remote::Use::Tutorial at
+    <http://nereida.deioc.ull.es/~pp2/Remote_Use/Tutorial.dvi>
+    * DVI version of Remote::Use at
+    <http://nereida.deioc.ull.es/~pp2/Remote_Use/Use.dvi>
+    * DVI version of pminstalled.pl at
+    <http://nereida.deioc.ull.es/~pp2/Remote_Use/pminstalled.dvi>
+    * "rsync" man page. <http://samba.anu.edu.au/ftp/rsync/rsync.html>
+    * "rsync" in the wikipedia <http://en.wikipedia.org/wiki/Rsync>
+    * "rsync" tutorial at <http://everythinglinux.org/rsync/>
+    * The "examples" directory in the accompanying distribution
+    <http://search.cpan.org/dist/Remote-Use/>.
+    * "wget" page at <http://www.gnu.org/software/wget/>
+    * "wget" man page at <http://www.gnu.org/software/wget/manual/wget.html>
+    * "wget" in the Wikipedia <http://en.wikipedia.org/wiki/Wget>
+    * "Curl" in the Wikipedia <http://en.wikipedia.org/wiki/CURL>
+    * "Curl" home page <ttp://curl.haxx.se/>
+    * Man pages of "ssh", "ssh-key-gen", "ssh_config", "scp", "ssh-agent",
+    "ssh-add", "sshd". See
+    <http://www.employees.org/~satch/ssh/faq/ssh-faq.html>
+    * CPAN::AutoINC
+    * Module::AutoINC
+    * Acme::RemoteINC
+
+AUTHOR
+    Casiano Rodriguez Leon (casiano.rodriguez.leon at gmail dot com)
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2007 Casiano Rodriguez-Leon (casiano.rodriguez.leon at
+    gmail dot com). All rights reserved.
+
+    These modules are free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself. See perlartistic.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

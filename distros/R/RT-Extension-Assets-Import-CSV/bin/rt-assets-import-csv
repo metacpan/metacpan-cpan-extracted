@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+use Getopt::Long;
+my %opt;
+GetOptions( \%opt, 'help|h', 'update|u', 'insert|i', 'debug|d', 'mdy', 'dmy', 'config|c=s' );
+my $file = shift @ARGV;
+
+if ( $opt{help} || !$file ) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage( { verbose => 2 } );
+    exit;
+}
+
+if ($opt{mdy} and $opt{dmy}) {
+    Pod::Usage::pod2usage("Only one of --mdy or --dmy can be provided");
+    exit;
+}
+
+use RT;
+use RT::Interface::CLI qw(GetCurrentUser);
+
+if ($opt{config}) {
+    die "Can't find configuration file $opt{config}" unless -f $opt{config};
+    no warnings 'redefine';
+    require RT::Config;
+    my $old = \&RT::Config::Configs;
+    *RT::Config::Configs = sub { return ($opt{config}, $old->(@_)) };
+}
+
+RT->LoadConfig();
+RT->Config->Set( LogToSTDERR => $opt{debug} ? 'debug' : 'warning' );
+RT->Config->Set( DateDayBeforeMonth => 1 ) if $opt{dmy};
+RT->Config->Set( DateDayBeforeMonth => 0 ) if $opt{mdy};
+RT->Init();
+
+require RT::Extension::Assets::Import::CSV;
+
+my $current_user = GetCurrentUser();
+
+unless ( $current_user->Id ) {
+    RT->Logger->error("No RT user found. Please consult your RT administrator.");
+    exit(1);
+}
+
+my ( $created, $updated, $skipped ) = RT::Extension::Assets::Import::CSV->run(
+    CurrentUser => $current_user,
+    File        => $file,
+    Update      => $opt{update},
+    Insert      => $opt{insert},
+);
+
+print <<"EOF";
+created: $created
+updated: $updated
+skipped: $skipped
+EOF
+
+__END__
+
+=head1 NAME
+
+rt-assets-import - import assets to rt
+
+=head1 SYNOPSIS
+
+    rt-assets-import /path/to/assets.csv
+    rt-assets-import --update /path/to/assets.csv
+
+=head1 DESCRIPTION
+
+This script will import/update assets from a CSV into rt.  See
+L<RT::Extension::Assets::Import::CSV> for configuration.
+
+=head1 OPTIONS
+
+=over
+
+=item C<--config> I<file> or C<-c> I<file>
+
+Provides an explicit extra configuration file which is loaded before any
+other configuration files.  This is useful to provide per-import
+C<AssetsImportUniqueCF> and C<AssetsImportFieldMapping> settings if you
+are importing from multiple sources with differing columns.  If this
+option is used, F<RT_SiteConfig.pm> should B<not> contain a setting for
+C<AssetsImportFieldMapping> -- otherwise the two hashes will be merged,
+which will produce unexpected behavior.
+
+=item C<--update>
+
+Without this option, existing assets (as determined by matching
+C<AssetsImportUniqueCF> values) are left untouched.  With this option
+provided, records will be updated based on their values in the CSV.
+
+=item C<--insert>
+
+By default, assets without a C<AssetsImportUniqueCF> values will produce
+a warning; with this flag, they will be inserted (generating their own
+id as needed) after all other operations.
+
+=item C<--mdy>, C<--dmy>
+
+Force RT to parse dates as C<mm/dd/yy> or C<dd/mm/yy>, respectively.  In
+the absence of this option, RT will default to the C<DateDayBeforeMonth>
+setting, which defaults to C<dd/mm/yy>.
+
+=item C<--debug>
+
+Provide verbose output to STDERR during the import.
+
+=back

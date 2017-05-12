@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Rose-ObjectX-CAF
+version:            0.03
+abstract:           Class::Accessor::Fast compatability for Rose::Object
+author:
+    - Peter Karman <karman@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:          5.008003
+    Rose::Object:  0
+    Test::More:    0
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Rose-ObjectX-CAF
+    homepage:    http://perl.peknet.com/wiki/RoseObjectXCAF
+    license:     http://dev.perl.org/licenses/
+    repository:  http://svn.peknet.com/perl/Rose-ObjectX-CAF
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

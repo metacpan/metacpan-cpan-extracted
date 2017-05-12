@@ -1,0 +1,16 @@
+Revision history for Perl extension Railsish
+
+0.21:
+- Implement named route
+- Implement restful routing
+- loads .pm files from app/{controllers,models,helpers}
+- implements cookie session
+- implements several builtin helpers
+- add an modperl2 handler class.
+
+0.20:
+- Implements routing ruels
+- Implements dispatcher
+
+0.01    Thu Feb  5 08:10:43 2009
+        - original version

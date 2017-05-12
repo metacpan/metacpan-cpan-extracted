@@ -1,0 +1,60 @@
+    <div id="metanav" class="nav">
+    <h2>Navigation</h2>
+    </div>
+</div>
+<div id="mainnav" class="navigator">
+    <ul id=dropdown>
+    <li><a href="/Admin/"><&|/l&>Configuration</&></a>
+    <& /Elements/AdminNavigator &>
+    </li>
+    <li><a href="/User/Prefs.html"><&|/l&>PersonalTools</&></a>
+    <ul>
+    <li><a href="/User/Prefs.html"><&|/l&>Preferences</&></a></li>
+    <li><a href="/Todo/calendar.html"><&|/l&>Todo</&></a></li>
+    <li><a href="/MyTickets.html"><&|/l&>My Tickets</&></a></li>
+    </ul>
+    </li>
+    <li><a accesskey="6" href="/Help.html?page=<%$caller%>" target="new window"><&|/l&>Help</&>/<&|/l&>Guide</&></a></li>
+    <li><a href="/index.html"><&|/l&>View tickets</&></a></li>
+    <li><a href="/Queues.html"><&|/l&>New ticket</&></a>
+    <ul>
+% my $i;
+% for my $queue (@queues) {
+% $i++;
+        <li><a href="/Create.html?Queue=<% $queue->{id} %>"><&|/l&><% $queue->{Name} %></&></a></li>
+% }
+        </ul>
+    </li>
+    <li><a href="/Queues.html" accesskey="8"><&|/l&>Queues</&></a>
+    <& /Elements/AdminQueues &>
+    </li>
+    <li><a href="/Search/Search.html" accesskey="4"><&|/l&>Search</&></a></li>
+    </ul>
+</div>
+<%INIT>
+my @queues;
+if ($cache && exists $session{$cache}) {
+    @queues = @{$session{$cache}};
+}
+else {
+    my $Queues = RT::Queues->new($session{'CurrentUser'});
+    $Queues->UnLimit();
+    @queues = map {
+        { Name => $_->Name, Description => $_->Description,
+          id => $_->Id } }
+        @{$Queues->ItemsArrayRef};
+
+    $session{$cache} = \@queues if $cache;
+}
+
+my $Tickets = RT::Tickets->new($session{'CurrentUser'});
+$_ = $r->uri;
+my $caller;
+$caller = $1 if (m|/(.+)(\.html)+|);
+</%INIT>
+<%ARGS>
+$cache => undef
+$queue_filter => undef
+$conditions => ()
+</%ARGS>
+

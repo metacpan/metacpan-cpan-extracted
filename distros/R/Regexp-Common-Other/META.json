@@ -1,0 +1,70 @@
+{
+   "abstract" : "Some more Regexp::Common patterns.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Regexp-Common-Other",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Regexp::Common" : "0",
+            "perl" : "5.005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Regexp::Common::ANSIescape" : {
+         "file" : "lib/Regexp/Common/ANSIescape.pm",
+         "version" : "14"
+      },
+      "Regexp::Common::Emacs" : {
+         "file" : "lib/Regexp/Common/Emacs.pm",
+         "version" : "14"
+      },
+      "Regexp::Common::Other" : {
+         "file" : "META.yml",
+         "version" : "14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/regexp-common-other/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "14"
+}

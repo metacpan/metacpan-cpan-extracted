@@ -1,0 +1,10 @@
+expose lineno for better diagnostics
+
+Deparse
+  remove extra list parens
+
+verify 2nd string of nWord/nQword is unused
+
+hard to believe there are no memory problems
+
+perl backend?

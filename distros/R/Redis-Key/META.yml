@@ -1,0 +1,42 @@
+---
+abstract: "wrapper class of Redis' key"
+author:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Test::Exception: '0'
+  Test::Kwalitee: '0'
+  Test::Kwalitee::Extra: '0'
+  Test::More: '0'
+  Test::RedisServer: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-Key
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Redis::Key:
+    file: lib/Redis/Key.pm
+    version: '0.03'
+requires:
+  Redis: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/shogo82148/Redis-Key/issues
+  homepage: https://github.com/shogo82148/Redis-Key
+  repository: git://github.com/shogo82148/Redis-Key.git
+version: '0.03'

@@ -1,0 +1,17 @@
+name: RT-Atom
+version: 0.03
+abstract: Atom API for RT
+author: Autrijus Tang <autrijus@autrijus.org>
+license: gpl
+distribution_type: module
+requires:
+  URI: 0
+  XML::Simple: 0
+  Digest::MD5: 0
+  Digest::SHA1: 0
+  MIME::Base64: 0
+no_index:
+  directory:
+    - html
+    - inc
+generated_by: Module::Install version 0.35

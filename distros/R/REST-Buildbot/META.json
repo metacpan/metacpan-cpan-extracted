@@ -1,0 +1,76 @@
+{
+   "abstract" : "Interface to the Buildbot v2 REST API",
+   "author" : [
+      "Dan Collins <DCOLLINS@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "REST-Buildbot",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "REST::Buildbot" : {
+         "file" : "lib/REST/Buildbot.pm",
+         "version" : "0.02"
+      },
+      "REST::Buildbot::Build" : {
+         "file" : "lib/REST/Buildbot/Build.pm",
+         "version" : "0.02"
+      },
+      "REST::Buildbot::BuildRequest" : {
+         "file" : "lib/REST/Buildbot/BuildRequest.pm",
+         "version" : "0.02"
+      },
+      "REST::Buildbot::BuildSet" : {
+         "file" : "lib/REST/Buildbot/BuildSet.pm",
+         "version" : "0.02"
+      },
+      "REST::Buildbot::Builder" : {
+         "file" : "lib/REST/Buildbot/Builder.pm",
+         "version" : "0.02"
+      },
+      "REST::Buildbot::Change" : {
+         "file" : "lib/REST/Buildbot/Change.pm",
+         "version" : "0.02"
+      },
+      "REST::Buildbot::Log" : {
+         "file" : "lib/REST/Buildbot/Log.pm",
+         "version" : "0.02"
+      },
+      "REST::Buildbot::SourceStamp" : {
+         "file" : "lib/REST/Buildbot/SourceStamp.pm",
+         "version" : "0.02"
+      },
+      "REST::Buildbot::Step" : {
+         "file" : "lib/REST/Buildbot/Step.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,56 @@
+# NAME
+
+Testing with a neo4j server
+
+# Description
+
+Many of the tests in this distribution work without a neo4j server.
+
+To include and run server reliant tests you will need to install neo4j
+somewhere.
+
+My preferred method is to use [Docker](https://www.docker.com/whatisdocker)
+with the [container provided by kbastani](https://github.com/kbastani/docker-neo4j)
+
+# Running The Server
+
+Once you have [Docker](https://www.docker.com/whatisdocker) installed and
+running you should be able to start a neo4j server by running the following
+command:
+
+    docker run -d \
+        -p 7474:7474 \
+        -v $PWD/neo4j/data:/opt/data \
+        --name graphdb \
+            kbastani/docker-neo4j
+
+And verify it's running using:
+
+    docker ps
+
+Check the server's running ok with:
+
+    # the -w switch adds a much needed trailing newline
+    curl -w '\n' http://localhost:7474
+
+The output should look like this
+
+    {
+        "management" : "http://localhost:7474/db/manage/",
+        "data" : "http://localhost:7474/db/data/"
+    }
+
+# Testing with the server
+
+Once you have a neo4j server running you should be able to test against the
+server.
+You'll need to export an environment variable.
+
+    # just a one-off
+    PERL_CYPHER_NEO4J_ADDRESS=http://localhost:7474 dzil test
+
+    # automatically use the neo4j server each time
+    export PERL_CYPHER_NEO4J_ADDRESS=http://localhost:7474
+
+    # ... time passes ...
+    dzil test

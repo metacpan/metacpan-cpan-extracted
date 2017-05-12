@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY version SYSTEM "version.xml">
+]>
+<refentry id="rasqal-section-query-results-formatter">
+<refmeta>
+<refentrytitle role="top_of_page">Query Results Formatter</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>RASQAL Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Query Results Formatter</refname>
+<refpurpose>Query results formatted into a syntax.</refpurpose>
+<!--[<xref linkend="desc" endterm="desc.title"/>]-->
+</refnamediv>
+
+<refsynopsisdiv role="synopsis">
+<title role="synopsis.title">Synopsis</title>
+
+<synopsis>
+
+
+
+<link linkend="int">int</link>         <link linkend="rasqal-query-results-formats-enumerate">rasqal_query_results_formats_enumerate</link>
+                                            (unsigned <link linkend="int">int</link> counter,
+                                             const <link linkend="char">char</link> **name,
+                                             const <link linkend="char">char</link> **label,
+                                             unsigned <link linkend="char">char</link> **uri_string);
+typedef     <link linkend="rasqal-query-results-formatter">rasqal_query_results_formatter</link>;
+<link linkend="rasqal-query-results-formatter">rasqal_query_results_formatter</link>* <link linkend="rasqal-new-query-results-formatter">rasqal_new_query_results_formatter</link>
+                                            (const <link linkend="char">char</link> *name,
+                                             <link linkend="raptor-uri">raptor_uri</link> *uri);
+<link linkend="void">void</link>        <link linkend="rasqal-free-query-results-formatter">rasqal_free_query_results_formatter</link>
+                                            (<link linkend="rasqal-query-results-formatter">rasqal_query_results_formatter</link> *formatter);
+<link linkend="int">int</link>         <link linkend="rasqal-query-results-formatter-write">rasqal_query_results_formatter_write</link>
+                                            (<link linkend="raptor-iostream">raptor_iostream</link> *iostr,
+                                             <link linkend="rasqal-query-results-formatter">rasqal_query_results_formatter</link> *formatter,
+                                             <link linkend="rasqal-query-results">rasqal_query_results</link> *results,
+                                             <link linkend="raptor-uri">raptor_uri</link> *base_uri);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+
+
+
+
+<refsect1 role="desc">
+<title role="desc.title">Description</title>
+<para>
+Variable bindings and boolean query results can be formatted into
+different syntaxes such as SPARQL Query Results Format or JSON.
+The rasqal_query_results_formatter class allows choosing a formatter
+for a particular syntax and writing the syntax to a raptor_iostream
+which allows turning the syntax into a string, writing to a file
+handle or other custom destination.
+</para>
+</refsect1>
+
+<refsect1 role="details">
+<title role="details.title">Details</title>
+<refsect2>
+<title><anchor id="rasqal-query-results-formats-enumerate" role="function"/>rasqal_query_results_formats_enumerate ()</title>
+<indexterm><primary>rasqal_query_results_formats_enumerate</primary></indexterm><programlisting><link linkend="int">int</link>         rasqal_query_results_formats_enumerate
+                                            (unsigned <link linkend="int">int</link> counter,
+                                             const <link linkend="char">char</link> **name,
+                                             const <link linkend="char">char</link> **label,
+                                             unsigned <link linkend="char">char</link> **uri_string);</programlisting>
+<para>
+Get information on query result syntaxes.
+</para>
+<para>
+The current list of format names/URI is given below however
+the results of this function will always return the latest.
+</para>
+<para>
+SPARQL XML Results 2006-01-25 (default format when <parameter>counter</parameter> is 0)
+name '<literal>xml</literal>' with
+URIs http://www.w3.org/TR/2006/WD-rdf-sparql-XMLres-20060125/ or
+http://www.w3.org/2005/sparql-results#
+</para>
+<para>
+JSON name '<literal>json</literal>' and
+URI http://www.w3.org/2001/sw/DataAccess/json-sparql/
+</para>
+<para>
+Older formats:
+</para>
+<para>
+Name '<literal>xml-v2</literal>' with
+URIs http://www.w3.org/TR/2005/WD-rdf-sparql-XMLres-20050527/ or
+http://www.w3.org/2001/sw/DataAccess/rf1/result2
+</para>
+<para>
+Name '<literal>xml-v1</literal>' with 
+URIs http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/ or
+http://www.w3.org/2001/sw/DataAccess/rf1/result
+</para>
+<para>
+If the writing succeeds, the query results will be exhausted.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>counter</parameter>&nbsp;:</term>
+<listitem><simpara> index into the list of query result syntaxes
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>name</parameter>&nbsp;:</term>
+<listitem><simpara> pointer to store the name of the query result syntax (or NULL)
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>label</parameter>&nbsp;:</term>
+<listitem><simpara> pointer to store query result syntax readable label (or NULL)
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>uri_string</parameter>&nbsp;:</term>
+<listitem><simpara> pointer to store query result syntax URI string (or NULL)
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non 0 on failure of if counter is out of range
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rasqal-query-results-formatter" role="typedef"/>rasqal_query_results_formatter</title>
+<indexterm><primary>rasqal_query_results_formatter</primary></indexterm><programlisting>rasqal_graph_query_results_formatter* query_results_formatter;
+</programlisting>
+<para>
+Rasqal query results formatter class.</para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="rasqal-new-query-results-formatter" role="function"/>rasqal_new_query_results_formatter ()</title>
+<indexterm><primary>rasqal_new_query_results_formatter</primary></indexterm><programlisting><link linkend="rasqal-query-results-formatter">rasqal_query_results_formatter</link>* rasqal_new_query_results_formatter
+                                            (const <link linkend="char">char</link> *name,
+                                             <link linkend="raptor-uri">raptor_uri</link> *uri);</programlisting>
+<para>
+Constructor - create a new rasqal_query_results_formatter object.
+</para>
+<para>
+A query results format can be named or identified by a URI, both
+of which are optional.  The default query results format will be used
+if both are NULL.  <link linkend="rasqal-query-results-formats-enumerate"><function>rasqal_query_results_formats_enumerate()</function></link> returns
+information on the known query results names, labels and URIs.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>name</parameter>&nbsp;:</term>
+<listitem><simpara> the query results format name (or NULL)
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>uri</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="raptor-uri"><type>raptor_uri</type></link> query results format uri (or NULL)
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> a new <link linkend="rasqal-query-results-formatter"><type>rasqal_query_results_formatter</type></link> object or NULL on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rasqal-free-query-results-formatter" role="function"/>rasqal_free_query_results_formatter ()</title>
+<indexterm><primary>rasqal_free_query_results_formatter</primary></indexterm><programlisting><link linkend="void">void</link>        rasqal_free_query_results_formatter
+                                            (<link linkend="rasqal-query-results-formatter">rasqal_query_results_formatter</link> *formatter);</programlisting>
+<para>
+Destructor - destroy a <link linkend="rasqal-query-results-formatter"><type>rasqal_query_results_formatter</type></link> object.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>formatter</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="rasqal-query-results-formatter"><type>rasqal_query_results_formatter</type></link> object
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rasqal-query-results-formatter-write" role="function"/>rasqal_query_results_formatter_write ()</title>
+<indexterm><primary>rasqal_query_results_formatter_write</primary></indexterm><programlisting><link linkend="int">int</link>         rasqal_query_results_formatter_write
+                                            (<link linkend="raptor-iostream">raptor_iostream</link> *iostr,
+                                             <link linkend="rasqal-query-results-formatter">rasqal_query_results_formatter</link> *formatter,
+                                             <link linkend="rasqal-query-results">rasqal_query_results</link> *results,
+                                             <link linkend="raptor-uri">raptor_uri</link> *base_uri);</programlisting>
+<para>
+Write the query results using the given formatter to an iostream
+</para>
+<para>
+See <link linkend="rasqal-query-results-formats-enumerate"><function>rasqal_query_results_formats_enumerate()</function></link> to get the
+list of syntax URIs and their description.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>iostr</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="raptor-iostream"><type>raptor_iostream</type></link> to write the query to
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>formatter</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="rasqal-query-results-formatter"><type>rasqal_query_results_formatter</type></link> object
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>results</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="rasqal-query-results"><type>rasqal_query_results</type></link> query results format
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>base_uri</parameter>&nbsp;:</term>
+<listitem><simpara> <link linkend="raptor-uri"><type>raptor_uri</type></link> base URI of the output format
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> non-0 on failure
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

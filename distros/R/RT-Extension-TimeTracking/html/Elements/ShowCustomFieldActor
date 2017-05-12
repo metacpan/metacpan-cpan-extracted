@@ -1,0 +1,9 @@
+<% $actor->Name |n%>
+<%INIT>
+my $actor = RT::User->new($session{CurrentUser});
+$actor->Load($Object->Content);
+</%INIT>
+
+<%ARGS>
+$Object
+</%ARGS>

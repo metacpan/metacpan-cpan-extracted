@@ -1,0 +1,18 @@
+%# "Pascal is not a high-level language."
+%# 		-- Steven Feiner
+
+<table border="0" cellspacing="1" cellpadding="2" width=100%>
+<tr><td class="tableTitle"><&|/l&>Top Downloads</&></td></tr>
+% while (my $QueueObj = $Queues->Next) {
+%     my $count = $QueueObj->Attribute('Download') or next;
+<tr bgcolor="white"><td><nobr>
+<a href="/Foundry/Project/Download/?Queue=<% $QueueObj->Id %>"><% $QueueObj->Name %></a> (<% $count %>)
+</nobr></td></tr>
+% }
+</table>
+<%INIT>
+my $Queues = RT::Queues->new($RT::SystemUser);
+$Queues->LimitToEnabled;
+$Queues->OrderByAttribute( NAME => 'Download', ORDER => 'DESC', NUMERIC => 1 );
+$Queues->RowsPerPage( 3 );
+</%INIT>

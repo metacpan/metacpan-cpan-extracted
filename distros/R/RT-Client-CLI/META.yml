@@ -1,0 +1,53 @@
+---
+abstract: 'Provides the official rt command line client'
+author:
+  - 'Best Practical Solutions, LLC'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RT-Client-CLI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - devel
+  package:
+    - Session
+optional_features:
+  httpauth:
+    description: 'HTTP basic authentication support'
+    requires:
+      GSSAPI: '0'
+      LWP::Authen::Negotiate: '0'
+requires:
+  Cwd: '0'
+  File::Temp: '0'
+  HTTP::Headers: '0'
+  HTTP::Request::Common: '0'
+  LWP: '0'
+  Pod::Usage: '0'
+  Term::ReadKey: '0'
+  Term::ReadLine: '0'
+  Text::ParseWords: '0'
+  Time::Local: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=RT-Client-CLI
+  homepage: https://metacpan.org/module/RT-Client-CLI
+  repository: git://github.com/bestpractical/rt-client-cli.git
+version: 4.2.11
+x_contributors:
+  - 'Alex Vandiver <alexmv@bestpractical.com>'
+  - 'Thomas Sibley <trs@bestpractical.com>'
+  - 'Todd Wade <todd@bestpractical.com>'

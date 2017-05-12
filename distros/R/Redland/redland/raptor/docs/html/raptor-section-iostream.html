@@ -1,0 +1,880 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>I/O Stream</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Raptor RDF Syntax Parsing and Serializing Library Manual">
+<link rel="up" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="prev" href="raptor-section-feature.html" title="Features">
+<link rel="next" href="raptor-section-locator.html" title="Locator">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="introduction.html" title="Raptor Overview">
+<link rel="part" href="tutorial.html" title="Part&#160;I.&#160;Raptor Tutorial">
+<link rel="chapter" href="tutorial-initialising-finishing.html" title="Initialising and Finishing using the Library">
+<link rel="chapter" href="tutorial-querying-functionality.html" title="Listing built-in functionality">
+<link rel="chapter" href="tutorial-parsing.html" title="Parsing syntaxes to RDF Triples">
+<link rel="chapter" href="tutorial-serializing.html" title="Serializing RDF triples to a syntax">
+<link rel="part" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="chapter" href="raptor-parsers.html" title="Parsers in Raptor (syntax to triples)">
+<link rel="chapter" href="raptor-serializers.html" title="Serializers in Raptor (triples to syntax)">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="raptor-section-feature.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference-manual.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Raptor RDF Syntax Parsing and Serializing Library Manual</th>
+<td><a accesskey="n" href="raptor-section-locator.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2565010" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2571425" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="raptor-section-iostream"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2565010"></a><span class="refentrytitle">I/O Stream</span>
+</h2>
+<p>I/O Stream &#8212; Providing streaming I/O writing to files, strings or user code.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>;
+int         (<a href="raptor-section-iostream.html#raptor-iostream-init-func">*raptor_iostream_init_func</a>)    (void *context);
+void        (<a href="raptor-section-iostream.html#raptor-iostream-finish-func">*raptor_iostream_finish_func</a>)  (void *context);
+int         (<a href="raptor-section-iostream.html#raptor-iostream-write-byte-func">*raptor_iostream_write_byte_func</a>)
+                                            (void *context,
+                                             const int byte);
+int         (<a href="raptor-section-iostream.html#raptor-iostream-write-bytes-func">*raptor_iostream_write_bytes_func</a>)
+                                            (void *context,
+                                             const void *ptr,
+                                             size_t size,
+                                             size_t nmemb);
+void        (<a href="raptor-section-iostream.html#raptor-iostream-write-end-func">*raptor_iostream_write_end_func</a>)
+                                            (void *context);
+            <a href="raptor-section-iostream.html#raptor-iostream-handler">raptor_iostream_handler</a>;
+<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* <a href="raptor-section-iostream.html#raptor-new-iostream-from-handler">raptor_new_iostream_from_handler</a>
+                                            (void *context,
+                                             const <a href="raptor-section-iostream.html#raptor-iostream-handler">raptor_iostream_handler</a> *handler);
+<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* <a href="raptor-section-iostream.html#raptor-new-iostream-to-sink">raptor_new_iostream_to_sink</a>
+                                            (void);
+<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* <a href="raptor-section-iostream.html#raptor-new-iostream-to-filename">raptor_new_iostream_to_filename</a>
+                                            (const char *filename);
+<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* <a href="raptor-section-iostream.html#raptor-new-iostream-to-file-handle">raptor_new_iostream_to_file_handle</a>
+                                            (FILE *handle);
+<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* <a href="raptor-section-iostream.html#raptor-new-iostream-to-string">raptor_new_iostream_to_string</a>
+                                            (void **string_p,
+                                             size_t *length_p,
+                                             void* (*malloc_handler) (size_t size));
+void        <a href="raptor-section-iostream.html#raptor-free-iostream">raptor_free_iostream</a>            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr);
+int         <a href="raptor-section-iostream.html#raptor-iostream-write-bytes">raptor_iostream_write_bytes</a>     (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const void *ptr,
+                                             size_t size,
+                                             size_t nmemb);
+int         <a href="raptor-section-iostream.html#raptor-iostream-write-byte">raptor_iostream_write_byte</a>      (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const int byte);
+void        <a href="raptor-section-iostream.html#raptor-iostream-write-end">raptor_iostream_write_end</a>       (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr);
+int         <a href="raptor-section-iostream.html#raptor-iostream-write-string">raptor_iostream_write_string</a>    (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const void *string);
+int         <a href="raptor-section-iostream.html#raptor-iostream-write-counted-string">raptor_iostream_write_counted_string</a>
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const void *string,
+                                             size_t len);
+size_t      <a href="raptor-section-iostream.html#raptor-iostream-get-bytes-written-count">raptor_iostream_get_bytes_written_count</a>
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr);
+int         <a href="raptor-section-iostream.html#raptor-iostream-write-decimal">raptor_iostream_write_decimal</a>   (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             int integer);
+int         <a href="raptor-section-iostream.html#raptor-iostream-format-hexadecimal">raptor_iostream_format_hexadecimal</a>
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             unsigned int integer,
+                                             int width);
+int         <a href="raptor-section-iostream.html#raptor-iostream-write-stringbuffer">raptor_iostream_write_stringbuffer</a>
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             <a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *sb);
+int         <a href="raptor-section-iostream.html#raptor-iostream-write-string-ntriples">raptor_iostream_write_string_ntriples</a>
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             unsigned char *string,
+                                             size_t len,
+                                             const char delim);
+void        <a href="raptor-section-iostream.html#raptor-iostream-write-statement-ntriples">raptor_iostream_write_statement_ntriples</a>
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2571425"></a><h2>Description</h2>
+<p>
+An class providing an I/O writer abstraction that allows generating
+output that can be stored or passed on to system files, strings
+allocated in memory (usually via <a href="raptor-section-stringbuffer.html#raptor-stringbuffer"><span class="type">raptor_stringbuffer</span></a>), system
+file handles (<code class="literal">FILE*</code>) or to a user function.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2608138"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2608149"></a><h3>
+<a name="raptor-iostream"></a>raptor_iostream</h3>
+<a class="indexterm" name="id2608162"></a><pre class="programlisting">raptor_iostream* raptor_iostream;
+</pre>
+<p>
+Raptor I/O Stream class</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608181"></a><h3>
+<a name="raptor-iostream-init-func"></a>raptor_iostream_init_func ()</h3>
+<a class="indexterm" name="id2608193"></a><pre class="programlisting">int         (*raptor_iostream_init_func)    (void *context);</pre>
+<p>
+Handler function for <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a> initialising.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>context</code></em>&#160;:</span></td>
+<td> stream context data
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608260"></a><h3>
+<a name="raptor-iostream-finish-func"></a>raptor_iostream_finish_func ()</h3>
+<a class="indexterm" name="id2608272"></a><pre class="programlisting">void        (*raptor_iostream_finish_func)  (void *context);</pre>
+<p>
+Handler function for <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a> terminating.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>context</code></em>&#160;:</span></td>
+<td> stream context data
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608328"></a><h3>
+<a name="raptor-iostream-write-byte-func"></a>raptor_iostream_write_byte_func ()</h3>
+<a class="indexterm" name="id2608341"></a><pre class="programlisting">int         (*raptor_iostream_write_byte_func)
+                                            (void *context,
+                                             const int byte);</pre>
+<p>
+Handler function for implementing <a href="raptor-section-iostream.html#raptor-iostream-write-byte"><code class="function">raptor_iostream_write_byte()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>context</code></em>&#160;:</span></td>
+<td> stream context data
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>byte</code></em>&#160;:</span></td>
+<td> byte to write
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2559497"></a><h3>
+<a name="raptor-iostream-write-bytes-func"></a>raptor_iostream_write_bytes_func ()</h3>
+<a class="indexterm" name="id2559510"></a><pre class="programlisting">int         (*raptor_iostream_write_bytes_func)
+                                            (void *context,
+                                             const void *ptr,
+                                             size_t size,
+                                             size_t nmemb);</pre>
+<p>
+Handler function for implementing <a href="raptor-section-iostream.html#raptor-iostream-write-bytes"><code class="function">raptor_iostream_write_bytes()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>context</code></em>&#160;:</span></td>
+<td> stream context data
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>ptr</code></em>&#160;:</span></td>
+<td> pointer to bytes to write
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>size</code></em>&#160;:</span></td>
+<td> size of item
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>nmemb</code></em>&#160;:</span></td>
+<td> number of items
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2559645"></a><h3>
+<a name="raptor-iostream-write-end-func"></a>raptor_iostream_write_end_func ()</h3>
+<a class="indexterm" name="id2559658"></a><pre class="programlisting">void        (*raptor_iostream_write_end_func)
+                                            (void *context);</pre>
+<p>
+Handler function for implementing <a href="raptor-section-iostream.html#raptor-iostream-write-end"><code class="function">raptor_iostream_write_end()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>context</code></em>&#160;:</span></td>
+<td> stream context data
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2559718"></a><h3>
+<a name="raptor-iostream-handler"></a>raptor_iostream_handler</h3>
+<a class="indexterm" name="id2559729"></a><pre class="programlisting">typedef struct {
+  raptor_iostream_init_func         init;
+  raptor_iostream_finish_func       finish;
+  raptor_iostream_write_byte_func   write_byte;
+  raptor_iostream_write_bytes_func  write_bytes;
+  raptor_iostream_write_end_func    write_end;
+} raptor_iostream_handler;
+</pre>
+<p>
+I/O stream implementation handler structure.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a href="raptor-section-iostream.html#raptor-iostream-init-func">raptor_iostream_init_func</a>&#160;<em class="structfield"><code>init</code></em>;</span></td>
+<td>  initialisation handler - optional, called at most once
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-iostream.html#raptor-iostream-finish-func">raptor_iostream_finish_func</a>&#160;<em class="structfield"><code>finish</code></em>;</span></td>
+<td> finishing handler -  optional, called at most once
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-iostream.html#raptor-iostream-write-byte-func">raptor_iostream_write_byte_func</a>&#160;<em class="structfield"><code>write_byte</code></em>;</span></td>
+<td> write byte handler - required
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-iostream.html#raptor-iostream-write-bytes-func">raptor_iostream_write_bytes_func</a>&#160;<em class="structfield"><code>write_bytes</code></em>;</span></td>
+<td> write bytes handler - required
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-iostream.html#raptor-iostream-write-end-func">raptor_iostream_write_end_func</a>&#160;<em class="structfield"><code>write_end</code></em>;</span></td>
+<td> write end handler - optional, called at most once
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614422"></a><h3>
+<a name="raptor-new-iostream-from-handler"></a>raptor_new_iostream_from_handler ()</h3>
+<a class="indexterm" name="id2614435"></a><pre class="programlisting"><a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* raptor_new_iostream_from_handler
+                                            (void *context,
+                                             const <a href="raptor-section-iostream.html#raptor-iostream-handler">raptor_iostream_handler</a> *handler);</pre>
+<p>
+Create a new iostream over a user-defined handler.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>context</code></em>&#160;:</span></td>
+<td> pointer to context information to pass in to calls
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>handler</code></em>&#160;:</span></td>
+<td> pointer to handler methods
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614517"></a><h3>
+<a name="raptor-new-iostream-to-sink"></a>raptor_new_iostream_to_sink ()</h3>
+<a class="indexterm" name="id2614528"></a><pre class="programlisting"><a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* raptor_new_iostream_to_sink
+                                            (void);</pre>
+<p>
+Create a new iostream to a sink.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a> object or NULL on failure
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614576"></a><h3>
+<a name="raptor-new-iostream-to-filename"></a>raptor_new_iostream_to_filename ()</h3>
+<a class="indexterm" name="id2614589"></a><pre class="programlisting"><a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* raptor_new_iostream_to_filename
+                                            (const char *filename);</pre>
+<p>
+Constructor - create a new iostream writing to a filename.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>filename</code></em>&#160;:</span></td>
+<td> Output filename to open and write to
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614659"></a><h3>
+<a name="raptor-new-iostream-to-file-handle"></a>raptor_new_iostream_to_file_handle ()</h3>
+<a class="indexterm" name="id2614673"></a><pre class="programlisting"><a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* raptor_new_iostream_to_file_handle
+                                            (FILE *handle);</pre>
+<p>
+Constructor - create a new iostream writing to a FILE*.
+</p>
+<p>
+The <em class="parameter"><code>handle</code></em> must already be open for writing.
+NOTE: This does not fclose the <em class="parameter"><code>handle</code></em> when it is finished.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>handle</code></em>&#160;:</span></td>
+<td> FILE* handle to write to
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614758"></a><h3>
+<a name="raptor-new-iostream-to-string"></a>raptor_new_iostream_to_string ()</h3>
+<a class="indexterm" name="id2614771"></a><pre class="programlisting"><a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a>* raptor_new_iostream_to_string
+                                            (void **string_p,
+                                             size_t *length_p,
+                                             void* (*malloc_handler) (size_t size));</pre>
+<p>
+Constructor - create a new iostream writing to a string.
+</p>
+<p>
+If <em class="parameter"><code>malloc_handler</code></em> is null, raptor will allocate it using it's
+own memory allocator.  *<em class="parameter"><code>string_p</code></em> is set to NULL on failure (and
+*<em class="parameter"><code>length_p</code></em> to 0 if <em class="parameter"><code>length_p</code></em> is not NULL).</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>string_p</code></em>&#160;:</span></td>
+<td> pointer to location to hold string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>length_p</code></em>&#160;:</span></td>
+<td> pointer to location to hold length of string (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>malloc_handler</code></em>&#160;:</span></td>
+<td> pointer to malloc to use to make string (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614915"></a><h3>
+<a name="raptor-free-iostream"></a>raptor_free_iostream ()</h3>
+<a class="indexterm" name="id2614926"></a><pre class="programlisting">void        raptor_free_iostream            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr);</pre>
+<p>
+Destructor - destroy an iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> iostream object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2614976"></a><h3>
+<a name="raptor-iostream-write-bytes"></a>raptor_iostream_write_bytes ()</h3>
+<a class="indexterm" name="id2614988"></a><pre class="programlisting">int         raptor_iostream_write_bytes     (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const void *ptr,
+                                             size_t size,
+                                             size_t nmemb);</pre>
+<p>
+Write bytes to the iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>ptr</code></em>&#160;:</span></td>
+<td> start of objects to write
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>size</code></em>&#160;:</span></td>
+<td> size of object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>nmemb</code></em>&#160;:</span></td>
+<td> number of objects
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> number of objects written or less than nmemb or 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615113"></a><h3>
+<a name="raptor-iostream-write-byte"></a>raptor_iostream_write_byte ()</h3>
+<a class="indexterm" name="id2615125"></a><pre class="programlisting">int         raptor_iostream_write_byte      (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const int byte);</pre>
+<p>
+Write a byte to the iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>byte</code></em>&#160;:</span></td>
+<td> byte to write
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615207"></a><h3>
+<a name="raptor-iostream-write-end"></a>raptor_iostream_write_end ()</h3>
+<a class="indexterm" name="id2615219"></a><pre class="programlisting">void        raptor_iostream_write_end       (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr);</pre>
+<p>
+End writing to the iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615269"></a><h3>
+<a name="raptor-iostream-write-string"></a>raptor_iostream_write_string ()</h3>
+<a class="indexterm" name="id2615282"></a><pre class="programlisting">int         raptor_iostream_write_string    (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const void *string);</pre>
+<p>
+Write a NULL-terminated string to the iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> string
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615365"></a><h3>
+<a name="raptor-iostream-write-counted-string"></a>raptor_iostream_write_counted_string ()</h3>
+<a class="indexterm" name="id2615378"></a><pre class="programlisting">int         raptor_iostream_write_counted_string
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const void *string,
+                                             size_t len);</pre>
+<p>
+Write a counted string to the iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len</code></em>&#160;:</span></td>
+<td> string length
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615483"></a><h3>
+<a name="raptor-iostream-get-bytes-written-count"></a>raptor_iostream_get_bytes_written_count ()</h3>
+<a class="indexterm" name="id2615497"></a><pre class="programlisting">size_t      raptor_iostream_get_bytes_written_count
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr);</pre>
+<p>
+Get the number of bytes written to the iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> number of bytes written or 0 if non written so far
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615560"></a><h3>
+<a name="raptor-iostream-write-decimal"></a>raptor_iostream_write_decimal ()</h3>
+<a class="indexterm" name="id2615574"></a><pre class="programlisting">int         raptor_iostream_write_decimal   (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             int integer);</pre>
+<p>
+Write an integer in decimal to the iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>integer</code></em>&#160;:</span></td>
+<td> integer to format as decimal
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615657"></a><h3>
+<a name="raptor-iostream-format-hexadecimal"></a>raptor_iostream_format_hexadecimal ()</h3>
+<a class="indexterm" name="id2615671"></a><pre class="programlisting">int         raptor_iostream_format_hexadecimal
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             unsigned int integer,
+                                             int width);</pre>
+<p>
+Write an integer in hexadecimal to the iostream.
+</p>
+<p>
+Always 0-fills the entire field and writes in uppercase A-F</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>integer</code></em>&#160;:</span></td>
+<td> unsigned integer to format as hexadecimal
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>width</code></em>&#160;:</span></td>
+<td> field width
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615780"></a><h3>
+<a name="raptor-iostream-write-stringbuffer"></a>raptor_iostream_write_stringbuffer ()</h3>
+<a class="indexterm" name="id2615794"></a><pre class="programlisting">int         raptor_iostream_write_stringbuffer
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             <a href="raptor-section-stringbuffer.html#raptor-stringbuffer">raptor_stringbuffer</a> *sb);</pre>
+<p>
+Write a stringbuffer to an iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iostream
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>sb</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-stringbuffer.html#raptor-stringbuffer"><span class="type">raptor_stringbuffer</span></a> to write
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615885"></a><h3>
+<a name="raptor-iostream-write-string-ntriples"></a>raptor_iostream_write_string_ntriples ()</h3>
+<a class="indexterm" name="id2615898"></a><pre class="programlisting">int         raptor_iostream_write_string_ntriples
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             unsigned char *string,
+                                             size_t len,
+                                             const char delim);</pre>
+<p>
+Write an UTF-8 string using N-Triples escapes to an iostream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a> to write to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> UTF-8 string to write
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len</code></em>&#160;:</span></td>
+<td> length of UTF-8 string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>delim</code></em>&#160;:</span></td>
+<td> Terminating delimiter character for string (such as " or &gt;)
+or \0 for no escaping.
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure such as bad UTF-8 encoding.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2616033"></a><h3>
+<a name="raptor-iostream-write-statement-ntriples"></a>raptor_iostream_write_statement_ntriples ()</h3>
+<a class="indexterm" name="id2616047"></a><pre class="programlisting">void        raptor_iostream_write_statement_ntriples
+                                            (<a href="raptor-section-iostream.html#raptor-iostream">raptor_iostream</a> *iostr,
+                                             const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement);</pre>
+<p>
+Write a <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> formatted in N-Triples format to a <a href="raptor-section-iostream.html#raptor-iostream"><span class="type">raptor_iostream</span></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> raptor iosteram
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>statement</code></em>&#160;:</span></td>
+<td> statement to write
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

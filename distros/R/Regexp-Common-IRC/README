@@ -1,0 +1,36 @@
+Regexp-Common-IRC2 version 0.0.1
+
+See Regexp::Common for usage. 
+
+This is a plugin for Regexp::Common to support IRC RFC patterns. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Chris Prather
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

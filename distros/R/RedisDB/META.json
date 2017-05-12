@@ -1,0 +1,77 @@
+{
+   "abstract" : "Perl extension to access redis database",
+   "author" : [
+      "Pavel Shaydo <zwon@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "redis"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RedisDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "Test::Differences" : "0.61",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0.96",
+            "Test::Most" : "0.22",
+            "Test::TCP" : "1.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.3002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.1",
+            "IO::Socket::IP" : "0",
+            "RedisDB::Parser" : "2.21",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "URI::redis" : "0",
+            "perl" : "5.008004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trinitum/RedisDB/issues"
+      },
+      "homepage" : "https://github.com/trinitum/RedisDB",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/trinitum/RedisDB"
+      }
+   },
+   "version" : "2.53",
+   "x_contributors" : [
+      "Pavel Shaydo <zwon@cpan.org>",
+      "HIROSE Masaaki <hirose31@gmail.com>",
+      "Norbert BuchmÃ¼ller <mendel@cpan.org>",
+      "Steve Ratcliffe <sr@itinken.com>",
+      "Uwe Voelker <uwe.voelker@xing.com>",
+      "Andrew O'Brien",
+      "Troy Ablan"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

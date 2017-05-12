@@ -1,0 +1,38 @@
+<%init>
+
+# Don't let users who aren't logged in do anything
+return unless ($session{'CurrentUser'});
+
+# Don't let users who can't see the service updates queue see things
+my $queue = RT::Queue->new($session{'CurrentUser'});
+$queue->LoadByCols(Name => 'Service Updates');
+return unless ($queue->CurrentUserHasRight('ShowTicket'));
+
+my $updates = RT::Tickets->new($session{'CurrentUser'});
+
+$updates->FromSQL(qq{Queue = "Service Updates" AND (Status = 'new' OR Status = 'open')});
+
+#return unless($updates->count());
+</%init>
+</%args>
+<div class="serviceupdates">
+<&|/l&>Service Updates</&>: 
+% while ( my $update =  $updates->Next) {
+<span class="serviceupdate">
+% my $path = $RT::WebPath."/ServiceUpdate/Show/".$update->id;
+&bull; <a 
+    href="<%$path%>" 
+    target="_blank" 
+    onClick="window.open('<%$path%>', '_blank', 'height=400,width=400,scrollbars=1').focus; return false;";
+><%$update->Subject%></a>
+</span>
+% }
+<div class="actions">
+% my $path = $RT::WebPath."/ServiceUpdate/Edit/";
+<a 
+    href="<%$path%>" 
+    target="_blank" 
+    onClick="window.open('<%$path%>', '_blank', 'height=400,width=400,scrollbars=1').focus; return false;"
+><&|/l&>create</&></a>
+</div>
+</div>

@@ -1,0 +1,28 @@
+---
+abstract: 'Create Regular Expressions for numeric ranges'
+author:
+  - 'Jacob R Rideout, C<< <cpan at jacobrideout.net> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.62
+  Math::Cartesian::Product: 1.006
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Regexp-NumRange
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Exporter: 5.53
+  perl: 5.6.0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.03

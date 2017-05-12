@@ -1,0 +1,20 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Religion/Bible/Regex/Config.pm
+t/00.load.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/TestYAML.pm
+t/pod.t
+t/pod-coverage.t
+t/TestConfig.pm
+t/perlcritic.t
+t/main.t
+t/search-configuration-interfaces.t
+t/00.load.t
+lib/Religion/Bible/Regex/Config.pm
+META.yml                                 Module meta-data (added by MakeMaker)

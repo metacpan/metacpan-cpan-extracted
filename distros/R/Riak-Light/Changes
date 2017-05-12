@@ -1,0 +1,98 @@
+0.12 2015-09-06 12:00:00 GMT
+  * fix pid creation ( force lazy creation ) (Tiago Peczenyj)
+
+0.11 2014-09-23 12:00:00 GMT
+  * send extra parameter r,w, dw, pr, pw, rw in all requests, if necessary (Tiago Peczenyj)
+
+0.10 2014-08-31 19:00:00 GMT
+  * fork safe capability (Tiago Peczenyj)
+
+0.09911 2014-03-03 14:42:00 GMT
+   * fix get_index_value, add get_all_index_values (Tiago Peczenyj) 
+
+0.09901 2014-02-28 13:00:00 GMT
+   * supports set/get client id (Tiago Peczenyj)
+
+0.099 2014-02-28 12:00:00 GMT
+   * first steps to support vclock (Tiago Peczenyj)
+
+0.084 2013-12-13 14:00:00 GMT
+   * improve map indexes (Tiago Peczenyj)
+
+0.083 2013-12-13 12:00:00 GMT
+   * add get_all_indexes method (Tiago Peczenyj)
+
+0.082 2013-12-06 14:00:00 GMT
+   * map reduce accept string or hashref query (Tiago Peczenyj)
+
+0.081 2013-12-06 13:00:00 GMT
+   * fix documentatiom (Tiago Peczenyj)
+
+0.080 2013-12-06 12:00:00 GMT
+   * Support to map_reduce operations (Tiago Peczenyj)
+
+0.072 2013-11-15 17:26:00 GMT 
+   * TCP_NODELAY should be configurable (Tiago Peczenyj)
+
+0.071 2013-11-15 16:55:00 GMT 
+   * Add TCP_NODELAY 1 to socket (Tiago Peczenyj)
+
+0.070 2013-11-15 15:43:00 GMT 
+   * Support pagination results (Tiago Peczenyj)
+
+0.061 2013-09-10 15:39:00 GMT 
+   * Support multi-values in secondary indexes (Damien Krotkine)
+
+0.060 2013-07-25 15:22:00 GMT 
+   * Support secondary indexes (2i)
+
+0.059 2013-06-06 16:27:08 GMT 
+   * Refactor util class. (Tiago Peczenyj)
+
+0.058 2013-06-06 15:27:08 GMT 
+   * Small refactor, fix small things, fix solaris support. (Tiago Peczenyj)
+
+0.057 2013-05-30 15:27:08 GMT 
+   * Cleanups, speedups, refactoring (Damien Krotkine)
+
+0.056 2013-05-17 08:18:08 GMT 
+   * bugfix clean $@ before all methods [issue #9] (Tiago Peczenyj)
+
+0.055 2013-05-16 22:18:08 GMT 
+   * remove namespace::autoclean [issue #8] (Tiago Peczenyj)
+   * change minimum perl to 5.008
+
+0.054 2013-05-16 11:31:08 GMT 
+   * Remove extra test (Tiago Peczenyj) 
+
+0.053 2013-05-16 09:31:08 GMT 
+   * Remove extra method (debug / experimental) (Tiago Peczenyj) 
+
+0.052 2013-05-16 07:31:08 GMT 
+   * Fix owner
+
+0.051 2013-05-15 18:31:08 GMT 
+   * Fix test
+
+0.05 2013-05-15 17:31:08 GMT 
+   * Fix bug in EOF
+   * add exists method, to test if there is some bucket => key
+
+0.04 2013-05-14 21:21:27 GMT 
+   * Fix bug in SetSockOpt (Tiago Peczenyj)
+   * Add warnings in Alarm and TimeOut providers (not safe)
+   * Add OS type / version check for some providers (Win32, NetBSD)
+   * Improve test coverage
+   * IO::Select is the default timeout provider
+   * Fix tests and error strings (will work for other OS)
+   * Minimum perl 5.12
+   * Small improvements 
+
+0.03 2013-05-14 11:21:27 GMT 
+   * Improve setsockopt (Tiago Peczenyj)
+   
+0.02 2013-05-13 13:16:08 GMT 
+   * Fix documentatio (Tiago Peczenyj)
+
+0.01 2013-05-13 10:16:08 GMT 
+   * First version (Tiago Peczenyj)

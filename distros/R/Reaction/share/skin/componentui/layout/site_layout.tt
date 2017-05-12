@@ -1,0 +1,47 @@
+=extends NEXT
+
+=for layout head_style
+
+  <link rel="stylesheet" type="text/css"
+    href="[% static_base %]/componentui-basic.css" />
+
+=for layout body
+
+  <div id="container">
+    <div id="header">
+     [% header %]
+    </div>
+
+    <div id="nav">
+       [% menu %]
+    </div>
+
+    <div id="contents">
+      <div id="wrapper">
+        [% sidebar %]
+        [% inner %]
+      </div>
+      <div class="spacer"></div>
+    </div>
+  </div>
+
+=for layout inner
+<!-- main content start -->
+[% call_next %]
+<!-- main content end -->
+=for layout header
+
+<h1>Component UI Header</h1>
+
+=for layout sidebar
+        <div class="sidebar">
+          Nothing to see here. Move along.
+        </div>
+
+=for layout menu
+        <ul class="menu">
+          <li> <a href="/testmodel/foo">Foo</a> </li>
+          <li> <a href="/testmodel/bar">Bar</a> </li>
+          <li> <a href="/testmodel/baz">Baz</a> </li>
+        </ul>
+=cut

@@ -1,0 +1,56 @@
+---
+abstract: 'DEPRECATED Cleanup RT database'
+author:
+  - 'Ruslan U. Zakirov <Ruslan.Zakirov@gmail.com>'
+  - 'Ruslan U. Zakirov <Ruslan.Zakirov@gmail.com>'
+build_requires:
+  Cwd: 0
+  DBD::SQLite: 0
+  ExtUtils::MakeMaker: 6.36
+  File::Copy: 0
+  File::Path: 0
+  File::Spec: 0
+  Test::Deep: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RTx-Shredder
+no_index:
+  directory:
+    - html
+    - inc
+    - t
+  package:
+    - RT::ACE
+    - RT::CachedGroupMember
+    - RT::Attachment
+    - RT::CustomFieldValue
+    - RT::CustomField
+    - RT::Group
+    - RT::GroupMember
+    - RT::ObjectCustomFieldValue
+    - RT::Link
+    - RT::Principal
+    - RT::Queue
+    - RT::Record
+    - RT::Scrip
+    - RT::ScripAction
+    - RT::ScripCondition
+    - RT::Template
+    - RT::Ticket
+    - RT::Transaction
+    - RT::User
+requires:
+  DBIx::SearchBuilder: 1.31
+  Exception::Class: 1.23
+  Getopt::Long: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

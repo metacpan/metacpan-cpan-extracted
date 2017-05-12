@@ -1,0 +1,104 @@
+Revision history for Perl distribution Regru-API.
+
+0.046   Mon Nov 9 07:23:20 2015 +0000
+
+    [ FIXES ]
+    - fixed isa check when JSON module loaded with 'support_by_pp' (gh #5)
+
+0.045   Fri Nov 28 11:58:44 2014 +0000
+
+    [ FEATURES ]
+    - added new REG.API method "add_spf"
+
+    [ TESTS ]
+    - added a few namespace tests
+
+    [ MISC ]
+    - fixed 'missing_build_prereqs' error
+
+0.044   Mon Jun 30 11:00:37 2014 +0000
+
+    [ FEATURES ]
+    - added new REG.API namespace "shop"
+    - added get_parallelswpb_constructor_url() method ("hosting")
+
+    [ DOCUMENTATION ]
+    - missed namespaces ("hosting" and "shop") mentioned at front page
+    - fixed urls in links pointed to reg.com website
+    - added documentation to "shop" methods
+    - added description for get_parallelswpb_constructor_url() method ("hosting")
+
+    [ TESTS ]
+    - updated tests
+
+0.043   Tue Nov 26 08:25:06 2013 +0000
+
+    [ FEATURES ]
+    - added new REG.API namespace "hosting" with two methods
+
+    [ TESTS ]
+    - updated tests
+
+0.042   Wed Oct 16 09:16:52 2013 +0000
+
+    [ FEATURES ]
+    - added new REG.API method: "get_deleted"
+      which allows to get a list of freeing domain names
+    - deleted obsoleted REG.API method: "service_get_details"
+
+    [ DOCUMENTATION ]
+    - added documentation related to DNS management and
+      service management methods
+
+    [ TESTS ]
+    - additional checks for rate limiting
+
+0.041   Mon Oct 7 08:23:59 2013 +0000
+
+    [ DOCUMENTATION ]
+    - added remarks about API rate limiting
+    - added documentation related to folder and account management methods
+
+    [ TESTS ]
+    - skip some tests if an API rate limit has exceeded
+
+0.004   Fri Oct 4 07:50:45 2013 +0000
+
+    [ DOCUMENTATION ]
+    - API methods in PODs grouped under distinct section: "REG.API METHODS"
+    - improved some parts of documentation
+
+    [ FEATURES ]
+    - client's attributes might be changed at runtime
+    - response object may print debug messages if debug enabled
+    - added validation of options: io_encondig and lang
+
+    [ TESTS ]
+    - rework namespaces testing
+    - added checking connection to API endpoint
+
+    [ META ]
+    - now Changes file uses groups
+    - clean up package
+
+0.003   Tue Oct 1 12:36:02 2013 +0000
+
+    [ FEATURES ]
+    - added namespace parameter for requests
+    - become more moo-ish
+
+    [ TESTS ]
+    - updated tests
+
+0.02    2013-09-19
+
+    [ DOCUMENTATION ]
+    - fixed documentation
+
+    [ META ]
+    - added license info
+    - added repository url
+
+0.01    2013-09-16
+
+    - Initial release

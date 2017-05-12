@@ -1,0 +1,25 @@
+Revision history for Perl extension Redis::Namespace
+
+0.07 2016-01-19T00:48:31Z
+        - support 3.2 pipelined migrate
+        - fix some test
+
+0.06 2015-09-22T03:30:34Z
+        - support commands of Redis 3.0
+        - add guess option
+
+0.05 2015-09-21T11:30:06Z
+        - fix synopsis (thx mihyaeru21)
+
+0.04 2015-07-09T16:26:03Z
+        - support namespaces including special chars (thx karupanerura)
+
+0.03 2014-09-13T10:00:47Z
+        - fix build prereq
+
+0.02 2013-12-26T13:47:39Z
+	- support scan/sscan/hscan/zscan
+	- fix test for Redis-2.8
+
+0.01 2013-10-14T12:43:45Z
+        - first version

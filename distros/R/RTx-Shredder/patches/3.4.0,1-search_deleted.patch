@@ -1,0 +1,54 @@
+diff -ru rt-3.4.0/lib/RT/Tickets_Overlay.pm rt-3.4.0-p/lib/RT/Tickets_Overlay.pm
+--- rt-3.4.0/lib/RT/Tickets_Overlay.pm	2005-02-01 17:20:40.000000000 +0300
++++ rt-3.4.0-p/lib/RT/Tickets_Overlay.pm	2005-09-25 13:48:26.000000000 +0400
+@@ -73,6 +73,10 @@
+ =begin testing
+ 
+ ok (require RT::Tickets);
++ok( my $testtickets = RT::Tickets->new( $RT::SystemUser ) );
++ok( $testtickets->LimitStatus( VALUE => 'deleted' ) );
++# Should be zero until 'allow_deleted_search'
++ok( $testtickets->Count == 0 );
+ 
+ =end testing
+ 
+@@ -1344,6 +1348,11 @@
+ OPERATOR is one of = or !=.
+ VALUE is a status.
+ 
++RT adds Status != 'deleted' until object has
++allow_deleted_search internal property set.
++$tickets->{'allow_deleted_search'} = 1;
++$tickets->LimitStatus( VALUE => 'deleted' );
++
+ =cut
+ 
+ sub LimitStatus {
+@@ -2263,7 +2272,8 @@
+         #TODO we should be doing this in the where clause.
+         #but you can't do multiple clauses on the same field just yet :/
+ 
+-        if ( $Ticket->__Value('Status') eq 'deleted' ) {
++        if ( $Ticket->__Value('Status') eq 'deleted' &&
++	            !$self->{'allow_deleted_search'} ) {
+             return ( $self->Next() );
+         }
+ 
+diff -ru rt-3.4.0/lib/RT/Tickets_Overlay_SQL.pm rt-3.4.0-p/lib/RT/Tickets_Overlay_SQL.pm
+--- rt-3.4.0/lib/RT/Tickets_Overlay_SQL.pm	2005-02-01 17:20:40.000000000 +0300
++++ rt-3.4.0-p/lib/RT/Tickets_Overlay_SQL.pm	2005-09-25 13:40:27.000000000 +0400
+@@ -508,8 +508,12 @@
+     $self->SUPER::Limit( FIELD => 'Type', OPERATOR => '=', VALUE => 'ticket');
+   }
+ 
+-  # We never ever want to show deleted tickets
+-  $self->SUPER::Limit(FIELD => 'Status' , OPERATOR => '!=', VALUE => 'deleted');
++  # We don't want deleted tickets unless 'allow_deleted_search' is set
++  unless( $self->{'allow_deleted_search'} ) {
++    $self->SUPER::Limit(FIELD => 'Status',
++                        OPERATOR => '!=',
++                        VALUE => 'deleted');
++  }
+ 
+ 
+   # set SB's dirty flag

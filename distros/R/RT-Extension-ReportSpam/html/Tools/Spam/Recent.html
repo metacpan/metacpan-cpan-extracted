@@ -1,0 +1,42 @@
+<& /Elements/Header, Title => loc("Recently created tickets") &>
+<& /Elements/Tabs &>
+
+<& /Elements/ListActions, actions => \@results &>
+
+<p>
+<% loc('Recently created tickets with status "new" and without owner.') %>
+<% loc('Mark spam by clicking "S".') %>
+<% loc('If you have rights to delete tickets then they will be deleted.') %>
+</p>
+
+<& /Elements/CollectionList, 
+    Rows         => 100,
+    OrderBy      => 'id',
+    Order        => 'DESC',
+    %ARGS,
+    Class        => 'RT::Tickets',
+    Query        => $Query,
+    Format       => $Format,
+    AllowSorting => 1,
+    ShowEmpty    => 1,
+&>
+
+<%ARGS>
+$Format => undef
+</%ARGS>
+<%INIT>
+my $Query = 
+    'Status = "new"'
+    .' AND Owner = "Nobody"'
+    .' AND HasNoAttribute= "SpamReports"';
+
+my @results;
+
+$Format ||= qq{
+    '<b><a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a></b>/TITLE:#',
+    '<b><a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a></b>/TITLE:Subject',
+    Requestors,
+    QueueName,
+    ReportSpam
+};
+</%INIT>

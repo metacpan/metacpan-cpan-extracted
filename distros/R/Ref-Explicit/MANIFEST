@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Ref/Explicit.pm
+t/00-compile.t
+t/01-basic.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-spell.t
+t/release-pod-syntax.t
+weaver.ini

@@ -1,0 +1,23 @@
+RT-Extension-EasyRelatedTickets version 0.1
+
+This will add 'Create' Links next to each of the relationship types in the
+ticket links box on the ticket display page, so you can easily create 
+related tickets with information prefilled ;)
+
+Caveat: this works only if your RT's ticket create page has ticket clone function.
+Also, it'll be into the core in version 3.8.
+
+How to install:
+
+if you haven't installed RT yet:
+
+1. PREFIX=PATH/TO/RT perl Makefile.PL
+2. make
+3. make install ( maybe need root permission )
+
+elsif you have installed RT already, you can just copy the files in html 
+directory to your rt's html directory, then you'd better clear cache and
+restart your web server.
+
+Good Luck! :)
+

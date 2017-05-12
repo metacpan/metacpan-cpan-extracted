@@ -1,0 +1,10 @@
+<%ARGS>
+$QueryString => undef
+</%ARGS>
+<a href="<%$RT::WebPath%>/Admin/Tools/Shredder/Search.html<%$QueryString%>"><&|/l&>Shredder</&></a>
+<%INIT>
+
+return unless $session{'CurrentUser'}->HasRight( Right => 'SuperUser', Object => $RT::System );
+
+</%INIT>
+

@@ -1,0 +1,63 @@
+% if ($prev) {
+<a href="<% $App->config->uri_root %>/<% $prev->path %>.html">previous</a>
+% }
+% if ( $prev && $next ) {
+&middot;
+% }
+% if ($next) {
+<a href="<% $App->config->uri_root %>/<% $next->path %>.html">next</a>
+% }
+
+<table cellpadding="10">
+ <tr valign="top">
+  <td>
+
+% if ( $image->has_caption ) {
+   <div class="Rudesind-caption">
+    <% $image->caption_as_html %>
+   </div>
+% }
+
+   <p>
+   <ul class="Rudesind-transform-list">
+    <li><a href="<% $App->config->uri_root %>/<% $image->path %>.html">normal size</a></li>
+    <li><a href="<% $App->config->uri_root %>/<% $image->path %>.html?transforms=double">double size</a></li>
+    <li><a href="<% $App->config->image_uri_root %>/images/<% $image->path %>">full size</a></li>
+    <li><a href="<% $App->config->uri_root %>/<% $image->path %>.html?transforms=rotate-90">rotate 90 degrees clockwise</a></li>
+    <li><a href="<% $App->config->uri_root %>/<% $image->path %>.html?transforms=rotate-270">rotate 90 degrees counter-clockwise</a></li>
+    <li><a href="<% $App->config->uri_root %>/<% $image->path %>.html?transforms=rotate-180">rotate 180 degrees</a></li>
+   </ul>
+   </p>
+
+% if ( $App->is_admin ) {
+   <p>
+    <a href="<% $App->config->uri_root %>/admin/edit_caption.html?path=<% $image->path | h %>">Edit caption for this image</a>.
+   </p>
+% }
+  </td>
+  <td>
+   <a href="<% $App->config->image_uri_root %><% $App->config->raw_image_subdir %>/<% $image->path %>">\
+<img src="<% $image->transformed_image_uri( transforms => $transforms ) %>"
+     <% Image::Size::html_imgsize( $image->transformed_image_file( transforms => $transforms ) ) %>
+     class="Rudesind-image" border="0" /></a>
+  </td>
+ </tr>
+ <tr>
+  <td colspan="2">
+  </td>
+ </tr>
+</table>
+
+<%args>
+$image
+$transforms => 'default'
+</%args>
+
+<%init>
+my $gallery = $image->gallery;
+
+my $prev = $gallery->previous_image($image);
+my $next = $gallery->next_image($image);
+
+$m->autoflush(1) unless $image->has_transformed_image_file( transforms => $transforms );
+</%init>

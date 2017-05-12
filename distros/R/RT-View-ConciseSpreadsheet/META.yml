@@ -1,0 +1,15 @@
+abstract: "[One line description of module's purpose here]"
+author: Jesse Vincent <jesse@bestpractical.com>
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: RT-View-ConciseSpreadsheet
+no_index: 
+  directory: 
+    - html
+    - inc
+    - t
+requires: 
+  Test::More: 0
+  Text::CSV_XS: 0
+version: 0.002

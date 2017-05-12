@@ -1,0 +1,38 @@
+5.2 2014-12-18
+ - Add no_index for core RT packages
+ - Add repository metadata
+
+5.1 2014-12-15
+ - Updated changelog
+ - Packaging and documenation updates
+
+5.0 2014-12-12
+ - Be more restrained with simple search guessing
+ - s/::/-/g when loading queue names from request args in menus
+
+4.0 2013-05-30
+ - RT 4.0 compatibility
+ - More localizations
+ - Packaging updates
+ - Show distribution notes on ticket display and modify
+ - Display preferred bug tracker information from META.yml
+ - Show better "queue disabled" message
+
+0.06 2009-12-25
+ - Close XSS with current user name
+
+0.05 2009-11-24
+ - subject tag per distribution, partial port from RT 3.8
+ - maintainers listed with links to distribution by maintainer
+
+0.04 2009-11-24
+ - add 'Manage' menu for distribution with ability to notify additional
+   addresses and distribution notes from maintainers
+ - Maintainers block
+ - better handling of disabled queues
+ - use ActiveStatus from the config
+ - don't use abort as it hides footer and breaks validity of html
+ - more code reuse with RT-BugTracker-Public
+
+0.03 2008-03-05
+ - intial release to the CPAN

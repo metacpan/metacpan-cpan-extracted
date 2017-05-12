@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Redland RDF Application Framework Bindings - Building and Installing from Source</title>
+</head>
+<body>
+
+<h1>Redland RDF Application Framework Bindings - Building and Installing from Source</h1>
+
+
+<h2>1. Get pre-requisites</h2>
+
+<p>The Redland Bindings require a previously built and installed
+Redland package with the same version number.  In particular, the
+header files, shared libraries and SWIG interface files that Redland
+provides are required for most language bindings.  An alternative to
+installation is to extract the Redland sources in a parent directory
+or a sibling directory called 'librdf'.</p>
+
+
+<h2>2. Getting the sources</h2>
+
+<p>There are several ways to get the sources.  The most stable and
+tested versions are the sources shipped with each release and these
+are recommended as the first place to start.  For the latest
+developent sources, anonymous Subversion access is available but this may
+require some configuring of developer tools that are not needed for
+the snapshot releases.</p>
+
+<p>The source bundle and package files contain all the HTML files and
+documentation provided on the web site.</p>
+
+
+<h3>2.1. Getting the sources from releases</h3>
+
+<p>The released sources and available from
+<a href="http://download.librdf.org/source/">http://download.librdf.org/source/</a> master site as well as the
+<a href="http://sourceforge.net/projects/librdf/">SourceForge site</a>.
+</p>
+
+
+<h3>2.2. Getting the sources from Subversion</h3>
+
+<p><strong>NOTE</strong>: Redland Bindings switched to use
+<a href="http://subversion.tigris.org/">Subversion</a>
+for version control after the 1.0.3.1 release.  If you were
+using CVS, you will need to re-check out the sources.</p>
+
+<pre>
+  svn checkout http://svn.librdf.org/repository/bindings/trunk/
+  mv trunk bindings
+  cd bindings
+</pre>
+
+<p>At this stage, or after a <code>svn update</code> you will
+need to create the automake and autoconf derived files, as described
+below in <a href="#sec-create-configure">Create the configure program</a>
+by using the <code>autogen.sh</code> script.</p>
+
+<p>Building the Redland bindings in this way requires some particular
+development tools not needed when building from snapshot releases -
+automake, autoconf and swig.
+The <code>autogen.sh</code> script looks for the newest versions
+of the auto* tools and checks that they meet the minimum versions.</p>
+
+
+
+<h2>3. Configuring and building</h2>
+
+<p>Redland bindings uses the GNU automake and autoconf to handle
+system dependency checking.  <code>configure</code> tries very hard
+to find several programs and libraries that the Redland bindings
+need.  These include the binding binaries: perl, python, etc.,
+headers for the bindings such as the JDK, Python etc.  and various
+others.  A summary of the parts found is given at the end of the
+configure run.  Several options to configure given below can be used
+to point to locations or names of dependencies that cannot be
+automatically determined.</p>
+
+<p>Redland Bindings is developed and built on x86 GNU/Linux
+(Redhat Fedora Core 4, Debian unstable) but is also regularly tested on
+sparc Sun Solaris, x86 FreeBSD, ppc Apple OSX 
+and as part of Redland on several other systems via the 
+<a href="http://sourceforge.net/">SourceForge</a> compile farm
+(typically AMD64, Alpha, Solaris x86, OpenBSD, NetBSD).</p>
+
+
+<h3><a id="sec-create-configure" name="sec-create-configure"></a>3.1. Create <code>configure</code> program</h3>
+
+<p>If there is no <code>configure</code> program, you can create it 
+by running the <code>autogen.sh</code> script, as long as you have the
+<a href="http://www.gnu.org/software/automake/automake.html">automake</a> and
+<a href="http://www.gnu.org/software/autoconf/autoconf.html">autoconf</a>
+tools.  This is done by:</p>
+<pre>
+  ./autogen.sh
+</pre>
+<p>and you can also pass along arguments intended for configure (see
+below for what these are):</p>
+<pre>
+  ./autogen.sh --prefix=/usr/local/somewhere
+</pre>
+
+<p>Alternatively you can run the automake and autoconf programs by
+hand with:</p>
+<pre>
+  aclocal; autoheader; automake --add-missing; autoconf
+</pre>
+
+<p>The automake and autoconf tools have many different versions and
+at present development is being done with automake 1.8.3 (minimum
+version 1.7), autoconf 2.59 (minimum version 2.54) and libtool 1.5.4
+(minimum version 1.4).  These are only needed when compiling from Subversion
+sources.  autogen.sh enforces the requirements.  In future
+development will move to require automake 1.8, autoconf 2.58 and
+libtool 1.5.</p>
+
+
+<h3>3.2. Options for <code>configure</code></h3>
+
+<p>See also the generic GNU installation instructions in 
+<a href="INSTALL">INSTALL</a> for information about general options
+such as <code>--prefix</code> etc.</p>
+
+<dl>
+
+<dt><code>--with-java</code>(=<em>JAVA-COMMAND</em>)<br /></dt>
+<dt><code>--with-perl</code>(=<em>PERL-COMMAND</em>)<br /></dt>
+<dt><code>--with-php</code>(=<em>PHP-COMMAND</em>)<br /></dt>
+<dt><code>--with-python</code>(=<em>PYTHON-COMMAND</em>)<br /></dt>
+<dt><code>--with-ruby</code>(=<em>RUBY-COMMAND</em>)<br /></dt>
+<dt><code>--with-tcl</code>(=<em>TCL-COMMAND</em>)<br /></dt>
+<dd><p>Enable the given language APIs - the default is to build
+no language APIs automatically.  If the option value is omitted or
+<em>yes</em>, configure will guess the location of the language
+command.  If the option value is <em>no</em> or no option is given,
+the language API will be disabled - this is the default, not
+to build any language API.</p>
+
+<p>If the option is given a value, that is used as the appropriate
+language command to use.  For example <code>--with-ruby=ruby1.8</code>
+will use the 'ruby1.8' binary, whereas <code>--with-ruby</code> will use
+'ruby' as the binary, both of these will be searched for in the PATH.
+An absolute path could alternatively be given such as
+<code>--with-python=/opt/mypython/bin/python</code> 
+to use a python installation in a different location.</p></dd>
+
+<dt><code>--with-python-ldflags</code>(=<em>FLAGS</em>)<br /></dt>
+<dd><p>Set the linker flags for linking Python.  This can also be
+done by setting the environment variable <code>PYTHON_LDFLAGS</code>.
+If neither is set, <code>configure</code> will guess an appropriate
+set for the current system.
+</p></dd>
+
+<dt><code>--with-jdk=</code><em>DIR</em><br /></dt>
+<dd><p>Choose the location of the Java JDK to use for building
+the Java API with Java JNI.  If omitted, Redland will guess likely
+locations but this is not guaranteed to work.
+</p></dd>
+
+
+<dt><code>--with-redland=</code> <code>system</code> or <code>internal</code><br /></dt>
+<dd><p>
+This option tells the bindings to use either the system installed version
+of <a href="http://librdf.org/">redland</a>
+or an internal version, in a parent or sibling directory as
+described above.  If the option is omittted, the system one is
+prefered, and if none is available, configure will stop.
+</p></dd>
+
+</dl>
+
+
+<h3>3.3 Configuring</h3>
+
+<p>If everything is in the default place, do:</p>
+<pre>
+   ./configure
+</pre>
+
+<p>More commonly you will be doing something like this, indicating
+which binding or bindings are wanted:</p>
+<pre>
+   ./configure --with-python
+</pre>
+
+<p>If you are having problems with configuring several times when
+adding or removing options, you may have to tidy up first with either
+of these:</p>
+<pre>
+   make clean
+   rm -f config.cache
+</pre>
+
+<h3>3.4 Compiling</h3>
+
+<pre>
+   make
+</pre>
+
+
+<h2 id="sec-testing">3.5. Testing</h2>
+
+<p>You can build and run the built-in tests for Redland with:</p>
+<pre>
+    make check
+</pre>
+<p>which will run these tests for the enabled languages.  These
+<em>may fail</em> if the main redland libraries (librdf and
+raptor, rasqal) are not installed but are used in nearby source trees.
+So in this case you should install redland, raptor and rasqal first</p>
+
+<p>The language-specific tests can also be built and run with:</p>
+<pre>
+   cd language
+   make check
+</pre>
+
+
+
+<h3 id="sec-install">3.6 Installing the bindings</h3>
+
+<p>To install the bindings, do:</p>
+
+<pre>
+   make install
+</pre>
+
+<p>Otherwise, the language-specific installations can be made with:</p>
+<pre>
+  cd language
+  make install
+</pre>
+
+
+
+<h2>4. Using the library</h2>
+
+<p>There are many examples for all of the language interfaces in the
+corresponding sub-directories such as <code>perl/example.pl</code>
+which may be easier to modify.</p>
+
+
+
+<h2>5. Using the Perl interface</h2>
+
+<p>See the <a href="docs/perl.html">Redland Perl Interface</a> document for
+full information on installing and using Redland from Perl.</p>
+
+<h2>6. Using the Python interface</h2>
+
+<p>See the <a href="docs/python.html">Redland Python Interface</a> document for
+full information on installing and using Redland from Python.</p>
+
+<h2>7. Using the Tcl interface</h2>
+
+<p>See the <a href="docs/tcl.html">Redland Tcl Interface</a> document for
+full information on installing and using Redland from Tcl, and/or Tcl/Tk.</p>
+
+<h2>8. Using the Java interface</h2>
+
+<p>See the <a href="docs/java.html">Redland Java Interface</a> document for
+full information on installing and using Redland from Java.</p>
+
+<h2>9. Using the Ruby interface</h2>
+
+<p>See the <a href="docs/ruby.html">Redland Ruby Interface</a> document for
+full information on installing and using Redland from Ruby.</p>
+
+<h2>10. Using the PHP interface</h2>
+
+<p>See the <a href="docs/php.html">Redland PHP Interface</a> document for
+full information on installing and using Redland from PHP.</p>
+
+<h2>11. Using the C# interface</h2>
+
+<p>See the <a href="docs/csharp.html">Redland C# Interface</a> document for
+full information on installing and using Redland from C# or an ECMA CLI
+language.</p>
+
+<h2>12. Using the Obj-C interface</h2>
+
+<p>See the <a href="docs/objc.html">Redland Obj-C Interface</a> document for
+information on obtaining and installing the Objective-C bindings for OSX
+which are maintained separately.</p>
+
+
+
+<hr />
+
+<p>Copyright (C) 2004-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a><br />Copyright (C) 2004-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>

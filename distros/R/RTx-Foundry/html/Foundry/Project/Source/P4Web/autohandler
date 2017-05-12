@@ -1,0 +1,47 @@
+%# One way to stop a runaway horse is to bet on him.
+
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr> 
+		<td><& /Edit/Elements/Tabs, Map => $Map, URL => $url &></td>
+              </tr>
+              <tr> 
+                <td class="tableEmboss">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="4">
+                    <tr> 
+                      <td bgcolor="#82D1EC" class="poptable" valign="bottom" > 
+                          <&|/l&>Project Name</&>: <% $QueueObj->Name %></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#A3DEF1"> 
+                        <table border="0" cellspacing="0" cellpadding="0" align="center" width="100%">
+			  <tr> 
+			    <td><& /Edit/Elements/Tabs, Name => 'Map2', Map => $ARGS{Map2}, URL => '../Basic/' &></td>
+			  </tr>
+			  <tr> 
+			    <td class="poptable" bgcolor="#C4E1F0">
+% $m->call_next;
+			    </td>
+			  </tr>
+			</table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+<%INIT>
+my $prefix = '/Foundry/Project/Source/';
+my $Map = [
+    ''			    => 'Queue=' . $QueueObj->Id,
+    $prefix		    => 'Files',		# loc
+    $prefix . "Changes/"    => 'Changes',		# loc
+];
+my $url = $r->uri;
+$url =~ s!\w+\.html$!!;
+</%INIT>
+<%ATTR>
+Tab2	=> 'Version Control'
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>

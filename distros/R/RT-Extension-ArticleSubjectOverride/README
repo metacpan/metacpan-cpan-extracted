@@ -1,0 +1,58 @@
+NAME
+    RT-Extension-ArticleSubjectOverride - Override Subject when selecting an
+    Article
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Set(@Plugins, qw(RT::Extension::ArticleSubjectOverride));
+
+        or add "RT::Extension::ArticleSubjectOverride" to your existing
+        @Plugins line.
+
+        By default, this will only be available on ticket Update with the
+        normal Articles UI. If you'd like to use it on Create, you'll need
+        to enable the config option for Articles on Create.
+
+    On RT 4.0.2, you need to apply the included patch to add two necessary
+    callbacks
+            $ patch -d /opt/rt4 -p1 < patches/0001-Add-two-new-callbacks.patch
+            patching file share/html/Admin/Articles/Classes/Modify.html
+
+        This patch is unnecessary for RT 4.0.3 and higher.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+USAGE
+    This extension will add a new dropdown to class basics page. It allows
+    you to choose one of your article custom fields and have it override the
+    subject. When used in a reply, this affects the subject of the
+    transaction, not the ticket. When used on ticket creation, it changes
+    the subject of the ticket. If you do not want this subject custom field
+    to appear in the body of your Article, use the standard class checkboxes
+    to avoid including it.
+
+AUTHOR
+    Kevin Falcone <falcone@bestpractical.com>
+
+BUGS
+    All bugs should be reported via
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ArticleSu
+    bjectOverride> or bug-RT-Extension-ArticleSubjectOverride@rt.cpan.org.
+
+LICENCE AND COPYRIGHT
+    This software is Copyright (c) 2011 by Best Practical Solutions.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

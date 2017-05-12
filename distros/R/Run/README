@@ -1,0 +1,8 @@
+This module may be used in two ways:
+     a) It implements (exported) function spawn which starts a process
+     	asyncroneously (as fork/exec on *nix, but without overhead on
+     	systems with native spawn()ing);
+     b) It implements run-trees which may be used instead of starting shell
+     	to run compicated commands.
+     	
+(Some tests still fail on some platforms.)	

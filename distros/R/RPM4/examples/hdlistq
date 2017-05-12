@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+##- Nanar <nanardon@zarb.org>
+##-
+##- This program is free software; you can redistribute it and/or modify
+##- it under the terms of the GNU General Public License as published by
+##- the Free Software Foundation; either version 2, or (at your option)
+##- any later version.
+##-
+##- This program is distributed in the hope that it will be useful,
+##- but WITHOUT ANY WARRANTY; without even the implied warranty of
+##- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##- GNU General Public License for more details.
+##-
+##- You should have received a copy of the GNU General Public License
+##- along with this program; if not, write to the Free Software
+##- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+
+use strict;
+use RPM4;
+use Getopt::Long;
+
+my $qf = "%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n";
+my $cond = undef;
+
+my $go_res = GetOptions (
+    "qf|queryformat=s" => \$qf,
+    "c|cond=s" => \$cond,
+    "qi" => sub {
+        $qf = 
+'Name        : %-27{NAME}  Relocations: %|PREFIXES?{[%{PREFIXES} ]}:{(not relocatable)}|
+Version     : %-27{VERSION}       Vendor: %{VENDOR}
+Release     : %-27{RELEASE}   Build Date: %{BUILDTIME:date}
+Install Date: %|INSTALLTIME?{%-27{INSTALLTIME:date}}:{(not installed)         }|      Build Host: %{BUILDHOST}
+Group       : %-27{GROUP}   Source RPM: %{SOURCERPM}
+Size        : %-27{SIZE}%|LICENSE?{      License: %{LICENSE}}|
+Signature   : %|DSAHEADER?{%{DSAHEADER:pgpsig}}:{%|RSAHEADER?{%{RSAHEADER:pgpsig}}:{%|SIGGPG?{%{SIGGPG:pgpsig}}:{%|SIGPGP?{%{SIGPGP:pgpsig}}:{(none)}|}|}|}|
+%|PACKAGER?{Packager    : %{PACKAGER}\n}|%|URL?{URL         : %{URL}\n}|\Summary     : %{SUMMARY}
+Description :\n%{DESCRIPTION}
+';
+    },
+);
+my ($type, $name, $flag, $ENV, $dep);
+if ($cond) {
+    my @d = split(/ +/, $cond);
+    $dep = RPM4::newdep(@d);
+}
+
+($go_res && @ARGV) or die 
+"$0 [--qf|--queryformat rpm_query] [--cond cond] hdlist.cz [hdlist2.cz [...]]
+Do something like `rpm -q --queryformat' on each header contains in hdlist archive
+--cond: show only rpm which apply to this condition:
+  R|C NAME [<=> VERSION], ex C rpm = 4.2.1 will show rpm providing rpm-4.2.1
+example: $0 --qf '%{NAME}\\n' hdlist.cz
+";
+
+foreach (@ARGV) {
+    open(my $hdfh, "zcat '$_' |") or die "Can't open $_";
+    while (my $hdr = stream2header($hdfh)) {
+        if ($cond) {
+            $hdr->matchdep($dep, "PROVIDE") or next;
+        }
+        print $hdr->queryformat($qf);
+    }
+    close($hdfh);
+}

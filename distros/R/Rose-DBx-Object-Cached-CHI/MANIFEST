@@ -1,0 +1,13 @@
+Changes
+lib/Rose/DBx/Object/Cached/CHI.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-warning.t
+t/001_load.t
+t/dbx-object-cached-chi-mysql.t
+t/test-lib.pl
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

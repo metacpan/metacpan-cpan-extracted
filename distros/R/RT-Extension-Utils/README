@@ -1,0 +1,37 @@
+NAME
+    RT::Extension::Utils - collection of command line utilities
+
+DESCRIPTION
+    This extension is collection of variouse command line utilities for
+    Request Tracker. Mostly these are tools for system administrators for
+    debugging and instrumenting.
+
+INSTALLAION
+    As usuall:
+
+        perl Makefile.PL
+        make
+        make install
+
+    Don't forget to register extension in @Plugins config option:
+
+        Set( @Plugins, qw(
+            RT::Extesion::Utils
+        ));
+
+    Without registering some utilities will fail to work.
+
+FOR UTILITIES WRITERS
+  METHODS
+   require_module $module $version
+    Loads a module and checks version. It doesn't die on error, but exit
+    with exit code 1. As this extension consist of many different scripts
+    that may require variouse modules from then CPAN, then all dependencies
+    are not announced during installtion.
+
+LICENSE
+    Under the same terms as perl itself.
+
+AUTHOR
+    Ruslan Zakirov <Ruslan.Zakirov@gmail.com>
+

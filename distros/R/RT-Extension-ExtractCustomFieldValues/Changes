@@ -1,0 +1,106 @@
+3.14 2016-03-28
+ - Copy examples in template into main docs
+ - Avoid log warning when message is undefined
+ - Packaging updates
+
+3.13 2014-12-16
+ - Packaging updates
+
+3.12 2014-07-01
+ - Packaging updates
+
+3.11 2014-06-17
+ - Packaging updates
+
+3.10 2013-10-03
+ - Fix example template to pass the template compiler check
+ - Strip leading and trailing spaces when parsing template lines
+
+3.09 2013-07-30
+ - Re-release 3.08 aftering fixing PAUSE permissions
+
+3.08 2013-07-30
+ - Add a '+' option to capture multiple values (thanks to Kevin Riggle)
+ - Add an explicit license
+
+3.07 2011-05-17
+ - Compatibility tweaks for RT4
+
+3.06 2010-03-30
+ - New 'Extract Custom Field Values With Code in Template' action that
+   allows your ExtractCustomFieldValues template to contain Text::Template
+   code in case your template needs to be dynamic.
+
+3.05 2009-09-17
+ - doc updates
+ - get rid of uninit warnings
+
+3.04 2009-08-06
+ - packaging release
+
+3.03 2009-08-06
+ - Add feature to search all of the headers of a mail, rather than just a
+   specific header.
+
+3.02 2009-07-27
+ - Parse text/html part if it's the only part in an email
+ - Don't run callback on negative matches
+
+3.01 2009-07-01
+ - Fix signature
+
+3.00 2009-07-01
+ - Release updated parser from 2.99 dev releases
+
+2.99_02 2009-05-28
+ - If you specified an invalid CF in your template or used the match-any-cf
+   option and your regex matched something that wasn't a CF name, the Scrip
+   would die before completing
+
+2.99_01 2009-03-12
+ - Rewrite to use method calls, not functions, and support extraction from
+   _all_ text/plain MIME parts, not just the first.
+
+2.05 2009-03-12
+ - Previous versions could find disabled versions of custon fields if they
+   had duplicate names.  Work around this by not using LoadByNameAndQueue.
+
+2.0 2008-12-17
+ - Fix initialdata quoting
+
+1.9 2008-12-15
+ - Add wildcard functionality
+ - Documentation and example fixups
+
+1.8 2008-10-31
+ - Bump Module::Install::RTx version
+
+1.7 2007-06-04
+ - Minor code cleanups
+ - More logging
+ - Warnings
+
+1.6 2007-04-18
+ - Added support for running code on a match without updating a custom
+   field.
+ - Refactor the Action code to handle this case.
+
+1.3
+ - First release from Best Practical
+
+1.2b1
+ - Added support for multiple value custom fields (values sep. by ",")
+   (Thanks to Steven Turner, MIT)
+
+1.1b3
+ - corrected a typo, which reappeared from a temporary version
+
+1.1b1
+ - added Option "q" for not recording transactions
+
+1.1b2
+ - added Command to change the Separator througout the template
+
+1.0b2
+ - fixed a bug, when called for a transaction without Attachment
+

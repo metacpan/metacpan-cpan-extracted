@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/Users/falcone/work/rt/li/local/lib /opt/rt3/lib);
+
+BEGIN{
+    use RT;
+    RT->LoadConfig;
+    RT->Init;
+}
+
+use RT::Queue;
+use RT::ScripAction;
+
+use Getopt::Long;
+my %opt;
+GetOptions(\%opt,  'help|h', 'create' );
+
+if ( $opt{help} ) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ verbose => 2 });
+    exit;
+}
+
+my $queue = RT::Queue->new(RT->SystemUser);
+my $scrip_action = RT::ScripAction->new(RT->SystemUser);
+
+my $statuses;
+for my $status ( $queue->StatusArray ) {
+    my ($id, $msg) = $scrip_action->LoadByCols(ExecModule => 'SetStatus', Argument => $status);
+    if ($id) {
+        $statuses->{exists}{$status}++
+    } else {
+        $statuses->{create}{$status}++;
+    }
+}
+
+if ( $opt{create} ) {
+    unless ( %{$statuses->{create}||{}} ) {
+        print "Found no ScripActions to create\n";
+        exit;
+    }
+
+    for my $status ( sort keys %{$statuses->{create}} ) {
+        my ($ret,$msg) = $scrip_action->Create( Name        => "Set Status to $status",
+                                                Description => "Sets this ticket's status to $status",
+                                                ExecModule  => 'SetStatus',
+                                                Argument    => $status );
+        if ($ret) {
+            print "Created ScripAction for $status.\n";
+            $RT::Logger->info("Created ScripAction for $status: $msg");
+        } else {
+            $RT::Logger->error("Unable to create ScripAction for $status: $msg");
+            next;
+        }
+    }
+} else {
+    for my $status ( sort keys %{$statuses->{create}} ) {
+        print "Would create ScripAction 'Set Status to $status'.\n";
+    }
+    for my $status ( sort keys %{$statuses->{exists}} ) {
+        print "Found existing ScripAction 'Set Status to $status'.\n";
+    }
+    if ( %{$statuses->{create}||{}} ) {
+        print "To create any new ScripActions, rerun with --create\n";
+    }
+}

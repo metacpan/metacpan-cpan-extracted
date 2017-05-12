@@ -1,0 +1,19 @@
+<%INIT>
+my @ids = @{$User->GetMergedUsers->Content};
+
+for my $role (@Roles) {
+    for my $id (@ids) {
+        $Assets->RoleLimit(
+            TYPE        => $role,
+            VALUE       => $id,
+            SUBCLAUSE   => "Role$role",
+        );
+    }
+}
+
+</%INIT>
+<%ARGS>
+@Roles  => ()
+$User   => undef
+$Assets => undef
+</%ARGS>

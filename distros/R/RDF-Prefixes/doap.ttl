@@ -1,0 +1,133 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [ doap-deps:on "Test::Warn"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Prefixes>;
+	doap:category        [ rdfs:label "RDF" ], [ rdfs:label "Prefixes" ], [ rdfs:label "Prefix" ], [ rdfs:label "Namespace" ], [ rdfs:label "Namespaces" ], [ rdfs:label "xmlns" ];
+	doap:created         "2010-09-04"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/RDF-Prefixes>;
+	doap:homepage        <https://metacpan.org/release/RDF-Prefixes>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "RDF-Prefixes";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rdf-prefixes>;
+	];
+	doap:shortdesc       "simple way to turn URIs into QNames"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release"@en;
+	dc:issued            "2010-09-06"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Prefixes-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2011-11-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Occasionally a new prefix was defined when we could have reused an old one."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Prefixes-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2012-05-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix typo."@en;
+			doap-changeset:thanks _:B1;
+		], [
+			rdfs:label "Review regular expressions for QNames."@en;
+			doap-changeset:thanks _:B1;
+		], [
+			rdfs:label "Disallow other vocabularies squatting on 'xsd' prefix."@en;
+			doap-changeset:thanks _:B1;
+		], [
+			rdfs:label "Remove some redundant regular expressions."@en;
+			doap-changeset:thanks _:B1;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Copyright 2012."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add test case covering warning message."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add test case covering utf8 support."@en;
+		], [ rdfs:label "Remove unneeded dependencies."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Prefixes-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2013-07-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Copyright 2013."@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Drop usage of smartmatch operator."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Prefixes-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Prefixes/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "RDF-Prefixes-0.005"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Prefixes-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+_:B1
+	a                    foaf:Person;
+	foaf:mbox_sha1sum    "5864440b7beefff0c8811ec0a4ef7bba0804e5fc";
+	foaf:name            "Saašha Metsärantala".
+

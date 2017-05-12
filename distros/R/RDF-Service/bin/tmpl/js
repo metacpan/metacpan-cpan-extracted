@@ -1,0 +1,22 @@
+<script>
+<!--
+function go(handler, action)
+{
+    document.f.action.value=action|| document.f.action.value;
+    document.f.handler.value = handler || document.f.handler.value;
+    document.f.submit();
+    return true;
+}
+
+function find(na)
+{
+  for( var i=0; i < document.f.elements.length; i++ )
+  {
+    elem = document.f.elements[i];
+    if( eval( "elem.name" )==na ) return eval("elem");
+  } 
+  alert(na+" not found");
+  return false;
+}
+//-->
+</script>

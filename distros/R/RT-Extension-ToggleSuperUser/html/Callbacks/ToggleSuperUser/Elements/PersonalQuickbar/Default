@@ -1,0 +1,3 @@
+%     if ( $session{'CurrentUser'}->Name && $session{'CurrentUser'}->HasRight( Right => 'SuperUser', Object => $RT::System ) ) {
+          <& /Elements/SuperUser &>
+%     }

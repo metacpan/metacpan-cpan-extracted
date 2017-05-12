@@ -1,0 +1,64 @@
+Revision history for Perl extension RPC::Object.
+
+0.31  26-FEB-2007
+        - Refactored to use prethreading module
+        - Changed to use IO::Socket again
+
+0.23  07-JAN-2006
+        - Added the missing t/broker.pl
+        - Replaced kill with remote exit to kill test broker
+
+0.22  07-JAN-2006
+        - Improved error handling
+        - Reorganized tests
+        - Reduced scalar leaked warning in tests by running broker in its own process
+
+0.21  02-JAN-2006
+        - Handled void context correctly
+        - Added more error handling code for Socket operations
+        - Updated tests to skip on Perl with no threads support
+
+0.20  28-DEC-2006
+        - Replaced RPC::Object's implementation from shared hash to scalar ref
+
+0.18  28-DEC-2006
+        - Updated file ``Changes''
+
+0.17  28-DEC-2006
+        - Fixed a problem in Container that broke tests on Perl 5.8.8
+
+0.16  27-DEC-2006
+        - Replaced IO::Socket with Socket;
+
+0.15  22-DEC-2006
+        - removed rpc_object_release()
+        - Housekeeping
+
+0.13  18-DEC-2006
+        - Removed pop() from Container;
+        - Fixed the problem to load RPC::Object::Broker multiple times
+
+0.12  14-DEC-2006
+        - Better error message handling
+
+0.11  14-DEC-2006
+        - Fixed the missing item in MANIFEST
+
+0.10  14-DEC-2006
+        - Added the RPC::Object::Container
+        - Created more tests
+        - Corrected doc. errors
+
+0.04  06-OCT-2006
+        - Add get_blessed_instance() and __release_ref()
+
+0.03  05-OCT-2006
+        - Fixed a problem in reference handling
+
+0.02  05-OCT-2006
+        - nfreeze() may currupt RPC::Object object if pass @_ to it
+
+0.01  04-OCT-2006
+	- Fixed extra DESTROY problem in 0.00_01
+
+

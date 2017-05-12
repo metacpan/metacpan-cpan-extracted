@@ -1,0 +1,56 @@
+---
+name: Repository-Simple
+version: 0.06
+author:
+  - 'Andrew Sterling Hanenkamp, E<lt>hanenkamp@cpan.orgE<gt>'
+abstract: Simple heirarchical repository for Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::Copy::Recursive: 0.05
+  Parse::RecDescent: 1.94
+provides:
+  Repository::Simple:
+    file: lib/Repository/Simple.pm
+    version: 0.06
+  Repository::Simple::Engine:
+    file: lib/Repository/Simple/Engine.pm
+    version: 0.06
+  Repository::Simple::Engine::FileSystem:
+    file: lib/Repository/Simple/Engine/FileSystem.pm
+    version: 0.06
+  Repository::Simple::Engine::Memory:
+    file: lib/Repository/Simple/Engine/Memory.pm
+    version: 0.05
+  Repository::Simple::Node:
+    file: lib/Repository/Simple/Node.pm
+    version: 0.06
+  Repository::Simple::Permission:
+    file: lib/Repository/Simple/Permission.pm
+    version: 0.06
+  Repository::Simple::Property:
+    file: lib/Repository/Simple/Property.pm
+    version: 0.06
+  Repository::Simple::Type::Node:
+    file: lib/Repository/Simple/Type/Node.pm
+    version: 0.06
+  Repository::Simple::Type::Property:
+    file: lib/Repository/Simple/Type/Property.pm
+    version: 0.06
+  Repository::Simple::Type::Value:
+    file: lib/Repository/Simple/Type/Value.pm
+    version: 0.06
+  Repository::Simple::Type::Value::Scalar:
+    file: lib/Repository/Simple/Type/Value/Scalar.pm
+    version: 0.01
+  Repository::Simple::Util:
+    file: lib/Repository/Simple/Util.pm
+    version: 0.06
+  Repository::Simple::Value:
+    file: lib/Repository/Simple/Value.pm
+    version: 0.06
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

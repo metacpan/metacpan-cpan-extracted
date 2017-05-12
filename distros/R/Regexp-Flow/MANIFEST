@@ -1,0 +1,11 @@
+Changes
+lib/Regexp/Flow.pm
+lib/Regexp/Flow/Result.pm
+lib/Regexp/Flow/Results.pm
+MANIFEST
+README
+t/flow.t
+Makefile.PL
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

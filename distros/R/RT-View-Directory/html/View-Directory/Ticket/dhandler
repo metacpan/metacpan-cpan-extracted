@@ -1,0 +1,32 @@
+<%args>
+$Query => undef
+$Order => 'ASC'
+$OrderBy => 'id'
+$OrderAttachmentsBy => 'id'
+$AttachmentOrder => 'ASC'
+</%args>
+<%init>
+my $id = $m->dhandler_arg;
+if ($id =~ '^(\d+)/File/(.*?)$') {
+    $m->comp('File', %ARGS, id => $1, Filename => $2);
+    return();
+}
+my $Ticket = RT::Ticket->new( $session{'CurrentUser'} );
+$Ticket->Load($id);
+
+
+my $QueryString = join(';', "Query=$Query", "Order=$Order","OrderBy=$OrderBy");
+
+my $title =  loc("All attachments for ticket [_1]: [_2]", $Ticket->id, $Ticket->Subject);
+</%init>
+<& /Elements/Header, Title => $title &>
+<& /Elements/Tabs, Title => $title, &>
+<hr />
+<a href="<%$RT::WebPath%>/View-Directory/?<%$QueryString%>">Back to search</a>
+<& ../Elements/ListAttachments,  
+    %ARGS,
+    Ticket => $Ticket, 
+&>
+
+
+

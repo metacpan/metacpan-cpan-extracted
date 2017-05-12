@@ -1,0 +1,15 @@
+Changes
+etc/initialdata
+html/NoAuth/Pushover/callback.html
+ignore.txt
+lib/RT/Action/PushoverNotify.pm
+lib/RT/Extension/PushoverNotify.pm
+lib/RT/Extension/PushoverNotify/PushoverNotification.pm
+lib/RT/Extension/PushoverNotify/PushoverNotifications.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

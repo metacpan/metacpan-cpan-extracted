@@ -1,0 +1,162 @@
+%# $File: //depot/RT/rt/local/html/Todo/index.html $ $Author: autrijus $
+%# $Revision: #2 $ $Change: 6417 $ $DateTime: 2003/06/10 05:54:04 $
+%# Personal to-do plugin
+
+<& /Elements/Header, Title => loc($QueueDescription) &>
+<& /Elements/Tabs, current_toptab => 'Todo/index.html' &>
+<& /Elements/ListActions, actions => \@Actions &>
+
+<H1><% loc($QueueDescription) %></H1>
+<TABLE WIDTH=100% CELLSPACING=0 CELLPADDING=3 border=0>
+<TR><TD colspan=3 BGCOLOR=#336699><FONT COLOR="#FFFFFF" size=+1><b>
+<&|/l&>Create new item</&>
+</b></FONT></TD></TR>
+
+<FORM METHOD=POST>
+    <INPUT TYPE=HIDDEN NAME="Queue" VALUE="<% $QueueName %>">
+    <TR>
+    <TD><INPUT SIZE="50" NAME="Subject"></TD>
+    <TD><% loc('Due') %>:<INPUT NAME="Due" SIZE=10></TD>
+    <TD><INPUT TYPE=SUBMIT VALUE="<% loc('Create') %>"></TD>
+    </TR>
+</FORM>
+
+<& .DisplayTodo, (
+    tickets	=> $tickets_cc,
+    title	=> '[*,_1,group ticket]',	# loc
+) &>
+<& .DisplayTodo, (
+    tickets	=> $tickets_with_due,
+    title	=> '[*,_1,ticket] due',		# loc
+) &>
+<& .DisplayTodo, (
+    tickets	=> $tickets_without_due,
+    title	=> '[*,_1,unresolved ticket]',	# loc
+) &>
+</TABLE>
+<%INIT>
+
+my @Actions;
+my $QueueName		= '___todo';
+my $QueueDescription	= 'Personal Todo'; # loc
+
+my $queue = RT::Queue->new($session{'CurrentUser'});
+
+my ($ok, $msg) = $queue->Load($QueueName);
+
+unless ($ok) {
+    my $new_entry = RT::Queue->new($RT::SystemUser);
+    my ( $return, $msg ) = $new_entry->Create(
+	Name		=> $QueueName,
+	Description	=> $QueueDescription,
+	Disabled	=> 1,
+    );
+
+    $queue->Load($QueueName);
+}
+
+
+if ($ARGS{'Subject'}) {
+    my $due = '';
+	
+    if ($ARGS{'Due'}) {	
+	$due = ParseDateToISO($ARGS{'Due'});
+    }
+
+    my $Ticket = RT::Ticket->new($session{'CurrentUser'});
+
+    my ($id, $Trans, $ErrMsg)= $Ticket->Create(
+	Queue	=> $ARGS{Queue},
+	Subject	=> $ARGS{Subject},
+	Owner	=> $session{'CurrentUser'}->Name,
+	Type	=> 'todo',
+	Due	=> $due,
+    );         
+
+    unless ($id && $Trans) {
+        Abort($ErrMsg);
+    }
+
+    push(@Actions, $ErrMsg);
+}
+
+if ($ARGS{'id'}) {
+    my $Ticket = RT::Ticket->new($session{'CurrentUser'});
+    $Ticket->Load($ARGS{'id'});
+
+    if ($ARGS{'Status'} ) {
+	my ($val, $msg) = $Ticket->SetStatus($ARGS{'Status'});
+	push @Actions, $msg;
+    }
+}
+
+my $tickets_with_due = RT::Tickets->new($session{'CurrentUser'});
+my $tickets_without_due = RT::Tickets->new($session{'CurrentUser'});
+my $tickets_cc = RT::Tickets->new($session{'CurrentUser'});
+
+foreach ($tickets_with_due, $tickets_without_due, $tickets_cc) {
+    $_->Limit( FIELD      => 'Type', VALUE => 'todo' );
+    $_->LimitQueue( VALUE => $queue->id, OPERATOR => '=' );
+    $_->LimitStatus(VALUE => 'open');
+    $_->LimitStatus(VALUE => 'new');
+    $_->OrderBy(FIELD => 'Due', ALIAS => 'main', ORDER => 'DESC');
+}
+
+foreach ($tickets_with_due, $tickets_without_due) {
+    $_->LimitOwner( VALUE => $session{'CurrentUser'}->Id );
+}
+
+$tickets_cc->LimitWatcher( TYPE => 'CC', VALUE => $session{'CurrentUser'}->EmailAddress );
+$tickets_with_due->Limit(FIELD => 'Due', OPERATOR => '>', VALUE => '1970-01-01');
+$tickets_without_due->Limit(FIELD => 'Due', OPERATOR => '=', VALUE => '1970-01-01');
+
+</%INIT>
+
+
+<%DEF .DisplayTodo>
+% return unless $tickets->Count;
+<TR><TD colspan=3  BGCOLOR=#336699><FONT COLOR="#FFFFFF" size="+1">
+<b><% loc($title, $tickets->Count) %></b>
+</FONT></TD></TR>
+
+% my $i;
+% while (my $ticket = $tickets->Next) {
+<TR <% ($i++ % 2) && 'BGCOLOR="#eeeeee"' %>>
+<TD>
+<A href="<% $RT::WebPath %>/Ticket/Display.html?id=<% $ticket->Id %>"><&|/l, $ticket->Id, $ticket->Subject &>#[_1]: [_2]</&></A> 
+
+%  if ($ticket->Owner != $session{'CurrentUser'}->Id) {
+<BR>
+<&|/l&>Owner</&>: <% $ticket->OwnerAsString %>
+<&|/l&>Cc</&>: <% $ticket->CcAddresses %>
+%  } elsif (my $cc = $ticket->CcAddresses) {
+<BR>
+<&|/l&>Cc</&>: <% $cc %>
+%  }
+
+</TD>
+<TD>
+%  if ($ticket->DueObj->Unix == -1) {
+&nbsp;
+%  } elsif ($ticket->DueObj->Unix < (time + (86400*5))) {
+<FONT COLOR="red"><% $ticket->DueObj->AsString %></FONT>
+%  } else {
+<% $ticket->DueObj->AsString %>
+%  }
+</TD>
+<TD>
+%  if ($ticket->Owner == $session{'CurrentUser'}->Id) {
+<A HREF="<% $RT::WebPath %>/Todo/index.html?id=<% $ticket->Id %>&Status=resolved">[<&|/l&>Done</&>]</A>
+%  } else {
+&nbsp;
+%  }
+</TD>
+</TR>
+% }
+<%ARGS>
+$tickets
+$title
+</%ARGS>
+</%DEF>
+
+

@@ -1,0 +1,155 @@
+#!/usr/bin/env perl
+
+use 5.008003;
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+=head1 NAME
+
+rt-check-user-right-on-ticket - check a right of a user on a ticket
+
+=head1 DESCRIPTION
+
+Checks who has a right in the system and describes why a user has
+or has no this right. Useful to debug rights problems.
+
+=cut
+
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+my ($uid, $right, $tid) = @ARGV;
+unless ( $uid && $right && $tid ) {
+    die "usage: $0 <user name or id> <right to check> <ticket id>";
+}
+
+my $user = RT::User->new( $RT::SystemUser );
+$user->Load( $uid );
+unless ( $user->id ) {
+    print STDERR "Couldn't load user '$uid'\n";
+    exit 1;
+}
+
+my $ticket = RT::Ticket->new( RT::CurrentUser->new( $user ) );
+$ticket->Load( $tid );
+unless ( $ticket->id ) {
+    print STDERR "Couldn't load ticket #$tid\n";
+    exit 1;
+}
+
+my $summary =
+    "User '$uid' has"
+    . ($ticket->CurrentUserHasRight( $right )? '': ' NO')
+    ." right $right on ticket #$tid";
+print "\n$summary\n";
+
+if ( $ticket->CurrentUserHasRight('SuperUser') ) {
+    print "User '$uid' actually has SuperUser right\n";
+    exit 0;
+}
+
+my @acl_equiv = $RT::System;
+if ( $ticket->can('ACLEquivalenceObjects') ) {
+    push @acl_equiv, $ticket->ACLEquivalenceObjects;
+} else {
+    my $queue = RT::Queue->new( $RT::SystemUser );
+    $queue->Load( $ticket->QueueObj->id );
+    push @acl_equiv, $queue;
+}
+
+print "----\n";
+
+my $ACL = RT::ACL->new( $RT::SystemUser );
+$ACL->Limit( FIELD => 'RightName', VALUE => $right );
+while ( my $ace = $ACL->Next ) {
+    check_ace( $ace, user => $user, ticket => $ticket, equiv => \@acl_equiv, );
+}
+
+print "----\n";
+print "$summary\n";
+
+sub check_ace {
+    my $ace = shift;
+    my %args = @_;
+
+    my $found = 0;
+    my ($object_type, $object_id) = ($ace->ObjectType, $ace->ObjectId);
+    foreach my $obj ( @{ $args{equiv} } ) {
+        next unless ref($obj) eq $object_type;
+        next if $object_id && $object_id != $obj->id;
+
+        $found = 1;
+    }
+    return unless $found;
+
+    my $right = $ace->RightName;
+    print $right ." is granted on $object_type"
+        . ($object_id? " #$object_id": '')
+        ."\n";
+
+    if ( $ace->PrincipalType eq 'Group' ) {
+        return check_user_group_ace( $ace, %args );
+    } else {
+        return check_role_ace( $ace, %args );
+    }
+}
+
+sub check_role_ace {
+    my $ace = shift;
+    my %args = @_;
+
+    my $role = $ace->PrincipalType;
+    print "\tto role '$role'\n";
+
+    foreach my $obj ( @{ $args{equiv} }, $args{'ticket'} ) {
+        my $role_group = RT::Group->new( $RT::SystemUser );
+        $role_group->LoadByCols(
+            Domain => ref($obj).'-Role',
+            Type => $role,
+            ( ref($obj) ne 'RT::System'
+                ? (Instance => $obj->id || 0)
+                : () ),
+        );
+        next unless $role_group->id;
+
+        my $is_member = $role_group->HasMemberRecursively(
+            $args{'user'}->PrincipalObj
+        );
+        print "\t\tthe user IS". ($is_member? '': ' NOT') ." $role of ". obj2str($obj) ."\n";
+    }
+
+}
+
+sub check_user_group_ace {
+    my $ace = shift;
+    my %args = @_;
+
+    my $group = RT::Group->new( $RT::SystemUser );
+    $group->Load( $ace->PrincipalId );
+    unless ( $group->id ) {
+        print STDERR "Something wrong\n";
+        return;
+    }
+
+    if ( $group->Domain eq 'ACLEquivalence' ) {
+        my $granted_to = $group->Instance;
+        print "\tto user #$granted_to\n";
+        print "\t\tIS ". ($granted_to == $args{'user'}? '': ' NOT')
+            ." the user we check)\n";
+    } else {
+        my $is_member = $group->HasMemberRecursively(
+            $args{'user'}->PrincipalObj
+        );
+        print "\tto group '". $group->Name ."' #". $group->id ."\n";
+        print "\t\tthe user IS". ($is_member? '': ' NOT') ." member\n";
+    }
+}
+
+sub obj2str {
+    return ref($_[0]) .($_[0]->id? " #". $_[0]->id : '');
+}
+

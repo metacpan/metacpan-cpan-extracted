@@ -1,0 +1,33 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/RDF-Crypt/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-001 .
+my:v_0-001
+	a               :Version ;
+	dc:issued       "2010-09-23"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Crypt-0.001.tar.gz> ;
+	rdfs:comment    "Original version"@en .
+
+my:project :release my:v_0-002 .
+my:v_0-002
+	a               :Version ;
+	dc:issued       "2012-06-25"^^xsd:date ;
+	:revision       "0.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-Crypt-0.002.tar.gz> ;
+	rdfs:comment    "Rebirth!"@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-001 ;
+		dcs:item   [ rdfs:label "Major refactoring, using Any::Moose and a role-based architecture." ] ;
+		dcs:item   [ rdfs:label "Module::Package::RDF"; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "More comprehensive test suite." ] ;
+		dcs:item   [ rdfs:label "verify_manifest now returns a list of objects; not a list of hashrefs." ] ;
+		dcs:item   [ rdfs:label "Integration with Web::ID." ]
+	].
+

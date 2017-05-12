@@ -1,0 +1,57 @@
+%# One way to stop a runaway horse is to bet on him.
+
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+<!--
+	    <tr> 
+		<td><& /Edit/Elements/Tabs, Map => $Map, URL => $url &></td>
+              </tr>
+              <tr> 
+                <td class="tableEmboss">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="4">
+                    <tr> 
+                      <td bgcolor="#82D1EC" class="poptable" valign="bottom" > 
+                          <&|/l&>Project Name</&>: <% $QueueObj->Name %></td>
+                    </tr>
+-->
+                    <tr> 
+                      <td bgcolor="#A3DEF1"> 
+                        <table border="0" cellspacing="0" cellpadding="0" align="center" width="100%">
+			  <tr> 
+			    <td class="poptable" bgcolor="#C4E1F0">
+% $m->call_next;
+			    </td>
+			  </tr>
+			</table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+<%INIT>
+my (undef, $repos, $action, $path) = split ('/', ($r->path_info), 4);
+$repos  ||= eval { $QueueObj->OriginObj->CustomFieldValue('UnixName') } || 'local';
+$action ||= 'browse';
+
+my $prefix = '/Foundry/Project/Source/index.html';
+my $Map = [
+    ''				    => 'Queue=' . $QueueObj->Id,
+    "$prefix/$repos/browse/$path"   => 'Files',		# loc
+    "$prefix/$repos/log/$path"	    => 'Revisions',	# loc
+];
+my $url = "$prefix/$repos/$action/$path";
+
+if ($action eq 'revision') {
+    push @$Map, $url => loc("Revision #[_1]", $ARGS{rev}||'HEAD');
+}
+elsif ($action eq 'checkout') {
+    push @$Map, $url => loc("File [_1]:[_2]", $path, $ARGS{rev}||'HEAD');
+}
+
+</%INIT>
+<%ATTR>
+Tab2	=> 'Version Control'
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>

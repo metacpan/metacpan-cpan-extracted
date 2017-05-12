@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         RTF-Writer
+version:      1.11
+version_from: lib/RTF/Writer.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Exporter:                      0
+    File::Path:                    0
+    Image::Size:                   0
+    strict:                        0
+    UNIVERSAL:                     0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

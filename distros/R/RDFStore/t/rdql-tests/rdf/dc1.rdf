@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:dctype="http://purl.org/dc/dcmitype/">
+ 
+  <rdf:Description rdf:about="http://testers.mkdoc.com/cma/">
+
+    <dc:identifier rdf:resource="http://testers.mkdoc.com/cma/" />
+
+    <dc:language>
+      <dcterms:RFC1766>
+        <rdf:value>en-gb</rdf:value>
+        <rdfs:label>English (United Kingdom)</rdfs:label>
+      </dcterms:RFC1766>
+    </dc:language>
+
+    <dc:title xml:lang="en-gb">Community Media Association</dc:title>
+
+    <dcterms:abstract xml:lang="en-gb">Community Media Association test page for MKDoc</dcterms:abstract>
+
+    <dc:creator>
+      Jean-Michel Hiver, jhiver@cisedi.com
+    </dc:creator>
+
+
+  
+    <dc:contributor>
+      Bill Best, bill@commedia.org.uk 
+    </dc:contributor>
+  
+    <dc:contributor>
+      Adam Moran, adam@webarchitects.co.uk 
+    </dc:contributor>
+  
+
+
+
+
+
+    <dc:subject xml:lang="en-gb">CMA</dc:subject>
+
+    <dc:subject xml:lang="en-gb">Community</dc:subject>
+
+    <dc:subject xml:lang="en-gb">Media</dc:subject>
+
+    <dc:subject xml:lang="en-gb">Association</dc:subject>
+
+    <dc:subject xml:lang="en-gb">Test</dc:subject>
+
+
+
+    <dcterms:isPartOf>
+      <rdf:Description rdf:about="http://testers.mkdoc.com/">
+        <dc:title xml:lang="en-gb">MKDoc Testers</dc:title>
+        <dcterms:abstract xml:lang="en-gb">MKDoc Testers</dcterms:abstract>
+      </rdf:Description>
+    </dcterms:isPartOf>
+
+
+
+    <dcterms:hasPart>
+      <rdf:Seq>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/cma/aaa/">
+            <dc:title xml:lang="no">aaa</dc:title>
+            <dcterms:abstract xml:lang="no">aaaaaa</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/cma/some-title-one/">
+            <dc:title xml:lang="en-gb">some title one</dc:title>
+            <dcterms:abstract xml:lang="en-gb">this is a very well made desciptive desciption</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+      </rdf:Seq>
+    </dcterms:hasPart>
+
+
+
+
+
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/community-media-association/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/community-media-association/foo/bar/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/community-media-association/bar/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/community-media-association/bar/foo/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/community-media-association/foo/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/javascript/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-tools/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/further-resources/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome-2/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/david-diaz/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/maisy/photo-3/temp/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ideas/test/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/adam-tyson/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/alan-smith/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ana-baptista/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/andreas-giesenhagen/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/antony-chan/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/amanda-croome/jruurii-mettaaddettaa/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/puppentheater-halle/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/foerstst/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/friends/cma/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/noshang-biao-nituite/cma/" />
+  
+
+
+
+
+    <dcterms:medium>
+      <dcterms:IMT>
+        <rdf:value>text/html</rdf:value>
+        <rdfs:label>HTML</rdfs:label>
+      </dcterms:IMT>
+    </dcterms:medium>
+
+    <dc:type>
+      <dcterms:Text>
+        <rdfs:label>Text</rdfs:label>
+      </dcterms:Text>
+    </dc:type>
+
+    <dcterms:created>
+      <dcterms:W3CDTF>
+        <rdf:value>2001-06-20T10:46:00Z</rdf:value>
+        <rdfs:label>Created</rdfs:label>
+      </dcterms:W3CDTF>
+    </dcterms:created>
+
+    <dcterms:modified>
+      <dcterms:W3CDTF>
+        <rdf:value>2001-07-30T16:38:56Z</rdf:value>
+        <rdfs:label>Modified</rdfs:label>
+      </dcterms:W3CDTF>
+    </dcterms:modified>
+
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://purl.org/dc/terms/abstract">
+    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/description"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://purl.org/dc/terms/medium">
+    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/format"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://purl.org/dc/terms/created">
+    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/date"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://purl.org/dc/terms/modified">
+    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/date"/>
+  </rdf:Description>
+
+</rdf:RDF>

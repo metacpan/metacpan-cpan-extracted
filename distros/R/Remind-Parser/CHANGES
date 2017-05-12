@@ -1,0 +1,70 @@
+---
+
+# Change log for Perl module Remind-Parser
+
+# This file is in YAML format; see <URL:http://www.yaml.org/>
+# for more information
+
+- date: 2013-04-03
+  version: 0.08
+  changes:
+    - Cache day of week calculations
+    - Set date_time and day_of_week elements as documented
+
+- date: 2010-01-18
+  version: 0.07
+  changes:
+    - Fixed parsing of more than one month's events
+  notes:
+    - >-
+      Thanks to Michael Higgins <col@evolone.org> for
+      spotting the problem and providing a patch
+
+- date: 2009-02-28
+  version: 0.06
+  changes:
+    - Added Date::DayOfWeek as a prerequisite
+
+- date: 2009-02-28
+  version: 0.05
+  changes:
+    - Add rem2yaml script
+    - Don't strip times from beginning unless skip_times is set
+    - Expanded documentation
+    - Other minor improvements
+
+- date: 2007-10-06
+  version: 0.04
+  changes:
+    - Fix parsing of 12:XXam in timed reminders
+
+- date: 2007-09-25
+  version: 0.03
+  changes:
+    - >-
+      Fix parsing of timed reminders (times were being included in
+      descriptions)
+
+- date: 2007-09-24
+  version : 0.02
+  changes:
+    - Fix egregious miscalculation of the minute of a reminder
+
+- date: 2007-09-22
+  version : 0.01_001
+  changes:
+    - Pull out rem2yaml code
+    - Return reference to empty list if no input
+
+- date: 2007-09-22
+  version: 0.01
+  changes:
+    - Add standard tests in t/
+    - strict() method documented
+  notes:
+    - First release
+
+- date: 2007-09-19
+  notes:
+    - First code
+

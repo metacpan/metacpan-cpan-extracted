@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Redland RDF Application Framework - Perl RDF::Redland::Parser Class</title>
+</head>
+<body>
+
+<h1 style="text-align:center">Redland RDF Application Framework - Perl RDF::Redland::Parser Class</h1>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+        <li><a href="#name">NAME</a></li>
+        <li><a href="#synopsis">SYNOPSIS</a></li>
+        <li><a href="#description">DESCRIPTION</a></li>
+        <li><a href="#constructors">CONSTRUCTORS</a></li>
+        <li><a href="#methods">METHODS</a></li>
+        <li><a href="#see_also">SEE ALSO</a></li>
+        <li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<h2><a name="name" id="name">NAME</a></h2>
+<p>RDF::Redland::Parser - Redland RDF Syntax Parsers Class</p>
+
+<h2><a name="synopsis" id="synopsis">SYNOPSIS</a></h2>
+<pre>
+  use RDF::Redland;
+</pre>
+<pre>
+  ...
+  my $parser=new RDF::Redland::Parser("rdfxml");
+  my $parser2=new RDF::Redland::Parser(undef, "application/rdf+xml);
+</pre>
+<pre>
+  # Return as an RDF::Redland::Stream
+  my $stream=$parser-&gt;parse_as_stream($source_uri, $base_uri);
+  
+  # Store in an RDF::Redland::Model
+  $parser-&gt;parse_into_model($source_uri, $base_uri, $model);
+</pre>
+
+<h2><a name="description" id="description">DESCRIPTION</a></h2>
+<p>This class represents parsers of various syntaxes that can deliver a RDF model either as a RDF::Redland::Stream of RDF::Redland::Statement objects or directly into an RDF::Redland::Model object.</p>
+
+<h2><a name="constructors" id="constructors">CONSTRUCTORS</a></h2>
+<dl>
+<dt><strong><a name="item_new__5bname__5bmime_type__5buri_5d_5d_5d" id="item_new__5bname__5bmime_type__5buri_5d_5d_5d">new [NAME [MIME_TYPE [URI]]]</a></strong></dt>
+<dd>
+<p>Create a new RDF::Redland::Parser object for a syntax parser named <em>NAME</em>, with MIME Type <em>MIME_TYPE</em> and/or URI <em>URI</em>. Any field can be undef or omitted; if all are omitted, a parser that provides MIME Type application/rdf+xml will be requested.</p>
+</dd>
+</dl>
+
+<h2><a name="methods" id="methods">METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_parse_as_stream_source_uri_base_uri" id="item_parse_as_stream_source_uri_base_uri">parse_as_stream SOURCE_URI BASE_URI</a></strong></dt>
+<dd>
+<p>Parse the syntax at the RDF::Redland::URI <em>SOURCE_URI</em> with optional base RDF::Redland::URI <em>BASE_URI</em>. If the base URI is given then the content is parsed as if it was at the base URI rather than the source URI.</p>
+</dd>
+<dd>
+<p>Returns an RDF::Redland::Stream of RDF::Redland::Statement objects or undef on failure.</p>
+</dd>
+</dl>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_parse_into_model_source_uri_base_uri_model__5bhand" id="item_parse_into_model_source_uri_base_uri_model__5bhand">parse_into_model SOURCE_URI BASE_URI MODEL [HANDLER]</a></strong></dt>
+</dl>
+</div>
+<p>Parse the syntax at the RDF::Redland::URI <em>SOURCE_URI</em> with optional base RDF::Redland::URI <em>BASE_URI</em> into RDF::Redland::Model <em>MODEL</em>. If the base URI is given then the content is parsed as if it was at the base URI rather than the source URI.</p>
+<p>If the optional <em>HANDLER</em> is given, it is a reference to a sub with the signature sub <code>handler($$$$$$$$$)</code> { my($code, $level, $facility, $message, $line, $column, $byte, $file, $uri)=@_; ... } that receives errors in parsing.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_parse_string_as_stream_string_base_uri" id="item_parse_string_as_stream_string_base_uri">parse_string_as_stream STRING BASE_URI</a></strong></dt>
+</dl>
+</div>
+<p>Parse the syntax in <em>STRING</em> with required base RDF::Redland::URI <em>BASE_URI</em>.</p>
+<p>Returns an RDF::Redland::Stream of RDF::Redland::Statement objects or undef on failure.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_parse_string_into_model_string_base_uri_model__5bh" id="item_parse_string_into_model_string_base_uri_model__5bh">parse_string_into_model STRING BASE_URI MODEL [HANDLER]</a></strong></dt>
+</dl>
+</div>
+<p>Parse the syntax in <em>STRING</em> with required base RDF::Redland::URI <em>BASE_URI</em> into RDF::Redfland::Model <em>MODEL</em>.</p>
+<p>If the optional <em>HANDLER</em> is given, it is a reference to a sub with the signature sub <code>handler($$$$$$$$$)</code> { my($code, $level, $facility, $message, $line, $column, $byte, $file, $uri)=@_; ... } that receives errors in parsing.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_feature_uri__5bvalue_5d" id="item_feature_uri__5bvalue_5d">feature URI [VALUE]</a></strong></dt>
+</dl>
+</div>
+<p>Get/set a parser feature. The feature is named via RDF::Redland::URI <em>URI</em> and the value is a RDF::Redland::Node. If <em>VALUE</em> is given, the feature is set to that value, otherwise the current value is returned.</p>
+
+<h2><a name="see_also" id="see_also">SEE ALSO</a></h2>
+<p><a href="URI.html">the RDF::Redland::URI manpage</a></p>
+
+<h2><a name="author" id="author">AUTHOR</a></h2>
+<p>Dave Beckett - <a href="http://purl.org/net/dajobe/">http://purl.org/net/dajobe/</a></p>
+<hr />
+
+<p>(C) Copyright 2000-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, (C) Copyright 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>

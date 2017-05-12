@@ -1,0 +1,26 @@
+RTMP-Client version 0.04
+========================
+
+This is a simple RTMP client without video or audio decode. It
+implemented in pure PERL including packing Adobe amf packages.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires "Time::HiRes".
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2011 ChenGang.
+This library is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.

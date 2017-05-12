@@ -1,0 +1,12 @@
+Unreleased Changes
+		None
+0.004	2014-10-27
+		Added function rr equivalent to Regexp::Result->new
+0.003	2014-06-28
+		Moo and Sub::Name needed to be in the PREREQ_PM
+                in Makefile.PL
+0.002	2014-06-27
+		Critical files missing from the MANIFEST in 0.001, so
+                distribution was not built correctly.
+0.001	2014-06-27
+		First Release!

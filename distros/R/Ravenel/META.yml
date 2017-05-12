@@ -1,0 +1,26 @@
+---
+abstract: ~
+author:
+  - 'Ryan Alan Dietrich. The Ravenel module is free software; you can redistribute it and/or modify it under the same terms as Perl itself with the exception that it cannot be placed on a CD-ROM or similar media for commercial distribution without the prior approval of the author.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.94'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Ravenel
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  PPI: 1.208
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1

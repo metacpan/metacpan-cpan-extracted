@@ -1,0 +1,41 @@
+RT-Extension-LDAPImport
+
+INSTALLATION
+
+How to install:
+
+1. perl Makefile.PL
+2. make
+3. make install (may need root permissions)
+4. Edit your /path-to-rt/etc/RT_SiteConfig.pm 
+    Set(@Plugins, qw(RT::Extension::LDAPImport));
+    or add RT::Extension::LDAPImport to your existing @Plugins line
+5. Clear your mason cache
+     rm -rf /path-to-rt/var/mason_data/obj
+6. Restart your webserver
+
+This will install an rtldapimport script in
+/opt/rt4/local/plugins/RT-Extension-LDAPImport/bin
+and install the RT::Extension::LDAPImport
+module.
+
+RUNNING THE IMPORTER
+
+Set the module documentation for details on
+configuration and running the importer.
+
+>perldoc RT::Extension::LDAPImmport
+
+DEPENDENCIES
+
+  Class::Accessor
+  Net::LDAP
+  RT: 3.8.x
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2011, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

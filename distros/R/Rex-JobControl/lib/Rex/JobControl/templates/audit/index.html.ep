@@ -1,0 +1,121 @@
+% layout 'audit';
+% title "Audit";
+<h2>Audit</h2>
+
+
+<h3>Active jobs</h3>
+
+% if(scalar @{ $tasks } > 0) {
+<div class="panel panel-default">
+
+  <div class="panel-heading">Worker Protocol</div>
+  <div class="panel-body">
+
+    <table id="worker_table" class="display" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th>Job</th>
+          <th>Status</th>
+          <th>User</th>
+          <th>Start</th>
+          <th>Server</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <th>Job</th>
+          <th>Status</th>
+          <th>User</th>
+          <th>Start</th>
+          <th>Server</th>
+        </tr>
+      </tfoot>
+      <tbody>
+    % for my $task (@{ $tasks }) {
+        % next if( $task->{task} ne "execute_rexfile" );
+        % next if( $task->{args}->[0] ne $project->name );
+        <tr>
+          % my $start_dt = DateTime->from_epoch(epoch => $task->{created});
+          <td><%= $task->{args}->[1] %></td>
+          <td><%= $task->{state} %></td>
+          <td><%= $task->{args}->[2] %></td>
+          <td><%= $start_dt->ymd("-") %> <%= $start_dt->hms(":") %></td>
+          <td><%= join(", ", @{ $task->{args} }[4..$#{ $task->{args} }]) %></td>
+        </tr>
+    % }
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+% } else {
+
+<p>Currently there are no active jobs.</p>
+
+% }
+
+<h3>Activity for <%= $project->name %></h3>
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Job Protocol</div>
+  <div class="panel-body">
+
+    <table id="log_table" class="display" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th>Job</th>
+          <th>User</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Rexfile</th>
+          <th>Task</th>
+          <th>Server</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <th>Job</th>
+          <th>User</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Rexfile</th>
+          <th>Task</th>
+          <th>Server</th>
+        </tr>
+      </tfoot>
+      <tbody>
+  % for my $job (@{ $project->jobs }) {
+    % for my $log (@{ $job->get_logs }) {
+    % next unless $log->{start_time};
+    % next unless $log->{end_time};
+      % for my $status_entry (@{ $log->{status} }) {
+        <tr>
+          % my $start_dt = DateTime->from_epoch(epoch => $log->{start_time});
+          % my $end_dt = DateTime->from_epoch(epoch => $log->{end_time});
+          <td><%= $job->name %></td>
+          <td><%= $log->{user} %></td>
+          <td><%= $start_dt->ymd("-") %> <%= $start_dt->hms(":") %></td>
+          <td><%= $end_dt->ymd("-") %> <%= $end_dt->hms(":") %></td>
+          <td><%= $status_entry->{rexfile} %></td>
+          <td><%= $status_entry->{task} %></td>
+          <td><%= $status_entry->{server} %></td>
+        </tr>
+      % }
+    % }
+  % }
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<script>
+$(document).ready(function() {
+
+  $('#log_table').dataTable();
+  $('#worker_table').dataTable();
+
+} );
+</script>

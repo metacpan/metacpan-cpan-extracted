@@ -1,0 +1,189 @@
+#!perl -w
+
+#
+# (c) Jan Gehring <jan.gehring@gmail.com>
+# 
+# vim: set ts=3 sw=3 tw=0:
+# vim: set expandtab:
+   
+use strict;
+use warnings;
+
+use Cwd qw(getcwd);
+use File::Basename;
+
+use Rex;
+use Rex::Config;
+use Rex::Group;
+use Rex::Batch;
+use Rex::TaskList;
+use Rex::Cache;
+use Rex::Logger;
+use Rex::Output;
+
+use JSON::XS;
+
+my $no_color = 0;
+eval "use Term::ANSIColor";
+if($@) { $no_color = 1; }
+
+# preload some modules
+use Rex -base;
+
+use Getopt::Std;
+
+BEGIN {
+
+   if(-d "lib") {
+      use lib "lib";
+   }
+
+};
+
+$|++;
+
+my %opts;
+
+if($#ARGV < 0) {
+   @ARGV = qw(-h);
+}
+
+getopts('QdcChg:', \%opts);
+
+require Rex::Args;
+Rex::Args->import;
+
+use Gearman::Worker;
+use Data::Dumper;
+
+
+if($opts{'Q'}) {
+   my ($stdout, $stderr);
+   open(my $newout, '>', \$stdout);
+   select $newout;
+   close(STDERR);
+}
+
+if($opts{'d'}) {
+   $Rex::Logger::debug = $opts{'d'};
+   $Rex::Logger::silent = 0;
+}
+
+if($opts{"c"}) {
+   $Rex::Cache::USE = 1;
+}
+elsif($opts{"C"}) {
+   $Rex::Cache::USE = 0;
+}
+
+Rex::Logger::debug("Command Line Parameters");
+for my $param (keys %opts) {
+   Rex::Logger::debug("\t$param = " . $opts{$param});
+}
+
+my $worker = Gearman::Worker->new;
+
+if(! -f "worker.conf") {
+   say "You have to create a file called worker.conf to define the gearmand servers.";
+   say "Example:";
+   say "{";
+   say "   job_servers => [";
+   say "                     '127.0.0.1:4730',";
+   say "                     '192.168.7.2:4730',";
+   say "                  ],";
+   say "};";
+
+   CORE::exit 1;
+}
+
+my $conf = eval eval { local(@ARGV, $/) = ("worker.conf"); <>; };
+
+if($@) {
+   say "Error parsing configuration file.";
+   say $@;
+   CORE::exit 1;
+}
+
+if(exists $opts{h}) {
+   print "(R)?ex - (Remote)? Execution (Gearman Worker)\n";
+   printf "  %-15s %s\n", "-Q", "Really quiet. Output nothing";
+   printf "  %-15s %s\n", "-d", "Run in debug mode.";
+   printf "  %-15s %s\n", "-c", "Turn cache on.";
+   printf "  %-15s %s\n", "-C", "Turn cache off.";
+   printf "  %-15s %s\n", "-h", "Output the help.";
+   printf "  %-15s %s\n", "-g", "Define the name of the worker queue.";
+ 
+   CORE::exit 0;
+}
+
+if(! exists $opts{g}) {
+   my $cwd = getcwd;
+   $opts{g} = basename($cwd);
+}
+
+Rex::Logger::debug("Registering job servers: " . join(", ", @{ $conf->{job_servers} }));
+$worker->job_servers(@{ $conf->{job_servers} });
+
+
+Rex::Logger::debug("Using function name: " . $opts{g});
+
+$::rexfile = "Rexfile";
+
+eval {
+   my $ok = do($::rexfile);
+   if(! $ok) {
+      Rex::Logger::info("There seems to be an error on some of your required files.", "error");
+      my @dir = (dirname($::rexfile));
+      for my $d (@dir) {
+         opendir(my $dh, $d) or die($!);
+         while(my $entry = readdir($dh)) {
+            if($entry =~ m/^\./) {
+               next;
+            }
+
+            if(-d "$d/$entry") {
+               push(@dir, "$d/$entry");
+               next;
+            }
+
+            if($entry =~ m/Rexfile/ || $entry =~ m/\.pm$/) {
+               # check files for syntax errors
+               my $check_out = qx{PERL5LIB=lib:\$PERL5LIB $^X -MRex::Commands -MRex::Commands::Run -MRex::Commands::Fs -MRex::Commands::Download -MRex::Commands::Upload -MRex::Commands::File -MRex::Commands::Gather -MRex::Commands::Kernel -MRex::Commands::Pkg -MRex::Commands::Service -MRex::Commands::Sysctl -MRex::Commands::Tail -MRex::Commands::Process -c $d/$entry 2>&1};
+               if($? > 0) {
+                  print "$d/$entry\n";
+                  print "--------------------------------------------------------------------------------\n";
+                  print $check_out;
+                  print "\n";
+               }
+            }
+         }
+         closedir($dh);
+      }
+
+      exit 1;
+   }
+};
+
+if($@) { print $@ . "\n"; exit 1; }
+
+$worker->register_function($opts{g} => sub {
+
+   my $json = $_[0]->arg;
+   my $options = decode_json($json);
+   @ARGV = @{ $options->{argv} };
+
+   Rex::TaskList->create()->set_default_auth($options->{default_auth});
+   Rex::TaskList->create()->set_in_transaction($options->{in_transaction});
+
+   # worker function
+   my $task = Rex::TaskList->create()->get_task($options->{task});
+
+   $task->run($options->{server},
+      in_transaction => $options->{in_transaction},
+      params => $options->{options}->{params}
+   );
+
+});
+$worker->work while 1;
+
+

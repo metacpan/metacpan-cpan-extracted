@@ -1,0 +1,617 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Sequence</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Raptor RDF Syntax Parsing and Serializing Library Manual">
+<link rel="up" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="prev" href="raptor-section-parser.html" title="Parser">
+<link rel="next" href="raptor-section-serializer.html" title="Serializer">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="introduction.html" title="Raptor Overview">
+<link rel="part" href="tutorial.html" title="Part&#160;I.&#160;Raptor Tutorial">
+<link rel="chapter" href="tutorial-initialising-finishing.html" title="Initialising and Finishing using the Library">
+<link rel="chapter" href="tutorial-querying-functionality.html" title="Listing built-in functionality">
+<link rel="chapter" href="tutorial-parsing.html" title="Parsing syntaxes to RDF Triples">
+<link rel="chapter" href="tutorial-serializing.html" title="Serializing RDF triples to a syntax">
+<link rel="part" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="chapter" href="raptor-parsers.html" title="Parsers in Raptor (syntax to triples)">
+<link rel="chapter" href="raptor-serializers.html" title="Serializers in Raptor (triples to syntax)">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="raptor-section-parser.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference-manual.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Raptor RDF Syntax Parsing and Serializing Library Manual</th>
+<td><a accesskey="n" href="raptor-section-serializer.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2561244" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2616965" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="raptor-section-sequence"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2561244"></a><span class="refentrytitle">Sequence</span>
+</h2>
+<p>Sequence &#8212; Ordered sequence of items.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a>;
+<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a>* <a href="raptor-section-sequence.html#raptor-new-sequence">raptor_new_sequence</a>        (raptor_sequence_free_handler *free_handler,
+                                             raptor_sequence_print_handler *print_handler);
+void        <a href="raptor-section-sequence.html#raptor-free-sequence">raptor_free_sequence</a>            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq);
+int         <a href="raptor-section-sequence.html#raptor-sequence-size">raptor_sequence_size</a>            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq);
+int         <a href="raptor-section-sequence.html#raptor-sequence-set-at">raptor_sequence_set_at</a>          (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             int idx,
+                                             void *data);
+int         <a href="raptor-section-sequence.html#raptor-sequence-push">raptor_sequence_push</a>            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             void *data);
+int         <a href="raptor-section-sequence.html#raptor-sequence-shift">raptor_sequence_shift</a>           (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             void *data);
+void*       <a href="raptor-section-sequence.html#raptor-sequence-get-at">raptor_sequence_get_at</a>          (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             int idx);
+void*       <a href="raptor-section-sequence.html#raptor-sequence-pop">raptor_sequence_pop</a>             (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq);
+void*       <a href="raptor-section-sequence.html#raptor-sequence-unshift">raptor_sequence_unshift</a>         (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq);
+int         <a href="raptor-section-sequence.html#raptor-compare-strings">raptor_compare_strings</a>          (const void *a,
+                                             const void *b);
+void        <a href="raptor-section-sequence.html#raptor-sequence-sort">raptor_sequence_sort</a>            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             int (*compare) (const void *, const void *));
+void        <a href="raptor-section-sequence.html#raptor-sequence-print-string">raptor_sequence_print_string</a>    (char *data,
+                                             FILE *fh);
+void        <a href="raptor-section-sequence.html#raptor-sequence-print-uri">raptor_sequence_print_uri</a>       (char *data,
+                                             FILE *fh);
+void        <a href="raptor-section-sequence.html#raptor-sequence-set-print-handler">raptor_sequence_set_print_handler</a>
+                                            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             raptor_sequence_print_handler *print_handler);
+void        <a href="raptor-section-sequence.html#raptor-sequence-print">raptor_sequence_print</a>           (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             FILE *fh);
+int         <a href="raptor-section-sequence.html#raptor-sequence-join">raptor_sequence_join</a>            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *dest,
+                                             <a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *src);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2616965"></a><h2>Description</h2>
+<p>
+A utility class that provides access to small sequence of items
+that grow at the end and require quick ordered and indexed access.
+Can be used as a queue/FIFO but less efficiently than a stack
+where the items are added and removed from the end.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2616985"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2616996"></a><h3>
+<a name="raptor-sequence"></a>raptor_sequence</h3>
+<a class="indexterm" name="id2617008"></a><pre class="programlisting">raptor_sequence* raptor_sequence;
+</pre>
+<p>
+Raptor sequence class</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2617027"></a><h3>
+<a name="raptor-new-sequence"></a>raptor_new_sequence ()</h3>
+<a class="indexterm" name="id2617040"></a><pre class="programlisting"><a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a>* raptor_new_sequence        (raptor_sequence_free_handler *free_handler,
+                                             raptor_sequence_print_handler *print_handler);</pre>
+<p>
+Constructor - create a new sequence with the given handlers.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>free_handler</code></em>&#160;:</span></td>
+<td> handler to free a sequence item
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>print_handler</code></em>&#160;:</span></td>
+<td> handler to print a sequence item to a FILE*
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="raptor-section-sequence.html#raptor-sequence"><span class="type">raptor_sequence</span></a> or NULL on failure 
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2617128"></a><h3>
+<a name="raptor-free-sequence"></a>raptor_free_sequence ()</h3>
+<a class="indexterm" name="id2617139"></a><pre class="programlisting">void        raptor_free_sequence            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq);</pre>
+<p>
+Destructor - free a <a href="raptor-section-sequence.html#raptor-sequence"><span class="type">raptor_sequence</span></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence to destroy
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2611092"></a><h3>
+<a name="raptor-sequence-size"></a>raptor_sequence_size ()</h3>
+<a class="indexterm" name="id2611104"></a><pre class="programlisting">int         raptor_sequence_size            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq);</pre>
+<p>
+Get the size of a sequence.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the sequence size (&gt;=0)
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2611162"></a><h3>
+<a name="raptor-sequence-set-at"></a>raptor_sequence_set_at ()</h3>
+<a class="indexterm" name="id2611174"></a><pre class="programlisting">int         raptor_sequence_set_at          (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             int idx,
+                                             void *data);</pre>
+<p>
+Replace/set an item in a sequence.
+</p>
+<p>
+The item at the offset <em class="parameter"><code>idx</code></em> in the sequence is replaced with the
+new item <em class="parameter"><code>data</code></em> (which may be NULL).  Any existing item is freed
+with the sequence's free_handler.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>idx</code></em>&#160;:</span></td>
+<td> index into sequence to operate at
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> new data item.
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2611292"></a><h3>
+<a name="raptor-sequence-push"></a>raptor_sequence_push ()</h3>
+<a class="indexterm" name="id2611303"></a><pre class="programlisting">int         raptor_sequence_push            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             void *data);</pre>
+<p>
+Add an item to the end of the sequence.
+</p>
+<p>
+This is efficient to perform. <a href="raptor-section-sequence.html#raptor-sequence"><span class="type">raptor_sequence</span></a> is optimised
+to append/remove from the end of the sequence.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence to add to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> item to add
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2617499"></a><h3>
+<a name="raptor-sequence-shift"></a>raptor_sequence_shift ()</h3>
+<a class="indexterm" name="id2617510"></a><pre class="programlisting">int         raptor_sequence_shift           (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             void *data);</pre>
+<p>
+Add an item to the start of the sequence.
+</p>
+<p>
+This is in-efficient to perform.  <a href="raptor-section-sequence.html#raptor-sequence"><span class="type">raptor_sequence</span></a> is optimised
+to append to the end of the sequence.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence to add to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> item to add
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2617604"></a><h3>
+<a name="raptor-sequence-get-at"></a>raptor_sequence_get_at ()</h3>
+<a class="indexterm" name="id2617615"></a><pre class="programlisting">void*       raptor_sequence_get_at          (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             int idx);</pre>
+<p>
+Retrieve an item at offset <em class="parameter"><code>index</code></em> in the sequence.
+</p>
+<p>
+This is efficient to perform. <a href="raptor-section-sequence.html#raptor-sequence"><span class="type">raptor_sequence</span></a> is optimised
+to append/remove from the end of the sequence.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence to use
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>idx</code></em>&#160;:</span></td>
+<td> index of item to get
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the object or NULL if <em class="parameter"><code>index</code></em> is out of range (0... sequence size-1)
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2617721"></a><h3>
+<a name="raptor-sequence-pop"></a>raptor_sequence_pop ()</h3>
+<a class="indexterm" name="id2617734"></a><pre class="programlisting">void*       raptor_sequence_pop             (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq);</pre>
+<p>
+Retrieve the item at the end of the sequence.
+</p>
+<p>
+This is efficient to perform.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence to use
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the object or NULL if the sequence is empty
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619257"></a><h3>
+<a name="raptor-sequence-unshift"></a>raptor_sequence_unshift ()</h3>
+<a class="indexterm" name="id2619268"></a><pre class="programlisting">void*       raptor_sequence_unshift         (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq);</pre>
+<p>
+Retrieve the item at the start of the sequence.
+</p>
+<p>
+This is in-efficient to perform. <a href="raptor-section-sequence.html#raptor-sequence"><span class="type">raptor_sequence</span></a> is optimised
+to append/remove from the end of the sequence.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence to use
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the object or NULL if the sequence is empty
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619342"></a><h3>
+<a name="raptor-compare-strings"></a>raptor_compare_strings ()</h3>
+<a class="indexterm" name="id2619353"></a><pre class="programlisting">int         raptor_compare_strings          (const void *a,
+                                             const void *b);</pre>
+<p>
+Utility function for <a href="raptor-section-sequence.html#raptor-sequence-sort"><code class="function">raptor_sequence_sort()</code></a> to compare a sequence of strings.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>a</code></em>&#160;:</span></td>
+<td> pointer first string
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>b</code></em>&#160;:</span></td>
+<td> pointer to second string
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> comparison of <em class="parameter"><code>a</code></em> to <em class="parameter"><code>b</code></em> as strings
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619455"></a><h3>
+<a name="raptor-sequence-sort"></a>raptor_sequence_sort ()</h3>
+<a class="indexterm" name="id2619466"></a><pre class="programlisting">void        raptor_sequence_sort            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             int (*compare) (const void *, const void *));</pre>
+<p>
+The comparison function is compatible with that used for <code class="function">qsort()</code>
+and provides the addresses of pointers to the data that
+must be dereferenced to get to the stored sequence data.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence to sort
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>compare</code></em>&#160;:</span></td>
+<td> comparison function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619549"></a><h3>
+<a name="raptor-sequence-print-string"></a>raptor_sequence_print_string ()</h3>
+<a class="indexterm" name="id2619562"></a><pre class="programlisting">void        raptor_sequence_print_string    (char *data,
+                                             FILE *fh);</pre>
+<p>
+Helper function for printing a sequence of strings.
+</p>
+<p>
+Intended for use as a <span class="type">raptor_sequence_print_handler</span> passed into
+<a href="raptor-section-sequence.html#raptor-new-sequence"><code class="function">raptor_new_sequence()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> data item (a char*)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fh</code></em>&#160;:</span></td>
+<td> file handle to print to
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619654"></a><h3>
+<a name="raptor-sequence-print-uri"></a>raptor_sequence_print_uri ()</h3>
+<a class="indexterm" name="id2619666"></a><pre class="programlisting">void        raptor_sequence_print_uri       (char *data,
+                                             FILE *fh);</pre>
+<p>
+Helper function for printing a sequence of URIs.
+</p>
+<p>
+Intended for use as a <span class="type">raptor_sequence_print_handler</span> passed into
+<a href="raptor-section-sequence.html#raptor-new-sequence"><code class="function">raptor_new_sequence()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> data item (a <a href="raptor-section-uri.html#raptor-uri"><span class="type">raptor_uri</span></a>)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fh</code></em>&#160;:</span></td>
+<td> file handle to print to
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619764"></a><h3>
+<a name="raptor-sequence-set-print-handler"></a>raptor_sequence_set_print_handler ()</h3>
+<a class="indexterm" name="id2619778"></a><pre class="programlisting">void        raptor_sequence_set_print_handler
+                                            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             raptor_sequence_print_handler *print_handler);</pre>
+<p>
+Set the print handler for the sequence.
+</p>
+<p>
+This is set in the <a href="raptor-section-sequence.html#raptor-new-sequence"><code class="function">raptor_new_sequence()</code></a> constructor and can be
+overridden here.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>print_handler</code></em>&#160;:</span></td>
+<td> print handler
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619865"></a><h3>
+<a name="raptor-sequence-print"></a>raptor_sequence_print ()</h3>
+<a class="indexterm" name="id2619876"></a><pre class="programlisting">void        raptor_sequence_print           (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *seq,
+                                             FILE *fh);</pre>
+<p>
+Print the sequence contents using the print_handler to print the data items.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>seq</code></em>&#160;:</span></td>
+<td> sequence to sort
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fh</code></em>&#160;:</span></td>
+<td> file handle
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619948"></a><h3>
+<a name="raptor-sequence-join"></a>raptor_sequence_join ()</h3>
+<a class="indexterm" name="id2619959"></a><pre class="programlisting">int         raptor_sequence_join            (<a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *dest,
+                                             <a href="raptor-section-sequence.html#raptor-sequence">raptor_sequence</a> *src);</pre>
+<p>
+Join two sequences moving all items from one sequence to the end of another.
+</p>
+<p>
+After this operation, sequence src will be empty (zero size) but
+will have the same item capacity as before.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>dest</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-sequence.html#raptor-sequence"><span class="type">raptor_sequence</span></a> destination sequence
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>src</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-sequence.html#raptor-sequence"><span class="type">raptor_sequence</span></a> source sequence
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

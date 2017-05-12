@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Redland RDF Application Framework - Perl RDF::Redland::Node Class</title>
+</head>
+<body>
+
+<h1 style="text-align:center">Redland RDF Application Framework - Perl RDF::Redland::Node Class</h1>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+        <li><a href="#name">NAME</a></li>
+        <li><a href="#synopsis">SYNOPSIS</a></li>
+        <li><a href="#description">DESCRIPTION</a></li>
+        <li><a href="#constructors">CONSTRUCTORS</a></li>
+        <li><a href="#methods">METHODS</a></li>
+        <li><a href="#older_methods">OLDER METHODS</a></li>
+        <li><a href="#see_also">SEE ALSO</a></li>
+        <li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<h2><a name="name" id="name">NAME</a></h2>
+<p>RDF::Redland::Node - Redland RDF Node (RDF Resource, Property, Literal) Class</p>
+
+<h2><a name="synopsis" id="synopsis">SYNOPSIS</a></h2>
+<pre>
+  use RDF::Redland;
+  my $node1=new RDF::Redland::Node("Hello, World!");
+  my $node2=new RDF::Redland::Node($uri); # $uri is an RDF::Redland::URI
+  my $node3=$node2-&gt;clone;
+</pre>
+<pre>
+  my $node4=new RDF::Redland::URINode("<a href="http://example.com/&quot;">http://example.com/"</a>;);
+  my $node5=new RDF::Redland::LiteralNode("Hello, World!");
+  my $node6=new RDF::Redland::XMLLiteral("&lt;tag&gt;content&lt;/tag&gt;");
+  my $node7=new RDF::Redland::BlankNode("genid1");
+</pre>
+<pre>
+  # alternate more verbose ways:
+  my $node4=RDF::Redland::Node-&gt;new_from_uri("<a href="http://example.com/&quot;">http://example.com/"</a>;);
+  my $node5=RDF::Redland::Node-&gt;new_literal("Hello, World!");
+  my $node6=RDF::Redland::Node-&gt;new_xml_literal("&lt;tag&gt;content&lt;/tag&gt;");
+  my $node7=RDF::Redland::Node-&gt;new_from_blank_identifier("genid1");
+  ...
+</pre>
+<pre>
+  print $node4-&gt;uri-&gt;as_string,"\n";  # Using RDF::Redland::URI::as_string
+  print $node5-&gt;literal_value_as_latin1,"\n";
+</pre>
+
+<h2><a name="description" id="description">DESCRIPTION</a></h2>
+<p>This class represents RDF URIs, literals and blank nodes in the RDF graph.</p>
+
+<h2><a name="constructors" id="constructors">CONSTRUCTORS</a></h2>
+<dl>
+<dt><strong><a name="item_new__5bstring__7c_uri__7c_node_5d" id="item_new__5bstring__7c_uri__7c_node_5d">new [STRING | URI | NODE]</a></strong></dt>
+<dd>
+<p>Create a new URI node, literal node or copy an existing node.</p>
+</dd>
+<dd>
+<p>If a literal <em>STRING</em> is given, make a plain literal node. If a the argument is of type <em>URI</em> (perl URI or RDF::Redland::URI), make a resource node.</p>
+</dd>
+<dd>
+<p>Otherwise if the argument is an RDF::Redland::Node <em>NODE</em>, copy it.</p>
+</dd>
+</dl>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_new_from_uri" id="item_new_from_uri">new_from_uri URI</a></strong></dt>
+</dl>
+</div>
+<p>Create a new URI node. <em>URI</em> can be either a RDF::Redland::URI object, a perl URI class or a literal string.</p>
+<p>An alternative is:</p>
+<pre>
+  new RDF::Redland::URINode("<a href="http://example.org/&quot;">http://example.org/"</a>;);
+</pre>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_new_literal_string__5bdatatype__5bxml_language_5d_" id="item_new_literal_string__5bdatatype__5bxml_language_5d_">new_literal STRING [DATATYPE [XML_LANGUAGE]]</a></strong></dt>
+</dl>
+</div>
+<p>Create a new literal node for a literal value <em>STRING</em>. Optional datatype URI <em>DATATYPE</em> (RDF::Redland::URI, perl URI or string) and language (xml:lang attribute) <em>XML_LANGUAGE</em> may also be given.</p>
+<p>An alternative is:</p>
+<pre>
+   new RDF::Redland::LiteralNode("Hello, World!");
+   new RDF::Redland::LiteralNode("Bonjour monde!", undef, "fr");
+</pre>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_new_xml_literal" id="item_new_xml_literal">new_xml_literal STRING</a></strong></dt>
+</dl>
+</div>
+<p>Create a new XML datatyped literal node for the XML in <em>STRING</em>.</p>
+<p>An alternative is:</p>
+<pre>
+  new RDF::Redland::XMLLiteral("&lt;tag&gt;content&lt;/tag&gt;");
+</pre>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_new_from_blank_identifier" id="item_new_from_blank_identifier">new_from_blank_identifier IDENTIFIER</a></strong></dt>
+</dl>
+</div>
+<p>Create a new blank node with blank node identifier <em>IDENTIFIER</em>.</p>
+<p>An alternative is:</p>
+<pre>
+  new RDF::Redland::BlankNode("id");
+</pre>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_clone" id="item_clone">clone</a></strong></dt>
+</dl>
+</div>
+<p>Copy a RDF::Redland::Node.</p>
+
+<h2><a name="methods" id="methods">METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_uri" id="item_uri">uri</a></strong></dt>
+<dd>
+<p>Get the current URI of the node as an RDF::Redland::URI object.</p>
+</dd>
+</dl>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_blank_identifier" id="item_blank_identifier">blank_identifier</a></strong></dt>
+</dl>
+</div>
+<p>Get the current blank identifier of the node</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_type" id="item_type">type</a></strong></dt>
+</dl>
+</div>
+<p>Get the node type. It is recommended to use the is_resource, is_literal or is_blank methods in preference to this (both simpler and quicker).</p>
+<p>The current list of types that are supported are:</p>
+<pre>
+  $RDF::Redland::Node::Type_Resource
+  $RDF::Redland::Node::Type_Literal
+  $RDF::Redland::Node::Type_Blank
+</pre>
+<p>Example:</p>
+<pre>
+  if ($node-&gt;type == $RDF::Redland::Node::Type_Resource) {
+    print "Node is a resource with URI ", $node-&gt;uri-&gt;as_string, "\n";
+  } else {
+    ...
+  }
+</pre>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_is_resource" id="item_is_resource">is_resource</a></strong></dt>
+</dl>
+</div>
+<p>Return true if node is a resource (with a URI)</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_is_literal" id="item_is_literal">is_literal</a></strong></dt>
+</dl>
+</div>
+<p>Return true if node is a literal</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_is_blank" id="item_is_blank">is_blank</a></strong></dt>
+</dl>
+</div>
+<p>Return true if node is a blank nodeID</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_literal_value" id="item_literal_value">literal_value</a></strong></dt>
+</dl>
+</div>
+<p>Get the node literal value string as UTF-8 (when the node is of type $RDF::Redland::Node::Type_Literal)</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_literal_value_as_latin1" id="item_literal_value_as_latin1">literal_value_as_latin1</a></strong></dt>
+</dl>
+</div>
+<p>Get the node literal value string converted from UTF-8 to ISO Latin-1 (when the node is of type $RDF::Redland::Node::Type_Literal)</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_literal_value_language" id="item_literal_value_language">literal_value_language</a></strong></dt>
+</dl>
+</div>
+<p>Get the node literal XML language (when the node is of type $RDF::Redland::Node::Type_Literal) or undef if not present.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_literal_value_is_wf_xml" id="item_literal_value_is_wf_xml">literal_value_is_wf_xml</a></strong></dt>
+</dl>
+</div>
+<p>Return non 0 if the literal string is well formed XML (when the node is of type $RDF::Redland::Node::Type_Literal).</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_literal_datatype" id="item_literal_datatype">literal_datatype</a></strong></dt>
+</dl>
+</div>
+<p>Return the RDF::Redland::URI of the literal datatype or undef if it is not a datatype.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_as_string" id="item_as_string">as_string</a></strong></dt>
+</dl>
+</div>
+<p>Return the RDF::Redland::Node formatted as a string (UTF-8 encoded).</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_equals" id="item_equals">equals NODE</a></strong></dt>
+</dl>
+</div>
+<p>Return non zero if this node is equal to NODE</p>
+
+<h2><a name="older_methods" id="older_methods">OLDER METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_new_from_literal_string_xml_language_is_wf" id="item_new_from_literal_string_xml_language_is_wf">new_from_literal STRING XML_LANGUAGE IS_WF</a></strong></dt>
+<dd>
+<p>Create a new RDF::Redland::Node object for a literal value <em>STRING</em> with XML language (xml:lang attribute) <em>XML_LANGUAGE</em> and if content is well formed XML, when <em>IS_WF</em> is non 0. <em>XML_LANGUAGE</em> is optional can can be set to undef.</p>
+</dd>
+<dd>
+<p>This method remains but using new_literal is prefered. Instead, for plain literals use:</p>
+</dd>
+<dd>
+<pre>
+  $node=new RDF::Redland::Node("blah")
+</pre></dd>
+</dl>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_new_from_typed_literal_string__5bdatatype__5bxml_l" id="item_new_from_typed_literal_string__5bdatatype__5bxml_l">new_from_typed_literal STRING [DATATYPE [XML_LANGUAGE]]</a></strong></dt>
+</dl>
+</div>
+<p>Renamed to new_literal with same arguments.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_new_from_uri_string_uri_string" id="item_new_from_uri_string_uri_string">new_from_uri_string URI_STRING</a></strong></dt>
+</dl>
+</div>
+<p>Create a new RDF::Redland::Node object for a resource with URI <em>URI_STRING</em>. It is equivalent to use the shorter:</p>
+<pre>
+  $a=new RDF::Redland::Node-&gt;new_from_uri($uri_string)
+</pre>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_new_from_node" id="item_new_from_node">new_from_node NODE</a></strong></dt>
+</dl>
+</div>
+<p>Create a new RDF::Redland::Node object from existing RDF::Redland::Node <em>NODE</em> (copy constructor). It is equivalent to use:</p>
+<pre>
+  $new_node=$old_node-&gt;clone
+</pre>
+
+<h2><a name="see_also" id="see_also">SEE ALSO</a></h2>
+<p><a href="Statement.html">the RDF::Redland::Statement manpage</a></p>
+
+<h2><a name="author" id="author">AUTHOR</a></h2>
+<p>Dave Beckett - <a href="http://purl.org/net/dajobe/">http://purl.org/net/dajobe/</a></p>
+<hr />
+
+<p>(C) Copyright 2000-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, (C) Copyright 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>

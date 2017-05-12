@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ca0a0cd3bb12b0c1311e83e2ef58dbedeb17a114 Changes
+SHA1 191c720d39ff5f3c457d5bfdac87737129ec78f3 MANIFEST
+SHA1 6af0f2769932006f7f1f231259f1a3d175b6fca6 META.yml
+SHA1 b4cdf355b30ff9561b1ee9aa1a80d190047ce84f Makefile.PL
+SHA1 076018df4e586385e7a915cd0b40ebd8ec67b3bf README
+SHA1 d0e97152d4d67f19abe0e2493fffff746c5b0610 etc/initialdata
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 6e010ba20a9d0ae23d8d0ff516868c1e571c2d44 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 9c02ec826b4fe666b1cc387e8b73622058b11bdd lib/RT/Action/UpdateParentTimeWorked.pm
+SHA1 1fa5da1da326d2f68370185888531b22ae86d71f lib/RT/Condition/TimeWorkedChange.pm
+SHA1 a5a32ce02ff34792d804a11bda0a46b013fdd166 lib/RT/Extension/ParentTimeWorked.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSTV04ACgkQMflWJZZAbqAG6QCfYPl0nCJ1kJX45pCMnbmtrTj5
++y8AmwQq/pFuj46aZz9yNKNSGtofwUSR
+=Lyyo
+-----END PGP SIGNATURE-----

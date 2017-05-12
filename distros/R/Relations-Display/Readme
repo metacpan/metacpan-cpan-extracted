@@ -1,0 +1,50 @@
+NAME
+
+  Relations::Display v0.92
+
+DESCRIPTION
+
+  This perl library uses perl5 objects to simplify creating graphs
+  from MySQL queries.
+
+COPYRIGHT
+
+  Copyright 2001 GAF-3 Industries, Inc. All rights reserved.
+  Written by George A. Fitch III (aka Gaffer), gaf3@gaf3.com
+
+  This program is free software, you can redistribute it and/or modify it under
+  the same terms as Perl istelf
+
+INSTALlATION
+
+  REQUIRED
+ 
+    perl 5.004
+    DBI >= 1.13
+    DBD::mysql >= 1.18
+    Relations >= 0.95
+    Relations::Query >= 0.93
+    Relations::Abstract >= 0.94
+
+  WIN32 (Relations-Display-0.92.zip)
+
+    Extract zip file into a directory and type
+
+    ppm install Relations-Display.ppd
+
+  UN*X (Relations-Display-0.92.tar.gz)
+
+    Extract bundle into a directory and type
+
+    perl Makefile.PL
+    make
+    make install
+
+TESTING
+
+  After installing, run test.pl by typing 
+
+    perl test.pl
+
+  while in the installation directory.
+  

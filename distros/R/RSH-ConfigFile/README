@@ -1,0 +1,44 @@
+RSH::ConfigFile version 1.0.x
+=============================
+
+RSH::ConfigFile is a configuration file that uses standard text
+'key = value' lines, where value can be a string, an array, or
+a hash.  In some ways, it is similar to Java properties files.
+It's primary goal is to make the source config file extremely
+easy to edit, make the entries and syntax largely self-documenting,
+and to make it very hard to screw up.
+
+The work for this module largely came from an aborted attempt to
+write a hosting management package.  It was written a while back,
+but I keep finding portions of it very useful.  I particularly 
+find the LockFile implementation useful at random times.
+So I thought it was high time to just shove it out there for others 
+to use, poke at, or deride.
+  
+Enjoy!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   NONE
+
+USAGE
+
+See "man RSH::ConfigFile", "perldoc RSH::ConfigFile", or
+"perldoc lib/RSH/ConfigFile" for more information on how to use it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2008 Matt Luker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

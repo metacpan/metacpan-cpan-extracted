@@ -1,0 +1,19 @@
+%# Sets property of a content.
+<%INIT>
+$Object->_ClassAccessible->{$Property}{read} or return(404, undef);
+$Object->_ClassAccessible->{$Property}{write} or return(403, undef);
+
+$m->notes('ToUTF8')->($Value);
+
+my $method = "Set$Property";
+
+return (200, $Value) if ($Object->$Property eq $Value);
+
+my ($rv, $errstr) = ($Object->$method( $Value ))[0, -1];
+return ( ($rv ? 200 : 400), $errstr );
+</%INIT>
+<%ARGS>
+$Object
+$Property
+$Value
+</%ARGS>

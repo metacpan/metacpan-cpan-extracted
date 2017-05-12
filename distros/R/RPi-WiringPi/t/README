@@ -1,0 +1,17 @@
+Pin usage for unit testing (GPIO layout):
+
+ADC = MCP3008 Analog to Digital Converter
+DAC = MCP4922 Digital to Analog Converter
+SR  = 74HC595 Shift Register
+
+18  - NC (used for base pin and interrupt tests)
+9   - ADC 12 
+10  - ADC 11, DAC 5
+11  - ADC 13, DAC 4
+12  - DAC 3 (CS)
+16  - SR 12 (LATCH)
+20  - SR 11 (CLK)
+21  - SR 14 (DATA)
+26  - ADC 10 (CS)
+27  - PUD/Interrupt testing 
+

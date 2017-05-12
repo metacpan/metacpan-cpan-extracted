@@ -1,0 +1,36 @@
+<&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 1, class_name => 'MemberOfRole' &>
+<p>This filter selects eligible owners by their role membership. Only members of the following role, either on the queue or on the ticket itself, will be automatically assigned tickets.</p>
+
+<table>
+<tr>
+<td class="label"><label for="<% $prefix %>_role">Role:</label></td>
+<td class="value">
+<select id="<% $prefix %>_role" name="<% $prefix %>_role">
+<option value="">-</option>
+% for my $role (qw/AdminCc Cc Requestor/) {
+<option <% ($config->{role}||'') eq $role ? "selected" : "" %> value="<% $role %>"><% $role %></option>
+% }
+% if ($custom_roles) {
+% while (my $role = $custom_roles->Next) {
+<option <% ($config->{role}||0) eq $role->Id ? "selected" : "" %> value="<% $role->Id %>"><% $role->Name %></option>
+% }
+% }
+</select>
+</td>
+</tr>
+</table>
+</&>
+
+<%INIT>
+my $custom_roles;
+if ( RT::Handle::cmp_version($RT::VERSION,'4.4.0') >= 0 ) {
+    $custom_roles = RT::CustomRoles->new($session{CurrentUser});
+    $custom_roles->LimitToObjectId($queue->Id);
+    $custom_roles->ApplySortOrder;
+}
+</%INIT>
+<%ARGS>
+$prefix
+$config
+$queue
+</%ARGS>

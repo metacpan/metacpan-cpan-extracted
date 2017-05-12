@@ -1,0 +1,13 @@
+name: RT-Authen-OpenID
+version: 0.01
+abstract: Allows RT to do authentication via a service which supports the OpenID API
+author: Artur Bergman <abergman@sixapart.com>
+license: GPL version 2
+distribution_type: module
+requires:
+  Net::OpenID::Consumer: 0
+no_index:
+  directory:
+    - html
+    - inc
+generated_by: Module::Install version 0.34

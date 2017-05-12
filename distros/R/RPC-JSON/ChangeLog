@@ -1,0 +1,10 @@
+2006-06-14 J. Shirley <jshirley@gmail.com>
+
+    * Initial Release
+    * Supports JSON-RPC Shell
+
+2008-08-01 Chris Carline <chris@carline.org>
+
+    * Add UTF8 support
+    * Removed dead code (bind, listen)
+    * Updated test

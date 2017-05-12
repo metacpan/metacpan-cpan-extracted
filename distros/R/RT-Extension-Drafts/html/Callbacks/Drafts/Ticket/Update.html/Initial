@@ -1,0 +1,12 @@
+<%init>
+my $Ticket = LoadTicket($$ARGSRef{'id'});
+if ( $$ARGSRef{'LoadDraft'} ) {
+    my $Draft = RT::Attribute->new( $session{'CurrentUser'} );
+    $Draft->LoadByNameAndObject( Object => $session{'CurrentUser'}->UserObj, Name => 'Draft-'.$Ticket->id );
+    $$ARGSRef{'UpdateContent'} = $Draft->Content if ( $Draft && $Draft->Content );
+    $$ARGSRef{'UpdateContentType'} = $Draft->ContentType if ( $Draft && $Draft->ContentType );
+}
+</%init>
+<%args>
+$ARGSRef => undef
+</%args>

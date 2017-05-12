@@ -1,0 +1,18 @@
+DESCRIPTION
+
+    This role adds a select() method to select nodes using Data::CSel.
+
+REQUIRED ROLES
+
+    Role::TinyCommons::Tree::Node
+
+PROVIDED METHODS
+
+ select([ \%opts, ] $expr)
+
+SEE ALSO
+
+    Role::TinyCommons
+
+    Data::CSel
+

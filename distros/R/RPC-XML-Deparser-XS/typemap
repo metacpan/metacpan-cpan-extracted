@@ -1,0 +1,21 @@
+TYPEMAP
+deparser_context_t*    deparserContextT
+
+
+INPUT
+deparserContextT
+    if (sv_derived_from($arg, \"RPC::XML::Deparser::XS::Writer\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ($type)tmp;
+    }
+    else {
+        croak(\"$var is not of type RPC::XML::Deparser::XS::Writer\");
+    }
+
+
+OUTPUT
+deparserContextT
+    sv_setref_pv(
+        $arg,
+        \"RPC::XML::Deparser::XS::Writer\",
+        (void*)$var);

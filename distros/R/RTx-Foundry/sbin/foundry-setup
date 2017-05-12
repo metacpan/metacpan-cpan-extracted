@@ -1,0 +1,286 @@
+#!/usr/local/bin/perl -w
+# $File: //depot/RT/osf/sbin/foundry-setup $ $Author: autrijus $
+# $Revision: #8 $ $Change: 10208 $ $DateTime: 2004/02/26 08:04:52 $
+
+use strict;
+use FindBin;
+use ExtUtils::MakeMaker;
+use lib "$FindBin::Bin/foundry-lib";
+use lib "$FindBin::Bin/../libexec/foundry";
+
+use constant EXPLAIN => { split(/\n\n/, << '.') };
+RT_NAME
+
+The string that RT will look for in mail messages to figure out what ticket
+a new piece of mail belongs to.  Your domain name is recommended, so as not
+to pollute the namespace.
+
+TZ
+
+Used to convert times entered by users into UTC and back again.  It should
+be set to a timezone recognized by your system, such as "Asia/Taipei".
+
+DB_TYPE
+
+Database driver being used.  Case matters.  Valid types are "mysql" and "Pg".
+
+DB_HOST
+
+The domain name of your database server.
+
+DB_PORT
+
+The port that your database server is running on.  Ignored unless it's a
+positive integer.  It's usually safe to leave this blank.
+
+DB_DBA_USER
+
+The name of the database user (inside the database).
+
+DB_DBA_PASSWORD
+
+Password used to access the database.
+
+HOST
+
+Base domain name for your host.  Used for canonizing email addresses.
+
+WEB_HOST
+
+Domain name for the web server.
+
+EMAIL_HOST
+
+Domain name for the user-serving email server.  Used by Sympa.
+
+RT_URL
+
+Base URL for the web server.  Usually "http://WEB_HOST" will do.
+
+SVNROOT
+
+Base directory for Subversion repositories.  Note that the actual
+directory used for Foundry will be $SVNROOT/foundry-repos/.
+
+CVSROOT
+
+Base directory for CVS repositories.  Note that the actual
+directory used for Foundry will be $CVSROOT/foundry-repos/.
+
+CVSUSER
+
+User name for CVS files.  Also used as the anonymous, read-only CVS user.
+
+CVSGROUP
+
+Group name for CVS files.
+
+.
+
+BEGIN {
+    die "$0: This command is reserved for the superuser.\n" unless -w '/etc';
+
+    my %Vars = (
+	VCS => [qw(
+	    DB_TYPE DB_HOST DB_PORT
+	    DB_DBA_USER DB_DBA_PASSWORD
+	    RT_URL
+	    SVNROOT
+	    CVSROOT CVSUSER CVSGROUP
+	)],
+	WWW => [qw(
+	    RT_NAME TZ
+	    DB_TYPE DB_HOST DB_PORT
+	    DB_DBA_USER DB_DBA_PASSWORD
+	    HOST WEB_HOST EMAIL_HOST 
+	)],
+    );
+
+    no strict 'refs';
+    my (%seen, @vars);
+    foreach my $key (reverse sort keys %Vars) {
+	my $ok = (
+	    $ENV{"INIT_$key"}
+	    or grep { /^-DINIT_ALL$/ } @ARGV
+	    or grep { /^-DINIT_$key$/ } @ARGV
+	    or grep { /^INIT_ALL=(.+)$/ and $1 } @ARGV
+	    or grep { /^INIT_$key=(.+)$/ and $1 } @ARGV
+	);
+	*{"INIT_$key"} = sub () { $ok };
+	next unless $ok;
+	($seen{$_}++ or push @vars, $_) for @{$Vars{$key}};
+    }
+
+    die "Must specify INIT_VCS=yes and/or INIT_WWW=yes\n" unless @vars;
+
+    *VARS = sub () { @vars };
+}
+
+use vars map "\$\L$_", +VARS, 'DB_PAM_MODULE', 'DB_MODULE';
+
+eval { require "/usr/local/etc/foundry.conf.sample" };
+eval { require "/usr/local/etc/foundry.conf" };
+
+foreach my $var (+VARS) {
+    no strict 'refs';
+    my $val = (map /^$var=(.+)/g, @ARGV)[-1] || $ENV{$var};
+    if (my $text = +EXPLAIN->{$var}) {
+	print "$text\n";
+    }
+    ${"\L$var"} = prompt("==> $var:", defined($val) ? $val : ());
+    print $/;
+}
+
+if ( $db_type =~ /^p(g|(?:ostgres?))(?:sql)?$/i ) {
+    $db_type = 'Pg';
+    $db_module = 'pgsql';
+    $db_pam_module = 'pam_pgsql';
+}
+elsif ( $db_type =~ /^mysql$/i ) {
+    $db_type = 'mysql';
+    $db_module = 'mysql';
+    $db_pam_module = 'pam_mysql';
+}
+else {
+    die "DB_TYPE '$db_type' unsupported";
+}
+
+&pam_conf if +INIT_VCS;
+&foundry_conf;
+&postfix_conf;
+&sympa_conf;
+
+sub postfix_conf {
+    return unless -e "/usr/local/sbin/postfix";
+
+    open my $MAIN, '>>', '/usr/local/etc/postfix/main.cf';
+    print $MAIN qq(
+alias_database = hash:/etc/aliases, hash:/etc/mail/sympa_aliases
+alias_maps = ${db_module}:/usr/local/etc/postfix/aliases.cf, hash:/etc/mail/sympa_aliases, hash:/etc/aliases
+);
+
+    open my $ALIASES, '>', '/usr/local/etc/postfix/aliases.cf';
+    print $ALIASES qq(
+user=${db_dba_user}
+password=${db_dba_password}
+dbname=rt3
+table=users
+select_field=emailaddress
+where_field=name
+hosts=${db_host}
+);
+}
+
+sub sympa_conf {
+    return unless -e "/usr/local/etc/sympa.conf";
+    open my $SYMPA, '>>', '/usr/local/etc/sympa.conf';
+    print $SYMPA qq(
+# Foundry-specific settings
+dark_color      #0F6080
+selected_color  #0F6080
+light_color     #D3DCE3
+shaded_color    #EEEEEE
+bg_color        #C4E1F0
+text_color      #000000
+);
+}
+
+sub foundry_conf {
+    my $conf = "/usr/local/etc/foundry.conf";
+
+    my @in_lines;
+    if (open my $IN, $conf) {
+	@in_lines = grep {
+	    my $line = $_;
+	    !grep $line =~ /\$ENV\{$_\}/, +VARS
+	} <$IN>;
+	close $IN;
+    }
+
+    no strict 'refs';
+    no warnings 'uninitialized';
+    open my $OUT, '>', $conf or die $!;
+    print $OUT (
+	@in_lines,
+	map {
+	    "\$ENV{$_}" .
+	    ("\t" x (2 - int((length($_)-1) / 8))) .
+	    "= '${lc$_}';\n"
+	} +VARS,
+    );
+    close $OUT;
+    chown 0600, $conf;
+
+    print "===> $conf successfully written.\n";
+}
+
+sub pam_conf {
+    my %params = (
+	host		=> $db_host,
+	user		=> $db_dba_user,
+	passwd		=> $db_dba_password,
+	db		=> 'rt3',
+	table		=> 'Users',
+	usercolumn	=> 'Name',
+	passwdcolumn	=> 'Password',
+	crypt		=> 'md5',
+    );
+    my %keys_pg = (
+	db		=> 'database',
+	usercolumn	=> 'user_column',
+	passwdcolumn	=> 'pwd_column',
+	crypt		=> 'pw_type',
+    );
+
+    my $params = '';
+    $params = join('', map " $_=$params{$_}", sort keys %params)
+	if $db_pam_module eq 'pam_mysql';
+    @params{values(%keys_pg)} = delete @params{keys(%keys_pg)}
+	if $db_pam_module eq 'pam_pgsql';
+
+    my @conf_lines = (
+	"auth        required    $db_pam_module.so$params\n",
+	"account     required    pam_permit.so\n",
+	"password    required    $db_pam_module.so$params\n",
+	"session     required    pam_permit.so\n",
+    );
+
+    my $service = 'sshdcvs';
+    my $pam_d = "/usr/local/etc/pam.d";
+    my $pam_conf = "/etc/pam.conf";
+    my $pam_module_conf = "/etc/$db_pam_module.conf";
+
+    if (-e $pam_conf) {
+	open my $IN, $pam_conf or die $!;
+	my @in_lines = grep !/^(?:# )?$service\s+/, <$IN>;
+	close $IN;
+	open my $OUT, '>', $pam_conf or die $!;
+	print $OUT (
+	    @in_lines,
+	    "# $service: added by $0 at " . localtime() . $/,
+	    map "$service $_", @conf_lines,
+	);
+	close $OUT;
+
+	print "===> $pam_conf successfully written.\n";
+    }
+    elsif (-d $pam_d) {
+	open my $OUT, '>', "$pam_d/$service" or die $!;
+	print $OUT @conf_lines;
+	close $OUT;
+
+	print "===> $pam_d/$service successfully written.\n";
+    }
+    else {
+	die "Cannot find $pam_conf or $pam_d/, aborting!\n";
+    }
+
+    if ($db_pam_module eq 'pam_pgsql') {
+	open my $OUT, '>', "$pam_module_conf" or die $!;
+	print $OUT "$_ = $params{$_}\n" for sort keys %params;
+	close $OUT;
+	print "===> $pam_module_conf successfully written.\n";
+    }
+}
+
+1;

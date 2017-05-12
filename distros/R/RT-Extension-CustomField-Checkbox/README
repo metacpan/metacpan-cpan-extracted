@@ -1,0 +1,21 @@
+NAME
+    RT::Extension::CustomField::Checkbox (DEPRECATED) - extension for RT to
+    add checkboxes and radio buttons based custom fields
+
+DESCRIPTION
+    Install it, register within @Plugins in the config. Enjoy.
+
+ATTENTION FOR USERS OF RT 4.0
+    You don't need this extension. RT 4.0 and newer has this functionality
+    build in.
+
+    RT 4.0.20 and 4.2.3 ship etc/upgrade/4.0-customfield-checkbox-extension
+    which can upgrade these custom fields to be compatible with the RT 4.0
+    core feature.
+
+AUTHOR
+    Ruslan Zakirov <Ruslan.Zakirov@gmail.com>
+
+LICENSE
+    Under the same terms as perl itself.
+

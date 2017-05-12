@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+use Ruby qw(rb_require rb_c);
+
+rb_require 'irb';
+rb_c(IRB)->start();

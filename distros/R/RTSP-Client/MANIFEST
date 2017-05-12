@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/RTSP-Client.t
+lib/RTSP/Client.pm
+META.yml                                 Module meta-data (added by MakeMaker)

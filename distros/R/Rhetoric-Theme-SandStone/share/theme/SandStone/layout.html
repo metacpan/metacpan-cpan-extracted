@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Title      : Sandstone
+Version    : 1.0
+Released   : 20091109
+Description: A two-column fixed-width template suitable for small websites.
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>[% title %][% IF post; " - " _ post.title; END %]</title>
+<meta name="keywords" content="[% keywords %]" />
+<meta name="description" content="[% description %]" />
+<link href="[% R('Feed') %]" rel="alternate" type="application/atom+xml" title="[% title %] Feed" />
+<link href="[% relocated %]/theme/SandStone/default.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+  <div id="header">
+    <div id="logo">
+      <h1><a href="[% R('Home') %]">[% title %]</a></h1>
+      <h2><a href="[% R('Home') %]">[% subtitle %]</a></h2>
+    </div>
+    <!-- end div#logo -->
+  </div>
+  <!-- end div#header -->
+  <div id="menu">
+    <ul>
+    [% FOREACH item IN menu %]
+      <li[% IF request_path == item.url %] class="active"[% END %]><a href="[% item.url %]">[% item.name %]</a></li>
+    [% END %]
+    </ul>
+  </div>
+  <div id="splash"><img src="[% relocated %]/theme/SandStone/images/img01.jpg" width="940" height="410" alt="" /></div>
+  <!-- end div#menu -->
+  <div id="page">
+    <div id="page-bgtop">
+      <div id="content">
+        [% content %]
+      </div>
+      <!-- end div#content -->
+      <div id="sidebar">
+        <ul>
+        [% FOREACH widget IN widgets.sidebar %]
+          <li>
+          [% widget %]
+          </li>
+        [% END %]
+        </ul>
+      </div>
+      <!-- end div#sidebar -->
+      <div style="clear: both; height: 1px"></div>
+    </div>
+  </div>
+  <!-- end div#page -->
+  <div id="footer">
+    <p>[% copy %] - Designed by <a href="http://www.freecsstemplates.org/">Free CSS Templates</a>. </p>
+    <p id="links"><a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
+  </div>
+  <!-- end div#footer -->
+</div>
+<!-- end div#wrapper -->
+</body>
+</html>

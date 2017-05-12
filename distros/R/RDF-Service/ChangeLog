@@ -1,0 +1,458 @@
+2000-12-21  aigan  <aigan@jonas>
+
+	* /cvsroot/wraf/RDF-Service/doc/TODO: *** empty log message ***
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm:
+	minor changes
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm:
+	 - connect() method changed
+	 - added desig_statement()
+	 - _export_to_ids() copies unchanged data from one IDS cache to another
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Resource.pm:
+	added net_with_ids()
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm:
+	 - more validation tests
+	 - use HISTORY to remember the steps in a nested call
+	 - interface responses validated
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm:
+	 - context inherits HISTORY
+	 - added get_node(), get_node_by_id(), could_be_a(), is_known_as_a(), exist_pred()
+	 - bugfixes
+	 - types_as_string() gives more info
+	 - wrapper methods for interface methods added: init...() and store...()
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Constants.pm:
+	 - RUNLEVEL makes startup a special case
+	 - MEMORY is a place for interface to store things in contexts
+	 - HISTORY remember function calles and hinder recursive calling
+	 - added properties LS:name, LS:level, LS:updated and LS:agent
+	 - removed the LS:ns data
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm:
+	 - nesting counting not depending on $DEBUG > 0
+	 - many validation testings on debug_start() and debug_end()
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm:
+	 - use RUNLEVEL to make upstart a special case
+	 - use get_node()
+
+	* /cvsroot/wraf/RDF-Service/lib/Wraf/Result.pm:
+	*** empty log message ***
+
+	* /cvsroot/wraf/RDF-Service/bin/tmpl/person_view:
+	Removed debugging data
+
+	* /cvsroot/wraf/RDF-Service/bin/tmpl/person_list: Reset output on error
+
+	* /cvsroot/wraf/RDF-Service/bin/tmpl/header: Resets output on error
+
+	* /cvsroot/wraf/RDF-Service/bin/serv1.pl:
+	 - resets the debug output indentation on exceptions
+	 - option to set service key by name 's' in query string
+	 - initialize session date after DBI connection
+	 - DB initialization includes the properties
+
+2000-12-04  aigan  <aigan@jonas>
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm, /cvsroot/wraf/RDF-Service/doc/rdf.sql:
+	 - Fixed type storing bug
+	 - Fixed date bug
+
+2000-12-01  aigan  <aigan@jonas>
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm:
+	See previous
+
+	* /cvsroot/wraf/RDF-Service/bin/tmpl/person_view, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Resource.pm, /cvsroot/wraf/RDF-Service/bin/serv1.pl:
+	 - Add types and props to session resource
+	 - Store nonsolid resources on demand
+	 - Tracked down and fixed error that substituted literal value with
+	the literal resource
+
+2000-11-26  aigan  <aigan@jonas>
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/doc/rdf.sql, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Constants.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Resource.pm, /cvsroot/wraf/RDF-Service/bin/tmpl/footer, /cvsroot/wraf/RDF-Service/bin/tmpl/header, /cvsroot/wraf/RDF-Service/bin/tmpl/menu, /cvsroot/wraf/RDF-Service/bin/tmpl/person_add_form, /cvsroot/wraf/RDF-Service/bin/tmpl/person_edit_form, /cvsroot/wraf/RDF-Service/bin/tmpl/person_list, /cvsroot/wraf/RDF-Service/bin/tmpl/person_view, /cvsroot/wraf/RDF-Service/cgi-bin/client.cgi, /cvsroot/wraf/RDF-Service/cgi-bin/demo.html, /cvsroot/wraf/RDF-Service/cgi-bin/tail.cgi, /cvsroot/wraf/RDF-Service/bin/serv1.pl:
+	 - Remembers if a change has been stored in the interface
+	 - Removed model fields from DBI and constants
+	 - Function for couple person with session
+	 - Storage needs more work...
+
+2000-11-21  aigan  <aigan@jonas>
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm:
+	... Again
+
+	* /cvsroot/wraf/RDF-Service/cgi-bin/client.cgi, /cvsroot/wraf/RDF-Service/cgi-bin/.htaccess, /cvsroot/wraf/RDF-Service/doc/TODO:
+	... See last entry
+
+	* /cvsroot/wraf/RDF-Service/bin/serv1.pl, /cvsroot/wraf/RDF-Service/bin/tmpl/footer, /cvsroot/wraf/RDF-Service/README:
+	 - bugfixes for delete
+	 - reuses session object
+	 - bugfix with CGI.pm and POST
+	 - And more...
+
+2000-11-14  aigan  <aigan@jonas>
+
+	* /cvsroot/wraf/RDF-Service/doc/TODO: Added DB handler item
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm:
+	Reuses the database connection. Release 0.03_01
+
+2000-11-12  aigan  <aigan@jonas>
+
+	* /cvsroot/wraf/RDF-Service/cgi-bin/demo.html, /cvsroot/wraf/RDF-Service/cgi-bin/tail.cgi, /cvsroot/wraf/RDF-Service/doc/ANNOUNCE, /cvsroot/wraf/RDF-Service/doc/scratchpad.txt, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/bin/serv1.pl, /cvsroot/wraf/RDF-Service/bin/tmpl/footer, /cvsroot/wraf/RDF-Service/bin/tmpl/header, /cvsroot/wraf/RDF-Service/bin/tmpl/menu, /cvsroot/wraf/RDF-Service/ChangeLog, /cvsroot/wraf/RDF-Service/Makefile.PL, /cvsroot/wraf/RDF-Service/MANIFEST, /cvsroot/wraf/RDF-Service/README:
+	Release-v0_03
+
+	* /cvsroot/wraf/RDF-Service/bin/tmpl/components, /cvsroot/wraf/RDF-Service/bin/tmpl/error, /cvsroot/wraf/RDF-Service/bin/tmpl/footer, /cvsroot/wraf/RDF-Service/bin/tmpl/header, /cvsroot/wraf/RDF-Service/bin/tmpl/js, /cvsroot/wraf/RDF-Service/bin/tmpl/menu, /cvsroot/wraf/RDF-Service/bin/tmpl/person_add_form, /cvsroot/wraf/RDF-Service/bin/tmpl/person_edit_form, /cvsroot/wraf/RDF-Service/bin/tmpl/person_list, /cvsroot/wraf/RDF-Service/bin/tmpl/person_view, /cvsroot/wraf/RDF-Service/bin/tmpl/test, /cvsroot/wraf/RDF-Service/doc/html/jumptable.html:
+	Moved templates from cgi-bin to bin
+
+	* /cvsroot/wraf/RDF-Service/t/rdf_server.pl, /cvsroot/wraf/RDF-Service/t/w23a.pl, /cvsroot/wraf/RDF-Service/t/w23b.pl:
+	Old testfiles removed
+
+	* /cvsroot/wraf/RDF-Service/bin/serv1.pl, /cvsroot/wraf/RDF-Service/cgi-bin/person.cgi, /cvsroot/wraf/RDF-Service/cgi-bin/rdf.handler, /cvsroot/wraf/RDF-Service/cgi-bin/serv1.pl:
+	serv1.pl moved to bin directory. Old test-files removed
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm, /cvsroot/wraf/RDF-Service/cgi-bin/serv1.pl, /cvsroot/wraf/RDF-Service/doc/ANNOUNCE, /cvsroot/wraf/RDF-Service/doc/TODO, /cvsroot/wraf/RDF-Service/README:
+	Preparation for a3
+
+2000-11-12  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/bin/tmpl/components, /cvsroot/wraf/RDF-Service/bin/tmpl/error, /cvsroot/wraf/RDF-Service/bin/tmpl/footer, /cvsroot/wraf/RDF-Service/bin/tmpl/header, /cvsroot/wraf/RDF-Service/bin/tmpl/js, /cvsroot/wraf/RDF-Service/bin/tmpl/menu, /cvsroot/wraf/RDF-Service/bin/tmpl/person_add_form, /cvsroot/wraf/RDF-Service/bin/tmpl/person_edit_form, /cvsroot/wraf/RDF-Service/bin/tmpl/person_list, /cvsroot/wraf/RDF-Service/bin/tmpl/person_view, /cvsroot/wraf/RDF-Service/bin/tmpl/test, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/components, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/error, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/footer, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/header, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/js, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/menu, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/person_add_form, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/person_edit_form, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/person_list, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/person_view, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/test, /cvsroot/wraf/RDF-Service/doc/html/jumptable.html:
+	Moved templates from cgi-bin to bin
+
+	* /cvsroot/wraf/RDF-Service/t/rdf_server.pl, /cvsroot/wraf/RDF-Service/t/w23a.pl, /cvsroot/wraf/RDF-Service/t/w23b.pl:
+	Old testfiles removed
+
+	* /cvsroot/wraf/RDF-Service/bin/serv1.pl, /cvsroot/wraf/RDF-Service/cgi-bin/person.cgi, /cvsroot/wraf/RDF-Service/cgi-bin/rdf.handler, /cvsroot/wraf/RDF-Service/cgi-bin/serv1.pl:
+	serv1.pl moved to bin directory. Old test-files removed
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm, /cvsroot/wraf/RDF-Service/cgi-bin/serv1.pl, /cvsroot/wraf/RDF-Service/doc/ANNOUNCE, /cvsroot/wraf/RDF-Service/doc/TODO, /cvsroot/wraf/RDF-Service/README:
+	Preparation for a3
+
+2000-11-10  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Constants.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Resource.pm, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/person_list, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm:
+	you can now create and delete entries without corrupting the internal
+	or DB data
+
+2000-11-05  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Constants.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Resource.pm:
+	More on the new deletion of dependent caches
+
+2000-11-04  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/cgi-bin/serv1.pl, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Constants.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Schema/RDFS_200001.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Resource.pm:
+	Switching from DEPEND to REV-data. Breakes everything...
+
+2000-10-30  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Schema/RDFS_200001.pm, /cvsroot/wraf/RDF-Service/t/w23a.pl, /cvsroot/wraf/RDF-Service/t/w23b.pl, /cvsroot/wraf/RDF-Service/cgi-bin/person.cgi, /cvsroot/wraf/RDF-Service/cgi-bin/serv1.pl, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/person_edit_form, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/person_list, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/person_view, /cvsroot/wraf/RDF-Service/cgi-bin/tmpl/test, /cvsroot/wraf/RDF-Service/doc/tutorial.txt, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Constants.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm:
+	 - Separated local schema namespace from local data namespace
+	 - Moved schemas from RDFS interface to Constants class
+	 - Moved schema functions from RDFS interface to base interface
+	 - Implemented sorted types list (the slooow version)
+	 - Debugging sublevels in Dispatcher
+	 - init_props() and init_types() uses the RDF, RDFS and LS schemas
+	 - A lot of details to evade cyclic dependencies
+	 - Many things still broken
+
+2000-10-27  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Dispatcher.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Resource.pm:
+	Small optimizations and a little mor on dependency registration
+
+2000-10-25  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/doc/scratchpad.txt: Temporary comments
+
+	* /cvsroot/wraf/RDF-Service/cgi-bin/client.cgi, /cvsroot/wraf/RDF-Service/cgi-bin/serv1.pl, /cvsroot/wraf/RDF-Service/doc/TODO, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Cache.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Constants.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/Makefile.PL, /cvsroot/wraf/RDF-Service/README:
+	 - Dependency partly implemented
+	 - DBI add_arc uses declare_arc
+
+	* /cvsroot/wraf/RDF-Service/doc/ANNOUNCE: *** empty log message ***
+
+2000-10-24  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/cgi-bin/client.cgi, /cvsroot/wraf/RDF-Service/cgi-bin/serv1.pl:
+	This is the client/server version of person.cgi
+
+2000-10-22  aigan  <aigan@astral.paranormal.se>
+
+	* /cvsroot/wraf/RDF-Service/ChangeLog, /cvsroot/wraf/RDF-Service/doc/ANNOUNCE, /cvsroot/wraf/RDF-Service/MANIFEST, /cvsroot/wraf/RDF-Service/MANIFEST.SKIP:
+	Release-v0_02
+
+	* /cvsroot/wraf/RDF-Service/ChangeLog: Changelog created
+
+	* /cvsroot/wraf/RDF-Service/doc/ANNOUNCE, /cvsroot/wraf/RDF-Service/doc/TODO, /cvsroot/wraf/RDF-Service/doc/tutorial.txt:
+	New documentation
+
+	* /cvsroot/wraf/RDF-Service/doc/api.html, /cvsroot/wraf/RDF-Service/TODO:
+	 - TODO moved to doc
+	 - api.html replaced by api.txt
+
+	* /cvsroot/wraf/RDF-Service/cgi-bin/person.cgi, /cvsroot/wraf/RDF-Service/doc/api.txt, /cvsroot/wraf/RDF-Service/doc/dependency.txt, /cvsroot/wraf/RDF-Service/doc/get_node.txt, /cvsroot/wraf/RDF-Service/doc/html/dbi.html, /cvsroot/wraf/RDF-Service/doc/html/jumptable.html, /cvsroot/wraf/RDF-Service/doc/html/presentation.html, /cvsroot/wraf/RDF-Service/doc/wraf.txt, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Context.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Base/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/DBI/V01.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service/Interface/Schema/RDFS_200001.pm, /cvsroot/wraf/RDF-Service/lib/RDF/Service.pm, /cvsroot/wraf/RDF-Service/MANIFEST.SKIP, /cvsroot/wraf/RDF-Service/README, /cvsroot/wraf/RDF-Service/t/w23a.pl, /cvsroot/wraf/RDF-Service/t/w23b.pl:
+	 - added type()
+	 - set() takes strings as literal props
+	 - updated documentation
+
+2000-10-22  aigan  <aigan@astral.paranormal.se>
+
+	* doc/ANNOUNCE, doc/TODO, doc/tutorial.txt:
+	New documentation
+
+	* doc/api.html, TODO:
+	 - TODO moved to doc
+	 - api.html replaced by api.txt
+
+	* cgi-bin/person.cgi, doc/api.txt, doc/dependency.txt, doc/get_node.txt, doc/html/dbi.html, doc/html/jumptable.html, doc/html/presentation.html, doc/wraf.txt, lib/RDF/Service/Context.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Interface/Schema/RDFS_200001.pm, lib/RDF/Service.pm, MANIFEST.SKIP, README, t/w23a.pl, t/w23b.pl:
+	 - added type()
+	 - set() takes strings as literal props
+	 - updated documentation
+
+2000-10-21  aigan  <aigan@astral.paranormal.se>
+
+	* cgi-bin/person.cgi, cgi-bin/tmpl/person_edit_form, cgi-bin/tmpl/person_list, cgi-bin/tmpl/person_view, lib/RDF/Service/Cache.pm, lib/RDF/Service/Context.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/Schema/RDFS_200001.pm, TODO:
+	minimal arc(), arc_obj(), arc_subj(), rev_type(), list() and li()
+
+2000-10-20  aigan  <aigan@astral.paranormal.se>
+
+	* doc/dependency.txt:
+	Info about dynamic properties
+
+	* lib/RDF/Service/Interface/Schema/RDFS_200001.pm, cgi-bin/person.cgi, cgi-bin/tmpl/person_list, doc/api.txt, lib/RDF/Service/Cache.pm, lib/RDF/Service/Constants.pm, lib/RDF/Service/Context.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service.pm, lib/RDF/Service/Resource.pm, TODO:
+	 - Improved debugging info
+	 - Implemented rev_type, rev_props, arc_subj, list and declare_selection
+	 - Revised API spec
+
+2000-10-13  aigan  <aigan@astral.paranormal.se>
+
+	* lib/RDF/Service/Context.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Interface/Schema/RDFS_200001.pm:
+	The problems from the introduction of the context wrapper has been solved
+
+2000-10-12  aigan  <aigan@astral.paranormal.se>
+
+	* doc/api.txt, lib/RDF/Service/Context.pm:
+	 - API for queries
+	 - Most things from RDF::Service::Resouce has moved to RDF::Service::Context
+
+	* lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Interface/Schema/RDFS_200001.pm, lib/RDF/Service/Cache.pm, lib/RDF/Service/Constants.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service.pm, lib/RDF/Service/Resource.pm, TODO:
+	This is the first phase of introducing the context wrapper around
+	resouce objects.  Many things broken.
+
+2000-10-08  aigan  <aigan@astral.paranormal.se>
+
+	* lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Resource.pm:
+	Minor changes...
+
+2000-10-04  aigan  <aigan@astral.paranormal.se>
+
+	* lib/RDF/Service/Interface/DBI/V01.pm, cgi-bin/person.cgi, cgi-bin/tmpl/person_view, doc/wraf.txt, lib/RDF/Service/Constants.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Resource.pm, README, TODO:
+	 - Will now distinguish better between multiple interfaces while changing data
+	 - setting types and props will correctly change the old settings
+
+2000-09-28  aigan  <aigan@astral.paranormal.se>
+
+	* doc/html/dbi.html, doc/html/jumptable.html, doc/html/presentation.html:
+	Initial version
+
+2000-09-27  aigan  <aigan@astral.paranormal.se>
+
+	* doc/html/jumptable.html, doc/html/presentation.html:
+	Documentation. Initial version
+
+	* doc/wraf.txt, lib/RDF/Service/Dispatcher.pm:
+	Updating documentation
+
+2000-09-26  aigan  <aigan@astral.paranormal.se>
+
+	* lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Interface/Schema/RDFS_200001.pm, doc/rdf.sql, doc/wraf.txt, lib/RDF/Service/Constants.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service.pm, lib/RDF/Service/Resource.pm, cgi-bin/person.cgi, cgi-bin/tmpl/person_edit_form, cgi-bin/tmpl/person_list, cgi-bin/tmpl/person_view, README, TODO:
+	- Shortend get_node() to get()
+	- You can now use either node or uri for many parameters
+	- declare_add_type() now adds implicit types based on subClassOf
+	- added a guard against infinite recursions
+
+2000-09-24  aigan  <aigan@astral.paranormal.se>
+
+	* cgi-bin/tmpl/person_edit_form, MANIFEST.SKIP:
+	Added missing files
+
+	* lib/RDF/Service/Cache.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Resource.pm, t/rdf_server.pl, t/w23a.pl, t/w23b.pl, cgi-bin/person.cgi, cgi-bin/rdf.handler, cgi-bin/tmpl/person_list, doc/api.html, doc/rdf.sql, lib/RDF/Service.pm:
+	- Adding update functionality
+	- Updated documentation
+
+	* bin/rdf_server.pl, bin/w23a.pl, bin/w23b.pl, Makefile.PL, MANIFEST, README:
+	- Moving files from ./bin to ./t
+	- Adding update function to lib
+	- Updating documentation
+
+2000-09-23  aigan  <aigan@astral.paranormal.se>
+
+	* lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Resource.pm, cgi-bin/person.cgi, lib/RDF/Service/Dispatcher.pm:
+	Implemented deletion of nodes
+
+	* lib/RDF/Service/Constants.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Resource.pm:
+	Begun to restructure handling of arcs
+
+2000-09-22  aigan  <aigan@astral.paranormal.se>
+
+	* cgi-bin/tmpl/components, cgi-bin/tmpl/components.html, cgi-bin/tmpl/error, cgi-bin/tmpl/footer, cgi-bin/tmpl/header, cgi-bin/tmpl/js, cgi-bin/tmpl/menu, cgi-bin/tmpl/person_add_form, cgi-bin/tmpl/person_list, cgi-bin/tmpl/person_view, cgi-bin/tmpl/test, cgi-bin/tmpl/error.html, cgi-bin/tmpl/header.html, cgi-bin/tmpl/js.html, cgi-bin/tmpl/menu.html:
+	New templates for person.cgi
+
+	* cgi-bin/person.cgi, lib/RDF/Service/Cache.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Resource.pm:
+	Changes for adding and viewing records with person.cgi
+
+2000-09-20  aigan  <aigan@astral.paranormal.se>
+
+	* lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Resource.pm, bin/w23b.pl:
+	Minor fixes...
+
+	* cgi-bin/tmpl/menu.html, cgi-bin/tmpl/js.html, cgi-bin/tmpl/header.html, cgi-bin/tmpl/error.html, cgi-bin/tmpl/components.html, cgi-bin/person.cgi:
+	CGI frontend for person records
+
+	* lib/Wraf/Result.pm: Initial version
+
+	* TODO: Project plan
+
+2000-09-19  aigan  <aigan@astral.paranormal.se>
+
+	* doc/rdf.sql: minor documentation changes
+
+	* lib/RDF/Service/Interface/DBI/V01.pm:
+	 - find_node() looks for the URI in the DB
+	 - init_types() reads the node and type records
+	 - create_literal() creates a literal record
+	 - _get_node() find a node based on the interface node id
+
+	* lib/RDF/Service/Interface/Base/V01.pm:
+	 - service_init_types() tells the types for the Service object
+	 - find_node() looks for the node in the cache
+
+	* lib/RDF/Service/Resource.pm:
+	 - added get_model() is_a() declare_add_type() declare_add_static_literal() declare_add_dynamic_literal() declare_add_prop()
+
+	* lib/RDF/Service/Dispatcher.pm:
+	 - Simplified jumptable construction
+	 - All interface functions should now return a second value stating the type of return
+
+	* lib/RDF/Service/Constants.pm:
+	Changed the URI for the local namespace
+
+	* lib/RDF/Service.pm:
+	Create service with specific URISTR
+
+	* bin/w23b.pl:
+	Just list the property keys for a specific resource
+
+	* bin/w23a.pl:
+	Creates a statement in a model. Only fixed URIs
+
+	* bin/rdf_server.pl: Added comment
+
+	* TODO: Cleaning out old notes
+
+2000-09-01  aigan  <aigan@astral.paranormal.se>
+
+	* doc/api.html:
+	Updated to reflect the present functions
+
+	* bin/w23b.pl, Changes:
+	Added w23b.pl and removed Changes
+
+	* lib/RDF/Service/Interface/Schema/RDFS_200001.pm:
+	- added debug flag
+	- renamed set_types() to init_types()
+
+	* lib/RDF/Service/Interface/DBI/V01.pm:
+	- added debug flag
+	- renamed set_types() to init_types()
+	- added init_props()
+	- added get_props_list()
+	- added add_arc()
+	- bugfix in _get_id()
+
+	* lib/RDF/Service/Interface/Base/V01.pm:
+	- added debug flag
+	- renamed set_types() to init_types()
+
+	* lib/RDF/Service/Resource.pm:
+	- Added debug flag
+	- get_node() searches the node cache
+	- bugfix in declare_model()
+
+	* lib/RDF/Service/Dispatcher.pm:
+	- Added debug flag
+	- renamed set_types() to init_types()
+
+	* lib/RDF/Service/Constants.pm:
+	Added a props property
+
+	* lib/RDF/Service/Cache.pm:
+	- Added node cache
+	- Added debug flag
+
+	* lib/RDF/Service.pm: Added debug flag
+
+	* bin/w23a.pl:
+	Insert a statement and list the properties for the subject
+
+2000-08-26  aigan  <aigan@astral.paranormal.se>
+
+	* lib/RDF/Service/Cache.pm, lib/RDF/Service/Constants.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Interface/Schema/RDFS_200001.pm, lib/RDF/Service.pm, lib/RDF/Service/Resource.pm, README:
+	Adding CVS ID tag, description and copyright information at the top of the files and in the README file
+
+	* Makefile.PL:
+	Depend on DBI and URI but not CGI
+
+	* lib/.htaccess: deleted
+
+	* bin/.htaccess: *** empty log message ***
+
+	* lib/RDF/Service/Interface/Schema/RDFS_200001.pm:
+	Removed references to removed classes
+
+	* lib/RDF/Service/Interface/DBI/V01.pm:
+	 - Package name corrected
+	 - Recieves the connection arguments as a hash ref
+	 - Moved model initialization to Resource class
+
+	* lib/RDF/Service/Interface/Base/V01.pm:
+	 - Registrer the interface with the interface rewouce rather than the
+	   interface module resource
+	 - Excludes 'passwd' from the interface URI
+
+	* lib/RDF/Service/Resource.pm:
+	 - Better debug messages
+	 - Does not use goto() in AUTOLOAD anymore
+	 - access get_node() as object method
+	 - declare_model() initializes resource data and set the types
+	 - declare_self() updates types for a resource
+	 - types_as_string() returnes an idented list of types for the resource
+
+	* lib/RDF/Service/Dispatcher.pm:
+	Better debug messages
+
+	* lib/RDF/Service.pm:
+	Declares the types for the Service resource to be Service, Model and Resource
+
+	* bin/w23a.pl:
+	onnects to DBI and creates a model
+
+2000-08-25  aigan  <aigan@astral.paranormal.se>
+
+	* bin/.htaccess, bin/rdf_server.pl, bin/w23a.pl, lib/.htaccess, lib/RDF/Service/Cache.pm, lib/RDF/Service/Constants.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Interface/Schema/RDFS_200001.pm, lib/RDF/Service.pm, lib/RDF/Service/Resource.pm:
+	Import of current files
+
+	* bin/.htaccess, bin/rdf_server.pl, bin/w23a.pl, lib/.htaccess, lib/RDF/Service/Cache.pm, lib/RDF/Service/Constants.pm, lib/RDF/Service/Dispatcher.pm, lib/RDF/Service/Interface/Base/V01.pm, lib/RDF/Service/Interface/DBI/V01.pm, lib/RDF/Service/Interface/Schema/RDFS_200001.pm, lib/RDF/Service.pm, lib/RDF/Service/Resource.pm:
+	New file.
+
+	* cgi-bin/rdf.handler, Changes, doc/api.html, doc/get_node.txt, doc/rdf.sql, doc/wraf.txt, Makefile.PL, MANIFEST, README, TODO:
+	Import of current files
+
+	* cgi-bin/rdf.handler, Changes, doc/api.html, doc/get_node.txt, doc/rdf.sql, doc/wraf.txt, Makefile.PL, MANIFEST, README, TODO:
+	New file.
+

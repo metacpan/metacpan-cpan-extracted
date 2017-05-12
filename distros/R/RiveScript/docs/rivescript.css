@@ -1,0 +1,39 @@
+body {
+ background-color: #FFFFFF;
+ font-family: Verdana,Arial,Helvetica,sans-serif;
+ font-size: small;
+ color: #000000
+}
+a:link, a:visited {
+ color: #0000FF;
+ text-decoration: underline
+}
+a:hover, a:active {
+ text-decoration: none
+}
+h1,h2 {
+ text-shadow: 2px 2px 2px #000000;
+}
+h1 {
+ font-size: 32pt;
+ text-decoration: underline;
+ color: #FF0000
+}
+h2 {
+ font-size: 28pt;
+ color: #DD0000
+}
+h3 {
+ font-size: x-large;
+ font-style: italic;
+ color: #660000
+}
+h4 {
+ font-size: medium;
+ color: #000000
+}
+pre,code {
+ font-family: "Lucida Console","DejaVu LGC Sans Mono","Bitstream Vera Sans Mono",monospace;
+ font-size: small;
+ color: #000099
+}

@@ -1,0 +1,8 @@
+Register 0.0.1 by Vecchio Fabrizio
+----------------------------------
+
+This module implements a Win32 system register into Unix.
+Visual Basic function like savesettings and getsettings are now availaible.
+
+Contact me at jacote@tiscalinet.it if you found bugs and related.
+Thanks.

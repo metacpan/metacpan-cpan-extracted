@@ -1,0 +1,16 @@
+<script type="text/javascript">
+    jQuery(function() {
+        jQuery("td.boxcontainer > div.ticket-info-basics"   ).unwrap();
+        jQuery("td.boxcontainer > div.ticket-info-reminders").unwrap();
+
+        jQuery("#body > div.summary, #body > div.summary ~ div")
+            .wrapAll("<table width='100%'><tr></tr></table>");
+        jQuery("#body > div.summary ~ div")
+            .wrapAll("<td valign='top' class='boxcontainer'></td>");
+        jQuery("div.summary")
+            .wrap("<td valign='top' class='boxcontainer' style='width: 30%;'></td>");
+    });
+</script>
+<%init>
+return unless RT->Config->Get( 'SideBySideView', $session{'CurrentUser'} );
+</%init>

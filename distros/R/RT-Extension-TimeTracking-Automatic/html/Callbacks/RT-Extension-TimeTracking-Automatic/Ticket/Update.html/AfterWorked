@@ -1,0 +1,6 @@
+<%args>
+$Ticket
+</%args>
+<%init>
+</%init>
+<input type="hidden" class="hidden" name="TimeTrackingAutomatic" value="<% time %>" /> <!-- time that this update was started -->

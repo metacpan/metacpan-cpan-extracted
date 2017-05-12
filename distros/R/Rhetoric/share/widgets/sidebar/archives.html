@@ -1,0 +1,6 @@
+<h2>Archives</h2>
+<ul>
+  [% FOREACH a IN archives %]
+  <li><a href="[% R('Archive', a.year, a.month) %]">[% a.name %]</a></li>
+  [% END %]
+</ul>

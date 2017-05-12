@@ -1,0 +1,2402 @@
+(
+'CPAN/Config.pm' => { dir => '/etc/perl', files => [
+	'/etc/perl/CPAN/Config.pm' ] },
+'IO/Tty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	'/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.so',
+	'/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.bs',
+	'/usr/local/lib/perl/5.8.8/IO/Tty.pm' ] },
+'IO/Pty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	'/usr/local/lib/perl/5.8.8/IO/Pty.pm' ] },
+'IO/Tty/Constant.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	'/usr/local/lib/perl/5.8.8/IO/Tty/Constant.pm' ] },
+'Math/Prime/XS.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	'/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+	'/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+	'/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' ] },
+'Parse/Eyapp.pm' => { 
+   dir => '/usr/local/share/perl/5.8.8', 
+   files => [ '/usr/local/share/perl/5.8.8/Parse/Eyapp.pm' ],
+   bin => [ '/usr/local/bin/eyapp', '/usr/local/bin/treereg' ]
+ },
+'Parse/Eyapp/Lalr.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Lalr.pm' ] },
+'Parse/Eyapp/YATW.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/YATW.pm' ] },
+'Parse/Eyapp/Treeregexp.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Treeregexp.pm' ] },
+'Parse/Eyapp/Parse.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Parse.pm' ] },
+'Parse/Eyapp/Scope.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Scope.pm' ] },
+'Parse/Eyapp/Options.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Options.pm' ] },
+'Parse/Eyapp/Output.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Output.pm' ] },
+'Parse/Eyapp/Node.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Node.pm' ] },
+'Parse/Eyapp/Grammar.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Grammar.pm' ] },
+'Parse/Eyapp/Driver.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Driver.pm' ] },
+'Parse/Eyapp/Base.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/Base.pm' ] },
+'Parse/Eyapp/_TreeregexpSupport.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Parse/Eyapp/_TreeregexpSupport.pm' ] },
+'Sub/Install.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Sub/Install.pm' ] },
+'Sub/Exporter.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Sub/Exporter.pm' ] },
+'Sub/Uplevel.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Sub/Uplevel.pod',
+	'/usr/local/share/perl/5.8.8/Sub/Uplevel.pm' ] },
+'Sub/Exporter/Util.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Sub/Exporter/Util.pm' ] },
+'Params/Util.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Params/Util.pm' ] },
+'Data/OptList.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Data/OptList.pm' ] },
+'Data/Hash/Transform.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Data/Hash/Transform.pm' ] },
+'String/Truncate.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/String/Truncate.pm' ] },
+'Module/Which.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Module/Which.pm' ] },
+'Module/Which/List.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Module/Which/List.pm' ] },
+'Module/Which/P5Path.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Module/Which/P5Path.pm' ] },
+'Test/Builder.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/Builder.pm' ] },
+'Test/Simple.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/Simple.pm' ] },
+'Test/More.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/More.pm' ] },
+'Test/Exception.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/Exception.pm' ] },
+'Test/Pod.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/Pod.pm' ] },
+'Test/Builder/Module.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/Builder/Module.pm' ] },
+'Test/Builder/Tester.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/Builder/Tester.pm' ] },
+'Test/Builder/Tester/Color.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/Builder/Tester/Color.pm' ] },
+'Test/Pod/Coverage.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Test/Pod/Coverage.pm' ] },
+'Pod/Coverage.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Coverage.pm' ] },
+'Pod/Escapes.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Escapes.pm' ] },
+'Pod/Simple.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple.pod',
+	'/usr/local/share/perl/5.8.8/Pod/Simple.pm' ] },
+'Pod/Coverage/CountParents.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Coverage/CountParents.pm' ] },
+'Pod/Coverage/ExportOnly.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Coverage/ExportOnly.pm' ] },
+'Pod/Coverage/Overloader.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Coverage/Overloader.pm' ] },
+'Pod/Simple/LinkSection.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/LinkSection.pm' ] },
+'Pod/Simple/DumpAsText.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/DumpAsText.pm' ] },
+'Pod/Simple/XMLOutStream.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/XMLOutStream.pm' ] },
+'Pod/Simple/Progress.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/Progress.pm' ] },
+'Pod/Simple/TextContent.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/TextContent.pm' ] },
+'Pod/Simple/Text.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/Text.pm' ] },
+'Pod/Simple/Search.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/Search.pm' ] },
+'Pod/Simple/TranscodeSmart.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/TranscodeSmart.pm' ] },
+'Pod/Simple/Debug.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/Debug.pm' ] },
+'Pod/Simple/PullParserStartToken.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/PullParserStartToken.pm' ] },
+'Pod/Simple/Methody.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/Methody.pm' ] },
+'Pod/Simple/PullParserTextToken.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/PullParserTextToken.pm' ] },
+'Pod/Simple/PullParserEndToken.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/PullParserEndToken.pm' ] },
+'Pod/Simple/TranscodeDumb.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/TranscodeDumb.pm' ] },
+'Pod/Simple/HTMLBatch.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/HTMLBatch.pm' ] },
+'Pod/Simple/RTF.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/RTF.pm' ] },
+'Pod/Simple/Checker.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/Checker.pm' ] },
+'Pod/Simple/PullParser.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/PullParser.pm' ] },
+'Pod/Simple/PullParserToken.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/PullParserToken.pm' ] },
+'Pod/Simple/SimpleTree.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/SimpleTree.pm' ] },
+'Pod/Simple/XHTML.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/XHTML.pm' ] },
+'Pod/Simple/TiedOutFH.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/TiedOutFH.pm' ] },
+'Pod/Simple/HTML.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/HTML.pm' ] },
+'Pod/Simple/HTMLLegacy.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/HTMLLegacy.pm' ] },
+'Pod/Simple/BlackBox.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/BlackBox.pm' ] },
+'Pod/Simple/DumpAsXML.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/DumpAsXML.pm' ] },
+'Pod/Simple/Transcode.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Pod/Simple/Transcode.pm' ] },
+'IO/Capture.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/IO/Capture.pm' ] },
+'IO/Capture/Stderr.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/IO/Capture/Stderr.pm' ] },
+'IO/Capture/Stdout.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/IO/Capture/Stdout.pm' ] },
+'IO/Capture/Tie_STDx.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/IO/Capture/Tie_STDx.pm' ] },
+'Config/Trivial.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Config/Trivial.pm' ] },
+'Devel/Loaded.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/Devel/Loaded.pm' ] },
+'ExtUtils/CBuilder.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder.pm' ] },
+'ExtUtils/ParseXS.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/ParseXS.pm' ] },
+'ExtUtils/Installed.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/Installed.pm' ] },
+'ExtUtils/Install.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/Install.pm' ] },
+'ExtUtils/Packlist.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/Packlist.pm' ] },
+'ExtUtils/CBuilder/Base.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Base.pm' ] },
+'ExtUtils/CBuilder/Platform/Windows.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Platform/Windows.pm' ] },
+'ExtUtils/CBuilder/Platform/aix.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Platform/aix.pm' ] },
+'ExtUtils/CBuilder/Platform/cygwin.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Platform/cygwin.pm' ] },
+'ExtUtils/CBuilder/Platform/VMS.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Platform/VMS.pm' ] },
+'ExtUtils/CBuilder/Platform/Unix.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Platform/Unix.pm' ] },
+'ExtUtils/CBuilder/Platform/darwin.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Platform/darwin.pm' ] },
+'ExtUtils/CBuilder/Platform/os2.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Platform/os2.pm' ] },
+'ExtUtils/CBuilder/Platform/dec_osf.pm' => { dir => '/usr/local/share/perl/5.8.8', files => [
+	'/usr/local/share/perl/5.8.8/ExtUtils/CBuilder/Platform/dec_osf.pm' ] },
+'mod_perl2.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/mod_perl2.pm' ] },
+'AptPkg.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/AptPkg/AptPkg.so',
+	'/usr/lib/perl5/auto/AptPkg/AptPkg.bs',
+	'/usr/lib/perl5/AptPkg.pm' ] },
+'DBI.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/DBI/Driver_xst.h',
+	'/usr/lib/perl5/auto/DBI/dbivport.h',
+	'/usr/lib/perl5/auto/DBI/dbd_xsh.h',
+	'/usr/lib/perl5/auto/DBI/Driver.xst',
+	'/usr/lib/perl5/auto/DBI/DBIXS.h',
+	'/usr/lib/perl5/auto/DBI/dbipport.h',
+	'/usr/lib/perl5/auto/DBI/dbi_sql.h',
+	'/usr/lib/perl5/auto/DBI/DBI.so',
+	'/usr/lib/perl5/auto/DBI/DBI.bs',
+	'/usr/lib/perl5/DBI.pm' ] },
+'Mysql.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Mysql.pm' ] },
+'APR.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/APR.so',
+	'/usr/lib/perl5/auto/APR/APR.bs',
+	'/usr/lib/perl5/auto/APR/BucketAlloc/BucketAlloc.so',
+	'/usr/lib/perl5/auto/APR/BucketAlloc/BucketAlloc.bs',
+	'/usr/lib/perl5/auto/APR/Base64/Base64.so',
+	'/usr/lib/perl5/auto/APR/Base64/Base64.bs',
+	'/usr/lib/perl5/auto/APR/Brigade/Brigade.so',
+	'/usr/lib/perl5/auto/APR/Brigade/Brigade.bs',
+	'/usr/lib/perl5/auto/APR/Bucket/Bucket.so',
+	'/usr/lib/perl5/auto/APR/Bucket/Bucket.bs',
+	'/usr/lib/perl5/auto/APR/BucketType/BucketType.so',
+	'/usr/lib/perl5/auto/APR/BucketType/BucketType.bs',
+	'/usr/lib/perl5/auto/APR/Date/Date.so',
+	'/usr/lib/perl5/auto/APR/Date/Date.bs',
+	'/usr/lib/perl5/auto/APR/Error/Error.so',
+	'/usr/lib/perl5/auto/APR/Error/Error.bs',
+	'/usr/lib/perl5/auto/APR/Finfo/Finfo.so',
+	'/usr/lib/perl5/auto/APR/Finfo/Finfo.bs',
+	'/usr/lib/perl5/auto/APR/IpSubnet/IpSubnet.so',
+	'/usr/lib/perl5/auto/APR/IpSubnet/IpSubnet.bs',
+	'/usr/lib/perl5/auto/APR/OS/OS.so',
+	'/usr/lib/perl5/auto/APR/OS/OS.bs',
+	'/usr/lib/perl5/auto/APR/Pool/Pool.so',
+	'/usr/lib/perl5/auto/APR/Pool/Pool.bs',
+	'/usr/lib/perl5/auto/APR/SockAddr/SockAddr.so',
+	'/usr/lib/perl5/auto/APR/SockAddr/SockAddr.bs',
+	'/usr/lib/perl5/auto/APR/Socket/Socket.so',
+	'/usr/lib/perl5/auto/APR/Socket/Socket.bs',
+	'/usr/lib/perl5/auto/APR/Status/Status.so',
+	'/usr/lib/perl5/auto/APR/Status/Status.bs',
+	'/usr/lib/perl5/auto/APR/String/String.so',
+	'/usr/lib/perl5/auto/APR/String/String.bs',
+	'/usr/lib/perl5/auto/APR/Table/Table.so',
+	'/usr/lib/perl5/auto/APR/Table/Table.bs',
+	'/usr/lib/perl5/auto/APR/ThreadMutex/ThreadMutex.so',
+	'/usr/lib/perl5/auto/APR/ThreadMutex/ThreadMutex.bs',
+	'/usr/lib/perl5/auto/APR/URI/URI.so',
+	'/usr/lib/perl5/auto/APR/URI/URI.bs',
+	'/usr/lib/perl5/auto/APR/UUID/UUID.so',
+	'/usr/lib/perl5/auto/APR/UUID/UUID.bs',
+	'/usr/lib/perl5/auto/APR/Util/Util.so',
+	'/usr/lib/perl5/auto/APR/Util/Util.bs',
+	'/usr/lib/perl5/auto/APR/Const/Const.so',
+	'/usr/lib/perl5/auto/APR/Const/Const.bs',
+	'/usr/lib/perl5/auto/APR/PerlIO/PerlIO.so',
+	'/usr/lib/perl5/auto/APR/PerlIO/PerlIO.bs',
+	'/usr/lib/perl5/APR.pm' ] },
+'Tk.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk.pod',
+	'/usr/lib/perl5/auto/Tk/Tk.so',
+	'/usr/lib/perl5/auto/Tk/Tk.bs',
+	'/usr/lib/perl5/auto/Tk/Error.al',
+	'/usr/lib/perl5/auto/Tk/FocusChildren.al',
+	'/usr/lib/perl5/auto/Tk/CancelRepeat.al',
+	'/usr/lib/perl5/auto/Tk/RepeatId.al',
+	'/usr/lib/perl5/auto/Tk/focusFollowsMouse.al',
+	'/usr/lib/perl5/auto/Tk/focusNext.al',
+	'/usr/lib/perl5/auto/Tk/focusPrev.al',
+	'/usr/lib/perl5/auto/Tk/FocusOK.al',
+	'/usr/lib/perl5/auto/Tk/EnterFocus.al',
+	'/usr/lib/perl5/auto/Tk/tabFocus.al',
+	'/usr/lib/perl5/auto/Tk/TraverseToMenu.al',
+	'/usr/lib/perl5/auto/Tk/FirstMenu.al',
+	'/usr/lib/perl5/auto/Tk/Selection.al',
+	'/usr/lib/perl5/auto/Tk/Receive.al',
+	'/usr/lib/perl5/auto/Tk/break.al',
+	'/usr/lib/perl5/auto/Tk/updateWidgets.al',
+	'/usr/lib/perl5/auto/Tk/ImageNames.al',
+	'/usr/lib/perl5/auto/Tk/ImageTypes.al',
+	'/usr/lib/perl5/auto/Tk/interps.al',
+	'/usr/lib/perl5/auto/Tk/lsearch.al',
+	'/usr/lib/perl5/auto/Tk/getEncoding.al',
+	'/usr/lib/perl5/auto/Tk/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/WinPhoto/WinPhoto.so',
+	'/usr/lib/perl5/auto/Tk/WinPhoto/WinPhoto.bs',
+	'/usr/lib/perl5/auto/Tk/pTk/extralibs.ld',
+	'/usr/lib/perl5/auto/Tk/Xlib/Xlib.so',
+	'/usr/lib/perl5/auto/Tk/Xlib/Xlib.bs',
+	'/usr/lib/perl5/auto/Tk/X/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/X/X.so',
+	'/usr/lib/perl5/auto/Tk/X/X.bs',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ScrlTopBottom.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Scrollbar.so',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Scrollbar.bs',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Enter.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Leave.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Motion.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ButtonDown.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ButtonUp.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Select.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/StartDrag.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Drag.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/EndDrag.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ScrlByUnits.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ScrlByPages.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ScrlToPos.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Pixmap/Pixmap.so',
+	'/usr/lib/perl5/auto/Tk/Pixmap/Pixmap.bs',
+	'/usr/lib/perl5/auto/Tk/TixGrid/TixGrid.so',
+	'/usr/lib/perl5/auto/Tk/TixGrid/TixGrid.bs',
+	'/usr/lib/perl5/auto/Tk/Text/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Text/Text.so',
+	'/usr/lib/perl5/auto/Tk/Text/Text.bs',
+	'/usr/lib/perl5/auto/Tk/TList/TList.so',
+	'/usr/lib/perl5/auto/Tk/TList/TList.bs',
+	'/usr/lib/perl5/auto/Tk/Menubutton/Menubutton.so',
+	'/usr/lib/perl5/auto/Tk/Menubutton/Menubutton.bs',
+	'/usr/lib/perl5/auto/Tk/Scale/ButtonDown.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Scale.so',
+	'/usr/lib/perl5/auto/Tk/Scale/Scale.bs',
+	'/usr/lib/perl5/auto/Tk/Scale/Activate.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Leave.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Enter.al',
+	'/usr/lib/perl5/auto/Tk/Scale/ButtonUp.al',
+	'/usr/lib/perl5/auto/Tk/Scale/EndDrag.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Drag.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Increment.al',
+	'/usr/lib/perl5/auto/Tk/Scale/ControlPress.al',
+	'/usr/lib/perl5/auto/Tk/Scale/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/PNG/PNG.so',
+	'/usr/lib/perl5/auto/Tk/PNG/PNG.bs',
+	'/usr/lib/perl5/auto/Tk/NBFrame/NBFrame.so',
+	'/usr/lib/perl5/auto/Tk/NBFrame/NBFrame.bs',
+	'/usr/lib/perl5/auto/Tk/Mwm/Mwm.so',
+	'/usr/lib/perl5/auto/Tk/Mwm/Mwm.bs',
+	'/usr/lib/perl5/auto/Tk/Compound/Compound.so',
+	'/usr/lib/perl5/auto/Tk/Compound/Compound.bs',
+	'/usr/lib/perl5/auto/Tk/Listbox/TIESCALAR.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Listbox.so',
+	'/usr/lib/perl5/auto/Tk/Listbox/Listbox.bs',
+	'/usr/lib/perl5/auto/Tk/Listbox/TIEARRAY.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/FETCHSIZE.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/FETCH.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/ButtonRelease_1.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/STORE.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/CLEAR.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/EXTEND.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/PUSH.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/POP.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/SHIFT.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/UNSHIFT.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/DELETE.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/EXISTS.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/SPLICE.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/xyIndex.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Cntrl_backslash.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Cntrl_Home.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Cntrl_End.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/deleteSelected.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/BeginSelect.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Motion.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/BeginExtend.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/BeginToggle.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/AutoScan.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/UpDown.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/ExtendUpDown.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/DataExtend.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Cancel.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/SelectAll.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/SetList.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/clipboardPaste.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/getSelected.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/JPEG/JPEG.so',
+	'/usr/lib/perl5/auto/Tk/JPEG/JPEG.bs',
+	'/usr/lib/perl5/auto/Tk/InputO/InputO.so',
+	'/usr/lib/perl5/auto/Tk/InputO/InputO.bs',
+	'/usr/lib/perl5/auto/Tk/IO/IO.so',
+	'/usr/lib/perl5/auto/Tk/IO/IO.bs',
+	'/usr/lib/perl5/auto/Tk/HList/HList.so',
+	'/usr/lib/perl5/auto/Tk/HList/HList.bs',
+	'/usr/lib/perl5/auto/Tk/Event/Event.so',
+	'/usr/lib/perl5/auto/Tk/Event/Event.bs',
+	'/usr/lib/perl5/auto/Tk/Entry/Entry.so',
+	'/usr/lib/perl5/auto/Tk/Entry/Entry.bs',
+	'/usr/lib/perl5/auto/Tk/Canvas/Canvas.so',
+	'/usr/lib/perl5/auto/Tk/Canvas/Canvas.bs',
+	'/usr/lib/perl5/auto/Tk/TextEdit/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Wm/AnchorAdjust.al',
+	'/usr/lib/perl5/auto/Tk/Wm/Post.al',
+	'/usr/lib/perl5/auto/Tk/Wm/FullScreen.al',
+	'/usr/lib/perl5/auto/Tk/Wm/Popup.al',
+	'/usr/lib/perl5/auto/Tk/Wm/iconposition.al',
+	'/usr/lib/perl5/auto/Tk/Wm/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/TextUndo/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_Create.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_BindIn.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_BindOut.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_Destroy.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_In.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_Out.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Frame/labelVariable.al',
+	'/usr/lib/perl5/auto/Tk/Frame/labelPack.al',
+	'/usr/lib/perl5/auto/Tk/Frame/queuePack.al',
+	'/usr/lib/perl5/auto/Tk/Frame/label.al',
+	'/usr/lib/perl5/auto/Tk/Frame/freeze_on_map.al',
+	'/usr/lib/perl5/auto/Tk/Frame/sbset.al',
+	'/usr/lib/perl5/auto/Tk/Frame/AddScrollbars.al',
+	'/usr/lib/perl5/auto/Tk/Frame/packscrollbars.al',
+	'/usr/lib/perl5/auto/Tk/Frame/scrollbars.al',
+	'/usr/lib/perl5/auto/Tk/Frame/FindMenu.al',
+	'/usr/lib/perl5/auto/Tk/Frame/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Widget/clipboardKeysyms.al',
+	'/usr/lib/perl5/auto/Tk/Widget/bindDump.al',
+	'/usr/lib/perl5/auto/Tk/Widget/ASkludge.al',
+	'/usr/lib/perl5/auto/Tk/Widget/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Widget/pathname.al',
+	'/usr/lib/perl5/auto/Tk/Clipboard/getSelected.al',
+	'/usr/lib/perl5/auto/Tk/Clipboard/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Table/totalColumns.al',
+	'/usr/lib/perl5/auto/Tk/Table/Create.al',
+	'/usr/lib/perl5/auto/Tk/Table/totalRows.al',
+	'/usr/lib/perl5/auto/Tk/Table/Posn.al',
+	'/usr/lib/perl5/auto/Tk/Table/see.al',
+	'/usr/lib/perl5/auto/Tk/Table/autosplit.ix',
+	'/usr/lib/perl5/Tk.pm' ] },
+'Locale/gettext.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Locale/gettext/gettext.so',
+	'/usr/lib/perl5/auto/Locale/gettext/gettext.bs',
+	'/usr/lib/perl5/Locale/gettext.pm' ] },
+'Text/CharWidth.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Text/CharWidth/CharWidth.so',
+	'/usr/lib/perl5/auto/Text/CharWidth/CharWidth.bs',
+	'/usr/lib/perl5/Text/CharWidth.pm' ] },
+'Text/Iconv.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Text/Iconv/autosplit.ix',
+	'/usr/lib/perl5/auto/Text/Iconv/Iconv.bs',
+	'/usr/lib/perl5/auto/Text/Iconv/Iconv.so',
+	'/usr/lib/perl5/Text/Iconv.pm' ] },
+'AptPkg/Cache.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/AptPkg/Cache.pm' ] },
+'AptPkg/System.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/AptPkg/System.pm' ] },
+'AptPkg/Config.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/AptPkg/Config.pod',
+	'/usr/lib/perl5/AptPkg/Config.pm' ] },
+'AptPkg/hash.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/AptPkg/hash.pm' ] },
+'AptPkg/Version.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/AptPkg/Version.pm' ] },
+'AptPkg/Source.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/AptPkg/Source.pm' ] },
+'HTML/PullParser.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/HTML/PullParser.pm' ] },
+'HTML/Parser.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/HTML/Parser/Parser.so',
+	'/usr/lib/perl5/auto/HTML/Parser/Parser.bs',
+	'/usr/lib/perl5/HTML/Parser.pm' ] },
+'HTML/Entities.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/HTML/Entities.pm' ] },
+'HTML/TokeParser.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/HTML/TokeParser.pm' ] },
+'HTML/LinkExtor.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/HTML/LinkExtor.pm' ] },
+'HTML/Filter.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/HTML/Filter.pm' ] },
+'HTML/HeadParser.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/HTML/HeadParser.pm' ] },
+'Finance/Quote.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote.pm' ] },
+'Finance/Quote/Cdnfundlibrary.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Cdnfundlibrary.pm' ] },
+'Finance/Quote/Tdwaterhouse.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Tdwaterhouse.pm' ] },
+'Finance/Quote/AEX.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/AEX.pm' ] },
+'Finance/Quote/Trustnet.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Trustnet.pm' ] },
+'Finance/Quote/UserAgent.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/UserAgent.pm' ] },
+'Finance/Quote/ASX.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/ASX.pm' ] },
+'Finance/Quote/BMONesbittBurns.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/BMONesbittBurns.pm' ] },
+'Finance/Quote/VWD.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/VWD.pm' ] },
+'Finance/Quote/FTPortfolios.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/FTPortfolios.pm' ] },
+'Finance/Quote/Tiaacref.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Tiaacref.pm' ] },
+'Finance/Quote/Fool.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Fool.pm' ] },
+'Finance/Quote/Fidelity.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Fidelity.pm' ] },
+'Finance/Quote/Troweprice.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Troweprice.pm' ] },
+'Finance/Quote/DWS.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/DWS.pm' ] },
+'Finance/Quote/IndiaMutual.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/IndiaMutual.pm' ] },
+'Finance/Quote/Yahoo/Australia.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Yahoo/Australia.pm' ] },
+'Finance/Quote/Yahoo/Europe.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Yahoo/Europe.pm' ] },
+'Finance/Quote/Yahoo/Base.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Yahoo/Base.pm' ] },
+'Finance/Quote/Yahoo/USA.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Yahoo/USA.pm' ] },
+'Finance/Quote/Yahoo/Asia.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Finance/Quote/Yahoo/Asia.pm' ] },
+'DBI/ProfileDumper.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/ProfileDumper.pm' ] },
+'DBI/Changes.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/Changes.pm' ] },
+'DBI/Roadmap.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/Roadmap.pm' ] },
+'DBI/FAQ.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/FAQ.pm' ] },
+'DBI/W32ODBC.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/W32ODBC.pm' ] },
+'DBI/Profile.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/Profile.pm' ] },
+'DBI/ProxyServer.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/ProxyServer.pm' ] },
+'DBI/DBD.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/DBD.pm' ] },
+'DBI/PurePerl.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/PurePerl.pm' ] },
+'DBI/ProfileData.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/ProfileData.pm' ] },
+'DBI/ProfileSubs.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/ProfileSubs.pm' ] },
+'DBI/Const/GetInfoReturn.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/Const/GetInfoReturn.pm' ] },
+'DBI/Const/GetInfoType.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/Const/GetInfoType.pm' ] },
+'DBI/Const/GetInfo/ANSI.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/Const/GetInfo/ANSI.pm' ] },
+'DBI/Const/GetInfo/ODBC.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/Const/GetInfo/ODBC.pm' ] },
+'DBI/SQL/Nano.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/SQL/Nano.pm' ] },
+'DBI/DBD/Metadata.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/DBD/Metadata.pm' ] },
+'DBI/ProfileDumper/Apache.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBI/ProfileDumper/Apache.pm' ] },
+'DBD/Proxy.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBD/Proxy.pm' ] },
+'DBD/DBM.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBD/DBM.pm' ] },
+'DBD/Sponge.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBD/Sponge.pm' ] },
+'DBD/File.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBD/File.pm' ] },
+'DBD/NullP.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBD/NullP.pm' ] },
+'DBD/ExampleP.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/DBD/ExampleP.pm' ] },
+'DBD/mysql.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/DBD/mysql/mysql.so',
+	'/usr/lib/perl5/auto/DBD/mysql/mysql.bs',
+	'/usr/lib/perl5/DBD/mysql.pm' ] },
+'Bundle/Apache2.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Bundle/Apache2.pm' ] },
+'Bundle/DBI.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Bundle/DBI.pm' ] },
+'Bundle/ApacheTest.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Bundle/ApacheTest.pm' ] },
+'Bundle/DBD/mysql.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Bundle/DBD/mysql.pm' ] },
+'Win32/DBIODBC.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Win32/DBIODBC.pm' ] },
+'Mysql/Statement.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Mysql/Statement.pm' ] },
+'Apache/TestRun.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestRun.pm' ] },
+'Apache/TestSmoke.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestSmoke.pm' ] },
+'Apache/TestTrace.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestTrace.pm' ] },
+'Apache/TestClient.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestClient.pm' ] },
+'Apache/TestMM.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestMM.pm' ] },
+'Apache/TestCommonPost.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestCommonPost.pm' ] },
+'Apache/TestRunPHP.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestRunPHP.pm' ] },
+'Apache/TestCommon.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestCommon.pm' ] },
+'Apache/TestSmokePerl.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestSmokePerl.pm' ] },
+'Apache/Test.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/Test.pm' ] },
+'Apache/TestConfigParse.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestConfigParse.pm' ] },
+'Apache/TestConfigPHP.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestConfigPHP.pm' ] },
+'Apache/TestConfigC.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestConfigC.pm' ] },
+'Apache/Test5005compat.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/Test5005compat.pm' ] },
+'Apache/TestBuild.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestBuild.pm' ] },
+'Apache/TestMB.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestMB.pm' ] },
+'Apache/TestPerlDB.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestPerlDB.pm' ] },
+'Apache/TestRequest.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestRequest.pm' ] },
+'Apache/TestHandler.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestHandler.pm' ] },
+'Apache/TestServer.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestServer.pm' ] },
+'Apache/TestReportPerl.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestReportPerl.pm' ] },
+'Apache/TestConfig.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestConfig.pm' ] },
+'Apache/TestConfigPerl.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestConfigPerl.pm' ] },
+'Apache/TestRunPerl.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestRunPerl.pm' ] },
+'Apache/TestReport.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestReport.pm' ] },
+'Apache/TestHarness.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestHarness.pm' ] },
+'Apache/TestSSLCA.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestSSLCA.pm' ] },
+'Apache/TestSort.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestSort.pm' ] },
+'Apache/TestUtil.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestUtil.pm' ] },
+'Apache/TestConfigParrot.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestConfigParrot.pm' ] },
+'Apache/TestRunParrot.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestRunParrot.pm' ] },
+'Apache/TestHarnessPHP.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache/TestHarnessPHP.pm' ] },
+'Apache2/SizeLimit.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/SizeLimit.pm' ] },
+'Apache2/SourceTables.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/SourceTables.pm' ] },
+'Apache2/compat.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/compat.pm' ] },
+'Apache2/PerlSections.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/PerlSections.pm' ] },
+'Apache2/Reload.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/Reload.pm' ] },
+'Apache2/ParseSource.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/ParseSource.pm' ] },
+'Apache2/Resource.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/Resource.pm' ] },
+'Apache2/Build.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Build/autosplit.ix',
+	'/usr/lib/perl5/Apache2/Build.pm' ] },
+'Apache2/XSLoader.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/XSLoader.pm' ] },
+'Apache2/Status.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/Status.pm' ] },
+'Apache2/BuildConfig.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/BuildConfig.pm' ] },
+'Apache2/porting.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/porting.pm' ] },
+'Apache2/Access.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Access/Access.so',
+	'/usr/lib/perl5/auto/Apache2/Access/Access.bs',
+	'/usr/lib/perl5/Apache2/Access.pm' ] },
+'Apache2/CmdParms.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/CmdParms/CmdParms.so',
+	'/usr/lib/perl5/auto/Apache2/CmdParms/CmdParms.bs',
+	'/usr/lib/perl5/Apache2/CmdParms.pm' ] },
+'Apache2/Command.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Command/Command.so',
+	'/usr/lib/perl5/auto/Apache2/Command/Command.bs',
+	'/usr/lib/perl5/Apache2/Command.pm' ] },
+'Apache2/Connection.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Connection/Connection.so',
+	'/usr/lib/perl5/auto/Apache2/Connection/Connection.bs',
+	'/usr/lib/perl5/Apache2/Connection.pm' ] },
+'Apache2/Directive.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Directive/Directive.so',
+	'/usr/lib/perl5/auto/Apache2/Directive/Directive.bs',
+	'/usr/lib/perl5/Apache2/Directive.pm' ] },
+'Apache2/Filter.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Filter/Filter.so',
+	'/usr/lib/perl5/auto/Apache2/Filter/Filter.bs',
+	'/usr/lib/perl5/Apache2/Filter.pm' ] },
+'Apache2/FilterRec.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/FilterRec/FilterRec.so',
+	'/usr/lib/perl5/auto/Apache2/FilterRec/FilterRec.bs',
+	'/usr/lib/perl5/Apache2/FilterRec.pm' ] },
+'Apache2/HookRun.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/HookRun/HookRun.so',
+	'/usr/lib/perl5/auto/Apache2/HookRun/HookRun.bs',
+	'/usr/lib/perl5/Apache2/HookRun.pm' ] },
+'Apache2/Log.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Log/Log.so',
+	'/usr/lib/perl5/auto/Apache2/Log/Log.bs',
+	'/usr/lib/perl5/Apache2/Log.pm' ] },
+'Apache2/MPM.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/MPM/MPM.so',
+	'/usr/lib/perl5/auto/Apache2/MPM/MPM.bs',
+	'/usr/lib/perl5/Apache2/MPM.pm' ] },
+'Apache2/Module.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Module/Module.so',
+	'/usr/lib/perl5/auto/Apache2/Module/Module.bs',
+	'/usr/lib/perl5/Apache2/Module.pm' ] },
+'Apache2/Process.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Process/Process.so',
+	'/usr/lib/perl5/auto/Apache2/Process/Process.bs',
+	'/usr/lib/perl5/Apache2/Process.pm' ] },
+'Apache2/RequestIO.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/RequestIO/RequestIO.so',
+	'/usr/lib/perl5/auto/Apache2/RequestIO/RequestIO.bs',
+	'/usr/lib/perl5/Apache2/RequestIO.pm' ] },
+'Apache2/RequestRec.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/RequestRec/RequestRec.so',
+	'/usr/lib/perl5/auto/Apache2/RequestRec/RequestRec.bs',
+	'/usr/lib/perl5/Apache2/RequestRec.pm' ] },
+'Apache2/RequestUtil.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/RequestUtil/RequestUtil.so',
+	'/usr/lib/perl5/auto/Apache2/RequestUtil/RequestUtil.bs',
+	'/usr/lib/perl5/Apache2/RequestUtil.pm' ] },
+'Apache2/Response.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Response/Response.so',
+	'/usr/lib/perl5/auto/Apache2/Response/Response.bs',
+	'/usr/lib/perl5/Apache2/Response.pm' ] },
+'Apache2/ServerRec.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/ServerRec/ServerRec.so',
+	'/usr/lib/perl5/auto/Apache2/ServerRec/ServerRec.bs',
+	'/usr/lib/perl5/Apache2/ServerRec.pm' ] },
+'Apache2/ServerUtil.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/ServerUtil/ServerUtil.so',
+	'/usr/lib/perl5/auto/Apache2/ServerUtil/ServerUtil.bs',
+	'/usr/lib/perl5/Apache2/ServerUtil.pm' ] },
+'Apache2/SubProcess.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/SubProcess/SubProcess.so',
+	'/usr/lib/perl5/auto/Apache2/SubProcess/SubProcess.bs',
+	'/usr/lib/perl5/Apache2/SubProcess.pm' ] },
+'Apache2/SubRequest.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/SubRequest/SubRequest.so',
+	'/usr/lib/perl5/auto/Apache2/SubRequest/SubRequest.bs',
+	'/usr/lib/perl5/Apache2/SubRequest.pm' ] },
+'Apache2/URI.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/URI/URI.so',
+	'/usr/lib/perl5/auto/Apache2/URI/URI.bs',
+	'/usr/lib/perl5/Apache2/URI.pm' ] },
+'Apache2/Util.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Util/Util.so',
+	'/usr/lib/perl5/auto/Apache2/Util/Util.bs',
+	'/usr/lib/perl5/Apache2/Util.pm' ] },
+'Apache2/Const.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Apache2/Const/Const.so',
+	'/usr/lib/perl5/auto/Apache2/Const/Const.bs',
+	'/usr/lib/perl5/Apache2/Const.pm' ] },
+'Apache2/PerlSections/Dump.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Apache2/PerlSections/Dump.pm' ] },
+'Tk/Checkbutton.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Checkbutton.pod',
+	'/usr/lib/perl5/Tk/Checkbutton.pm' ] },
+'Tk/Config.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Config.pm' ] },
+'Tk/install.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/install.pm' ] },
+'Tk/X11Font.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/X11Font.pod',
+	'/usr/lib/perl5/Tk/X11Font.pm' ] },
+'Tk/Wm.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Wm.pod',
+	'/usr/lib/perl5/auto/Tk/Wm/AnchorAdjust.al',
+	'/usr/lib/perl5/auto/Tk/Wm/Post.al',
+	'/usr/lib/perl5/auto/Tk/Wm/FullScreen.al',
+	'/usr/lib/perl5/auto/Tk/Wm/Popup.al',
+	'/usr/lib/perl5/auto/Tk/Wm/iconposition.al',
+	'/usr/lib/perl5/auto/Tk/Wm/autosplit.ix',
+	'/usr/lib/perl5/Tk/Wm.pm' ] },
+'Tk/Dirlist.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Dirlist.pm' ] },
+'Tk/TextEdit.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Tk/TextEdit/autosplit.ix',
+	'/usr/lib/perl5/Tk/TextEdit.pm' ] },
+'Tk/TextUndo.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/TextUndo.pod',
+	'/usr/lib/perl5/auto/Tk/TextUndo/autosplit.ix',
+	'/usr/lib/perl5/Tk/TextUndo.pm' ] },
+'Tk/LabEntry.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/LabEntry.pm' ] },
+'Tk/Optionmenu.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Optionmenu.pod',
+	'/usr/lib/perl5/Tk/Optionmenu.pm' ] },
+'Tk/Photo.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Photo.pod',
+	'/usr/lib/perl5/Tk/Photo.pm' ] },
+'Tk/FileSelect.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/FileSelect.pod',
+	'/usr/lib/perl5/Tk/FileSelect.pm' ] },
+'Tk/Toplevel.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Toplevel.pod',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_Create.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_BindIn.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_BindOut.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_Destroy.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_In.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/FG_Out.al',
+	'/usr/lib/perl5/auto/Tk/Toplevel/autosplit.ix',
+	'/usr/lib/perl5/Tk/Toplevel.pm' ] },
+'Tk/LabRadio.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/LabRadio.pm' ] },
+'Tk/Dialog.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Dialog.pod',
+	'/usr/lib/perl5/Tk/Dialog.pm' ] },
+'Tk/Frame.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Frame.pod',
+	'/usr/lib/perl5/auto/Tk/Frame/labelVariable.al',
+	'/usr/lib/perl5/auto/Tk/Frame/labelPack.al',
+	'/usr/lib/perl5/auto/Tk/Frame/queuePack.al',
+	'/usr/lib/perl5/auto/Tk/Frame/label.al',
+	'/usr/lib/perl5/auto/Tk/Frame/freeze_on_map.al',
+	'/usr/lib/perl5/auto/Tk/Frame/sbset.al',
+	'/usr/lib/perl5/auto/Tk/Frame/AddScrollbars.al',
+	'/usr/lib/perl5/auto/Tk/Frame/packscrollbars.al',
+	'/usr/lib/perl5/auto/Tk/Frame/scrollbars.al',
+	'/usr/lib/perl5/auto/Tk/Frame/FindMenu.al',
+	'/usr/lib/perl5/auto/Tk/Frame/autosplit.ix',
+	'/usr/lib/perl5/Tk/Frame.pm' ] },
+'Tk/ColorEditor.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/ColorEditor.pod',
+	'/usr/lib/perl5/Tk/ColorEditor.pm' ] },
+'Tk/Menubar.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Menubar.pm' ] },
+'Tk/Xrm.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Xrm.pod',
+	'/usr/lib/perl5/Tk/Xrm.pm' ] },
+'Tk/Widget.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Widget.pod',
+	'/usr/lib/perl5/auto/Tk/Widget/clipboardKeysyms.al',
+	'/usr/lib/perl5/auto/Tk/Widget/bindDump.al',
+	'/usr/lib/perl5/auto/Tk/Widget/ASkludge.al',
+	'/usr/lib/perl5/auto/Tk/Widget/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Widget/pathname.al',
+	'/usr/lib/perl5/Tk/Widget.pm' ] },
+'Tk/Submethods.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Submethods.pod',
+	'/usr/lib/perl5/Tk/Submethods.pm' ] },
+'Tk/Panedwindow.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Panedwindow.pod',
+	'/usr/lib/perl5/Tk/Panedwindow.pm' ] },
+'Tk/widgets.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/widgets.pod',
+	'/usr/lib/perl5/Tk/widgets.pm' ] },
+'Tk/Adjuster.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Adjuster.pod',
+	'/usr/lib/perl5/Tk/Adjuster.pm' ] },
+'Tk/Message.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Message.pod',
+	'/usr/lib/perl5/Tk/Message.pm' ] },
+'Tk/After.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/After.pm' ] },
+'Tk/Configure.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Configure.pm' ] },
+'Tk/MakeDepend.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/MakeDepend.pm' ] },
+'Tk/Tiler.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Tiler.pod',
+	'/usr/lib/perl5/Tk/Tiler.pm' ] },
+'Tk/DummyEncode.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DummyEncode.pm' ] },
+'Tk/ItemStyle.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/ItemStyle.pm' ] },
+'Tk/Menu.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Menu.pod',
+	'/usr/lib/perl5/Tk/Menu.pm' ] },
+'Tk/IconList.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/IconList.pod',
+	'/usr/lib/perl5/Tk/IconList.pm' ] },
+'Tk/ROText.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/ROText.pod',
+	'/usr/lib/perl5/Tk/ROText.pm' ] },
+'Tk/Labelframe.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Labelframe.pod',
+	'/usr/lib/perl5/Tk/Labelframe.pm' ] },
+'Tk/Stats.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Stats.pm' ] },
+'Tk/Clipboard.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Clipboard.pod',
+	'/usr/lib/perl5/auto/Tk/Clipboard/getSelected.al',
+	'/usr/lib/perl5/auto/Tk/Clipboard/autosplit.ix',
+	'/usr/lib/perl5/Tk/Clipboard.pm' ] },
+'Tk/ProgressBar.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/ProgressBar.pm' ] },
+'Tk/MMutil.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/MMutil.pm' ] },
+'Tk/Animation.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Animation.pod',
+	'/usr/lib/perl5/Tk/Animation.pm' ] },
+'Tk/FBox.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/FBox.pod',
+	'/usr/lib/perl5/Tk/FBox.pm' ] },
+'Tk/Pane.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Pane.pm' ] },
+'Tk/Pretty.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Pretty.pm' ] },
+'Tk/MMtry.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/MMtry.pm' ] },
+'Tk/Button.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Button.pod',
+	'/usr/lib/perl5/Tk/Button.pm' ] },
+'Tk/Font.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Font.pod',
+	'/usr/lib/perl5/Tk/Font.pm' ] },
+'Tk/Trace.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Trace.pm' ] },
+'Tk/MainWindow.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/MainWindow.pod',
+	'/usr/lib/perl5/Tk/MainWindow.pm' ] },
+'Tk/Image.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Image.pod',
+	'/usr/lib/perl5/Tk/Image.pm' ] },
+'Tk/Radiobutton.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Radiobutton.pod',
+	'/usr/lib/perl5/Tk/Radiobutton.pm' ] },
+'Tk/Derived.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Derived.pod',
+	'/usr/lib/perl5/Tk/Derived.pm' ] },
+'Tk/Bitmap.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Bitmap.pod',
+	'/usr/lib/perl5/Tk/Bitmap.pm' ] },
+'Tk/Spinbox.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Spinbox.pod',
+	'/usr/lib/perl5/Tk/Spinbox.pm' ] },
+'Tk/Label.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Label.pod',
+	'/usr/lib/perl5/Tk/Label.pm' ] },
+'Tk/English.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/English.pm' ] },
+'Tk/Region.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Region.pm' ] },
+'Tk/CmdLine.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/CmdLine.pod',
+	'/usr/lib/perl5/Tk/CmdLine.pm' ] },
+'Tk/ErrorDialog.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/ErrorDialog.pm' ] },
+'Tk/Table.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Table.pod',
+	'/usr/lib/perl5/auto/Tk/Table/totalColumns.al',
+	'/usr/lib/perl5/auto/Tk/Table/Create.al',
+	'/usr/lib/perl5/auto/Tk/Table/totalRows.al',
+	'/usr/lib/perl5/auto/Tk/Table/Posn.al',
+	'/usr/lib/perl5/auto/Tk/Table/see.al',
+	'/usr/lib/perl5/auto/Tk/Table/autosplit.ix',
+	'/usr/lib/perl5/Tk/Table.pm' ] },
+'Tk/BrowseEntry.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/BrowseEntry.pod',
+	'/usr/lib/perl5/Tk/BrowseEntry.pm' ] },
+'Tk/Xlib.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Tk/Xlib/Xlib.so',
+	'/usr/lib/perl5/auto/Tk/Xlib/Xlib.bs',
+	'/usr/lib/perl5/Tk/Xlib.pm' ] },
+'Tk/X.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/X.pod',
+	'/usr/lib/perl5/auto/Tk/X/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/X/X.so',
+	'/usr/lib/perl5/auto/Tk/X/X.bs',
+	'/usr/lib/perl5/Tk/X.pm' ] },
+'Tk/WinPhoto.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Tk/WinPhoto/WinPhoto.so',
+	'/usr/lib/perl5/auto/Tk/WinPhoto/WinPhoto.bs',
+	'/usr/lib/perl5/Tk/WinPhoto.pm' ] },
+'Tk/Balloon.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Balloon.pod',
+	'/usr/lib/perl5/Tk/Balloon.pm' ] },
+'Tk/NoteBook.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/NoteBook.pod',
+	'/usr/lib/perl5/Tk/NoteBook.pm' ] },
+'Tk/ReindexedText.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/ReindexedText.pm' ] },
+'Tk/DialogBox.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DialogBox.pod',
+	'/usr/lib/perl5/Tk/DialogBox.pm' ] },
+'Tk/LabFrame.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/LabFrame.pod',
+	'/usr/lib/perl5/Tk/LabFrame.pm' ] },
+'Tk/Tree.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Tree.pod',
+	'/usr/lib/perl5/Tk/Tree.pm' ] },
+'Tk/DirTree.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DirTree.pod',
+	'/usr/lib/perl5/Tk/DirTree.pm' ] },
+'Tk/Text.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Text.pod',
+	'/usr/lib/perl5/auto/Tk/Text/autosplit.ix',
+	'/usr/lib/perl5/auto/Tk/Text/Text.so',
+	'/usr/lib/perl5/auto/Tk/Text/Text.bs',
+	'/usr/lib/perl5/Tk/Text.pm' ] },
+'Tk/Pixmap.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Pixmap.pod',
+	'/usr/lib/perl5/auto/Tk/Pixmap/Pixmap.so',
+	'/usr/lib/perl5/auto/Tk/Pixmap/Pixmap.bs',
+	'/usr/lib/perl5/Tk/Pixmap.pm' ] },
+'Tk/TixGrid.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/TixGrid.pod',
+	'/usr/lib/perl5/auto/Tk/TixGrid/TixGrid.so',
+	'/usr/lib/perl5/auto/Tk/TixGrid/TixGrid.bs',
+	'/usr/lib/perl5/Tk/TixGrid.pm' ] },
+'Tk/FloatEntry.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/FloatEntry.pm' ] },
+'Tk/ReindexedROText.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/ReindexedROText.pm' ] },
+'Tk/Reindex.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Reindex.pm' ] },
+'Tk/Scrollbar.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Scrollbar.pod',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ScrlTopBottom.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Scrollbar.so',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Scrollbar.bs',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Enter.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Leave.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Motion.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ButtonDown.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ButtonUp.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Select.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/StartDrag.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/Drag.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/EndDrag.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ScrlByUnits.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ScrlByPages.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/ScrlToPos.al',
+	'/usr/lib/perl5/auto/Tk/Scrollbar/autosplit.ix',
+	'/usr/lib/perl5/Tk/Scrollbar.pm' ] },
+'Tk/TextList.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/TextList.pm' ] },
+'Tk/TList.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/TList.pod',
+	'/usr/lib/perl5/auto/Tk/TList/TList.so',
+	'/usr/lib/perl5/auto/Tk/TList/TList.bs',
+	'/usr/lib/perl5/Tk/TList.pm' ] },
+'Tk/Menubutton.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Menubutton.pod',
+	'/usr/lib/perl5/auto/Tk/Menubutton/Menubutton.so',
+	'/usr/lib/perl5/auto/Tk/Menubutton/Menubutton.bs',
+	'/usr/lib/perl5/Tk/Menubutton.pm' ] },
+'Tk/Scale.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Scale.pod',
+	'/usr/lib/perl5/auto/Tk/Scale/ButtonDown.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Scale.so',
+	'/usr/lib/perl5/auto/Tk/Scale/Scale.bs',
+	'/usr/lib/perl5/auto/Tk/Scale/Activate.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Leave.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Enter.al',
+	'/usr/lib/perl5/auto/Tk/Scale/ButtonUp.al',
+	'/usr/lib/perl5/auto/Tk/Scale/EndDrag.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Drag.al',
+	'/usr/lib/perl5/auto/Tk/Scale/Increment.al',
+	'/usr/lib/perl5/auto/Tk/Scale/ControlPress.al',
+	'/usr/lib/perl5/auto/Tk/Scale/autosplit.ix',
+	'/usr/lib/perl5/Tk/Scale.pm' ] },
+'Tk/PNG.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Tk/PNG/PNG.so',
+	'/usr/lib/perl5/auto/Tk/PNG/PNG.bs',
+	'/usr/lib/perl5/Tk/PNG.pm' ] },
+'Tk/NBFrame.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Tk/NBFrame/NBFrame.so',
+	'/usr/lib/perl5/auto/Tk/NBFrame/NBFrame.bs',
+	'/usr/lib/perl5/Tk/NBFrame.pm' ] },
+'Tk/Mwm.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Mwm.pod',
+	'/usr/lib/perl5/auto/Tk/Mwm/Mwm.so',
+	'/usr/lib/perl5/auto/Tk/Mwm/Mwm.bs',
+	'/usr/lib/perl5/Tk/Mwm.pm' ] },
+'Tk/Listbox.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Listbox.pod',
+	'/usr/lib/perl5/auto/Tk/Listbox/TIESCALAR.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Listbox.so',
+	'/usr/lib/perl5/auto/Tk/Listbox/Listbox.bs',
+	'/usr/lib/perl5/auto/Tk/Listbox/TIEARRAY.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/FETCHSIZE.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/FETCH.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/ButtonRelease_1.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/STORE.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/CLEAR.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/EXTEND.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/PUSH.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/POP.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/SHIFT.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/UNSHIFT.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/DELETE.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/EXISTS.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/SPLICE.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/xyIndex.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Cntrl_backslash.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Cntrl_Home.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Cntrl_End.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/deleteSelected.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/BeginSelect.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Motion.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/BeginExtend.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/BeginToggle.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/AutoScan.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/UpDown.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/ExtendUpDown.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/DataExtend.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/Cancel.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/SelectAll.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/SetList.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/clipboardPaste.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/getSelected.al',
+	'/usr/lib/perl5/auto/Tk/Listbox/autosplit.ix',
+	'/usr/lib/perl5/Tk/Listbox.pm' ] },
+'Tk/JPEG.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Tk/JPEG/JPEG.so',
+	'/usr/lib/perl5/auto/Tk/JPEG/JPEG.bs',
+	'/usr/lib/perl5/Tk/JPEG.pm' ] },
+'Tk/InputO.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/InputO.pod',
+	'/usr/lib/perl5/auto/Tk/InputO/InputO.so',
+	'/usr/lib/perl5/auto/Tk/InputO/InputO.bs',
+	'/usr/lib/perl5/Tk/InputO.pm' ] },
+'Tk/IO.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/IO.pod',
+	'/usr/lib/perl5/auto/Tk/IO/IO.so',
+	'/usr/lib/perl5/auto/Tk/IO/IO.bs',
+	'/usr/lib/perl5/Tk/IO.pm' ] },
+'Tk/HList.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/HList.pod',
+	'/usr/lib/perl5/auto/Tk/HList/HList.so',
+	'/usr/lib/perl5/auto/Tk/HList/HList.bs',
+	'/usr/lib/perl5/Tk/HList.pm' ] },
+'Tk/Event.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/Tk/Event/Event.so',
+	'/usr/lib/perl5/auto/Tk/Event/Event.bs',
+	'/usr/lib/perl5/Tk/Event.pm' ] },
+'Tk/Entry.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Entry.pod',
+	'/usr/lib/perl5/auto/Tk/Entry/Entry.so',
+	'/usr/lib/perl5/auto/Tk/Entry/Entry.bs',
+	'/usr/lib/perl5/Tk/Entry.pm' ] },
+'Tk/DragDrop.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop.pm' ] },
+'Tk/DropSite.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DropSite.pod',
+	'/usr/lib/perl5/Tk/DropSite.pm' ] },
+'Tk/Compound.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Compound.pod',
+	'/usr/lib/perl5/auto/Tk/Compound/Compound.so',
+	'/usr/lib/perl5/auto/Tk/Compound/Compound.bs',
+	'/usr/lib/perl5/Tk/Compound.pm' ] },
+'Tk/Canvas.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Canvas.pod',
+	'/usr/lib/perl5/auto/Tk/Canvas/Canvas.so',
+	'/usr/lib/perl5/auto/Tk/Canvas/Canvas.bs',
+	'/usr/lib/perl5/Tk/Canvas.pm' ] },
+'Tk/Menu/Item.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Menu/Item.pm' ] },
+'Tk/Text/Tag.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Text/Tag.pm' ] },
+'Tk/Event/IO.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/Event/IO.pm' ] },
+'Tk/DragDrop/LocalDrop.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop/LocalDrop.pm' ] },
+'Tk/DragDrop/Rect.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop/Rect.pm' ] },
+'Tk/DragDrop/SunSite.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop/SunSite.pm' ] },
+'Tk/DragDrop/XDNDSite.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop/XDNDSite.pm' ] },
+'Tk/DragDrop/SunConst.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop/SunConst.pm' ] },
+'Tk/DragDrop/Common.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop/Common.pm' ] },
+'Tk/DragDrop/SunDrop.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop/SunDrop.pm' ] },
+'Tk/DragDrop/XDNDDrop.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tk/DragDrop/XDNDDrop.pm' ] },
+'Tie/Watch.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/Tie/Watch.pm' ] },
+'ModPerl/FunctionMap.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/FunctionMap.pm' ] },
+'ModPerl/TestRun.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/TestRun.pm' ] },
+'ModPerl/Config.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/Config.pm' ] },
+'ModPerl/Manifest.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/Manifest.pm' ] },
+'ModPerl/ParseSource.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/ParseSource.pm' ] },
+'ModPerl/CScan.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/CScan.pm' ] },
+'ModPerl/Code.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/Code.pm' ] },
+'ModPerl/MM.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/MM.pm' ] },
+'ModPerl/PerlRunPrefork.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/PerlRunPrefork.pm' ] },
+'ModPerl/BuildOptions.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/BuildOptions.pm' ] },
+'ModPerl/MethodLookup.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/MethodLookup.pm' ] },
+'ModPerl/WrapXS.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/WrapXS.pm' ] },
+'ModPerl/MapUtil.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/MapUtil.pm' ] },
+'ModPerl/BuildMM.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/BuildMM.pm' ] },
+'ModPerl/TypeMap.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/TypeMap.pm' ] },
+'ModPerl/TestReport.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/TestReport.pm' ] },
+'ModPerl/StructureMap.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/StructureMap.pm' ] },
+'ModPerl/RegistryCooker.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/RegistryCooker.pm' ] },
+'ModPerl/Registry.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/Registry.pm' ] },
+'ModPerl/RegistryPrefork.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/RegistryPrefork.pm' ] },
+'ModPerl/PerlRun.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/PerlRun.pm' ] },
+'ModPerl/RegistryLoader.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/RegistryLoader.pm' ] },
+'ModPerl/RegistryBB.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/ModPerl/RegistryBB.pm' ] },
+'ModPerl/Global.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/ModPerl/Global/Global.so',
+	'/usr/lib/perl5/auto/ModPerl/Global/Global.bs',
+	'/usr/lib/perl5/ModPerl/Global.pm' ] },
+'ModPerl/Util.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/ModPerl/Util/Util.so',
+	'/usr/lib/perl5/auto/ModPerl/Util/Util.bs',
+	'/usr/lib/perl5/ModPerl/Util.pm' ] },
+'ModPerl/Const.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/ModPerl/Const/Const.so',
+	'/usr/lib/perl5/auto/ModPerl/Const/Const.bs',
+	'/usr/lib/perl5/ModPerl/Const.pm' ] },
+'APR/BucketAlloc.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/BucketAlloc/BucketAlloc.so',
+	'/usr/lib/perl5/auto/APR/BucketAlloc/BucketAlloc.bs',
+	'/usr/lib/perl5/APR/BucketAlloc.pm' ] },
+'APR/XSLoader.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/APR/XSLoader.pm' ] },
+'APR/Base64.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Base64/Base64.so',
+	'/usr/lib/perl5/auto/APR/Base64/Base64.bs',
+	'/usr/lib/perl5/APR/Base64.pm' ] },
+'APR/Brigade.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Brigade/Brigade.so',
+	'/usr/lib/perl5/auto/APR/Brigade/Brigade.bs',
+	'/usr/lib/perl5/APR/Brigade.pm' ] },
+'APR/Bucket.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Bucket/Bucket.so',
+	'/usr/lib/perl5/auto/APR/Bucket/Bucket.bs',
+	'/usr/lib/perl5/APR/Bucket.pm' ] },
+'APR/BucketType.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/BucketType/BucketType.so',
+	'/usr/lib/perl5/auto/APR/BucketType/BucketType.bs',
+	'/usr/lib/perl5/APR/BucketType.pm' ] },
+'APR/Date.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Date/Date.so',
+	'/usr/lib/perl5/auto/APR/Date/Date.bs',
+	'/usr/lib/perl5/APR/Date.pm' ] },
+'APR/Error.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Error/Error.so',
+	'/usr/lib/perl5/auto/APR/Error/Error.bs',
+	'/usr/lib/perl5/APR/Error.pm' ] },
+'APR/Finfo.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Finfo/Finfo.so',
+	'/usr/lib/perl5/auto/APR/Finfo/Finfo.bs',
+	'/usr/lib/perl5/APR/Finfo.pm' ] },
+'APR/IpSubnet.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/IpSubnet/IpSubnet.so',
+	'/usr/lib/perl5/auto/APR/IpSubnet/IpSubnet.bs',
+	'/usr/lib/perl5/APR/IpSubnet.pm' ] },
+'APR/OS.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/OS/OS.so',
+	'/usr/lib/perl5/auto/APR/OS/OS.bs',
+	'/usr/lib/perl5/APR/OS.pm' ] },
+'APR/Pool.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Pool/Pool.so',
+	'/usr/lib/perl5/auto/APR/Pool/Pool.bs',
+	'/usr/lib/perl5/APR/Pool.pm' ] },
+'APR/SockAddr.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/SockAddr/SockAddr.so',
+	'/usr/lib/perl5/auto/APR/SockAddr/SockAddr.bs',
+	'/usr/lib/perl5/APR/SockAddr.pm' ] },
+'APR/Socket.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Socket/Socket.so',
+	'/usr/lib/perl5/auto/APR/Socket/Socket.bs',
+	'/usr/lib/perl5/APR/Socket.pm' ] },
+'APR/Status.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Status/Status.so',
+	'/usr/lib/perl5/auto/APR/Status/Status.bs',
+	'/usr/lib/perl5/APR/Status.pm' ] },
+'APR/String.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/String/String.so',
+	'/usr/lib/perl5/auto/APR/String/String.bs',
+	'/usr/lib/perl5/APR/String.pm' ] },
+'APR/Table.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Table/Table.so',
+	'/usr/lib/perl5/auto/APR/Table/Table.bs',
+	'/usr/lib/perl5/APR/Table.pm' ] },
+'APR/ThreadMutex.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/ThreadMutex/ThreadMutex.so',
+	'/usr/lib/perl5/auto/APR/ThreadMutex/ThreadMutex.bs',
+	'/usr/lib/perl5/APR/ThreadMutex.pm' ] },
+'APR/URI.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/URI/URI.so',
+	'/usr/lib/perl5/auto/APR/URI/URI.bs',
+	'/usr/lib/perl5/APR/URI.pm' ] },
+'APR/UUID.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/UUID/UUID.so',
+	'/usr/lib/perl5/auto/APR/UUID/UUID.bs',
+	'/usr/lib/perl5/APR/UUID.pm' ] },
+'APR/Util.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Util/Util.so',
+	'/usr/lib/perl5/auto/APR/Util/Util.bs',
+	'/usr/lib/perl5/APR/Util.pm' ] },
+'APR/Const.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/Const/Const.so',
+	'/usr/lib/perl5/auto/APR/Const/Const.bs',
+	'/usr/lib/perl5/APR/Const.pm' ] },
+'APR/PerlIO.pm' => { dir => '/usr/lib/perl5', files => [
+	'/usr/lib/perl5/auto/APR/PerlIO/PerlIO.so',
+	'/usr/lib/perl5/auto/APR/PerlIO/PerlIO.bs',
+	'/usr/lib/perl5/APR/PerlIO.pm' ] },
+'DebianNet.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/DebianNet.pm' ] },
+'URI.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI.pm' ] },
+'LWP.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP.pm' ] },
+'ConfigFile.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/ConfigFile.pm' ] },
+'Debconf/AutoSelect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/AutoSelect.pm' ] },
+'Debconf/Config.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Config.pm' ] },
+'Debconf/Question.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Question.pm' ] },
+'Debconf/Template.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Template.pm' ] },
+'Debconf/Base.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Base.pm' ] },
+'Debconf/FrontEnd.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd.pm' ] },
+'Debconf/Log.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Log.pm' ] },
+'Debconf/Priority.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Priority.pm' ] },
+'Debconf/Gettext.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Gettext.pm' ] },
+'Debconf/Db.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Db.pm' ] },
+'Debconf/Encoding.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Encoding.pm' ] },
+'Debconf/ConfModule.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/ConfModule.pm' ] },
+'Debconf/Format.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Format.pm' ] },
+'Debconf/Element.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element.pm' ] },
+'Debconf/Iterator.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Iterator.pm' ] },
+'Debconf/TmpFile.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/TmpFile.pm' ] },
+'Debconf/DbDriver.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver.pm' ] },
+'Debconf/FrontEnd/Editor.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Editor.pm' ] },
+'Debconf/FrontEnd/Text.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Text.pm' ] },
+'Debconf/FrontEnd/Gnome.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Gnome.pm' ] },
+'Debconf/FrontEnd/Web.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Web.pm' ] },
+'Debconf/FrontEnd/Passthrough.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Passthrough.pm' ] },
+'Debconf/FrontEnd/Noninteractive.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Noninteractive.pm' ] },
+'Debconf/FrontEnd/ScreenSize.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/ScreenSize.pm' ] },
+'Debconf/FrontEnd/Teletype.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Teletype.pm' ] },
+'Debconf/FrontEnd/Dialog.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Dialog.pm' ] },
+'Debconf/FrontEnd/Readline.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Readline.pm' ] },
+'Debconf/FrontEnd/Kde.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Kde.pm' ] },
+'Debconf/FrontEnd/Kde/WizardUi.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Kde/WizardUi.pm' ] },
+'Debconf/FrontEnd/Kde/Wizard.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/FrontEnd/Kde/Wizard.pm' ] },
+'Debconf/Format/822.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Format/822.pm' ] },
+'Debconf/Element/Gnome.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome.pm' ] },
+'Debconf/Element/Noninteractive.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive.pm' ] },
+'Debconf/Element/Multiselect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Multiselect.pm' ] },
+'Debconf/Element/Select.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Select.pm' ] },
+'Debconf/Element/Kde.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde.pm' ] },
+'Debconf/Element/Dialog/String.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/String.pm' ] },
+'Debconf/Element/Dialog/Text.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/Text.pm' ] },
+'Debconf/Element/Dialog/Note.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/Note.pm' ] },
+'Debconf/Element/Dialog/Multiselect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/Multiselect.pm' ] },
+'Debconf/Element/Dialog/Select.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/Select.pm' ] },
+'Debconf/Element/Dialog/Boolean.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/Boolean.pm' ] },
+'Debconf/Element/Dialog/Password.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/Password.pm' ] },
+'Debconf/Element/Dialog/Error.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/Error.pm' ] },
+'Debconf/Element/Dialog/Progress.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Dialog/Progress.pm' ] },
+'Debconf/Element/Kde/String.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/String.pm' ] },
+'Debconf/Element/Kde/Text.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/Text.pm' ] },
+'Debconf/Element/Kde/Note.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/Note.pm' ] },
+'Debconf/Element/Kde/Multiselect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/Multiselect.pm' ] },
+'Debconf/Element/Kde/Boolean.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/Boolean.pm' ] },
+'Debconf/Element/Kde/Select.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/Select.pm' ] },
+'Debconf/Element/Kde/Password.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/Password.pm' ] },
+'Debconf/Element/Kde/Error.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/Error.pm' ] },
+'Debconf/Element/Kde/Progress.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Kde/Progress.pm' ] },
+'Debconf/Element/Gnome/String.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/String.pm' ] },
+'Debconf/Element/Gnome/Text.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/Text.pm' ] },
+'Debconf/Element/Gnome/Note.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/Note.pm' ] },
+'Debconf/Element/Gnome/Multiselect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/Multiselect.pm' ] },
+'Debconf/Element/Gnome/Boolean.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/Boolean.pm' ] },
+'Debconf/Element/Gnome/Select.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/Select.pm' ] },
+'Debconf/Element/Gnome/Password.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/Password.pm' ] },
+'Debconf/Element/Gnome/Error.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/Error.pm' ] },
+'Debconf/Element/Gnome/Progress.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Gnome/Progress.pm' ] },
+'Debconf/Element/Editor/String.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/String.pm' ] },
+'Debconf/Element/Editor/Text.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/Text.pm' ] },
+'Debconf/Element/Editor/Note.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/Note.pm' ] },
+'Debconf/Element/Editor/Multiselect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/Multiselect.pm' ] },
+'Debconf/Element/Editor/Select.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/Select.pm' ] },
+'Debconf/Element/Editor/Boolean.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/Boolean.pm' ] },
+'Debconf/Element/Editor/Password.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/Password.pm' ] },
+'Debconf/Element/Editor/Error.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/Error.pm' ] },
+'Debconf/Element/Editor/Progress.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Editor/Progress.pm' ] },
+'Debconf/Element/Noninteractive/Select.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/Select.pm' ] },
+'Debconf/Element/Noninteractive/Note.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/Note.pm' ] },
+'Debconf/Element/Noninteractive/Multiselect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/Multiselect.pm' ] },
+'Debconf/Element/Noninteractive/Boolean.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/Boolean.pm' ] },
+'Debconf/Element/Noninteractive/Error.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/Error.pm' ] },
+'Debconf/Element/Noninteractive/Password.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/Password.pm' ] },
+'Debconf/Element/Noninteractive/Progress.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/Progress.pm' ] },
+'Debconf/Element/Noninteractive/String.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/String.pm' ] },
+'Debconf/Element/Noninteractive/Text.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Noninteractive/Text.pm' ] },
+'Debconf/Element/Teletype/String.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/String.pm' ] },
+'Debconf/Element/Teletype/Text.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/Text.pm' ] },
+'Debconf/Element/Teletype/Note.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/Note.pm' ] },
+'Debconf/Element/Teletype/Multiselect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/Multiselect.pm' ] },
+'Debconf/Element/Teletype/Select.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/Select.pm' ] },
+'Debconf/Element/Teletype/Boolean.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/Boolean.pm' ] },
+'Debconf/Element/Teletype/Password.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/Password.pm' ] },
+'Debconf/Element/Teletype/Error.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/Error.pm' ] },
+'Debconf/Element/Teletype/Progress.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Teletype/Progress.pm' ] },
+'Debconf/Element/Web/String.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/String.pm' ] },
+'Debconf/Element/Web/Text.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/Text.pm' ] },
+'Debconf/Element/Web/Note.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/Note.pm' ] },
+'Debconf/Element/Web/Multiselect.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/Multiselect.pm' ] },
+'Debconf/Element/Web/Boolean.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/Boolean.pm' ] },
+'Debconf/Element/Web/Select.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/Select.pm' ] },
+'Debconf/Element/Web/Password.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/Password.pm' ] },
+'Debconf/Element/Web/Error.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/Error.pm' ] },
+'Debconf/Element/Web/Progress.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Element/Web/Progress.pm' ] },
+'Debconf/DbDriver/PackageDir.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/PackageDir.pm' ] },
+'Debconf/DbDriver/Directory.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/Directory.pm' ] },
+'Debconf/DbDriver/Backup.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/Backup.pm' ] },
+'Debconf/DbDriver/Stack.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/Stack.pm' ] },
+'Debconf/DbDriver/Debug.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/Debug.pm' ] },
+'Debconf/DbDriver/Copy.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/Copy.pm' ] },
+'Debconf/DbDriver/DirTree.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/DirTree.pm' ] },
+'Debconf/DbDriver/Pipe.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/Pipe.pm' ] },
+'Debconf/DbDriver/File.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/File.pm' ] },
+'Debconf/DbDriver/LDAP.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/LDAP.pm' ] },
+'Debconf/DbDriver/Cache.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/DbDriver/Cache.pm' ] },
+'Debconf/Template/Transient.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Template/Transient.pm' ] },
+'Debconf/Client/ConfModule.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debconf/Client/ConfModule.pm' ] },
+'Debian/DictionariesCommon.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/DictionariesCommon.pm' ] },
+'Debian/AdduserCommon.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/AdduserCommon.pm' ] },
+'Debian/DebConf/Client/ConfModule.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/DebConf/Client/ConfModule.pm' ] },
+'Debian/Defoma/FontCache.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/Defoma/FontCache.pm' ] },
+'Debian/Defoma/Common.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/Defoma/Common.pm' ] },
+'Debian/Defoma/Font.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/Defoma/Font.pm' ] },
+'Debian/Defoma/IdCache.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/Defoma/IdCache.pm' ] },
+'Debian/Defoma/Id.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/Defoma/Id.pm' ] },
+'Debian/Defoma/SubstCache.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/Defoma/SubstCache.pm' ] },
+'Debian/Defoma/Subst.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/Defoma/Subst.pm' ] },
+'Debian/Defoma/User.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Debian/Defoma/User.pm' ] },
+'Text/WrapI18N.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Text/WrapI18N.pm' ] },
+'HTML/TreeBuilder.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/TreeBuilder.pm' ] },
+'HTML/Tagset.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/Tagset.pm' ] },
+'HTML/AsSubs.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/AsSubs.pm' ] },
+'HTML/TableExtract.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/TableExtract.pm' ] },
+'HTML/Element.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/Element.pm' ] },
+'HTML/Tree.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/Tree.pm' ] },
+'HTML/Parse.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/Parse.pm' ] },
+'HTML/Form.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/Form.pm' ] },
+'HTML/Element/traverse.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTML/Element/traverse.pm' ] },
+'URI/QueryParam.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/QueryParam.pm' ] },
+'URI/_ldap.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/_ldap.pm' ] },
+'URI/ftp.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/ftp.pm' ] },
+'URI/_segment.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/_segment.pm' ] },
+'URI/_generic.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/_generic.pm' ] },
+'URI/tn3270.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/tn3270.pm' ] },
+'URI/nntp.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/nntp.pm' ] },
+'URI/gopher.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/gopher.pm' ] },
+'URI/sips.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/sips.pm' ] },
+'URI/_userpass.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/_userpass.pm' ] },
+'URI/WithBase.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/WithBase.pm' ] },
+'URI/ldapi.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/ldapi.pm' ] },
+'URI/mailto.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/mailto.pm' ] },
+'URI/data.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/data.pm' ] },
+'URI/telnet.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/telnet.pm' ] },
+'URI/urn.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/urn.pm' ] },
+'URI/ldap.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/ldap.pm' ] },
+'URI/_foreign.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/_foreign.pm' ] },
+'URI/mms.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/mms.pm' ] },
+'URI/Heuristic.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/Heuristic.pm' ] },
+'URI/_server.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/_server.pm' ] },
+'URI/URL.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/URL.pm' ] },
+'URI/rtsp.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/rtsp.pm' ] },
+'URI/_query.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/_query.pm' ] },
+'URI/file.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/file.pm' ] },
+'URI/Split.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/Split.pm' ] },
+'URI/rlogin.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/rlogin.pm' ] },
+'URI/news.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/news.pm' ] },
+'URI/ssh.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/ssh.pm' ] },
+'URI/http.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/http.pm' ] },
+'URI/rsync.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/rsync.pm' ] },
+'URI/https.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/https.pm' ] },
+'URI/ldaps.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/ldaps.pm' ] },
+'URI/snews.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/snews.pm' ] },
+'URI/pop.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/pop.pm' ] },
+'URI/rtspu.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/rtspu.pm' ] },
+'URI/Escape.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/Escape.pm' ] },
+'URI/sip.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/sip.pm' ] },
+'URI/_login.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/URI/_login.pm' ] },
+'Config/IniFiles.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Config/IniFiles.pm' ] },
+'LWP/UserAgent.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/UserAgent.pm' ] },
+'LWP/RobotUA.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/RobotUA.pm' ] },
+'LWP/Protocol.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol.pm' ] },
+'LWP/MemberMixin.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/MemberMixin.pm' ] },
+'LWP/Debug.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Debug.pm' ] },
+'LWP/ConnCache.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/ConnCache.pm' ] },
+'LWP/MediaTypes.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/MediaTypes.pm' ] },
+'LWP/DebugFile.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/DebugFile.pm' ] },
+'LWP/Simple.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Simple.pm' ] },
+'LWP/Authen/Digest.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Authen/Digest.pm' ] },
+'LWP/Authen/Ntlm.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Authen/Ntlm.pm' ] },
+'LWP/Authen/Basic.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Authen/Basic.pm' ] },
+'LWP/Protocol/gopher.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/gopher.pm' ] },
+'LWP/Protocol/ftp.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/ftp.pm' ] },
+'LWP/Protocol/loopback.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/loopback.pm' ] },
+'LWP/Protocol/cpan.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/cpan.pm' ] },
+'LWP/Protocol/nntp.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/nntp.pm' ] },
+'LWP/Protocol/mailto.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/mailto.pm' ] },
+'LWP/Protocol/https10.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/https10.pm' ] },
+'LWP/Protocol/http.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/http.pm' ] },
+'LWP/Protocol/file.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/file.pm' ] },
+'LWP/Protocol/http10.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/http10.pm' ] },
+'LWP/Protocol/GHTTP.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/GHTTP.pm' ] },
+'LWP/Protocol/data.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/data.pm' ] },
+'LWP/Protocol/nogo.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/nogo.pm' ] },
+'LWP/Protocol/https.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/LWP/Protocol/https.pm' ] },
+'HTTP/Negotiate.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Negotiate.pm' ] },
+'HTTP/Message.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Message.pm' ] },
+'HTTP/Status.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Status.pm' ] },
+'HTTP/Daemon.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Daemon.pm' ] },
+'HTTP/Cookies.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Cookies.pm' ] },
+'HTTP/Date.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Date.pm' ] },
+'HTTP/Request.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Request.pm' ] },
+'HTTP/Response.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Response.pm' ] },
+'HTTP/Headers.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Headers.pm' ] },
+'HTTP/Headers/ETag.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Headers/ETag.pm' ] },
+'HTTP/Headers/Util.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Headers/Util.pm' ] },
+'HTTP/Headers/Auth.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Headers/Auth.pm' ] },
+'HTTP/Request/Common.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Request/Common.pm' ] },
+'HTTP/Cookies/Microsoft.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Cookies/Microsoft.pm' ] },
+'HTTP/Cookies/Netscape.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/HTTP/Cookies/Netscape.pm' ] },
+'Net/HTTPS.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Net/HTTPS.pm' ] },
+'Net/HTTP.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Net/HTTP.pm' ] },
+'Net/Daemon.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Net/Daemon.pm' ] },
+'Net/HTTP/Methods.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Net/HTTP/Methods.pm' ] },
+'Net/HTTP/NB.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Net/HTTP/NB.pm' ] },
+'Net/Daemon/Test.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Net/Daemon/Test.pm' ] },
+'Net/Daemon/Log.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Net/Daemon/Log.pm' ] },
+'File/Listing.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/File/Listing.pm' ] },
+'WWW/RobotRules.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/WWW/RobotRules.pm' ] },
+'WWW/RobotRules/AnyDBM_File.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/WWW/RobotRules/AnyDBM_File.pm' ] },
+'Bundle/PlRPC.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Bundle/PlRPC.pm' ] },
+'Bundle/LWP.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Bundle/LWP.pm' ] },
+'Date/Parse.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Parse.pm' ] },
+'Date/Language.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language.pm' ] },
+'Date/Format.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Format.pm' ] },
+'Date/Language/TigrinyaEritrean.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/TigrinyaEritrean.pm' ] },
+'Date/Language/Swedish.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Swedish.pm' ] },
+'Date/Language/Oromo.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Oromo.pm' ] },
+'Date/Language/Czech.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Czech.pm' ] },
+'Date/Language/Amharic.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Amharic.pm' ] },
+'Date/Language/Italian.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Italian.pm' ] },
+'Date/Language/TigrinyaEthiopian.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/TigrinyaEthiopian.pm' ] },
+'Date/Language/Chinese_GB.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Chinese_GB.pm' ] },
+'Date/Language/Austrian.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Austrian.pm' ] },
+'Date/Language/Dutch.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Dutch.pm' ] },
+'Date/Language/English.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/English.pm' ] },
+'Date/Language/Norwegian.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Norwegian.pm' ] },
+'Date/Language/Somali.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Somali.pm' ] },
+'Date/Language/Gedeo.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Gedeo.pm' ] },
+'Date/Language/Greek.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Greek.pm' ] },
+'Date/Language/Afar.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Afar.pm' ] },
+'Date/Language/Brazilian.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Brazilian.pm' ] },
+'Date/Language/Tigrinya.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Tigrinya.pm' ] },
+'Date/Language/Danish.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Danish.pm' ] },
+'Date/Language/Finnish.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Finnish.pm' ] },
+'Date/Language/Sidama.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/Sidama.pm' ] },
+'Date/Language/German.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/German.pm' ] },
+'Date/Language/French.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Date/Language/French.pm' ] },
+'Time/Zone.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Time/Zone.pm' ] },
+'Mail/Header.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Header.pm' ] },
+'Mail/Cap.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Cap.pm' ] },
+'Mail/Mailer.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Mailer.pm' ] },
+'Mail/Send.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Send.pm' ] },
+'Mail/Filter.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Filter.pm' ] },
+'Mail/Field.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Field.pm' ] },
+'Mail/Internet.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/auto/Mail/Internet/add_signature.al',
+	'/usr/share/perl5/auto/Mail/Internet/reply.al',
+	'/usr/share/perl5/auto/Mail/Internet/_prephdr.al',
+	'/usr/share/perl5/auto/Mail/Internet/sign.al',
+	'/usr/share/perl5/auto/Mail/Internet/escape_from.al',
+	'/usr/share/perl5/auto/Mail/Internet/smtpsend.al',
+	'/usr/share/perl5/auto/Mail/Internet/send.al',
+	'/usr/share/perl5/auto/Mail/Internet/nntppost.al',
+	'/usr/share/perl5/auto/Mail/Internet/unescape_from.al',
+	'/usr/share/perl5/auto/Mail/Internet/autosplit.ix',
+	'/usr/share/perl5/Mail/Internet.pm' ] },
+'Mail/Util.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/auto/Mail/Util/read_mbox.al',
+	'/usr/share/perl5/auto/Mail/Util/maildomain.al',
+	'/usr/share/perl5/auto/Mail/Util/mailaddress.al',
+	'/usr/share/perl5/auto/Mail/Util/autosplit.ix',
+	'/usr/share/perl5/Mail/Util.pm' ] },
+'Mail/Address.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Address.pm' ] },
+'Mail/Mailer/rfc822.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Mailer/rfc822.pm' ] },
+'Mail/Mailer/qmail.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Mailer/qmail.pm' ] },
+'Mail/Mailer/sendmail.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Mailer/sendmail.pm' ] },
+'Mail/Mailer/smtp.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Mailer/smtp.pm' ] },
+'Mail/Mailer/testfile.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Mailer/testfile.pm' ] },
+'Mail/Field/AddrList.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Field/AddrList.pm' ] },
+'Mail/Field/Date.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Mail/Field/Date.pm' ] },
+'IO/ScalarArray.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/IO/ScalarArray.pm' ] },
+'IO/Lines.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/IO/Lines.pm' ] },
+'IO/Stringy.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/IO/Stringy.pm' ] },
+'IO/AtomicFile.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/IO/AtomicFile.pm' ] },
+'IO/Wrap.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/IO/Wrap.pm' ] },
+'IO/InnerFile.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/IO/InnerFile.pm' ] },
+'IO/Scalar.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/IO/Scalar.pm' ] },
+'IO/WrapTie.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/IO/WrapTie.pm' ] },
+'Convert/BinHex.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Convert/BinHex.pm' ] },
+'MIME/Entity.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Entity.pm' ] },
+'MIME/Body.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Body.pm' ] },
+'MIME/Words.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Words.pm' ] },
+'MIME/Head.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Head.pm' ] },
+'MIME/WordDecoder.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/WordDecoder.pm' ] },
+'MIME/Tools.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Tools.pm' ] },
+'MIME/Decoder.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Decoder.pm' ] },
+'MIME/Parser.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Parser.pm' ] },
+'MIME/Decoder/QuotedPrint.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Decoder/QuotedPrint.pm' ] },
+'MIME/Decoder/Gzip64.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Decoder/Gzip64.pm' ] },
+'MIME/Decoder/NBit.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Decoder/NBit.pm' ] },
+'MIME/Decoder/BinHex.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Decoder/BinHex.pm' ] },
+'MIME/Decoder/Binary.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Decoder/Binary.pm' ] },
+'MIME/Decoder/UU.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Decoder/UU.pm' ] },
+'MIME/Decoder/Base64.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Decoder/Base64.pm' ] },
+'MIME/Field/ConTraEnc.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Field/ConTraEnc.pm' ] },
+'MIME/Field/ContDisp.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Field/ContDisp.pm' ] },
+'MIME/Field/ContType.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Field/ContType.pm' ] },
+'MIME/Field/ParamVal.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Field/ParamVal.pm' ] },
+'MIME/Parser/Results.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Parser/Results.pm' ] },
+'MIME/Parser/Filer.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Parser/Filer.pm' ] },
+'MIME/Parser/Reader.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/MIME/Parser/Reader.pm' ] },
+'News/NNTPClient.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/News/NNTPClient.pm' ] },
+'RPC/PlServer.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/RPC/PlServer.pm' ] },
+'RPC/PlClient.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/RPC/PlClient.pm' ] },
+'RPC/PlServer/Comm.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/RPC/PlServer/Comm.pm' ] },
+'RPC/PlServer/Test.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/RPC/PlServer/Test.pm' ] },
+'Crypt/PasswdMD5.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Crypt/PasswdMD5.pm' ] },
+'Apache/Htpasswd.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Apache/Htpasswd.pm' ] },
+'Devel/Symdump.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Devel/Symdump.pm' ] },
+'Devel/ptkdb.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Devel/ptkdb.pm' ] },
+'Devel/Symdump/Export.pm' => { dir => '/usr/share/perl5', files => [
+	'/usr/share/perl5/Devel/Symdump/Export.pm' ] },
+'mod_perl.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/mod_perl.pod',
+	'/usr/local/lib/perl/5.8.4/mod_perl.pm' ] },
+'mod_perl_hooks.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/mod_perl_hooks.pm' ] },
+'Apache.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/Apache/Leak/Leak.so',
+	'/usr/local/lib/perl/5.8.4/auto/Apache/Leak/Leak.bs',
+	'/usr/local/lib/perl/5.8.4/auto/Apache/Symbol/Symbol.so',
+	'/usr/local/lib/perl/5.8.4/auto/Apache/Symbol/Symbol.bs',
+	'/usr/local/lib/perl/5.8.4/Apache.pm' ] },
+'Cwd.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/Cwd/Cwd.so',
+	'/usr/local/lib/perl/5.8.4/auto/Cwd/Cwd.bs',
+	'/usr/local/lib/perl/5.8.4/Cwd.pm' ] },
+'Apache/Resource.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Resource.pm' ] },
+'Apache/Options.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Options.pm' ] },
+'Apache/src.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/src.pm' ] },
+'Apache/MyConfig.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/MyConfig.pm' ] },
+'Apache/Opcode.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Opcode.pm' ] },
+'Apache/httpd_conf.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/httpd_conf.pm' ] },
+'Apache/Debug.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Debug.pm' ] },
+'Apache/SizeLimit.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/SizeLimit.pm' ] },
+'Apache/Registry.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Registry.pm' ] },
+'Apache/FakeRequest.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/FakeRequest.pm' ] },
+'Apache/PerlRun.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/PerlRun.pm' ] },
+'Apache/RegistryNG.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/RegistryNG.pm' ] },
+'Apache/PerlSections.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/PerlSections.pm' ] },
+'Apache/RegistryBB.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/RegistryBB.pm' ] },
+'Apache/Include.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Include.pm' ] },
+'Apache/SIG.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/SIG.pm' ] },
+'Apache/testold.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/testold.pm' ] },
+'Apache/RedirectLogFix.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/RedirectLogFix.pm' ] },
+'Apache/StatINC.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/StatINC.pm' ] },
+'Apache/ExtUtils.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/ExtUtils.pm' ] },
+'Apache/Symdump.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Symdump.pm' ] },
+'Apache/RegistryLoader.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/RegistryLoader.pm' ] },
+'Apache/Status.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Status.pm' ] },
+'Apache/Connection.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Connection.pm' ] },
+'Apache/Constants.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Constants.pm' ] },
+'Apache/File.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/File.pm' ] },
+'Apache/Leak.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/Apache/Leak/Leak.so',
+	'/usr/local/lib/perl/5.8.4/auto/Apache/Leak/Leak.bs',
+	'/usr/local/lib/perl/5.8.4/Apache/Leak.pm' ] },
+'Apache/Log.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Log.pm' ] },
+'Apache/ModuleConfig.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/ModuleConfig.pm' ] },
+'Apache/PerlRunXS.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/PerlRunXS.pm' ] },
+'Apache/Server.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Server.pm' ] },
+'Apache/Symbol.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/Apache/Symbol/Symbol.so',
+	'/usr/local/lib/perl/5.8.4/auto/Apache/Symbol/Symbol.bs',
+	'/usr/local/lib/perl/5.8.4/Apache/Symbol.pm' ] },
+'Apache/Table.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Table.pm' ] },
+'Apache/URI.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/URI.pm' ] },
+'Apache/Util.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Util.pm' ] },
+'Apache/Constants/Exports.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Apache/Constants/Exports.pm' ] },
+'Bundle/Apache.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/Bundle/Apache.pm' ] },
+'Digest/SHA.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/Digest/SHA/SHA.so',
+	'/usr/local/lib/perl/5.8.4/auto/Digest/SHA/SHA.bs',
+	'/usr/local/lib/perl/5.8.4/Digest/SHA.pm' ] },
+'File/Spec.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec.pm' ] },
+'File/Spec/Mac.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec/Mac.pm' ] },
+'File/Spec/OS2.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec/OS2.pm' ] },
+'File/Spec/VMS.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec/VMS.pm' ] },
+'File/Spec/Cygwin.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec/Cygwin.pm' ] },
+'File/Spec/Epoc.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec/Epoc.pm' ] },
+'File/Spec/Functions.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec/Functions.pm' ] },
+'File/Spec/Unix.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec/Unix.pm' ] },
+'File/Spec/Win32.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/File/Spec/Win32.pm' ] },
+'Compress/Zlib.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/Compress/Zlib/Zlib.so',
+	'/usr/local/lib/perl/5.8.4/auto/Compress/Zlib/Zlib.bs',
+	'/usr/local/lib/perl/5.8.4/auto/Compress/Zlib/autosplit.ix',
+	'/usr/local/lib/perl/5.8.4/Compress/Zlib.pm' ] },
+'Term/ReadKey.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/Term/ReadKey/ReadKey.so',
+	'/usr/local/lib/perl/5.8.4/auto/Term/ReadKey/ReadKey.bs',
+	'/usr/local/lib/perl/5.8.4/auto/Term/ReadKey/autosplit.ix',
+	'/usr/local/lib/perl/5.8.4/Term/ReadKey.pm' ] },
+'XML/Parser.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/XML/Parser/Expat/Expat.so',
+	'/usr/local/lib/perl/5.8.4/auto/XML/Parser/Expat/Expat.bs',
+	'/usr/local/lib/perl/5.8.4/XML/Parser.pm' ] },
+'XML/Parser/Expat.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/XML/Parser/Expat/Expat.so',
+	'/usr/local/lib/perl/5.8.4/auto/XML/Parser/Expat/Expat.bs',
+	'/usr/local/lib/perl/5.8.4/XML/Parser/Expat.pm' ] },
+'XML/Parser/Style/Tree.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/XML/Parser/Style/Tree.pm' ] },
+'XML/Parser/Style/Subs.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/XML/Parser/Style/Subs.pm' ] },
+'XML/Parser/Style/Objects.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/XML/Parser/Style/Objects.pm' ] },
+'XML/Parser/Style/Debug.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/XML/Parser/Style/Debug.pm' ] },
+'XML/Parser/Style/Stream.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/XML/Parser/Style/Stream.pm' ] },
+'List/MoreUtils.pm' => { dir => '/usr/local/lib/perl/5.8.4', files => [
+	'/usr/local/lib/perl/5.8.4/auto/List/MoreUtils/MoreUtils.so',
+	'/usr/local/lib/perl/5.8.4/auto/List/MoreUtils/MoreUtils.bs',
+	'/usr/local/lib/perl/5.8.4/List/MoreUtils.pm' ] },
+'CPANPLUS.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS.pm' ] },
+'CPAN.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN.pm' ] },
+'Spiffy.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Spiffy.pm' ] },
+'YAML.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML.pm' ] },
+'Text/Template.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Text/Template.pm' ] },
+'Text/Glob.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Text/Glob.pm' ] },
+'Text/Template/Preprocess.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Text/Template/Preprocess.pm' ] },
+'CPANPLUS/Internals.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals.pm' ] },
+'CPANPLUS/Backend.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Backend.pm' ] },
+'CPANPLUS/Shell.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Shell.pm' ] },
+'CPANPLUS/Module.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Module.pm' ] },
+'CPANPLUS/Config.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Config.pm' ] },
+'CPANPLUS/inc.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/inc.pm' ] },
+'CPANPLUS/Dist.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Dist.pm' ] },
+'CPANPLUS/Configure.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Configure.pm' ] },
+'CPANPLUS/Error.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Error.pm' ] },
+'CPANPLUS/Backend/RV.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Backend/RV.pm' ] },
+'CPANPLUS/Shell/Default.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Shell/Default.pm' ] },
+'CPANPLUS/Shell/Classic.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Shell/Classic.pm' ] },
+'CPANPLUS/Module/Signature.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Module/Signature.pm' ] },
+'CPANPLUS/Module/Author.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Module/Author.pm' ] },
+'CPANPLUS/Module/Checksums.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Module/Checksums.pm' ] },
+'CPANPLUS/Module/Fake.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Module/Fake.pm' ] },
+'CPANPLUS/Module/Author/Fake.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Module/Author/Fake.pm' ] },
+'CPANPLUS/Internals/Report.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Report.pm' ] },
+'CPANPLUS/Internals/Utils.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Utils.pm' ] },
+'CPANPLUS/Internals/Source.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Source.pm' ] },
+'CPANPLUS/Internals/Fetch.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Fetch.pm' ] },
+'CPANPLUS/Internals/Search.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Search.pm' ] },
+'CPANPLUS/Internals/Extract.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Extract.pm' ] },
+'CPANPLUS/Internals/Constants.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Constants.pm' ] },
+'CPANPLUS/Internals/Constants/Report.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Constants/Report.pm' ] },
+'CPANPLUS/Internals/Utils/Autoflush.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Internals/Utils/Autoflush.pm' ] },
+'CPANPLUS/Dist/Sample.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Dist/Sample.pm' ] },
+'CPANPLUS/Dist/MM.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Dist/MM.pm' ] },
+'CPANPLUS/Configure/Setup.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPANPLUS/Configure/Setup.pm' ] },
+'Sort/Versions.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Sort/Versions.pm' ] },
+'ExtUtils/AutoInstall.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/ExtUtils/AutoInstall.pm' ] },
+'Apache/AuthenPasswd.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Apache/AuthenPasswd.pm' ] },
+'Module/Signature.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Signature.pm' ] },
+'Module/Build.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build.pm' ] },
+'Module/Build/Notes.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Notes.pm' ] },
+'Module/Build/Compat.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Compat.pm' ] },
+'Module/Build/PodParser.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/PodParser.pm' ] },
+'Module/Build/ModuleInfo.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/ModuleInfo.pm' ] },
+'Module/Build/Base.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Base.pm' ] },
+'Module/Build/PPMMaker.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/PPMMaker.pm' ] },
+'Module/Build/Cookbook.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Cookbook.pm' ] },
+'Module/Build/YAML.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/YAML.pm' ] },
+'Module/Build/ConfigData.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/ConfigData.pm' ] },
+'Module/Build/Platform/darwin.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/darwin.pm' ] },
+'Module/Build/Platform/MacOS.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/MacOS.pm' ] },
+'Module/Build/Platform/RiscOS.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/RiscOS.pm' ] },
+'Module/Build/Platform/VOS.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/VOS.pm' ] },
+'Module/Build/Platform/Windows.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/Windows.pm' ] },
+'Module/Build/Platform/Unix.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/Unix.pm' ] },
+'Module/Build/Platform/Amiga.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/Amiga.pm' ] },
+'Module/Build/Platform/os2.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/os2.pm' ] },
+'Module/Build/Platform/VMS.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/VMS.pm' ] },
+'Module/Build/Platform/MPEiX.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/MPEiX.pm' ] },
+'Module/Build/Platform/cygwin.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/cygwin.pm' ] },
+'Module/Build/Platform/EBCDIC.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/EBCDIC.pm' ] },
+'Module/Build/Platform/aix.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/aix.pm' ] },
+'Module/Build/Platform/Default.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Build/Platform/Default.pm' ] },
+'Module/Install/TestBase.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Module/Install/TestBase.pm' ] },
+'File/Temp.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/File/Temp.pm' ] },
+'File/HomeDir.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/File/HomeDir.pm' ] },
+'File/HomeDir/Darwin.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/File/HomeDir/Darwin.pm' ] },
+'File/HomeDir/Unix.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/File/HomeDir/Unix.pm' ] },
+'File/HomeDir/MacOS9.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/File/HomeDir/MacOS9.pm' ] },
+'File/HomeDir/Windows.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/File/HomeDir/Windows.pm' ] },
+'Archive/Zip.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Archive/Zip.pod',
+	'/usr/local/share/perl/5.8.4/Archive/Zip.pm' ] },
+'Archive/Tar.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Archive/Tar.pm' ] },
+'Archive/Zip/Tree.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Archive/Zip/Tree.pm' ] },
+'Archive/Zip/MemberRead.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Archive/Zip/MemberRead.pm' ] },
+'Archive/Zip/MockFileHandle.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Archive/Zip/MockFileHandle.pm' ] },
+'Archive/Zip/BufferedFileHandle.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Archive/Zip/BufferedFileHandle.pm' ] },
+'Archive/Tar/Constant.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Archive/Tar/Constant.pm' ] },
+'Archive/Tar/File.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Archive/Tar/File.pm' ] },
+'Net/Telnet.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/Telnet.pm' ] },
+'Net/POP3.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/POP3.pm' ] },
+'Net/SMTP.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/SMTP.pm' ] },
+'Net/Config.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/Config.pm' ] },
+'Net/Domain.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/Domain.pm' ] },
+'Net/Cmd.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/Cmd.pm' ] },
+'Net/FTP.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/FTP.pm' ] },
+'Net/Netrc.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/Netrc.pm' ] },
+'Net/NNTP.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/NNTP.pm' ] },
+'Net/Time.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/Time.pm' ] },
+'Net/FTP/dataconn.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/FTP/dataconn.pm' ] },
+'Net/FTP/E.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/FTP/E.pm' ] },
+'Net/FTP/L.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/FTP/L.pm' ] },
+'Net/FTP/A.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/FTP/A.pm' ] },
+'Net/FTP/I.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Net/FTP/I.pm' ] },
+'Term/ReadPassword.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Term/ReadPassword.pm' ] },
+'Term/ReadLine/Perl.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Term/ReadLine/Perl.pm' ] },
+'Term/ReadLine/readline.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Term/ReadLine/readline.pm' ] },
+'CPAN/Version.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN/Version.pm' ] },
+'CPAN/Admin.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN/Admin.pm' ] },
+'CPAN/Tarzip.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN/Tarzip.pm' ] },
+'CPAN/Debug.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN/Debug.pm' ] },
+'CPAN/HandleConfig.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN/HandleConfig.pm' ] },
+'CPAN/Nox.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN/Nox.pm' ] },
+'CPAN/FirstTime.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN/FirstTime.pm' ] },
+'CPAN/Mini.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/CPAN/Mini.pm' ] },
+'Test/Base.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Test/Base.pm' ] },
+'Test/YAML.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Test/YAML.pm' ] },
+'Test/Base/Filter.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/Test/Base/Filter.pm' ] },
+'YAML/Types.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Types.pm' ] },
+'YAML/Loader.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Loader.pm' ] },
+'YAML/Node.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Node.pm' ] },
+'YAML/Error.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Error.pm' ] },
+'YAML/Marshall.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Marshall.pm' ] },
+'YAML/Tag.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Tag.pm' ] },
+'YAML/Base.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Base.pm' ] },
+'YAML/Dumper.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Dumper.pm' ] },
+'YAML/Loader/Base.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Loader/Base.pm' ] },
+'YAML/Dumper/Base.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/YAML/Dumper/Base.pm' ] },
+'IO/Zlib.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/IO/Zlib.pm' ] },
+'XML/NamespaceSupport.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/NamespaceSupport.pm' ] },
+'XML/SAX.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX.pm' ] },
+'XML/Simple.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/Simple.pm' ] },
+'XML/SAX/ParserFactory.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/ParserFactory.pm' ] },
+'XML/SAX/DocumentLocator.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/DocumentLocator.pm' ] },
+'XML/SAX/PurePerl.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl.pm' ] },
+'XML/SAX/Base.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/Base.pm' ] },
+'XML/SAX/Exception.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/Exception.pm' ] },
+'XML/SAX/PurePerl/Exception.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/Exception.pm' ] },
+'XML/SAX/PurePerl/UnicodeExt.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/UnicodeExt.pm' ] },
+'XML/SAX/PurePerl/DocType.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/DocType.pm' ] },
+'XML/SAX/PurePerl/NoUnicodeExt.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/NoUnicodeExt.pm' ] },
+'XML/SAX/PurePerl/EncodingDetect.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/EncodingDetect.pm' ] },
+'XML/SAX/PurePerl/DebugHandler.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/DebugHandler.pm' ] },
+'XML/SAX/PurePerl/Productions.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/Productions.pm' ] },
+'XML/SAX/PurePerl/XMLDecl.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/XMLDecl.pm' ] },
+'XML/SAX/PurePerl/DTDDecls.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/DTDDecls.pm' ] },
+'XML/SAX/PurePerl/Reader.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/Reader.pm' ] },
+'XML/SAX/PurePerl/Reader/UnicodeExt.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/Reader/UnicodeExt.pm' ] },
+'XML/SAX/PurePerl/Reader/Stream.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/Reader/Stream.pm' ] },
+'XML/SAX/PurePerl/Reader/NoUnicodeExt.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/Reader/NoUnicodeExt.pm' ] },
+'XML/SAX/PurePerl/Reader/String.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/Reader/String.pm' ] },
+'XML/SAX/PurePerl/Reader/URI.pm' => { dir => '/usr/local/share/perl/5.8.4', files => [
+	'/usr/local/share/perl/5.8.4/XML/SAX/PurePerl/Reader/URI.pm' ] },
+);

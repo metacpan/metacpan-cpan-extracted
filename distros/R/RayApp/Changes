@@ -1,0 +1,97 @@
+
+This is change file for RayApp.
+
+2.004 Sun Apr 9 18:52:58 CEST 2006
+	Support for cookies.
+	Man pages added.
+
+2.003 Mon Mar 27 21:46:17 CEST 2006
+	Support for structured parameters.
+
+2.002 Wed Mar 1 17:21:00 CET 2006
+	Upgraded to support mod_perl 2.0.
+
+2.001 Mon Oct 31 11:58:56 CET 2005
+	Upgraded to support mod_perl 1.99.
+
+1.166 Apr 23 2005
+	Added support for plain transformation of XML (to HTML).
+
+1.165 Feb 22 2005
+
+1.148 Sat Sep  4 19:45:32 CEST 2004
+	Further tests.
+
+	RayApp::Request split to APR and CGI files.
+
+	Added ->body method.
+
+1.147 Sat Aug 21 16:49:13 CEST 2004
+	Added tests that run CGI, CGIStorage and mod_perl requests
+	against Apache. Minor code cleanup.
+
+1.146 Sat Jul 17 11:52:32 CEST 2004
+	The code and the tests are now strict, warnings, $^W and taint
+	clean.
+
+1.145 Fri May 28 21:15:09 CEST 2004
+	RayApp: When .html file exists, it is sent as is.
+	RayApp::mod_perl: Added binmode to STDOUT. Fixed handling of
+		status.
+
+1.140 Tue Jan 27 21:56:21 CET 2004
+	RayApp: Caching of DSDs, applications, and XSLT stylesheets
+		made mtime aware.
+	RayApp::CGI: Improved URI translation handling.
+	RayApp::mod_perl: Adds no-cache headers.
+
+1.136 Fri Jan 23 19:32:25 CET 2004
+	RayApp: added the cache parameter and
+	execute_application_cgi method.
+	Minor fixes.
+
+1.120 Tue Dec 23 22:04:48 CET 2003
+	Prerequisites added to Makefile.PL.
+	Namespace support improved.
+	RayApp::CGI added to the distribution.
+
+1.110 Wed Dec 10 16:06:15 CET 2003
+	Minor documentation fixes.
+
+1.100 Sun Sep 14 16:48:02 CEST 2003
+	Documentation aligned with the thesis text.
+
+1.010 Sun Sep  7 11:15:23 CEST 2003
+	Handling of idattr fixed for DTDs.
+
+1.000 Tue Aug 26 21:14:45 CEST 2003
+	Release 1.0, with documentation and tests.
+
+0.950 Sat Aug 23 12:01:13 CEST 2003
+	Internals rewritten using numerical pointers, to allow more
+	flexible handling of attributes.
+
+0.921 Fri Aug 15 17:20:12 CEST 2003
+	Finalization of the API.
+
+0.85 Fri Feb 14 21:07:40 CET 2003
+	Renamed to RayApp. Rewritten using XML::LibXML.
+
+0.44 Sat Jul 28 20:27:50 CEST 2001
+        Configuration of propagate, charset and ReturnXML added.
+
+0.43 Sat Jul 28 18:33:00 CEST 2001
+        Configuration of dbh setting added.
+
+0.42 Sat Jul 28 16:06:05 CEST 2001
+        Configuration of tests made more flexible.
+
+0.40 Fri Jul 27 18:29:38 CEST 2001
+        Packed 0.36 into working distribution.
+
+0.36 Thu Jul 26 20:31:16 CEST 2001
+
+	Named Apache::AxKit::RayApp. The initial public release,
+	tied closely to AxKit.
+
+

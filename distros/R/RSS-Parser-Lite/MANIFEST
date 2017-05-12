@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/XML/RSS/Parser/Lite.pm
+t/RSS-Parser-Lite.t

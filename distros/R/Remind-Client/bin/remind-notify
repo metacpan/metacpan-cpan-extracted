@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+remind-notify - send timed reminders to libnotify
+
+=head1 SYNOPSIS
+
+  remind-notify [--filename /path/to/.reminders] [--summary "My Reminders"] [--urgency [low|normal|critical]]
+
+=head1 DESCRIPTION
+
+This is a convenient, lightweight client for remind, that will just send
+each timed reminder as a 'critical' reminder, by default.
+
+=cut
+
+use warnings;
+use strict;
+
+use Getopt::Long qw(:config auto_help auto_version);
+use Pod::Usage;
+
+use Remind::Client::libnotify;
+
+our $VERSION = '0.03';
+$VERSION = eval $VERSION;
+
+my %O = (
+    filename => undef,
+    summary => undef,
+    urgency => undef,
+);
+GetOptions(\%O, 'filename=s')
+    or pod2usage(2);
+
+$O{app_name} = $0;
+
+my $rc = Remind::Client::libnotify->new(%O);
+$rc->run();
+
+exit;
+
+=head1 SEE ALSO
+
+L<Remind::Client>, L<notify-send>(1)
+
+=head1 AUTHOR
+
+Mike Kelly <pioto@pioto.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009, Mike Kelly.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses at <http://www.perlfoundation.org/artistic_license_1_0>,
+and <http://www.gnu.org/licenses/gpl-2.0.html>.
+
+This program is distributed in the hope that it will be
+useful, but without any warranty; without even the implied
+warranty of merchantability or fitness for a particular purpose.
+
+=cut
+
+# vim: set ft=perl sw=4 sts=4 et :

@@ -1,0 +1,7 @@
+Revision history for Perl module RT::Extension::LinkedTicketsHistory
+
+0.01 2013-11-04
+ - initial CPAN release
+
+0.02 2013-11-13
+ - Ensure that only linked _ticket_ history gets shown

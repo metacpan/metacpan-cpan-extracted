@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Religion-Bible-Regex-Reference
+version:            0.95
+abstract:           ~
+author:
+    - Daniel Holmlund <holmlund.dev@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Religion::Bible::Regex::Builder:  v0.95
+    Religion::Bible::Regex::Config:  v0.5
+    Test::Base:           0
+    Test::More:           0
+    version:              0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

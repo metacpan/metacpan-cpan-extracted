@@ -1,0 +1,40 @@
+---
+abstract: "he's a bit slow, but he's sure good lookin'"
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  JSON: '2.00'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::11 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RDF-TrineX-Serializer-MockTurtleSoup
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  RDF::TrineX::Serializer::MockTurtleSoup:
+    file: lib/RDF/TrineX/Serializer/MockTurtleSoup.pm
+    version: '0.006'
+requires:
+  RDF::Prefixes: '0.003'
+  RDF::Trine: '1.000'
+  Sort::Key: '0'
+  match::smart: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-TrineX-Serializer-MockTurtleSoup
+  homepage: https://metacpan.org/release/RDF-TrineX-Serializer-MockTurtleSoup
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-rdf-trinex-serializer-mockturtlesoup.git
+version: '0.006'

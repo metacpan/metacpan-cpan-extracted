@@ -1,0 +1,63 @@
+@prefix :     <http://usefulinc.com/ns/doap#> .
+@prefix dc:   <http://purl.org/dc/terms/> .
+@prefix my:   <http://purl.org/NET/cpan-uri/dist/RDF-Trine-Node-Literal-XML/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dcs:  <http://ontologi.es/doap-changeset#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+
+<>
+    dc:title     "DOAP for RDF-Trine-Node-Literal-XML"@en ;
+    dc:subject   my:project ;
+    dc:creator   <http://www.kjetil.kjernsmo.net/foaf#me> .
+
+my:project	 
+    a           :Project ;
+    :name       "RDF-Trine-Node-Literal-XML" ;
+    :shortdesc  "Get XML::LibXML objects for rdf:XMLLiterals"@en ;
+    :created    "2009-12-06"^^xsd:date ;
+    :programming-language "Perl" ;
+    :homepage <http://search.cpan.org/dist/RDF-Trine-Node-Literal-XML/> ;
+    :maintainer <http://www.kjetil.kjernsmo.net/foaf#me> ;
+    :developer <http://kasei.us/about/foaf.xrdf#greg> ;
+    :bug-database <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=RDF-Trine-Node-Literal-XML> ;
+    :release    my:v_0_15 ;
+    :release    my:v_0_16 .
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+    a           foaf:Person ;
+    owl:sameAs  <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+    foaf:name   "Kjetil Kjernsmo" ;
+    foaf:mbox   <mailto:kjetilk@cpan.org> .
+
+
+
+my:v_0_15
+    a           :Version ;
+    dc:issued   "2010-04-05"^^xsd:date ;
+    :revision   "0.15"^^xsd:string ;
+    rdfs:label  "Mostly packaging issues and minor fixes"@en ; 
+    dcs:changeset [
+      dcs:item
+        [ rdfs:label "Run perltidy."@en ] ,
+        [ rdfs:label "require libxml2 2.6.27."@en ] ,
+        [ rdfs:label "Set configure_requires XML::LibXML."@en ] ,
+        [ rdfs:label "Add Test::Perl::Critic author test."@en ; a dcs:Addition ] ,
+        [ rdfs:label "Add auto_set_repository, auto_set_bugtracker, write_doap_changes."@en ; a dcs:Addition ] ,
+        [ rdfs:label "Minor Perl::Critic stuff."@en ; a dcs:Bugfix ]
+    ] .
+
+my:v_0_16
+    a           :Version ;
+    dc:issued   "2011-03-04"^^xsd:date ;
+    :revision   "0.16"^^xsd:string ;
+    rdfs:label  "Make Test::Signature author test"@en ; 
+    dcs:changeset [
+      dcs:item
+        [ rdfs:label "Another test."@en ] ,
+        [ rdfs:label "Minor cleanup POD."@en ] ,
+        [ rdfs:label "Minor cleanup in Makefile.PL."@en ] ,
+        [ rdfs:label "Make Test::Signature author test."@en ] 
+     ] .

@@ -1,0 +1,38 @@
+%# God is Dead
+%#		-- Nietzsche
+%# Nietzsche is Dead
+%#		-- God
+%# Nietzsche is God
+%#		-- The Dead
+<table width="100%" border="0" cellspacing="1" cellpadding="2" class="poptable" bgcolor="#AAE3DE">
+<TR>
+<TD COLSPAN=5 align="center"><&|/l&>My Projects</&></TD>
+</TR>
+
+<TR>
+<TD class="tableTitle" ALIGN=LEFT><&|/l&>Project</&></TD>
+<TD class="tableTitle" ALIGN=LEFT><&|/l&>Owner</&></TD>
+<TD class="tableTitle" ALIGN=LEFT><&|/l&>Members</&></TD>
+</TR>
+
+%while (my $queue = $Queues->Next) {
+%     next unless $queue->HasWatcher($session{CurrentUser}->UserObj);
+%     my $bg = 'ffffff';
+%     my $clicky = '';
+    <tr bgcolor='<% $bg %>'
+	onMouseOver="this.style.backgroundColor='#D1FAFC'" 
+        onMouseOut="this.style.backgroundColor='<% $bg %>'"
+	style="cursor:hand" 
+	onClick="MM_goToURL('self','/Foundry/Project/index.html?Queue=<% $queue->Id %>');return document.MM_returnValue"
+    > 
+<td height="26"><a href="/Foundry/Project/index.html?Queue=<% $queue->Id %>"><% $queue->Name %></a></td>
+<td><% eval {join(', ', map $_->Name, @{$queue->AdminCc->UserMembersObj->ItemsArrayRef} ) } %></td>
+<td><% eval {join(', ', map $_->Name, @{$queue->Cc->UserMembersObj->ItemsArrayRef} ) } %></td>
+</TR>
+% }
+</TABLE>
+
+<%INIT>
+my $Queues = RT::Queues->new($session{'CurrentUser'}); 
+$Queues->LimitToEnabled;
+</%INIT>

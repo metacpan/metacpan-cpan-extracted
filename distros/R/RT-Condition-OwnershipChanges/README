@@ -1,0 +1,44 @@
+NAME
+    RT-Condition-OwnershipChanges - Checks for ownership changes
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        Only do this during the intial install. Running it twice will result
+        in duplicate Scrip Conditions.
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Set(@Plugins, qw(RT::Condition::OwnershipChanges));
+
+        or add "RT::Condition::OwnershipChanges" to your existing @Plugins
+        line.
+
+    make initdb
+        Only do this on your first install
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Kevin Falcone <falcone@bestpractical.com>
+
+BUGS
+    All bugs should be reported via
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Condition-Ownership
+    Changes> or bug-RT-Condition-OwnershipChanges@rt.cpan.org.
+
+LICENCE AND COPYRIGHT
+    This software is Copyright (c) 2011 by Best Practical Solutions.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

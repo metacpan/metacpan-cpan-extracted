@@ -1,0 +1,152 @@
+$Id: dependency.txt,v 1.2 2000/10/22 10:59:00 aigan Exp $
+
+ DYNAMIC PROPERTIES
+ ------------------
+
+If a property is calculated from another property, we will have to
+recalculate the property if the property it depends on is changed.
+
+So far, I have treated types as a special case.  Not because they are
+fundamentally diffrent, but because I believe the implementation will
+be faster.  It includes the creation of dynamic properties for
+indirect types.  Every resource is implicitly of type Resource, even if
+the model doesn't say so.  More implicit types comes as an effect of
+subClassOf properties.
+
+
+Introductory example:
+
+  #A --fullname--> 'J L'
+  #A --firstname--> 'J'
+  #A --lastname--> 'L'
+
+The fullname of #A could be said to be dependent on firstname and
+lastname.  Are they dependent on the literals, the statements or maby
+on some way the properties?
+
+
+The main example:
+
+ #1:  #A --subClassOf--> #B
+ #2:  #B --subClassOf--> #C
+ #3:  #A --subClassOf--> #C
+
+Statement #3 follows from #1 and #2.  This means that #3 is dependent
+on #1 and #2.
+
+But that is not enough to answer { $myclass->subClassOf->list }.  The
+question depends not only on all the curent subClassOf properties, but
+on *all* subClassOf properties for the resource.  
+
+
+ CREATION TRIGGERS
+ -----------------
+
+This calls for some sort of statement creation callback...  (The
+discussion here is about all properties.  subClassOf is only used as
+an illustration / testcase.)
+
+Each interface can contribute with part of the answer to the
+question.  This is presently done by a call to init_props() for the
+subject.  This will be generalized to allow initialization for just
+some properties and/or one by one.  This will eventually be done by
+the individual calls to, for example, subClassOf().
+
+After each interface has returned their part of the list of
+subClassOf statements, the callback must be activated in order to
+complement this list with the subClassOf statements inferenced from
+the other statements.  The subClassOf will infer the value from
+each objects subClassOf properties, which will recursively call the
+higher level up to the top.
+
+But what should be done if two diffrent interfaces both hook up to
+subClassOf statements creations?  The callback should only add
+subClassOf statements and not statements with other properties.  I
+guess that the correct thing to do is to call both callbacks and do it
+one more time if any of the callbacks added another statement for the
+subject.
+
+Both the callbacks will register register dependencies in each of the
+statements used for each of the inferred statements.  This will insure
+that a deletion of a source statemnt will invalidate the dependent
+statement.
+
+
+
+ DEPTH OF SEARCH
+ ----------------
+
+On top on this; we will have things like "depth of search".  Some
+questions will be pursued in greate depth and other questions will
+be taken lightly.  Some dependencies will be forced in realtime while
+other will be resolved in batches oncen in a while.   
+
+Just take foreign models as an example.  They reside on other servers
+and, if not closed, could change at any time.  The http cache
+directives tells us then to time out the cache and make a new
+retrieval.
+
+Another example is the translation rules.  You can apply all known
+translation rules and get a whole lot of new properties.  These could
+serve as input for another run of the translation rules.  This could
+go on in the same manner as a chess computer examines the question
+about what the winning move is.  We have to draw the line somewhere.
+
+I will keep a nesting counter as a safegaurd for cyclic dependencies
+in the program.  It can act as a simple "depth of search".  Looping
+class inheritance should be catched by the "nothig new here" rule.
+But other problems could be catched by the nesting counter.
+
+
+
+ THE MODEL OF INFERED STATEMENTS
+ -------------------------------
+
+What will be the model of the inferenced statements?  The translation
+rule belongs to a schma/model.  The source statements belongs to their
+respective models.  None of the models actualy says that the infered
+statement is true.  The schema can only say that "this is true
+provided that the dependent statements are also true".
+
+The inferenced subClassOf statements will be owned/stated by the RDFS
+schema, not as "facts" but as reified statemnts.  But that means that
+the actual statement doesn't have a model at all.  Hmm.  Let's
+introduce the Anonymous model.
+
+Since these inferenced statements will be mind-bogglingly common, it
+would be bad to have to represent the dependencies explicitly.  They
+will be stored for efficient handling in the internal cache and be
+represented outwardly as statements by the schema.
+
+It could be done by setting a flag for the statement, marking it as a
+inferenced statement from the schema model. Or we could create a new
+model with the said relationship with the schema model.
+
+
+
+ DEEP DEPENDENCIES
+ -----------------
+
+A statement dependent on a statement involving a literal is also
+dependent on the actual value of the literal.  This dependency is of
+the same type as a dependency on a part of a tree.  
+
+Say for example that one statement is dependent on the contact
+information and that the contact information is made up of several
+substatements. A change in any of the substatements could invalidate
+the dependent statement.
+
+This will be solved by having two types of dependencies.  You can
+depend either on specific statements or on all statements of a
+selection, including models.  A removed or added statement (including
+changed literal) will check for dependent statements hooked to the
+statement, the statements subject, all the subjects selections
+including its model.
+
+And this brings us back to the { $myclass->subClassOf->list }
+question.  The answer is dependent on the selection {
+$myclass->subClassOf }.  This is dependent on all subClassOf
+statements for the subject.  A new statement invalidates the cached
+response.  (But that's not the same as the construction trigger
+discussed in 'creation triggers' section.)
+

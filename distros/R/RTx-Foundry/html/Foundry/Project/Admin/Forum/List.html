@@ -1,0 +1,36 @@
+<%INIT>
+our ($Get, $Post, $ua, $wws);
+
+use Encode;
+my $args = { map { $_ => Encode::encode_utf8($ARGS{$_}) } grep /^[_a-z]/, keys %ARGS };
+
+if ($r->path_info =~ m{^/wws(.*)}) {
+    require URI;
+    my $url = URI->new('http:');
+    $url->query_form(%$args);
+    my $out = $Get->("$1?" . $url->query);
+    $out =~ s/.*<!-- end title.tt2 -->//s;
+    $out =~ s{<!-- end is_priv -->.*<!-- end list_menu.tt2 -->}
+	     {</TD></TR></TABLE>}s;
+    $out =~ s{<!-- begin -->.*<!-- Panel list info -->}{</TD></TR>}s;
+    $m->print($out);
+    return;
+}
+elsif ($ARGS{action_create_list}) {
+    if (!length($ARGS{listname})) {
+	return $m->comp('/Foundry/Project/Admin/Forum/index.html', %ARGS);
+    }
+    $args->{listname} = "$args->{topics}-$args->{listname}";
+    $args->{subject} ||= $args->{listname};
+    $args->{info} ||= $args->{listname};
+    $Post->( "", $args);
+
+    # XXX - /home/sympa/bin/etc/scenari/create_list.public_listmaster
+    # needs to read
+    # true()                    md5,smime -> do_it
+    return $m->comp('/Foundry/Project/Admin/Forum/index.html', QueueObj => $ARGS{QueueObj});
+}
+else {
+    $m->print($Post->( "", $args));
+}
+</%INIT>

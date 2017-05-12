@@ -1,0 +1,20 @@
+@CustomFields = (
+    {
+        Name => 'i-doit objects',
+        Type => 'FreeformMultiple',
+        LookupType => 'RT::Queue-RT::Ticket',
+        Disabled => 0,
+        Description => 'Reference to one or more i-doit objects'
+    },
+    {
+        Name => 'i-doit tenant',
+        Type => 'SelectSingle',
+        LookupType => 'RT::Queue-RT::Ticket',
+        RenderType => 'Dropdown',
+        Disabled => 0,
+        Description => 'i-doit tenant who owns the objects',
+        Values => [
+            { Name => '1', SortOrder => 1 }
+        ]
+    }
+)

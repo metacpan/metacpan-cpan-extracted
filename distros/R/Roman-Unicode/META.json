@@ -1,0 +1,59 @@
+{
+   "abstract" : "Make roman numerals, using the Unicode characters for them",
+   "author" : [
+      "brian d foy <brian.d.foy@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Roman-Unicode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Unicode::Normalize" : "0",
+            "Unicode::UCD" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Unicode::Casing" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/Roman-Unicode/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/Roman-Unicode",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/Roman-Unicode.git",
+         "web" : "https://github.com/briandfoy/Roman-Unicode"
+      }
+   },
+   "version" : "1.031"
+}

@@ -1,0 +1,16 @@
+Changes
+glib2_config.pl
+inc/ExtUtils/MY_Metafile.pm
+lib/RPC/XML/Deparser/XS.pm
+libxwrite.c
+libxwrite.h
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/00-use.t
+t/01-deparse.t
+typemap
+XS.xs
+META.yml                                 Module meta-data (added by MakeMaker)

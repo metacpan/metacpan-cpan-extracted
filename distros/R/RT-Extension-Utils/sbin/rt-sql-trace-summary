@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie;
+
+use Regexp::Common qw/delimited/;
+my $re_number      = qr/(?<![0-9a-z])[+-]?[0-9]+(?![0-9a-z])/i;
+my $re_delim       = qr/$RE{delimited}{-delim=>qq{\'\"}}/;
+my $re_value       = qr/(?:$re_number|$re_delim)/;
+
+foreach my $file ( @ARGV ) {
+
+    print "extracting info from '$file'...\n";
+    open my $fh, '<:utf8', $file;
+    my @list = extract_sql( $fh );
+    close $fh;
+    print "Done\n";
+
+    #ten_slowest( \@list );
+
+    group_queries( \@list );
+
+    print "Ten slowest groups\n";
+    foreach my $group ( (sort { $b->{time}{'sum'} <=> $a->{time}{'sum'} } @list)[0..10] ) {
+        my $qprefix = $group->{query} ."";
+        $qprefix = substr $qprefix, 0, 160;
+        $qprefix =~ s/(.{80})/$1\n\t/g;
+        printf "\n%f\t(%f x %d)\t(%f <-> %f)\n\t%s\n",
+            $group->{time}{'sum'},
+            $group->{time}{'avg'}, scalar @{ $group->{times} },
+            $group->{time}{'min'}, $group->{time}{'max'},
+            $qprefix
+        ;
+    }
+    print "Done\n";
+
+    my $total = 0;
+    $total += $_->{time}{'sum'} foreach @list;
+    printf "total: %f\n", $total;
+}
+
+sub group_queries {
+    my $list = shift;
+
+    my %index;
+    foreach my $row ( splice @$list ) {
+        my ($query) = unbind_query( $row->{query} );
+
+        my $i = $index{ $query };
+        unless ( defined $i ) {
+            $index{ $query } = @$list;
+            $row->{'query'} = $query;
+            $row->{'times'} = [ $row->{'time'} ];
+            $row->{'time'} = { sum => $row->{'time'} };
+            $row->{'callers'} = [ {
+                file => delete $row->{'file'},
+                line => delete $row->{'line'},
+            } ];
+            push @$list, $row;
+            next;
+        }
+
+        $list->[$i]->{time}{sum} += $row->{'time'};
+        push @{ $list->[$i]->{times} }, $row->{'time'};
+        push @{ $list->[$i]->{callers} }, {
+            file => $row->{'file'},
+            line => $row->{'line'},
+        };
+    }
+
+    foreach my $row ( @$list ) {
+        $row->{time}{avg} = $row->{time}{sum}/@{ $row->{'times'} };
+        $row->{time}{min} = $row->{time}{max} = $row->{'times'}[0];
+        foreach ( @{ $row->{'times'} } ) {
+            $row->{time}{min} = $_ if $_ < $row->{time}{min};
+            $row->{time}{max} = $_ if $_ > $row->{time}{max};
+        }
+    }
+}
+
+sub unbind_query {
+    my $query = shift;
+
+    $query =~ s/$re_value/?/g;
+    return $query;
+}
+
+sub ten_slowest {
+    my $list = shift;
+
+    print "Ten slowest\n";
+    foreach ( (sort { $b->{time} <=> $a->{time} } @$list)[1 .. 10] ) {
+        print "\n". $_->{time} ."\t". $_->{query} ."\n";
+    }
+    print "Done\n";
+}
+
+sub extract_sql {
+    my $fh = shift;
+
+    my $common_path_prefix = undef;
+
+    my @res;
+    while ( my $str = <$fh> ) {
+        my %row;
+        @row{qw(time query binds file line)} = (
+            $str =~ m{
+                SQL\(([0-9]+\.[0-9]+)s\):
+                \s+(.*?);
+                (?:\s+\[\s+bound\s+values:\s+(.*?)\s+\])?
+                \s+\([a-zA-Z0-9/]+:([0-9]+)\)
+            }x
+        );
+        next unless defined $row{'time'} && length $row{'time'};
+
+        $common_path_prefix = $row{'file'} unless defined $common_path_prefix;
+        if ( rindex($row{'file'}, $common_path_prefix, 0) != 0 ) {
+            do {
+                $common_path_prefix =~ s{/[^/]+$}{};
+            } while length $common_path_prefix
+                && rindex($row{'file'}, $common_path_prefix, 0) != 0;
+        }
+        push @res, \%row;
+    }
+
+    if ( my $l = length $common_path_prefix ) {
+        substr( $_->{'file'}, 0, $l ) = '' foreach @res;
+    }
+    return @res;
+}
+

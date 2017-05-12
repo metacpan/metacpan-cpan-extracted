@@ -1,0 +1,35 @@
+% my $i;
+% while (my $ticket = $tickets->Next) {
+%     my $duedate = $ticket->DueObj->AsString;
+%     my $ticket_year = substr($duedate, 0, 4);
+%     my $ticket_month = substr($duedate, 5, 2);
+%     if ($ticket_year == ($date[5]+1900) && $ticket_month == ($date[4]+1)) {
+%         my $ticket_date = substr($duedate, 8, 2);
+%         $cal->addcontent($ticket_date, "<div id='event'><A href=".$RT::WebPath."/Ticket/Display.html?id=".$ticket->Id.">".$ticket->Subject."</A></div>");
+%         }
+% }
+% my $drew = $cal->as_HTML;
+% print $drew;
+<%INIT>
+use HTML::CalendarMonthSimple;
+require Date::Calc;
+my @date = localtime();
+my $cal = new HTML::CalendarMonthSimple('year'  => $date[5]+1900, 
+					'month' => $date[4]+1);
+$cal->border(1);
+$cal->width('100%');
+$cal->todaycontentcolor('#ff6600');
+# show the days of the week in English and Chinese
+            # calendar CSS by isis
+$cal->tableclass('caltable');
+$cal->cellclass('calcell');
+$cal->weekdaycellclass('calweekdaycell');
+$cal->weekendcellclass('calweekendcell');
+$cal->todaycellclass('caltodaycell');
+#$cal->datecellclass(DATE,[STRING]);
+$cal->headerclass('calheader');
+
+</%INIT>
+<%ARGS>
+$tickets
+</%ARGS>

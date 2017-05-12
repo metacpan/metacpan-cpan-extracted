@@ -1,0 +1,137 @@
+NAME
+    RT::Condition::NotStartedInBusinessHours - Check for unstarted tickets
+    within business hours
+
+DESCRIPTION
+    This RT condition will check for tickets which are not started within
+    business hours.
+
+SYNOPSIS
+  CLI
+        rt-crontool
+            --search RT::Search::ModuleName
+            --search-arg 'The Search Argument'
+            --condition RT::Condition::NotStartedInBusinessHours
+            --condition-arg 'The Condition Argument'
+            --action RT::Action:ActionModule
+            --template 'Template Name or ID'
+
+INSTALLATION
+    This condition based on the following modules:
+
+        RT >= 4.0.0
+        Date::Manip >= 6.34
+
+    To install this condition run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    or place this script under
+
+        $RT_HOME/local/lib/RT/Condition/
+
+    where $RT_HOME is the path to your RT installation, for example
+    "/opt/rt4".
+
+    You may additionally make this condition available in RT's web UI as a
+    Scrip Condition:
+
+        make initdb
+
+    Another way to install the latest release is via CPAN:
+
+        cpan RT::Condition::NotStartedInBusinessHours
+        $RT_HOME/sbin/rt-setup-database --action insert --datafile /opt/rt4/local/plugins/RT-Condition-NotStartedInBusinessHours/etc/initialdata
+
+    The second command is equivalent to "make initdb", but is unfortunately
+    not executed automatically.
+
+CONFIGURATION
+  RT SITE CONFIGURATION
+    To enabled this condition edit the RT site configuration located under
+    "$RT_HOME/etc/RT_SiteConfig.pm":
+
+        Set(@Plugins,qw(RT::Condition::NotStartedInBusinessHours));
+
+    To change the standard behavior of Date::Manip you may add to the site
+    configuration:
+
+        Set(%DateManipConfig, (
+            'WorkDayBeg', '9:00',
+            'WorkDayEnd', '17:00', 
+            #'WorkDay24Hr', '0',
+            'WorkWeekBeg', '1',
+            'WorkWeekEnd', '5'
+        ));
+
+    For more information see
+    <http://search.cpan.org/~sbeck/Date-Manip-6.34/lib/Date/Manip/Config.pod
+    #BUSINESS_CONFIGURATION_VARIABLES>.
+
+  CONDITION ARGUMENT
+    This condition needs exactly 1 argument to work.
+
+        --condition RT::Condition::NotStartedInBusinessHours 
+        --condition-arg 1
+
+    1 is the time in hours for escalation.
+
+  EXAMPLE CRON JOB
+        rt-crontool 
+            --search RT::Search::FromSQL 
+            --search-arg "Queue = 'General' AND ( Status = 'new' ) AND Owner = 'Nobody'" 
+            --condition RT::Condition::NotStartedInBusinessHours 
+            --condition-arg 1 
+            --action RT::Action::RecordComment 
+            --template 'Unowned tickets'
+
+AUTHOR
+    Benjamin Heisig, <bheisig@synetics.de>
+
+SUPPORT AND DOCUMENTATION
+    You can find documentation for this module with the "perldoc" command.
+
+        perldoc RT::Condition::NotStartedInBusinessHours
+
+    You can also look for information at:
+
+    Search CPAN
+        <http://search.cpan.org/dist/RT-Condition-NotStartedInBusinessHours/
+        >
+
+    RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=RT-Condition-NotStartedInB
+        usinessHours>
+
+    AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/RT-Condition-NotStartedInBusinessHours>
+
+    CPAN Ratings
+        <http://cpanratings.perl.org/d/RT-Condition-NotStartedInBusinessHour
+        s>
+
+    Repository
+        <https://github.com/bheisig/rt-condition-notstartedinbusinesshours>
+
+BUGS
+    Please report any bugs or feature requests to the author.
+
+ACKNOWLEDGEMENTS
+    This script is a fork from RT::Condition::UntouchedInBusinessHours
+    written by Torsten Brumm.
+
+COPYRIGHT AND LICENSE
+    Copyright 2012 synetics GmbH, <http://i-doit.org/>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+SEE ALSO
+        RT
+        Date::Manip
+

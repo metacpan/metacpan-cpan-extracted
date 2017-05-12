@@ -1,0 +1,13 @@
+Revision history for Perl extension Run.
+
+0.01  Thu Dec 18 14:50:57 1997
+	- original version; created by h2xs 1.18
+
+0.02:	Initial release (chain, or, and, pipe, env, redir).
+	Redir very fragile in complicated situations (tests 10-13 may fail
+	depending on what fd were used when started).
+
+0.03:	fdopen() is in fact ">&=FOO", thus close of created filehandle
+	invalidates FOO.  Changed to open().
+
+	Some tests still do not work right.

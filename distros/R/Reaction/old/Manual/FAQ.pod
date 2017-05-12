@@ -1,0 +1,103 @@
+=head1 NAME
+
+Reaction::Manual::FAQ
+
+=head2 INTRODUCTION
+
+=head3 What is Reaction?
+
+Reaction is an MVCish framework that is designed with two goals in mind:
+"don't repeat yourself" and "components rule".
+
+=head3 How is it different from other MVC frameworks?
+
+Reaction is more flexible and abstract. Web development is only a specialized
+set of what Reaction is designed to provide - the inner classes are general
+enough to be used in many different environments and for solving non-web
+problems.
+
+It is planned to go a lot further than just the web - we want to develop GUIs
+and CLIs as easily and painlessly as possible, using Reaction. How about
+writing your web application and instantly getting a CLI to go with it? That's
+only part of the flexibility we have in mind.
+
+=head3 How is it different from Catalyst?
+
+Catalyst is MVC-based whereas Reaction splits the Model into 2 parts: The
+"Domain Model" and the "Interface Model". Web development is only a sample of
+what Reaction can do - but it already comes bundled with the basic components
+that you would have to program in Catalyst. At the moment, Reaction runs on
+Catalyst for web development.
+
+=head3 What's a Domain?
+
+A domain is the field where an abstraction makes sense. For example, to build
+a web site a programmer may come up with an abstraction of a User, Products,
+User roles, etc. These concepts are just one particular implementation of all
+the possible abstractions for that web site -- the set of all these possible
+abstractions make up the Domain.
+
+=head3 What's a Domain Model?
+
+A Domain Model is an actual computational model of an abstraction. In most
+cases these models are business-based, as in the set of objects that make up
+the representation for a particular domain, such as Users, Products, User
+Roles, etc.
+
+=head3 What's an Interface Model?
+
+A well defined model for the common operations involved in a particular mode
+of interaction with the domain. In other words, it's a layer around the Domain
+Model that provides interaction with it. One example would be an authorization
+procedure for different views of the same data, based on the user's credentials.
+
+=head3 I'm lost! What does "Model" mean?
+
+The term "model" can mean two things: "model as in Computer Model" and "Model
+as in MVC". For this document, the former will be written as just "Model"
+whereas the latter will be referred to as "Model as in MVC."
+
+=head3 Haven't I seen these definitions elsewhere?
+
+Yes, similar terms have been used in Java-land and Smalltalk-ville. Note that
+for the sake of simplicity we are not giving rigorous (and more complex)
+definitions.
+
+=head3 What's a View?
+
+=head3 What's a Viewport?
+
+ListView and ActionForm are subclasses of ViewPort.
+
+=head3 What's a Focus Stack?
+
+=head3 What are Tangents?
+
+=head3 Can I have a pony?
+
+=head2 USING REACTION
+
+=head3 Where do I put my HTML?
+
+=head3 Packages involved
+
+ ComponentUI
+ ComponentUI::Controller::Bar
+ ComponentUI::Controller::Baz
+ ComponentUI::Controller::Foo
+ ComponentUI::Controller::Root
+ ComponentUI::Model::TestDB
+ ComponentUI::Model::Action
+ ComponentUI::View::XHTML
+
+CRUD    
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

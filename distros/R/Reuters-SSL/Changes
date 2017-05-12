@@ -1,0 +1,25 @@
+Revision history for Perl extension Reuters::SSL.
+
+0.01  Wed Apr  3 11:49:44 2002
+	- original version; created by h2xs 1.19
+0.50  Wed Jul 31 16:50:00 2002
+        - added some documentation
+        - addes some type checking for robustness
+        - found some memory leaks, but was unable
+          to close them yes
+0.51  Mon Sep 02 18:00:00 2002
+        - added forgotten returnvalue 
+        - added some static casts to avoid
+	  compiler warnings
+	(Thanks to Waseem Wali)
+0.52  
+	- added sslErrorLog - function
+	  to log into defined files and not only
+	  the default files 
+	- added optional Parameter to
+	  sslSnkOpen to change the 
+	  RequestType to Normal/Snapshot/Host
+	- worked on test.pl to make the
+	  output more readable
+	(Thanks to Waseem Wali for proposals)
+

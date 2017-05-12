@@ -1,0 +1,64 @@
+{
+   "abstract" : "Lazy typing access to RDF data",
+   "author" : [
+      "Jakob Voß <voss@gbv.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-Lazy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.036"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "RDF::NS" : "20131002",
+            "RDF::Trine" : "1.000",
+            "Try::Tiny" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nichtich/RDF-Lazy/issues"
+      },
+      "homepage" : "https://github.com/nichtich/RDF-Lazy",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nichtich/RDF-Lazy.git",
+         "web" : "https://github.com/nichtich/RDF-Lazy"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "Jakob Voss <jakob@nichtich.de>",
+      "Jakob Voss <voss@gbv.de>"
+   ]
+}
+

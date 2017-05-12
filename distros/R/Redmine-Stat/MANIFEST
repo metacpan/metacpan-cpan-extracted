@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Redmine-Stat.t
+t/fixtures/issues.xml
+t/fixtures/trackers.xml
+t/fixtures/projects.xml
+t/real_auth_data/url
+t/real_auth_data/auth_key
+t/real_auth_data/query_id
+lib/Redmine/Stat.pm
+META.yml                                 Module meta-data (added by MakeMaker)

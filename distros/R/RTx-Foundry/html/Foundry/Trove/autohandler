@@ -1,0 +1,36 @@
+%# One way to stop a runaway horse is to bet on him.
+<& /Foundry/Elements/Header,
+    Title => 'Project Directory',
+    ($action ? (Action => $action) : ()),
+    ($method ? (Method => $method) : ()),
+&>
+
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td><& /Foundry/Elements/Tabs, Text => $Type &></td>
+  </tr>
+  <tr> 
+    <td>
+      <table border="0" cellspacing="0" cellpadding="0" class="poptable" width="100%">
+% $m->call_next(%ARGS, Type => $Type);
+       </table>
+<br>
+
+<& /Foundry/Elements/Footer &>
+<%INIT>
+@RT::Tabs = (
+    map { $_ => "/Foundry/Trove/?Type=$_" }
+    'Overview', 'Maturity', 'Platform', 'License', 'ProgrammingLanguage', 'IntendedAudience'
+);
+
+my $action = $m->base_comp->attr('Action');
+my $method = $m->base_comp->attr('Method');
+</%INIT>
+<%ARGS>
+$Type	=> 'Overview'
+</%ARGS>
+<%ATTR>
+Action	=> undef
+Method	=> undef
+</%ATTR>

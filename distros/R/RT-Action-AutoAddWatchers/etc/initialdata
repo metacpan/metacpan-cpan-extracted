@@ -1,0 +1,11 @@
+use strict;
+use warnings;
+
+our @ScripActions = (
+    {
+        Name        => 'Automatically add ticket watchers from new addresses',
+        Description => 'Parses message for addresses and adds them as ticket watchers, accounting for privileged status',
+        ExecModule  => 'AutoAddWatchers',
+        Argument    => '',
+    },
+);

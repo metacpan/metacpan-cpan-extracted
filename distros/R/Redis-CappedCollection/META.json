@@ -1,0 +1,81 @@
+{
+   "abstract" : "Redis::CappedCollection module provides the fixed sized collections that have a auto-FIFO age-out feature.",
+   "author" : [
+      "TrackingSoft LLC <sgladkov@trackingsoft.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-CappedCollection",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Fast" : "0.014",
+            "Digest::SHA1" : "2.13",
+            "Mouse" : "0",
+            "Params::Util" : "1.07",
+            "Redis" : "1.976",
+            "Try::Tiny" : "0.18",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::UUID" : "1.217",
+            "JSON::XS" : "3.01",
+            "Net::EmptyPort" : "0",
+            "Sys::SigAction" : "0.21",
+            "Test::Exception" : "0.31",
+            "Test::NoWarnings" : "1.04",
+            "Test::RedisServer" : "0.04"
+         }
+      }
+   },
+   "provides" : {
+      "Redis::CappedCollection" : {
+         "file" : "lib/Redis/CappedCollection.pm",
+         "version" : "1.10"
+      },
+      "Redis::CappedCollection::Util" : {
+         "file" : "lib/Redis/CappedCollection/Util.pm",
+         "version" : "1.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/TrackingSoft/Redis-CappedCollection/issues"
+      },
+      "homepage" : "https://github.com/TrackingSoft/Redis-CappedCollection",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/TrackingSoft/Redis-CappedCollection.git",
+         "web" : "http://github.com/TrackingSoft/Redis-CappedCollection"
+      }
+   },
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

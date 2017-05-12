@@ -1,0 +1,14 @@
+abstract: RT Extension-Timeline Extension
+author: Todd Chapman <todd@chaka.net>
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: RTx-Timeline
+no_index: 
+  directory: 
+    - html
+    - inc
+    - t
+requires: 
+  JSON::Syck: 0
+version: 0.03

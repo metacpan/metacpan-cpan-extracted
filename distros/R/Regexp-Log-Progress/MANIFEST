@@ -1,0 +1,23 @@
+Build.PL
+Changes
+debian/compat
+debian/libregexp-log-progress-perl.docs
+debian/control
+debian/copyright
+debian/rules
+debian/watch
+debian/changelog
+lib/Regexp/Log/Progress.pm
+lib/Regexp/Log/Progress/Broker.pm
+lib/Regexp/Log/Progress/Server.pm
+lib/Regexp/Log/Progress/Database.pm
+lib/Regexp/Log/Progress/NameServer.pm
+lib/Regexp/Log/Progress/AdminServer.pm
+MANIFEST			This list of files
+perl-Regexp-Log-Progress.spec
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+Makefile.PL
+META.yml

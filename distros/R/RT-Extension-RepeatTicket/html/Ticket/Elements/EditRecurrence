@@ -1,0 +1,291 @@
+<script>
+jQuery( function () {
+    jQuery('div.repeat input[name=repeat-enabled]').change( function () {
+        var val = jQuery(this).val();
+        if ( jQuery(this).is(':checked') ) {
+            jQuery('div.repeat div.repeat-toggle').removeClass('hidden');
+        }
+        else {
+            jQuery('div.repeat div.repeat-toggle').addClass('hidden');
+        }
+    } );
+ 
+    jQuery('div.repeat input[name=repeat-type]').change( function () {
+        var val = jQuery(this).val();
+        jQuery('div.repeat td.repeat-details:not(.repeat-details-'+val+')').addClass('hidden');
+        jQuery('div.repeat td.repeat-details-' +val ).removeClass('hidden');
+    } );
+
+% if ( $ReadOnly ) {
+    jQuery('div.repeat input, div.repeat select').attr('disabled', true);
+% }
+} );
+</script>
+<div class="repeat">
+<label><input name="repeat-enabled" type="checkbox" value="1" <% $ARGSRef->{'repeat-enabled'} ? 'checked="checked"' : '' |n %>/> <&|/l&>Enable Recurrence?</&></label>
+
+<div class="repeat-toggle <% $ARGSRef->{'repeat-enabled'} ? '' : 'hidden' %> ">
+
+<label><&|/l&>Ticket lead time (days)</&>:
+<input size="3" name="repeat-lead-time" type="text" value="<% $ARGSRef->{'repeat-lead-time'} %>" /></label>
+<label><&|/l&>Concurrent active tickets</&>:
+<input size="3" name="repeat-coexistent-number" type="text" value="<% $ARGSRef->{'repeat-coexistent-number'} %>" /></label>
+
+<fieldset>
+<legend><&|/l&>Recurrence pattern</&></legend>
+<table width="100%" border="0">
+<tr>
+<td width="100px">
+  <table border="0">
+    <tr>
+        <td width="100px">
+            <label><input name="repeat-type" type="radio" value="daily" <% ($ARGSRef->{'repeat-type'} || '') eq 'daily' ? 'checked="checked"' : '' |n  %> /> <&|/l&>Daily</&></label>
+        </td>
+        <td width="1" rowspan="4" bgcolor="#aaa"><br></td>
+    </tr>
+    <tr>
+        <td width="100px">
+            <label><input name="repeat-type" type="radio" value="weekly" <% ($ARGSRef->{'repeat-type'} || '') eq 'weekly' ?  'checked="checked"' : '' |n %>/> <&|/l&>Weekly</&></label>
+        </td>
+    </tr>
+    <tr>
+        <td width="100px">
+            <label><input name="repeat-type" type="radio" value="monthly" <% ($ARGSRef->{'repeat-type'} || '') eq 'monthly' ?  'checked="checked"' : '' |n %>/> <&|/l&>Monthly</&></label>
+        </td>
+    </tr>
+    <tr>
+        <td width="100px">
+            <label><input name="repeat-type" type="radio" value="yearly" <% ($ARGSRef->{'repeat-type'} || '') eq 'yearly' ?  'checked="checked"' : '' |n %>/> <&|/l&>Yearly</&></label>
+        </td>
+    </tr>
+  </table>
+</td>
+<td class="repeat-details repeat-details-daily <% ($ARGSRef->{'repeat-type'} || '' ) eq 'daily' ? '' : 'hidden' %>">
+  <table border="0">
+    <tr>
+        <td>
+            <label><input name="repeat-details-daily" type="radio" value="day" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'day' ?  'checked="checked"' : '' |n %>/>
+            <&|/l_unsafe, $input->("repeat-details-daily-day") &>Every [_1] Day(s)</&></label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label><input name="repeat-details-daily" type="radio" value="weekday" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'weekday' ?  'checked="checked"' : '' |n %>/>
+            <&|/l&>Every Weekday</&></label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label><input name="repeat-details-daily" type="radio" value="complete" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'complete' ?  'checked="checked"' : '' |n %>/>
+            <&|/l_unsafe, $input->("repeat-details-daily-complete") &>Create new task [_1] day(s) after each task is completed</&></label>
+        </td>
+    </tr>
+  </table>
+</td>
+
+<td class="repeat-details repeat-details-weekly  <% ($ARGSRef->{'repeat-type'} || '' ) eq 'weekly' ? '' : 'hidden' %>">
+  <table border="0">
+    <tr>
+        <td colspan="5">
+            <label><input name="repeat-details-weekly" type="radio" value="week" <% ($ARGSRef->{'repeat-details-weekly'} || '') eq 'week' ?  'checked="checked"' : '' |n %> />
+            <&|/l_unsafe, $input->("repeat-details-weekly-week") &>Recur every [_1] week(s) on</&>:</label>
+        </td>
+    </tr>
+    <tr>
+        <td width="10px" />
+% for my $number ( 0 .. 6 ) {
+        <td>
+    <label><input name="repeat-details-weekly-weeks" type="checkbox" value="<% $week_values[$number] %>"
+% if ( defined $ARGSRef->{'repeat-details-weekly-weeks'} && (
+%   ( ref $ARGSRef->{'repeat-details-weekly-weeks'} && grep { $_ eq $week_values[$number] }
+%         @{$ARGSRef->{'repeat-details-weekly-weeks'}} ) ||
+%           ( $ARGSRef->{'repeat-details-weekly-weeks'} eq $week_values[$number] ) ) ) {
+    checked="checked"
+% }
+
+/><% loc($week_labels[$number]) %></label>
+        </td>
+% if ( $number == 3 ) {
+    </tr>
+    <tr>
+        <td width="10px" />
+% }
+% }
+    </tr>
+    <tr>
+        <td colspan="5">
+            <label><input name="repeat-details-weekly" type="radio" value="complete" <% ($ARGSRef->{'repeat-details-weekly'} || '') eq 'complete' ?  'checked="checked"' : '' |n%>/>
+            <&|/l_unsafe, $input->("repeat-details-weekly-complete") &>Create new task [_1] week(s) after each task is completed</&></label>
+        </td>
+    </tr>
+  </table>
+</td>
+
+<td class="repeat-details repeat-details-monthly  <% ($ARGSRef->{'repeat-type'} || '' ) eq 'monthly' ? '' : 'hidden' %>">
+  <table border="0">
+    <tr>
+        <td>
+            <label><input name="repeat-details-monthly" type="radio" value="day" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'day' ?  'checked="checked"' : '' |n %> /><&|/l_unsafe, $input->("repeat-details-monthly-day-day"), $input->("repeat-details-monthly-day-month") &>Day [_1] of every [_2] month(s)</&></label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label><input name="repeat-details-monthly" type="radio" value="week" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'week' ?  'checked="checked"' : '' |n %> /><&|/l_unsafe, $nth->("repeat-details-monthly-week-number"), $wday->("repeat-details-monthly-week-week"), $input->("repeat-details-monthly-week-month") &>The [_1] [_2] of every [_3] month(s)</&></label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label><input name="repeat-details-monthly" type="radio" value="complete" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'complete' ? 'checked="checked"' : '' |n %> />
+            <&|/l_unsafe, $input->("repeat-details-monthly-complete") &>Create new task [_1] month(s) after each task is completed</&></label>
+        </td>
+    </tr>
+  </table>
+</td>
+
+<td class="repeat-details repeat-details-yearly <% ($ARGSRef->{'repeat-type'} || '' ) eq 'yearly' ? '' : 'hidden' %>">
+  <table border="0">
+    <tr>
+        <td>
+            <label><input name="repeat-details-yearly" type="radio" value="day" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'day' ?  'checked="checked"' : '' |n %> /><&|/l_unsafe, $month->("repeat-details-yearly-day-month"), $input->("repeat-details-yearly-day-day") &>Every [_1] [_2]</&></label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label><input name="repeat-details-yearly" type="radio" value="week" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'week' ?  'checked="checked"' : '' |n %> /><&|/l_unsafe, $nth->("repeat-details-yearly-week-number"), $wday->("repeat-details-yearly-week-week"), $month->("repeat-details-yearly-week-month") &>The [_1] [_2] of [_3]</&></label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label><input name="repeat-details-yearly" type="radio" value="complete" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'complete' ?  'checked="checked"' : '' |n %> />
+            <&|/l_unsafe, $input->("repeat-details-yearly-complete") &>Create new task [_1] year(s) after each task is completed</&></label>
+        </td>
+    </tr>
+  </table>
+</td>
+
+</tr>
+</table>
+</fieldset>
+
+
+<fieldset>
+<legend><&|/l&>Range of recurrence</&></legend>
+<table width="100%" border="0">
+<tr>
+    <td rowspan="3">
+        <label>
+        <&|/l&>Start</&>:
+        <& /Elements/SelectDate, Name => 'repeat-start-date', ShowTime => 0, Default => $ARGSRef->{'repeat-start-date'} || '' &>
+        </label>
+    </td>
+    <td>
+        <label>
+        <input type="radio" name="repeat-end" value="none" <% ($ARGSRef->{'repeat-end'} || '') eq 'none' ? 'checked="checked"' : '' |n %>> <&|/l&>No end date</&>
+        </label>
+    </td>
+</tr>
+<tr>
+    <td>
+        <label><input type="radio" name="repeat-end" value="number" <% ($ARGSRef->{'repeat-end'} || '') eq 'number' ? 'checked="checked"' : '' |n %>>
+        <&|/l_unsafe, $input->("repeat-end-number",6,10) &>End after [_1] occurrence(s)</&>
+% if ( $Initial ) {
+    <input name="repeat-occurrences" type="hidden" value="1">
+% } else {
+    <&|/l&>Current</&>: <input size="6" type="text" name="repeat-occurrences" readonly="readonly" value="<% $ARGSRef->{'repeat-occurrences'} %>"></label>
+% }
+    </td>
+</tr>
+<tr>
+    <td>
+        <label><input type="radio" name="repeat-end" value="date" <% ($ARGSRef->{'repeat-end'} || '') eq 'date' ? 'checked="checked"' : '' |n %>> <&|/l&>End by</&>:
+        <& /Elements/SelectDate, Name => 'repeat-end-date', ShowTime => 0, Default => $ARGSRef->{'repeat-end-date'} || '' &></label>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+</div>
+
+</div>
+
+<%init>
+my @week_labels = qw(Sun Mon Tue Wed Thu Fri Sat); # loc_qw
+my @week_values = qw(su mo tu we th fr sa);
+my @week_number_labels = qw(First Second Third Fourth Last); # loc_qw
+my @month_labels = qw(January February March April  May June July August September October November December); # loc_qw
+
+if ( $Ticket ) {
+    my ($repeat) = $Ticket->Attributes->Named('RepeatTicketSettings');
+    if ( $repeat ) {
+        $ARGSRef = $repeat->Content if $repeat;
+    }
+}
+
+if ( not $ARGSRef ){
+     $Initial = 1;
+}
+
+$ARGSRef->{'repeat-type'} ||= 'daily';
+$ARGSRef->{'repeat-details-daily'} ||= 'day';
+$ARGSRef->{'repeat-details-weekly'} ||= 'week';
+$ARGSRef->{'repeat-details-monthly'} ||= 'day';
+$ARGSRef->{'repeat-details-yearly'} ||= 'day';
+$ARGSRef->{'repeat-end'} ||= 'none';
+$ARGSRef->{'repeat-lead-time'} //= RT->Config->Get('RepeatTicketLeadTime') // 14;
+$ARGSRef->{'repeat-coexistent-number'} ||= RT->Config->Get('RepeatTicketCoexistentNumber') || 1;
+
+my $input = sub {
+    my ($name, $width, $default) = (@_);
+    $width ||= 4; $default ||= 1;
+    my $escaped = $m->interp->apply_escapes($name, "h");
+    return qq|<input name="$escaped" type="text" size="$width" value="|
+         . $m->interp->apply_escapes($ARGSRef->{$name} || $default, "h")
+         . qq|" />|;
+};
+
+my $nth = sub {
+    my ($name) = @_;
+    my $escaped = $m->interp->apply_escapes($name, "h");
+    my $str = qq|<select name="$escaped">|;
+    for my $number ( 1 .. 4, -1 ) {
+        $str .= qq|<option value="$number" |
+              . (($ARGSRef->{$name} || '') eq $number ? 'selected="selected"' : '') . ">"
+              . $m->interp->apply_escapes(loc($week_number_labels[$number > 0 ? $number-1 : -1]), "h")
+              . "</option>";
+    }
+    $str .= "</select>";
+    return $str;
+};
+my $wday = sub {
+    my ($name) = @_;
+    my $escaped = $m->interp->apply_escapes($name, "h");
+    my $str = qq|<select name="$escaped">|;
+    for my $number ( 0 .. 6 ) {
+        $str .= qq|<option value="$week_values[$number]" |
+              . (($ARGSRef->{$name} || '') eq $week_values[$number] ? 'selected="selected"' : '' ) . ">"
+              . $m->interp->apply_escapes(loc($week_labels[$number]), "h")
+              . "</option>";
+    }
+    $str .= "</select>";
+    return $str;
+};
+my $month = sub {
+    my ($name) = @_;
+    my $escaped = $m->interp->apply_escapes($name, "h");
+    my $str = qq|<select name="$escaped">|;
+    for my $number ( 1 .. 12 ) {
+        $str .= qq|<option value="$number" |
+              . (($ARGSRef->{$name} || '') eq $number ? 'selected="selected"' : '') . ">"
+              . $m->interp->apply_escapes(loc($month_labels[$number-1]), "h")
+              . "</option>";
+    }
+    $str .= "</select>";
+    return $str;
+};
+</%init>
+<%args>
+$ARGSRef => undef
+$Ticket => undef
+$ReadOnly => undef
+$Initial => undef
+</%args>

@@ -1,0 +1,18 @@
+Revision history for RT-Extension-CommentOnCreate
+
+0.05 2014-02-06
+  - POD error
+
+0.05 2014-02-06
+  - release packaged for 4.2
+  - includes development release for ignoring articles.
+
+0.02_01
+ - Don't include articles in comments (requires RT patch for RT version <= 4.0.6)
+
+0.02
+ - Make width/height of the boxes configurable
+
+0.01
+ - Initial release.
+

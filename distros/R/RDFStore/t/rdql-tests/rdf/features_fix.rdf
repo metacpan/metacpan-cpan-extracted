@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcq="http://dublincore.org/2000/03/13/dcq#"
+         xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#">
+
+  <rdf:Description rdf:about="http://testers.mkdoc.com/features/">
+
+    <dc:title>Features</dc:title>
+
+    <dcq:abstract>
+      MKDoc is a web site content management system that is very feature rich.
+    </dcq:abstract>
+
+    <dc:creator>
+      <rdf:Description>
+        <rdfs:label>Croome, Chris</rdfs:label>
+        <vCard:FN>Chris Croome</vCard:FN>
+        <vCard:EMAIL>chris@mkdoc.com</vCard:EMAIL>
+        <vCard:N rdf:parseType="Resource">
+          <vCard:Family>Croome</vCard:Family>
+          <vCard:Given>Chris</vCard:Given>
+        </vCard:N>
+      </rdf:Description>
+    </dc:creator>
+
+
+
+
+    <dc:publisher>
+      MKDoc Ltd. c/o webarchitects,PO Box 1660,Sheffield,S7 1XF,UK.
+    </dc:publisher>
+
+
+    <dc:subject>
+      <rdf:Bag>
+
+        <rdf:li>MKDoc is a web site content management system that is very feature rich.</rdf:li>
+
+      </rdf:Bag>
+    </dc:subject>
+
+    <dc:identifier rdf:resource="http://testers.mkdoc.com/features/"/>
+
+
+  <!-- snip ... ... --> 
+  <!-- lost some examples; and all that bag stuff -->
+
+
+    <dcq:references>
+            <rdf:Description rdf:about="http://testers.mkdoc.com/features/human-readable-web-addresses/">
+              <dc:title>Human Readable Web Addresses</dc:title>
+            </rdf:Description> 
+     </dcq:references>
+
+
+    <dcq:references>
+          <rdf:Description rdf:about="http://www.useit.com/alertbox/20000723.html">
+            <dc:title>End of Web Design</dc:title>
+            <dc:description>Jackob Neilsen's column on the End of Web Design</dc:description>
+          </rdf:Description>
+    </dcq:references>
+
+
+
+    <dc:rights>
+      Copyright &#169; 2001 MKDoc Ltd.
+    </dc:rights>
+
+
+    <dc:format>
+      <dcq:IMT>
+        <rdf:value>text/html</rdf:value>
+        <rdfs:label>HTML</rdfs:label>
+      </dcq:IMT>
+    </dc:format>
+
+    <dc:type>
+      <dcq:Text>
+        <rdfs:label>Text</rdfs:label>
+      </dcq:Text>
+    </dc:type>
+
+    <dcq:created>
+      <dcq:W3CDTF>
+        <rdf:value>2001-06-28T14:21:55Z</rdf:value>
+        <rdfs:label>Created</rdfs:label>
+      </dcq:W3CDTF>
+    </dcq:created>
+
+    <dcq:modified>
+      <dcq:W3CDTF>
+        <rdf:value>2001-06-28T16:50:35Z</rdf:value>
+        <rdfs:label>Modified</rdfs:label>
+      </dcq:W3CDTF>
+    </dcq:modified>
+
+    <dc:language>
+      <dcq:RFC1766>
+        <rdf:value>en-gb</rdf:value>
+        <rdfs:label>English (United Kingdom)</rdfs:label>
+      </dcq:RFC1766>
+    </dc:language>
+
+  </rdf:Description>
+
+</rdf:RDF>

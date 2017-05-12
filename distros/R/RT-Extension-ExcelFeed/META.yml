@@ -1,0 +1,30 @@
+---
+abstract: 'RT-Extension-ExcelFeed Extension'
+author:
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: gplv2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-ExcelFeed
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+requires:
+  Excel::Writer::XLSX: 0
+  perl: 5.10.1
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: '0.04'
+x_module_install_rtx_version: '0.37'
+x_requires_rt: 4.2.0
+x_rt_too_new: 4.6.0

@@ -1,0 +1,63 @@
+{
+   "abstract" : "Perl interface to Raspberry Pi's board, GPIO, LCDs and other various items",
+   "author" : [
+      "Steve Bertrand <steveb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RPi-WiringPi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.72"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "RPi::ADC::ADS" : "1.01",
+            "RPi::ADC::MCP3008" : "2.3603",
+            "RPi::BMP180" : "2.3603",
+            "RPi::DAC::MCP4922" : "2.3604",
+            "RPi::DHT11" : "1.02",
+            "RPi::DigiPot::MCP4XXXX" : "2.3603",
+            "RPi::LCD" : "2.3601",
+            "RPi::SPI" : "2.3606",
+            "RPi::WiringPi::Constant" : "0.02",
+            "WiringPi::API" : "2.3609",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/rpi-wiringpi/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/rpi-wiringpi.git",
+         "web" : "https://github.com/stevieb9/rpi-wiringpi"
+      }
+   },
+   "version" : "2.3612",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

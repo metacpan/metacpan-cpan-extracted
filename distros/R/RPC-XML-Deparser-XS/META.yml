@@ -1,0 +1,24 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         RPC-XML-Deparser-XS
+version:      0.02
+version_from: lib/RPC/XML/Deparser/XS.pm
+installdirs:  site
+author:       Hidden <hidden@example.net>
+abstract:     Fast XML-RPC deparser written in C
+license:      Perl
+requires:
+  RPC::XML: 0
+build_requires:
+  IPC::Run:        0
+  Test::Exception: 0
+  Test::More:      0
+no_index:
+  directory:
+    - inc
+    - t
+
+distribution_type: module
+generated_by: ExtUtils::MY_Metafile version 0.09, EUMM-6.44.
+meta-spec:
+  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html

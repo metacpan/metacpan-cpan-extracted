@@ -1,0 +1,52 @@
+# Revision history for Perl extension Rubyish.
+
+0.32:
+  - implements 'true', 'false' keywords
+  - implements Array#first, Array#last
+  - implements Object#clone
+  - Adds a Rubyish::Dir class
+  - automatically inject Rubyish::Autobox whenever saying 'use Rubyish'
+  - Rubyish::String now properly overload '+', 'eq' and stringification operations.
+
+0.31:
+  - Add "class" syntax. WOOT.
+  - More docs.
+
+0.30:
+  - Renamed the dist to just "Rubyish" since it's quite obvious
+  - Way more docs
+
+0.22:
+  - Fix previous dists.
+  - Implement nil and NilClass
+  - Implement Enumerable methods: to_a, all, any
+
+0.21:
+  - Manifest fix.
+  - Update Changes to be a valid yaml file. Kinda cool.
+
+0.20:
+  - Add Rubyish:::Autobox that autoboxes scalars to Rubyish::* objects.
+  - methods implemented:
+      Object:
+        - #inspect, #methods, #is_a, #kind_of, #__id__, #object_id
+
+      Class:
+        - #class, #superclass
+
+      Kernel:
+        - #String, #Array, #Hash, #puts
+
+      Array:
+        - #new, #at, #size, #length, #each, #map, #join, #clear, #inspect
+
+      Hash:
+        - #new, #fetch, #each, #map, #inspect
+
+      String:
+        - #new
+
+  - special word implemented: def
+
+0.01:
+  - original version

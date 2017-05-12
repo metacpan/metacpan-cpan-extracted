@@ -1,0 +1,6 @@
+Makefile
+notes.txt
+blib
+pm_to_blib
+*.tmp
+RFID-Alien*

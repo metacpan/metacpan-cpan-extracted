@@ -1,0 +1,2123 @@
+<ENUM>
+<NAME>librdf_log_level</NAME>
+typedef enum {
+  LIBRDF_LOG_NONE = 0,
+  LIBRDF_LOG_DEBUG,
+  LIBRDF_LOG_INFO,
+  LIBRDF_LOG_WARN,
+  LIBRDF_LOG_ERROR,
+  LIBRDF_LOG_FATAL,
+  LIBRDF_LOG_LAST=LIBRDF_LOG_FATAL
+} librdf_log_level;
+</ENUM>
+<ENUM>
+<NAME>librdf_log_facility</NAME>
+typedef enum {
+  LIBRDF_FROM_NONE = 0,
+  LIBRDF_FROM_CONCEPTS,
+  LIBRDF_FROM_DIGEST,
+  LIBRDF_FROM_FILES,
+  LIBRDF_FROM_HASH,
+  LIBRDF_FROM_INIT,
+  LIBRDF_FROM_ITERATOR,
+  LIBRDF_FROM_LIST,
+  LIBRDF_FROM_MODEL,
+  LIBRDF_FROM_NODE,
+  LIBRDF_FROM_PARSER,
+  LIBRDF_FROM_QUERY,
+  LIBRDF_FROM_SERIALIZER,
+  LIBRDF_FROM_STATEMENT,
+  LIBRDF_FROM_STORAGE,
+  LIBRDF_FROM_STREAM,
+  LIBRDF_FROM_URI,
+  LIBRDF_FROM_UTF8,
+  LIBRDF_FROM_MEMORY,
+  LIBRDF_FROM_LAST=LIBRDF_FROM_MEMORY
+} librdf_log_facility;
+</ENUM>
+<USER_FUNCTION>
+<NAME>librdf_log_level_func</NAME>
+<RETURNS>int </RETURNS>
+void *user_data, const char *message, va_list arguments
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>librdf_log_func</NAME>
+<RETURNS>int </RETURNS>
+void *user_data, librdf_log_message *message
+</USER_FUNCTION>
+<FUNCTION>
+<NAME>librdf_log_message_code</NAME>
+<RETURNS>int </RETURNS>
+librdf_log_message *message
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_log_message_level</NAME>
+<RETURNS>librdf_log_level </RETURNS>
+librdf_log_message *message
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_log_message_facility</NAME>
+<RETURNS>librdf_log_facility </RETURNS>
+librdf_log_message *message
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_log_message_message</NAME>
+<RETURNS>const char *</RETURNS>
+librdf_log_message *message
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_log_message_locator</NAME>
+<RETURNS>raptor_locator*</RETURNS>
+librdf_log_message *message
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_uri</NAME>
+<RETURNS>librdf_uri*</RETURNS>
+librdf_world *world, const unsigned char *uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_uri_from_uri</NAME>
+<RETURNS>librdf_uri*</RETURNS>
+librdf_uri* old_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_uri_from_uri_local_name</NAME>
+<RETURNS>librdf_uri*</RETURNS>
+librdf_uri* old_uri, const unsigned char *local_name
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_uri</NAME>
+<RETURNS>void </RETURNS>
+librdf_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_uri_as_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_uri_as_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_uri *uri, size_t *len_p
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_uri_print</NAME>
+<RETURNS>void </RETURNS>
+librdf_uri* uri, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_uri_to_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_uri* uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_uri_to_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_uri* uri, size_t* len_p
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_uri_equals</NAME>
+<RETURNS>int </RETURNS>
+librdf_uri* first_uri, librdf_uri* second_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_uri_is_file_uri</NAME>
+<RETURNS>int </RETURNS>
+librdf_uri* uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_uri_to_filename</NAME>
+<RETURNS>const char*</RETURNS>
+librdf_uri* uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_uri_normalised_to_base</NAME>
+<RETURNS>librdf_uri*</RETURNS>
+const unsigned char *uri_string, librdf_uri* source_uri, librdf_uri* base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_uri_relative_to_base</NAME>
+<RETURNS>librdf_uri*</RETURNS>
+librdf_uri* base_uri, const unsigned char *uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_uri_from_filename</NAME>
+<RETURNS>librdf_uri*</RETURNS>
+librdf_world* world, const char *filename
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_hash_from_string</NAME>
+<RETURNS>librdf_hash*</RETURNS>
+librdf_world *world, const char *name, const char *string
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_hash_from_array_of_strings</NAME>
+<RETURNS>librdf_hash*</RETURNS>
+librdf_world *world, const char *name, const char **array
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_hash_from_hash</NAME>
+<RETURNS>librdf_hash*</RETURNS>
+librdf_hash* old_hash
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_hash</NAME>
+<RETURNS>void </RETURNS>
+librdf_hash *hash
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_hash_get</NAME>
+<RETURNS>char*</RETURNS>
+librdf_hash* hash, const char *key
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_hash_get_as_boolean</NAME>
+<RETURNS>int </RETURNS>
+librdf_hash* hash, const char *key
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_hash_get_as_long</NAME>
+<RETURNS>long </RETURNS>
+librdf_hash* hash, const char *key
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_hash_get_del</NAME>
+<RETURNS>char*</RETURNS>
+librdf_hash* hash, const char *key
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_hash_put_strings</NAME>
+<RETURNS>int </RETURNS>
+librdf_hash* hash, const char *key, const char *value
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_hash_print</NAME>
+<RETURNS>void </RETURNS>
+librdf_hash* hash, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_hash_print_keys</NAME>
+<RETURNS>void </RETURNS>
+librdf_hash* hash, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_hash_print_values</NAME>
+<RETURNS>void </RETURNS>
+librdf_hash* hash, const char *key_string, FILE *fh
+</FUNCTION>
+<USER_FUNCTION>
+<NAME>librdf_iterator_map_handler</NAME>
+<RETURNS>void *</RETURNS>
+librdf_iterator *iterator, void *map_context, void *item
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>librdf_iterator_map_free_context_handler</NAME>
+<RETURNS>void </RETURNS>
+void *map_context
+</USER_FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_iterator</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_world *world, void *context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_iterator</NAME>
+<RETURNS>void </RETURNS>
+librdf_iterator* iterator
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_iterator_end</NAME>
+<RETURNS>int </RETURNS>
+librdf_iterator* iterator
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_iterator_have_elements</NAME>
+<RETURNS>int </RETURNS>
+librdf_iterator* iterator
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_iterator_next</NAME>
+<RETURNS>int </RETURNS>
+librdf_iterator* iterator
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_iterator_get_object</NAME>
+<RETURNS>void*</RETURNS>
+librdf_iterator* iterator
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_iterator_get_context</NAME>
+<RETURNS>void*</RETURNS>
+librdf_iterator* iterator
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_iterator_get_key</NAME>
+<RETURNS>void*</RETURNS>
+librdf_iterator* iterator
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_iterator_get_value</NAME>
+<RETURNS>void*</RETURNS>
+librdf_iterator* iterator
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_iterator_add_map</NAME>
+<RETURNS>int </RETURNS>
+librdf_iterator* iterator, librdf_iterator_map_handler map_function, librdf_iterator_map_free_context_handler free_context, void *map_context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_empty_iterator</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_world *world
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_world</NAME>
+<RETURNS>librdf_world*</RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_world</NAME>
+<RETURNS>void </RETURNS>
+librdf_world *world
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_world_open</NAME>
+<RETURNS>void </RETURNS>
+librdf_world *world
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_world_init_mutex</NAME>
+<RETURNS>void </RETURNS>
+librdf_world *world
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_world_set_error</NAME>
+<RETURNS>void </RETURNS>
+librdf_world* world, void *user_data, librdf_log_level_func error_handler
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_world_set_warning</NAME>
+<RETURNS>void </RETURNS>
+librdf_world* world, void *user_data, librdf_log_level_func warning_handler
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_world_set_logger</NAME>
+<RETURNS>void </RETURNS>
+librdf_world* world, void *user_data, librdf_log_func log_handler
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_world_set_digest</NAME>
+<RETURNS>void </RETURNS>
+librdf_world* world, const char *name
+</FUNCTION>
+<MACRO>
+<NAME>LIBRDF_WORLD_FEATURE_GENID_BASE</NAME>
+#define LIBRDF_WORLD_FEATURE_GENID_BASE "http://feature.librdf.org/genid-base"
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_WORLD_FEATURE_GENID_COUNTER</NAME>
+#define LIBRDF_WORLD_FEATURE_GENID_COUNTER "http://feature.librdf.org/genid-counter"
+</MACRO>
+<FUNCTION>
+<NAME>librdf_world_get_feature</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world* world, librdf_uri *feature
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_world_set_feature</NAME>
+<RETURNS>int </RETURNS>
+librdf_world* world, librdf_uri *feature, librdf_node* value
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_init_world</NAME>
+<RETURNS>void </RETURNS>
+char *digest_factory_name, void* not_used2
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_destroy_world</NAME>
+<RETURNS>void </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_basename</NAME>
+<RETURNS>const char*</RETURNS>
+const char *name
+</FUNCTION>
+<USER_FUNCTION>
+<NAME>librdf_stream_map_handler</NAME>
+<RETURNS>librdf_statement *</RETURNS>
+librdf_stream *stream, void *map_context, librdf_statement *item
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>librdf_stream_map_free_context_handler</NAME>
+<RETURNS>void </RETURNS>
+void *map_context
+</USER_FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_world *world, void* context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_stream_from_node_iterator</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_iterator* iterator, librdf_statement* statement, librdf_statement_part field
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_stream</NAME>
+<RETURNS>void </RETURNS>
+librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_stream_end</NAME>
+<RETURNS>int </RETURNS>
+librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_stream_next</NAME>
+<RETURNS>int </RETURNS>
+librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_stream_get_object</NAME>
+<RETURNS>librdf_statement*</RETURNS>
+librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_stream_get_context</NAME>
+<RETURNS>void*</RETURNS>
+librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_stream_add_map</NAME>
+<RETURNS>int </RETURNS>
+librdf_stream* stream, librdf_stream_map_handler map_function, librdf_stream_map_free_context_handler free_context, void *map_context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_stream_print</NAME>
+<RETURNS>void </RETURNS>
+librdf_stream *stream, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_empty_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_world *world
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_list</NAME>
+<RETURNS>librdf_list*</RETURNS>
+librdf_world *world
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_list</NAME>
+<RETURNS>void </RETURNS>
+librdf_list* list
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_clear</NAME>
+<RETURNS>void </RETURNS>
+librdf_list* list
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_add</NAME>
+<RETURNS>int </RETURNS>
+librdf_list* list, void *data
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_unshift</NAME>
+<RETURNS>int </RETURNS>
+librdf_list* list, void *data
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_shift</NAME>
+<RETURNS>void*</RETURNS>
+librdf_list* list
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_pop</NAME>
+<RETURNS>void*</RETURNS>
+librdf_list* list
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_remove</NAME>
+<RETURNS>void *</RETURNS>
+librdf_list* list, void *data
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_contains</NAME>
+<RETURNS>int </RETURNS>
+librdf_list* list, void *data
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_size</NAME>
+<RETURNS>int </RETURNS>
+librdf_list* list
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_set_equals</NAME>
+<RETURNS>void </RETURNS>
+librdf_list* list, int (*equals) (void* data1, void *data2)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_get_iterator</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_list* list
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_list_foreach</NAME>
+<RETURNS>void </RETURNS>
+librdf_list* list, void (*fn)(void *, void *), void *user_data
+</FUNCTION>
+<ENUM>
+<NAME>librdf_node_type</NAME>
+typedef enum {
+  LIBRDF_NODE_TYPE_UNKNOWN   = 0,  /* To catch uninitialised nodes */
+  LIBRDF_NODE_TYPE_RESOURCE  = 1,  /* rdf:Resource (& rdf:Property) - has a URI */
+  LIBRDF_NODE_TYPE_LITERAL   = 2,  /* rdf:Literal - has an XML string, language, XML space */
+  /* node type 3 is unused at present. Do not renumber this list. */
+  LIBRDF_NODE_TYPE_BLANK     = 4,  /* blank node has an identifier string */
+  LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_BLANK
+} librdf_node_type;
+</ENUM>
+<FUNCTION>
+<NAME>librdf_new_node</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world* world
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_uri_string</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world* world, const unsigned char *uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_uri</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world* world, librdf_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_uri_local_name</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world* world, librdf_uri *uri, const unsigned char *local_name
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_normalised_uri_string</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world* world, const unsigned char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_literal</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world* world, const unsigned char *string, const char *xml_language, int is_wf_xml
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_typed_literal</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world *world, const unsigned char *value, const char *xml_language, librdf_uri* datatype_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_typed_counted_literal</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world *world, const unsigned char *value, size_t value_len, const char *xml_language, size_t xml_language_len, librdf_uri* datatype_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_blank_identifier</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world* world, const unsigned char *identifier
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_node_from_node</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_node *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_node</NAME>
+<RETURNS>void </RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_uri</NAME>
+<RETURNS>librdf_uri*</RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_type</NAME>
+<RETURNS>librdf_node_type </RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_literal_value</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_literal_value_as_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_node* node, size_t* len_p
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_literal_value_as_latin1</NAME>
+<RETURNS>char*</RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_literal_value_language</NAME>
+<RETURNS>char*</RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_literal_value_is_wf_xml</NAME>
+<RETURNS>int </RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_literal_value_datatype_uri</NAME>
+<RETURNS>librdf_uri*</RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_li_ordinal</NAME>
+<RETURNS>int </RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_get_blank_identifier</NAME>
+<RETURNS>unsigned char *</RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_is_resource</NAME>
+<RETURNS>int </RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_is_literal</NAME>
+<RETURNS>int </RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_is_blank</NAME>
+<RETURNS>int </RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_encode</NAME>
+<RETURNS>size_t </RETURNS>
+librdf_node* node, unsigned char *buffer, size_t length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_decode</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_world *world, size_t* size_p, unsigned char *buffer, size_t length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_to_string</NAME>
+<RETURNS>unsigned char *</RETURNS>
+librdf_node* node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_to_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_node* node, size_t* len_p
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_print</NAME>
+<RETURNS>void </RETURNS>
+librdf_node* node, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_equals</NAME>
+<RETURNS>int </RETURNS>
+librdf_node* first_node, librdf_node* second_node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_node_static_iterator_create</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_node** nodes, int size
+</FUNCTION>
+<TYPEDEF>
+<NAME>librdf_unichar</NAME>
+typedef u32 librdf_unichar;
+</TYPEDEF>
+<FUNCTION>
+<NAME>librdf_unicode_char_to_utf8</NAME>
+<RETURNS>int </RETURNS>
+librdf_unichar c, byte *output, int length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_utf8_to_unicode_char</NAME>
+<RETURNS>int </RETURNS>
+librdf_unichar *output, const byte *input, int length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_utf8_to_latin1</NAME>
+<RETURNS>byte*</RETURNS>
+const byte *input, int length, int *output_length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_latin1_to_utf8</NAME>
+<RETURNS>byte*</RETURNS>
+const byte *input, int length, int *output_length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_utf8_print</NAME>
+<RETURNS>void </RETURNS>
+const byte *input, int length, FILE *stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_register_factory</NAME>
+<RETURNS>void </RETURNS>
+librdf_world *world, const char *name, const unsigned char *uri_string, void (*factory) (librdf_query_factory*)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_query</NAME>
+<RETURNS>librdf_query*</RETURNS>
+librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string, librdf_uri* base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_query_from_query</NAME>
+<RETURNS>librdf_query*</RETURNS>
+librdf_query* old_query
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_query_from_factory</NAME>
+<RETURNS>librdf_query*</RETURNS>
+librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const unsigned char* query_string, librdf_uri* base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_query</NAME>
+<RETURNS>void </RETURNS>
+librdf_query *query
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_execute</NAME>
+<RETURNS>librdf_query_results*</RETURNS>
+librdf_query* query, librdf_model *model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_get_limit</NAME>
+<RETURNS>int </RETURNS>
+librdf_query *query
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_set_limit</NAME>
+<RETURNS>int </RETURNS>
+librdf_query *query, int limit
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_get_offset</NAME>
+<RETURNS>int </RETURNS>
+librdf_query *query
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_set_offset</NAME>
+<RETURNS>int </RETURNS>
+librdf_query *query, int offset
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_as_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_query_results* query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_get_count</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results* query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_next</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results* query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_finished</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results* query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_get_bindings</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results* query_results, const char ***names, librdf_node **values
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_get_binding_value</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_query_results* query_results, int offset
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_get_binding_name</NAME>
+<RETURNS>const char*</RETURNS>
+librdf_query_results* query_results, int offset
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_get_binding_value_by_name</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_query_results* query_results, const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_get_bindings_count</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results* query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_to_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri, size_t *length_p
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_to_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_to_file_handle</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results *query_results, FILE *handle, librdf_uri *format_uri, librdf_uri *base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_to_file</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results *query_results, const char *name, librdf_uri *format_uri, librdf_uri *base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_query_results</NAME>
+<RETURNS>void </RETURNS>
+librdf_query_results* query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_is_bindings</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results *query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_is_boolean</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results *query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_is_graph</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results *query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_query_results_get_boolean</NAME>
+<RETURNS>int </RETURNS>
+librdf_query_results *query_results
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_digest</NAME>
+<RETURNS>librdf_digest*</RETURNS>
+librdf_world *world, const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_digest</NAME>
+<RETURNS>void </RETURNS>
+librdf_digest *digest
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_digest_init</NAME>
+<RETURNS>void </RETURNS>
+librdf_digest* digest
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_digest_update</NAME>
+<RETURNS>void </RETURNS>
+librdf_digest* digest, const unsigned char *buf, size_t length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_digest_update_string</NAME>
+<RETURNS>void </RETURNS>
+librdf_digest* digest, const unsigned char *string
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_digest_final</NAME>
+<RETURNS>void </RETURNS>
+librdf_digest* digest
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_digest_get_digest</NAME>
+<RETURNS>void*</RETURNS>
+librdf_digest* digest
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_digest_get_digest_length</NAME>
+<RETURNS>size_t </RETURNS>
+librdf_digest* digest
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_digest_to_string</NAME>
+<RETURNS>char*</RETURNS>
+librdf_digest* digest
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_digest_print</NAME>
+<RETURNS>void </RETURNS>
+librdf_digest* digest, FILE* fh
+</FUNCTION>
+<ENUM>
+<NAME>librdf_statement_part</NAME>
+typedef enum {
+  LIBRDF_STATEMENT_SUBJECT   = 1 << 0,
+  LIBRDF_STATEMENT_PREDICATE = 1 << 1,
+  LIBRDF_STATEMENT_OBJECT    = 1 << 2,
+
+  /* must be a combination of all of the above */
+  LIBRDF_STATEMENT_ALL       = (LIBRDF_STATEMENT_SUBJECT|
+                                LIBRDF_STATEMENT_PREDICATE|
+                                LIBRDF_STATEMENT_OBJECT)
+} librdf_statement_part;
+</ENUM>
+<FUNCTION>
+<NAME>librdf_new_statement</NAME>
+<RETURNS>librdf_statement*</RETURNS>
+librdf_world* world
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_statement_from_statement</NAME>
+<RETURNS>librdf_statement*</RETURNS>
+librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_statement_from_nodes</NAME>
+<RETURNS>librdf_statement*</RETURNS>
+librdf_world *world, librdf_node* subject, librdf_node* predicate, librdf_node* object
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_init</NAME>
+<RETURNS>void </RETURNS>
+librdf_world *world, librdf_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_clear</NAME>
+<RETURNS>void </RETURNS>
+librdf_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_statement</NAME>
+<RETURNS>void </RETURNS>
+librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_get_subject</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_set_subject</NAME>
+<RETURNS>void </RETURNS>
+librdf_statement *statement, librdf_node *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_get_predicate</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_set_predicate</NAME>
+<RETURNS>void </RETURNS>
+librdf_statement *statement, librdf_node *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_get_object</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_set_object</NAME>
+<RETURNS>void </RETURNS>
+librdf_statement *statement, librdf_node *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_is_complete</NAME>
+<RETURNS>int </RETURNS>
+librdf_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_to_string</NAME>
+<RETURNS>unsigned char *</RETURNS>
+librdf_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_print</NAME>
+<RETURNS>void </RETURNS>
+librdf_statement *statement, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_equals</NAME>
+<RETURNS>int </RETURNS>
+librdf_statement* statement1, librdf_statement* statement2
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_match</NAME>
+<RETURNS>int </RETURNS>
+librdf_statement* statement, librdf_statement* partial_statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_encode</NAME>
+<RETURNS>size_t </RETURNS>
+librdf_statement* statement, unsigned char *buffer, size_t length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_encode_parts</NAME>
+<RETURNS>size_t </RETURNS>
+librdf_statement* statement, librdf_node* context_node, unsigned char *buffer, size_t length, librdf_statement_part fields
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_decode</NAME>
+<RETURNS>size_t </RETURNS>
+librdf_statement* statement, unsigned char *buffer, size_t length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_statement_decode_parts</NAME>
+<RETURNS>size_t </RETURNS>
+librdf_statement* statement, librdf_node** context_node, unsigned char *buffer, size_t length
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_register_factory</NAME>
+<RETURNS>void </RETURNS>
+librdf_world *world, const char *name, const char *label, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_serializer_factory*)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_enumerate</NAME>
+<RETURNS>int </RETURNS>
+librdf_world* world, const unsigned int counter, const char **name, const char **label
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_serializer</NAME>
+<RETURNS>librdf_serializer*</RETURNS>
+librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_serializer_from_factory</NAME>
+<RETURNS>librdf_serializer*</RETURNS>
+librdf_world* world, librdf_serializer_factory *factory
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_serializer</NAME>
+<RETURNS>void </RETURNS>
+librdf_serializer *serializer
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_model</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, FILE *handle, librdf_uri* base_uri, librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_stream_to_file_handle</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, FILE *handle, librdf_uri* base_uri, librdf_stream *stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_model_to_file_handle</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, FILE *handle, librdf_uri* base_uri, librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_stream_to_file</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_model_to_file</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_stream_to_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_serializer* serializer, librdf_uri* base_uri, librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_model_to_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_serializer* serializer, librdf_uri* base_uri, librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_stream_to_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_serializer* serializer, librdf_uri* base_uri, librdf_stream* stream, size_t *length_p
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_model_to_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_serializer* serializer, librdf_uri* base_uri, librdf_model* model, size_t *length_p
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_stream_to_iostream</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, librdf_uri* base_uri, librdf_stream *stream, raptor_iostream* iostr
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_serialize_model_to_iostream</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, librdf_uri* base_uri, librdf_model *model, raptor_iostream* iostr
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_set_error</NAME>
+<RETURNS>void </RETURNS>
+librdf_serializer* serializer, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_set_warning</NAME>
+<RETURNS>void </RETURNS>
+librdf_serializer* serializer, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_get_feature</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_serializer* serializer, librdf_uri *feature
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_set_feature</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, librdf_uri *feature, librdf_node* value
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_serializer_set_namespace</NAME>
+<RETURNS>int </RETURNS>
+librdf_serializer* serializer, librdf_uri *uri, const char *prefix
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_files_temporary_file_name</NAME>
+<RETURNS>char*</RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_register_factory</NAME>
+<RETURNS>void </RETURNS>
+librdf_world *world, const char *name, const char *label, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_parser_factory*)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_enumerate</NAME>
+<RETURNS>int </RETURNS>
+librdf_world* world, const unsigned int counter, const char **name, const char **label
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_parser</NAME>
+<RETURNS>librdf_parser*</RETURNS>
+librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_parser_from_factory</NAME>
+<RETURNS>librdf_parser*</RETURNS>
+librdf_world* world, librdf_parser_factory *factory
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_parser</NAME>
+<RETURNS>void </RETURNS>
+librdf_parser *parser
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_parse_as_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_parse_into_model</NAME>
+<RETURNS>int </RETURNS>
+librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri, librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_parse_string_as_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_parser* parser, const unsigned char* string, librdf_uri* base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_parse_string_into_model</NAME>
+<RETURNS>int </RETURNS>
+librdf_parser* parser, const unsigned char *string, librdf_uri* base_uri, librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_set_error</NAME>
+<RETURNS>void </RETURNS>
+librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_set_warning</NAME>
+<RETURNS>void </RETURNS>
+librdf_parser* parser, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_parse_counted_string_as_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_parse_counted_string_into_model</NAME>
+<RETURNS>int </RETURNS>
+librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri, librdf_model* model
+</FUNCTION>
+<MACRO>
+<NAME>LIBRDF_PARSER_FEATURE_ERROR_COUNT</NAME>
+#define LIBRDF_PARSER_FEATURE_ERROR_COUNT "http://feature.librdf.org/parser-error-count"
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_PARSER_FEATURE_WARNING_COUNT</NAME>
+#define LIBRDF_PARSER_FEATURE_WARNING_COUNT "http://feature.librdf.org/parser-warning-count"
+</MACRO>
+<FUNCTION>
+<NAME>librdf_parser_get_feature</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_parser* parser, librdf_uri *feature
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_set_feature</NAME>
+<RETURNS>int </RETURNS>
+librdf_parser* parser, librdf_uri* feature, librdf_node* value
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_parser_get_accept_header</NAME>
+<RETURNS>char*</RETURNS>
+librdf_parser* parser
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_enumerate</NAME>
+<RETURNS>int </RETURNS>
+librdf_world* world, const unsigned int counter, const char **name, const char **label
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_model</NAME>
+<RETURNS>librdf_model*</RETURNS>
+librdf_world *world, librdf_storage *storage, const char* options_string
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_model_with_options</NAME>
+<RETURNS>librdf_model*</RETURNS>
+librdf_world *world, librdf_storage *storage, librdf_hash* options
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_model_from_model</NAME>
+<RETURNS>librdf_model*</RETURNS>
+librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_model</NAME>
+<RETURNS>void </RETURNS>
+librdf_model *model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_size</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_add</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_add_string_literal_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* literal, const char *xml_language, int is_wf_xml
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_add_typed_literal_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* literal, const char *xml_language, librdf_uri *datatype_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_add_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_add_statements</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_stream* statement_stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_remove_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_contains_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_has_arc_in</NAME>
+<RETURNS>int </RETURNS>
+librdf_model *model, librdf_node *node, librdf_node *property
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_has_arc_out</NAME>
+<RETURNS>int </RETURNS>
+librdf_model *model, librdf_node *node, librdf_node *property
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_as_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_serialise</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_find_statements</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_model* model, librdf_statement* statement
+</FUNCTION>
+<MACRO>
+<NAME>LIBRDF_MODEL_FIND_OPTION_MATCH_SUBSTRING_LITERAL</NAME>
+#define LIBRDF_MODEL_FIND_OPTION_MATCH_SUBSTRING_LITERAL "http://feature.librdf.org/model-find-match-substring-literal"
+</MACRO>
+<FUNCTION>
+<NAME>librdf_model_find_statements_with_options</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_model* model, librdf_statement* statement, librdf_node* context_node, librdf_hash* options
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_sources</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_model *model, librdf_node *arc, librdf_node *target
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_arcs</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_model *model, librdf_node *source, librdf_node *target
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_targets</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_model *model, librdf_node *source, librdf_node *arc
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_source</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_model *model, librdf_node *arc, librdf_node *target
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_arc</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_model *model, librdf_node *source, librdf_node *target
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_target</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_model *model, librdf_node *source, librdf_node *arc
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_arcs_in</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_model *model, librdf_node *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_arcs_out</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_model *model, librdf_node *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_add_submodel</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_model* sub_model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_remove_submodel</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_model* sub_model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_print</NAME>
+<RETURNS>void </RETURNS>
+librdf_model *model, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_context_add_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_node* context, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_context_add_statements</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_node* context, librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_context_remove_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_node* context, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_context_remove_statements</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_node* context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_context_as_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_model* model, librdf_node* context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_context_serialize</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_model* model, librdf_node* context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_contains_context</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_node* context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_query_execute</NAME>
+<RETURNS>librdf_query_results*</RETURNS>
+librdf_model* model, librdf_query* query
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_sync</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_storage</NAME>
+<RETURNS>librdf_storage*</RETURNS>
+librdf_model *model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_load</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_uri *uri, const char *name, const char *mime_type, librdf_uri *type_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_to_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_model* model, librdf_uri *uri, const char *name, const char *mime_type, librdf_uri *type_uri, size_t* string_length_p
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_to_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+librdf_model* model, librdf_uri *uri, const char *name, const char *mime_type, librdf_uri *type_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_find_statements_in_context</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_model* model, librdf_statement* statement, librdf_node* context_node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_get_contexts</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_model* model
+</FUNCTION>
+<MACRO>
+<NAME>LIBRDF_MODEL_FEATURE_CONTEXTS</NAME>
+#define LIBRDF_MODEL_FEATURE_CONTEXTS "http://feature.librdf.org/model-contexts"
+</MACRO>
+<FUNCTION>
+<NAME>librdf_model_get_feature</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_model* model, librdf_uri* feature
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_model_set_feature</NAME>
+<RETURNS>int </RETURNS>
+librdf_model* model, librdf_uri* feature, librdf_node* value
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_heuristic_gen_name</NAME>
+<RETURNS>char*</RETURNS>
+const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_heuristic_is_blank_node</NAME>
+<RETURNS>int </RETURNS>
+const char *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_heuristic_get_blank_node</NAME>
+<RETURNS>const char*</RETURNS>
+const char *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_heuristic_object_is_literal</NAME>
+<RETURNS>int </RETURNS>
+const char *object
+</FUNCTION>
+<MACRO>
+<NAME>REDLAND_API</NAME>
+#    define REDLAND_API
+</MACRO>
+<MACRO>
+<NAME>REDLAND_API</NAME>
+#      define REDLAND_API _declspec(dllexport)
+</MACRO>
+<MACRO>
+<NAME>REDLAND_API</NAME>
+#      define REDLAND_API _declspec(dllimport)
+</MACRO>
+<MACRO>
+<NAME>REDLAND_API</NAME>
+#  define REDLAND_API
+</MACRO>
+<MACRO>
+<NAME>REDLAND_DEPRECATED</NAME>
+#define REDLAND_DEPRECATED
+</MACRO>
+<MACRO>
+<NAME>REDLAND_DEPRECATED</NAME>
+#define REDLAND_DEPRECATED __attribute__((deprecated))
+</MACRO>
+<MACRO>
+<NAME>REDLAND_DEPRECATED</NAME>
+#define REDLAND_DEPRECATED
+</MACRO>
+<MACRO>
+<NAME>REDLAND_PRINTF_FORMAT</NAME>
+#define REDLAND_PRINTF_FORMAT(string_index, first_to_check_index) \
+  __attribute__((__format__(__printf__, string_index, first_to_check_index)))
+</MACRO>
+<MACRO>
+<NAME>REDLAND_PRINTF_FORMAT</NAME>
+#define REDLAND_PRINTF_FORMAT(string_index, first_to_check_index)
+</MACRO>
+<TYPEDEF>
+<NAME>librdf_world</NAME>
+typedef struct librdf_world_s librdf_world;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_hash</NAME>
+typedef struct librdf_hash_s librdf_hash;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_hash_cursor</NAME>
+typedef struct librdf_hash_cursor_s librdf_hash_cursor;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_digest</NAME>
+typedef struct librdf_digest_s librdf_digest;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_digest_factory</NAME>
+typedef struct librdf_digest_factory_s librdf_digest_factory;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_uri</NAME>
+typedef struct librdf_uri_s librdf_uri;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_list</NAME>
+typedef struct librdf_list_s librdf_list;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_iterator</NAME>
+typedef struct librdf_iterator_s librdf_iterator;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_node</NAME>
+typedef struct librdf_node_s librdf_node;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_statement</NAME>
+typedef struct librdf_statement_s librdf_statement;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_model</NAME>
+typedef struct librdf_model_s librdf_model;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_model_factory</NAME>
+typedef struct librdf_model_factory_s librdf_model_factory;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_storage</NAME>
+typedef struct librdf_storage_s librdf_storage;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_storage_factory</NAME>
+typedef struct librdf_storage_factory_s librdf_storage_factory;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_stream</NAME>
+typedef struct librdf_stream_s librdf_stream;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_parser</NAME>
+typedef struct librdf_parser_s librdf_parser;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_parser_factory</NAME>
+typedef struct librdf_parser_factory_s librdf_parser_factory;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_query</NAME>
+typedef struct librdf_query_s librdf_query;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_query_factory</NAME>
+typedef struct librdf_query_factory_s librdf_query_factory;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_query_results</NAME>
+typedef struct librdf_query_results_s librdf_query_results;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_serializer</NAME>
+typedef struct librdf_serializer_s librdf_serializer;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>librdf_serializer_factory</NAME>
+typedef struct librdf_serializer_factory_s librdf_serializer_factory;
+</TYPEDEF>
+<VARIABLE>
+<NAME>librdf_version_major</NAME>
+extern const unsigned int librdf_version_major;
+</VARIABLE>
+<VARIABLE>
+<NAME>librdf_version_minor</NAME>
+extern const unsigned int librdf_version_minor;
+</VARIABLE>
+<VARIABLE>
+<NAME>librdf_version_release</NAME>
+extern const unsigned int librdf_version_release;
+</VARIABLE>
+<VARIABLE>
+<NAME>librdf_version_decimal</NAME>
+extern const unsigned int librdf_version_decimal;
+</VARIABLE>
+<FUNCTION>
+<NAME>librdf_storage_register_factory</NAME>
+<RETURNS>void </RETURNS>
+librdf_world *world, const char *name, const char *label, void (*factory) (librdf_storage_factory*)
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_enumerate</NAME>
+<RETURNS>int </RETURNS>
+librdf_world* world, const unsigned int counter, const char **name, const char **label
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_storage</NAME>
+<RETURNS>librdf_storage*</RETURNS>
+librdf_world *world, const char *storage_name, const char *name, const char *options_string
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_storage_with_options</NAME>
+<RETURNS>librdf_storage*</RETURNS>
+librdf_world *world, const char *storage_name, const char *name, librdf_hash *options
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_storage_from_storage</NAME>
+<RETURNS>librdf_storage*</RETURNS>
+librdf_storage* old_storage
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_new_storage_from_factory</NAME>
+<RETURNS>librdf_storage*</RETURNS>
+librdf_world *world, librdf_storage_factory* factory, const char *name, librdf_hash* options
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_free_storage</NAME>
+<RETURNS>void </RETURNS>
+librdf_storage *storage
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_open</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_model *model
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_close</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_size</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_add_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_add_statements</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_stream* statement_stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_remove_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_contains_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_serialise</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_storage* storage
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_find_statements</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_storage* storage, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_find_statements_with_options</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_storage* storage, librdf_statement* statement, librdf_node* context_node, librdf_hash* options
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_get_sources</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_storage *storage, librdf_node *arc, librdf_node *target
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_get_arcs</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_storage *storage, librdf_node *source, librdf_node *target
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_get_targets</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_storage *storage, librdf_node *source, librdf_node *arc
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_get_arcs_in</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_storage *storage, librdf_node *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_get_arcs_out</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_storage *storage, librdf_node *node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_has_arc_in</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage *storage, librdf_node *node, librdf_node *property
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_has_arc_out</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage *storage, librdf_node *node, librdf_node *property
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_context_add_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_node* context, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_context_add_statements</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_node* context, librdf_stream* stream
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_context_remove_statement</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_node* context, librdf_statement* statement
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_context_remove_statements</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_node* context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_context_as_stream</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_storage* storage, librdf_node* context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_context_serialise</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_storage* storage, librdf_node* context
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_supports_query</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_query *query
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_query_execute</NAME>
+<RETURNS>librdf_query_results*</RETURNS>
+librdf_storage* storage, librdf_query *query
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_sync</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage *storage
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_find_statements_in_context</NAME>
+<RETURNS>librdf_stream*</RETURNS>
+librdf_storage* storage, librdf_statement* statement, librdf_node* context_node
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_get_contexts</NAME>
+<RETURNS>librdf_iterator*</RETURNS>
+librdf_storage* storage
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_get_feature</NAME>
+<RETURNS>librdf_node*</RETURNS>
+librdf_storage* storage, librdf_uri* feature
+</FUNCTION>
+<FUNCTION>
+<NAME>librdf_storage_set_feature</NAME>
+<RETURNS>int </RETURNS>
+librdf_storage* storage, librdf_uri* feature, librdf_node* value
+</FUNCTION>
+<ENUM>
+<NAME>librdf_concepts_index</NAME>
+typedef enum {
+  LIBRDF_CONCEPT_MS_Alt,
+  LIBRDF_CONCEPT_MS_Bag,
+  LIBRDF_CONCEPT_MS_Property,
+  LIBRDF_CONCEPT_MS_Seq,
+  LIBRDF_CONCEPT_MS_Statement,
+  LIBRDF_CONCEPT_MS_object,
+  LIBRDF_CONCEPT_MS_predicate,
+  LIBRDF_CONCEPT_MS_subject,
+  LIBRDF_CONCEPT_MS_type,
+  LIBRDF_CONCEPT_MS_value,
+  LIBRDF_CONCEPT_MS_li,
+
+  LIBRDF_CONCEPT_MS_RDF,
+  LIBRDF_CONCEPT_MS_Description,
+
+  LIBRDF_CONCEPT_MS_aboutEach,
+  LIBRDF_CONCEPT_MS_aboutEachPrefix,
+
+  LIBRDF_CONCEPT_RS_nodeID,
+  LIBRDF_CONCEPT_RS_List,
+  LIBRDF_CONCEPT_RS_first,
+  LIBRDF_CONCEPT_RS_rest,
+  LIBRDF_CONCEPT_RS_nil,
+  LIBRDF_CONCEPT_RS_XMLLiteral,
+
+  /* RDF Schema concepts defined in prose at
+   *   http://www.w3.org/TR/2000/CR-rdf-schema-20000327/
+   * and in RDF Schema form at 
+   *   http://www.w3.org/2000/01/rdf-schema
+   */
+  LIBRDF_CONCEPT_S_Class,
+  LIBRDF_CONCEPT_S_ConstraintProperty,
+  LIBRDF_CONCEPT_S_ConstraintResource,
+  LIBRDF_CONCEPT_S_Container,
+  LIBRDF_CONCEPT_S_ContainerMembershipProperty,
+  LIBRDF_CONCEPT_S_Literal,
+  LIBRDF_CONCEPT_S_Resource,
+  LIBRDF_CONCEPT_S_comment,
+  LIBRDF_CONCEPT_S_domain,
+  LIBRDF_CONCEPT_S_isDefinedBy,
+  LIBRDF_CONCEPT_S_label,
+  LIBRDF_CONCEPT_S_range,
+  LIBRDF_CONCEPT_S_seeAlso,
+  LIBRDF_CONCEPT_S_subClassOf,
+  LIBRDF_CONCEPT_S_subPropertyOf,
+
+  /* first entry from schema namespace */
+  LIBRDF_CONCEPT_FIRST_S_ID = LIBRDF_CONCEPT_S_Class,
+
+  LIBRDF_CONCEPT_LAST = LIBRDF_CONCEPT_S_subPropertyOf,
+} librdf_concepts_index;
+</ENUM>
+<MACRO>
+<NAME>LIBRDF_MS_Alt</NAME>
+#define LIBRDF_MS_Alt librdf_concept_resources[LIBRDF_CONCEPT_MS_Alt]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Bag</NAME>
+#define LIBRDF_MS_Bag librdf_concept_resources[LIBRDF_CONCEPT_MS_Bag]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Property</NAME>
+#define LIBRDF_MS_Property librdf_concept_resources[LIBRDF_CONCEPT_MS_Property]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Seq</NAME>
+#define LIBRDF_MS_Seq librdf_concept_resources[LIBRDF_CONCEPT_MS_Seq]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Statement</NAME>
+#define LIBRDF_MS_Statement librdf_concept_resources[LIBRDF_CONCEPT_MS_Statement]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_object</NAME>
+#define LIBRDF_MS_object librdf_concept_resources[LIBRDF_CONCEPT_MS_object]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_predicate</NAME>
+#define LIBRDF_MS_predicate librdf_concept_resources[LIBRDF_CONCEPT_MS_predicate]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_subject</NAME>
+#define LIBRDF_MS_subject librdf_concept_resources[LIBRDF_CONCEPT_MS_subject]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_type</NAME>
+#define LIBRDF_MS_type librdf_concept_resources[LIBRDF_CONCEPT_MS_type]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_value</NAME>
+#define LIBRDF_MS_value librdf_concept_resources[LIBRDF_CONCEPT_MS_value]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_li</NAME>
+#define LIBRDF_MS_li librdf_concept_resources[LIBRDF_CONCEPT_MS_li]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_RDF</NAME>
+#define LIBRDF_MS_RDF librdf_concept_resources[LIBRDF_CONCEPT_MS_RDF]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Description</NAME>
+#define LIBRDF_MS_Description librdf_concept_resources[LIBRDF_CONCEPT_MS_Description]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_aboutEach</NAME>
+#define LIBRDF_MS_aboutEach librdf_concept_resources[LIBRDF_CONCEPT_MS_aboutEach]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_aboutEachPrefix</NAME>
+#define LIBRDF_MS_aboutEachPrefix librdf_concept_resources[LIBRDF_CONCEPT_MS_aboutEachPrefix]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_nodeID</NAME>
+#define LIBRDF_RS_nodeID librdf_concept_resources[LIBRDF_CONCEPT_RS_nodeID]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_List</NAME>
+#define LIBRDF_RS_List librdf_concept_resources[LIBRDF_CONCEPT_RS_List]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_first</NAME>
+#define LIBRDF_RS_first librdf_concept_resources[LIBRDF_CONCEPT_RS_first]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_rest</NAME>
+#define LIBRDF_RS_rest librdf_concept_resources[LIBRDF_CONCEPT_RS_rest]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_nil</NAME>
+#define LIBRDF_RS_nil librdf_concept_resources[LIBRDF_CONCEPT_RS_nil]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_XMLLiteral</NAME>
+#define LIBRDF_RS_XMLLiteral librdf_concept_resources[LIBRDF_CONCEPT_RS_XMLLiteral]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_Class</NAME>
+#define LIBRDF_S_Class librdf_concept_resources[LIBRDF_CONCEPT_S_Class]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_ConstraintProperty</NAME>
+#define LIBRDF_S_ConstraintProperty librdf_concept_resources[LIBRDF_CONCEPT_S_ConstraintProperty]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_ConstraintResource</NAME>
+#define LIBRDF_S_ConstraintResource librdf_concept_resources[LIBRDF_CONCEPT_S_ConstraintResource]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_Container</NAME>
+#define LIBRDF_S_Container librdf_concept_resources[LIBRDF_CONCEPT_S_Container]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_ContainerMembershipProperty</NAME>
+#define LIBRDF_S_ContainerMembershipProperty librdf_concept_resources[LIBRDF_CONCEPT_S_ContainerMembershipProperty]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_Literal</NAME>
+#define LIBRDF_S_Literal librdf_concept_resources[LIBRDF_CONCEPT_S_Literal]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_Resource</NAME>
+#define LIBRDF_S_Resource librdf_concept_resources[LIBRDF_CONCEPT_S_Resource]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_comment</NAME>
+#define LIBRDF_S_comment librdf_concept_resources[LIBRDF_CONCEPT_S_comment]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_domain</NAME>
+#define LIBRDF_S_domain librdf_concept_resources[LIBRDF_CONCEPT_S_domain]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_isDefinedBy</NAME>
+#define LIBRDF_S_isDefinedBy librdf_concept_resources[LIBRDF_CONCEPT_S_isDefinedBy]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_label</NAME>
+#define LIBRDF_S_label librdf_concept_resources[LIBRDF_CONCEPT_S_label]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_range</NAME>
+#define LIBRDF_S_range librdf_concept_resources[LIBRDF_CONCEPT_S_range]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_seeAlso</NAME>
+#define LIBRDF_S_seeAlso librdf_concept_resources[LIBRDF_CONCEPT_S_seeAlso]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_subClassOf</NAME>
+#define LIBRDF_S_subClassOf librdf_concept_resources[LIBRDF_CONCEPT_S_subClassOf]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_subPropertyOf</NAME>
+#define LIBRDF_S_subPropertyOf librdf_concept_resources[LIBRDF_CONCEPT_S_subPropertyOf]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_subPropertyOf</NAME>
+#define LIBRDF_S_subPropertyOf librdf_concept_resources[LIBRDF_CONCEPT_S_subPropertyOf]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Alt_URI</NAME>
+#define LIBRDF_MS_Alt_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_Alt]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Bag_URI</NAME>
+#define LIBRDF_MS_Bag_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_Bag]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Property_URI</NAME>
+#define LIBRDF_MS_Property_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_Property]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Seq_URI</NAME>
+#define LIBRDF_MS_Seq_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_Seq]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Statement_URI</NAME>
+#define LIBRDF_MS_Statement_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_Statement]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_object_URI</NAME>
+#define LIBRDF_MS_object_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_object]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_predicate_URI</NAME>
+#define LIBRDF_MS_predicate_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_predicate]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_subject_URI</NAME>
+#define LIBRDF_MS_subject_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_subject]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_type_URI</NAME>
+#define LIBRDF_MS_type_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_type]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_value_URI</NAME>
+#define LIBRDF_MS_value_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_value]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_li_URI</NAME>
+#define LIBRDF_MS_li_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_li]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_RDF_URI</NAME>
+#define LIBRDF_MS_RDF_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_RDF]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_Description_URI</NAME>
+#define LIBRDF_MS_Description_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_Description]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_aboutEach_URI</NAME>
+#define LIBRDF_MS_aboutEach_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_aboutEach]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_MS_aboutEachPrefix_URI</NAME>
+#define LIBRDF_MS_aboutEachPrefix_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_aboutEachPrefix]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_nodeID_URI</NAME>
+#define LIBRDF_RS_nodeID_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_nodeID]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_List_URI</NAME>
+#define LIBRDF_RS_List_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_List]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_first_URI</NAME>
+#define LIBRDF_RS_first_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_first]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_rest_URI</NAME>
+#define LIBRDF_RS_rest_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_rest]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_nil_URI</NAME>
+#define LIBRDF_RS_nil_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_nil]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_RS_XMLLiteral_URI</NAME>
+#define LIBRDF_RS_XMLLiteral_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_XMLLiteral]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_subPropertyOf_URI</NAME>
+#define LIBRDF_S_subPropertyOf_URI librdf_concept_uris[LIBRDF_CONCEPT_S_subPropertyOf]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_subClassOf_URI</NAME>
+#define LIBRDF_S_subClassOf_URI librdf_concept_uris[LIBRDF_CONCEPT_S_subClassOf]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_seeAlso_URI</NAME>
+#define LIBRDF_S_seeAlso_URI librdf_concept_uris[LIBRDF_CONCEPT_S_seeAlso]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_range_URI</NAME>
+#define LIBRDF_S_range_URI librdf_concept_uris[LIBRDF_CONCEPT_S_range]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_label_URI</NAME>
+#define LIBRDF_S_label_URI librdf_concept_uris[LIBRDF_CONCEPT_S_label]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_isDefinedBy_URI</NAME>
+#define LIBRDF_S_isDefinedBy_URI librdf_concept_uris[LIBRDF_CONCEPT_S_isDefinedBy]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_domain_URI</NAME>
+#define LIBRDF_S_domain_URI librdf_concept_uris[LIBRDF_CONCEPT_S_domain]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_comment_URI</NAME>
+#define LIBRDF_S_comment_URI librdf_concept_uris[LIBRDF_CONCEPT_S_comment]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_Resource_URI</NAME>
+#define LIBRDF_S_Resource_URI librdf_concept_uris[LIBRDF_CONCEPT_S_Resource]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_Literal_URI</NAME>
+#define LIBRDF_S_Literal_URI librdf_concept_uris[LIBRDF_CONCEPT_S_Literal]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_Container_URI</NAME>
+#define LIBRDF_S_Container_URI librdf_concept_uris[LIBRDF_CONCEPT_S_Container]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_ContainerMembershipProperty_URI</NAME>
+#define LIBRDF_S_ContainerMembershipProperty_URI librdf_concept_uris[LIBRDF_CONCEPT_S_ContainerMembershipProperty]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_ConstraintResource_URI</NAME>
+#define LIBRDF_S_ConstraintResource_URI librdf_concept_uris[LIBRDF_CONCEPT_S_ConstraintResource]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_ConstraintProperty_URI</NAME>
+#define LIBRDF_S_ConstraintProperty_URI librdf_concept_uris[LIBRDF_CONCEPT_S_ConstraintProperty]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_S_Class_URI</NAME>
+#define LIBRDF_S_Class_URI librdf_concept_uris[LIBRDF_CONCEPT_S_Class]
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_URI_RDF_MS</NAME>
+#define LIBRDF_URI_RDF_MS (librdf_concept_ms_namespace_uri)
+</MACRO>
+<MACRO>
+<NAME>LIBRDF_URI_RDF_SCHEMA</NAME>
+#define LIBRDF_URI_RDF_SCHEMA (librdf_concept_schema_namespace_uri)
+</MACRO>
+<VARIABLE>
+<NAME>librdf_concept_ms_namespace_uri</NAME>
+extern librdf_uri* librdf_concept_ms_namespace_uri;
+</VARIABLE>
+<VARIABLE>
+<NAME>librdf_concept_schema_namespace_uri</NAME>
+extern librdf_uri* librdf_concept_schema_namespace_uri;
+</VARIABLE>

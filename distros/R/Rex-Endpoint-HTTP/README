@@ -1,0 +1,28 @@
+Rex - A tool to ease your daily system administration tasks
+===========================================================
+
+With Rex you can manage all your boxes from a central point through the complete process of configuration management and software deployment.
+
+This is the HTTP Endpoint for Rex.
+
+INSTALLATION
+
+To install Rex::Endpoint::HTTP type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules, libraries and programs:
+
+   Mojolicious
+
+BUGS
+
+Please report bugs on the github issue tracker at 
+
+   https://github.com/krimdomu/rex-endpoint-http/issues
+

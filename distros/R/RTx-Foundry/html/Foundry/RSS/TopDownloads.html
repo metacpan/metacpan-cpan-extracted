@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<rdf:RDF
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns="http://my.netscape.com/rdf/simple/0.9/">
+
+<channel>
+<title><% $RT::rtname %> - Hot Projects</title>
+<link><% $RT::WebBaseURL %></link>
+<description><% $RT::Organization %></description>
+</channel>
+% my $count;
+% while (my $QueueObj = $Queues->Next) {
+%     next unless $QueueObj->Attribute('Download');
+<item>
+<title><% $QueueObj->Name %></title>
+<link><% $RT::WebBaseURL %>/Foundry/Project/Download/?Queue=<% $QueueObj->Id %></link>
+</item>
+%     last if ++$count == $Limit;
+% }
+</rdf:RDF>
+% $m->abort;
+<%INIT>
+$r->content_type('text/xml');
+
+my $Queues = RT::Queues->new($RT::SystemUser);
+$Queues->LimitToEnabled;
+$Queues->OrderByAttribute( NAME => 'Download', ORDER => 'DESC', NUMERIC => 1 );
+</%INIT>
+<%ARGS>
+$Limit => 3
+</%ARGS>

@@ -1,0 +1,36 @@
+---
+name: RDF-Trine-AllegroGraph
+version: 0.01
+author:
+  - 'Robert Barta <drrho@cpan.org>'
+abstract: Compatibility layer between RDF::Trine and AllegroGraph
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  HTTP::Request::Common: ~
+  LWP::UserAgent: ~
+  List::MoreUtils: ~
+  RDF::AllegroGraph::Easy: ~
+  RDF::Endpoint: 0.01
+  RDF::Query: 2.905
+  RDF::Trine: 0.134
+  Test::Exception: ~
+  Test::More: 0
+  Test::WWW::Mechanize::PSGI: ~
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  RDF::Trine::AllegroGraph:
+    file: lib/RDF/Trine/AllegroGraph.pm
+    version: 0.01
+  RDF::Trine::AllegroGraph::FAQ:
+    file: lib/RDF/Trine/AllegroGraph/FAQ.pm
+    version: 0.01
+  RDF::Trine::Store::AllegroGraph:
+    file: lib/RDF/Trine/Store/AllegroGraph.pm
+    version: 0.1
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

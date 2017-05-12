@@ -1,0 +1,82 @@
+{
+   "abstract" : "A RRDtool command wrapper with rawish interface",
+   "author" : [
+      "Yuuki Tsubouchi  C<< <yuuki@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RRDTool-Rawish",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::Fatal" : "0",
+            "Test::Mock::ExternalCommand" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Which" : "1.09",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "RRDTool::Rawish" : {
+         "file" : "lib/RRDTool/Rawish.pm",
+         "version" : "0.040"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yuuki/p5-RRD-Rawish/issues"
+      },
+      "homepage" : "https://github.com/yuuki/p5-RRD-Rawish",
+      "repository" : {
+         "url" : "git://github.com/yuuki/p5-RRD-Rawish.git",
+         "web" : "https://github.com/yuuki/p5-RRD-Rawish"
+      }
+   },
+   "version" : "0.040",
+   "x_authority" : "cpan:YUUKI",
+   "x_contributors" : [
+      "Ulrich Habel <rhaen@pkgbox.de>",
+      "y_uuki <yuki.tsubo@gmail.com>"
+   ]
+}

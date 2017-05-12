@@ -1,0 +1,290 @@
+=head1 NAME
+
+pminstalled.pl - Builds a Perl Public Module Descriptor File 
+
+=head1 SYNOPSYS
+
+This script must be installed in the server.
+If not, just copy it from the client:
+
+  client$ scp pminstalled.pl perlmodule.server:
+
+Executed in the server:
+
+  perlmodule.server$ pminstalled.pl [options] [searchpathlist] -o .ppmdf.descriptor
+
+or executed in the client (assuming automatic SSH authentication):
+
+  client$ ssh perlmodule.server perl pminstalled.pl [options] [searchpathlist] > .ppmdf.descriptor
+
+=head1 DESCRIPTION
+
+This script is part of the L<Remote::Use>
+distribution. Its execution
+produces a Perl Public Module Descriptor File 
+of the specified Perl Modules Server (see section below
+L</PERL PUBLIC MODULES DESCRIPTOR FILE (PPMDF)>.
+Such file is used by a Perl program in a client machine 
+when dealing with a statement 
+
+   use Some::Module;
+
+to resolve where to locate C<Some::Module> inside the 
+server machine
+
+=head1 WARNING
+
+When I wrote this module I didn't know of the existence of
+L<PAR::Repository::Client> and L<PAR::Repository> distributions.
+These distributions - now embedded inside the L<PAR> distribution -
+broach similar problems.
+
+Look at them first before considering using this one.
+They provide a solution more robust and cover 
+a range of problems much wider than this distribution.
+
+L<Remote::Use> focuses in the direct loading of modules already installed in some 
+remote server while L<PAR::Repository::Client> and L<PAR::Repository>
+deal with the use of remote C<PAR> repositories. 
+
+There are a few scenarios where this module can still
+be useful:
+
+=over 2
+
+=item * If your server and clients are homogeneous: same Perl version,
+very similar O.S. distributions, same external libraries installed, etc.
+and you want to avoid the extra work of repository creation and
+administration
+
+=item * If you want to use protocols like SSH, SFTP or
+others not currently supported by L<PAR::Repository::Client> and L<PAR::Repository>
+
+=item * If no binaries are involved
+
+=back
+
+
+
+
+
+=head1 EXECUTION MODES
+
+When executed without options produces a set of warnings 
+(sent to STDERR) and a PPMDF description of
+the set of Perl modules in C<searchpathlist> is sent to STDOUT.
+If C<searchpathlist> is empty it defaults to the C<@INC> list
+of the Perl interpreter being used.
+
+For each directory C</some/path/> in the search list,
+C<pminstalled.pl> recursively looks for module files like 
+
+             An/Interesting/Module.pm
+
+that have a C<.pm> extension. The associated directory
+C</some/path/auto/An/Interesting/Module> is also visited
+and all the files there will be added to the list 
+for C<An::Interesting::Module>.
+
+To save the PPMDF, redirect STDOUT to some file like in this example
+(along these code snippets C<nereida> is the client machine and C<orion>
+the Perl Public Modules Server):
+
+  pp2@nereida:$ ssh orion perl pminstalled.pl > /tmp/perl5lib/.orion.installed.modules
+  Duplicated module 'Test/Builder.pm':
+  Is in:
+         /usr/local/share/perl/5.8.8/Test/Builder.pm
+  and in:
+         /usr/local/share/perl/5.8.4/Test/Builder.pm
+  only the first will be considered.
+
+  Duplicated module 'Test/Simple.pm':
+  Is in:
+         /usr/local/share/perl/5.8.8/Test/Simple.pm
+  and in:
+         /usr/local/share/perl/5.8.4/Test/Simple.pm
+  only the first will be considered.
+
+  ..... etc, etc.
+
+  pp2@nereida:$
+
+If you want to make public modules that aren't in the official C<@INC> path, just add
+the corresponding C<-I> options to the perl interpreter
+executing C<pminstalled.pl>:
+
+ $ ssh orion perl -I/home/casiano/public_html/cpan pminstalled.pl \
+             > /tmp/perl5lib/.orion.plus.public.installed.modules
+
+If we want an entirely different search path alternative to C<@INC>
+we execute C<pminstalled.pl> with the list of directories
+where to look at:
+
+ orion:$ perl pminstalled.pl /home/casiano/public_html/cpan -o /home/casiano/public_html/.orion.via.web
+
+
+=head1 PERL PUBLIC MODULES DESCRIPTOR FILE (PPMDF)
+
+A Perl Modules Descriptor File describes what Modules in the Module Server Machine
+will be published and what files must be downloaded for each of those modules. 
+It is used by L<Remote::Use> to automatically download the Perl modules
+need by a script being executed from a Perl Public Modules Server (See
+L<Remote::Use::Tutorial>).
+
+The file is a Perl list. For each published module C<Some::Module>
+there is a key which is the associated file name C<Some/Module.pm>
+and a value. The value is a hash reference that must contain at least
+two entries: one named C<dir> and another named C<file>. The second 
+contains the list of files to be downloaded when C<Some::Module>
+is used. The C<dir> entry contains the prefix path that must be 
+removed from the path of the source file names (at the server)
+to produce the target file names (at the client). 
+
+      'Some/Module.pm' => {
+        dir => '/prefix/path/',
+        files => [ '/auto/Some/Module/Module.so', 
+                   '/Some/Module.pm', 
+                   '/Some/Module.pod' ],
+        bin => [ '/some/script', /another/script' ],
+        man => [ '/some/man', /another/man' ],
+      }
+
+          
+For each module
+entry additional file families can be added 
+as illustrates the C<bin>
+entry for C<Parse::Eyapp> in the former example:
+
+  'Parse/Eyapp.pm' => { dir => '',
+    files => [ '/Parse/Eyapp.pm' ],
+    bin => [ '/bin/eyapp', '/bin/treereg' ]
+  }
+
+The following example illustrates the syntax of a PPMDF file:
+
+  pp2@nereida:~/LRemoteUse/examples$ cat /tmp/perl5lib/.orion.via.web
+  (
+  'Trivial.pm' => { dir => '', files => [
+          '/Trivial.pm' ] },
+  'Tintin/Trivial.pm' => { dir => '', files => [
+          '/Tintin/Trivial.pm' ] },
+  'Parse/Eyapp.pm' => { dir => '',
+    files => [ '/Parse/Eyapp.pm' ],
+    bin => [ '/bin/eyapp', '/bin/treereg' ]
+  },
+  'Parse/Eyapp/Lalr.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Lalr.pm' ] },
+  'Parse/Eyapp/YATW.pm' => { dir => '', files => [
+          '/Parse/Eyapp/YATW.pm' ] },
+  'Parse/Eyapp/Treeregexp.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Treeregexp.pm' ] },
+  'Parse/Eyapp/Parse.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Parse.pm' ] },
+  'Parse/Eyapp/Scope.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Scope.pm' ] },
+  'Parse/Eyapp/Options.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Options.pm' ] },
+  'Parse/Eyapp/Output.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Output.pm' ] },
+  'Parse/Eyapp/Node.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Node.pm' ] },
+  'Parse/Eyapp/Grammar.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Grammar.pm' ] },
+  'Parse/Eyapp/Driver.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Driver.pm' ] },
+  'Parse/Eyapp/Base.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Base.pm' ] },
+  'Parse/Eyapp/_TreeregexpSupport.pm' => { dir => '', files => [
+          '/Parse/Eyapp/_TreeregexpSupport.pm' ] },
+  'Math/Prime/XS.pm' => { dir => '', files => [
+          '/auto/Math/Prime/XS/XS.bs',
+          '/auto/Math/Prime/XS/XS.so',
+          '/Math/Prime/XS.pm' ] },
+  );
+
+Here is another (summarized) example:
+
+  ~/LRemote-Use/script$ head -23 orion.installed.modules
+  (
+  'CPAN/Config.pm' => { dir => '/etc/perl', files => [
+	  '/etc/perl/CPAN/Config.pm' ] },
+  'Template.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/auto/Template/Stash/XS/XS.so',
+	  '/usr/local/lib/perl/5.8.8/auto/Template/Stash/XS/XS.bs',
+	  '/usr/local/lib/perl/5.8.8/Template.pm' ] },
+  'IO/Tty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.so',
+	  '/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.bs',
+	  '/usr/local/lib/perl/5.8.8/IO/Tty.pm' ] },
+  'IO/Pty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/IO/Pty.pm' ] },
+  'IO/Tty/Constant.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/IO/Tty/Constant.pm' ] },
+  'Math/Prime/XS.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+	  '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+	  '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' ] },
+  'Template/Stash.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/auto/Template/Stash/XS/XS.so',
+	  '/usr/local/lib/perl/5.8.8/auto/Template/Stash/XS/XS.bs',
+	  '/usr/local/lib/perl/5.8.8/Template/Stash.pm' ] },
+
+
+
+=head1 LIST OF OPTIONS
+
+=over 2
+
+=item * C<--relative path>, C<-r path> 
+
+The consequence of using C<-r path>
+is that C<path> will be removed 
+from the C<dir> entries in the PPMDF file 
+
+=item * C<--log file>, C<-l file>
+
+Specifies the log file where warnings will be saved.
+For example:
+
+  pp2@nereida:$ ssh orion perl pminstalled.pl -log /tmp/dups > /tmp/perl5lib/.orion.installed.modules
+
+=item * C<--output file>, C<-o log>
+
+Must be followed by the name of the output file.
+
+=item * C<--pod>, C<--nopod>
+
+The POD files (extension C<.pod>) associated with the module will be added
+to the C<files> entry for that module
+
+=item * C<-help> 
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * See L<Remote::Use::Tutorial> for more detailed use
+
+=item * DVI version of L<Remote::Use::Tutorial> at L<http://nereida.deioc.ull.es/~pp2/Remote_Use/Tutorial.dvi>
+
+=item * DVI version of L<pminstalled.pl> at L<http://nereida.deioc.ull.es/~pp2/Remote_Use/pminstalled.dvi>
+
+=back
+
+
+=head1 AUTHOR
+
+Casiano Rodriguez Leon E<lt>casiano@ull.esE<gt>
+
+=head1 COPYRIGHT
+
+(c) Copyright 2008 Casiano Rodriguez-Leon
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

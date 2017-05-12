@@ -1,0 +1,342 @@
+=pod
+
+=head1 NAME
+
+RPC::ExtDirect::API::Hook - Ext.Direct Method wrappers
+
+=head1 DESCRIPTION
+
+Hooks are L<RPC::ExtDirect>'s way of implementing
+L<Method|RPC::ExtDirect::Intro/Method> modifiers for the (relatively)
+rare cases when you need them but don't want to bring in the whole
+nine yards of L<Moose>.
+
+=head1 TYPES
+
+A hook is a Perl subroutine (can be anonymous, too). Hooks can be of
+three types:
+
+=over 4
+
+=item C<before>
+
+C<before> hook is called before a L<Method|RPC::ExtDirect::Intro/Method>
+is invoked, and can be used to change Method arguments or cancel Method
+execution. This hook must return numeric value C<1> to allow Method call.
+Any other value will be interpreted as an Ext.Direct
+L<Result|RPC::ExtDirect::Intro/Result>; it will be returned to the
+client side and the Method never gets called.
+
+Note that RPC::ExtDirect will not make any assumptions about this hook's
+return value; a false value like C<''> or C<0> will probably not look
+too helpful from the client side's point of view.
+
+If this hook throws an exception, it will be returned as an Ext.Direct
+L<Exception|RPC::ExtDirect::Intro/Exception> to the client side, and
+the Method does not execute.
+
+=item C<instead>
+
+C<instead> hook replaces the Method it is assigned to. It is
+the hook sub's responsibility to invoke (or not) the Method code
+and return appropriate L<Result|RPC::ExtDirect::Intro/Result>.
+
+If this hook throws an exception, it is interpreted as if the
+Method threw it.
+
+This hook is analogous to Moose's C<around> method modifier, except
+that C<around> would be a bit of a misnomer since the hook code is
+actually called I<instead> of the Method. Hence the name.
+
+=item C<after>
+
+C<after> hook is called after the Method code or C<instead> hook.
+This hook cannot affect Method execution, it is intended mostly for
+logging and testing purposes; its input includes Method's
+L<Result|RPC::ExtDirect::Intro/Result> or
+L<Exception|RPC::ExtDirect::Intro/Exception>.
+
+This hook's return value and thrown exceptions are ignored.
+
+=back
+
+=head1 HIERARCHY
+
+Hooks can be defined on three levels, in order of precedence: Method,
+Action, and global. For each Method, only one hook of each type can be
+applied. Hooks specified in Method definition take precedence over all
+other; if no Method hook is found then Action level hook applies; and if
+there is no Action hook then global hook gets called, if any.
+
+To avoid using hooks for a particular method, use C<"NONE"> or C<undef>
+instead of coderef; this way you can specify global and/or Action hooks
+and exclude some specific Methods piecemeal.
+
+See more in the documentation for the constructor: L</new>.
+
+=head1 CALLING CONVENTION
+
+Hook subroutine is called as a class method, i.e. first argument
+is name of the package in which this sub was defined. Ignore it
+if you don't need it.
+
+Hooks receive a hash of the following arguments:
+
+=over 4
+
+=item C<action>
+
+Ext.Direct L<Action|RPC::ExtDirect::Intro/Action> name for the
+L<Method|RPC::ExtDirect::Intro/Method>.
+
+B<DEPRECATED>. Use L<method_ref|/method_ref> instead:
+C<< $method_ref->action >>
+
+=item C<method>
+
+Ext.Direct L<Method|RPC::ExtDirect::Intro/Method> name
+
+B<DEPRECATED>. Use L<method_ref|/method_ref> instead:
+C<< $method_ref->name >>
+
+=item C<package>
+
+Name of the package (not Action) where the Method is declared
+
+B<DEPRECATED>. Use L<method_ref|/method_ref> instead:
+C<< $method_ref->package >>
+
+=item C<code>
+
+Coderef to the Method subroutine
+
+B<DEPRECATED>. Use L<method_ref|/method_ref> instead:
+C<< $method_ref->code >>
+
+=item C<param_no>
+ 
+Number of parameters when Method accepts ordered arguments
+
+B<DEPRECATED>. Use L<method_ref|/method_ref> instead:
+C<< $method_ref->len >>
+
+=item C<param_names>
+
+Arrayref with names of parameters when Method accepts named arguments
+
+B<DEPRECATED>. Use L<method_ref|/method_ref> instead:
+C<< $method_ref->params >>
+
+=item C<formHandler>
+
+True if Method handles form submits
+
+B<DEPRECATED>. Use L<method_ref|/method_ref> instead:
+C<< $method_ref->formHandler >>
+
+=item C<pollHandler>
+
+True if Method handles Event poll requests
+
+B<DEPRECATED>. Use L<method_ref|/method_ref> instead:
+C<< $method_ref->pollHandler >>
+
+=item C<arg>
+
+Arrayref with the invocation arguments when Method accepts ordered args,
+single L<Environment object|RPC::ExtDirect/"ENVIRONMENT OBJECTS"> for
+L<Poll handlers|RPC::ExtDirect::Intro/"Poll Handler Method">, hashref
+otherwise.
+
+Note that this is a direct link to the Method's C<@_> so it is possible
+to modify the arguments in C<before> hook if you need to.
+
+=item C<env>
+
+L<Environment object|RPC::ExtDirect/"ENVIRONMENT OBJECTS"> for the
+invocation. Like L<arg|/arg>, this is a direct reference to the same
+object that will be passed to the Method, so it's possible to modify
+the env object in the C<before> hook.
+
+=item C<before>
+
+Coderef to C<before> hook for that Method, or undef
+
+B<DEPRECATED>. Use L<before_ref|/before_ref> instead:
+C<< $before_ref->code >>
+
+=item C<instead>
+
+Coderef to C<instead> hook for that Method, or undef
+
+B<DEPRECATED>. Use L<instead_ref|/instead_ref> instead:
+C<< $instead_ref->code >>
+
+=item C<after>
+
+Coderef to "after" hook for that Method, or undef
+
+B<DEPRECATED>. Use L<after_ref|/after_ref> instead:
+C<< $after_ref->code >>
+
+=item C<result>
+
+For C<after> hooks, the L<Result|RPC::ExtDirect::Intro/Result> returned
+by the Method or C<instead> hook, whichever got called. Not defined for
+C<before> and C<instead> hooks.
+
+=item C<exception>
+
+For C<after> hooks, an exception (C<$@>) thrown by the Method or
+C<instead> hook, if any. Not defined for C<before> and C<instead> hooks.
+
+=item C<method_called>
+
+For C<after> hooks, a reference to the actual code called as Method, if
+any. Can be either the Method code itself, C<instead> hook or C<undef>
+if the invocation was canceled.
+
+=item C<orig>
+
+A closure that binds Method coderef to its current arguments, allowing to call
+it as easily as C<< $params{orig}->() >>
+
+=back
+
+=head1 HOOK OBJECT INTERFACE
+
+L<RPC::ExtDirect::API::Hook> provides several public methods:
+
+=over 4
+
+=item C<HOOK_TYPES>
+
+Class/instance method. Returns the list of supported hook types.
+
+=item C<new>
+
+Constructor. Returns a new L<RPC::ExtDirect::API::Hook> object. Accepts
+named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<type>
+
+Hook L<type|/TYPES>. This parameter is mandatory.
+
+=item C<code>
+
+Hook code. This parameter is mandatory, and it can take one of the
+following forms:
+
+=over 12
+
+=item *
+
+C<'NONE'> or C<undef> to cancel hook execution for the corresponding type
+
+=item *
+
+A coderef for the hook sub to run for the corresponding type
+
+=item *
+
+Package and subroutine address to call at the hook execution time, like
+C<'Foo::Bar::baz'>. This allows late code binding without loading the
+corresponding package early.
+
+=back
+
+=back
+
+=item C<run>
+
+Run the hook and return the result. This method accepts named arguments
+in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<api>
+
+An instance of L<RPC::ExtDirect::API>.
+
+This parameter is mandatory.
+
+=item C<env>
+
+An L<environment object|RPC::ExtDirect/"ENVIRONMENT OBJECTS"> for this
+hook invocation.
+
+This parameter is mandatory.
+
+=item C<arg>
+
+Method arguments, either array- or hashref depending on the Method's
+calling convention.
+
+This parameter is mandatory.
+
+=item C<result>
+
+The result of a Method's invocation for an C<after> hook.
+
+This parameter is mandatory for C<after> hooks.
+
+=item C<exception>
+
+An exception thrown by a Method or a hook. This parameter is only
+meaningful for C<after> hooks, and is optional.
+
+=item C<method_ref>
+
+An instance of L<RPC::ExtDirect::API::Method>.
+
+This parameter is mandatory.
+
+=item C<callee>
+
+A reference to the code executed for a Method; can be either the
+Method code, or its C<instead> hook code.
+
+This parameter is mandatory for C<after> hooks.
+
+=back
+
+=back
+
+=head1 ACCESSOR METHODS
+
+For L<RPC::ExtDirect::API::Hook>, the following
+L<accessor methods|RPC::ExtDirect::Config/"ACCESSOR METHODS"> are
+provided:
+
+=over 4
+
+=item C<type>
+
+Return the L</type> of this Hook object.
+
+=item C<code>
+
+Return the L</code> of this Hook object.
+
+=item C<package>
+
+Return the package name for the Hook code.
+
+=item C<sub_name>
+
+Return the subroutine name for the Hook code. This will yield meaningful
+result only when L</code> was set to a string 'Package::sub'.
+
+=item C<runnable>
+
+Return true if this Hook's code is runnable and can be executed.
+
+=back
+
+=cut

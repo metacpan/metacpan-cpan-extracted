@@ -1,0 +1,4 @@
+REST::Google::Apps::EmailSettings is a Perl library to Google's RESTful
+Apps Email Settings API.  It is freely distributable under the terms of
+the GNU General Public License.
+

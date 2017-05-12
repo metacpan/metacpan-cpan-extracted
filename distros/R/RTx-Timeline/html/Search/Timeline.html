@@ -1,0 +1,38 @@
+<& /Elements/Header, Title => $title &>
+<& /Ticket/Elements/Tabs,
+    current_tab => "Search/Timeline.html".$QueryString,
+    Title => loc($title),
+    Format => $Format,
+    Query => $Query,
+    Order => $Order,
+    OrderBy => $OrderBy,
+    Rows => $RowsPerPage
+&>
+<&  Elements/Timeline, Query => $Query &>
+<%init>
+my $QueryString;
+if ($NewQuery) {
+    $QueryString = '?NewQuery=1';
+}
+else {
+    $QueryString = '?'
+      . $m->comp(
+        '/Elements/QueryString',
+        Query   => $Query,
+        Format  => $Format,
+        Order   => $Order,
+        OrderBy => $OrderBy,
+        Rows    => $RowsPerPage
+      )
+      if ($Query);
+}
+</%init>
+<%args>
+$title => 'ticket timeline'
+$NewQuery => 0
+$Query => undef
+$Format => undef
+$Order => undef
+$OrderBy => undef
+$RowsPerPage => undef
+</%args>

@@ -1,0 +1,9 @@
+<div class="gravatar" style="float: right;">
+<& /Elements/Gravatar, UserObj => $User &>
+</div>
+<%INIT>
+return unless $User->HasGravatar;
+</%INIT>
+<%ARGS>
+$User => undef
+</%ARGS>

@@ -1,0 +1,26 @@
+---
+abstract: 'Simple, correct readonly values'
+author:
+  - 'Ben Morrow <ben@morrow.me.uk>'
+build_requires:
+  Test::Exception: '0'
+  Test::Exports: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Readonly-Tiny
+provides:
+  Readonly::Tiny:
+    file: lib/Readonly/Tiny.pm
+    version: '4'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Readonly-Tiny
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: http://github.com/mauzo/Readonly-Tiny
+version: '4'

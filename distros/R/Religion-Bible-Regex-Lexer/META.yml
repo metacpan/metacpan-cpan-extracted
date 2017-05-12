@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Religion-Bible-Regex-Lexer
+version:            0.85
+abstract:           [One line description of module's purpose here]
+author:
+    - Daniel Holmlund <holmlund.dev@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Religion::Bible::Regex::Builder:  0
+    Religion::Bible::Regex::Config:  0
+    Religion::Bible::Regex::Reference:  0
+    Test::More:           0
+    version:              0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

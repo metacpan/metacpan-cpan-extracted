@@ -1,0 +1,30 @@
+NAME
+    Regexp::ID::NumVerbage - Regex pattern to match Indonesian number
+    verbage in text
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+     use Regexp::ID::NumVerbage ($RE);
+
+     say $1 if "pemasukan tahun ini mencapai tiga koma tujuh triliun" =~ /\b($RE)\b/; # "tiga koma tujuh triliun"
+
+EXPORTS
+  $RE (regex)
+    A regex for quickly matching/extracting verbage from text; it looks for
+    a string of words. It's not perfect (the extracted verbage might not be
+    valid, e.g. "dua ratus tiga ribu"), but it's convenient.
+
+SEE ALSO
+    Regexp::EN::NumVerbage.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,21 @@
+RDF-Generator-HTTP
+==================
+
+Created:      2014-10-08
+Home page:    <https://metacpan.org/release/RDF-Generator-HTTP>
+Bug tracker:  <https://github.com/kjetilk/p5-rdf-generator-http/issues>
+Wiki:         <http://wiki.perlrdf.org/>
+Mailing list: <http://lists.perlrdf.org/listinfo/dev>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.003	2014-12-15	Attributes for subjects
+
+ [ Documentation ]
+ - Fix internal link
+
+ [ Other ]
+ - Added: Create attributes to set and access the subjects of messages.
+
+0.002	2014-12-14	Improve documentation
+
+0.001	2014-10-08	Initial release

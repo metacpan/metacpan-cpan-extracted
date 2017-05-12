@@ -1,0 +1,8 @@
+<%INIT>
+return unless $session{'BitcardUser'};
+
+use RT::Authen::Bitcard;
+my $bc = RT::Authen::Bitcard->handler;
+my $account_url = $bc->account_url( r => $RT::WebURL . 'index.html' );
+</%INIT>
+| <a href="<% $account_url %>"><&|/l&>Manage Bitcard account</&></a>

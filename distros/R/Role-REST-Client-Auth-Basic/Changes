@@ -1,0 +1,18 @@
+Revision history for Role-Model-REST-Auth-Basic
+
+0.05    2014-04-18 18:38:06 Europe/Copenhagen
+ - Mooify. (Aran Deltac)
+ - Work when passwd or user are lazy built. (Aran Deltac)
+
+0.04    2012-03-30 11:10:27 Europe/Copenhagen
+ - Don't use 5.010. We don't need it.
+
+0.03    2012-03-22 07:09:32 Europe/Copenhagen
+ - httpheaders require Role::REST::Client 0.03
+
+0.02    2012-03-21 08:08:59 Europe/Copenhagen
+ - _headers changes to httpheaders in Role::REST::Client
+
+0.01    2012-03-01 21:20:18 Europe/Copenhagen
+ - First version
+   Thanks goes to Alex Howarth for testing and patching

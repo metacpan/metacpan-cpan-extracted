@@ -1,0 +1,148 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%#
+%# COPYRIGHT:
+%#
+%# This software is Copyright (c) 1996-2013 Best Practical Solutions, LLC
+%#                                          <sales@bestpractical.com>
+%#
+%# (Except where explicitly superseded by other copyright notices)
+%#
+%#
+%# LICENSE:
+%#
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%#
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+%# 02110-1301 or visit their web page on the internet at
+%# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+%#
+%#
+%# CONTRIBUTION SUBMISSION POLICY:
+%#
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%#
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%#
+%# END BPS TAGGED BLOCK }}}
+<& /Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+
+% if ( $Query ) {
+<& /Elements/CollectionList, Title => loc('Search Results'),
+     Format  => $Format,
+     Query   => $Query,
+     Order   => @Order,
+     OrderBy => @OrderBy,
+     BaseURL => $BaseURL,
+     AllowSorting => 1,
+     Class   => 'RT::Tickets',
+     Rows    => $Rows,
+     Page    => $Page &>
+% } else {
+% $m->callback( %ARGS, CallbackName => 'PreForm' );
+
+<div id="SimpleSearchForm">
+<form action="SimpleSearch.html" method="get">
+
+<div align="center">
+<input name="q" size="60" /><input type="submit" class="button" value="<&|/l&>Search</&>" />
+</div>
+
+% my @strong = qw(<strong> </strong>);
+
+<p><&|/l_unsafe, @strong &>Search for tickets by entering [_1]id[_2] numbers, subject words [_1]"in quotes"[_2], [_1]queues[_2] by name, Owners by [_1]username[_2], Requestors by [_1]email address[_2], and ticket [_1]statuses[_2].  Searching for [_1]@domainname.com[_2] will return tickets with requestors from that domain.</&></p>
+
+<p><&|/l&>Any word not recognized by RT is searched for in ticket subjects.</&></p>
+
+% my $config = RT->Config->Get('FullTextSearch') || {};
+% my $fulltext_keyword = 'fulltext:';
+% if ( $config->{'Enable'} ) {
+% if ( $config->{'Indexed'} ) {
+<p><&|/l, $fulltext_keyword &>You can search for any word in full ticket history by typing <b>[_1]<i>word</i></b>.</&></p>
+% } else {
+<p><&|/l, $fulltext_keyword &>Searching the full text of every ticket can take a long time, but if you need to do it, you can search for any word in full ticket history by typing <b>[_1]<i>word</i></b>.</&></p>
+% }
+% }
+
+<p><&|/l_unsafe, map { "<strong>$_</strong>" } qw(initial active inactive any) &>Entering [_1], [_2], [_3], or [_4] limits results to tickets with one of the respective types of statuses.  Any individual status name limits results to just the statuses named.</&>
+
+% if (RT->Config->Get('OnlySearchActiveTicketsInSimpleSearch', $session{'CurrentUser'})) {
+% my $status_str  = join ', ', map { loc($_) } RT::Queue->ActiveStatusArray;
+<&|/l, $status_str &>Unless you specify a specific status, only tickets with active statuses ([_1]) are searched.</&>
+% }
+</p>
+
+<p><&|/l_unsafe, map { "<strong>$_</strong>" } 'queue:"Example Queue"', 'owner:email@example.com' &>Start the search term with the name of a supported field followed by a colon, as in [_1] and [_2], to explicitly specify the search type.</&></p>
+
+<p><&|/l_unsafe, '<strong>cf.Name:value</strong>' &>CFs may be searched using a similar syntax as above with [_1].</&></p>
+
+</form>
+
+% $m->callback( %ARGS, CallbackName => 'PostForm' );
+
+</div>
+% }
+
+<%INIT>
+my $title = loc("Search for tickets");
+my $class;
+if ( eval { require RT::Search::Simple; 1 } ) {
+    $class = "RT::Search::Simple";
+} else {
+    require RT::Search::Googleish;
+    $class = "RT::Search::Googleish";
+}
+
+if ($q && !$Query) {
+    my $tickets = RT::Tickets->new( $session{'CurrentUser'} );
+    $m->callback( %ARGS, query => \$q, CallbackName => 'ModifyQuery' );
+
+    if ($q =~ /^#?(\d+)$/) {
+        RT::Interface::Web::Redirect(RT->Config->Get('WebURL')."/SelfService/Display.html?id=".$1);
+    }
+
+    my %args = (
+        Argument   => $q,
+        TicketsObj => $tickets,
+    );
+
+    $m->callback( %ARGS, CallbackName => 'SearchArgs', args => \%args);
+
+    my $search = $class->new(%args);
+
+    my $id = $session{'CurrentUser'}->id;
+    $Query = join ' AND ', $search->QueryToSQL(), "( Watcher.id = $id )";
+}
+</%INIT>
+
+<%ARGS>
+$q => undef
+$Query => undef
+$Format => RT->Config->Get('DefaultSelfServiceSearchResultFormat');
+$Rows => 50
+$BaseURL => RT->Config->Get('WebPath')."/SelfService/SimpleSearch.html?"
+$Page => 1
+@Order => ('ASC')
+@OrderBy => ('Created')
+</%ARGS>

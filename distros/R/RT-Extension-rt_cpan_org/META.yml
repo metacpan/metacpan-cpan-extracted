@@ -1,0 +1,20 @@
+--- 
+abstract: The customizations that turn a RT into a RT for rt.cpan.org
+author: 
+  - Thomas Sibley <trs@bestpractical.com>
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: GPL version 2
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: RT-Extension-rt_cpan_org
+no_index: 
+  directory: 
+    - html
+    - inc
+    - t
+requires: 
+  Hook::LexWrap: 0
+  perl: 5.8.3
+version: 0.02

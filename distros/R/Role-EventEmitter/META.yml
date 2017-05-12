@@ -1,0 +1,38 @@
+---
+abstract: 'Event emitter role'
+author:
+  - 'Dan Book <dbook@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Role-EventEmitter
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Role::EventEmitter:
+    file: lib/Role/EventEmitter.pm
+    version: '0.002'
+requires:
+  Role::Tiny: '2.000001'
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/Grinnz/Role-EventEmitter/issues
+  homepage: https://github.com/Grinnz/Role-EventEmitter
+  repository: https://github.com/Grinnz/Role-EventEmitter.git
+version: '0.002'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'

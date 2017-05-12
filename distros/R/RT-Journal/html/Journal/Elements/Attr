@@ -1,0 +1,11 @@
+<%args>
+$Name => undef
+$User => undef
+</%args>
+<%init>
+my @attr = $User->Attributes->Named('RT::Journal-'.$Name);
+if( UNIVERSAL::can($attr[0], 'Content')){
+	$m->out($attr[0]->Content);
+}
+return();
+</%init>

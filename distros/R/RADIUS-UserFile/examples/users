@@ -1,0 +1,42 @@
+# First line
+banner     Password = "ascend"
+           Reply-Message = "Cartman's Cheesy Poof Company",
+           User-Service = Dialout-Framed-User
+
+#blah blah blah
+#even more blah blah blah
+
+# Pre-joeuser comment
+# joeuser comment line 2
+joeuser    Ascend-Assign-IP-Pool = 1
+           Ascend-Data-Filter = "line 1",
+           Ascend-Data-Filter = "line 2",
+           Ascend-Data-Filter = "line 3",
+           Ascend-Data-Filter = "line 4",
+           Ascend-Idle-Limit = 3600,
+           Ascend-Preempt-Limit = 3600,
+           Framed-Protocol = PPP,
+           Framed-Routing = None,
+           Password = "UNIX",
+           User-Service = Framed-User
+
+chumpsize  Ascend-Assign-IP-Pool = 2
+           Ascend-Idle-Limit = 3600,
+           Ascend-Preempt-Limit = 3600,
+           Framed-Protocol = PPP,
+           Framed-Routing = None,
+           Password = "Unix",
+           User-Service = Framed-User
+
+# Pre-gandalf comment
+gandalf    Ascend-Assign-IP-Pool = 3
+           Ascend-Idle-Limit = 3600,
+           Ascend-Preempt-Limit = 3600,
+           Framed-Protocol = PPP,
+           Framed-Routing = None,
+           Password = "eunuchs",
+           User-Service = Framed-User
+# Post-gandalf comment
+
+# Second to last line
+

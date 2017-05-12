@@ -1,0 +1,41 @@
+RPM/Make/Simple version 0.01
+============================
+
+RPM (RedHat Package Manager) is a way of rolling out files (such as binaries,
+data etc.) in a nice, easily installable package.
+
+RPM::Make::Simple is (hopefully) designed to provide a nice interface to the
+RPM::Make Perl module for building these RPM's.
+
+I'd recommend reading about RPM's, spec files and whatnot first, otherwise
+the "Simple" bit will seem rather ironic. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   RPM::Make
+
+Although most features will work with RPM::Make version 0.8, it is recommended
+that you use 0.9 as bits and pieces (such as post installation scripts) will
+not work. This can be found here:
+    http://search.cpan.org/~steveha/RPM-Tools-0.9/
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 Stephen Hardisty <moowahaha@hotmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

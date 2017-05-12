@@ -1,0 +1,47 @@
+=head1 NAME
+
+Reaction::Manual - The Index of The Manual
+
+=head1 DESCRIPTON
+
+Reaction is basically an extended MVC framework built upon L<Catalyst>.
+
+=head1 SECTIONS
+
+=head2 L<Reaction::Manual::Intro>
+
+=head2 L<Reaction::Manual::Example>
+
+=head2 L<Reaction::Manual::Cookbook>
+
+=head2 L<Reaction::Manual::Internals>
+
+=head2 L<Reaction::Manual::FAQ>
+
+=head1 SEE ALSO
+
+=over 
+
+=item * L<Catalyst::Manual>
+
+=item * L<DBIx::Class::Manual>
+
+=item * L<Moose>
+
+=item * L<Template::Toolkit>
+
+=back
+
+=head1 SUPPORT
+
+IRC: Join #reaction on irc.perl.org
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

@@ -1,0 +1,31 @@
+=for layout widget
+
+[% header %]
+[% body   %]
+[% footer %]
+
+=for layout header
+
+[% header_row %]
+
+=for layout header_row
+
+[% header_cells %]
+
+=for layout header_cell
+
+[% header_cell_contents %]
+
+=for layout header_cell_contents
+
+[% label %]
+
+=for layout header_action_cell
+
+Actions
+
+=for layout body
+
+[% members %]
+
+=cut

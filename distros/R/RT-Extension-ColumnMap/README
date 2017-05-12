@@ -1,0 +1,13 @@
+NAME
+    RT::Extension::ColumnMap - bring ColumnMap to libraries
+
+DESCRIPTION
+    This extension provides API to turn ColumnMap like strings into values.
+    It can be used in other extensions and/or local customizations.
+
+LICENSE
+    Under the same terms as perl itself.
+
+AUTHOR
+    Ruslan Zakirov <Ruslan.Zakirov@gmail.com>
+

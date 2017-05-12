@@ -1,0 +1,22 @@
+RPC::ExtDirect::Client::Async
+=============================
+
+    This module implements a fully asynchronous Ext.Direct client based on
+    AnyEvent::HTTP. It can be used with any event loop supported by
+    AnyEvent.
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make && make test
+        make install
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2013-2016 Alex Tokarev <tokarev@cpan.org>.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

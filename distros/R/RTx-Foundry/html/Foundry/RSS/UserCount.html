@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<rdf:RDF
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns="http://my.netscape.com/rdf/simple/0.9/">
+
+<channel>
+<title><% $RT::rtname %> - User Count</title>
+<link><% $RT::WebBaseURL %></link>
+<description><% $RT::Organization %></description>
+</channel>
+<item>
+<title><% $UserCount %></title>
+<link></link>
+</item>
+</rdf:RDF>
+% $m->abort;
+<%INIT>
+$r->content_type('text/xml');
+
+my $Users = RT::Users->new($RT::SystemUser);
+$Users->LimitToPrivileged;
+$Users->LimitToEnabled;
+my $UserCount = $Users->Count;
+</%INIT>

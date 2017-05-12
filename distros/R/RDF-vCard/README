@@ -1,0 +1,63 @@
+NAME
+    RDF::vCard - convert between RDF and vCard
+
+SYNOPSIS
+     use RDF::vCard;
+     use RDF::TrineShortcuts qw(rdf_string);
+ 
+     my $input    = "http://example.com/contact-data.rdf";
+     my $exporter = RDF::vCard::Exporter->new;
+ 
+     my $data     = join '', $exporter->export_cards($input);
+     print $data; # vCard 3.0 data
+ 
+     my $importer = RDF::vCard::Importer->new;
+     $importer->import_string($data);
+     print rdf_string($importer->model => 'RDFXML');
+
+DESCRIPTION
+    This module doesn't do anything itself; it just loads RDF::vCard::Exporter
+    and RDF::vCard::Importer for you.
+
+  RDF::vCard::Exporter
+    RDF::vCard::Exporter takes some RDF using the W3C's vCard vocabulary, and
+    outputs RDF::vCard::Entity objects.
+
+  RDF::vCard::Importer
+    RDF::vCard::Importer does the reverse.
+
+  RDF::vCard::Entity
+    An RDF::vCard::Entity objects is an individual vCard. It overloads
+    stringification, so just treat it like a string.
+
+  RDF::vCard::Entity::WithXmlSupport
+    RDF::vCard::Entity::WithXmlSupport is a subclass of RDF::vCard::Entity,
+    with a `to_xml` method. It requires XML::LibXML to be installed and
+    working. The importer and exporter will try to create these if possible.
+
+  RDF::vCard::Line
+    RDF::vCard::Line is internal fu that you probably don't want to touch.
+
+BUGS
+    If your RDF asserts that Alice is Bob's AGENT and Bob is Alice's AGENT,
+    then RDF::vCard::Export will eat your face. Don't do it.
+
+    Please report any other bugs to
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=RDF-vCard>.
+
+SEE ALSO
+    <http://www.w3.org/Submission/vcard-rdf/>.
+
+    <http://perlrdf.org/>.
+
+    RDF::vCard::Babelfish.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2011 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

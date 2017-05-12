@@ -1,0 +1,21 @@
+# the install script will use this to add the action and scrip to RT's database
+
+@ScripActions= ( 
+    {
+        Name => 'Add Queue AdminCcs to Ticket',
+        Description => "adds the queue's AdminCcs as ticket AdminCcs",
+        ExecModule => 'AddQueueAdminCcs',
+    }
+);
+
+@Scrips= ( 
+    {
+        Description => "On queue change, add the old queue's AdminCcs as ticket AdminCcs",
+        Queue => 0,
+        ScripCondition => 'On Queue Change',
+        ScripAction => 'Add Queue AdminCcs to Ticket',
+        Template => 'Blank',
+    }
+);
+
+1;

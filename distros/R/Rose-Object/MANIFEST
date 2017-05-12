@@ -1,0 +1,21 @@
+Changes
+lib/Rose/Class.pm
+lib/Rose/Class/MakeMethods/Generic.pm
+lib/Rose/Class/MakeMethods/Set.pm
+lib/Rose/Object.pm
+lib/Rose/Object/MakeMethods.pm
+lib/Rose/Object/MakeMethods/DateTime.pm
+lib/Rose/Object/MakeMethods/Generic.pm
+lib/Rose/Object/MixIn.pm
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/lib/Person1.pm
+t/lib/Person2.pm
+t/makemethods.t
+t/makemethods-xs.t
+t/pod.t
+t/redefine.t
+xt/debugger.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

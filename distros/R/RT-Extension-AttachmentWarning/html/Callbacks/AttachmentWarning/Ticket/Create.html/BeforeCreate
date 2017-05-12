@@ -1,0 +1,9 @@
+<%init>
+if ( $m->notes('attachment_warning') ) {
+    $$skip_create = 1 unless $$skip_create;
+}
+</%init>
+
+<%args>
+$skip_create
+</%args>

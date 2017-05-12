@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel;
+use Ravenel::Document;
+
+my $obj = new Ravenel( { 
+	'docroot' => $FindBin::Bin,
+	'debug'   => $ARGV[0],
+	'debug2'  => $ARGV[1],
+	'dynamic' => 0,
+} );
+
+my Ravenel::Document $doc = $obj->add_document( {
+	'data'         => qq(
+	<r:Moo:ret depth="2">
+		1
+        	<r:Moo:ret depth="1">
+			2
+			<r:Moo:ret depth="0">
+				3
+			</r:Moo:ret>
+        	</r:Moo:ret>
+	</r:Moo:ret>
+	), 
+
+	'prefix'       => 'r:',
+	'content_type' => 'html',
+	'arguments'    => {
+		'moo' => 'bar',
+	},
+	'name' => 'test',
+	#'path' => '/foo.html',
+} );
+
+my $res = $doc->parse();
+
+#print $res . "\n";
+
+eval $res;
+print $@ if ( $@ );
+print test->get_html_content() . "\n";
+

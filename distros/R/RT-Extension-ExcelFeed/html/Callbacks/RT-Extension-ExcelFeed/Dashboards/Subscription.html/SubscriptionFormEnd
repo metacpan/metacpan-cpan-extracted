@@ -1,0 +1,11 @@
+<tr><td class="label">
+<&|/l&>Microsoft Excel Attachment</&>:
+</td><td class="value">
+<input type="checkbox" id="MSExcel" name="MSExcel" value="selected" <% $FieldsRef->{'MSExcel'} eq 'selected' ? 'checked="checked"' : "" |n %>></input>
+<label for="MSExcel"><&|/l&>Send reports as attached Microsoft Excel (.xlsx) files</&></label>
+</td></tr>
+<%ARGS>
+$FieldsRef
+$SubscriptionObj
+$DashboardObj
+</%ARGS>

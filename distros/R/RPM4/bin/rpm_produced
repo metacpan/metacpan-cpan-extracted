@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+
+##- Nanar <nanardon@zarb.org>
+##-
+##- This program is free software; you can redistribute it and/or modify
+##- it under the terms of the GNU General Public License as published by
+##- the Free Software Foundation; either version 2, or (at your option)
+##- any later version.
+##-
+##- This program is distributed in the hope that it will be useful,
+##- but WITHOUT ANY WARRANTY; without even the implied warranty of
+##- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##- GNU General Public License for more details.
+##-
+##- You should have received a copy of the GNU General Public License
+##- along with this program; if not, write to the Free Software
+##- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+
+use strict;
+use warnings;
+use RPM4;
+use Getopt::Long;
+
+my ($showsrc, $tmp, @macros) = (1, $ENV{TMP} || '/tmp');
+
+GetOptions(
+    'define=s' => \@macros,
+    'src!' => \$showsrc,
+);
+
+(@ARGV) or die 
+"$0 file1 [file2 [...]] 
+Give rpms filename produce by a specfile or a src.rpm
+
+Options:
+  --define \"macro value\"   define a macro into rpm land
+  --no-src                   do not show the src.rpm
+";
+
+RPM4::addmacro("_sourcedir $tmp");
+RPM4::addmacro("_specdir $tmp");
+
+sub set_config {
+    RPM4::readconfig();
+    foreach (@macros) {
+        RPM4::addmacro($_);
+    }
+}
+
+sub specquery {
+    my ($spec) = @_;
+    $showsrc and print $spec->srcrpm ."\n";
+    foreach my $bin ($spec->binrpm) {
+        print "$bin\n";
+    }
+}
+
+foreach my $file (@ARGV) {
+    set_config();
+    $file =~ m/\.src\.rpm$/ and do {
+        if(my ($specfile) = RPM4::installsrpm($file)) {
+            if (my $spec = RPM4::specnew($specfile, undef, undef, undef, 1, 1)) {
+                specquery($spec);
+                $spec->build([qw(RMSOURCE RMSPEC)]);
+            }
+        }
+        next;
+    };
+    $file =~ m/\.spec$/ and do {
+        if (my $spec = RPM4::specnew($file, undef, undef, undef, 1, 1)) {
+            specquery($spec);
+        }
+        next;
+    }
+}

@@ -1,0 +1,203 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<file:///home/kjetil/dev/RDF-Generator-Void/meta/project.ttl>
+	dc:creator           <http://www.kjetil.kjernsmo.net/foaf#me>;
+	dc:subject           <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/project>;
+	dc:title             "DOAP for RDF-Generator-Void"@en.
+
+<http://data.semanticweb.org/person/tope-omitola>
+	a                    foaf:Person;
+	foaf:name            "Tope Omitola"@en.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/project>
+	a                    doap:Project;
+	cpan-uri:x_IRC       <irc://irc.perl.org/#perlrdf>;
+	doap-deps:runtime-recommendation [ doap-deps:on "App::perlrdf 0.004"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Moose"^^doap-deps:CpanId ], [ doap-deps:on "aliased"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine"^^doap-deps:CpanId ], [ doap-deps:on "URI"^^doap-deps:CpanId ], [ doap-deps:on "Data::UUID"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "App::Cmd::Tester"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.88"^^doap-deps:CpanId ], [ doap-deps:on "Test::RDF 1.10"^^doap-deps:CpanId ], [ doap-deps:on "FindBin"^^doap-deps:CpanId ], [ doap-deps:on "File::Temp"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/RDF-Generator-Void/issues>;
+	doap:created         "2012-06-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kba>, <http://tobyinkster.co.uk/#i>;
+	doap:helper          <http://data.semanticweb.org/person/tope-omitola>;
+	doap:homepage        <https://metacpan.org/module/RDF::Generator::Void>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://www.kjetil.kjernsmo.net/foaf#me>;
+	doap:name            "RDF-Generator-Void";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-12>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-13>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-14>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-16>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0_02>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0_04>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0_06>, <http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0_10>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/RDF-Generator-Void/>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-Generator-Void&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "Generate voiD descriptions based on data in an RDF model."@en;
+	owl:sameAs           <http://packages.qa.debian.org/librdf-generator-void-perl#upstream>;
+	rdfs:seeAlso         <http://packages.qa.debian.org/libr/librdf-generator-void-perl.ttl>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-12>
+	a                    doap:Version;
+	rdfs:label           "Some provenance and command line tool."@en;
+	dc:issued            "2013-07-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Author tests changes."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Command-line usage through perlrdf."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Use provenance ontology to assert that this module generated the description."@en;
+		];
+	];
+	doap:revision        "0.12"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-13>
+	a                    doap:Version;
+	rdfs:label           "Test bugfix."@en;
+	dc:issued            "2013-08-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Missing EXLOCK caused problems with SQLite on some platforms (again...)."@en;
+		];
+	];
+	doap:revision        "0.13"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-14>
+	a                    doap:Version;
+	rdfs:label           "Migrate to Dist::Inkt."@en;
+	dc:issued            "2016-02-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Migrate to Dist::Inkt, fixes install problems caused by bundled Scalar::Util."@en;
+		];
+	];
+	doap:revision        "0.14"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0-16>
+	a                    doap:Version;
+	rdfs:label           "Minor fixes."@en;
+	dc:issued            "2016-02-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix tests when App::Cmd::Tester is not installed."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Wrong link in TODO list"@en;
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/manwar>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Exclude README.pod from CPAN dist"@en;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/jonass>;
+		];
+	];
+	doap:revision        "0.16"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0_02>
+	a                    doap:Version;
+	rdfs:label           "Initial release."@en;
+	dc:issued            "2012-06-20"^^xsd:date;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0_04>
+	a                    doap:Version;
+	rdfs:label           "Read static file."@en;
+	dc:issued            "2012-06-30"^^xsd:date;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0_06>
+	a                    doap:Version;
+	rdfs:label           "More statistics."@en;
+	dc:issued            "2012-08-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add class and property partitioning data."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Large test dataset."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "More tests (for partitioning in particular)."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add detail level method."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Some cosmetic fixes."@en;
+		];
+	];
+	doap:revision        "0.06"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-Generator-Void/v_0_10>
+	a                    doap:Version;
+	rdfs:label           "Big refactoring."@en;
+	dc:issued            "2012-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Make sure it works on old Perls"@en;
+			doap-changeset:blame <http://tobyinkster.co.uk/#i>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use a trait to fix awful verbosity in attribute names."@en;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/kba>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add object and subject counts on property partitions"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add more tests, especially for different levels."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "RDF-based packaging."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Make most attributes private."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add funny disclaimer."@en;
+		];
+	];
+	doap:revision        "0.10"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/jonass>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:dr@jones.dk>;
+	foaf:name            "Jonas Smedegaard".
+
+<http://purl.org/NET/cpan-uri/person/kba>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kba@cpan.org>;
+	foaf:name            "Konstantin Baierer".
+
+<http://purl.org/NET/cpan-uri/person/manwar>
+	a                    foaf:Person;
+	foaf:name            "Mohammad S Anwar";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-Generator-Void&serialization=PROV-O#user-Mohammad-S-Anwar>.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:name            "Toby Inkster";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-Generator-Void&serialization=PROV-O#user-Toby-Inkster>.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-Generator-Void&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
+

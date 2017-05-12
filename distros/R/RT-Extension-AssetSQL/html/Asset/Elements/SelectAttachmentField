@@ -1,0 +1,7 @@
+<select name="<%$Name%>">
+<option value="Name"><&|/l&>Name</&></option>
+<option value="Description"><&|/l&>Description</&></option>
+</select>
+<%ARGS>
+$Name => 'AttachmentField'
+</%ARGS>

@@ -1,0 +1,44 @@
+NAME
+    Regexp::Common::Chess - regexp for algebraic notation in chess
+
+SYNOPSIS
+     use Regexp::Common qw/Chess/;
+
+     my $move = 'Rxh7+';
+     if($move =~ /^$RE{Chess}{SAN}$/) {
+             say "Yay! A valid chess move!";
+     } else {
+             say "Sad to say, that doesn't look valid...";
+     }
+
+DESCRIPTION
+    This module defines a regular expression for use when parsing standard
+    algebaric notation (SAN) as specified in the Portable Game Notation
+    (PGN) standard (export format). It is not a complete PGN regexp. It is
+    limited to only match one specific move at a time.
+
+SEE ALSO
+    The PGN format, including its SAN specification, is documented in the
+    "Portable Game Notation Specification and Implementation Guide",
+    available here:
+
+    *   <http://www.chessclub.com/help/PGN-spec>
+
+    The Regexp::Common manual documents the use of the Regexp::Common
+    framework and interface, used by Regexp::Common::Chess.
+
+AVAILABILITY
+    The latest released code of this module is available from CPAN.
+
+    The latest development, useful for contributing and for those living on
+    the edge etc. is available from Github:
+
+    *   <https://github.com/olof/Regexp-Common-Chess>
+
+COPYRIGHT
+     Copyright (c) 2011 - Olof Johansson <olof@cpan.org>
+     All rights reserved.
+
+     This program is free software; you can redistribute it 
+     and/or modify it under the same terms as Perl itself.
+

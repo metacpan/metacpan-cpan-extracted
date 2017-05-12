@@ -1,0 +1,58 @@
+{
+   "abstract" : "Tie::Handle interface for Redis queues",
+   "author" : [
+      "Traian Nedelea <tron at cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-Handle",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::Redis" : "0.23",
+            "Carp" : "1.20",
+            "Redis" : "1.904",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tron1point0/redis-handle/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Redis-Handle",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tron1point0/redis-handle.git",
+         "web" : "https://github.com/tron1point0/redis-handle"
+      }
+   },
+   "version" : "0.2.0"
+}
+

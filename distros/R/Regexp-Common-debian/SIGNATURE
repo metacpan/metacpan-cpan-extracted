@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 44ad96f52d3b04e02bcd20c331f55d23ceed8b12 Build.PL
+SHA1 13bd4e55d6517aa87575eabc84f1ee7a788f7492 Changes
+SHA1 7e5fc631937f44ff5a3b47a91563517716962e70 MANIFEST
+SHA1 918f3b3a19b44f4e106c1908939e5def1d57dfb4 META.json
+SHA1 78723148a6aebc05b0df49c283e992c23f016d31 META.yml
+SHA1 e98fda80bda7310a8ddfb7d964bb17fcc16675f0 README
+SHA1 8c17a91b547e855aaad96251a8edfdffca3fbc26 lib/Regexp/Common/debian.pm
+SHA1 b13c46d7d596ac66265fc4a997c0600f9f67745d t/TestSuite.pm
+SHA1 271e6b00d0f3f2b5a5c04f817377c20ec6e1e6bf t/architecture.t
+SHA1 6158d4a71041a59bdd33290f6f020ea1a3fcce77 t/architecture.yaml
+SHA1 b05bb566c03b2e1586599fa0a4dec8ee007bb407 t/archive.misc.t
+SHA1 4e46a629c05a375fd795fdca8fc234b54eb25cb6 t/archive.misc.yaml
+SHA1 83d1504d0eec5104c22b2d806d09abf2977801c2 t/archive.source.t
+SHA1 dda64cbd8539c4c4a61e58e247788fc9e9dca2bb t/archive.source.yaml
+SHA1 31afb52fb24d3fc1cff1431afb2148cbc324123b t/changelog.t
+SHA1 e2d57e266d0d00dcd340c82f34f022efa3cc9e1f t/changelog.yaml
+SHA1 0cd00a1cebece470ee99cb537054b4dd2e422d7d t/package.t
+SHA1 e5c907cf8cae5b556b9b622ac32ddc5f88e11be7 t/package.yaml
+SHA1 9f49c0ceb79f024ffb22782cff017c283672a11c t/preferences.t
+SHA1 c2962f9e6ab01694146abe94feebf9df706b151b t/preferences.yaml
+SHA1 cb7d1c197867337aea993ac9541c6f0d57a78edf t/sourceslist.t
+SHA1 e871716664be6ed11e4f37fab3875475692b24c9 t/sourceslist.yaml
+SHA1 c592f4c786160a98195fef40a5aea755c3e26336 t/version.t
+SHA1 b2552240961a936c118e94f872d316db82d7fbc1 t/version.yaml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iD8DBQFTuFvt1qsM9O+FbKQRAiP9AJ4+T8uR4IYtdmVbEu1x9VlC3yqEQwCfSjvv
+2A3vTd6aYWyDKsJnHusu8eg=
+=NS36
+-----END PGP SIGNATURE-----

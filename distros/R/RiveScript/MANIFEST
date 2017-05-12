@@ -1,0 +1,31 @@
+bin/rivescript
+Changes
+CONTRIBUTING.md
+docs/bin-rivescript.html
+docs/JavaScript.html
+docs/JavaScript.pod
+docs/RiveScript-WD.html
+docs/rivescript.css
+docs/RiveScript.html
+docs/Tutorial.html
+docs/Tutorial.pod
+INSTALL.md
+lib/RiveScript.pm
+lib/RiveScript/demo/admin.rive
+lib/RiveScript/demo/begin.rive
+lib/RiveScript/demo/clients.rive
+lib/RiveScript/demo/eliza.rive
+lib/RiveScript/demo/myself.rive
+lib/RiveScript/demo/perl.rive
+lib/RiveScript/demo/rpg.rive
+lib/RiveScript/WD.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+perl-RiveScript.spec.tt
+README.md
+rpmbuild
+t/RiveScript.t
+testsuite.rive
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,63 @@
+%# Never call a man a fool; borrow from him.
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%"><tr valign="top"><td width="50%">
+
+<table border="0" cellspacing="1" cellpadding="2" width="100%">
+<tr><td colspan="2" class="tableTitle"><&|/l&>Personal Info</&></td></tr>
+<tr><td class="tableTitle"><nobr><&|/l&>User Id</&></nobr></td>
+    <td bgcolor="white"><% $UserObj->Id %></td></tr>
+<tr><td class="tableTitle"><nobr><&|/l&>Login Name</&></nobr></td>
+    <td bgcolor="white"><% $UserObj->Name %></td></tr>
+% if ($UserObj->IsPublic('RealName')) {
+<tr><td class="tableTitle"><nobr><&|/l&>Real Name</&></nobr></td>
+    <td bgcolor="white"><% $UserObj->RealName %></td></tr>
+% }
+% if ($UserObj->IsPublic('PersonalHomepage')) {
+<tr><td class="tableTitle"><nobr><&|/l&>Personal Homepage</&></nobr></td>
+    <td bgcolor="white"><% $UserObj->OriginObj->CustomFieldValue('PersonalHomepage') %></td></tr>
+% }
+% if ($UserObj->IsPublic('Email')) {
+<tr><td class="tableTitle"><nobr><&|/l&>Email</&></nobr></td>
+% my $Email = $UserObj->EmailAddress;
+% $Email =~ s{\@}{ at };
+    <td bgcolor="white"><% $Email %></td></tr>
+% }
+<tr><td class="tableTitle"><nobr><&|/l&>Member Since</&></nobr></td>
+    <td bgcolor="white"><% eval { $UserObj->OriginObj->CreatedObj->ISO } %></td></tr>
+% if ($UserObj->IsPublic('Intro')) {
+<tr><td class="tableTitle"><nobr><&|/l&>About Me</&></nobr></td>
+    <td bgcolor="white"><% $UserObj->OriginObj->Transactions->First->Content %></td></tr>
+% }
+</table>
+
+</td><td width="50%">
+
+<table border="0" cellspacing="1" cellpadding="2" width="100%">
+<tr><td colspan="2" class="tableTitle"><&|/l&>Involved Projects</&></td></tr>
+<tr><td class="tableTitle"><&|/l&>Name</&></td>
+    <td class="tableTitle"><&|/l&>Role</&></td></tr>
+% while (my $queue = $Queues->Next) {
+%     my $IsAdmin = $queue->HasAdminCc($UserObj);
+%     next unless $IsAdmin or $queue->HasCc($UserObj);
+%     my $bg = 'ffffff';
+%     my $clicky = '';
+    <tr bgcolor='<% $bg %>'
+	onMouseOver="this.style.backgroundColor='#D1FAFC'" 
+        onMouseOut="this.style.backgroundColor='<% $bg %>'"
+	style="cursor:hand" 
+	onClick="MM_goToURL('self','/Foundry/Project/index.html?Queue=<% $queue->Id %>');return document.MM_returnValue"
+    > 
+<td><a href="/Foundry/Project/index.html?Queue=<% $queue->Id %>"><% $queue->Name %></a></td>
+<td><% loc($IsAdmin ? 'Admin' : 'Member') %></td></tr>
+% }
+</table>
+
+</td></tr></table>
+
+<%INIT>
+my $Queues = RT::Queues->new($session{'CurrentUser'}); 
+$Queues->LimitToEnabled;
+</%INIT>
+<%ARGS>
+$UserObj
+</%ARGS>

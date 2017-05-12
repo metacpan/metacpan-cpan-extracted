@@ -1,0 +1,628 @@
+Revision history for Perl module RT::Client::REST
+
+0.50	Fri Dec 11 2015 "Sarvesh Das" <sarveshd@opmbx.org>
+  - Added the 'disabled' attribute to RT::Client::REST::Group and
+    RT::Client::REST::Queue to match the addition in RT 4.2.2 --
+    commit 7557633. Thanks Tom.
+  - Allow a trailing forward slash in the server URI --
+    RT#97621. Thanks Marco Pessotto.
+  - Tests in 82-stringify.t are skipped with LWP::UserAgent 6.04
+    which has buggy read timeout -- commit da577af. Thanks Marco
+    Pessotto.
+  - Fixed warning `Unescaped left brace in regex is deprecated'
+    in perl 5.22 -- RT#106795. Thanks Mike Andrews.
+  - Fixed documentation for RT::Client:REST::search() in POD --
+    RT#98160.
+  - Removed MYMETA* files from distribution -- RT#108083
+
+0.49	Sat May 10 2014 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  - This module is now all covered by the Perl Artistic License:
+    GPL is gone.  This was done with permission from the original
+    author of the command-line `rt' utility, Abhijit Menon-Sen.
+  - Support custom fields that contain '#' in their name.  Patch
+    contributed by Ryan Niebur in RT#83856 -- thanks!
+  - Documented get_links() -- RT#68673.
+  - All tests now correctly run on Windows -- RT#81872.
+  - All tests now correctly run on OpenBSD -- RT#95223.
+
+0.48    Wed Apr 30 2014 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  - Fixed POD bug in 0.47 -- `logger' attribute and method of
+    RT::Client::REST was not documented and this caused POD
+    coverage test to fail.  While at it, made it a developer-only
+    test.  This way, these types of issues do not cause all
+    cpantesters to fail.
+
+0.47    Wed Apr 30 2014 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  - Support redirects on login, RT#92371.
+  - Skip failing test 83-attachments.t on OpenBSD while we investigage
+    why it fails.  Track this issue in RT#95223.
+
+0.46    Sat Apr 26 2014 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  This release only fixes several tests, there are no functional changes.
+  Dmitri Tikhonov <dtikhonov@yahoo.com>
+   - Skip some tests on Windows and with buggy LWP::UserAgent.
+  Marco Pessotto
+   - Bumped version for next release (+ fixed version number in POD)
+
+0.45
+  Marco Pessotto
+   - Fixed uploading preventing objects to be stringified (RT#88919)
+   - Added option to get undecoded attachments (RT#90112)
+   - Added test 82-stringify.t (fails with 0.44 before the RT#88919 fix)
+   - Added test 83-attachments.t to illustrate and check RT#90112
+
+0.44
+  Damien Krotkine
+   - Add URI in the prereqs
+  Dave Lambley
+   - Add support for parsing RT dates and returning a datetime object.
+     (RT#73920 + RT#76658)
+  Gregor Hermann (Debian Perl Group)
+   - Doc improvement (RT#74191)
+  Darren Duncan
+     Doc improvement for timeout (RT #78133)
+  richardgmcmahon@gmail.com
+     Doc improvement for show method (RT #78439)
+  Miquel Ruiz
+     Fix for submitting non latin-1 strings to RT
+
+0.43
+  Miquel Ruiz <mruiz@cpan.org>
+    - Added support for groups via new class RT::Client::REST::Group
+      Tests and examples also added.
+  Roman Plesll <RPLESSL@cpan.org>
+    - Fix for ticket merges (RT #62405)
+  Stuart Browne <stuart.browne@ausregistry.com.au>
+    - Accept question mark in custom field names (RT #70631)
+  T Pascal <t_pascal@zennet.com>
+    - Patch for different link types (RT #68673)
+  Jose Luis Martinez <jlmartinez@capside.com>
+    - Skip timeout tests on Windows (RT #70225, RT #35770)
+    - Fix 'priveleged' (renamed to 'privileged') method on RT::Client::REST::User
+    - Add missing disabled, nickname, lang, contactinfo and signature methods to
+      RT::Client::REST::User
+    - Clean up the API for retrieving links. Patch from T.Pascal is missing some
+      cases like links that are URLs. This feature is not documented as it's
+      considered experimental.
+    - Refactor login method to accept any type of field name (not just username
+      and password)
+
+0.42
+  False release. See 0.43
+  - support for groups via new class RT::Client::REST::Group
+  - Fix for ticket merges
+  - Accept question mark in custom field names
+
+0.41
+  Tomas Doran <bobtfish@bobtfish.net>
+ - Make version number a string to avoid length of version number changing
+   at 0.X0 releases (as this breaks distro packages)
+ - Update META.yml to the 0.4 META spec.
+ - Include repository metadata to make it easier for people to contribute
+   to the module.
+ - Change from ExtUtils::MakeMaker to Module::Install (I'm sure you can
+   generate the correct information with EU::MM, I just don't know how
+   offhand).
+ - Add Test::More as a test_requires to help distros which split it out
+   of their core perl package (RT#45150)
+
+0.40 
+  Jerrad Pierce <jpierce@cpan.org>
+  - #38710, more user attributes
+  - #39868 & #42391, Alter CF parsing to accomodate 3.8 as well as 3.6
+	This required tweaks to Forms as well as Object.
+  - #38591 & #43844, Add requestor attribute to Ticket so that autoreplies
+	are sent to users under RT3.8
+
+0.37	Fri Aug 15 2008 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  - Fri Aug 15 2008 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+    Improvement: reorganized exceptions, made
+    RT::Client::REST::Object::Exception a subclass of
+    RT::Client::REST::Exception.  What this means is that now any native
+    exception thrown by RT::Client::REST code can be caught by catching a
+    generic RT::Client::REST::Exception class.  Added tests to ticket and
+    attachment tests scripts to verify the behavior.  I have been meaning
+    to do this for a while now.
+
+    Fixed an error in RT::Client::REST::Ticket POD.  Bug 36814.
+
+0.36    Sat May 10 2008 "Damien Krotkine" <dams@cpan.org>
+  - Sat May 10 2008 "Damien Krotkine" <dams@cpan.org>
+    Bug 35692 and 35146 : added test and fix.
+
+0.35    Tue Apr 15 2008 "Damien Krotkine" <dams@cpan.org>
+  - Tue Mar 04 2008 "Damien Krotkine" <dams@cpan.org>
+    Bug 34917 : applying patch from Andreas J. Koenig.
+    remove unneeded Encode
+
+0.34    Tue Mar 04 2008 "Damien Krotkine" <dams@cpan.org>
+  - Mon, 03 Mar 2008 "Damien Krotkine" <dams@cpan.org>
+    added Encode prerequist
+
+0.33    Fri Feb 29 2008 "Damien Krotkine" <dams@cpan.org>
+  - Fri, 01 Feb 2008 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+    Fixed a typo.
+    Updated POD; no code changes.
+    s/dtikhonov@vonage.com/dtikhonov@yahoo.com/
+
+  - Tue, 29 Jan 2008 "Damien Krotkine" <dams@cpan.org>
+    Decode data from REST from the proper encoding to Perl internal.
+    Thanks to "Sébastien Aperghis-Tramoni" <sebastien@aperghis.net> 
+
+  - Fri, 25 Jan 2008 "Damien Krotkine" <dams@cpan.org>
+    Add dirty custom fields handling. Without it, cf are always submitted,
+    included void ones, which may (and does on rt.cpan.org) conflict with
+    custom fields rules on the server (e.g. a custom field value cannot be
+    empty)
+
+0.32    Sun Dec 23 2007 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  - Fixed bug 31827 -- allow to specify custom fields at creation time.
+    Method 'cf' can now take a hash reference that has a list of custom
+    fields and their values.
+
+  - Fixed bug 31828: allow to specify ticket content at creation time.
+    Methods RT::Client::REST->create and RT::Client::REST::Ticket->store
+    now take optional 'text' parameter.
+
+0.31    Fri May 25 2007 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  ! lib/RT/Client/REST.pm
+    * Fixed 'VERSION' section of POD to print the correct version.
+
+  ! lib/RT/Client/REST/Ticket.pm
+  ! lib/RT/Client/REST/User.pm
+    * Fixed SYNOPSYS in POD to reflect reality.  No code changes.
+
+  ! lib/RT/Client/REST/Queue.pm
+    * CPAN.RT #27267 - fixed POD.  No code changes.
+
+  ! Makefile.PL
+    * Added 'LICENSE' option.
+
+0.30    Sat May 19 2007 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  ! lib/RT/Client/REST.pm
+    * CPAN.RT #27201 -- if one login fails, subsequent logins should
+      fail as well.
+
+0.29    Thu May 17 2007 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  ! lib/RT/Client/REST/Object.pm
+    * Do not validate values received from the server (from_form
+      method).
+
+0.28    Fri Apr 27 2007 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+  This is a bug fix release.
+
+  ! lib/RT/Client/REST/Ticket.pm
+    * CPAN.RT #25185 -- fixed typos in attribute validation specs.
+
+  ! lib/RT/Client/REST.pm
+    * CPAN.RT #26528 -- fixed a typo in method 'get_transaction_ids'
+
+  ! examples/show_ticket.pl
+    * Added code to display all custom fields.
+
+  + t/99-kwalitee.t
+    * Kwalitee is spelled... vanity?!
+
+  ! TODO
+    * Removed a couple of old items.
+
+  Special thanks to Damien Krotkine (Dams) who found and provided
+  patches for both bugs.
+
+0.27    Tue Oct  3 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  This is a small release to fix warnings and a couple of documentation
+  errors.
+
+  ! lib/RT/Client/REST.pm
+    * Fixed SYNOPSIS (CPAN RT 21314).
+    * Upped $VERSION to 0.27.
+
+  ! lib/RT/Client/REST/Object.pm
+    * Fixed code to avoid a possible 'undefined value' warnings from
+      tests.
+    * Fixed up POD (annocpan note #989).
+
+  ! t/35-db.t
+    * Changed from 'no_plan' to plan 20 tests.
+
+  ! t/22-ticket.t
+    * Added test to verify properties of list attributes.
+
+0.26    Tue Aug 15 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST.pm
+    * Match either $res->content or $res->message for the timeout
+      message; this depends on version of HTTP::Response installed on
+      the system.  Discovered when timeout tests threw wrong exceptions
+      on an old box.
+
+  ! README
+    * Reworded some things.
+
+0.25    Wed Aug  9 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  Added support for basic HTTP authentication.
+
+  ! lib/RT/Client/REST.pm
+    * Added support for using basic HTTP authentication with the help
+      of a callback provided via method "basic_auth_cb".
+    * Use our own UA class (subclass of LWP::UserAgent).
+
+  ! t/10-core.t
+    * More tests.
+
+  + lib/RT/Client/REST/HTTPClient.pm
+    * Subclass of LWP::UserAgent to add some methods.
+
+  + examples/report-bug-to-cpan.pl
+    * Report a bug to CPAN rt.
+
+  ! examples/show_ticket.pl
+    * Removed ticket-modifying code.
+
+  ! MANIFEST
+    * Added new files.
+
+  ! TODO
+    * More stuff to do.
+
+0.24    Tue Aug  8 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST.pm
+    * Added 'timeout' attribute to the object.  If specified, overrides
+      the default used by LWP::UserAgent.
+
+  ! lib/RT/Client/REST/Exception.pm
+    * Added RT::Client::REST::RequestTimedOutException.
+
+  ! 91-pod-coverage.t
+    * RT::Client::REST now has improved POD.
+
+  ! MANIFEST
+    * Added new files.
+
+  ! TODO
+    * Added 'write user manual' item.
+
+  + t/80-timeout.t
+    * Test timeout exceptions.
+
+  + README
+    * Added README file.
+
+0.23    Fri Aug  4 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST.pm
+    * API change -- added 'login' method.
+
+  ! lib/RT/Client/REST/SearchResult.pm
+    * API change -- 'object' instead of 'retrieve'.
+
+  ! lib/RT/Client/REST/Object.pm
+    * Added support for transparency and a bunch of other goodies.
+      See POD.
+
+  ! lib/RT/Client/REST/Attachment.pm
+  ! lib/RT/Client/REST/Ticket.pm
+    * Modified to conform to changed APIs.
+
+  ! examples/*.pl
+    * Modified to adhere to new APIs.
+
+  + t/35-db.t
+    * Test auto* goodies.
+
+  + t/91-pod-coverage.t
+    * Test POD coverage.
+
+  ! t/10-core.t
+  ! t/20-object.t
+  ! t/40-search.t
+    * Updated with new tests, methods, APIs, etc.
+
+  ! MANIFEST
+    * Added new test files.
+
+0.22    Fri Aug  4 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST/Object.pm
+    * Modified behavior.  Now list attribute methods return lists,
+      not array references.
+    * Fixed the way comma-separated values are split when parsing forms.
+    * Updated POD.
+
+  ! Makefile.PL
+    * Added dependency on Test::Exception, so that automated CPAN tests
+      don't fail.
+
+  ! lib/RT/Client/REST.pm
+    * Updated POD.
+    * Upped VERSION.
+    * No code changes.
+
+  ! examples/edit_ticket.pl
+    * Modified to support setting list attributes.
+
+0.21    Thu Aug  3 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST.pm
+    * Added support for attachments.
+
+  ! lib/RT/Client/REST/Ticket.pm
+    * Updated POD.
+
+  ! lib/RT/Client/REST/Exception.pm
+    * Added exception RT::Client::REST::CannotReadAttachmentException.
+    * Jump version to 0.17 so that CPAN indexer does not bitch.
+
+  ! t/22-ticket.t
+    * Added test for RT::Client::REST::CannotReadAttachmentException.
+
+0.20    Wed Aug  2 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  Added support for queues.
+
+  ! lib/RT/Client/REST.pm
+    * Modified method "show()" to accept non-numeric IDs for objects
+      of type 'queue'.
+
+  + lib/RT/Client/REST/Queue.pm
+  + t/25-queue.t
+    * Queue support.
+
+  + examples/show_queue.pl
+  + examples/create_user.pl
+  + examples/list_tickets.pl
+    * More examples.
+
+  ! MANIFEST
+    * Added new files.
+
+0.19    Wed Aug  2 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST.pm
+    * Fixed a bug in 'create' and 'edit' -- introduced in 0.14 when
+      APIs changed.  (Note to self - need a full-blown test suite).
+
+0.18    Wed Aug  2 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST.pm
+  ! t/10-core.t
+    * Added methods 'take', 'untake', and 'steal'.
+    * If attribute 'server' is unset,
+      RT::Client::REST::RequiredAttributeUnsetException will be thrown
+      when a REST method is called.
+
+  ! lib/RT/Client/REST/Exception.pm
+    * Added exceptions:
+      * RT::Client::REST::RequiredAttributeUnsetException
+      * RT::Client::REST::AlreadyTicketOwnerException
+
+  ! lib/RT/Client/REST/Object.pm
+  ! t/20-object.t
+    * Added convenience assertions methods:
+      * _assert_rt_and_id
+      * _assert_rt
+    * Added assertions to methods 'retrieve', 'store', and 'count'.
+
+  ! lib/RT/Client/REST/Object/Exception.pm
+    * Added exceptions:
+      * RT::Client::REST::Object::NoopOperationException
+      *	RT::Client::REST::Object::RequiredAttributeUnsetException
+
+  ! lib/RT/Client/REST/Ticket.pm
+  ! t/22-ticket.t
+    * Added methods 'take', 'untake', and 'steal'
+    * Added assertions in a couple of places
+    * Fixed up POD.
+
+  + examples/take_ticket.pl
+    * Taking a ticket.
+
+  ! MANIFEST
+    * Added new example.
+
+0.17    Tue Aug  1 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  + lib/RT/Client/REST/Transaction.pm
+  + t/24-transaction.t
+    * Added transaction object.
+
+  + examples/show_transaction.pl
+  + examples/list_transactions_rt.pl
+  + examples/list_transactions.pl
+    * Some more examples.
+
+  ! lib/RT/Client/REST/Ticket.pm
+    * Added method "transactions()".
+
+  ! lib/RT/Client/REST.pm
+  ! t/10-core.t
+    * Added methods "get_transaction_ids()" and "get_transaction()"
+
+  ! lib/RT/Client/REST/Attachment.pm
+    * After retrieving values, set everything to not dirty.
+    * Fixed up POD.
+
+  ! MANIFEST
+    * Added new files.
+
+0.16    Tue Aug  1 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  Added support for user object; other minor changes.
+
+  + lib/RT/Client/REST/User.pm
+  + t/21-user.t
+    * Added user object.
+
+  + examples/show_user.pl
+  + examples/edit_user.pl
+    * Examples of the user APIs.
+
+  ! lib/RT/Client/REST.pm
+    * If method "show()" is called to retrieve an object of type "user",
+      'id' parameter does not have to be numeric.
+
+  ! lib/RT/Client/REST/Exception.pm
+    * Added RT::Client::REST::UnauthorizedActionException
+    * Method _rt_content_to_exception() now returns a ready-to-throw
+      exception with message set to massaged text from RT server.
+
+  ! MANIFEST
+    * Added new files.
+
+0.15    Tue Aug  1 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST/Ticket.pm
+    * Fixed up POD.
+
+  ! lib/RT/Client/REST.pm
+    * Upped $VERSION to 0.15 -- no code changes.
+
+0.14    Tue Aug  1 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  + lib/RT/Client/REST/Attachment.pm
+  + examples/list_attachments.pl
+  + examples/show_attachment.pl
+  + t/23-attachment.t
+    * New attachment representation.
+
+  ! lib/RT/Client/REST/Ticket.pm
+  ! t/22-ticket.t
+    * Added method "attachments()".
+
+  ! lib/RT/Client/REST/SearchResult.pm
+  ! t/40-search.t
+    * Changed APIs to be more flexible -- pass a closure to retrieve
+      objects.
+
+  ! lib/RT/Client/REST/Object.pm
+    * Modified to work correctly with new REST.pm and SearchResult.pm APIs.
+
+  ! lib/RT/Client/REST/Object/Exception.pm
+    * Added RT::Client::REST::Object::IllegalMethodException
+
+  ! examples/show_ticket.pl
+    * Catch and display exceptions.
+
+  ! lib/RT/Client/REST/Exception.pm
+    * Added several exceptions.
+    * Added POD.
+
+  ! lib/RT/Client/REST.pm
+  ! t/10-core.t
+    * Modified "show()" and "edit()" methods to only accept a single ID.
+      This is needed in order to correctly throw exceptions -- one object
+      at a time, please.
+    * Added methods "get_attachment_ids()" and "get_attachment()".
+    * Removed list of exceptions (see Exception.pm docs).
+    * Various small updates to POD.
+
+  ! MANIFEST
+    * Added the new files.
+
+0.13    Mon Jul 31 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  Added searching APIs.
+
+  ! lib/RT/Client/REST/Object.pm
+    * Added methods 'search' and 'count'.
+    * Updated POD.
+
+  + lib/RT/Client/REST/SearchResult.pm
+    * This class is an OO representation of search results.
+
+  + t/40-search.t
+    * Tests for RT/Client/REST/SearchResult.pm
+
+  + examples/search_tickets.pl
+    * Example of a search.
+
+  ! lib/RT/Client/REST.pm
+    * Added method 'search'.
+    * Modified POD to reflect latest changes.
+
+  ! t/10-core.t
+    * Added test for method 'search'.
+
+  ! lib/RT/Client/REST/Exception.pm
+    * Added RT::Client::REST::InvalidQueryException
+    * Added $VERSION
+
+  ! lib/RT/Client/REST/Object/Exception.pm
+    * Added two exceptions:
+      * RT::Client::REST::Object::InvalidSearchParametersException
+      * RT::Clite::REST::Object::InvalidAttributeException
+
+  ! TODO
+    * Search has been implemented.
+
+  ! MANIFEST
+    * Added search-related files.
+
+0.12    Tue Jul 25 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  Refactoring and improvement continues.  Still very much beta.
+
+  ! lib/RT/Client/REST/Ticket.pm
+    * Added methods 'comment' and 'correspond'.
+    * Added attribute 'last_updated'.
+    * Added POD.
+
+  ! t/22-ticket.t
+    * Added tests for new methods and attributes.
+
+  ! lib/RT/Client/REST.pm
+    * Added 'cc' and 'bcc' support to 'comment' and 'correspond' methods.
+    * Refactoring: moved forms functions and exceptions into their own files.
+    * Fixed POD (s/=end/=cut/).
+    * Throw 409 RT errors (syntax errors), since this client is not
+      interactive.
+
+  + lib/RT/Client/REST/Exception.pm
+    * Refactoring: moved forms functions and exceptions into their own files.
+    * Mapped 'does not exist' to ObjectNotFound exception.
+    * Added RT::Client::REST::UnknownCustomFieldException.
+
+  + lib/RT/Client/REST/Forms.pm
+    * Refactoring: moved forms functions and exceptions into their own files.
+
+  ! lib/RT/Client/REST/Object.pm
+    * When creating an object, update $self with the new id.
+    * Added support for fetching and updating custom fields.
+    * Added method 'cf' for custom field manipulation.
+    * Added POD.
+
+  ! t/20-object.t
+    * Added test for 'cf' method.
+
+  + t/90-pod.t
+    * Added POD tests using Test::Pod.
+
+  ! examples/edit_ticket.pl
+  ! examples/show_ticket.pl
+    * Now rtserver is $ENV{RTSERVER} by default.
+
+  + examples/create_ticket.pl
+  + examples/comment_on_ticket.pl
+  + examples/edit_custom_field.pl
+    * More examples.
+
+  ! Makefile.PL
+    * Added dependency on Params::Validate.
+
+  ! MANIFEST
+    * Updated to reflect new tests, examples, and classes.
+
+  + TODO
+    * Added TODO file.
+
+0.11    Sat Jul 22 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  ! lib/RT/Client/REST.pm 
+    * Make $VERSION a string so that 'make tardist' works as
+      expected (i.e. version 0.10 instead of 0.1).
+
+0.10    Sat Jul 22 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  Started working on new APIs; new objects and file structure.
+
+0.06    Wed Jul 12 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  * Method 'create' now returns numeric ID of the new object.
+  * RT::Interface::REST is no longer a requirement.  If it is not
+    installed, embedded copy of auxiliary methods is used.
+  * Added tests.
+
+0.05    Thu Apr 20 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  * Added RT::Client::REST::CouldNotCreateObjectException
+
+0.04    Wed Apr 19 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  * Removed old print statements
+
+0.03    Wed Apr 19 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  This is the initial release.
+
+# vim:sts=2:sw=2:et:ft=changelog:

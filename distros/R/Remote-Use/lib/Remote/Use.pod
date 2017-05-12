@@ -1,0 +1,642 @@
+=head1 NAME
+
+Remote::Use - Using modules from a remote server
+
+=head1 SYNOPSIS
+
+  $ cat -n prime3.pl
+     1  #!/usr/bin/perl -I../lib -w
+     2  # The module Math::Prime::XS isn't installed in the machine
+     3  # but will be downloaded from some remote server
+     4  use Math::Prime::XS qw{:all};
+     5
+     6  @all_primes   = primes(9);
+     7  print "@all_primes\n";
+     8
+     9  @range_primes = primes(4, 9);
+    10  print "@range_primes\n";
+
+
+  $ perl -I../lib -MRemote::Use=config,rsyncconfig prime3.pl
+
+  $ cat -n rsyncconfig
+     1  package rsyncconfig; # Configuration file
+     2
+     3  sub getarg {
+     4    my ($class, $self) = @_;
+     5
+     6    return (
+     7      host => 'orion:',
+     8      prefix => '/tmp/perl5lib/',
+     9      command => 'rsync -i -vaue ssh',
+    10      ppmdf => '/tmp/perl5lib/.orion.installed.modules',
+    11    );
+    12  }
+    13
+    14  1;
+
+=head1 INTRODUCTION
+
+When I wrote this module I didn't know of the existence of
+L<PAR::Repository::Client> and L<PAR::Repository> distributions.
+These distributions - now embedded inside the L<PAR> distribution -
+broach similar problems.
+
+Look at them first before considering using this one.
+They provide a solution more robust and cover 
+a range of problems much wider than this distribution.
+
+L<Remote::Use> focuses in the direct loading of modules already installed in some 
+remote server while L<PAR::Repository::Client> and L<PAR::Repository>
+deal with the use of remote C<PAR> repositories. 
+
+There are a few scenarios where this module can still
+be useful:
+
+=over 2
+
+=item * If your server and clients are homogeneous: same Perl version,
+very similar O.S. distributions, same external libraries installed, etc.
+and you want to avoid the extra work of repository creation and
+administration
+
+=item * If you want to use protocols like SSH, SFTP or
+others not currently supported by L<PAR::Repository::Client> and L<PAR::Repository>
+
+=item * If no binaries are involved
+
+=back
+
+
+
+
+L<Remote::Use> provides a way to run a Perl program
+when some libraries aren't availables at start time.
+The libraries will be downloaded from a specified server
+using a specified application that runs on top of some
+protocol. The clients must be binary compatibles with the 
+server if binary libraries - as is the case of the 
+module L<Math::Prime::XS> used 
+in the  L<SYNOPSIS> section example script -
+are involved.
+Typical downloaders are C<scp>, C<rsync> or C<wget> but 
+any other suitable alternative like L<lwp-mirror> or C<Curl>
+can be used. This means 
+that many different protocols can be used for the transference:
+SSH, SFTP, HTTP, HTTPS, FTP, etc. 
+
+This way, the clients download the modules their programs use 
+to some directory. Once the modules are downloaded they
+will not be downloaded again, unless the modules are removed.
+
+
+
+
+To get familiar with L<Remote::Use> start by reading 
+L<Remote::Use::Tutorial>
+
+=head1 PPMDF files
+
+A Perl Modules Descriptor File describes what Modules in the Module Server Machine
+will be published and what files must be downloaded for each of those modules. 
+It is used by L<Remote::Use> to automatically download the Perl modules
+need by a script being executed from a Perl Public Modules Server (See
+L<Remote::Use::Tutorial>).
+
+The file is a Perl list. For each published module C<Some::Module>
+there is a key which is the associated file name C<Some/Module.pm>
+and a value. The value is a hash reference that must contain at least
+two entries: one named C<dir> and another named C<file>. The second 
+contains the list of files to be downloaded when C<Some::Module>
+is used. The C<dir> entry contains the prefix path that must be 
+removed from the path of the source file names (at the server)
+to produce the target file names (at the client). 
+
+      'Some/Module.pm' => {
+        dir => '/prefix/path/',
+        files => [ '/auto/Some/Module/Module.so', 
+                   '/Some/Module.pm', 
+                   '/Some/Module.pod' ],
+        bin => [ '/some/script', /another/script' ],
+        man => [ '/some/man', /another/man' ],
+      }
+
+          
+For each module
+entry additional file families can be added 
+as illustrates the C<bin>
+entry for C<Parse::Eyapp> in the former example:
+
+  'Parse/Eyapp.pm' => { dir => '',
+    files => [ '/Parse/Eyapp.pm' ],
+    bin => [ '/bin/eyapp', '/bin/treereg' ]
+  }
+
+The following example illustrates the syntax of a PPMDF file:
+
+  pp2@nereida:~/LRemoteUse/examples$ cat /tmp/perl5lib/.orion.via.web
+  (
+  'Trivial.pm' => { dir => '', files => [
+          '/Trivial.pm' ] },
+  'Tintin/Trivial.pm' => { dir => '', files => [
+          '/Tintin/Trivial.pm' ] },
+  'Parse/Eyapp.pm' => { dir => '',
+    files => [ '/Parse/Eyapp.pm' ],
+    bin => [ '/bin/eyapp', '/bin/treereg' ]
+  },
+  'Parse/Eyapp/Lalr.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Lalr.pm' ] },
+  'Parse/Eyapp/YATW.pm' => { dir => '', files => [
+          '/Parse/Eyapp/YATW.pm' ] },
+  'Parse/Eyapp/Treeregexp.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Treeregexp.pm' ] },
+  'Parse/Eyapp/Parse.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Parse.pm' ] },
+  'Parse/Eyapp/Scope.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Scope.pm' ] },
+  'Parse/Eyapp/Options.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Options.pm' ] },
+  'Parse/Eyapp/Output.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Output.pm' ] },
+  'Parse/Eyapp/Node.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Node.pm' ] },
+  'Parse/Eyapp/Grammar.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Grammar.pm' ] },
+  'Parse/Eyapp/Driver.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Driver.pm' ] },
+  'Parse/Eyapp/Base.pm' => { dir => '', files => [
+          '/Parse/Eyapp/Base.pm' ] },
+  'Parse/Eyapp/_TreeregexpSupport.pm' => { dir => '', files => [
+          '/Parse/Eyapp/_TreeregexpSupport.pm' ] },
+  'Math/Prime/XS.pm' => { dir => '', files => [
+          '/auto/Math/Prime/XS/XS.bs',
+          '/auto/Math/Prime/XS/XS.so',
+          '/Math/Prime/XS.pm' ] },
+  );
+
+Here is another (summarized) example:
+
+  ~/LRemote-Use/script$ head -23 orion.installed.modules
+  (
+  'CPAN/Config.pm' => { dir => '/etc/perl', files => [
+	  '/etc/perl/CPAN/Config.pm' ] },
+  'Template.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/auto/Template/Stash/XS/XS.so',
+	  '/usr/local/lib/perl/5.8.8/auto/Template/Stash/XS/XS.bs',
+	  '/usr/local/lib/perl/5.8.8/Template.pm' ] },
+  'IO/Tty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.so',
+	  '/usr/local/lib/perl/5.8.8/auto/IO/Tty/Tty.bs',
+	  '/usr/local/lib/perl/5.8.8/IO/Tty.pm' ] },
+  'IO/Pty.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/IO/Pty.pm' ] },
+  'IO/Tty/Constant.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/IO/Tty/Constant.pm' ] },
+  'Math/Prime/XS.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+	  '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+	  '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' ] },
+  'Template/Stash.pm' => { dir => '/usr/local/lib/perl/5.8.8', files => [
+	  '/usr/local/lib/perl/5.8.8/auto/Template/Stash/XS/XS.so',
+	  '/usr/local/lib/perl/5.8.8/auto/Template/Stash/XS/XS.bs',
+	  '/usr/local/lib/perl/5.8.8/Template/Stash.pm' ] },
+
+
+
+
+=head1 THE CONFIGURATION PACKAGE
+
+If the C<config> option is set while using L<Remote::Use>
+as in:
+
+     use Remote::Use config => 'tutu/wgetconfigpm.pm';
+
+then the configuration will be loaded from the specified
+I<configuration package> file C<tutu/wgetconfigpm.pm>. 
+
+The I<configuration package> is a Perl package describing the connection with the 
+Perl Public Modules Server. While the PPMDF file tell us where are the files
+to transfer, the configuration package says how they will
+be transferred. The configuration package specifies, among other
+things,  where the PPMDF file is and what application
+will be used for the transference of files.
+The configuration package is C<require>d by the C<import>
+method of L<Remote::Use>. See an example:
+
+  pp2@nereida:~/LRemoteUse/examples$ cat -n tutu/wgetconfigpm.pm
+     1  package tutu::wgetconfigpm;
+     2  use strict;
+     3  use warnings;
+     4
+     5  sub getarg {
+     6    return (
+     7      command => 'wget -o /tmp/wget.log',
+     8      commandoptions => '-O',
+     9      host => 'http://orion.pcg.ull.es/~casiano/cpan',
+    10      prefix => '/tmp/perl5lib/',
+    11      ppmdf => '/tmp/perl5lib/.orion.via.web',
+    12    );
+    13  }
+    14
+    15  1;
+
+
+=head2 The C<getarg> method
+
+
+The configuration file must have a subroutine named C<getarg>.
+Such subroutine sets the attributes of the L<Remote::Use>
+object that lead the behavior
+of L<Remote::Use> during downloading. It receives as arguments
+the configuration package identifier and a reference to 
+the L<Remote::Use> object. Let us describe each of
+the attributes returned by C<getarg>:
+
+=over 2
+
+=item * The C<command> argument of C<getarg> specifies the driver command 
+(executable) that will be used to download the files.
+
+              command => 'rsync -i -vaue ssh'
+
+In this example we use C<rsync>. See C<rsync> man pages for more
+information. The C<-e ssh> option tells C<rsync> to use C<SSH>
+to connect to the remote machine. The C<-v> option increases the level 
+of verbosity. The C<-u> option makes C<rsync> to skip 
+files that are newer on the receiver.
+The C<-a> option says you want recursion and want to preserve
+most of the attributes of the source file.
+
+
+=item * The C<host> argument describes the I<host descriptor>
+in terms of the application used 
+to connect. 
+
+L<Remote::Use> calls the specified C<command> (in this case C<rsync -i -vaue ssh>)
+to download by asking the operating system to execute
+a line that can be decomposed in the following components:
+
+ "$command $host$sourcefile $commandoptions $targetfile"
+
+Where C<$sourcefile> is the file being downloaded and C<$targetfile>
+is the name 
+of the file in the target machine. 
+The C<$targetfile> name is deduced from the source file name and the hints given by the user
+in the configuration package.
+Usually the C<$command> 
+part includes the options, as in the example
+
+              command => 'rsync -i -vaue ssh'
+
+but if more options are needed
+after the C<"$host$sourcefile"> prefix they can be specified using the 
+C<commandoptions> argument.
+See  the  configuration package  C<wgetconfig>
+inside the section L<Remote::Use::Tutorial/A CONFIGURATION FILE FOR wget> for an example.
+
+For C<rsync> connections the C<host> attribute must be the name of the 
+SSH connection followed by a colon:
+
+                         host => 'orion:'
+
+This is because, to download using C<rsync> a file like
+
+  /usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so
+
+placed at the remote server (C<orion>) we use a command like:
+
+  rsync -aue ssh orion:/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so XS.so
+
+The C<"$host$sourcefile"> argument of
+the full command line can be divided into two
+parts: the host descriptor that includes the colon separator C<orion:>
+and the file descriptor C</usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so>.
+
+I usually set the multiple parameters of a connection in the C<~/.ssh/config>
+file that governs the C<SSH> connection. As an example here
+is the paragraph in C<~/.ssh/config> that refers to the
+connection named C<'orion'>:
+
+
+  Host orion orion.pcg.ull.es orion.deioc.ull.es chum
+  user casiano
+  # The real name of the machine
+  Hostname orion.pcg.ull.es
+  ForwardX11 yes
+
+This way I don't have to write the user name and the full 
+name of the machine each time I set a SSH connection.
+
+See L<APPENDIX: AUTOMATIC AUTHENTICATION> and
+the L<SEE ALSO> sections to know more about SSH
+configuration files.
+
+=item * The C<prefix> argument describes the path
+in the client machine where modules will be stored.
+The downloaded modules will be stored below this path.
+Thus, the setting:
+
+           prefix => '/tmp/perl5lib/'
+
+stores the C<files> for module C<Math::Prime::XS>
+
+  'Math/Prime/XS.pm' => { 
+     dir => '/usr/local/lib/perl/5.8.8', 
+     files => [
+        '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so',
+        '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.bs',
+        '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/.packlist',
+        '/usr/local/lib/perl/5.8.8/Math/Prime/XS.pm' 
+     ] 
+  },
+
+
+respectively in:
+
+          '/tmp/perl5lib/files/auto/Math/Prime/XS/XS.so'
+          '/tmp/perl5lib/files/auto/Math/Prime/XS/XS.bs'
+          '/tmp/perl5lib/files/auto/Math/Prime/XS/.packlist'
+          '/tmp/perl5lib/files/Math/Prime/XS.pm' 
+
+That is: the target directory where the file will be finally stored is 
+obtained by substituting in the corresponding C<files> entry 
+the C<dir> prefix (C<'/usr/local/lib/perl/5.8.8'>) by
+the C<prefix> attribute (C<'/tmp/perl5lib/'>) followed by
+the (C<files>) word.
+Thus 
+
+  '/usr/local/lib/perl/5.8.8/auto/Math/Prime/XS/XS.so'
+
+is finally locally stored in 
+
+  '/tmp/perl5lib/files/auto/Math/Prime/XS/XS.so'
+
+Be sure you add that path specified in C<prefix>
+to the environment variable 
+C<PERL5LIB> so that any Perl scripts that don't make use of L<Remote::Use>
+can still have access to the downloaded modules.
+
+=item * The C<ppmdf> option tells L<Remote::Use>
+where is the PPMDF file:
+
+    ppmdf => '/tmp/perl5lib/.orion.installed.modules',
+
+=back
+
+
+The most important method that has to be defined inside the configuration 
+package is C<getarg>.
+
+=head2 HOOKS
+
+A PPMDF file is a Perl list. For each published module C<Some::Module>
+there is a key which is the associated file name C<Some/Module.pm>
+and a value. The value is a hash reference that must contain at least
+two entries: one named C<dir> and another named C<file>. The second 
+contains the list of files to be downloaded when C<Some::Module>
+is used. The C<dir> entry contains the prefix path that must be 
+removed from the path of the source file names (at the server)
+to produce the target file names (at the client). 
+
+      'Some/Module.pm' => {
+        dir => '/prefix/path/',
+        files => [ '/auto/Some/Module/Module.so', 
+                   '/Some/Module.pm', 
+                   '/Some/Module.pod' ],
+        bin => [ '/some/script', /another/script' ],
+        man => [ '/some/man', /another/man' ],
+      }
+
+In any entry for a module like C<Some/Module.pm> we can add couples with the syntax
+
+        tag => [ 'd1/f1', 'd2/f2', ... ]
+
+to the hash entry. The C<tag> is arbitrary and defines
+a I<family> of files related with the module. 
+
+While the C<dir> and C<files> tags are compulsory, the others are optional.
+The behavior of L<Remote::Use> for a family C<tag> like
+
+        tag => [ 'd1/f1', 'd2/f2', ... ]
+
+is as follows: the family of files 
+C<'d1/f1'>, C<'d2/f2'>, etc. associated with the C<tag>
+will be by default downloaded to
+C<'prefix/tag/f1'>, C<'prefix/tag/f2'>, etc.
+Where C<prefix> is the directory specified in the C<prefix>
+option of C<getarg> inside the configuration package. 
+
+Such behavior can be modified using hooks defined in the configuration package.
+
+=head3 The hook C<pretag>
+
+If a subroutine with name C<pretag> exists in the configuration package
+it will be executed for each file specified in the C<tag> family
+just before the file is downloaded.
+The C<pretag> subroutine receives as arguments the configuration package name, 
+the full description of the file to download in the server (something like
+C<orion:/usr/local/bin/eyapp>), 
+the default name of the file in the client (i.e. something like 
+C< /tmp/perl5lib/bin/eyapp>)
+and a reference to the C<Remote::Use> object. It must return
+the definitive full name of the file in the client 
+(i.e. something like C</home/mylogin/bin/eyapp>).
+
+=head3 The hook C<posttag>
+
+If a subroutine with name C<posttag> exists in the configuration package
+it will be executed for each file specified in the C<tag> family
+just after the file was downloaded.
+The C<posttag> subroutine receives as arguments the configuration package name, 
+the name of the downloaded file and a reference to the C<Remote::Use> object.
+
+
+=head1 DIRECT SPECIFICATION OF OPTIONS
+
+An alternative to the use of a configuration package
+is to directly specify the configuration options
+in the C<use> of L<Remote::Use> as in the following
+example:
+
+  pp2@nereida:~/LRemoteUse/examples$ cat -n ut1.pl
+     1  #!/usr/bin/perl -w -I../lib/
+     2  use strict;
+     3  use Remote::Use
+     4    command => 'wget -o /tmp/wget.log',
+     5    commandoptions => '-O',
+     6    host => 'http://orion.pcg.ull.es/~casiano/cpan',
+     7    prefix => '/tmp/perl5lib/',
+     8    ppmdf => '/tmp/perl5lib/.orion.via.web',
+     9  ;
+    10  use Trivial;
+    11
+    12  Trivial::hello();
+
+The meaning of the options is at it was explained in
+section L<The getarg method>
+
+=head1 LIMITATIONS
+
+=over 2
+
+=item *
+Though not tested, more than likely, the current version
+of this module will only work in Unix-like systems.
+
+=item * If binary files are involved both platforms must be binary compatible.
+Here is an example where server and client differ in the version
+of the C<GLIBC> library:
+
+  pp2@nereida:~/LRemoteUse/examples$ reqprimetonga.pl
+  receiving file list ... done
+  >f+++++++++ XS.bs
+
+  sent 42 bytes  received 94 bytes  272.00 bytes/sec
+  total size is 0  speedup is 0.00
+  receiving file list ... done
+  >f+++++++++ XS.so
+
+  sent 42 bytes  received 50814 bytes  101712.00 bytes/sec
+  total size is 50712  speedup is 1.00
+  receiving file list ... done
+  >f+++++++++ XS.pm
+
+  sent 42 bytes  received 5733 bytes  3850.00 bytes/sec
+  total size is 5635  speedup is 0.98
+  Can't load '/tmp/perl5lib//files/auto/Math/Prime/XS/XS.so' for 
+  module Math::Prime::XS: /lib/tls/i686/cmov/libc.so.6: 
+  version `GLIBC_2.4' not found 
+  (required by /tmp/perl5lib//files/auto/Math/Prime/XS/XS.so) 
+  at /usr/lib/perl/5.8/DynaLoader.pm line 225.
+  at ./reqprimetonga.pl line 4
+  Compilation failed in require at ./reqprimetonga.pl line 4.
+  pp2@nereida:~/LRemoteUse/examples$                                 
+
+=item *
+Not only the libraries, the Perl interpreters must be binary compatible (which usually
+means they must have the same version). Here is another example in which the versions
+of Perl in the client (beowulf) and the server (orion) differ:
+
+  casiano@beowulf:/tmp/Remote-Use-0.04$ export REMOTE_USE_DEVELOPER=1
+  casiano@beowulf:/tmp/Remote-Use-0.04$ t/03reqprime.t
+  1..1
+  receiving file list ... done
+  >f+++++++++ XS.so
+
+  sent 42 bytes  received 15997 bytes  6415.60 bytes/sec
+  total size is 15899  speedup is 0.99
+  receiving file list ... done
+  >f+++++++++ XS.bs
+
+  sent 42 bytes  received 94 bytes  54.40 bytes/sec
+  total size is 0  speedup is 0.00
+  receiving file list ... done
+  >f+++++++++ XS.pm
+
+  sent 42 bytes  received 5733 bytes  2310.00 bytes/sec
+  total size is 5635  speedup is 0.98
+  /usr/bin/perl: symbol lookup error: 
+  /tmp/perl5lib//files/auto/Math/Prime/XS/XS.so: 
+   undefined symbol: Perl_Tstack_sp_ptr
+
+The version in the client is 10.0:
+
+  casiano@beowulf:/tmp/Remote-Use-0.04$ perl -v
+
+  This is perl, v5.10.0 built for i486-linux-gnu-thread-multi
+
+The version in the server is 5.8.8
+
+  casiano@beowulf:/tmp/Remote-Use-0.04$ ssh orion perl -v
+
+  This is perl, v5.8.8 built for i486-linux-gnu-thread-multi
+
+
+=back
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+Finally, thanks to Juana, Coro and my students at La Laguna.
+
+
+
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * L<Remote::Use>
+
+=item * L<Remote::Use::Tutorial>
+
+=item * L<pminstalled.pl>
+
+=item * DVI version of L<Remote::Use::Tutorial> at L<http://nereida.deioc.ull.es/~pp2/Remote_Use/Tutorial.dvi>
+
+=item * DVI version of L<Remote::Use> at L<http://nereida.deioc.ull.es/~pp2/Remote_Use/Use.dvi>
+
+=item * DVI version of L<pminstalled.pl> at L<http://nereida.deioc.ull.es/~pp2/Remote_Use/pminstalled.dvi>
+
+=item * C<rsync> man page. L<http://samba.anu.edu.au/ftp/rsync/rsync.html>
+
+=item * C<rsync> in the wikipedia L<http://en.wikipedia.org/wiki/Rsync>
+
+=item * C<rsync> tutorial at L<http://everythinglinux.org/rsync/>
+
+=item * The C<examples> directory in the accompanying distribution L<http://search.cpan.org/dist/Remote-Use/>.
+
+=item * C<wget> page at L<http://www.gnu.org/software/wget/>
+
+=item * C<wget> man page at L<http://www.gnu.org/software/wget/manual/wget.html>
+
+=item * C<wget> in the Wikipedia L<http://en.wikipedia.org/wiki/Wget>
+
+=item * C<Curl> in the Wikipedia L<http://en.wikipedia.org/wiki/CURL>
+
+=item * C<Curl> home page L<ttp://curl.haxx.se/>
+
+=item * Man pages of C<ssh>, C<ssh-key-gen>, C<ssh_config>, C<scp>, 
+C<ssh-agent>, C<ssh-add>, C<sshd>. See L<http://www.employees.org/~satch/ssh/faq/ssh-faq.html>
+
+=item * L<PAR::Repository>
+
+=item * L<PAR::Repository::Client>
+
+=item * L<CPAN::AutoINC>
+
+=item * L<Module::AutoINC>
+
+=item * L<Acme::RemoteINC>
+
+=back
+
+
+
+=head1 AUTHOR
+
+Casiano Rodriguez Leon (casiano.rodriguez.leon at gmail dot com)
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2007 Casiano Rodriguez-Leon (casiano.rodriguez.leon at gmail dot com). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+
+
+
+=cut
+

@@ -1,0 +1,69 @@
+=head1 NAME
+
+ResourcePool::Command::DBI::Select - A DBI command to exexcute select statements.
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Command::DBI::Select;
+ 
+ # simple usage
+ my $cmd = ResourcePool::Command::DBI::Select->new();
+ eval {
+ 	my $sth = $pool->execute($cmd
+ 		, 'select id, name, value from test where id > ?'
+ 		, 5
+ 	);
+ 	while ($sth->fetch()) {
+ 	}
+ 	$sth->finish(); # don't forget!!
+ };
+
+=head1 DESCRIPTION
+
+
+This command can be used to execute select statements in a DBI database using the L<ResourcePool|ResourcePool> command execution environment.
+
+In order to understand this Class, and more importantly this document, you need to know a few terms I use in this document, if you are new to this class you should read the L<TERMS|ResourcePool::Command::DBI::Execute/TERMS> sections first.
+
+Before using this class, look if one of the similar classes like SelectRow can help you. For some databases/driver it is possible that the use of this class is not safe, becaus it makes it possible to open more than one cursor with one database handle. You have also to finish the DBI statementhandle yourself.
+
+There will be more advanced specaliced Commands available to select from a database.
+
+=head2 S<ResourcePool::Command::DBI::Select-E<gt>new>
+
+Instantiates a new Select object. The parameters are (nearly) identical to those of the Execute method, the only difference is that it make no sense to specify output parameters (max_len).
+
+
+=head2 S<$pool-E<gt>execute>
+
+Similar to the same named method of the Execute() class. The only difference is that it returns a DBI sth (statement handle) which can be used to retreive the data. You have to finish this sth manually when done.
+
+
+=head1 TODO
+
+
+
+=over 4
+
+=item Documentation
+
+Year, we really need documentation.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBI|DBI>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Factory|ResourcePool::Factory>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2004 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

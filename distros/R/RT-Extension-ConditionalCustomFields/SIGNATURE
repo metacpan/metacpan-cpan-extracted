@@ -1,0 +1,89 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a46f50b5cf486b5120fb75401f635b2d8b9bb785 Changes
+SHA1 0a3224be32be8a39834f4c2d84648064fadeb559 LICENSE
+SHA1 c08d522de55971015721f69ec856347941c645a0 MANIFEST
+SHA1 6ad196f67ec85ad00ca85ce804fdbc57d99b8a8c META.yml
+SHA1 aad0407e68a1b9a322cce1e1f51a5d15a0e33645 Makefile.PL
+SHA1 a2c319d66b2a35efa366b20948ac86fdcf47b27d README
+SHA1 a841eedc01b38d2c1603fcecf7f1c6908a50935d README.md
+SHA1 b9e0464297e517ac75b6f269f5121e79a7034b4a html/Callbacks/RT-Extension-ConditionalCustomFields/Admin/CustomFields/Modify.html/BeforeEnabled
+SHA1 b8b3521c6fa97765c64f2fbfc541b3519a6caa11 html/Callbacks/RT-Extension-ConditionalCustomFields/Admin/CustomFields/Modify.html/Massage
+SHA1 4795d3f454640e7aec535c50b51331967ef620a9 html/Callbacks/RT-Extension-ConditionalCustomFields/Admin/Groups/Modify.html/AfterCustomFieldValue
+SHA1 4795d3f454640e7aec535c50b51331967ef620a9 html/Callbacks/RT-Extension-ConditionalCustomFields/Admin/Queues/Modify.html/AfterCustomFieldValue
+SHA1 4795d3f454640e7aec535c50b51331967ef620a9 html/Callbacks/RT-Extension-ConditionalCustomFields/Articles/Article/Elements/EditCustomFields/AfterCustomFieldValue
+SHA1 9af5cf974ce21ed238f791cd4051e6b82c7e221f html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/EditCustomFields/AfterCustomFieldValue
+SHA1 13d28419e0c7f49cf3a8d1e0a94c805a1d0029d2 html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/ShowCustomFields/AfterCustomFieldValue
+SHA1 6b6a9136e04f04cf37d3976c43226c1fdf5df7f0 html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/ShowRecord/AfterValue
+SHA1 335412aa3bd809ff8dddc8066fa15c519980f057 html/Elements/EditConditionalCustomFields
+SHA1 c8455a614a39d636648ae703b5729d3f7dcf9df0 html/Elements/ShowConditionalCustomFields
+SHA1 8c8ec3cc95397288e3e444a35d3c45889483862c html/Helpers/SelectCondition
+SHA1 9d3b2104a620fbaa1e5291400cb14385b205c8da inc/Module/AutoInstall.pm
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 93283b6d98078acdd04b242b3e994258821f4fe5 inc/Module/Install/AutoInstall.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 16bf1e6d5eea70e16e296fcad31e76bb6c256961 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 69b1e4a63bfd3110fe109f204ac897d17417a6c5 lib/RT/Extension/ConditionalCustomFields.pm
+SHA1 523c22fc9e32e87bf60a01d842335b64b2fccbea lib/RT/Extension/ConditionalCustomFields/Test.pm.in
+SHA1 4ae19b19eb25633ecfe53fa2e3b642cfe02dc26d patches/4.2-add-callbacksto-extend-customfields-capabilities.patch
+SHA1 8e0a55c5b346eb46fa59bf84d5343cec1e296753 patches/4.4-add-callbacks-to-extend-customfields-capabilities.patch
+SHA1 9e3a86e20c07856cea04e7019a5a781ffe359e28 xt/00-load.t
+SHA1 653774841d82113fd618eb87b0e0733d53912177 xt/admin_cfs.t
+SHA1 b34a7abff6909687d5da1fd35b3e830e3a5d817a xt/api.t
+SHA1 177fa7b59df91f079a292b35a50fec15d98761ff xt/article_display.t
+SHA1 c8e8b4a479bea76f4925152bb53f6f813db0aa87 xt/article_edit_dropdown.t
+SHA1 28006359b50c4b015e357e8b69c82d3b2accdf16 xt/article_edit_list.t
+SHA1 a0dcd33c52f73b8306e6690f887c3aee133407cc xt/article_edit_selectbox.t
+SHA1 91695c0a13edfb96cc69a350ed3c2d39af808470 xt/asset_display.t
+SHA1 8ffce0842633637efc8e2ca5aa1e83d7b11ffa61 xt/asset_modify_dropdown.t
+SHA1 f587ed3af2b84715b2c54c205a38cd5049fc4a35 xt/asset_modify_list.t
+SHA1 b51da37dc4fbf5cdd8e545eac394ba5e85628004 xt/asset_modify_selectbox.t
+SHA1 3c24f112494442dd7d92e30997e7e11b4ca3704c xt/data/firstcf
+SHA1 31a39cb03919fb11ee5fc553a695877ace8bec0e xt/data/initialdata
+SHA1 fa4152135b91b207bb06d0bbfc7a49dcf2542c8e xt/group_modify_dropdown.t
+SHA1 c3b78fda369b9e7ea2875f48618f68013ccbe90f xt/group_modify_list.t
+SHA1 af67e29b739c74280d1d90711abdb7641f863026 xt/group_modify_selectbox.t
+SHA1 f2e221ac5ac349fd1aff1999687b1abf9fbabbdc xt/initialdata.t
+SHA1 930bfd74370e434809aeae49ec81d4979b7dcc75 xt/queue_modify_dropdown.t
+SHA1 80763601ff51f66cccd2459842915c35b19c0031 xt/queue_modify_list.t
+SHA1 dd1aa4716a9979650858c28ca7cd8ff0e0281c0e xt/queue_modify_selectbox.t
+SHA1 19c82aa33770bec1dce69062e8366280579c5354 xt/ticket_display.t
+SHA1 eb89743193574afa4640abd7e097a871a0440683 xt/ticket_modify_dropdown.t
+SHA1 a803b8bcc962a7366b32f71fb652e81fa4813468 xt/ticket_modify_list.t
+SHA1 cd37d78a016a67203183f580b0c3b4e1926ade1a xt/ticket_modify_selectbox.t
+SHA1 8e46530e5d2f3e7facc57db8edf362893f69328d xt/user_modify_dropdown.t
+SHA1 1a82f196323542fad5e9b505c6213640deab3750 xt/user_modify_list.t
+SHA1 055b4089b2159cf058fe92decc259b9854fad9a0 xt/user_modify_selectbox.t
+SHA1 85114afe7c9883e6683e987266720df9b53db43b xt/user_summary.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAljeKfUACgkQ8914Z7pT+T+2xQCePunAvR2hb2DGXzpvG2NVR0fh
+0UkAn2vSS0UsoKnuvGvV+YuVwgQHtYIV
+=R9Xd
+-----END PGP SIGNATURE-----

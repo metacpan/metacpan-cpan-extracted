@@ -1,0 +1,60 @@
+---
+abstract: 'convert from RDF to iCalendar'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640'
+keywords:
+  - Directory
+  - Event
+  - RDF
+  - SemWeb
+  - 'Semantic Web'
+  - Todo
+  - hCal
+  - hCalendar
+  - iCal
+  - iCalendar
+  - vCalendar
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RDF-iCalendar
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  RDF::iCalendar:
+    file: lib/RDF/iCalendar.pm
+    version: '0.005'
+  RDF::iCalendar::Entity:
+    file: lib/RDF/iCalendar/Entity.pm
+    version: '0.005'
+  RDF::iCalendar::Exporter:
+    file: lib/RDF/iCalendar/Exporter.pm
+    version: '0.005'
+  RDF::iCalendar::Line:
+    file: lib/RDF/iCalendar/Line.pm
+    version: '0.005'
+requires:
+  DateTime: '0'
+  RDF::vCard: '0.010'
+  perl: '5.008'
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  Identifier: http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-iCalendar
+  homepage: https://metacpan.org/release/RDF-iCalendar
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-rdf-icalendar.git
+version: '0.005'

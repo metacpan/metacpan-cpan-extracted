@@ -1,0 +1,2 @@
+%# RT 4.0
+<& /Callbacks/BriefHistory/Elements/ShowHistoryPage/SkipTransaction, %ARGS &>

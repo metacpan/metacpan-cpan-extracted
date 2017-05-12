@@ -1,0 +1,10 @@
+DEBVERSION=1
+VERSION=0.08
+
+debian:
+	export DEB_BUILD_OPTIONS=nocheck
+	dh-make-perl --build --version=$(VERSION)-$(DEBVERSION) RDF-AllegroGraph-Easy-$(VERSION)
+
+inject: debian
+	scp librdf-allegrograph-easy-perl_$(VERSION)-$(DEBVERSION)_all.deb packages:packages/
+	ssh packages reprepro -b /var/www/packages/data includedeb testing packages/librdf-allegrograph-easy-perl_$(VERSION)-$(DEBVERSION)_all.deb

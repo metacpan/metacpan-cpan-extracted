@@ -1,0 +1,120 @@
+=head1 NAME
+
+VCP::Process - How vcp works
+
+=head1 DESCRIPTION
+
+L<C<vcp>|vcp> is designed to be a general purpose repository
+import/export tool.  This document describes some of the techniques used
+to keep C<vcp> general purpose.
+
+=head2 Phases of Operation
+
+C<vcp> works in several phases: 
+
+=over
+
+=item 1. Metadata Scanning
+
+Before anything else can happen, C<vcp> must take the source repository
+spec, something like C<cvs:module/dir/...> and use the appropriate
+repository interface (C<cvs log> in this case) to extract the metadata.
+
+The metadata is currently kept all in memory; if you run in to a
+repository so big that this is troublesome, do the transfer in phases or
+pester us to provide a swap file capability for this data.
+
+In the case of a RevML source, it is not practical to scan the input for
+metadata alone (the RevML may be coming from the standard input, for
+instance), so all of the files in a RevML source file are extracted
+during the scanning phase, as mentioned in L<VCP::Source::revml>.
+
+=over
+
+=item 1a. Base revisions and backfilling
+
+When sourcing from incremental RevML transfers, an additional step must
+be taken for each text file in the transfer.  An incremental RevML file
+does not usually contain the entire body of any revision of a text file;
+it only contains deltas between revisions.  This is not so for binary
+files, which are currently always shipped in their entirety, or for when
+the --bootstrap option has been provided during the extraction.
+
+C<vcp> therefore needs to be able to recreate the first revision of a
+text file in an incremental transfer when RevML is in use.  This is
+addressed by a process called "backfilling the base revision".
+
+The "base" revision of a file is the revision that immediately precedes
+the first revision being transfered.  It is also the last revision in
+the previous transfer and must be the most recent revision (on the
+appropriate branch) in the destination repository.
+
+C<vcp> "backfills" the base revision by checking it out of the
+destination repository, then reconstitutes the first revision by
+applying the (base revision => first revision) delta to the base
+revision.  Each revision in a RevML file contains an L<MD5|Digest::MD5>
+checksum to make sure that all backfilling and patching is implemented
+accurately.
+
+=item 1b. Selecting
+
+In the case of  L<VCP::Source::cvs|VCP::Source::cvs>, the initial scan
+often nets too much data, so the data scanned is winnowed down to the
+desired set (see L<VCP::Source::cvs/Files that aren't tagged> for
+details).
+
+=back
+
+=item 2. Sorting and Change Aggregation
+
+The order that the soruce repository presents revisions in is often not
+the order they need to be inserted in, so the destination driver
+(L<VCP::Dest::p4>, for example) is given the opportunity to sort the
+revisions.
+
+This is primarily used to do change number aggregation when converting from a
+repository that does not provide change set metadata (like CVS) to one that
+does (like p4).
+
+This is also important when generating RevML files because the order of
+appearance of files in a log file may hinge on exactly when the files
+were inserted along with their names, at least in the case of CVS.
+Sorting the revisions provides for consistent RevML files, which is
+important in testing situations.
+
+=item 3.  File transfer.
+
+The final stage is to do the file transfer.  When the entire source file
+is available, it is simply added to the result repository in the correct
+order.
+
+For incremental transfers an extra step is taken to ensure that
+incremental transfers leave no gaps.  The base revision is backfilled
+from the destination repository (using the process for backfilling
+described in phase 1 above) and compared to the base revision from the
+source repository.
+
+=back
+
+=head1 Command Line Tools
+
+Currently, C<vcp> shells out to command line tools like C<cvs> and
+C<p4>.  This is a "least common denominator" approach that allows VCP to
+operate at a safe distance from the underlying implementations.  It is
+also the primary bottleneck in transferring files.  We will gladly
+accept donations of drivers that use direct library interfaces or remote
+procedure call (SOAP, RMI, etc., etc.) techniques to speed this process
+up.
+
+=head1 AUTHOR
+
+Barrie Slaymaker <barries@slaysys.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000, 2001, 2002 Perforce Software, Inc.
+All rights reserved.
+
+See L<VCP::License|VCP::License> (C<vcp help license>) for the terms of use.
+
+=cut

@@ -1,0 +1,6 @@
+Revision history for Perl extension Regexp::Log::RealServer.
+
+0.01  Sat May  7 21:59:57 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn Regexp::Log::RealServer
+

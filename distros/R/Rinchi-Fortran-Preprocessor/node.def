@@ -1,0 +1,14 @@
+/*
+DEF_NODE_TYPE(enumeration value, printable name).
+*/
+
+DEF_NODE_TYPE(NODE_TYPE_COMMON,     "common")
+DEF_NODE_TYPE(NODE_TYPE_IDENTIFIER, "identifier")
+DEF_NODE_TYPE(NODE_TYPE_MACRO,      "macro")
+DEF_NODE_TYPE(NODE_TYPE_TEXT,       "text")
+DEF_NODE_TYPE(NODE_TYPE_COMMENT,    "comment")
+DEF_NODE_TYPE(NODE_TYPE_ERROR,      "error")
+DEF_NODE_TYPE(NODE_TYPE_LOCATION,   "location")
+DEF_NODE_TYPE(NODE_TYPE_FILE,       "file")
+DEF_NODE_TYPE(NODE_TYPE_IPATH,      "ipath")
+

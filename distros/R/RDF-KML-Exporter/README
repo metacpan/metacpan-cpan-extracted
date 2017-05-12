@@ -1,0 +1,56 @@
+NAME
+    RDF::KML::Exporter - export RDF geo data to KML (Google Earth)
+
+SYNOPSIS
+     use RDF::KML::Exporter;
+ 
+     my $exporter = RDF::KML::Exporter->new;
+     my $input    = 'http://dbpedia.org/resource/Lewes';
+ 
+     print $exporter->export_kml($input)->render;
+
+DESCRIPTION
+  Constructor
+    *   "new(%options)"
+
+        Returns a new RDF::KML::Exporter object.
+
+        There are no valid options at the moment - the hash is reserved for
+        future use.
+
+  Methods
+    *   "export_kml($input, %options)"
+
+        Returns a KML document including all the locations in the input, in
+        no particular order.
+
+        The input may be a URI, file name, RDF::Trine::Model or anything
+        else that can be handled by the "parse" function of
+        RDF::TrineX::Functions.
+
+        The returned object is an Geo::GoogleEarth::Pluggable instance,
+        which can be output as XML using its "render" method.
+
+  RDF Input
+    Input is expected to use the W3C's WGS84 Geo Positioning vocabulary
+    <http://www.w3.org/2003/01/geo/wgs84_pos#>. Place names should use
+    rdfs:label.
+
+SEE ALSO
+    HTML::Microformats, RDF::TrineX::Functions, Geo::GoogleEarth::Pluggable.
+
+    <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+
+    <http://www.perlrdf.org/>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011-2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,53 @@
+0.11.0  - Tue Apr 02 10:09:00 EDT 2013
+        * Cache AUTOLOAD functions by Songmu
+        * Bump hiredis version to latest by Songmu
+
+0.10.2  - Tue Jun 12 11:06:00 EDT 2012
+        * update net.c to latest bits from hiredis, mostly to pull in change to use poll and not select
+
+0.10.1  - Sat Apr 07 10:46:00 EDT 2012
+        * update hiredis lib to 10.1
+        * connect_unix additions by Toru Yamaguchi
+        * file relocation / renaming
+
+0.9.2.8 - Sat Jul 23 11:17:00 EDT 2011
+        * don't croak on REDIS_REPLY_ERROR if we are processing a multi bulk reply since they can have failures and successes intertwined
+
+0.9.2.7 - Thu Jun 16 16:59:00 EDT 2011
+        * croak on a null reply, patch via Eugene Loktionov
+
+0.9.2.6 - Mon Feb 28 20:43:00 EST 2011
+        * update doc links
+
+0.9.2.5 - Sat Feb 19 21:02:00 EST 2011
+        * command supports array of args now too command("set", "foo", "bar")
+        * Added autoload to allow calls like set("foo", "bar") and get("foo")
+
+0.9.2.4 - Sat Feb 19 11:59:00 EST 2011
+        * command supports an array ref of args again, fixes issue where values, etc could not contain spaces
+        * utf8 and "connect on new" support from David Leadbeater
+
+0.9.2.3 - Sat Jan 08 20:16:00 EST 2011
+        * Remove Test::Exception from tests, no need to make it a dependency if I don't have to
+
+0.9.2.2 - Mon Jan 03 09:47:00 EST 2011
+        * Patch from Whitney Jackson to provide pipelining, better error handling and code modularization
+
+0.9.2.1 - Fri Dec 24 10:11:00 EST 2010
+        * Fix DESTROY to not free NULL pointer
+
+0.9.2 - Thu Dec 23 15:51:00 EST 2010
+        * Update to latest hiredis release
+        * Bump version to now match hiredis
+
+0.0.3 - Tue Nov 02 11:01:00 EDT 2010
+        * Bring lib-hiredis.c up to date
+        * Fix bug #62234, seg fault on return of array of integers
+        * Added tests for bug #62234
+
+0.0.2 - Tue Aug 31 17:05:00 EDT 2010
+        * Fix tests to not fallback to localhost and skip if
+            REDISHOST isn't defined
+
+0.0.1 - Sun Aug 29 10:48:00 EDT 2010
+        * Initial release

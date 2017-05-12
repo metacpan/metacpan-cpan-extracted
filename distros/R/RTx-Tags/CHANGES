@@ -1,0 +1,92 @@
+0.25	2009-08-03
+	Corrected autocompletion to include tag values of all tickets,
+	regardless of tagsStatus setting in Tags_SiteConfig.pm. This is what
+	one would expect since completion's most useful for rarely seen vals.
+
+	Slightly cleaner completion implementation to minimize localized code.
+
+	Better (still untested) support for multiple value custom field type.
+
+0.21	2009-08-02
+
+	Tweaked non-complete of short terms to yield no display.
+
+	Added configuration option for minimum-length completion stem.
+
+0.20	2009-08-02
+	Changed cloud links to .Tags for out of the box Postgres compatability.
+
+	Added autocompletion for tag values (actually contents).
+
+0.14	2009-02-04
+	!! Fixed documentation to indicate user should use Tags_SiteConfig.pm
+	to customize.
+
+	Modified configuration options.
+
+	Added link from cloud title to new Search/TagCloud.html, it displays
+	an optional uncustomized tag cloud, plus per-class clouds.
+
+	Tweaked local Elements/SimpleSearch to preserve search terms in
+	simple search textbox; assuming your setup supports $m->cgi_object
+
+	Added build date for 0.12
+
+0.12	2009-02-03
+	Added configuration options to limit what's counted in the cloud.
+	See etc/Tags_Config.pm for details.
+
+	Added support for negation of custom filed searches: -.foo:bar
+
+0.10	2008-12-20
+	Forgot to include the homepage component in .07 AND 0.08 :-/
+
+	Fixed bug #41201 for non-standard installs to locate CSS.
+
+	Added dummy test and explicit RT dependency to soothe CPANTS.
+
+	Added link titles of tag frequencies.
+
+0.08	2008-11-01
+	Fixed typo bug resulting from #40588 adjustment
+
+	Forgot to include the homepage component in .07
+
+	Fixed bug which caused unused tags to be displayed
+
+0.07	2008-11-01
+	Fixed bug #40587, include WebPath in URIs
+
+	Addressed wishlist #40588 to expand CF value searches beyond \w+
+
+	Create Tag Cloud homepage component
+
+0.06	2008-09-29
+	Fixed a bug that generated bad TicketSQL, and error log messages,
+	if no CFs were searched.
+
+0.05	2008-09-22
+	Better splitting of multi-tag values.
+
+	Fixed bug in tag weighting when multi-tag values are used.
+
+	Update Module::Install RTx to avoid duplication of files.
+
+	Update documentation DESCRIPTION to remove outdated information
+	about patching.
+
+0.04	2008-09-15
+	Added <p> around Simple Search blurb.
+
+	Fixed typo in keyword matching that meant some rare strings might
+	be misinterpreted as custom field searches.
+
+	Created a Googleish_Local overlay to avoid the need for patching.
+
+	Updated documentation.
+
+0.02	2008-09-14
+	Convert to plugin.
+
+0.01	2008-09-8&14
+	Local modifications.

@@ -1,0 +1,13 @@
+name: RT-OnlineDocs
+version: 0.02
+abstract: Display RT API documentation online
+author: Jesse Vincent <jesse@bestpractical.com>
+license: GPLv2
+distribution_type: module
+requires:
+  Pod::Simple::HTML: 0
+no_index:
+  directory:
+    - html
+    - inc
+generated_by: Module::Install version 0.33

@@ -1,0 +1,26 @@
+[Changes for 0.01 - August 26, 2004]
+
+Change all MIME types from application/x.atom+xml to 
+application/atom+xml due to the IETF-AtomWG's recommendations.
+
+[Changes for 0.00_04 - August 4, 2004]
+
+Add first draft of MIMEObj handling for ->update.
+
+[Changes for 0.00_03 - May 19, 2004]
+
+Add missing dependency to URI.
+
+Removed the unneccessary Get before Get/Set.
+
+All tests now pass correctly now with RT::Atom 0.00_02.
+
+[Changes for 0.00_02 - May 19, 2004]
+
+Add missing dependency to XML::Simple.
+
+Ditch dependency to Filter::Include.
+
+[Changes for 0.00_01 - May 17, 2004]
+
+Initial CPAN Release.

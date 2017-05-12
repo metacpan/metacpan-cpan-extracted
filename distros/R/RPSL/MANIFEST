@@ -1,0 +1,9 @@
+Build.PL
+Changes
+MANIFEST			This list of files
+README
+lib/RPSL.pm
+t/RPSL.t
+t/pod.t
+Makefile.PL
+META.yml

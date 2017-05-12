@@ -1,0 +1,700 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>General</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Raptor RDF Syntax Parsing and Serializing Library Manual">
+<link rel="up" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="prev" href="serializer-rss-1-0.html" title="RSS 1.0 serializer (name rss-1.0)">
+<link rel="next" href="raptor-section-memory.html" title="Memory">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="introduction.html" title="Raptor Overview">
+<link rel="part" href="tutorial.html" title="Part&#160;I.&#160;Raptor Tutorial">
+<link rel="chapter" href="tutorial-initialising-finishing.html" title="Initialising and Finishing using the Library">
+<link rel="chapter" href="tutorial-querying-functionality.html" title="Listing built-in functionality">
+<link rel="chapter" href="tutorial-parsing.html" title="Parsing syntaxes to RDF Triples">
+<link rel="chapter" href="tutorial-serializing.html" title="Serializing RDF triples to a syntax">
+<link rel="part" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="chapter" href="raptor-parsers.html" title="Parsers in Raptor (syntax to triples)">
+<link rel="chapter" href="raptor-serializers.html" title="Serializers in Raptor (triples to syntax)">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="serializer-rss-1-0.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference-manual.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Raptor RDF Syntax Parsing and Serializing Library Manual</th>
+<td><a accesskey="n" href="raptor-section-memory.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2572215" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2575693" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="raptor-section-general"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2572215"></a><span class="refentrytitle">General</span>
+</h2>
+<p>General &#8212; General library startup, shutdown and utility functions</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+extern      const unsigned int <a href="raptor-section-general.html#raptor-version-major">raptor_version_major</a>;
+extern      const unsigned int <a href="raptor-section-general.html#raptor-version-minor">raptor_version_minor</a>;
+extern      const unsigned int <a href="raptor-section-general.html#raptor-version-release">raptor_version_release</a>;
+extern      const unsigned int <a href="raptor-section-general.html#raptor-version-decimal">raptor_version_decimal</a>;
+void        <a href="raptor-section-general.html#raptor-init">raptor_init</a>                     (void);
+void        <a href="raptor-section-general.html#raptor-finish">raptor_finish</a>                   (void);
+void        (<a href="raptor-section-general.html#raptor-simple-message-handler">*raptor_simple_message_handler</a>)
+                                            (void *user_data,
+                                             const char *message,
+                                             ...);
+void        (<a href="raptor-section-general.html#raptor-message-handler">*raptor_message_handler</a>)       (void *user_data,
+                                             <a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator,
+                                             const char *message);
+void        (<a href="raptor-section-general.html#raptor-statement-handler">*raptor_statement_handler</a>)     (void *user_data,
+                                             const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement);
+int         <a href="raptor-section-general.html#raptor-parsers-enumerate">raptor_parsers_enumerate</a>        (unsigned int counter,
+                                             const char **name,
+                                             const char **label);
+int         <a href="raptor-section-general.html#raptor-syntaxes-enumerate">raptor_syntaxes_enumerate</a>       (unsigned int counter,
+                                             const char **name,
+                                             const char **label,
+                                             const char **mime_type,
+                                             unsigned char **uri_string);
+int         <a href="raptor-section-general.html#raptor-syntax-name-check">raptor_syntax_name_check</a>        (const char *name);
+const char* <a href="raptor-section-general.html#raptor-guess-parser-name">raptor_guess_parser_name</a>        (<a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             const char *mime_type,
+                                             unsigned char *buffer,
+                                             size_t len,
+                                             unsigned char *identifier);
+int         <a href="raptor-section-general.html#raptor-serializers-enumerate">raptor_serializers_enumerate</a>    (unsigned int counter,
+                                             const char **name,
+                                             const char **label,
+                                             const char **mime_type,
+                                             unsigned char **uri_string);
+int         <a href="raptor-section-general.html#raptor-serializer-syntax-name-check">raptor_serializer_syntax_name_check</a>
+                                            (const char *name);
+int         <a href="raptor-section-general.html#raptor-print-ntriples-string">raptor_print_ntriples_string</a>    (FILE *stream,
+                                             unsigned char *string,
+                                             const char delim);
+unsigned char* <a href="raptor-section-general.html#raptor-ntriples-string-as-utf8-string">raptor_ntriples_string_as_utf8_string</a>
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             unsigned char *src,
+                                             int len,
+                                             size_t *dest_lenp);
+const char* <a href="raptor-section-general.html#raptor-ntriples-term-as-string">raptor_ntriples_term_as_string</a>  (raptor_ntriples_term_type term);
+char*       <a href="raptor-section-general.html#raptor-vsnprintf">raptor_vsnprintf</a>                (const char *message);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2575693"></a><h2>Description</h2>
+<p>
+How to initialise and terminate the library, get
+access to version numbers, set message and error handlers,
+list the parsed and serialized syntaxes provided in the library
+and various other utility functions.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2575712"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2575723"></a><h3>
+<a name="raptor-version-major"></a>raptor_version_major</h3>
+<a class="indexterm" name="id2575734"></a><pre class="programlisting">extern const unsigned int raptor_version_major;
+</pre>
+<p>
+Library major version number as a decimal integer.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2575754"></a><h3>
+<a name="raptor-version-minor"></a>raptor_version_minor</h3>
+<a class="indexterm" name="id2575766"></a><pre class="programlisting">extern const unsigned int raptor_version_minor;
+</pre>
+<p>
+Library minor version number as a decimal integer.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2575786"></a><h3>
+<a name="raptor-version-release"></a>raptor_version_release</h3>
+<a class="indexterm" name="id2575797"></a><pre class="programlisting">extern const unsigned int raptor_version_release;
+</pre>
+<p>
+Library release version number as a decimal integer.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2575818"></a><h3>
+<a name="raptor-version-decimal"></a>raptor_version_decimal</h3>
+<a class="indexterm" name="id2575829"></a><pre class="programlisting">extern const unsigned int raptor_version_decimal;
+</pre>
+<p>
+Library full version as a decimal integer.
+</p>
+<p>
+See also <span class="type">raptor_version_string</span>.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591310"></a><h3>
+<a name="raptor-init"></a>raptor_init ()</h3>
+<a class="indexterm" name="id2591322"></a><pre class="programlisting">void        raptor_init                     (void);</pre>
+<p>
+Initialise the raptor library.
+</p>
+<p>
+This function MUST be called before using any of the raptor APIs.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591351"></a><h3>
+<a name="raptor-finish"></a>raptor_finish ()</h3>
+<a class="indexterm" name="id2591363"></a><pre class="programlisting">void        raptor_finish                   (void);</pre>
+<p>
+Terminate the raptor library.
+</p>
+<p>
+Cleans up state of the library.  If called, must be used after
+all other objects are destroyed with their destructor.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591394"></a><h3>
+<a name="raptor-simple-message-handler"></a>raptor_simple_message_handler ()</h3>
+<a class="indexterm" name="id2591407"></a><pre class="programlisting">void        (*raptor_simple_message_handler)
+                                            (void *user_data,
+                                             const char *message,
+                                             ...);</pre>
+<p>
+Simple message handler function.
+</p>
+<p>
+Used by multiple functions including <a href="raptor-section-xml.html#raptor-xml-escape-string"><code class="function">raptor_xml_escape_string()</code></a>,
+<a href="raptor-section-xml.html#raptor-iostream-write-xml-escaped-string"><code class="function">raptor_iostream_write_xml_escaped_string()</code></a>, <a href="raptor-section-xml-qname.html#raptor-new-qname"><code class="function">raptor_new_qname()</code></a>,
+<a href="raptor-section-xml-qname.html#raptor-qname-string-to-uri"><code class="function">raptor_qname_string_to_uri()</code></a>, <a href="raptor-section-xml-namespace.html#raptor-new-namespaces"><code class="function">raptor_new_namespaces()</code></a>,
+<a href="raptor-section-xml-namespace.html#raptor-namespaces-init"><code class="function">raptor_namespaces_init()</code></a>, <a href="raptor-section-xml.html#raptor-iostream-write-xml-element"><code class="function">raptor_iostream_write_xml_element()</code></a>,
+<a href="raptor-section-xml.html#raptor-new-xml-writer"><code class="function">raptor_new_xml_writer()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>message</code></em>&#160;:</span></td>
+<td> message to report
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>...</code></em>&#160;:</span></td>
+<td> arguments for message
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588623"></a><h3>
+<a name="raptor-message-handler"></a>raptor_message_handler ()</h3>
+<a class="indexterm" name="id2588634"></a><pre class="programlisting">void        (*raptor_message_handler)       (void *user_data,
+                                             <a href="raptor-section-locator.html#raptor-locator">raptor_locator</a> *locator,
+                                             const char *message);</pre>
+<p>
+Message with location handler function.
+</p>
+<p>
+Used during parsing and serializing for errors and warnings that
+may include location information. Multiple handlers may be set for
+parsers and serializers by <a href="raptor-section-parser.html#raptor-set-fatal-error-handler"><code class="function">raptor_set_fatal_error_handler()</code></a>,
+<a href="raptor-section-parser.html#raptor-set-error-handler"><code class="function">raptor_set_error_handler()</code></a>, <a href="raptor-section-parser.html#raptor-set-warning-handler"><code class="function">raptor_set_warning_handler()</code></a>,
+<a href="raptor-section-serializer.html#raptor-serializer-set-error-handler"><code class="function">raptor_serializer_set_error_handler()</code></a> and
+<a href="raptor-section-serializer.html#raptor-serializer-set-warning-handler"><code class="function">raptor_serializer_set_warning_handler()</code></a>.
+</p>
+<p>
+Also used by <a href="raptor-section-www.html#raptor-www-set-error-handler"><code class="function">raptor_www_set_error_handler()</code></a> for location-based errors
+in WWW retrieval.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>locator</code></em>&#160;:</span></td>
+<td> location associated with message or NULL
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>message</code></em>&#160;:</span></td>
+<td> message to report
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588797"></a><h3>
+<a name="raptor-statement-handler"></a>raptor_statement_handler ()</h3>
+<a class="indexterm" name="id2588808"></a><pre class="programlisting">void        (*raptor_statement_handler)     (void *user_data,
+                                             const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement);</pre>
+<p>
+Statement (triple) reporting handler function.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>statement</code></em>&#160;:</span></td>
+<td> statement to report
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588880"></a><h3>
+<a name="raptor-parsers-enumerate"></a>raptor_parsers_enumerate ()</h3>
+<a class="indexterm" name="id2588891"></a><pre class="programlisting">int         raptor_parsers_enumerate        (unsigned int counter,
+                                             const char **name,
+                                             const char **label);</pre>
+<p>
+Get list of syntax parsers.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>counter</code></em>&#160;:</span></td>
+<td> index to list of parsers
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> pointer to store syntax name (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>label</code></em>&#160;:</span></td>
+<td> pointer to store syntax label (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure of if counter is out of range
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609181"></a><h3>
+<a name="raptor-syntaxes-enumerate"></a>raptor_syntaxes_enumerate ()</h3>
+<a class="indexterm" name="id2609192"></a><pre class="programlisting">int         raptor_syntaxes_enumerate       (unsigned int counter,
+                                             const char **name,
+                                             const char **label,
+                                             const char **mime_type,
+                                             unsigned char **uri_string);</pre>
+<p>
+Get information on syntaxes.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>counter</code></em>&#160;:</span></td>
+<td> index into the list of syntaxes
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> pointer to store the name of the syntax (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>label</code></em>&#160;:</span></td>
+<td> pointer to store syntax readable label (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>mime_type</code></em>&#160;:</span></td>
+<td> pointer to store syntax MIME Type (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri_string</code></em>&#160;:</span></td>
+<td> pointer to store syntax URI string (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure of if counter is out of range
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609328"></a><h3>
+<a name="raptor-syntax-name-check"></a>raptor_syntax_name_check ()</h3>
+<a class="indexterm" name="id2609339"></a><pre class="programlisting">int         raptor_syntax_name_check        (const char *name);</pre>
+<p>
+Check name of a parser.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> the syntax name
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 if name is a known syntax name
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609368"></a><h3>
+<a name="raptor-guess-parser-name"></a>raptor_guess_parser_name ()</h3>
+<a class="indexterm" name="id2609378"></a><pre class="programlisting">const char* raptor_guess_parser_name        (<a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             const char *mime_type,
+                                             unsigned char *buffer,
+                                             size_t len,
+                                             unsigned char *identifier);</pre>
+<p>
+Guess a parser name for content.
+</p>
+<p>
+Find a parser by scoring recognition of the syntax by a block of
+characters, the content identifier or a mime type.  The content
+identifier is typically a filename or URI or some other identifier.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> URI identifying the syntax (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>mime_type</code></em>&#160;:</span></td>
+<td> mime type identifying the content (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>buffer</code></em>&#160;:</span></td>
+<td> buffer of content to guess (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len</code></em>&#160;:</span></td>
+<td> length of buffer
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>identifier</code></em>&#160;:</span></td>
+<td> identifier of content (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a parser name or NULL if no guess could be made
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609520"></a><h3>
+<a name="raptor-serializers-enumerate"></a>raptor_serializers_enumerate ()</h3>
+<a class="indexterm" name="id2609532"></a><pre class="programlisting">int         raptor_serializers_enumerate    (unsigned int counter,
+                                             const char **name,
+                                             const char **label,
+                                             const char **mime_type,
+                                             unsigned char **uri_string);</pre>
+<p>
+Get information on syntax serializers.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>counter</code></em>&#160;:</span></td>
+<td> index into the list of syntaxes
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> pointer to store the name of the syntax (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>label</code></em>&#160;:</span></td>
+<td> pointer to store syntax readable label (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>mime_type</code></em>&#160;:</span></td>
+<td> pointer to store syntax MIME Type (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri_string</code></em>&#160;:</span></td>
+<td> pointer to store syntax URI string (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure of if counter is out of range
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609669"></a><h3>
+<a name="raptor-serializer-syntax-name-check"></a>raptor_serializer_syntax_name_check ()</h3>
+<a class="indexterm" name="id2609682"></a><pre class="programlisting">int         raptor_serializer_syntax_name_check
+                                            (const char *name);</pre>
+<p>
+Check name of a serializer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> the syntax name
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 if name is a known syntax name
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609738"></a><h3>
+<a name="raptor-print-ntriples-string"></a>raptor_print_ntriples_string ()</h3>
+<a class="indexterm" name="id2609750"></a><pre class="programlisting">int         raptor_print_ntriples_string    (FILE *stream,
+                                             unsigned char *string,
+                                             const char delim);</pre>
+<p>
+Print an UTF-8 string using N-Triples escapes.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>stream</code></em>&#160;:</span></td>
+<td> FILE* stream to print to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> UTF-8 string to print
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>delim</code></em>&#160;:</span></td>
+<td> Delimiter character for string (such as ") or \0 for no delim
+escaping.
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure such as bad UTF-8 encoding.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609846"></a><h3>
+<a name="raptor-ntriples-string-as-utf8-string"></a>raptor_ntriples_string_as_utf8_string ()</h3>
+<a class="indexterm" name="id2609858"></a><pre class="programlisting">unsigned char* raptor_ntriples_string_as_utf8_string
+                                            (<a href="raptor-section-parser.html#raptor-parser">raptor_parser</a> *rdf_parser,
+                                             unsigned char *src,
+                                             int len,
+                                             size_t *dest_lenp);</pre>
+<p>
+Turn an N-Triples string with escapes into a UTF-8 string.
+</p>
+<p>
+<em class="parameter"><code>Deprecated</code></em>: This requires use of parser internals and was never in the public API header.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>rdf_parser</code></em>&#160;:</span></td>
+<td> parser object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>src</code></em>&#160;:</span></td>
+<td> data to read from
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len</code></em>&#160;:</span></td>
+<td> size of data
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>dest_lenp</code></em>&#160;:</span></td>
+<td> pointer to length of destination (out) or NULL
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new UTF-8 string
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609983"></a><h3>
+<a name="raptor-ntriples-term-as-string"></a>raptor_ntriples_term_as_string ()</h3>
+<a class="indexterm" name="id2609996"></a><pre class="programlisting">const char* raptor_ntriples_term_as_string  (raptor_ntriples_term_type term);</pre>
+<p>
+<em class="parameter"><code>Deprecated</code></em>: an internal debug function, do not use.
+</p>
+<p>
+Get a label for a <span class="type">raptor_ntriples_term_type</span>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>term</code></em>&#160;:</span></td>
+<td> N-Triples term.
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a pointer to a constant string.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2610067"></a><h3>
+<a name="raptor-vsnprintf"></a>raptor_vsnprintf ()</h3>
+<a class="indexterm" name="id2610077"></a><pre class="programlisting">char*       raptor_vsnprintf                (const char *message);</pre>
+<p>
+Format output for a variable arguments list.
+</p>
+<p>
+This is a wrapper around system versions of vsnprintf with
+different call and return conventions.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>message</code></em>&#160;:</span></td>
+<td> printf-style format string
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a newly allocated string as the format result or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

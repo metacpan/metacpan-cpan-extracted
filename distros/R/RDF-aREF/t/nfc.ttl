@@ -1,0 +1,2 @@
+<x:y> <http://xmlns.com/foaf/0.1/given> "\u0045\u0304\u0300\uAC00\u11A8" ;
+      <http://xmlns.com/foaf/0.1/surname> "\u1E14\uAC01" .

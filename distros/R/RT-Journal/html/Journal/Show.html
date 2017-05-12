@@ -1,0 +1,56 @@
+<& Elements/Tabs &>
+<h1><&|/l,$session{'CurrentUser'}->UserObj->Name&>Journal of [_1]</&></h1>
+%while( my $post =  $tix->Next) {
+% my $my_category =  $post->FirstCustomFieldValue('RT::Journal-Category');
+<%$post->CreatedObj->AsString%><br>
+<h2><a href="Article.html?id=<%$post->id%>"><%$post->Transactions->First->Subject|| loc('Untitled')%></a></h2>
+% my $content = $post->Transactions->First->Content;
+% $content =~ s/^-- (.*)$//gism; # kill all signatures
+% $content =~ s/\n/<br>/gi;
+<%$content|n%>
+% my $refto = $post->RefersTo;
+<div align="right">
+% while( my $link = $refto->Next ) {
+<A href="<%$link->TargetURI->Resolver->HREF%>"><%$link->TargetURI->Resolver->HREF%></a><br>
+% }
+</div>
+% my $comments = $post->Transactions;
+% $comments->Limit(FIELD => 'Type', VALUE => 'Correspond');
+[<a href="Article.html?id=<%$post->Id%>"><&|/l,$comments->Count&>[_1] Comments</&></a>]
+<a href="Show.html?show=<%$ARGS{'show'}%>&user=<%$user%>&category=<%$my_category%>"><%$my_category%></a>
+<hr>
+% }
+<a href="Show.html?show=<%$ARGS{'show'}%>&user=<%$user%>&category=<%$category%>&first=<%$first+$count%>"><&|/l&>Next page</&></a> |
+% if ($first > 1) {
+<a href="Show.html?show=<%$ARGS{'show'}%>&user=<%$user%>&category=<%$category%>&first=<%$first-$count%>"><&|/l&>Previous page</&></a> |
+% } 
+<%INIT>
+my $q = RT::Queue->new($RT::SystemUser);
+$q->Load($RT::JournalQueue);
+
+my $cat = RT::CustomField->new($RT::SystemUser);
+$cat->LoadByNameAndQueue( Name => 'RT::Journal-Category', Queue => $q->Id );
+
+my $tix = RT::Tickets->new( $session{'CurrentUser'} );
+$tix->LimitQueue( VALUE => $RT::JournalQueue );
+$tix->OrderBy( FIELD => 'Created', ORDER => 'DESC' );
+if ($user) {
+    $tix->LimitOwner( VALUE => $user );
+}
+if ($category) {
+    $tix->LimitCustomField(
+        CUSTOMFIELD => $cat->Id,
+        OPERATOR    => 'LIKE',
+        VALUE       => $category . "%"
+    );
+}
+$tix->RowsPerPage($count);
+$tix->FirstRow($first);
+</%INIT>
+<%ARGS>
+$user	=> undef
+$first	=> 1
+$category => undef
+$show => 'article'
+$count	=> 25
+</%ARGS>

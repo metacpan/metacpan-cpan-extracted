@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RPM4
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Digest::SHA1: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  MDV::Packdrakeng: '0'
+version: '0.36'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

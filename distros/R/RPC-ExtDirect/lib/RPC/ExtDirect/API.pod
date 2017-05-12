@@ -1,0 +1,795 @@
+=pod
+
+=head1 NAME
+
+RPC::ExtDirect::API - Ext.Direct service discovery handler
+
+=head1 SYNOPSIS
+
+    use RPC::ExtDirect::Config;
+    use RPC::ExtDirect::API;
+    
+    my $config = RPC::ExtDirect::Config->new(
+        namespace    => 'MyApp',
+        router_path  => '/router',
+        poll_path    => '/events',
+        remoting_var => 'MyApp.REMOTING_API',
+        polling_var  => 'MyApp.POLLING_API',
+    );
+    
+    my $api = RPC::ExtDirect::API->new_from_hashref(
+        config   => $config,
+        api_href => {
+            before => 'MyApp::Util::global_before_hook',
+            after  => 'MyApp::Util::global_after_hook',
+            
+            'MyApp::Server::Foo' => {
+                before  => 'MyApp::Server::Foo::package_before_hook',
+                
+                action => 'MyApp.Server.Foo', # JavaScript style with dots
+            
+                methods => {
+                    foo => {
+                        len => 1,
+                    },
+                    bar => {
+                        params => ['foo', 'bar'],
+                    },
+                    baz => {
+                        params => ['frobbe', 'throbbe'],
+                        metadata => {
+                            params => ['mymse', 'qux'],
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+=head1 DESCRIPTION
+
+With Ext.Direct, the L<API|RPC::ExtDirect::Intro/API> exposed by the
+server side is published to the clients via fixed URI, a GET request
+to which produces a response with a piece of JavaScript code containing
+the API declaration. This module handles the API service discovery requests.
+
+The Ext.Direct L<API declaration|RPC::ExtDirect::Intro/"API declaration">
+is in fact a tree-like data structure (an Object in JavaScript parlance)
+containing description of L<Actions|RPC::ExtDirect::Intro/Action> and
+L<Methods|RPC::ExtDirect::Intro/Method> available to the client. This
+data structure is encoded in JavaScript code statement that is
+regenerated dynamically every time it is requested. No caching is used
+at this time.
+
+=head1 ACTIONS AND METHODS
+
+An L<Action|RPC::ExtDirect::Intro/Action> in Ext.Direct parlance is a
+collection of L<Method|RPC::ExtDirect::Intro/Method> definitions. The
+nearest similar Perl thing is a package, other languages may call it
+a Class. In L<RPC::ExtDirect>, an Action needs a unique name that can
+be nested; Methods should have unique names within their Actions.
+
+=head2 Action names
+
+If the Action name is not specified explicitly, it will be deduced from the
+package name. If
+L<api_full_action_names|RPC::ExtDirect::Config/api_full_action_names>
+Config option is truthy, Action name will be similar to the package name
+with the same level of nesting, having C<'::'> replaced with dots:
+C<'Foo::Bar::Baz' -E<gt> 'Foo.Bar.Baz'>. Starting with Ext JS version 4.2.1,
+this allows having nested API objects on the client side as well, so you
+can call the server side methods like normal JavaScript methods:
+
+    Foo.Bar.Baz.do_foo(...);
+
+However nested API objects are not supported in Ext JS below 4.2.1 as well
+as in Sencha Touch 2.x, so the default behavior is to use only the last
+chunk of the package name: C<'Foo::Bar::Baz' -E<gt> 'Baz'>.
+
+=head2 Method calling conventions
+
+L<Ext.Direct specification|www.sencha.com/products/extjs/extdirect/>
+defines four calling convention for methods:
+
+=over 4
+
+=item *
+
+With parameters passed by position
+(L<ordered Method|RPC::ExtDirect::Intro/"Ordered Method">)
+
+=item *
+
+With parameters passed by name
+(L<named Method|RPC::ExtDirect::Intro/"Named Method">)
+
+=item *
+
+L<Form Handler|RPC::ExtDirect::Intro/"Form Handler Method">. This is a
+special case of a Method that accepts field values for a submitted HTML
+form. Form handlers are used to process
+L<file uploads|RPC::ExtDirect/"FILE UPLOADS">.
+
+=item *
+
+L<Poll Handler|RPC::ExtDirect::Intro/"Poll Handler Method">. This is
+another special case of a Method. Poll Handlers do not accept any
+arguments, except L<Environment objects|RPC::ExtDirect/"ENVIRONMENT OBJECTS">
+when requested.
+
+=back
+
+When an Ext.Direct remoting method is called on the client side, the
+transport layer will perform a check on the actual arguments passed
+to the L<method stub|RPC::ExtDirect::Intro/"Method stub">, and throw
+an exception if arguments do not conform to the
+L<API declaration|RPC::ExtDirect::Intro/"API declaration">.
+
+To declare an ordered method, define the L</len> option with the number of
+parameters accepted; this number may be 0 for methods that do not accept any
+parameters at all.
+
+To declare a named method, define the L</params> option with the names of
+mandatory parameters. It is worth noting that only I<existence> of parameters
+is mandatory; their values may as well be undefined. If not all arguments
+exist, an exception will be thrown. If there are any extra arguments not
+declared for this method, an exception will be thrown as well, unless
+strict argument checking is turned off
+(L<see below|/"Lazy parameter checking">).
+
+It is also possible to declare a named Method with I<no> mandatory
+parameters at all; do that by setting L</params> option to an empty
+arrayref: C<[]>. In that case, the calling convention is still honored
+but all parameters are treated as optional and no checks are performed.
+
+=head2 Lazy parameter checking
+
+Starting with Ext JS 4.2.2 and RPC::ExtDirect 3.00, it is possible to
+perform less strict parameter checking on by-name methods. All parameters
+explicitly declared for a method will still be treated as mandatory, but
+no exception will be thrown if undeclared arguments are passed into the
+L<method stub|RPC::ExtDirect::Intro/"Method stub">; these "extra" arguments
+will be transmitted to the server side and passed into the actual
+L<Method|RPC::ExtDirect::Intro/Method>. It is also possible to completely
+bypass the argument checking by not declaring any mandatory methods for
+a Method.
+
+As mentioned above, the strict checking is enabled by default; to disable
+it, set the L<strict|/strict> option to falsy value for any given method.
+
+Lazy parameter checking is not supported in Ext JS below 4.2.2, and in
+Sencha Touch 2.x.
+
+=head2 Call metadata
+
+Starting with Ext JS 5.1.0 and RPC::ExtDirect 3.20, it is possible to
+pass additional set of metadata arguments to any Method that supports it.
+
+Metadata arguments can differ in calling convention from the main arguments;
+e.g. it is possible to have an Ordered method with named metadata,
+and vice versa. The only kind of Methods unable to receive metadata is
+Poll handlers.
+
+Call metadata is optional and will only be passed to the Methods that declare
+their metadata convention. Unlike the main arguments, call metadata is always
+passed by reference, in arrayref or hashref.
+
+In order to support call metadata, the Method declaration should include
+corresponding parameters via the L</metadata> keyword. Note that for Ordered
+Methods, metadata declaration should always include the position for the
+metadata argument.
+
+=head1 COMPILE VS RUN TIME DEFINITION
+
+There are two ways to define Ext.Direct L<API|RPC::ExtDirect::Intro/API>
+with RPC::ExtDirect: statically by using C<ExtDirect> subroutine attribute,
+or dynamically by including Actions and Methods in a hashref that is used to
+configure an API object.
+
+Both of these ways have their advantages and disadvantages. Using the
+C<ExtDirect> attribute, it's easier to keep definitions closer to the
+actual code so that when the code changes, its definition can be
+remembered to be changed as well. Also this approach is very easy to use
+and start with; just add the attribute to your code, and you're good to
+go. Also, the attribute syntax is expressive enough to be self-documenting,
+so often no other API documentation is needed.
+
+On the other hand, for larger and more centralized projects it may be easier
+to keep all API definitions in one place rather than spread over dozens of
+packages. Besides easier maintenance, using dynamic approach allows having
+more than one active API object at a given time, possibly implementing
+different APIs tailored for usage patterns of a particular application.
+
+Note that these two methods are I<not> mutually exclusive, but it is
+not recommended to mix them unless you are ready to deal with ensuing
+timing issues. You've been warned.
+
+=head1 DEFINING METHODS STATICALLY
+
+In order to add a subroutine to the Ext.Direct interface, use an attribute
+with the sub definition:
+
+    sub foo : ExtDirect(...) {}
+
+Note that there can be no space between the C<ExtDirect> attribute name and
+the opening parens; also in Perls older than 5.12, the attribute statement
+cannot span multiple lines, i.e. the whole C<ExtDirect(...)> construct
+should fit in one line. This is due to limitations in Perl code parser.
+
+Inside the parentheses, one of the following mutually exclusive option
+keywords is B<mandatory>:
+
+=over 4
+
+=item C<n>
+
+The number of ordered arguments this L<Method|RPC::ExtDirect::Intro/Method>
+accepts. This form is considered obsolete, use L</len> keyword instead.
+If C<n> is used, this keyword should always come first in the list:
+
+    sub foo : ExtDirect(1, ...) {} # right
+    sub bar : ExtDirect(..., 1) {} # wrong
+    sub baz : ExtDirect(0)      {} # right
+
+=item C<len>
+
+The more preferred way to define an Ordered Method. This keyword should be
+followed by the number of the parameters accepted by the Method:
+
+    sub foo : ExtDirect(len => 1)      {} # right
+    sub bar : ExtDirect(..., len => 1) {} # also right
+    sub baz : ExtDirect(len => 0)      {} # right again
+
+
+=item C<params>
+
+A list of the named parameters this method accepts. Since a
+L<Method|RPC::ExtDirect::Intro/Method> can be either
+L<ordered or named|/"Method calling conventions">, this and above options
+are mutually exclusive. This keyword should be followed by an arrayref
+with the parameter names, possibly empty:
+
+    sub foo : ExtDirect(params => ['foo', 'bar', ...], ...) {}
+    sub bar : ExtDirect(params => [], ...)                  {}
+
+
+=item C<formHandler>
+
+This option defines the Method as a
+L<Form Handler|RPC::ExtDirect::Intro/"Form Handler Method">.
+
+=item C<pollHandler>
+
+This option defines the Method as a
+L<Poll Handler|RPC::ExtDirect::Intro/"Poll Handler Method">.
+
+=back
+
+Having more than one calling convention keyword in the Method definition
+is not supported and will lead to undefined behavior.
+
+Besides the mandatory calling convention keyword, there are optional
+Method attributes in hash-like C<< key => value >> form. See more in
+L<RPC::ExtDirect::API::Method/new>.
+
+=head1 DEFINING METHODS DYNAMICALLY
+
+If you find the static definition method inconvenient or hard to maintain,
+use dynamic definition instead. You can create a new API object using
+L<new_from_hashref|/new_from_hashref> constructor, or just init the
+L<global API instance|/"GLOBAL API TREE INSTANCE"> from a hashref
+containing the API definition:
+
+    my $api = RPC::ExtDirect->get_api();
+    $api->init_from_hashref({
+        'MyApp::Server::Foo' => {
+            methods => {
+                ordered_method => {
+                    len => 1,
+                },
+                named_method => {
+                    params => [qw/ foo bar /],
+                    strict => !1,
+                },
+                form_handler => {
+                    formHandler => 1,
+                },
+                poll_handler => {
+                    pollHandler => 1,
+                },
+            },
+        },
+    });
+
+Keywords and options are mostly the same as with the static definition;
+refer to L<RPC::ExtDirect::API::Method/new> for details.
+
+=head1 GLOBAL API TREE INSTANCE
+
+Under the hood, static API definition operates on a global instance of
+C<RPC::ExtDirect::API>, created at the package compilation time and
+available globally throughout the application.
+
+Versions 1.x and 2.x of RPC::ExtDirect used package global variables to hold
+this information; version 3.0 is using a global L<RPC::ExtDirect::API> object
+instead. This object is held in a private variable and can be retrieved by
+the L<get_api|RPC::ExtDirect/get_api> method:
+
+    my $global_api = RPC::ExtDirect->get_api;
+
+This API object holds an instance of L<RPC::ExtDirect::Config> with a set
+of options used to configure the API object behavior. This Config instance
+can be retrieved to set options directly:
+
+    my $cfg = RPC::ExtDirect->get_api->config;
+    $cfg->option1('foo');
+    $cfg->option2('bar');
+
+Since the API object is a normal object, and the L<config|/config> method
+is a normal accessor, it is possible to replace that Config instance with
+a new one. However this may result in a loss of statically defined Config
+options, and is not recommended. Instead, use
+L<import package sub|/CONFIGURATION> to configure the global API when
+using static API definitions.
+
+The global API instance is used by default to generate the
+L<API declaration|RPC::ExtDirect::Intro/"API declaration"> requested by
+the client side, and for dispatching remoting calls from the client side.
+If you prefer more control over the API tree, create the API object
+explicitly as shown in the L<SYNOPSIS|/SYNOPSIS>, and pass it to the
+gateway object. Refer to the actual
+L<gateway|RPC::ExtDirect::Intro/GATEWAYS> documentation for details.
+
+Because attribute parsing happens at package compilation
+time, it is hard to predict the order in which the methods will be
+processed. To provide some help with debugging, RPC::ExtDirect will throw
+an error if you are trying to redefine a Method; usually that means a
+mistake has been made somewhere.
+
+=head1 API CONFIGURATION
+
+RPC::ExtDirect::API provides two ways to configure Ext.Direct API declaration
+variables to accommodate for specific application needs: dynamic via an
+L<RPC::ExtDirect::Config> instance, and static via C<import> package
+subroutine.
+
+An example of the new dynamic configuration is available in the L</SYNOPSIS>
+above. This is the preferred way of configuring the API in large complex
+applications; it allows keeping the whole API definition in one place
+instead of distributed among the packages. It is also possible to define
+more than one API this way, for publishing to different clients.
+
+The static configuration has been available since version 1.0 and will be
+supported going forward. This way it is possible to configure the API
+variables at compile time:
+
+ use RPC::ExtDirect::API         namespace    => 'myApp',
+                                 router_path  => '/router',
+                                 poll_path    => '/events',
+                                 remoting_var => 'Ext.app.REMOTING_API',
+                                 polling_var  => 'Ext.app.POLLING_API',
+                                 auto_connect => 0,
+                                 no_polling   => 0,
+                                 before       => \&global_before_hook,
+                                 after        => \&global_after_hook,
+                                 ;
+
+Under the hood, the above code will set specified options on the
+L<Config|RPC::ExtDirect::Config> instance held in the 
+L<global API object|/"GLOBAL API TREE INSTANCE">.
+
+=head1 API CONFIGURATION OPTIONS
+
+The following configuration options are supported by RPC::ExtDirect::API:
+
+=over 4
+
+=item C<namespace>
+
+Declares the namespace your L<Actions|RPC::ExtDirect::Intro/Action> will
+reside in. To call the L<Methods|RPC::ExtDirect::Intro/Method> on client side,
+you will have to qualify them with namespace: C<namespace.Action.Method>,
+e.g.: C<myApp.Foo.Bar>
+
+=item C<router_path>
+
+URI for Ext.Direct L<Router|RPC::ExtDirect::Intro/Router> calls. For the
+L<CGI environment|CGI::ExtDirect>, this should be the name of the CGI script
+that provides the API declaration; for more sophisticated environments it is
+an anchor for the specified PATH_INFO.
+
+=item C<poll_path>
+
+URI for Ext.Direct L<Event Provider|RPC::ExtDirect::Intro/"Event Provider">
+calls. Client side will poll this URI periodically, hence the name.
+
+=item C<remoting_var>
+
+By default, Ext.Direct L<API declaration|RPC::ExtDirect::Intro/"API declaration">
+for remoting (forward) L<Methods|RPC::ExtDirect::Intro/Method> is stored in
+Ext.app.REMOTING_API variable. If for any reason you would like to change that,
+do this by setting remoting_var.
+
+Note that in production environment you would probably want to use a compiled
+version of the JavaScript application that consist of one big JavaScript file.
+In this case, it is recommended to include API declaration as the first script
+in your index.html and change the remoting API variable name to something like
+C<EXT_DIRECT_API>. Default variable name depends on Ext.app namespace being
+available by the time Ext.Direct
+L<API declaration|RPC::ExtDirect::Intro/"API declaration"> is downloaded, which is
+often not the case.
+
+=item C<polling_var>
+
+Ext.Direct does not provide a standard namespace for
+L<Event Providers|RPC::ExtDirect::Intro/"Event Provider"> to be published in.
+For similarity with L</remoting_var>, C<Ext.app.POLLING_API> name is used to
+declare an L<Event Provider|RPC::ExtDirect::Intro/"Event Provider"> so that
+it could be used on the client side without having to hardcode any URIs
+explicitly.
+
+C<Ext.app.POLLING_API> configuration will only be published to the client side
+if there is at least one L<pollHandler|RPC::ExtDirect::Config/pollHandler>
+L<Method|RPC::ExtDirect::Intro/Method> defined in the Ext.Direct
+L<API|RPC::ExtDirect::Intro/API>.
+
+Note that the same variable naming caveat applies here as with L</remoting_var>.
+
+=item C<no_polling>
+
+Explicitly prohibit the L<API declaration|RPC::ExtDirect::Intro/"API declaration">
+from containing a L</polling_var> definition. This will suppress publishing
+L<Event Providers|RPC::ExtDirect::Intro/"Event Provider"> even if there are any
+L<pollHandler|RPC::ExtDirect::Config/pollHandler> methods in the actual
+L<API|RPC::ExtDirect::Intro/API>.
+
+This option can be useful for testing.
+
+=item C<auto_connect>
+
+This option is deprecated and should not be used anymore.
+
+=item C<before>
+
+Global C<before> hook. See L<RPC::ExtDirect/HOOKS>.
+
+=item C<instead>
+
+Global C<instead> hook. See L<RPC::ExtDirect/HOOKS>.
+
+=item C<after>
+
+Global C<after> hook. See L<RPC::ExtDirect/HOOKS>.
+
+=back
+
+=head1 API OBJECT INTERFACE
+
+RPC::ExtDirect::API provides several public methods:
+
+=over 4
+
+=item C<HOOK_TYPES>
+
+Class/instance method. Returns the list of supported hook types.
+See L<RPC::ExtDirect/HOOKS> for more information.
+
+Accepts no arguments.
+
+=item C<new>
+
+Constructor. Returns a new L<RPC::ExtDirect::API> object with
+an empty L<API tree|RPC::ExtDirect::Intro/API>. Accepts named
+arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<config>
+
+Optional L<RPC::ExtDirect::Config> instance to be used. If not provided,
+a new Config instance will be created.
+
+=back
+
+=item C<new_from_hashref>
+
+Constructor. Returns a new L<RPC::ExtDirect::API> object with
+an L<API tree|RPC::ExtDirect::Intro/API> initialized from the
+L<api_href|/api_href> argument. Accepts named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<config>
+
+Optional L<RPC::ExtDirect::Config> instance to be used. If not provided,
+a new instance will be created.
+
+=item C<api_href>
+
+Mandatory. A hashref containing the API tree. See
+L</"DEFINING METHODS DYNAMICALLY"> for more information.
+
+=back
+
+=item C<init_from_hashref>
+
+Instance method. Initializes the API tree in the object from the passed
+hashref with API definitions. This method will be called internally by
+L</new_from_hashref>.
+
+Accepts only one ordered argument:
+
+=over 8
+
+=item *
+
+API definition hashref. See L</"DEFINING METHODS DYNAMICALLY"> for
+more information.
+
+=back
+
+=item C<get_remoting_api>
+
+Instance method. Returns stringified
+L<API declaration|RPC::ExtDirect::Intro/"API declaration"> for the current
+API tree contained in the object. Accepts named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<config>
+
+An optional L<RPC::ExtDirect::Config> instance to be used when generating
+the L<API declaration|RPC::ExtDirect::Intro/"API declaration">. This is
+useful for testing, but should not be used in production.
+
+=item C<env>
+
+An L<Environment object|RPC::ExtDirect/"ENVIRONMENT OBJECTS">. This object
+is not used by the stock L<RPC::ExtDirect::API> code directly; instead, it
+is passed to the Action's
+L<remoting_api|RPC::ExtDirect::API::Action/remoting_api> method, which in
+turn will pass it to the Method's
+L<get_api_definition|RPC::ExtDirect::API::Method> method that will return
+the actual Method API definition.
+
+You can subclass L<RPC::ExtDirect::API::Method> to perform some additional
+actions, e.g. checking users' authentication status before generating the
+API declaration.
+
+=back
+
+=item C<actions>
+
+Instance method. Returns the list of names for all
+L<Actions|RPC::ExtDirect::Intro/Action> defined in the API tree.
+
+=item C<add_action>
+
+Instance method. Adds or replaces an L<Action|RPC::ExtDirect::Intro/Action>
+in the current API tree. Accepts named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<package>
+
+Mandatory. Package name for the Action.
+
+=item C<action>
+
+Optional name for the Action. If not provided, a new Action name will
+be generated, see L</"Action names"> for more detail.
+
+=item other
+
+The rest of the arguments is passed directly to the Action constructor.
+If no L<api_action_class|RPC::ExtDirect::Config/api_action_class> Config
+option is set, the default L<RPC::ExtDirect::API::Action> class will be
+used.
+
+=back
+
+=item C<get_action_by_name>
+
+Instance method. Returns the L<Action|RPC::ExtDirect::Intro/Action> object
+for the corresponding action name, or C<undef>. Accepts one ordered
+argument (action name).
+
+=item C<get_action_by_package>
+
+Instance method. Returns the L<Action|RPC::ExtDirect::Intro/Action> object
+for the corresponding package, or C<undef>. Accepts one ordered argument
+(package name).
+
+=item C<add_method>
+
+Instance method. Add a new Ext.Direct L<Method|RPC::ExtDirect::Intro/Method>
+object to the current API tree, creating an Action for it if necessary.
+Accepts named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<action>
+
+Action name to add the Method to. Either this or C<package> parameter below
+is mandatory.
+
+=item C<package>
+
+Package name of the Action to add the Method to. Either this or C<action>
+parameter above is mandatory.
+
+=item C<method>
+
+Name of the Method to add.
+
+=item other
+
+The rest of the arguments is passed directly to the Method constructor.
+If no L<api_method_class|RPC::ExtDirect::Config/api_method_class> Config
+option is set, the default L<RPC::ExtDirect::API::Method> class will be
+used.
+
+=back
+
+=item C<get_method_by_name>
+
+Instance method. Return the L<Method|RPC::ExtDirect::Intro/Method> object
+for the corresponding Action and Method name, or C<undef>. Accepts two
+ordered arguments:
+
+=over 8
+
+=item *
+
+Action name to look up the Method in.
+
+=item *
+
+Method name.
+
+=back
+
+=item C<add_hook>
+
+Instance method. Adds a new L<Hook|RPC::ExtDirect/HOOKS> object to the
+current API tree. Accepts named arguments in a hash.
+
+For global hooks, only C<type> and C<code> parameters are needed.
+For Action level hooks, either C<package> or C<action> parameter
+is needed as well. For Method level hooks, the C<method> parameter
+is required in addition to the above.
+
+If L<api_hook_class|RPC::ExtDirect::Config/api_hook_class> Config option
+is not set, the default L<RPC::ExtDirect::API::Hook> class will be used
+to instantiate the Hook object.
+
+Parameters:
+
+=over 8
+
+=item C<package>
+
+Package for which the hook is added. Optional for global hooks. This
+or C<action> parameter is mandatory for Action or Method level hooks.
+
+=item C<action>
+
+Action name for which the hook is added. Optional for global hooks.
+This or C<package> parameter is mandatory for Action or Method level
+hooks.
+
+=item C<method>
+
+Method name for which the hook is added. Optional for package and global
+hooks.
+
+=item C<type>
+
+Hook type. The list of hook types supported by the API class is returned
+by the L</HOOK_TYPES> method. See L<RPC::ExtDirect::API::Hook/TYPES> for
+more information on hook types.
+
+This parameter is mandatory.
+
+=item C<code>
+
+Hook code, or absence thereof. See L<RPC::ExtDirect::API::Hook/code>.
+
+This parameter is mandatory.
+
+=back
+
+=item C<get_hook>
+
+Instance method. Returns the Hook object for given criteria, or C<undef>.
+Accepts named arguments in a hash.
+
+When looking up Method level hook, C<action> or C<package> parameter is
+mandatory, as well as the C<method> name and hook C<type>. For Action
+level hooks, C<action> or C<package> is required to look up the Action,
+and C<type> for the hook. For global hooks, only C<type> is required.
+
+Parameters:
+
+=over 8
+
+=item C<action>
+
+Action name to return the Hook object for. This or C<package> parameter
+is required for Action or Method level hooks, and is optional for global
+hooks.
+
+=item C<package>
+
+Package name of the Action to return the Hook object for. This or
+C<action> parameter is required for Action or Method level hooks, and is
+optional for global hooks.
+
+=item C<method>
+
+Method name to return the Hook object for. Optional for Action and global
+level hooks.
+
+=item C<type>
+
+Type of the hook to return. This parameter is required.
+
+=back
+
+=item C<get_poll_handlers>
+
+Instance method. Returns the list of Method objects for all
+L<Poll handlers|RPC::ExtDirect::Intro/"Poll Handler Method"> for every
+Action in the current API tree.
+
+This method does not accept any arguments.
+
+=back
+
+=head1 ACCESSOR METHODS
+
+For L<RPC::ExtDirect::API>, the following
+L<accesor methods|RPC::ExtDirect::Config/"ACCESSOR METHODS"> are provided:
+
+=over 4
+
+=item C<config>
+
+Return the current L<RPC::ExtDirect::Config> instance held in this
+API object, or set a new one.
+
+=item C<before>
+
+Return the global C<before> L<Hook object|RPC::ExtDirect::API::Hook> if
+set, or assign a new one. See L<RPC::ExtDirect/HOOKS> for more information.
+
+=item C<instead>
+
+Return the global C<instead> L<Hook object|RPC::ExtDirect::API::Hook>
+if set, or assign a new one. See L<RPC::ExtDirect/HOOKS> for more
+information.
+
+=item C<after>
+
+Return the global C<after> L<Hook object|RPC::ExtDirect::API::Hook>
+if set, or assign a new one. See L<RPC::ExtDirect/HOOKS> for more
+information.
+
+=back
+
+=head1 SEE ALSO
+
+More information on the configuration options can be found in
+L<RPC::ExtDirect::Config> documentation.
+
+=cut

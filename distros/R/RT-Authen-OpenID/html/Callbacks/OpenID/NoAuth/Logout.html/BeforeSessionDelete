@@ -1,0 +1,6 @@
+<%INIT>
+if ($session{'BitcardUser'}) {
+    delete $session{'BitcardUser'};
+    $m->notes(isBitcardUser => 1);
+}
+</%INIT>

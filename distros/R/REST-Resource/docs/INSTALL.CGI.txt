@@ -1,0 +1,45 @@
+OVERVIEW:
+
+   This document describes how to get a REST::Resource CGI script
+   running.
+
+PREREQUISITES:
+
+    It is assumed that you have a webserver in mind.  If not, you may
+    want to look at INSTALL.WWW-Resource-FRAMEWORK, by Ira Woodhead.
+
+APACHE CGI CONFIGURATION:
+
+    In httpd.conf (sometimes found in /etc/httpd/conf/httpd.conf),
+    make sure this section is enabled.
+
+        LoadModule cgi_module modules/mod_cgi.so
+        #
+        # AddHandler allows you to map certain file extensions to "handlers":
+        # actions unrelated to filetype. These can be either built into the server
+        # or added with the Action directive (see below)
+        #
+        # To use CGI scripts outside of ScriptAliased directories:
+        # (You will also need to add "ExecCGI" to the "Options" directive.)
+        #
+        AddHandler cgi-script .cgi
+
+INSTALL SAMPLE FILES:
+
+    Copy ./eg/*.cgi to some directory that you have R/W access to and
+    set the execute permissions appropriately.
+
+        mkdir /var/www/html/parts/
+        chmod 777 /var/www/html/parts/
+        cp ./eg/parts.cgi /var/www/html/parts/
+	chmod 755 /var/www/html/parts/parts.cgi
+
+SAMPLE URLS:
+
+    http://localhost/parts/parts.cgi
+    http://localhost/parts/parts.cgi/api
+
+DATA SETS:
+
+    Once you have generated some parts and descriptions in a browser,
+    you can start trying to retrieve these parts / data simply.

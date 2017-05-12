@@ -1,0 +1,19 @@
+###############################################################################
+#
+#   Sub Name:       identity
+#
+#   Description:    Simply returns the server's identity as a string
+#
+#   Arguments:      First arg is server instance
+#
+#   Globals:        None.
+#
+#   Returns:        string
+#
+###############################################################################
+sub identity
+{
+    use strict;
+
+    $_[0]->product_tokens;
+}

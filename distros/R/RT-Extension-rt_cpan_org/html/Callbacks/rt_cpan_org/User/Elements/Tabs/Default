@@ -1,0 +1,18 @@
+<%ARGS>
+$tabs
+</%ARGS>
+<%INIT>
+### Delegation option is disabled because the widgets are unclever about the
+### number of queues involved and so they hose the server.  When we've made
+### the widgets smarter, we'll re-enable these options.
+my $lstr = loc('Delegation');
+if ( $tabs->{'h'} && $tabs->{'h'}{'title'} eq $lstr ) {
+    delete $tabs->{'h'};
+    return;
+}
+while ( my ($k, $v) = each %$tabs ) {
+    next if $v->{'title'} ne $lstr;
+    delete $tabs->{ $k };
+    return;
+}
+</%INIT>

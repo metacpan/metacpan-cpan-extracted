@@ -1,0 +1,47 @@
+NAME
+    RT::Extension::BriefHistory - Filter history by type on ticket display
+    page
+
+DESCRIPTION
+    This plugin filter the history on the ticket display page by transaction
+    types that are defined in the configuration. By default it shows only
+    the transaction types create, correspond and comment.
+
+    The history page shows always the full history.
+
+    It was created after an article in the Best Practical wiki and an
+    discussion in the rt-user mailing list (look at SEE ALSO).
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::BriefHistory');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::BriefHistory));
+
+        or add RT::Extension::BriefHistory to your existing @Plugins line.
+
+AUTHOR
+    Christian Loos <cloos@netsandbox.de>
+
+LICENCE AND COPYRIGHT
+    Copyright (C) 2010-2014, Christian Loos.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    <http://bestpractical.com/rt/>
+
+    <http://wiki.bestpractical.com/view/HideTransactions>
+
+    <http://lists.bestpractical.com/pipermail/rt-users/2010-May/064720.html>
+

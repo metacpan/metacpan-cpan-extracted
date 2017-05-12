@@ -1,0 +1,111 @@
+From 0fc8cfd1cdf689e250ad27c2b5bff242f9a3541f Mon Sep 17 00:00:00 2001
+From: gibus <gibus@easter-eggs.com>
+Date: Sun, 12 Mar 2017 13:27:48 +0100
+Subject: [PATCH 1/4] Add callback to allow extensions to process a custom
+ field when created or updated
+
+---
+ share/html/Admin/CustomFields/Modify.html | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/share/html/Admin/CustomFields/Modify.html b/share/html/Admin/CustomFields/Modify.html
+index 80cb05d..6055432 100644
+--- a/share/html/Admin/CustomFields/Modify.html
++++ b/share/html/Admin/CustomFields/Modify.html
+@@ -284,6 +284,9 @@ if ( $ARGS{'Update'} && $id ne 'new' ) {
+         push @results, $msg;
+     }
+ 
++    # Add oportunity for extensions to do something
++    $m->callback(CallbackName => 'Massage', CustomField => $CustomFieldObj, Results => \@results, ARGSRef => \%ARGS);
++
+     my $paramtag = "CustomField-". $CustomFieldObj->Id ."-Value";
+     # Delete any fields that want to be deleted
+     foreach my $key ( keys %ARGS ) {
+-- 
+2.7.4
+
+
+From 75c42e8c0df29e5c41203cedd7c5269d83423da2 Mon Sep 17 00:00:00 2001
+From: gibus <gibus@easter-eggs.com>
+Date: Sun, 12 Mar 2017 13:28:45 +0100
+Subject: [PATCH 2/4] Add callback to allow extensions to process a Group's
+ custom field when modifying this Group
+
+---
+ share/html/Admin/Groups/Modify.html | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/share/html/Admin/Groups/Modify.html b/share/html/Admin/Groups/Modify.html
+index d9c4966..86db6b7 100644
+--- a/share/html/Admin/Groups/Modify.html
++++ b/share/html/Admin/Groups/Modify.html
+@@ -76,7 +76,9 @@
+ </td><td>
+ <& /Elements/EditCustomField, CustomField => $CF, 
+                               Object => $Group, &>
+-</td></tr>
++</td>
++% $m->callback( CallbackName => 'AfterCustomFieldValue', CustomField => $CF, Object => $Group);
++</tr>
+ % }
+ <tr>
+ <td colspan="2">
+-- 
+2.7.4
+
+
+From 3b99e62d7fe92093d653720453667f4730d4ef5f Mon Sep 17 00:00:00 2001
+From: gibus <gibus@easter-eggs.com>
+Date: Sun, 12 Mar 2017 13:30:09 +0100
+Subject: [PATCH 3/4] Add callback to allow extensions to process a Queue's
+ custom field when modifying this Queue
+
+---
+ share/html/Admin/Queues/Modify.html | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/share/html/Admin/Queues/Modify.html b/share/html/Admin/Queues/Modify.html
+index 75b0e65..34c79b8 100644
+--- a/share/html/Admin/Queues/Modify.html
++++ b/share/html/Admin/Queues/Modify.html
+@@ -112,7 +112,9 @@ checked="checked"
+ </td><td>
+ <& /Elements/EditCustomField, CustomField => $CF,
+                               Object => $QueueObj, &>
+-</td></tr>
++</td>
++% $m->callback( CallbackName => 'AfterCustomFieldValue', CustomField => $CF, Object => $QueueObj);
++</tr>
+ % }
+ 
+ % if ( RT->Config->Get('Crypt')->{'Enable'} ) {
+-- 
+2.7.4
+
+
+From 1b67dc47919420b292cec609ac33c6d9f00e105a Mon Sep 17 00:00:00 2001
+From: gibus <gibus@easter-eggs.com>
+Date: Sun, 12 Mar 2017 13:30:27 +0100
+Subject: [PATCH 4/4] Add callback to allow extensions to process an Article's
+ custom field when modifying this Article
+
+---
+ share/html/Articles/Article/Elements/EditCustomFields | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/share/html/Articles/Article/Elements/EditCustomFields b/share/html/Articles/Article/Elements/EditCustomFields
+index c5e4eb8..835833c 100644
+--- a/share/html/Articles/Article/Elements/EditCustomFields
++++ b/share/html/Articles/Article/Elements/EditCustomFields
+@@ -59,6 +59,7 @@
+         Rows => 15,
+         Cols => 70
+         &></td>
++% $m->callback( CallbackName => 'AfterCustomFieldValue', CustomField => $CustomField, Object => $ArticleObj);
+ </tr>
+ </table>
+ % }
+-- 
+2.7.4
+

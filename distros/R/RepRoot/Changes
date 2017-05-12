@@ -1,0 +1,15 @@
+Revision history for RepRoot
+
+0.02  Wed Apr 23 18:39:00 PST 2006
+
+ - Fixed bug where deepest directory was skipped because I misunderstood the
+   proper usage of File::Spec; now using the $no_file arg to splitpath()
+
+ - Added note to perldoc about canonical paths and symlinks
+
+ - Changed the style of the Changes file :)
+
+0.01  Sun Apr 23 16:49:00 PST 2006
+
+ -  First version, created by module-starter.
+

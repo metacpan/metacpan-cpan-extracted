@@ -1,0 +1,4 @@
+% if ( $session{'Attachments'} ) {
+% for my $attach_name (keys %{$session{'Attachments'}}) {
+<input type="hidden" name="Attached" value="<% $attach_name %>" />
+% } }

@@ -1,0 +1,246 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+BEGIN {
+### after: push @INC, qw(@RT_LIB_PATH@);
+push @INC, qw(/opt/rt3/local/lib /opt/rt3/lib);
+}
+use RT;
+
+use Getopt::Long;
+my %opt = (
+    debug => 0,
+    'prune-backups' => 0,
+);
+GetOptions( \%opt, 'debug', 'prune-backups:i' );
+
+RT::LoadConfig();
+
+# set debugging level
+RT->Config->Set( LogToScreen => ($opt{'debug'}? 'debug': 'error') );
+
+RT::Init();
+
+require RT::Extension::TicketAging;
+sub loc(@) { RT::Extension::TicketAging::loc(@_) }
+
+if ( $opt{'prune-backups'} ) {
+    prune_backups( OlderThan => $opt{'prune-backups'} );
+}
+
+my @ages = RT::Extension::TicketAging->Ages();
+my ($map, $msg)  = RT::Extension::TicketAging->PrepareMap();
+unless ( $map ) {
+    $RT::Logger->crit( $msg );
+    exit 1;
+}
+
+foreach my $age ( @ages ) {
+    $RT::Logger->debug( loc "Processing [_1] age...", $age );
+    unless ( $map->{ $age } ) {
+        $RT::Logger->debug( loc "Skipped [_1] age", $age );
+        next;
+    }
+
+    my $query = build_age_candidates_query( $age );
+    $RT::Logger->debug( loc "Query for age '[_1]': [_2]", $age, $query );
+
+    my $tickets = RT::Tickets->new( $RT::SystemUser );
+    if ( my $cb = $map->{ $age }{'Condition'}{'CallbackPre'} ) {
+        my ($status, $msg) = $cb->( Age => $age, Collection => $tickets );
+        unless ( $status ) {
+            $RT::Logger->crit(loc "Pre callback for '[_1]' age failed with error: [_2]", $age, $msg );
+        }
+    }
+    $tickets->FromSQL( $query );
+    if ( my $cb = $map->{ $age }{'Condition'}{'CallbackPost'} ) {
+        my ($status, $msg) = $cb->( Age => $age, Collection => $tickets );
+        unless ( $status ) {
+            $RT::Logger->error(loc "Post callback for '[_1]' age failed with error: [_2]", $age, $msg );
+        }
+    }
+    if ( my $count = $tickets->Count ) {
+        $RT::Logger->debug( loc "Found [_1] tickets for age '[_2]'(not filtered)", $count, $age );
+    } else {
+        $RT::Logger->debug( loc "No tickets of '[_1]' age", $age );
+        next;
+    }
+
+    walk_collection( Collection => $tickets, Age => $age );
+
+    $RT::Logger->debug( loc "Complete" );
+}
+exit 0;
+
+sub walk_collection {
+    my %args = ( Collection => undef, Age => undef, @_ );
+    my $objs = $args{'Collection'};
+
+    my $filter = $map->{ $args{'Age'} }{'Condition'}{'Filter'};
+    $RT::Logger->debug( loc "There is a filter for '[_1]' age", $args{'Age'} );
+
+    my $tmp = new File::Temp; # croaks on error
+    my $class = '';
+
+    fetch_next( $objs, 1 );
+    while ( my $obj = fetch_next( $objs ) ) {
+        $class = ref $obj unless $class;
+        next if $filter && !$filter->(
+            Object     => $obj,
+            Collection => $objs,
+            Age        => $args{'Age'},
+        );
+        print $tmp $obj->id, "\n";
+    }
+    return unless $class;
+
+    seek $tmp, 0, 0;
+    while ( my $id = <$tmp> ) {
+        chomp $id;
+
+        my $obj = $class->new( $objs->CurrentUser );
+        $obj->LoadById( $id );
+        unless ( $obj->id ) {
+            $RT::Logger->warning( loc "Couldn't load [_1] #[_2], may be it doesn't exist anymore", $class, $id );
+            next;
+        }
+
+        my ($status, $msg) = apply_action(
+            Object     => $obj,
+            Collection => $objs,
+            Age        => $args{'Age'},
+        );
+        $RT::Logger->error(loc("Couldn't apply action for age [_1]: [_2]", $args{'Age'}, $msg))
+            unless $status;
+    }
+}
+
+sub apply_action {
+    my %args = ( Object => undef, Collection => undef, Age => undef, @_ );
+    my $age = $args{'Age'};
+    my $action = $map->{ $age }{'Action'};
+    if ( $action ) {
+        my ($status, $msg) = $action->( %args );
+        return ($status, $msg) unless $status;
+    }
+    return $args{'Object'}->AddCustomFieldValue(
+        Field => 'Age',
+        Value => $age,
+        RecordTransaction => 0,
+    );
+}
+
+use constant PAGE_SIZE => 100;
+sub fetch_next($;$) {
+    my ($objs, $init) = @_;
+    if ( $init ) {
+        $objs->RowsPerPage( PAGE_SIZE );
+        $objs->FirstPage;
+        return;
+    }
+
+    my $obj = $objs->Next;
+    return $obj if $obj;
+    $objs->NextPage;
+    return $objs->Next;
+}
+
+sub build_age_candidates_query {
+    my $age = shift;
+    my $query = '';
+
+    if ( exists $map->{ $age }{'Condition'}{'SQL'} ) {
+        $query = $map->{ $age }{'Condition'}{'SQL'}->( Age => $age ) || '';
+        $query = "( $query )" if $query;
+    }
+
+    my $i = 0;
+    $i++ while $ages[$i] && $ages[$i] ne $age;
+    $i-- while $i && !$map->{ $ages[$i-1] };
+    return joinq( 'AND', $query, ($i? "CF.{Age} = '". $ages[$i-1] ."'": "CF.{Age} IS NULL") );
+}
+
+sub joinq {
+    my ($aggregator, @parts) = @_;
+    return '( '. join( " $aggregator ", grep $_ && !/^\s+$/, @parts ) .' )';
+}
+
+sub prune_backups {
+    my %arg = (OlderThan => 0, @_);
+
+    require File::Spec;
+    my $name = RT->Config->Get('TicketAgingFilenameTemplate');
+    my $base;
+    unless ( $name ) {
+        require RT::Shredder;
+        $base = RT::Shredder->StoragePath
+    }
+    elsif ( !File::Spec->file_name_is_absolute( $name ) ) {
+        require RT::Shredder;
+        $name = File::Spec->catfile(RT::Shredder->StoragePath, $name);
+    }
+    $base ||= File::Spec->catpath( (File::Spec->splitpath( $name ))[0,1] );
+    $base = File::Spec->catfile( $base, '*' );
+    $RT::Logger->debug(loc("Scanning files in '[_1]'...", $base));
+
+    require RT::Date;
+    my $date = RT::Date->new( $RT::SystemUser );
+    $date->Unix( time - $arg{'OlderThan'}*24*60*60 );
+    $RT::Logger->debug(loc("Looking for files older than [_1]...", $date->AsString));
+
+    my $mtime = $date->Unix;
+    my @files = grep { (stat $_)[9] < $mtime && -f _ } glob $base;
+    unless ( @files ) {
+        $RT::Logger->debug(loc("No files"));
+        exit;
+    }
+    exit unless prompt_yN( loc("Do you want delete [_1] file(s)", scalar @files) );
+
+    foreach my $file( @files ) {
+        $RT::Logger->debug( $file );
+        unlink $file or $RT::Logger->error(loc("Couldn't delete file '[_1]': [_2]", $file, $!));
+    }
+    exit;
+}
+
+
+sub prompt_yN
+{
+    my $text = shift;
+    print "$text [y/N] ";
+    unless( <STDIN> =~ /^(?:y|yes)$/i ) {
+        return 0;
+    }
+    return 1;
+}
+
+
+
+__END__
+
+=head1 NAME
+
+rt-aging - tickets aging utility
+
+=head1 SYNOPSYS
+
+    rt-aging [--debug]
+    rt-aging --prune-backups 90 [--debug]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--debug>
+
+Prints debug messages.
+
+=item B<--prune-backups> <days>
+
+Deletes backups that are older than C<< <days> >> days.
+
+=back
+
+=cut

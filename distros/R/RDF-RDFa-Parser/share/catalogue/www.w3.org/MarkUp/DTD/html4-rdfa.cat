@@ -1,0 +1,22 @@
+-- .......................................................................... --
+-- File catalog  ............................................................ --
+
+--  HTML4+RDFa 1.0 Catalog Data File
+
+    Revision:  $Revision: 1.1 $
+
+    See "Entity Management", SGML Open Technical Resolution 9401 for detailed
+    information on supplying and using catalog data. This document is available
+    from OASIS at URL:
+
+        <http://www.oasis-open.org/html/tr9401.html>
+--
+
+-- .......................................................................... --
+-- SGML declaration associated with HTML + RDFa ............................. --
+
+OVERRIDE YES
+
+SGMLDECL "HTML4.decl"
+
+PUBLIC "-//ApTest//DTD HTML4+RDFa 1.0//EN"         "html4-rdfa-1.dtd"

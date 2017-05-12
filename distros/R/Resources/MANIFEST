@@ -1,0 +1,8 @@
+00VERSION			-- version id
+Changes				-- Changelog
+MANIFEST			-- This file
+Makefile.PL			-- make template
+Manifest			-- this file
+README				-- general info stuff
+Resources.pm			-- the package in question
+test.pl				-- test script

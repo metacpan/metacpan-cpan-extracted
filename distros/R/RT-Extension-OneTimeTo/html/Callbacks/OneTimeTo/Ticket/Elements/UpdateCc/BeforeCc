@@ -1,0 +1,43 @@
+<%ARGS>
+$Ticket
+@one_time_Ccs
+%txn_addresses
+$ARGSRef
+</%ARGS>
+<%INIT>
+my $hide_cc_suggestions =  RT->Config->Get('HideOneTimeSuggestions', $session{CurrentUser});
+my $show_label    = $m->interp->apply_escapes( loc("show suggestions"), 'h' );
+my $hide_label    = $m->interp->apply_escapes( loc("hide suggestions"), 'h' );
+</%INIT>
+<tr><td class="label"><&|/l&>One-time To</&>:</td><td><& /Elements/EmailInput, Name => 'UpdateTo', Size => undef, Default => $ARGSRef->{UpdateTo}, AutocompleteMultiple => 1 &><br />
+
+%if (scalar @one_time_Ccs) {
+%   if ($hide_cc_suggestions) {
+        <a href="#" class="ToggleSuggestions" data-hide-label="<% $hide_label %>" data-show-label="<% $show_label %>">
+            <i class="label">(<&|/l&>show suggestions</&>)</i>
+        </a>
+        <div class="OneTimeCcs hidden">
+%   }
+<i class="label">(<&|/l&>check to add</&>)</i>
+<span class="ticket-update-suggested-cc">
+<input type="checkbox" class="checkbox" id="AllSuggestedTo" name="AllSuggestedTo" value="1" onclick="setCheckbox(this, /^UpdateTo-/, null, true)">
+<label for="AllSuggestedTo"><% loc('All recipients') %></label>
+</span>
+%}
+%foreach my $addr ( @one_time_Ccs ) {
+<span class="ticket-update-suggested-cc">
+<input
+    id="UpdateTo-<%$addr%>"
+    name="UpdateTo-<%$addr%>"
+    class="onetime onetimeto"
+    type="checkbox"
+% my $clean_addr = $txn_addresses{$addr}->format;
+    onClick="checkboxToInput('UpdateTo', <% "UpdateTo-$addr" |n,j%>, <%$clean_addr|n,j%> );"
+    <% $ARGSRef->{'UpdateTo-'.$addr} ? 'checked="checked"' : ''%> >
+      <label for="UpdateTo-<%$addr%>"><& /Elements/ShowUser, Address => $txn_addresses{$addr}&></label>
+</span>
+%}
+%if (@one_time_Ccs && $hide_cc_suggestions) {
+</div>
+%}
+</td></tr>

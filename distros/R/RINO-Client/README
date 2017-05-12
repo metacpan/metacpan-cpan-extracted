@@ -1,0 +1,43 @@
+RINO-Client
+===========
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+EXAMPLES
+
+Procmail:
+
+:0
+* ^Return-Path: <soc@ren-isac.net>
+{
+    :0 c
+    | /usr/local/bin/my_rino.pl
+
+    :0
+    $DEFAULT
+}
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML::IODEF, JSON, Text::Table, Class::CSV, Module::Pluggable
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Wes Young (claimid.com/wesyoung)
+Copyright (C) 2011 by Doug Pearson
+Copyright (C) 2011 by the Trustee's of Indiana University (www.iu.edu)
+Copyright (C) 2011 by the REN-ISAC (www.ren-isac.net)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

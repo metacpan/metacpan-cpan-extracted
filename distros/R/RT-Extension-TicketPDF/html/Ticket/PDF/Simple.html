@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><% $title %></title>
+
+    <style>
+        <& /NoAuth/css/print.css &>
+        section > div { padding: 3px 10px; }
+        label { display: inline-block; width: 150px; }
+    </style>
+</head>
+<body style="width: 90%">
+    <header style="width:100%; text-align: center;">
+        <h2><% RT->Config->Get('Organization') %></h2>
+    </header>
+
+
+    <!-- Admin Fields -->
+    <section class="top">
+%       my $date = RT::Date->new; $date->SetToNow; $date = $date->ISO; $date =~ s/ .*//;
+        <div><label>Date   : </label><span><% $date %></span></div>
+        <div><label>RT #   : </label><span><% $TicketObj->Id %></span></div>
+        <div><label>Status : </label><span><% $TicketObj->Status %></span></div>
+    </section>
+
+    <hr>
+
+    <!-- Custom Fields -->
+    <section>
+        <h3>Information</h3>
+% foreach my $cf_id (@ids) {
+        <div><label><% $CF{$cf_id}{Name} %> : </label><span><% $CF{$cf_id}{Value} %></span></div>
+% }
+    </section>
+</body>
+</html>
+<%INIT>
+    my $TicketObj = LoadTicket($ARGS{'id'});
+    my $title = loc("#[_1]: [_2]", $TicketObj->Id, $TicketObj->Subject || '');
+
+    # Build up a hash of the customfields.
+    my %CF;
+    my @ids;
+    {
+        my $CustomFields = $TicketObj->CustomFields;
+        $CustomFields->GotoFirstItem;
+        while ( my $CustomField = $CustomFields->Next) {
+            push @ids, $CustomField->Id;
+            my $Values = $TicketObj->CustomFieldValues ($CustomField->Id);
+            $CF{$CustomField->Id} = {
+                # CustomField => $CustomField,
+                Name => $CustomField->Name,
+                Value => $Values->First
+            };
+        }
+    }
+</%INIT>
+<%ARGS>
+    $id => undef
+</%ARGS>
+<%FLAGS>
+    inherit => undef
+    # vim: syn=mason
+</%FLAGS>

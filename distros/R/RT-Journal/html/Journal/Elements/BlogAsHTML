@@ -1,0 +1,53 @@
+<& Header, User => $User &>
+<div class="blog">
+%while( my $post =  $EntriesObj->Next) {
+% my $my_category =  $post->FirstCustomFieldValue('RT::Journal-Category');
+<div class="blog-header">
+<h2 class="date"><%$post->CreatedObj->AsString%></h2><br>
+<h3 class="title"><%$post->Subject|| loc('Untitled')%></h3>
+</div>
+<br>
+% my $content = $post->Transactions->First->Content;
+% $content =~ s/-- (.*)$//gism;
+% $content =~ s/\n/<br>/gi;
+<div class="blogbody">
+<%$content|n%>
+</div>
+% my $refto = $post->RefersTo;
+<div align="right">
+% while( my $link = $refto->Next ) {
+<A href="<%$link->TargetURI->Resolver->HREF%>"><%$link->TargetURI->Resolver->HREF%></a><br>
+% }
+</div>
+% if ( $session{'CurrentUser'} && $session{'CurrentUser'}->Id == $post->OwnerObj->Id ) {
+[<a href="Edit.html?id=<%$post->Id%>"><&|/l&>Edit</&></a>]
+% }
+% my $comments = $post->Transactions;
+% $comments->Limit(FIELD => 'Type', VALUE => 'Correspond', OPERATOR => '=', ENTRYAGGREGATOR => 'AND');
+<div class="blog-footer">
+<a href="<& Attr, User => $User, Name=>'BaseURL'&>/Entry/<%$post->Id%>"><&|/l,$comments->Count&>[_1] Comments</&></a> |
+<a href="<& Attr, User => $User, Name=>'BaseURL'&>/Entry/<%$post->Id%>"><&|/l&>Permalink</&></a>
+<%$my_category%>
+</div>
+<br />
+% }
+
+<br>
+% if ($Page > 1) {
+<a href="?Page=<%$Page-1%>">Previous page</a> |
+% }
+<a href="?Page=<%$Page+1%>">Next page</a>
+
+</div>
+<& Footer, %ARGS &>
+
+<%ARGS>
+$Page => undef
+$show => undef
+$User	=> undef
+$EntriesObj	=> undef
+</%ARGS>
+<%init>
+#return if ($m->cache_self([expires_in => '1 hour']));
+my $guest = RT::CurrentUser->new('RT::Journal-Guest');
+</%init>

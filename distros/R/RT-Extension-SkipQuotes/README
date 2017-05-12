@@ -1,0 +1,17 @@
+NAME
+    RT::Extension::SkipQuotes - helps to collapse overquoted emails
+
+SYNOPSYS
+            Set(@Plugins, qw(RT::Extension::SkipQuotes));
+
+DESCRIPTION
+    This extension intended to collapse overquoted emails which often
+    happens in corporate environments. Extension adds a javascript to a
+    ticket display page, so action is taken on client's side.
+
+AUTHOR
+    Vitaly Tskhovrebov <vitaly@tskhovrebov.ru>
+
+LICENSE
+    Under the same terms as perl itself.
+

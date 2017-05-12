@@ -1,0 +1,6 @@
+Revision history for Perl extension Redmine::Stat.
+
+0.01  Wed Jul 11 21:01:26 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -n Redmine::Stat
+

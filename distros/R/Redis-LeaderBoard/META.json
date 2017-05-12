@@ -1,0 +1,85 @@
+{
+   "abstract" : "leader board using Redis",
+   "author" : [
+      "Masayuki Matsuki <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-LeaderBoard",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Redis::Fast" : "0"
+         },
+         "requires" : {
+            "Mouse" : "0",
+            "Redis" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::RedisServer" : "0",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Redis::LeaderBoard" : {
+         "file" : "lib/Redis/LeaderBoard.pm",
+         "version" : "1.11"
+      },
+      "Redis::LeaderBoard::Member" : {
+         "file" : "lib/Redis/LeaderBoard/Member.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-Redis-LeaderBoard/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-Redis-LeaderBoard",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-Redis-LeaderBoard.git",
+         "web" : "https://github.com/Songmu/p5-Redis-LeaderBoard"
+      }
+   },
+   "version" : "1.11",
+   "x_contributors" : [
+      "Ichinose Shogo <shogo82148@gmail.com>"
+   ]
+}

@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use strict;
+use CGI;
+use Config::IniFiles;
+
+use constant {
+    CONFIG_PATH => "/usr/local/etc/rack.conf",
+};
+
+
+# read RackMan configuration to fetch RackTables URL
+my $config  = Config::IniFiles->new(-file => CONFIG_PATH);
+my $rt_url  = $config->val(general => "racktables_url");
+
+# fetch the shortened params
+my $cgi = CGI->new;
+my $object_id = $cgi->param("oi");
+my $port_id   = $cgi->param("pi");
+
+# construct the full URL
+my $url = "$rt_url/index.php?page=object&object_id=$object_id";
+$url .= "&hl_port_id=$port_id" if defined $port_id and length $port_id;
+
+print $cgi->redirect($url);
+
+__END__
+
+=head1 NAME
+
+rtlink - Trivial link redirecter to RackTables
+
+=head1 DESCRIPTION
+
+The sole purpose of this very small CGI program is to redirect to
+RackTables, allowing the use of shorter parameter names in order
+to work around the tight limits in some devices.
+
+  Translation table
+  -----------------
+  oi  object_id
+  pi  hl_port_id
+
+
+=head1 AUTHOR
+
+Sebastien Aperghis-Tramoni
+
+=cut
+

@@ -1,0 +1,79 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cdf5940f4c6fc43c33a62ebe7939563af198a362 Changes
+SHA1 f99cc0ad297524a636b5f1e0aafb213d0d609e8e MANIFEST
+SHA1 dd97b5a2d59fdc020c1ace4c4f3f4621178435bd META.yml
+SHA1 ceca073ea0f1d029691a137a6751490b4e8112af Makefile.PL
+SHA1 530fe3e569ca2cb55e271179da62e916459fc8ec README
+SHA1 270ccb1cb0382ff11bd6c6b58f52ba01f7beba36 etc/BugTracker_Config.pm
+SHA1 ac8cbe9ae38985e230d2e7574bd734e053134dbd etc/initialdata
+SHA1 05a50706bbf6d8b5aa0c80be02ee08b6ab9ae34a etc/upgrade/subject-tags/content
+SHA1 d449e27cec95839f37800e40ac03742afcab7d79 html/Callbacks/BugTracker/Elements/Tabs/Privileged
+SHA1 c08b6a07216d82c4c196c33a803b54201cc50539 html/Callbacks/BugTracker/Elements/Tabs/SelfService
+SHA1 6b72aaea560ab99f99f4fabd87e8c7b6fb55dcee html/Callbacks/BugTracker/Search/Simple.html/ModifyQuery
+SHA1 5757e505ce2611777e4c854f100071979df0481d html/Callbacks/BugTracker/Search/Simple.html/PreForm
+SHA1 9f31134e6f22862fb1c8b3ada81b3bcf54a54972 html/Callbacks/BugTracker/Ticket/Create.html/Default
+SHA1 17e3a825348191401baf532a8ede4b1a0edc6a4c html/Callbacks/BugTracker/Ticket/Create.html/FormStart
+SHA1 7e61a635015ff327cd5400b86a5a4325e1524f37 html/Callbacks/BugTracker/Ticket/Display.html/BeforeActionList
+SHA1 7d690454d7e310c172a04191e0da6631353b267c html/Callbacks/BugTracker/Ticket/Elements/EditCustomFields/MassageCustomFields
+SHA1 7e61a635015ff327cd5400b86a5a4325e1524f37 html/Callbacks/BugTracker/Ticket/Modify.html/BeforeActionList
+SHA1 c8369c189802c1c8f1ea8a80f1bebc7427b0d7f8 html/Callbacks/BugTracker/Ticket/Update.html/AfterWorked
+SHA1 5ab531d31518b624b5eaa681828ee440d90bbb37 html/Callbacks/BugTracker/Ticket/Update.html/BeforeActionList
+SHA1 d6bb83bf00b5bb883a5ac0754fc5b4736cccef48 html/Callbacks/BugTracker/autohandler/Default
+SHA1 d7f08bcb5d1c796a1932dad021c02ba7f0391ee5 html/Dist/BeginsWith.html
+SHA1 8bd84297a8be91479d8a9c398404b5b2acf95628 html/Dist/Browse.html
+SHA1 f93fbca7568fb9b226391be27a83df624ae67388 html/Dist/ByMaintainer.html
+SHA1 a7e5d93c17ebe1c8b0382c2589c348eaa3d8e410 html/Dist/Display.html
+SHA1 bc2e49e2d1d165a809d5aeb8219e2e5b8e88c793 html/Dist/Elements/BeginsWith
+SHA1 88426cc195301da49690b520d9bfd21299426ca3 html/Dist/Elements/DistributionList
+SHA1 f43c19cb4d4cfd80d124fef1edaa37814383f488 html/Dist/Elements/EditNotes
+SHA1 4725393a986ee9ba8cb8c219ed658e2e5605f5ff html/Dist/Elements/EditNotifyAddresses
+SHA1 658bab13fd0264faad46a195259e965a221df948 html/Dist/Elements/EditSubjectTag
+SHA1 7772902191db31f086cd1a7bf7146017f14e0136 html/Dist/Elements/ErrorDisabled
+SHA1 09f47647f02ab0c0204c647effefde1900e79816 html/Dist/Elements/ShowBugs
+SHA1 a5d318d2386011217b79a1ba09d8d9cce2a54e9a html/Dist/Elements/ShowBugtracker
+SHA1 af1427745ff2dcca6ff5c00d12beb23dd3b243eb html/Dist/Elements/ShowMaintainers
+SHA1 462e9cd63fd4364cffebae059e176a3054f7d1ae html/Dist/Elements/ShowNotes
+SHA1 9c430aa9e32cc73e18fb219919fa5f1a21d046f3 html/Dist/Manage.html
+SHA1 35ecce3a046133f58415014a3e40ae4215db7fef html/Dist/Search.html
+SHA1 f4db4634afe099c2b754c85762df1fe63e77a252 html/Elements/ErrorNoDist
+SHA1 6aaf79e28e18e4a5e897f346b051fdfe7249ee19 html/Elements/ErrorNoUser
+SHA1 91f724c27a9f64632de0a44d9dbad0c8198ef085 html/NoAuth/css/bugtracker.css
+SHA1 7640c76b42151ddd9729bf2be612fb49d2358f94 html/Ticket/Elements/ShowQueue
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 6e010ba20a9d0ae23d8d0ff516868c1e571c2d44 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 560e35088aa8704d928626915590e38dbf908376 lib/RT/Action/NotifyAdditionalAddresses.pm
+SHA1 004fe209ceab66941f784965a4e3d14c95e5fbe8 lib/RT/BugTracker.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSTTrkACgkQMflWJZZAbqDglACePdiG6PiRK2g8uF4dGbaAXhim
+ZU0An2cLpFIBNfbSyO3ebBQp6L2H20m6
+=zOCR
+-----END PGP SIGNATURE-----

@@ -1,0 +1,6 @@
+Revision history for Perl extension Rubberband.
+
+0.01  Sat Jul 17 15:51:45 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.0.5 -n Rubberband
+

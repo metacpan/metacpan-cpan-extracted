@@ -1,0 +1,29 @@
+---
+abstract: 'An Extension to Best Practical Request Tracker (https://www.bestpractical.com/rt/) to return to a defined a url after a status change'
+author:
+  - 'Mark Hofstertter University of Vienna  <mark.hofstetter@univie.ac.at>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RT-Extension-OneClickClose
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+resources:
+  bugtracker: https://github.com/MarkHofstetter/RT-Extension-OneClickClose/issues
+  homepage: https://github.com/MarkHofstetter/RT-Extension-OneClickClose
+  repository: https://github.com/MarkHofstetter/RT-Extension-OneClickClose.git
+version: '0.02'
+x_contributors:
+  - 'Mark Hofstetter <mark@univie.ac.at>'

@@ -1,0 +1,4 @@
+[local_rt]
+period      = daily
+detection   = daily
+feed        = 'https://localhost/rt/CIFMinimal/feed?user=cif&pass=passwordpassword'

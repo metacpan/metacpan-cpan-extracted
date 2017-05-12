@@ -1,0 +1,70 @@
+<%init>
+# grab ticket number from URL
+my ($mode,$ticket_no) = ($m->dhandler_arg =~ m/^((?:all|current))\/(\d+)\//i );
+
+# create ticket object
+my $Ticket = LoadTicket($ticket_no);
+
+# collect individual attached files in a hash of arrays
+my $AttachObj = $m->comp('/Ticket/Elements/FindAttachments', Ticket => $Ticket);
+my %attached_files;
+while (my $attached_name = $AttachObj->Next() ) {
+  next unless ($attached_name->Filename());
+  unshift( @{ $attached_files{ $attached_name->Filename } }, $attached_name );
+}
+my $tempdir = File::Temp->newdir( CLEANUP => 1 );
+my $zip = Archive::Zip->new();
+my ($zip_fh,$zip_name) = Archive::Zip::tempFile($tempdir);
+</%init>
+<%perl>
+foreach my $name (keys %attached_files) {
+  foreach my $revision (@{$attached_files{$name}}) {
+    # temporary on-disk storage of files for zip
+    my $tempfile_fh = File::Temp->new(DIR => $tempdir, SUFFIX => ".tmp");
+
+    # these objects go out of scope before the zipfile is written to disk,
+    # which would cause them to be deleted too early.  Let the tempdir
+    # CLEANUP take care of them instead.
+    $tempfile_fh->unlink_on_destroy(0);
+    my $tempfile_name = $tempfile_fh->filename;
+    print $tempfile_fh $revision->Content;
+
+    # need to close the FH so that perl flushes output
+    close $tempfile_fh;
+
+    # add tempfile to zip as the original name from the attachment, with revision ID
+    my $member;
+    if ($mode =~ m/all/i) {
+      $member = $zip->addFile($tempfile_name,sprintf('ticket_%d/%d_%s',$Ticket->Id,$revision->Id,$revision->Filename));
+    } else {
+      $member = $zip->addFile($tempfile_name,sprintf('ticket_%d/%s',$Ticket->Id,$revision->Filename));
+    }
+    $member->desiredCompressionMethod( COMPRESSION_DEFLATED );
+    last if ($mode !~ m/all/i);
+  }
+}
+
+if ( $zip->writeToFileHandle($zip_fh) == AZ_OK) {
+  # need to close the FH so that perl flushes output
+  close $zip_fh;
+  $r->content_type( "application/zip" );
+  $m->clear_buffer();
+  $m->out($m->file($zip_name));
+  $m->abort;
+} else {
+  close $zip_fh;
+  $RT::Logger->error("write error writing zip to $zip_name");
+  $r->content_type( "text/plain" );
+  $m->clear_buffer();
+  $m->out("Sorry, error creating zip.  Please contact your system administrator.");
+  $m->abort;
+}
+undef $tempdir;
+</%perl>
+<%attr>
+AutoFlush => 0
+</%attr>
+<%once>
+use Archive::Zip qw( :ERROR_CODES :CONSTANTS);
+use File::Temp qw( tempfile tempdir);
+</%once>

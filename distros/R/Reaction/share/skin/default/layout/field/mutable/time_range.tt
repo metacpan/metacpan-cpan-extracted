@@ -1,0 +1,11 @@
+=extends NEXT
+
+=for layout message
+
+<!-- This conditional goes away when mst comes up with something better -->
+[% content_str = GET content; %]
+[% IF content_str.length; %]
+  <span class="time_range_message"> [% content_str | html %] </span><br />
+[% END %]
+
+=cut

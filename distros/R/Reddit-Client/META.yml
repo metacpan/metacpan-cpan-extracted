@@ -1,0 +1,29 @@
+---
+abstract: 'A Perl wrapper for the Reddit API.'
+author:
+  - '"Jeff Ober" <"jeffober@gmail.com">'
+build_requires:
+  IO::Capture::Stderr: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Reddit-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Path::Expand: '1.02'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  URI::Encode: '0'
+version: '1.084'

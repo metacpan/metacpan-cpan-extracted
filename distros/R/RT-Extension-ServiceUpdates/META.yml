@@ -1,0 +1,12 @@
+name: RT-Extension-ServiceUpdates
+version: 0.1
+abstract: RT Extension-ServiceUpdates Extension
+author: Jesse Vincent <jesse@bestpractical.com>
+license: perl
+distribution_type: module
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+generated_by: Module::Install version 0.36

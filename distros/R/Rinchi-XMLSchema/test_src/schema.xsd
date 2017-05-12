@@ -1,0 +1,1234 @@
+<?xml version='1.0'?>
+<!-- DOCTYPE xsd:schema PUBLIC "-//W3C//DTD XMLSCHEMA 200102//EN" SYSTEM "XMLSchema.dtd" [
+
+< ! - - provide ID type information even for parsers which only read the
+     internal subset - - >
+<!ATTLIST xsd:schema          id  ID  #IMPLIED>
+<!ATTLIST xsd:complexType     id  ID  #IMPLIED>
+<!ATTLIST xsd:complexContent  id  ID  #IMPLIED>
+<!ATTLIST xsd:simpleContent   id  ID  #IMPLIED>
+<!ATTLIST xsd:extension       id  ID  #IMPLIED>
+<!ATTLIST xsd:element         id  ID  #IMPLIED>
+<!ATTLIST xsd:group           id  ID  #IMPLIED> 
+<!ATTLIST xsd:all             id  ID  #IMPLIED>
+<!ATTLIST xsd:choice          id  ID  #IMPLIED>
+<!ATTLIST xsd:sequence        id  ID  #IMPLIED>
+<!ATTLIST xsd:any             id  ID  #IMPLIED>
+<!ATTLIST xsd:anyAttribute    id  ID  #IMPLIED>
+<!ATTLIST xsd:attribute       id  ID  #IMPLIED>
+<!ATTLIST xsd:attributeGroup  id  ID  #IMPLIED>
+<!ATTLIST xsd:unique          id  ID  #IMPLIED>
+<!ATTLIST xsd:key             id  ID  #IMPLIED>
+<!ATTLIST xsd:keyref          id  ID  #IMPLIED>
+<!ATTLIST xsd:selector        id  ID  #IMPLIED>
+<!ATTLIST xsd:field           id  ID  #IMPLIED>
+<!ATTLIST xsd:include         id  ID  #IMPLIED>
+<!ATTLIST xsd:import          id  ID  #IMPLIED>
+<!ATTLIST xsd:redefine        id  ID  #IMPLIED>
+<!ATTLIST xsd:notation        id  ID  #IMPLIED>
+]-->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" blockDefault="#all"
+           elementFormDefault="qualified" xml:lang="EN"
+           targetNamespace="http://www.w3.org/2001/XMLSchema"
+           version="Id: structures.xsd,v 1.2 2004/01/15 11:34:25 ht Exp ">
+  <xsd:annotation>
+    <xsd:documentation source="../structures/structures-with-errata.html.html">
+   The schema corresponding to this document is normative,
+   with respect to the syntactic constraints it expresses in the
+   XML Schema language.  The documentation (within &lt;documentation> elements)
+   below, is not normative, but rather highlights important aspects of
+   the W3C Recommendation of which this is a part</xsd:documentation>
+  </xsd:annotation>
+  <xsd:annotation>
+    <xsd:documentation>
+   The simpleType element and all of its members are defined
+   in datatypes.xsd</xsd:documentation>
+  </xsd:annotation>
+  <xsd:include schemaLocation="datatypes.xsd"/>
+  <xsd:import namespace="http://www.w3.org/XML/1998/namespace"
+             schemaLocation="http://www.w3.org/2001/xml.xsd">
+    <xsd:annotation>
+      <xsd:documentation>
+       Get access to the xml: attribute groups for xml:lang
+       as declared on 'schema' and 'documentation' below
+     </xsd:documentation>
+    </xsd:annotation>
+  </xsd:import>
+  <xsd:complexType name="openAttrs">
+    <xsd:annotation>
+      <xsd:documentation>
+       This type is extended by almost all schema types
+       to allow attributes from other namespaces to be
+       added to user schemas.
+     </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:anyType">
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="annotated">
+    <xsd:annotation>
+      <xsd:documentation>
+       This type is extended by all types which allow annotation
+       other than &lt;schema> itself
+     </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xsd:openAttrs">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="id" type="xsd:ID"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:group name="schemaTop">
+    <xsd:annotation>
+      <xsd:documentation>
+   This group is for the
+   elements which occur freely at the top level of schemas.
+   All of their types are based on the "annotated" type by extension.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice>
+      <xsd:group ref="xsd:redefinable"/>
+      <xsd:element ref="xsd:element"/>
+      <xsd:element ref="xsd:attribute"/>
+      <xsd:element ref="xsd:notation"/>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:group name="redefinable">
+    <xsd:annotation>
+      <xsd:documentation>
+   This group is for the
+   elements which can self-redefine (see &lt;redefine> below).</xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice>
+      <xsd:element ref="xsd:simpleType"/>
+      <xsd:element ref="xsd:complexType"/>
+      <xsd:element ref="xsd:group"/>
+      <xsd:element ref="xsd:attributeGroup"/>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:simpleType name="formChoice">
+    <xsd:annotation>
+      <xsd:documentation>
+   A utility type, not for public use</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="qualified"/>
+      <xsd:enumeration value="unqualified"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="reducedDerivationControl">
+    <xsd:annotation>
+      <xsd:documentation>
+   A utility type, not for public use</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:derivationControl">
+      <xsd:enumeration value="extension"/>
+      <xsd:enumeration value="restriction"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="derivationSet">
+    <xsd:annotation>
+      <xsd:documentation>
+   A utility type, not for public use</xsd:documentation>
+      <xsd:documentation>
+   #all or (possibly empty) subset of {extension, restriction}</xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType name="derivationSet-all">
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="#all"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="anon_05">
+        <xsd:list itemType="xsd:reducedDerivationControl"/>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <xsd:simpleType name="typeDerivationControl">
+    <xsd:annotation>
+      <xsd:documentation>
+   A utility type, not for public use</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:derivationControl">
+      <xsd:enumeration value="extension"/>
+      <xsd:enumeration value="restriction"/>
+      <xsd:enumeration value="list"/>
+      <xsd:enumeration value="union"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="fullDerivationSet">
+    <xsd:annotation>
+      <xsd:documentation>
+   A utility type, not for public use</xsd:documentation>
+      <xsd:documentation>
+   #all or (possibly empty) subset of {extension, restriction, list, union}</xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType name="fullDerivationSet-all">
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="#all"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="anon_06">
+        <xsd:list itemType="xsd:typeDerivationControl"/>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <xsd:element name="schema" id="schema">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-schema"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:openAttrs">
+          <xsd:sequence>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+              <xsd:element ref="xsd:include"/>
+              <xsd:element ref="xsd:import"/>
+              <xsd:element ref="xsd:redefine"/>
+              <xsd:element ref="xsd:annotation"/>
+            </xsd:choice>
+            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+              <xsd:group ref="xsd:schemaTop"/>
+              <xsd:element ref="xsd:annotation" minOccurs="0"
+                          maxOccurs="unbounded"/>
+            </xsd:sequence>
+          </xsd:sequence>
+          <xsd:attribute name="targetNamespace" type="xsd:anyURI"/>
+          <xsd:attribute name="version" type="xsd:token"/>
+          <xsd:attribute name="finalDefault" type="xsd:fullDerivationSet"
+                        default="" use="optional"/>
+          <xsd:attribute name="blockDefault" type="xsd:blockSet" default=""
+                        use="optional"/>
+          <xsd:attribute name="attributeFormDefault" type="xsd:formChoice"
+                        default="unqualified" use="optional"/>
+          <xsd:attribute name="elementFormDefault" type="xsd:formChoice"
+                        default="unqualified" use="optional"/>
+          <xsd:attribute name="id" type="xsd:ID"/>
+          <xsd:attribute ref="xml:lang"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:key name="element">
+      <xsd:selector xpath="xsd:element"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:key name="attribute">
+      <xsd:selector xpath="xsd:attribute"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:key name="type">
+      <xsd:selector xpath="xsd:complexType|xsd:simpleType"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:key name="group">
+      <xsd:selector xpath="xsd:group"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:key name="attributeGroup">
+      <xsd:selector xpath="xsd:attributeGroup"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:key name="notation">
+      <xsd:selector xpath="xsd:notation"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:key name="identityConstraint">
+      <xsd:selector xpath=".//xsd:key|.//xsd:unique|.//xsd:keyref"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+  </xsd:element>
+  <xsd:simpleType name="allNNI">
+    <xsd:annotation>
+      <xsd:documentation>
+   for maxOccurs</xsd:documentation>
+    </xsd:annotation>
+    <xsd:union memberTypes="xsd:nonNegativeInteger">
+      <xsd:simpleType name="allNNI-unbounded">
+        <xsd:restriction base="xsd:NMTOKEN">
+          <xsd:enumeration value="unbounded"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <xsd:attributeGroup name="occurs">
+    <xsd:annotation>
+      <xsd:documentation>
+   for all particles</xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="minOccurs" type="xsd:nonNegativeInteger" default="1"
+                  use="optional"/>
+    <xsd:attribute name="maxOccurs" type="xsd:allNNI" default="1" use="optional"/>
+  </xsd:attributeGroup>
+  <xsd:attributeGroup name="defRef">
+    <xsd:annotation>
+      <xsd:documentation>
+   for element, group and attributeGroup,
+   which both define and reference</xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="name" type="xsd:NCName"/>
+    <xsd:attribute name="ref" type="xsd:QName"/>
+  </xsd:attributeGroup>
+  <xsd:group name="typeDefParticle">
+    <xsd:annotation>
+      <xsd:documentation>
+   'complexType' uses this</xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice>
+      <xsd:element name="group" type="xsd:groupRef"/>
+      <xsd:element ref="xsd:all"/>
+      <xsd:element ref="xsd:choice"/>
+      <xsd:element ref="xsd:sequence"/>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:group name="nestedParticle">
+    <xsd:choice>
+      <xsd:element name="element" type="xsd:localElement"/>
+      <xsd:element name="group" type="xsd:groupRef"/>
+      <xsd:element ref="xsd:choice"/>
+      <xsd:element ref="xsd:sequence"/>
+      <xsd:element ref="xsd:any"/>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:group name="particle">
+    <xsd:choice>
+      <xsd:element name="element" type="xsd:localElement"/>
+      <xsd:element name="group" type="xsd:groupRef"/>
+      <xsd:element ref="xsd:all"/>
+      <xsd:element ref="xsd:choice"/>
+      <xsd:element ref="xsd:sequence"/>
+      <xsd:element ref="xsd:any"/>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:complexType name="attribute">
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:sequence>
+          <xsd:element name="simpleType" type="xsd:localSimpleType" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attributeGroup ref="xsd:defRef"/>
+        <xsd:attribute name="type" type="xsd:QName"/>
+        <xsd:attribute name="use" default="optional" use="optional">
+          <xsd:simpleType name="attributeUse">
+            <xsd:restriction base="xsd:NMTOKEN">
+              <xsd:enumeration value="prohibited"/>
+              <xsd:enumeration value="optional"/>
+              <xsd:enumeration value="required"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="default" type="xsd:string"/>
+        <xsd:attribute name="fixed" type="xsd:string"/>
+        <xsd:attribute name="form" type="xsd:formChoice"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="topLevelAttribute">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:attribute">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:element name="simpleType" type="xsd:localSimpleType" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="ref" use="prohibited"/>
+        <xsd:attribute name="form" use="prohibited"/>
+        <xsd:attribute name="use" use="prohibited"/>
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:group name="attrDecls">
+    <xsd:sequence>
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="attribute" type="xsd:attribute"/>
+        <xsd:element name="attributeGroup" type="xsd:attributeGroupRef"/>
+      </xsd:choice>
+      <xsd:element ref="xsd:anyAttribute" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:group>
+  <xsd:element name="anyAttribute" type="xsd:wildcard" id="anyAttribute">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-anyAttribute"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:group name="complexTypeModel">
+    <xsd:choice>
+      <xsd:element ref="xsd:simpleContent"/>
+      <xsd:element ref="xsd:complexContent"/>
+      <xsd:sequence>
+        <xsd:annotation>
+          <xsd:documentation>
+   This branch is short for
+   &lt;complexContent>
+   &lt;restriction base="xsd:anyType">
+   ...
+   &lt;/restriction>
+   &lt;/complexContent></xsd:documentation>
+        </xsd:annotation>
+        <xsd:group ref="xsd:typeDefParticle" minOccurs="0"/>
+        <xsd:group ref="xsd:attrDecls"/>
+      </xsd:sequence>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:complexType name="complexType" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:group ref="xsd:complexTypeModel"/>
+        <xsd:attribute name="name" type="xsd:NCName">
+          <xsd:annotation>
+            <xsd:documentation>
+      Will be restricted to required or forbidden</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="mixed" type="xsd:boolean" default="false"
+                      use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+      Not allowed if simpleContent child is chosen.
+      May be overriden by setting on complexContent child.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="abstract" type="xsd:boolean" default="false"
+                      use="optional"/>
+        <xsd:attribute name="final" type="xsd:derivationSet"/>
+        <xsd:attribute name="block" type="xsd:derivationSet"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="topLevelComplexType">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:complexType">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:group ref="xsd:complexTypeModel"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="localComplexType">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:complexType">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:group ref="xsd:complexTypeModel"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" use="prohibited"/>
+        <xsd:attribute name="abstract" use="prohibited"/>
+        <xsd:attribute name="final" use="prohibited"/>
+        <xsd:attribute name="block" use="prohibited"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="restrictionType">
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:sequence>
+          <xsd:choice minOccurs="0">
+            <xsd:group ref="xsd:typeDefParticle"/>
+            <xsd:group ref="xsd:simpleRestrictionModel"/>
+          </xsd:choice>
+          <xsd:group ref="xsd:attrDecls"/>
+        </xsd:sequence>
+        <xsd:attribute name="base" type="xsd:QName" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="complexRestrictionType">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:restrictionType">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:choice minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>This choice is added simply to
+                   make this a valid restriction per the REC</xsd:documentation>
+            </xsd:annotation>
+            <xsd:group ref="xsd:typeDefParticle"/>
+          </xsd:choice>
+          <xsd:group ref="xsd:attrDecls"/>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="extensionType">
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:sequence>
+          <xsd:group ref="xsd:typeDefParticle" minOccurs="0"/>
+          <xsd:group ref="xsd:attrDecls"/>
+        </xsd:sequence>
+        <xsd:attribute name="base" type="xsd:QName" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="complexContent" id="complexContent">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-complexContent"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:annotated">
+          <xsd:choice>
+            <xsd:element name="restriction" type="xsd:complexRestrictionType"/>
+            <xsd:element name="extension" type="xsd:extensionType"/>
+          </xsd:choice>
+          <xsd:attribute name="mixed" type="xsd:boolean">
+            <xsd:annotation>
+              <xsd:documentation>
+       Overrides any setting on complexType parent.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="simpleRestrictionType">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:restrictionType">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:choice minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>This choice is added simply to
+                   make this a valid restriction per the REC</xsd:documentation>
+            </xsd:annotation>
+            <xsd:group ref="xsd:simpleRestrictionModel"/>
+          </xsd:choice>
+          <xsd:group ref="xsd:attrDecls"/>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="simpleExtensionType">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:extensionType">
+        <xsd:sequence>
+          <xsd:annotation>
+            <xsd:documentation>
+      No typeDefParticle group reference</xsd:documentation>
+          </xsd:annotation>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:group ref="xsd:attrDecls"/>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="simpleContent" id="simpleContent">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-simpleContent"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:annotated">
+          <xsd:choice>
+            <xsd:element name="restriction" type="xsd:simpleRestrictionType"/>
+            <xsd:element name="extension" type="xsd:simpleExtensionType"/>
+          </xsd:choice>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="complexType" type="xsd:topLevelComplexType" id="complexType">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-complexType"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:simpleType name="blockSet">
+    <xsd:annotation>
+      <xsd:documentation>
+    A utility type, not for public use</xsd:documentation>
+      <xsd:documentation>
+    #all or (possibly empty) subset of {substitution, extension,
+    restriction}</xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType name="blockSet-all">
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="#all"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="anon_07">
+        <xsd:list>
+          <xsd:simpleType name="blockSet-derivationControl">
+            <xsd:restriction base="xsd:derivationControl">
+              <xsd:enumeration value="extension"/>
+              <xsd:enumeration value="restriction"/>
+              <xsd:enumeration value="substitution"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:list>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <xsd:complexType name="element" abstract="true">
+    <xsd:annotation>
+      <xsd:documentation>
+   The element element can be used either
+   at the top level to define an element-type binding globally,
+   or within a content model to either reference a globally-defined
+   element or type or declare an element-type binding locally.
+   The ref form is not allowed at the top level.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:sequence>
+          <xsd:choice minOccurs="0">
+            <xsd:element name="simpleType" type="xsd:localSimpleType"/>
+            <xsd:element name="complexType" type="xsd:localComplexType"/>
+          </xsd:choice>
+          <xsd:group ref="xsd:identityConstraint" minOccurs="0"
+                    maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attributeGroup ref="xsd:defRef"/>
+        <xsd:attribute name="type" type="xsd:QName"/>
+        <xsd:attribute name="substitutionGroup" type="xsd:QName"/>
+        <xsd:attributeGroup ref="xsd:occurs"/>
+        <xsd:attribute name="default" type="xsd:string"/>
+        <xsd:attribute name="fixed" type="xsd:string"/>
+        <xsd:attribute name="nillable" type="xsd:boolean" default="false"
+                      use="optional"/>
+        <xsd:attribute name="abstract" type="xsd:boolean" default="false"
+                      use="optional"/>
+        <xsd:attribute name="final" type="xsd:derivationSet"/>
+        <xsd:attribute name="block" type="xsd:blockSet"/>
+        <xsd:attribute name="form" type="xsd:formChoice"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="topLevelElement">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:element">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:choice minOccurs="0">
+            <xsd:element name="simpleType" type="xsd:localSimpleType"/>
+            <xsd:element name="complexType" type="xsd:localComplexType"/>
+          </xsd:choice>
+          <xsd:group ref="xsd:identityConstraint" minOccurs="0"
+                    maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="ref" use="prohibited"/>
+        <xsd:attribute name="form" use="prohibited"/>
+        <xsd:attribute name="minOccurs" use="prohibited"/>
+        <xsd:attribute name="maxOccurs" use="prohibited"/>
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="localElement">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:element">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:choice minOccurs="0">
+            <xsd:element name="simpleType" type="xsd:localSimpleType"/>
+            <xsd:element name="complexType" type="xsd:localComplexType"/>
+          </xsd:choice>
+          <xsd:group ref="xsd:identityConstraint" minOccurs="0"
+                    maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="substitutionGroup" use="prohibited"/>
+        <xsd:attribute name="final" use="prohibited"/>
+        <xsd:attribute name="abstract" use="prohibited"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="element" type="xsd:topLevelElement" id="element">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-element"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="group" abstract="true">
+    <xsd:annotation>
+      <xsd:documentation>
+   group type for explicit groups, named top-level groups and
+   group references</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:group ref="xsd:particle" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:attributeGroup ref="xsd:defRef"/>
+        <xsd:attributeGroup ref="xsd:occurs"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="realGroup">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:group">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element ref="xsd:all"/>
+            <xsd:element ref="xsd:choice"/>
+            <xsd:element ref="xsd:sequence"/>
+          </xsd:choice>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="namedGroup">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:realGroup">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:choice minOccurs="1" maxOccurs="1">
+            <xsd:element name="all">
+              <xsd:complexType>
+                <xsd:complexContent>
+                  <xsd:restriction base="xsd:all">
+                    <xsd:group ref="xsd:allModel"/>
+                    <xsd:attribute name="minOccurs" use="prohibited"/>
+                    <xsd:attribute name="maxOccurs" use="prohibited"/>
+                    <xsd:anyAttribute namespace="##other" processContents="lax"/>
+                  </xsd:restriction>
+                </xsd:complexContent>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="choice" type="xsd:simpleExplicitGroup"/>
+            <xsd:element name="sequence" type="xsd:simpleExplicitGroup"/>
+          </xsd:choice>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+        <xsd:attribute name="ref" use="prohibited"/>
+        <xsd:attribute name="minOccurs" use="prohibited"/>
+        <xsd:attribute name="maxOccurs" use="prohibited"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="groupRef">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:realGroup">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="ref" type="xsd:QName" use="required"/>
+        <xsd:attribute name="name" use="prohibited"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="explicitGroup">
+    <xsd:annotation>
+      <xsd:documentation>
+   group type for the three kinds of group</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:group">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:group ref="xsd:nestedParticle" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:NCName" use="prohibited"/>
+        <xsd:attribute name="ref" type="xsd:QName" use="prohibited"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="simpleExplicitGroup">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:explicitGroup">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:group ref="xsd:nestedParticle" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="minOccurs" use="prohibited"/>
+        <xsd:attribute name="maxOccurs" use="prohibited"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:group name="allModel">
+    <xsd:sequence>
+      <xsd:element ref="xsd:annotation" minOccurs="0"/>
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>This choice with min/max is here to
+                          avoid a pblm with the Elt:All/Choice/Seq
+                          Particle derivation constraint</xsd:documentation>
+        </xsd:annotation>
+        <xsd:element name="element" type="xsd:narrowMaxMin"/>
+      </xsd:choice>
+    </xsd:sequence>
+  </xsd:group>
+  <xsd:complexType name="narrowMaxMin">
+    <xsd:annotation>
+      <xsd:documentation>restricted max/min</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:localElement">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:choice minOccurs="0">
+            <xsd:element name="simpleType" type="xsd:localSimpleType"/>
+            <xsd:element name="complexType" type="xsd:localComplexType"/>
+          </xsd:choice>
+          <xsd:group ref="xsd:identityConstraint" minOccurs="0"
+                    maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="minOccurs" default="1" use="optional">
+          <xsd:simpleType name="narrowMaxMinMinOccursEnumerationType">
+            <xsd:restriction base="xsd:nonNegativeInteger">
+              <xsd:enumeration value="0"/>
+              <xsd:enumeration value="1"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="maxOccurs" default="1" use="optional">
+          <xsd:simpleType name="narrowMaxMinMaxOccursEnumerationType">
+            <xsd:restriction base="xsd:allNNI">
+              <xsd:enumeration value="0"/>
+              <xsd:enumeration value="1"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="all">
+    <xsd:annotation>
+      <xsd:documentation>
+   Only elements allowed inside</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:explicitGroup">
+        <xsd:group ref="xsd:allModel"/>
+        <xsd:attribute name="minOccurs" default="1" use="optional">
+          <xsd:simpleType name="allMinOccursEnumerationType">
+            <xsd:restriction base="xsd:nonNegativeInteger">
+              <xsd:enumeration value="0"/>
+              <xsd:enumeration value="1"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="maxOccurs" default="1" use="optional">
+          <xsd:simpleType name="allMaxOccursEnumerationType">
+            <xsd:restriction base="xsd:allNNI">
+              <xsd:enumeration value="1"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="all" type="xsd:all" id="all">
+    <xsd:annotation>
+      <xsd:documentation source="http://www.w3.org/TR/xmlschema-1/#element-all"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="choice" type="xsd:explicitGroup" id="choice">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-choice"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="sequence" type="xsd:explicitGroup" id="sequence">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-sequence"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="group" type="xsd:namedGroup" id="group">
+    <xsd:annotation>
+      <xsd:documentation source="http://www.w3.org/TR/xmlschema-1/#element-group"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="wildcard">
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:attribute name="namespace" type="xsd:namespaceList" default="##any"
+                      use="optional"/>
+        <xsd:attribute name="processContents" default="strict" use="optional">
+          <xsd:simpleType name="wildcardProcessContentsEnumerationType">
+            <xsd:restriction base="xsd:NMTOKEN">
+              <xsd:enumeration value="skip"/>
+              <xsd:enumeration value="lax"/>
+              <xsd:enumeration value="strict"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="any" id="any">
+    <xsd:annotation>
+      <xsd:documentation source="http://www.w3.org/TR/xmlschema-1/#element-any"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:wildcard">
+          <xsd:attributeGroup ref="xsd:occurs"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:annotation>
+    <xsd:documentation>
+   simple type for the value of the 'namespace' attr of
+   'any' and 'anyAttribute'</xsd:documentation>
+  </xsd:annotation>
+  <xsd:annotation>
+    <xsd:documentation>
+   Value is
+              ##any      - - any non-conflicting WFXML/attribute at all
+
+              ##other    - - any non-conflicting WFXML/attribute from
+                              namespace other than targetNS
+
+              ##local    - - any unqualified non-conflicting WFXML/attribute 
+
+              one or     - - any non-conflicting WFXML/attribute from
+              more URI        the listed namespaces
+              references
+              (space separated)
+
+    ##targetNamespace or ##local may appear in the above list, to
+        refer to the targetNamespace of the enclosing
+        schema or an absent targetNamespace respectively</xsd:documentation>
+  </xsd:annotation>
+  <xsd:simpleType name="namespaceList">
+    <xsd:annotation>
+      <xsd:documentation>
+   A utility type, not for public use</xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType name="namespaceList-ao">
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="##any"/>
+          <xsd:enumeration value="##other"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="anon_08">
+        <xsd:list>
+          <xsd:simpleType name="anon_09">
+            <xsd:union memberTypes="xsd:anyURI">
+              <xsd:simpleType name="namespaceList-tl">
+                <xsd:restriction base="xsd:token">
+                  <xsd:enumeration value="##targetNamespace"/>
+                  <xsd:enumeration value="##local"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:union>
+          </xsd:simpleType>
+        </xsd:list>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <xsd:element name="attribute" type="xsd:topLevelAttribute" id="attribute">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-attribute"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="attributeGroup" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:group ref="xsd:attrDecls"/>
+        <xsd:attributeGroup ref="xsd:defRef"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="namedAttributeGroup">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:attributeGroup">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+          <xsd:group ref="xsd:attrDecls"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+        <xsd:attribute name="ref" use="prohibited"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="attributeGroupRef">
+    <xsd:complexContent>
+      <xsd:restriction base="xsd:attributeGroup">
+        <xsd:sequence>
+          <xsd:element ref="xsd:annotation" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="ref" type="xsd:QName" use="required"/>
+        <xsd:attribute name="name" use="prohibited"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="attributeGroup" type="xsd:namedAttributeGroup"
+              id="attributeGroup">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-attributeGroup"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="include" id="include">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-include"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:annotated">
+          <xsd:attribute name="schemaLocation" type="xsd:anyURI" use="required"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="redefine" id="redefine">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-redefine"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:openAttrs">
+          <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element ref="xsd:annotation"/>
+            <xsd:group ref="xsd:redefinable"/>
+          </xsd:choice>
+          <xsd:attribute name="schemaLocation" type="xsd:anyURI" use="required"/>
+          <xsd:attribute name="id" type="xsd:ID"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="import" id="import">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-import"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:annotated">
+          <xsd:attribute name="namespace" type="xsd:anyURI"/>
+          <xsd:attribute name="schemaLocation" type="xsd:anyURI"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="selector" id="selector">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-selector"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:annotated">
+          <xsd:attribute name="xpath" use="required">
+            <xsd:simpleType name="anon_10">
+              <xsd:annotation>
+                <xsd:documentation>A subset of XPath expressions for use
+in selectors</xsd:documentation>
+                <xsd:documentation>A utility type, not for public
+use</xsd:documentation>
+              </xsd:annotation>
+              <xsd:restriction base="xsd:token">
+                <xsd:annotation>
+                  <xsd:documentation>The following pattern is intended to allow XPath
+                           expressions per the following EBNF:
+	  Selector    ::=    Path ( '|' Path )*  
+	  Path    ::=    ('.//')? Step ( '/' Step )*  
+	  Step    ::=    '.' | NameTest  
+	  NameTest    ::=    QName | '*' | NCName ':' '*'  
+                           child:: is also allowed
+         </xsd:documentation>
+                </xsd:annotation>
+                <xsd:pattern
+                     value="(\.//)?(((child::)?((\i\c*:)?(\i\c*|\*)))|\.)(/(((child::)?((\i\c*:)?(\i\c*|\*)))|\.))*(\|(\.//)?(((child::)?((\i\c*:)?(\i\c*|\*)))|\.)(/(((child::)?((\i\c*:)?(\i\c*|\*)))|\.))*)*"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="field" id="field">
+    <xsd:annotation>
+      <xsd:documentation source="http://www.w3.org/TR/xmlschema-1/#element-field"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:annotated">
+          <xsd:attribute name="xpath" use="required">
+            <xsd:simpleType name="anon_11">
+              <xsd:annotation>
+                <xsd:documentation>A subset of XPath expressions for use
+in fields</xsd:documentation>
+                <xsd:documentation>A utility type, not for public
+use</xsd:documentation>
+              </xsd:annotation>
+              <xsd:restriction base="xsd:token">
+                <xsd:annotation>
+                  <xsd:documentation>The following pattern is intended to allow XPath
+                           expressions per the same EBNF as for selector,
+                           with the following change:
+          Path    ::=    ('.//')? ( Step '/' )* ( Step | '@' NameTest ) 
+         </xsd:documentation>
+                </xsd:annotation>
+                <xsd:pattern
+                     value="(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="keybase">
+    <xsd:complexContent>
+      <xsd:extension base="xsd:annotated">
+        <xsd:sequence>
+          <xsd:element ref="xsd:selector"/>
+          <xsd:element ref="xsd:field" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:group name="identityConstraint">
+    <xsd:annotation>
+      <xsd:documentation>The three kinds of identity constraints, all with
+                     type of or derived from 'keybase'.
+   </xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice>
+      <xsd:element ref="xsd:unique"/>
+      <xsd:element ref="xsd:key"/>
+      <xsd:element ref="xsd:keyref"/>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:element name="unique" type="xsd:keybase" id="unique">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-unique"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="key" type="xsd:keybase" id="key">
+    <xsd:annotation>
+      <xsd:documentation source="http://www.w3.org/TR/xmlschema-1/#element-key"/>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="keyref" id="keyref">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-keyref"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:keybase">
+          <xsd:attribute name="refer" type="xsd:QName" use="required"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="notation" id="notation">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-notation"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:annotated">
+          <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+          <xsd:attribute name="public" type="xsd:public"/>
+          <xsd:attribute name="system" type="xsd:anyURI"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:simpleType name="public">
+    <xsd:annotation>
+      <xsd:documentation>
+   A utility type, not for public use</xsd:documentation>
+      <xsd:documentation>
+   A public identifier, per ISO 8879</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:token"/>
+  </xsd:simpleType>
+  <xsd:element name="appinfo" id="appinfo">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-appinfo"/>
+    </xsd:annotation>
+    <xsd:complexType mixed="true">
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:any processContents="lax"/>
+      </xsd:sequence>
+      <xsd:attribute name="source" type="xsd:anyURI"/>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="documentation" id="documentation">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-documentation"/>
+    </xsd:annotation>
+    <xsd:complexType mixed="true">
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:any processContents="lax"/>
+      </xsd:sequence>
+      <xsd:attribute name="source" type="xsd:anyURI"/>
+      <xsd:attribute ref="xml:lang"/>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="annotation" id="annotation">
+    <xsd:annotation>
+      <xsd:documentation
+           source="http://www.w3.org/TR/xmlschema-1/#element-annotation"/>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="xsd:openAttrs">
+          <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element ref="xsd:appinfo"/>
+            <xsd:element ref="xsd:documentation"/>
+          </xsd:choice>
+          <xsd:attribute name="id" type="xsd:ID"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:annotation>
+    <xsd:documentation>
+   notations for use within XML Schema schemas</xsd:documentation>
+  </xsd:annotation>
+  <xsd:notation name="XMLSchemaStructures" public="structures"
+               system="http://www.w3.org/2000/08/XMLSchema.xsd"/>
+  <xsd:notation name="XML" public="REC-xml-19980210"
+               system="http://www.w3.org/TR/1998/REC-xml-19980210"/>
+  <xsd:complexType name="anyType" mixed="true">
+    <xsd:annotation>
+      <xsd:documentation>
+   Not the real urType, but as close an approximation as we can
+   get in the XML representation</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+    </xsd:sequence>
+    <xsd:anyAttribute processContents="lax"/>
+  </xsd:complexType>
+</xsd:schema>

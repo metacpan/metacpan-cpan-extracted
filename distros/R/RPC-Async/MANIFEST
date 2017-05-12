@@ -1,0 +1,24 @@
+MANIFEST			This list of files
+Build.PL
+ChangeLog
+examples/client.pl
+examples/server.pl
+human-test.pl
+lib/RPC/Async.pm
+lib/RPC/Async/Client.pm
+lib/RPC/Async/Coderef.pm
+lib/RPC/Async/Server.pm
+lib/RPC/Async/URL.pm
+lib/RPC/Async/Util.pm
+listen.pl
+Makefile.PL
+META.yml
+README
+t/cfd.t
+t/critic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+t/reflection.t
+test-server.pl
+wsdldump.pl

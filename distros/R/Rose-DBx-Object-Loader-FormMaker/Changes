@@ -1,0 +1,12 @@
+2008-03-15  Adam Prime <adam.prime@utoronto.ca>
+
+        * Build.PL, Makefile.PL: - change Rose::HTML::Object, to Rose::HTML::Objects
+
+2008-02-10  Adam Prime <adam.prime@utoronto.ca>
+
+	* Changes, MANIFEST, lib/Rose/DBx/Object/Loader/FormMaker.pm: - incremented version number, added changes file, removed version
+	from pod
+
+2008-02-10  Adam Prime <adam.prime@utoronto.ca>
+
+	* Makefile.PL: Added requirement for Rose::DBx::TestDB to Makefile

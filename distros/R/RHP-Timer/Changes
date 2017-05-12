@@ -1,0 +1,8 @@
+Revision history for Perl extension RHP::Timer.
+0.1  Weds May 10 04::20:00 2007
+    - Fixed some unrealistic tests
+    - Fiddle fiddle
+    - initial tests for accuracy and precision
+    - original version; created by h2xs 1.23 with options
+        -X RHP-Timer
+

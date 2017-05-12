@@ -1,0 +1,14 @@
+[% LOCALE en %]
+
+[% START MYOBJ_ERR3 %]
+my msg 3: [2], [1]
+[% END MYOBJ_ERR3 %]
+
+[% START MYOBJ_ERR2 %]
+my msg 2: [2], [1]
+[% END MYOBJ_ERR2 %]
+
+[% LOCALE xx %]
+
+MYOBJ_ERR2 = "mon\nmsg 2: [b], [a]"
+

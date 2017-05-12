@@ -1,0 +1,125 @@
+=head1 NAME
+
+REST::Google - access Google REST (aka AJAX) API from Perl
+
+=head1 SYNOPSIS
+
+	use REST::Google;
+
+	# set service to use
+	REST::Google->service('http://ajax.googleapis.com/ajax/services/search/web');
+
+	# provide a valid http referer
+	REST::Google->http_referer('http://example.com');
+
+	my $res = REST::Google->new(
+		q => 'Larry Wall',
+	);
+
+	die "response status failure" if $res->responseStatus != 200;
+
+	my $data = $res->responseData;
+
+	use Data::Dumper;
+	print Dumper( $data );
+
+=head1 DESCRIPTION
+
+C<REST::Google> provides OO interface to Google REST (aka AJAX) API.
+
+Note that this module provides low-level access to Google services API. Consider using
+L<REST::Google::Search>, L<REST::Google::Translate> or L<REST::Google::Feeds>, which
+provide convenient access to service request results.
+
+=head1 METHODS
+
+=over
+
+=item __PACKAGE__->service()
+
+Get/set service to use. You must set this to valid URL. E.g.:
+
+	REST::Google->service('http://ajax.googleapis.com/ajax/services/search/web');
+
+Normally, you don't need this, since L<REST::Google::Search>, L<REST::Google::Translate> or L<REST::Google::Feeds>
+modules do this for you.
+
+=item __PACKAGE__->http_referer()
+
+Get/set HTTP C<Referer> header.
+
+	REST::Google->http_referer('http://example.org/search.html');
+
+I<Note:> Google says that you should supply a valid HTTP referer header each time you
+perform a request to their AJAX API, so C<new()> raises warning unless referer is specified.
+
+=item __PACKAGE__->new()
+
+The constructor use it's arguments to build a valid HTTP GET request to given service,
+so it takes the same arguments as the given web service takes.
+Please refer to 'Google AJAX API' documentation for complete list
+of arguments for a service you're using. E.g.:
+
+	my $res = REST::Google->new(
+		q => 'Pamela Anderson',
+	);
+
+For example, if you're using the Web search service, the code above will perform a following HTTP GET request:
+
+	http://ajax.googleapis.com/ajax/services/search/web?q=Pamela+Anderson&v=1.0
+
+I<Note:> You can left protocol version number unspecified since C<v=1.0> is passed by default.
+
+For service specific arguments, check Google API documentation pages in the SEE ALSO section.
+
+C<REST::Google> object completely represents Google API response objects
+and has the following structure:
+
+	{
+		"responseData" => {},
+		"responseDetails" => undef | string-on-error,
+		"responseStatus" => 200 | error-code
+	}
+
+=item $res->responseStatus()
+
+The responseStatus property contains a value of 200 on success and a non-200
+HTTP error status code on failure. If there is a failure, C<responseDetails> contains
+a diagnostic string.
+
+=item $res->responseDetails()
+
+Contain an error string if C<responseStatus> is not 200.
+
+=item $res->responseData()
+
+Returns a C<responseData> structure.
+Please refer to service API documentation for response structure details.
+
+=back
+
+=head1 DEPENDENCIES
+
+C<REST::Google> uses L<JSON::Any> for decoding Google AJAX Search API response and L<LWP> for search request sending.
+
+=head1 SEE ALSO
+
+L<REST::Google::Search>, L<REST::Google::Translate>, L<REST::Google::Feeds> child classes for
+Search, Translate and Feeds services correspondingly.
+
+L<http://github.com/esobchenko/rest-google/> - this project on github;
+
+L<http://code.google.com/apis/ajaxsearch/documentation/#fonje> - brief information about
+Google Search AJAX API in non-Javascript environments;
+
+L<http://code.google.com/apis/ajaxsearch/documentation/reference.html#_intro_fonje> - Google Search AJAX API documentation;
+
+L<http://code.google.com/apis/ajaxlanguage/documentation/#fonje> - Google Translate AJAX API documentation;
+
+L<http://code.google.com/apis/ajaxfeeds/documentation/#fonje> - Google Feeds AJAX API documentation;
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2008, Eugen Sobchenko <ejs@cpan.org> and Sergey Sinkovskiy <glorybox@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

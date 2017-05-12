@@ -1,0 +1,2 @@
+0.04  2014-02-02 19:42:14 GMT
+    * Feature #414 : use REST::Client instead of Net::HTTP::Spore (Celogeek San)

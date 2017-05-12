@@ -1,0 +1,41 @@
+Version 0.001
+=============
+
+Internal version.
+
+
+Version 0.002
+=============
+
+Initial public release.
+
+
+Version 0.003
+=============
+
+Work around bug with taint checking and fork on some versions of Windows,
+  by skipping those tests.
+
+Work around broken nonblocking file reads on some versions of Windows,
+  by using select instead.
+
+AFAIK, this fixes all of the bugs that stopped earlier versions from working
+  on Windows XP.
+
+
+Version 0.004
+=============
+
+Fix performance problem where we ended up polling the COM port in a
+  tight loop.  Instead we read one character at a time, which isn't ideal
+  either, but is much better (3-4% CPU usage instead of 95%).  Maybe an
+  expert on Device::SerialPort can provide advice on how best to do this.
+
+
+Version 0.005 (Wed Apr 26 13:13:21 EDT 2006)
+============================================
+
+Update copyright dates.
+
+Fix timeout to use correct units.
+

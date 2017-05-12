@@ -1,0 +1,27 @@
+0.05 2015-09-22T16:16:33+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.04 2014-11-26T00:02:55+01:00
+ - Add README file.
+ - Add error checks for random_day_month_year() method.
+ - Add error checks for random_day_month() method.
+ - Add error checks for random_day() method.
+ - Add error checks for random_month() method.
+ - Add error checks for random_month_year() method.
+ - Add some tests.
+ - Fix LICENSE file.
+ - Update LICENSE AND COPYRIGHT section in doc to my standard.
+ - Update Module::Install to 1.14 version.
+
+0.03 2013-11-07
+ - Add dependency for perl (based on Error::Pure).
+
+0.02 2013-09-20
+ - Fix NAME in doc.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.01 2013-09-19
+ - First version.

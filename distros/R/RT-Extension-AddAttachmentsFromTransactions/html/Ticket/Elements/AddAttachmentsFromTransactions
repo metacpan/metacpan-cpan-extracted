@@ -1,0 +1,19 @@
+% foreach my $key (sort { lc($a) cmp lc($b) } keys %Attachments) {
+<dl>
+<dt><%$key%></dt>
+% foreach my $rev (@{$Attachments{$key}}) {
+<dd>
+<input type="checkbox" class="checkbox" name="AttachExisting" value="<% $rev->Id %>" />
+<font size="-2">
+<a href="<%RT->Config->Get('WebPath')%>/Ticket/Attachment/<%$rev->TransactionId%>/<%$rev->Id%>/<%$rev->Filename | un %>">
+% my $desc = loc("[_1] ([_2]) by [_3]", $rev->CreatedAsString, $rev->FriendlyContentLength, $m->scomp('/Elements/ShowUser', User => $rev->CreatorObj));
+<% $desc |n%>
+</a>
+</font>
+</dd>
+% }
+</dl>
+% }
+<%args>
+%Attachments
+</%args>

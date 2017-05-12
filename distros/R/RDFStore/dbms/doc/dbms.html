@@ -1,0 +1,134 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<!--
+ *     Copyright (c) 2000-2006 Alberto Reggiori <areggiori@webweaving.org>
+ *                        Dirk-Willem van Gulik <dirkx@webweaving.org>
+ *
+ * NOTICE
+ *
+ * This product is distributed under a BSD/ASF like license as described in the 'LICENSE'
+ * file you should have received together with this source code. If you did not get a
+ * a copy of such a license agreement you can pick up one at:
+ *
+ *     http://rdfstore.sourceforge.net/LICENSE
+ *
+-->
+
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; Linux 2.2.12 i386) [Netscape]">
+   <title>DBMS - A TCP/IP remote storage service</title>
+</head>
+
+<body link="#0000FF" vlink="#800080" bgcolor="#FFFFFF">
+
+<br><b><font face="Garamond"><font size=+2>The DB engine</font></font></b>
+<p><font face="Garamond"><font >For the <a href="http://parleunet.jrc.it">ParlEuNet</a> project - a federated user editable hierarchical datastore with a web front end - a fast networked transactional object store was required as a back end. Multiple single key hash based BerkeleyDB where used along with Object Serialization in Perl and an optimized network routing daemon with a single thread/process per database.</font></font> <p><font face="Garamond"><font >For an educational project a web application is build which allows for federated management of hierarchical multimedia content by its users. Due to the nature of the project, most users will use the system at the same time, during short windows on Wednesday afternoon. The develop, test and deploy timeline of the project is less than a year. Most users will be, at best, be utilizing a shared ISDN connection to the internet. As the project is to use standard web browsers and the general purpose HTTP protocol latency is a serious issue; in order to reply quick enough only a fraction of the user perceived handling time can be spend by the application logic; and even less is to be spend on database lookups. Each user has access to almost all content, and almost all content can be edited at any time. To the project sharing and collaboration between users is of importance. For this reason it was decided early in the project that all operations will be carried out on a single data holding. Given the time line, a waterfall or layered design and construct approach was not considered feasible. This would leave to much to chance near the end of the project. Where, in our experience, most of the time actually should have been spend on operations and UI tuning issues. So instead a number of technologies are chosen allowing for rapid development of a environment in which ideas can be tested and which can be used as a template for the final production system. Given the expected complexity of the application logic the language perl is selected over php.These four requirements also translate to a rather stiff set of requirements for the backend. It needs to be <b>very fast</b>, <b>support atomic and/or transactional operations</b>, has to deal with <b>arbitrary sized data</b>, and can <b>handle multiple connections concurrently</b>. A fifth requirement however is considered even more important, that of <b>avoiding a 'stagger' situation</b>; a pseudo 'overload' situation where the (web) server appears to halt for short periods of times, and processes a lot of requests in parallel, and has a load far surpassing its hardware resources, followed by a long relatively quiet period. To understand this consider the following. On a high volume web server which serves mostly dynamic content serving an individual request can take relatively long to handle, process and send out. In order to deal which such loads most web servers will parellelize requests. As the load increases at some moment is inevitable to have request overlapping. As soon as several requests start to overlap, and compete for resources, the server will take a noticeable performance hit; causing the requests to be handled significantly slower; and thus occupying a longer time slot. Thus increasing the number of requests which have to be handled in parallel quite dramatically. At this point server performance trails off, though overall average throughput stays nearly the same. As users have a certain 'click' through behaviour which has the temporal properties of pink noise at some moments normal <a href="http://www.humanfactor.com/cgi-bin/cgi-delegate/apache-ML/nh/1998/Apr/0260.html">Markof queue</a> assumptions no longer hold, and the application starts to act as both a alpha over beta filter which loops back and a phase loop back amplifier which will, at first slowly but progressively quicker, lock in to a specific Eigen frequency<!--which is a function of ??? &lt;&lt; elaborate more on the above - and show the kap graphs from the german site and the finland measure trials>>-->. It is important to note that this is more a 'perception' problem leading to loss of user satisfaction; the average throughput has not gone down by much (the only real cost is some context switching by the kernel, and when the datasets are large and the access patterns is sparse, loss of cache effectiveness). Hence normal 'peak' benchmarks do not detect such.</font></font>
+
+<p><a NAME="_Toc463634473"></a><b><font face="Garamond"><font >Approach</font></font></b>
+<p><font face="Garamond"><font >All operations are considered atomic,
+and hence need to be serialized for a given table. As both lock (flock())
+and mutexes can be expensive, and cause stammers, each table accessor is
+given its own thread of execution. Within this space incoming requests
+are served sequentially on a first come, first serve basis. Using non blocking
+IO and extensive buffering of both incoming and outgoing packets processing
+stalls are reduced to a minimum. A client connects to a well known port
+and presents an INIT request for a specific table with specific read, create
+or write permissions. A protocol version is also exchanged. The mother
+process receives the request and check's if any of the existing children
+already has this table open. If so the mother issues an file descriptor
+handoff message to the child, along with a copy of the INIT request. If
+the table is not yet open, the mother either created a new child or assigns
+the table to the least loaded child using a simple lowest number of tables
+round robin algorithm. Each child thus receives an INIT from the connection
+to the mother; and then uses the file descriptor handoff message to connect
+directly with the client; and sends an ACK (with fault) to both the mother
+and client. The mother process closes the file descriptor to the client
+as soon as the ACK is received. From this moment on any request by the
+client, such as for example a 'get', is communicated directly with the
+one child which handles the associated table. Each handler process, both
+child and mother, consist of a single execution thread, blocking only in
+a select() loop on all open file descriptors with periodic time out. When
+select() returns the bitarray is scanned for read, write or exceptions
+on the corresponding file descriptor. Both read and write's are done with
+an iovector where possible; and are non blocking. Specific buffers are
+kept with each connection. This implies that as the server gets busy and
+catches several operation during the outstanding select handle, the actual
+handling becomes proportional longer. Hence scaling is better than n.log
+n. Another important optimization is that both during receiving a request
+and sending back the results the initial non blocking io call uses an iovector
+on the buffers to be submitted or the buffers to returned from the database
+accessors and the protocol engine. Only if this initial non blocking call
+fails is the perl connection buffering used; the remaining bytes from the
+iovec are concatenated into it and the corresponding bit in the file descriptor
+mask is set. This is made possible by because for each table we are guaranteed
+a single execution environment; and thus the mmaped segments are available
+during the io operation. The above optimization alone makes almost any
+multi-threading or mutex approach slower in terms of operations required.
+Especially when most of the hash tables are fully mapped in, or when a
+raid array is used with good caching. The ParlEuNet system uses both. But
+even tests on a more modest system, with system intensive IDE disks showed
+that the above simplification is effective with a BSD kernel under almost
+all circumstances but a small single table.</font></font>
+<p><a NAME="_Toc463634474"></a><b><font face="Garamond"><font >Problems</font></font></b>
+<p><font face="Garamond"><font >As discussed a the large number
+of front end processes, each requiring several long term connections to
+the DBMS, are essential in when dealing with the stagger problem. This
+implies that on the backend server several thousands of DBMS connections
+to just a few unix processes are open at any given time. These connections
+are long lived. This use of resources is clearly outside the range to which
+a general purpose unix machine is tuned. As the DBMS machine has been designed
+for a specific purpose general purpose assumptions no longer hold: the
+machine has got a lot of memory, no normal 'users' and is geared towards
+a single tasks. For this reason it is advantageous to increase both the
+MAXUSER and FD_SETSIZE values. The first ensures that more buffer space
+is allocated, the latter allows form more file descriptors. It would have
+been better to tune the TCP/IP related buffers directly, as MAXUSER also
+increases some buffers not heavily used but so far that has not been needed.
+Secondly the requests are of a specific nature; the client sends a request
+packet, to which the server answers quickly. This is followed by a relatively
+long period no communication. Setting the MBUF size as the advantage that
+replies are immediately sent out with less fragmentation. Finally in the
+'select()'[/sys/kern/sys_generic.c] function of BSD there is a static file
+descriptor mask buffer of 2k which is used whenever possible to avoid a
+more expensive kernel malloc(). This value can be increased. With the approach
+taken, and assuming that context switches are cheap, there is a fundamental
+flaw in that during the database operation, and specifically during disk
+io, no further concurrent actions take place within the processing thread
+for a given table. This does not cause any serious penalties because during
+such a wait the kernel will correctly buffer incoming request, deal and
+purge outgoing data. But still for some of the smaller, most frequently
+accessed, tables whose hash indexes fit in main memory, sub optimal performance
+is observed; for example the ATPS for four tables of identical size is
+19000, for just one table 110000 and for four tables of relative sizes
+1, 2 4 and 8 (but still with the same hash table size and density as the
+previous two) 16000. This suggest that close to an order of two performance
+increase might be realized by either changing the kernel semantics to control
+the context switch or by giving each table space two threads with a single
+mutex. The latter was tried; but did not show any serious performance;
+in part because both on FreeBSD 3.2 and on Linux 2.2.3 threads are not
+yet that efficient. Cursory tests on Solaris 2.6 suggest that this is better.</font></font>
+<p><a NAME="_Toc463634475"></a><b><font face="Garamond"><font >Results</font></font></b>
+<p><font face="Garamond"><font >The final prototype has been in
+production use for over 6 months without significant problems; and routinely
+deals with over 120 requests/second with no noticeable load. This is one
+order of magnitude below cruse performance and two orders of magnitude
+between peek performance. On a general Internet scale of growth this implies
+that the server, hardware an software technology, will suffice for two
+to three years. This is on par or better than currently provided by commercial
+off the shelf products.</font></font>
+
+<P>
+<BR>
+<CITE>Written by <a href="mailto:dirkx@webweaving.org">Dirk-Willem van Gulik</a>&#160;&#160;Aug 1999</CITE>
+
+<!--Conclusion:
+
+
+        improving round robin assign
+        allowing dynamic reallocate from children
+        report on experiemnts wth fuully threaded solution
+
+-->
+</body>
+</html>

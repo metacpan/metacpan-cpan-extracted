@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8f7f62a4d44e41e32ca5db4d218427925743be9f Changes
+SHA1 b74a0f4d906eaa24252d4c61967f45c147bdc5a5 MANIFEST
+SHA1 2e518a0658eec0a6ef39686480178aec5cc0f6ce MANIFEST.SKIP
+SHA1 2b9a3db6eb9168e74e48b2c7396e2a650e85f303 META.yml
+SHA1 41d7c50e9ae53cb0dc3d5e1154ae0247b886dbf4 Makefile.PL
+SHA1 b386b53d54a6e3ffd8928d08f4ad98237564331c README
+SHA1 a58e658615de3269bb8c7652b1fe3bb9024b3236 html/Callbacks/ReminderImproved/Tools/Elements/Tabs/Default
+SHA1 98f5ccb8bd61ffc7d5658d96652b5eb851d50fee html/Callbacks/ReminderImproved/Tools/index.html/Default
+SHA1 b4e80ca23f9067f75457bb0b89486917dfac349f html/Elements/MyReminders
+SHA1 645fce48596e1786ab5e9f07b0c4f3ccdaa22b73 html/Elements/ShowReminders
+SHA1 b5c6b65a135b4a4de6f5033f8f6f69331173d367 html/Ticket/Elements/Reminders
+SHA1 e19e46c2b3af7ac44c96973331c9ab354d15f14b html/Ticket/Reminders.html
+SHA1 89f928535212dbc0a40083c37b1bd1f6442ba46d html/Tools/MyReminders.html
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 acbf148a1e6067cc677c89da2bfe1ae4b0b1e01b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4afcd32d7a733dcf0d21f2cda456fed47012cd9c inc/YAML/Tiny.pm
+SHA1 3b39cfb54fdbc374793e4c8581a8cdf3062fb2c8 inc/unicore/Name.pm
+SHA1 62524cad1c54808fd19ed9ffabf50de455c92dc6 lib/RT/Extension/ReminderImproved.pm
+SHA1 bd95f9dd92080817f70adbc82cc0a4129cca4670 lib/RT/Reminders.pm
+SHA1 11cb231881bcf4e785c7cc1c933914feb0c6ed4f lib/RT/Ticket_Vendor.pm
+SHA1 b57b9a352022af193ac8a1f388a4915455f2a875 po/de.po
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQIjQACgkQTwqgb7Yxh3xqmQCdESI0QGcn97aW+HrRNQZeQJoH
++U8An1gxh5yZh1XBNcDXUJUfnL7//bkq
+=o+C1
+-----END PGP SIGNATURE-----

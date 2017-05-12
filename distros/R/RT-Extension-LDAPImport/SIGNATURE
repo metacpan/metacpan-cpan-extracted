@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0ef63d18806c76d6f8b7c68ca88e42803d8e8edc Changes
+SHA1 aa6f90a7f758d536fae48309ab17db0ab73d4d76 INSTALL
+SHA1 b92dc35693c93036ce43b7c57cf8ee7afc239927 INSTALL.SKIP
+SHA1 e438aed13200b2129721d0f6855cc376562a43f4 MANIFEST
+SHA1 34f2740f1551380ad63bb2ed3cfc91544db5312b MANIFEST.SKIP
+SHA1 549dd27965f4eaff63a01018b44fd6a90b5e11bc META.yml
+SHA1 d8ec95c1686822b550d3a07ee70ee24cfdb7f3b0 Makefile.PL
+SHA1 bda83fb9e024cbf2077358cb6214b4bd6c0e79c5 README
+SHA1 f235ec747a674715165c668b6fa010920828525f bin/rtldapimport.in
+SHA1 248dabb0dbdd603ecf7374c69e9a51073453e15d inc/Module/AutoInstall.pm
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 4d21888488f7c6a67742343a0be404bb7e1b3e66 inc/Module/Install/AutoInstall.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 6e010ba20a9d0ae23d8d0ff516868c1e571c2d44 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 df2ac12161fdc98a18968ea2b8b147529b19ef8f lib/RT/Extension/LDAPImport.pm
+SHA1 ca16acd585a375f0a8f138e18ccb10bf17df9697 xt/00.load.t
+SHA1 5a8d65dbc59ad1fdca7282f3b89b915f869b718a xt/group-callbacks.t
+SHA1 518a28210c3ac6b123cc99ba029128413dcc7448 xt/group-import.t
+SHA1 e2ce1ff5fe1717c2c52470933f2aa1deda3a07f3 xt/group-member-import.t
+SHA1 4c1a0025cc7dfd91730ad3fb8c873b6d01376d20 xt/group-rename.t
+SHA1 fb5f010101d5901f0e1dd9ac30e841f40324b887 xt/lib/RT/Extension/LDAPImport/Test.pm.in
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 xt/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 xt/pod.t
+SHA1 3f84d7bd421863e26e4450e8393309059ca9a5c4 xt/user-import-cfs.t
+SHA1 d865416d04331c3e34b64501851fb022a29ed70e xt/user-import-privileged.t
+SHA1 16d08ee99c588fccd73230965c91813354e0c10e xt/user-import.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQghWMACgkQMflWJZZAbqDVGQCfWA2dX8u6KQUD6PdvvvzXnrG+
+hfkAn2xlwx2p2f8GFU6aJFfQ5m+8n8Mr
+=cQPF
+-----END PGP SIGNATURE-----

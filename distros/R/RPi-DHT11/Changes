@@ -1,0 +1,69 @@
+Revision history for Perl extension RPi::DHT11
+
+1.02    2016-10-23
+        - add sanity checking in temp() and humidity() to combat against one-off
+          rogue values that are way out of range (fixes #1)
+
+1.01    2016-10-16
+        - added a sleep(1); in c_temp() and c_humidity() to wait one second
+          before retrying a fetch of valid sensor data
+        - added c_debug() and a debug flag. If set in the new() method as the
+          second param, we'll enable debugging in the XS code to print to
+          STDOUT what's happening internally in the fetch loops
+
+1.00    2016-09-01
+        - GPIO pin numbering scheme is enforced (but see below)
+        - add ability to share pin modes with RPi::WiringPi seamlessly
+        - we can now create an RPi::WiringPi object *BEFORE* creating one of
+          this class, and whatever numbering scheme you use there, we'll use
+          it as well(ie. if a RPi::WiringPi is set to use 'wpi' pin numbering
+          scheme, you'll need to send in the 'wpi' pin number into new() in
+          this module as well)
+        - POD updates, cleanup, fixes
+        - added a couple of tests scripts in tests/
+
+0.07_02 2016-09-01
+        - POD fixes and updates
+        - separated C functionality into its own POD doc
+
+0.07_01 2016-09-01
+        - clone of RPi::DHT11::EnvControl with reduced functionality, as that
+          module shouldn't do anything more than read the sensor (the said
+          distribution will be removed from CPAN)
+        - removed all code that was outside of core read functionality
+        - simplified new() to accept a single integer pin number param
+        - modified temp() and humidity() to keep polling if the result is zero
+        - variable renaming
+
+0.06    2016-08-12
+        - POD updates
+        - c_temp() now returns an int for both temperature and humidity. The
+          temperature is returned as Celcius
+        - if 'f' is sent in as a single param to Perl's temp() function, it'll
+          return the temp in Farenheit. Otherwise, by default, we return
+          Celcius
+        - changed return type of temp() and humidity() to be ints
+
+0.05    2016-08-09
+        - added test files to MANIFEST
+        - updated examples/synopsis.pl with complete working example
+
+0.04    2016-08-09
+        - moved from functional interface to OO for keeping state and
+          better error management
+        - temp() now returns a 2 point float
+
+0.03    2016-08-09
+        - added status() which checks the status of a GPIO pin, and removed
+          that functionality from control()
+
+0.02    2016-08-09
+        - added temp(), humidity(), control(), cleanup() public functions
+        - added noboard_test() private function
+        - functionality for testing on a non Pi board implemented
+        - added initial test suite 
+
+0.01  Tue Aug  9 07:25:40 2016
+	- original version; created by h2xs 1.23 with options
+		-A -n RPi::DHT11::EnvControl
+

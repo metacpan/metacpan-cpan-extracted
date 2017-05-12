@@ -1,0 +1,124 @@
+<%INIT>
+use RT::Report::Tickets;
+use Excel::Writer::XLSX;
+
+my $report = RT::Report::Tickets->new( $session{CurrentUser} );
+
+my %columns = $report->SetupGroupings(
+    Query => $Query,
+    GroupBy => $GroupBy,
+    Function => $ChartFunction,
+);
+
+$report->SortEntries;
+
+my %table = $report->FormatTable( %columns );
+
+$m->clear_buffer;
+
+my ($xlsx_file, $fh);
+unless (open $fh, '>', \$xlsx_file){
+    $RT::Logger->crit( "Can't open xlsx file: $!" );
+    $m->abort();
+}
+
+my $workbook  = Excel::Writer::XLSX->new( $fh );
+my $worksheet = $workbook->add_worksheet();
+
+my ($current_row, $current_cell, $section_row_index) = (0, 0, 0);
+
+# fill in colspan
+for my $section (qw(thead tbody tfoot)) {
+    next unless $table{ $section } && @{ $table{ $section } };
+    for my $row ( @{ $table{ $section } } ) {
+        $current_cell = 0;
+        my @cells = @{ $row->{cells} };
+        for my $cell (@cells) {
+            my $colspan = $cell->{colspan} || 1;
+            if ($colspan > 1) {
+                my $value   = $cell->{value};
+                my $rowspan = $cell->{rowspan};
+                for (my $i = 1; $i < $colspan; $i++) {
+                    # clone cell, making sure to grab rowspan as well
+                    splice @{ $row->{cells} }, $current_cell+1, 0, { value => '', rowspan => $rowspan };
+                }
+            }
+            $current_cell++;
+        }
+    }
+}
+
+($current_row, $current_cell, $section_row_index) = (0, 0, 0);
+
+# fill in rowspan
+for my $section (qw(thead tbody tfoot)) {
+    next unless $table{ $section } && @{ $table{ $section } };
+    $section_row_index = 0;
+    for my $row ( @{ $table{$section} } ) {
+        $current_cell = 0;
+        for my $cell ( @{ $row->{cells} } ) {
+            my $rowspan = $cell->{rowspan} || 1;
+            if ($rowspan > 1) {
+                my $value   = $cell->{value};
+                my $row_to_span = $table{$section}->[$section_row_index+1]->{cells};
+                splice @$row_to_span, $current_cell, 0, { value => $value, rowspan => $rowspan-1 };
+            }
+            $current_cell++;
+        }
+        $current_row++;
+        $section_row_index++;
+    }
+}
+
+($current_row, $current_cell, $section_row_index) = (0, 0, 0);
+
+# print to XLSX
+for my $section (qw(thead tbody tfoot)) {
+    next unless $table{ $section } && @{ $table{ $section } };
+
+    for my $row ( @{ $table{ $section } } ) {
+        $current_cell = 0;
+        for my $cell ( @{ $row->{'cells'} } ) {
+            my $value = $cell->{value};
+            $worksheet->write($current_row, $current_cell, $value);
+            $current_cell++;
+        }
+        $current_row++;
+    }
+}
+
+($current_row, $current_cell, $section_row_index) = (0, 0, 0);
+
+# merge rowspans in header
+if ($table{thead} && @{ $table{thead} }) {
+    for my $row ( @{ $table{thead} } ) {
+        $current_cell = 0;
+        for my $cell ( @{ $row->{cells} } ) {
+            my $rowspan = $cell->{rowspan} || 1;
+            if ($rowspan > 1) {
+                my $value   = $cell->{value};
+                $worksheet->merge_range( $current_row, $current_cell, $current_row+$rowspan, $current_cell, $value, $workbook->add_format() );
+            }
+            $current_cell++;
+        }
+        $current_row++;
+    }
+}
+
+$r->content_type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+$workbook->close();
+
+binmode $fh;
+
+$m->print($xlsx_file);
+
+close $fh;
+
+$m->abort();
+</%INIT>
+<%ARGS>
+$Query            => undef
+$GroupBy          => undef
+$ChartFunction    => undef
+</%ARGS>

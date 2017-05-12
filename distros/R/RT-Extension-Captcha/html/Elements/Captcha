@@ -1,0 +1,12 @@
+
+<&| /Widgets/TitleBox, title => loc("You must solve a CAPTACHA to proceed") &>
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td><img src="<% RT->Config->Get('WebPath') %>/Helpers/Captcha" /></td>
+<td><input type="text" name="CaptchaString" /></td></tr>
+</table>
+
+</&>
+
+<%ARGS>
+</%ARGS>

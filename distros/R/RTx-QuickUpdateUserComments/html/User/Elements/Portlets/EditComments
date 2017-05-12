@@ -1,0 +1,23 @@
+<%args>
+$User
+</%args>
+<%init>
+return unless $User->CurrentUserCanModify('Comments')
+          and $User->CurrentUserCanSee('Comments');
+
+my $status;
+if (exists $DECODED_ARGS->{Comments}) {
+    my ($ok, $msg) = $User->SetComments($DECODED_ARGS->{Comments} || '');
+    $status = $ok ? loc('Saved!') : loc('Not saved: [_1]', $msg);
+}
+</%init>
+<&| /Widgets/TitleBox, title => loc('Comments'), class => "user comments" &>
+<form action="<% RT->Config->Get('WebPath') %>/User/Summary.html" method="POST">
+  <textarea name="Comments" style="width: 50em; height: 5em" placeholder="<% loc('No comment entered about this user') %>"><% $User->Comments || '' %></textarea>
+  <input type="hidden" name="id" value="<% $User->id %>">
+  <input type="submit" class="button" value="<% loc('Update') %>" style="vertical-align: top">
+% if ($status) {
+  <span class="status" style="display: inline-block; vertical-align: top;"><% $status %></span>
+% }
+</form>
+</&>

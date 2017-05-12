@@ -1,0 +1,789 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:admin="http://webns.net/mvcb/"
+ xmlns:contact="http://www.w3.org/2000/10/swap/pim/contact#" 
+ xmlns:air="http://www.daml.org/2001/10/html/airport-ont#" 
+>
+
+<channel rdf:about="http://use.perl.org/">
+<title>use Perl</title>
+<link>http://use.perl.org/</link>
+<description>All the Perl that's Practical to Extract and Report</description>
+<dc:language>en-us</dc:language>
+<dc:rights>use Perl; is Copyright 1998-2004, Chris Nandor. Stories, comments, 
+journals, and other submissions posted on use Perl; are Copyright their respective 
+owners.</dc:rights>
+<dc:date>2005-04-06T05:35:23+00:00</dc:date>
+
+<dc:publisher>pudge</dc:publisher>
+<dc:creator>pudge@perl.org</dc:creator>
+<dc:subject>Technology</dc:subject>
+<syn:updatePeriod>hourly</syn:updatePeriod>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updateBase>1970-01-01T00:00+00:00</syn:updateBase>
+<dc:author rdf:resource="#Nacho"/>
+<items>
+ <rdf:Seq>
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/04/02/2135258&amp;from=rss" />
+
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/04/01/1634248&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/03/18/192229&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/03/07/1451236&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/02/27/0930208&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/02/27/0431255&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/02/23/0030241&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/02/14/1523219&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/02/07/1751255&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/02/07/140211&amp;from=rss" />
+
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/02/04/0048202&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/01/25/0420255&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/01/24/1357207&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/01/21/1356251&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/01/07/1431223&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/01/04/2246222&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=05/01/04/2243255&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=04/12/29/1522251&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=04/12/21/0534201&amp;from=rss" />
+
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=04/12/17/0929203&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=04/12/07/2227256&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=04/12/05/2116255&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=04/12/03/1045228&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=04/12/01/1121244&amp;from=rss" />
+  <rdf:li 
+rdf:resource="http://use.perl.org/article.pl?sid=04/11/30/1125252&amp;from=rss" />
+ </rdf:Seq>
+</items>
+<image rdf:resource="http://use.perl.org/images/topics/useperl.gif" />
+</channel>
+
+<image rdf:about="http://use.perl.org/images/topics/useperl.gif">
+<title>use Perl</title>
+<url>http://use.perl.org/images/topics/useperl.gif</url>
+<link>http://use.perl.org/</link>
+</image>
+
+<dc:Person rdf:about="#Nacho">
+    <dc:firstname>Mike</dc:firstname>
+    <dc:sirname>Nachbaur</dc:sirname>
+    <dc:fullname>Mike Nachbaur</dc:fullname>
+    <contact:nearestAirport rdf:resource="http://www.daml.org/cgi-bin/airport?YHW"/>
+</dc:Person>
+
+<air:Airport rdf:about="http://www.daml.org/cgi-bin/airport?YHW">
+    <air:iata>YHW</air:iata>
+</air:Airport>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/04/02/2135258&amp;from=rss">
+<title>Perl 5.9.2 released</title>
+<link>http://use.perl.org/article.pl?sid=05/04/02/2135258&amp;from=rss</link>
+<description>The Perl 5 developer team is pleased to announce the release of perl
+5.9.2, the third development release of perl 5.9, incorporating
+developments towards the next major stable version of perl, perl 5.10.
+
+&lt;p /&gt;
+It is available from the Comprehensive Perl Archive Network as
+&lt;pre&gt;
+    ftp://ftp.cpan.org/pub/CPAN/src/perl-5.9.2.tar.gz
+&lt;/pre&gt;
+Its MD5 checksum is a98df18c362355172c86c2f6cb1be9a2 and its size is
+12450287 bytes.
+&lt;p /&gt;
+The perl592delta document outlines the changes between perl 5.9.1 and
+perl 5.9.2. It can be found at:
+&lt;pre&gt;
+    http://search.cpan.org/~rgarcia/perl-5.9.2/pod/perl592delta.pod
+
+&lt;/pre&gt;</description>
+<dc:creator>rafael</dc:creator>
+<dc:date>2005-04-02T21:30:00+00:00</dc:date>
+<dc:subject>releases</dc:subject>
+<slash:section>mainpage</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/04/01/1634248&amp;from=rss">
+<title>YAPC::NA 2nd Call-for-Papers</title>
+
+<link>http://use.perl.org/article.pl?sid=05/04/01/1634248&amp;from=rss</link>
+<description>&lt;A HREF="http://yapc.org/America/"&gt;RichDice&lt;/A&gt; writes 
+&lt;i&gt;"Just a reminder -- the Call-For-Papers deadline for Yet Another Perl 
+Conference North America 2005 in Toronto is April 18 -- that's only 2.5 weeks away 
+from now.  As a reminder that this is coming up soon, we are issuing this Second 
+Call-For-Papers.
+
+&lt;p&gt;
+Once all papers are submitted, the YAPC conference organizing team will review them 
+over the following week and hopefully have a draft conference schedule by Monday 25 
+April.
+
+&lt;p&gt;
+Get more details about the Call-For-Papers at:
+&lt;A 
+HREF="http://yapc.org/America/cfp-2005.shtml"&gt;http://yapc.org/America/cfp-2005.shtml&lt;/a&gt;
+
+&lt;p&gt;
+Also, if you haven't registered yet, please do!  Prompt registration is 
+&lt;b&gt;very&lt;/b&gt; recommended as hotel and other accommodations in Toronto are 
+going to book up quickly for the end of June.  Book by the first week of May -- 
+you're good.  After that, nothing can be guaranteed.  Registration info is here:  
+&lt;A 
+HREF="http://yapc.org/America/register-2005.shtml"&gt;http://yapc.org/America/register-2005.shtml&lt;/a&gt;
+
+&lt;p&gt;
+Questions / comments regarding the Call-For-Papers:  &lt;A 
+HREF="mailto:na-author@yapc.org"&gt;na-author@yapc.org&lt;/a&gt;
+
+&lt;br&gt;
+General questions / comments: &lt;A 
+HREF="mailto:na-help@yapc.org"&gt;na-help@yapc.org&lt;/a&gt;"&lt;/i&gt;</description>
+<dc:creator>KM</dc:creator>
+<dc:date>2005-04-01T16:54:00+00:00</dc:date>
+<dc:subject>yapc</dc:subject>
+<slash:section>yapc</slash:section>
+
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/03/18/192229&amp;from=rss">
+<title>YAPC::NA::2005 Registration Open</title>
+<link>http://use.perl.org/article.pl?sid=05/03/18/192229&amp;from=rss</link>
+<description>Registration for &lt;a 
+href="http://yapc.org/America/"&gt;YAPC::NA&lt;/a&gt; (Yet Another Perl Conference, 
+North America)
+2005 in Toronto, Ontario, Canada is now open.
+&lt;p&gt;
+
+The conference registration price is USD$85.  This price includes
+admission to all aspects of the conference, respectable amounts of
+catering, several activities and a few conference goodies.
+
+Please see &lt;a href="http://yapc.org/America/register-2005.shtml"&gt;the 
+website&lt;/a&gt; for full details, and we hope to see you in Toronto this 
+summer!</description>
+<dc:creator>KM</dc:creator>
+<dc:date>2005-03-18T19:00:00+00:00</dc:date>
+<dc:subject>yapc</dc:subject>
+<slash:section>yapc</slash:section>
+<slash:hitparade>7,7,7,2,0,0,0</slash:hitparade>
+
+<slash:comments>7</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/03/07/1451236&amp;from=rss">
+<title>Parrot 0.1.2 "Phoenix" Released</title>
+<link>http://use.perl.org/article.pl?sid=05/03/07/1451236&amp;from=rss</link>
+<description>&lt;A HREF="http://use.perl.org/~coke/"&gt;Will Coleda&lt;/A&gt; writes 
+&lt;i&gt;"From leo&amp;mdash;&lt;br&gt; &lt;br&gt;
+
+On behalf of the Parrot team I'm proud to announce the release of
+Parrot 0.1.2.
+&lt;br&gt; &lt;br&gt;
+What is Parrot?
+&lt;br&gt; &lt;br&gt;
+Parrot is a virtual machine aimed at running Perl6 and other dynamic
+languages.
+&lt;br&gt; &lt;br&gt;
+Parrot 0.1.2 contains a lot of new stuff:
+&lt;br&gt; &lt;br&gt;
+
+&lt;ul&gt;
+&lt;li&gt;New string handling code. Strings now have charset and encoding
+&lt;li&gt;Parts of a generational garbage collector
+&lt;li&gt;Better Python support, separated into dynclasses
+&lt;li&gt;Parrot Grammar Engine
+&lt;li&gt;Improved test coverage and documentation
+&lt;li&gt;and a lot more
+&lt;/ul&gt;
+You can grab it from
+
+&lt;A 
+HREF="http://www.cpan.org/authors/id/L/LT/LTOETSCH/parrot-0.1.2.tar.gz"&gt;CPAN&lt;/a&gt;.
+&lt;br&gt; &lt;br&gt;
+As parrot is still in steady development we recommend that you
+just &lt;A HREF="http://dev.perl.org/cvs/"&gt;get the latest and best from CVS&lt;/a&gt;.
+&lt;br&gt; &lt;br&gt;
+
+Turn your web browser towards &lt;A 
+HREF="http://www.parrotcode.org/"&gt;http://www.parrotcode.org&lt;/a&gt; for more
+information about Parrot, get involved, and:
+&lt;br&gt; &lt;br&gt;
+Have fun!&lt;br&gt;
+leo"&lt;/i&gt;</description>
+<dc:creator>KM</dc:creator>
+
+<dc:date>2005-03-07T15:11:00+00:00</dc:date>
+<dc:subject>parrot</dc:subject>
+<slash:section>news</slash:section>
+<slash:hitparade>3,3,3,1,0,0,0</slash:hitparade>
+<slash:comments>3</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/02/27/0930208&amp;from=rss">
+<title>Pugs Apocryphon 1 released</title>
+<link>http://use.perl.org/article.pl?sid=05/02/27/0930208&amp;from=rss</link>
+
+<description>&lt;A HREF="mailto:autrijus@autrijus.org"&gt;autrijus&lt;/A&gt; writes 
+&lt;i&gt;"I'm glad to report that I have released &lt;A 
+HREF="http://svn.perl.org/perl6/pugs/trunk/docs/01Overview.html"&gt;Pugs Apocryphon 
+1: Overview of the Pugs project&lt;/a&gt;. In it I explained the relationship between 
+existing Perl 6 projects and Pugs (a Perl 6 implementation). I have also listed some 
+resources for people who'd like to help. Feedbacks are most 
+welcome!"&lt;/i&gt;</description>
+<dc:creator>rafael</dc:creator>
+<dc:date>2005-02-27T09:48:00+00:00</dc:date>
+
+<dc:subject>perl6</dc:subject>
+<slash:section>mainpage</slash:section>
+<slash:hitparade>2,2,2,0,0,0,0</slash:hitparade>
+<slash:comments>2</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/02/27/0431255&amp;from=rss">
+<title>The Perl Review, Spring 2005</title>
+<link>http://use.perl.org/article.pl?sid=05/02/27/0431255&amp;from=rss</link>
+<description>&lt;A HREF="mailto:comdog@panix.com"&gt;brian_d_foy&lt;/A&gt; writes 
+&lt;i&gt;"The third print issue of &lt;A HREF="http://www.theperlreview.com/"&gt;The
+Perl Review&lt;/a&gt; is now on the presses and will be mailed on March 1
+(so you have time to &lt;A 
+HREF="https://www.theperlreview.com/cgi-bin/subscribe.cgi/up"&gt;get your
+name on the subscriber list&lt;/a&gt;).  TPR is
+the only print magazine entirely devoted to Perl.
+
+&lt;p&gt;
+In this issue ( 1.2, Spring 2005 )
+&lt;/p&gt;
+
+	&lt;ul&gt;
+   &lt;li&gt;Hashes with History -- Alberto Manuel Sim&amp;otilde;es
+
+   &lt;li&gt;Test::Number::Delta -- David Golden
+
+   &lt;li&gt;9-Block Quilt Patterns in Perl -- Daniel Allen
+
+   &lt;li&gt;Packet Sniffing with Perl -- Gerry Finkel
+
+   &lt;li&gt;Serious Perl -- Henning Koch
+
+   &lt;li&gt;Barcodes from Perl -- brian d foy
+
+   &lt;li&gt;plus Perl News, Perl Mongers and Perl Foundation reports, book
+   reviews, short notes, and more.
+	&lt;/ul&gt;
+
+&lt;p&gt;
+Subscribers get immediate access to the &lt;A 
+HREF="http://www.theperlreview.com/Subscribers/?up"&gt;online PDF
+versions&lt;/a&gt;:"&lt;/i&gt;</description>
+<dc:creator>ziggy</dc:creator>
+<dc:date>2005-02-27T04:50:00+00:00</dc:date>
+<dc:subject>news</dc:subject>
+<slash:section>news</slash:section>
+
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/02/23/0030241&amp;from=rss">
+<title>FOSDEM: Perl Developer Room</title>
+<link>http://use.perl.org/article.pl?sid=05/02/23/0030241&amp;from=rss</link>
+<description>&lt;A HREF="mailto:dave@dave.org.uk"&gt;davorg&lt;/A&gt; writes 
+&lt;i&gt;"&lt;A HREF="http://www.fosdem.org/"&gt;FOSDEM&lt;/a&gt; is on in Brussels 
+this weekend and this year, for the first time, there is a dedicated 'Perl 
+Developers' Room.'  I've just posted posted the &lt;A 
+HREF="http://www.fosdem.org/2005/index/dev_room_perl/schedule"&gt;schedule of 
+talks&lt;/a&gt; which includes both of the current Perl 5.x pumpkings and Allison 
+Randal giving an update on Perl 6.  If you're near Brussels this weekend then please 
+drop in and say hello. Attendance at FOSDEM is free."&lt;/i&gt;</description>
+
+<dc:creator>pudge</dc:creator>
+<dc:date>2005-02-23T00:49:00+00:00</dc:date>
+<dc:subject>events</dc:subject>
+<slash:section>mainpage</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/02/14/1523219&amp;from=rss">
+<title>Perl Foundation Funding Goals: 2005-2006</title>
+<link>http://use.perl.org/article.pl?sid=05/02/14/1523219&amp;from=rss</link>
+
+<description>Allison writes &lt;i&gt;"Thanks to amazingly generous members of the 
+Perl community The Perl Foundation was able to fund Damian Conway, Larry Wall, and 
+Dan Sugalski in 2002-2003. In 2005-2006 we hope to repeat this pattern and fund Larry 
+Wall, Patrick Michaud, Leopold T&amp;ouml;tsch, and a second Parrot developer. Why 
+now? For one thing, Parrot and Perl 6 are both close enough to completion that a few 
+full-time developers could polish them off in a very small number of "Christmases". 
+Another (more urgent) reason is that we've just learned that we have about 6 weeks 
+left of Leo's time before he's forced to take a sabbatical from Parrot to pursue the 
+noble task of "putting food on the table". This would set the project back by six 
+months or more. So here we stand, on the edge of acceleration or a severe setback. US 
+$200 funds a day of developer time; you can read more about it in the &lt;A 
+HREF="http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html"&gt;Perl 6 
+&amp;amp; Parrot Proposal&lt;/a&gt;.
+&lt;p&gt;
+Our sincere thanks go to the German Perl Workshop organizers and participants, who 
+got things started by donating funds for just over 20 days of developer 
+time."&lt;/i&gt;</description>
+<dc:creator>KM</dc:creator>
+<dc:date>2005-02-14T15:43:00+00:00</dc:date>
+
+<dc:subject>perlfoundation</dc:subject>
+<slash:section>news</slash:section>
+<slash:hitparade>64,64,64,22,0,0,0</slash:hitparade>
+<slash:comments>64</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/02/07/1751255&amp;from=rss">
+<title>CPAN::Forum</title>
+<link>http://use.perl.org/article.pl?sid=05/02/07/1751255&amp;from=rss</link>
+<description>&lt;A HREF="http://www.cpanforum.com/"&gt;gabor&lt;/A&gt; writes 
+&lt;i&gt;"I am happy to announce the first live version of
+
+&lt;A HREF="http://www.cpanforum.com/"&gt;CPAN::Forum&lt;/a&gt;.
+Graham integrated links to the individual subforums
+in the &lt;A HREF="http://search.cpan.org/"&gt;search.cpan&lt;/a&gt; results
+and Randy in the Kobes' search.
+I hope people who are searching for modules will find it a good place to discuss them.
+&lt;p&gt;
+You can post a message to a distribution,
+and people who are subscribed to that distribution will
+get an e-mail alert regarding the new post.
+For example if you have something to say about
+&lt;A HREF="http://www.cpanforum.com/dist/CPAN-Forum"&gt;CPAN::Forum&lt;/a&gt;
+you can do that in the its own subforum and people interested in this topic will be 
+notified."&lt;/i&gt;</description>
+
+<dc:creator>rafael</dc:creator>
+<dc:date>2005-02-07T18:11:00+00:00</dc:date>
+<dc:subject>cpan</dc:subject>
+<slash:section>mainpage</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/02/07/140211&amp;from=rss">
+<title>YAPC::Taipei 2005 Registration Opens</title>
+<link>http://use.perl.org/article.pl?sid=05/02/07/140211&amp;from=rss</link>
+
+<description>&lt;A HREF="mailto:hcchien@hcchien.org"&gt;hcchien&lt;/A&gt; writes 
+&lt;i&gt;"The &lt;A 
+HREF="http://yapc.elixus.org/english/speakers.html"&gt;abstracts&lt;/a&gt; and &lt;A 
+HREF="http://yapc.elixus.org/english/schedule.html"&gt;schedule&lt;/a&gt; for 
+YAPC::Taipei 2005, together with a &lt;A 
+HREF="http://register.elixus.org/yapc2005/"&gt;registration form&lt;/a&gt;, are now 
+online.
+
+&lt;p&gt;
+This year, we will hear Jesse Vincent's talk about plans for &lt;A 
+HREF="http://www.bestpractical.com/rt/"&gt;RT&lt;/a&gt; 4.0 and beyond, as well as 
+Brian Ingerson's thoughts on &lt;A HREF="http://kwiki.org/"&gt;Kwiki&lt;/a&gt;'s 
+future. Tatsuhiko Miyagawa, the prolific CPAN author and Movable Type staff, will 
+share his social software tricks with us, echoed by Leon Brocard's talk of exploiting 
+web services offered by certain Other Enterprises.
+&lt;p&gt;
+&lt;p&gt;
+Sam Vilain and the &lt;A HREF="http://svk.elixus.org/"&gt;SVK&lt;/a&gt; author 
+Chia-Liang Kao will talk about their CPAN modules: &lt;A 
+HREF="http://search.cpan.org/dist/Tangram/"&gt;Tangram&lt;/a&gt; and &lt;A 
+HREF="http://search.cpan.org/dist/RunApp/"&gt;RunApp&lt;/a&gt; respectively.  Another 
+local speaker Tsung-Hsiang Chang will cover practical applications of &lt;A 
+HREF="http://search.cpan.org/dist/Mail-SpamAssassin/"&gt;SpamAssassin&lt;/a&gt;.
+
+&lt;/p&gt;
+&lt;p&gt;
+As the closing session, Autrijus Tang will unleash a working interpreter for Perl6 
+(known as &lt;A HREF="http://autrijus.org/pugs/"&gt;Pugs&lt;/a&gt;), as well as its 
+design documents, the Apocrypha."&lt;/i&gt;</description>
+<dc:creator>rafael</dc:creator>
+<dc:date>2005-02-07T14:17:00+00:00</dc:date>
+<dc:subject>yapc</dc:subject>
+
+<slash:section>yapc</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/02/04/0048202&amp;from=rss">
+<title>Boston.pm Tech Meeting with brian d foy</title>
+<link>http://use.perl.org/article.pl?sid=05/02/04/0048202&amp;from=rss</link>
+<description>&lt;A HREF="http://use.perl.org/~n1vux/journal"&gt;n1vux&lt;/A&gt; 
+writes &lt;i&gt;"&lt;A HREF="http://boston.pm.org/"&gt;Boston.pm&lt;/A&gt; will have 
+a tech meeting Tuesday, February 8, at Boston University, Kenmore Classroom Building, 
+565 Commonwealth Ave, room 103 (&lt;A 
+HREF="http://boston.pm.org/kwiki/index.cgi?BuDirections"&gt;directions&lt;/A&gt; on 
+web), starting at 7:30pm.  (This is the same building but a
+different room from our usual location.)
+
+
+&lt;P&gt; Well-known Perl trainer and writer &lt;code&gt;brian d foy&lt;/code&gt; 
+will be presenting at this month's meeting.  brian is also the publisher of &lt;A 
+HREF="http://www.theperlreview.com/"&gt;The Perl Review&lt;/A&gt;.
+
+&lt;P&gt;At the meeting, brian will be giving his talk on &lt;A 
+HREF="http://www.panix.com/~comdog/#talks"&gt;Automating Software Releases&lt;/A&gt;.
+
+
+
+&lt;P&gt;Please RSVP to [Boston.pm facilitor Ron] if you're planning to attend - 
+rjk-bostonpm(at)tamias.net
+
+&lt;P&gt;Pizza and soda will be provided.
+
+&lt;P&gt;For more information about Boston Perl Mongers, or to subscribe to one of
+our mailing lists, visit our &lt;A HREF="http://boston.pm.org/"&gt;website&lt;/A&gt; 
+at &lt;A HREF="http://boston.pm.org/"&gt;http://boston.pm.org/&lt;/A&gt;
+&lt;P&gt;[Cribbed from Boston.pm announcement]"&lt;/i&gt;</description>
+
+<dc:creator>jjohn</dc:creator>
+<dc:date>2005-02-03T08:00:00+00:00</dc:date>
+<dc:subject>groups</dc:subject>
+<slash:section>meetings</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/01/25/0420255&amp;from=rss">
+<title>7th German Perl Workshop Schedule and Registration</title>
+<link>http://use.perl.org/article.pl?sid=05/01/25/0420255&amp;from=rss</link>
+
+<description>&lt;A HREF="mailto:wsorga@perl-workshop.de"&gt;JStenzel&lt;/A&gt; writes 
+&lt;i&gt;"The &lt;A HREF="http://www.perl-workshop.de/en/2005/"&gt;schedule of the 
+7th German Perl Workshop&lt;/A&gt;, together with the abstracts, is now online. A 
+&lt;A HREF="http://www.perl-workshop.de/en/db/register.epl"&gt;registration 
+form&lt;/A&gt; is provided on the same page.  The Workshop will be held in Dresden 
+from 9th to 11th February 2005. Both German and English talks will be presented in 
+the typical workshop atmosphere which inspired me as often as I took 
+part."&lt;/i&gt;</description>
+
+<dc:creator>pudge</dc:creator>
+<dc:date>2005-01-25T04:40:00+00:00</dc:date>
+<dc:subject>events</dc:subject>
+<slash:section>meetings</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/01/24/1357207&amp;from=rss">
+<title>YAPC::NA 2005 Call For Papers Released</title>
+<link>http://use.perl.org/article.pl?sid=05/01/24/1357207&amp;from=rss</link>
+
+<description>&lt;A HREF="mailto:na-help@yapc.org"&gt;Richard Dice&lt;/A&gt; writes 
+&lt;i&gt;"
+&lt;b&gt;YAPC::NA 2005&lt;/b&gt; (Yet Another Perl Conference, North America) has just
+released its call-for-papers; potential and aspiring speakers can
+submit a presentation proposal via:
+
+
+&lt;p&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+    &lt;A 
+HREF="http://yapc.org/America/cfp-2005.shtml"&gt;http://yapc.org/America/cfp-2005.shtml&lt;/a&gt;"&lt;/i&gt;</description>
+
+<dc:creator>KM</dc:creator>
+<dc:date>2005-01-24T14:16:00+00:00</dc:date>
+<dc:subject>news</dc:subject>
+<slash:section>yapc</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/01/21/1356251&amp;from=rss">
+<title>OSCON Call For Proposals</title>
+<link>http://use.perl.org/article.pl?sid=05/01/21/1356251&amp;from=rss</link>
+
+<description>&lt;A HREF="http://www.askbjoernhansen.com/"&gt;Ask Bj&#248;rn 
+Hansen&lt;/A&gt; writes &lt;i&gt;"&lt;A 
+HREF="http://conferences.oreillynet.com/os2005/"&gt;OSCON&lt;/a&gt; is headed back to 
+friendly, economical Portland, Oregon during the week of August 1-5, 2005. If you've 
+ever wanted to join the OSCON speaker firmament, now's your chance to submit a 
+proposal (or two) by February 13, 2005.&lt;BR&gt;&lt;/I&gt;</description>
+<dc:creator>KM</dc:creator>
+
+<dc:date>2005-01-21T14:15:00+00:00</dc:date>
+<dc:subject>events</dc:subject>
+<slash:section>news</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/01/07/1431223&amp;from=rss">
+<title>Dutch Perl Workshop 2005, Program Available</title>
+<link>http://use.perl.org/article.pl?sid=05/01/07/1431223&amp;from=rss</link>
+<description>&lt;A HREF="mailto:mark@overmeer.net"&gt;Mark Ovemeer&lt;/A&gt; writes 
+&lt;i&gt;"The schedule of the second Dutch Perl Workshop has just been released.  
+With speakers like Allison Randal, Johan Vromans, Abigail, H.Merijn Brand (config 
+pumpkin), and Abe (mr Smoke) [just to give a few examples] we have a very interesting 
+day ahead of us. I am very sorry for most of you: all but one talk will be in Dutch!  
+See &lt;A 
+HREF="http://workshop.perlpromo.nl/"&gt;http://workshop.perlpromo.nl&lt;/A&gt;."&lt;/i&gt;</description>
+
+<dc:creator>rafael</dc:creator>
+<dc:date>2005-01-07T14:50:00+00:00</dc:date>
+<dc:subject>events</dc:subject>
+<slash:section>meetings</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/01/04/2246222&amp;from=rss">
+<title>January 2005 Dallas/Ft. Worth Perl Mongers Meeting</title>
+<link>http://use.perl.org/article.pl?sid=05/01/04/2246222&amp;from=rss</link>
+
+<description>&lt;A HREF="http://reversethis-{moc.liamg} {ta} {tarksum.rm}"&gt;Mr. 
+Muskrat&lt;/A&gt; writes &lt;i&gt;"The first Dallas / Ft. Worth Perl Mongers 
+technical meeting of 2005 will feature Patrick Michaud speaking about the Perl 6 
+grammars.  The meeting will be held at 7pm on January 25, 2005.  The &lt;A 
+HREF="http://dfw.pm.org/news.html"&gt;D/FW PM News&lt;/a&gt; has the complete details 
+(including a map)."&lt;/i&gt;</description>
+<dc:creator>pudge</dc:creator>
+<dc:date>2005-01-05T12:05:00+00:00</dc:date>
+
+<dc:subject>perl6</dc:subject>
+<slash:section>meetings</slash:section>
+<slash:hitparade>4,4,4,1,0,0,0</slash:hitparade>
+<slash:comments>4</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=05/01/04/2243255&amp;from=rss">
+<title>YAPC::EU::2005 Call for Papers</title>
+<link>http://use.perl.org/article.pl?sid=05/01/04/2243255&amp;from=rss</link>
+<description>&lt;A HREF="http://{cog} {at} {cpan.org}"&gt;cog&lt;/A&gt; writes 
+&lt;i&gt;"This is the first Call for Papers for YAPC::EU::2005, at the University of 
+Minho, Braga, Portugal from 31 August to 2 September, 2005.  Proposals are due 15 
+May, speakers will be notified 19 June, and papers/slides are due 31 July.  The theme 
+for this year's conference is 'Perl Everywhere'; we are therefore looking for talks 
+on this topic. Show us on which platforms you use Perl and what for. We will also, of 
+course, accept talks on topics that are not related to the theme.  If you have an 
+idea for a talk you'd like to give, or a topic you'd like to hear a talk on, you 
+should post a synopsis on our &lt;A 
+HREF="http://braga.yapceurope.org/index.cgi?TalkProposals"&gt;conference 
+wiki&lt;/A&gt; to see what others think.  Proposed talks with a favourable response 
+on the wiki have a better chance of getting accepted."&lt;/i&gt;</description>
+
+<dc:creator>pudge</dc:creator>
+<dc:date>2005-01-04T23:02:00+00:00</dc:date>
+<dc:subject>events</dc:subject>
+<slash:section>yapc</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=04/12/29/1522251&amp;from=rss">
+<title>Perl Mongers Hosting Changes</title>
+<link>http://use.perl.org/article.pl?sid=04/12/29/1522251&amp;from=rss</link>
+
+<description>&lt;A HREF="mailto:dave@dave.org.uk"&gt;davorg&lt;/A&gt; writes 
+&lt;i&gt;"Early in 2005 the &lt;A HREF="http://www.pm.org/"&gt;pm.org&lt;/a&gt; 
+server that hosts a large number of Perl Monger web sites and mailing lists will be 
+moving and will become part of the &lt;A 
+HREF="http://www.perl.org/"&gt;perl.org&lt;/a&gt; server farm.
+
+&lt;p&gt;We are planning to take this opportunity to remove a lot of inactive web 
+sites and mailing lists and will therefore only be moving over sites and lists that 
+are specifically requested by PM groups.&lt;/p&gt;
+&lt;p&gt;If you're the leader of a PM group that uses these services then you need to 
+send an email to &lt;A 
+HREF="mailto:user_groups@pm.org"&gt;user_groups@pm.org&lt;/a&gt; with the subject 
+"Please save xxx.pm". Within the email please list the web sites and mailing lists 
+that you want saved.&lt;/p&gt;
+&lt;p&gt;If you're a member of a PM group that uses this services, them please do 
+what you can to ensure that your group leader is aware of these forthcoming 
+changes."&lt;/i&gt;</description>
+
+<dc:creator>KM</dc:creator>
+<dc:date>2004-12-29T15:42:00+00:00</dc:date>
+<dc:subject>groups</dc:subject>
+<slash:section>mainpage</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=04/12/21/0534201&amp;from=rss">
+<title>Help Regenerate the Phalanx 100</title>
+<link>http://use.perl.org/article.pl?sid=04/12/21/0534201&amp;from=rss</link>
+
+<description>&lt;A HREF="mailto:andy@petdance.com"&gt;Andy Lester&lt;/A&gt; writes 
+&lt;i&gt;"The Phalanx 100 is a list of the 'top 100' modules on CPAN, and by 
+extension, those that should have the most attention paid to them by the Phalanx project.
+&lt;P&gt;
+The first time I generated the P100 was over a year ago, and things are old and 
+stale.  Distributions have changed names (CGI::Kwiki is now Kwiki, for example).  
+Some distros have come and some have gone.  It's time to be updated.
+&lt;P&gt;
+This time, YOU can help determine the P100."&lt;/i&gt;</description>
+<dc:creator>pudge</dc:creator>
+
+<dc:date>2004-12-21T05:46:00+00:00</dc:date>
+<dc:subject>modules</dc:subject>
+<slash:section>mainpage</slash:section>
+<slash:hitparade>9,9,9,8,0,0,0</slash:hitparade>
+<slash:comments>9</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=04/12/17/0929203&amp;from=rss">
+<title> "Practical mod_perl" Book Goes Open Source</title>
+<link>http://use.perl.org/article.pl?sid=04/12/17/0929203&amp;from=rss</link>
+
+<description>&lt;A HREF="mailto:stas@stason.org"&gt;stas&lt;/A&gt; writes : 
+&lt;i&gt;"The complete &lt;A HREF="http://modperlbook.org/"&gt;"Practical 
+mod_perl"&lt;/a&gt; book is now available online under
+the terms of the &lt;A 
+HREF="http://creativecommons.org/"&gt;CreativeCommons&lt;/a&gt; &lt;A 
+HREF="http://creativecommons.org/licenses/by-sa/2.0/"&gt;"Attribution Share-Alike 
+License"&lt;/a&gt;.
+
+&lt;p&gt;Thanks to all who have purchased our book so far. You can still get the
+printed version from your favorite book store and it will certainly make a
+nice "light" XMas present (hint, hint&lt;nobr&gt; 
+&lt;wbr&gt;&lt;/nobr&gt;:)."&lt;/p&gt;&lt;/i&gt;</description>
+<dc:creator>rafael</dc:creator>
+<dc:date>2004-12-17T09:46:00+00:00</dc:date>
+<dc:subject>books</dc:subject>
+
+<slash:section>mainpage</slash:section>
+<slash:hitparade>3,3,3,0,0,0,0</slash:hitparade>
+<slash:comments>3</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=04/12/07/2227256&amp;from=rss">
+<title>The Perl Review Offers Cheaper Subscription Options</title>
+<link>http://use.perl.org/article.pl?sid=04/12/07/2227256&amp;from=rss</link>
+<description>&lt;A HREF="mailto:comdog@panix.com"&gt;brian_d_foy&lt;/A&gt; writes 
+&lt;i&gt;"A lot of people have asked about an online-only edition of TPR,
+so &lt;A HREF="https://www.theperlreview.com/cgi-bin/subscribe.cgi"&gt;I created 
+one&lt;/a&gt;.  International customers can pay the same
+price as US subscribers ($US16), although they won't get the print
+edition.  Those subscribers still have full access to the
+PDF versions.
+
+
+
+
+&lt;p&gt;
+We are, however, working on a European edition.  If we get
+enough European subscribers, the online-only edition will
+convert to a print subscription at no additional cost.
+Online-only subscribers can also get the print versions
+for the price of shipping if they change their minds later.
+&lt;/p&gt;
+&lt;p&gt;
+We've also reduced the price to $US20 for Canada and Mexico,
+since the shipping is a bit cheaper than overseas.  Anyone
+who recently subscribed from either of those countries can
+contact me if they want to get the lower rate (or something
+else for the extra money)."&lt;/i&gt;</description>
+<dc:creator>pudge</dc:creator>
+<dc:date>2004-12-07T22:47:00+00:00</dc:date>
+<dc:subject>news</dc:subject>
+<slash:section>mainpage</slash:section>
+
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=04/12/05/2116255&amp;from=rss">
+<title>CPAN Master Site Back in Business</title>
+<link>http://use.perl.org/article.pl?sid=04/12/05/2116255&amp;from=rss</link>
+<description>&lt;A HREF="mailto:jhi@iki.fi"&gt;jhi&lt;/A&gt; writes &lt;i&gt;"The 
+CPAN master site disk problems reported &lt;A 
+HREF="http://use.perl.org/article.pl?sid=04/11/29/2140235&amp;amp;tid=32"&gt;earlier&lt;/a&gt; are now resolved.  The RAID controller had lost its mind, or more importantly, its configuration.  As soon as the RAID controller was replaced, all the disks were found to be safe and sound.  CPAN should be working normally now."&lt;/i&gt;</description>
+
+<dc:creator>hfb</dc:creator>
+<dc:date>2004-12-05T21:36:00+00:00</dc:date>
+<dc:subject>cpan</dc:subject>
+<slash:section>mainpage</slash:section>
+<slash:hitparade>1,1,1,0,0,0,0</slash:hitparade>
+<slash:comments>1</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=04/12/03/1045228&amp;from=rss">
+<title>The Perl Review 1.1 is Available</title>
+
+<link>http://use.perl.org/article.pl?sid=04/12/03/1045228&amp;from=rss</link>
+<description>&lt;A HREF="mailto:comdog@panix.com"&gt;brian_d_foy&lt;/A&gt; writes 
+&lt;i&gt;"The Winter 2004 issue of The Perl Review is now available for &lt;A 
+HREF="http://www.theperlreview.com/Subscribers/ThePerlReview-v1i1.pdf"&gt;subscriber 
+download&lt;/a&gt; from &lt;A HREF="http://www.theperlreview.com/"&gt;our 
+website&lt;/a&gt;.  Print versions go into the mail next week.
+
+Features include:
+
+
+&lt;ul&gt;
+&lt;li&gt;Down Translating XML -- Alberto Manuel Sim&amp;otilde;es
+&lt;li&gt;Module Release and Beyond -- brian d foy
+&lt;li&gt;Functional Perl Programming -- Frank Antonsen
+&lt;li&gt;Faking Stored Procedures -- Zach Thompson
+&lt;/ul&gt;
+
+There are a lot of changes with this issue, including a completely re-designed look 
+by Eric Maki, and recurring columns for Perl Mongers and The Perl 
+Foundation."&lt;/i&gt;</description>
+
+<dc:creator>rafael</dc:creator>
+<dc:date>2004-12-03T10:57:00+00:00</dc:date>
+<dc:subject>news</dc:subject>
+<slash:section>news</slash:section>
+<slash:hitparade>2,2,2,0,0,0,0</slash:hitparade>
+<slash:comments>2</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=04/12/01/1121244&amp;from=rss">
+<title>Perl Advent Calendar Returns for 2004</title>
+
+<link>http://use.perl.org/article.pl?sid=04/12/01/1121244&amp;from=rss</link>
+<description>&lt;A HREF="http://2shortplanks.com/contact/"&gt;2shortplanks&lt;/A&gt; 
+writes &lt;i&gt;"The &lt;A HREF="http://perladvent.org/"&gt;Perl Advent 
+Calendar&lt;/a&gt; returns for another year, again offering up a recommendation and 
+mini-tutorial on a different CPAN module each day."&lt;/i&gt; Yay.</description>
+
+<dc:creator>rafael</dc:creator>
+<dc:date>2004-12-01T11:40:00+00:00</dc:date>
+<dc:subject>news</dc:subject>
+<slash:section>news</slash:section>
+<slash:hitparade>2,2,2,2,0,0,0</slash:hitparade>
+<slash:comments>2</slash:comments>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=04/11/30/1125252&amp;from=rss">
+<title>Perl 5.8.6 released</title>
+
+<link>http://use.perl.org/article.pl?sid=04/11/30/1125252&amp;from=rss</link>
+<description>&lt;A HREF="http://www.ccl4.org/~nick/"&gt;nicholas&lt;/A&gt; writes 
+&lt;i&gt;"The Perl 5 developer team is pleased to announce the Perl Release 5.8.6, 
+the sixth maintenance release of Perl 5.8. It was uploaded to CPAN shortly before the 
+&lt;A 
+HREF="http://use.perl.org/article.pl?sid=04/11/29/2140235&amp;amp;tid=32"&gt;current 
+master site issues&lt;/a&gt;, and so hasn't been affected by 
+this.&lt;/i&gt;"</description>
+
+<dc:creator>rafael</dc:creator>
+<dc:date>2004-11-30T11:42:00+00:00</dc:date>
+<dc:subject>releases</dc:subject>
+<slash:section>mainpage</slash:section>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+</rdf:RDF>
+

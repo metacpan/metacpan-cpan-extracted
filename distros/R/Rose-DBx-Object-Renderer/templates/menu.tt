@@ -1,0 +1,15 @@
+[% IF no_head %][% PROCESS menu %][% ELSE %][% doctype %]<html><head><title>[% title %]</title>[% html_head %]</head><body>[% PROCESS menu %]</body></html>[% END %]
+
+[% BLOCK menu %]
+	[% UNLESS hide %]
+		<div>
+			<div class="menu">
+				<ul>
+					[% FOREACH item = item_order %]<li><a [% IF items.$item.table == current %]class="current" [% END %]href="[% items.$item.link %]">[% items.$item.label %]</a></li>[% END %]
+				</ul>
+			</div>
+			[% IF description %]<p>[% description %]</p>[% END %]
+		</div>
+	[% END %]
+	[% content %]
+[% END %]

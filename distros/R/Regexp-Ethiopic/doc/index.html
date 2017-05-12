@@ -1,0 +1,1493 @@
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Ethiopic Character Classes</title>
+</head>
+<body bgcolor="#fffffh">
+
+<h1 align="center">Ethiopic Character Classes</h1>
+
+<h3>Why Ethiopic Character Classes?</h3>
+
+<p align="justify">Because they're not there!  Why character classes at all?
+The whole point of RE languages is to make pattern matching simpler than writing
+your own matching algorithms.  Standardized RE languages are also easier to
+read, write, maintain and share than the alternatives.  Syntax for character
+classes exist to exploit in simple notation the shared properties of a group of
+characters.</p>
+
+<p align="justify">So what properties do Ethiopic characters have that RE
+languages do not detect?  Ethiopic letters each contain two properties that
+should be matched independently.  Each letter is a syllable, a "CV" pattern,
+a means to detect either the "C" part or the "V" part is highly desirable.
+There are 7 basic "V" forms shared by 37 "C" bases.  This gives us 7 classes
+each containing 37 members and the inversion of 37 "C" classes each of 7
+members.  We need a simple way to specify these groups without typing out
+every member of the group in a bracketed list.</p>
+
+<p align="justify">
+But isn't this just a matter of convenience?  Yes, but we like convenience,
+that's why we have character classes and REs to begin with.  Since Perl 5.6
+Unicode derived character classes have been introduced in the form of
+<code>\p{IsDigit}</code>.
+While this is great for working across scripts in a multilingual
+document or archive, it is less nice when working with documents you know
+are English only.  Really, would you use <code>\p{IsDigit}</code> when you
+could more easily use <code>\d</code> (or <code>[0-9]</code>
+or <code>[:digit:]</code>)??</p>
+
+<p align="justify">
+This package offers overloading of the Perl regular expressions mechanism
+to provide syllabic style character class definitions with the convenience
+and ease of use POSIX notation.  See the <code>examples/</code> directory
+and module documentation for details.</p>
+
+
+<h2><u>Character Classes From Regexp::Ethiopic</u></h2>
+<a name="grid"/>
+<h3>Syllabic Classes: Equivalence of Family (row) and Equivalence of Form (column)</h3>
+
+<table border="1">
+<tr align="center">
+  <th>&nbsp;</th>
+  <th>[#1#]</th>
+  <th>[#2#]</th>
+  <th>[#3#]</th>
+  <th>[#4#]</th>
+  <th>[#5#]</th>
+  <th>[#6#]</th>
+  <th>[#7#]</th>
+  <th>[#8#]</th>
+  <th>[#9#]</th>
+  <th>[#10#]</th>
+  <th>[#11#]</th>
+  <th>[#12#]</th>
+</tr>
+<tr align="center">
+  <th>[#&#x1200;#]</th>
+  <td>&#x1200;</td>
+  <td>&#x1201;</td>
+  <td>&#x1202;</td>
+  <td>&#x1203;</td>
+  <td>&#x1204;</td>
+  <td>&#x1205;</td>
+  <td>&#x1206;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1208;#]</th>
+  <td>&#x1208;</td>
+  <td>&#x1209;</td>
+  <td>&#x120A;</td>
+  <td>&#x120B;</td>
+  <td>&#x120C;</td>
+  <td>&#x120D;</td>
+  <td>&#x120E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x120F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1210;#]</th>
+  <td>&#x1210;</td>
+  <td>&#x1211;</td>
+  <td>&#x1212;</td>
+  <td>&#x1213;</td>
+  <td>&#x1214;</td>
+  <td>&#x1215;</td>
+  <td>&#x1216;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1217;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1218;#]</th>
+  <td>&#x1218;</td>
+  <td>&#x1219;</td>
+  <td>&#x121A;</td>
+  <td>&#x121B;</td>
+  <td>&#x121C;</td>
+  <td>&#x121D;</td>
+  <td>&#x121E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x121F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1220;#]</th>
+  <td>&#x1220;</td>
+  <td>&#x1221;</td>
+  <td>&#x1222;</td>
+  <td>&#x1223;</td>
+  <td>&#x1224;</td>
+  <td>&#x1225;</td>
+  <td>&#x1226;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1227;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1228;#]</th>
+  <td>&#x1228;</td>
+  <td>&#x1229;</td>
+  <td>&#x122A;</td>
+  <td>&#x122B;</td>
+  <td>&#x122C;</td>
+  <td>&#x122D;</td>
+  <td>&#x122E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x122F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1230;#]</th>
+  <td>&#x1230;</td>
+  <td>&#x1231;</td>
+  <td>&#x1232;</td>
+  <td>&#x1233;</td>
+  <td>&#x1234;</td>
+  <td>&#x1235;</td>
+  <td>&#x1236;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1237;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1238;#]</th>
+  <td>&#x1238;</td>
+  <td>&#x1239;</td>
+  <td>&#x123A;</td>
+  <td>&#x123B;</td>
+  <td>&#x123C;</td>
+  <td>&#x123D;</td>
+  <td>&#x123E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x123F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1240;#]</th>
+  <td>&#x1240;</td>
+  <td>&#x1241;</td>
+  <td>&#x1242;</td>
+  <td>&#x1243;</td>
+  <td>&#x1244;</td>
+  <td>&#x1245;</td>
+  <td>&#x1246;</td>
+  <td>&#x1248;</td>
+  <td>&#x124D;</td>
+  <td>&#x124A;</td>
+  <td>&#x124B;</td>
+  <td>&#x124C;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1250;#]</th>
+  <td>&#x1250;</td>
+  <td>&#x1251;</td>
+  <td>&#x1252;</td>
+  <td>&#x1253;</td>
+  <td>&#x1254;</td>
+  <td>&#x1255;</td>
+  <td>&#x1256;</td>
+  <td>&#x1258;</td>
+  <td>&#x125D;</td>
+  <td>&#x125A;</td>
+  <td>&#x125B;</td>
+  <td>&#x125C;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1260;#]</th>
+  <td>&#x1260;</td>
+  <td>&#x1261;</td>
+  <td>&#x1262;</td>
+  <td>&#x1263;</td>
+  <td>&#x1264;</td>
+  <td>&#x1265;</td>
+  <td>&#x1266;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1267;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1268;#]</th>
+  <td>&#x1268;</td>
+  <td>&#x1269;</td>
+  <td>&#x126A;</td>
+  <td>&#x126B;</td>
+  <td>&#x126C;</td>
+  <td>&#x126D;</td>
+  <td>&#x126E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x126F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1270;#]</th>
+  <td>&#x1270;</td>
+  <td>&#x1271;</td>
+  <td>&#x1272;</td>
+  <td>&#x1273;</td>
+  <td>&#x1274;</td>
+  <td>&#x1275;</td>
+  <td>&#x1276;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1277;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1278;#]</th>
+  <td>&#x1278;</td>
+  <td>&#x1279;</td>
+  <td>&#x127A;</td>
+  <td>&#x127B;</td>
+  <td>&#x127C;</td>
+  <td>&#x127D;</td>
+  <td>&#x127E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x127F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1280;#]</th>
+  <td>&#x1280;</td>
+  <td>&#x1281;</td>
+  <td>&#x1282;</td>
+  <td>&#x1283;</td>
+  <td>&#x1284;</td>
+  <td>&#x1285;</td>
+  <td>&#x1286;</td>
+  <td>&#x1288;</td>
+  <td>&#x128D;</td>
+  <td>&#x128A;</td>
+  <td>&#x128B;</td>
+  <td>&#x128C;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1290;#]</th>
+  <td>&#x1290;</td>
+  <td>&#x1291;</td>
+  <td>&#x1292;</td>
+  <td>&#x1293;</td>
+  <td>&#x1294;</td>
+  <td>&#x1295;</td>
+  <td>&#x1296;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1297;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1298;#]</th>
+  <td>&#x1298;</td>
+  <td>&#x1299;</td>
+  <td>&#x129A;</td>
+  <td>&#x129B;</td>
+  <td>&#x129C;</td>
+  <td>&#x129D;</td>
+  <td>&#x129E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x129F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12A0;#]</th>
+  <td>&#x12A0;</td>
+  <td>&#x12A1;</td>
+  <td>&#x12A2;</td>
+  <td>&#x12A3;</td>
+  <td>&#x12A4;</td>
+  <td>&#x12A5;</td>
+  <td>&#x12A6;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x12A7;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12A8;#]</th>
+  <td>&#x12A8;</td>
+  <td>&#x12A9;</td>
+  <td>&#x12AA;</td>
+  <td>&#x12AB;</td>
+  <td>&#x12AC;</td>
+  <td>&#x12AD;</td>
+  <td>&#x12AE;</td>
+  <td>&#x12B0;</td>
+  <td>&#x12B5;</td>
+  <td>&#x12B2;</td>
+  <td>&#x12B3;</td>
+  <td>&#x12B4;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12B8;#]</th>
+  <td>&#x12B8;</td>
+  <td>&#x12B9;</td>
+  <td>&#x12BA;</td>
+  <td>&#x12BB;</td>
+  <td>&#x12BC;</td>
+  <td>&#x12BD;</td>
+  <td>&#x12BE;</td>
+  <td>&#x12C0;</td>
+  <td>&#x12C5;</td>
+  <td>&#x12C2;</td>
+  <td>&#x12C3;</td>
+  <td>&#x12C4;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12C8;#]</th>
+  <td>&#x12C8;</td>
+  <td>&#x12C9;</td>
+  <td>&#x12CA;</td>
+  <td>&#x12CB;</td>
+  <td>&#x12CC;</td>
+  <td>&#x12CD;</td>
+  <td>&#x12CE;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12D0;#]</th>
+  <td>&#x12D0;</td>
+  <td>&#x12D1;</td>
+  <td>&#x12D2;</td>
+  <td>&#x12D3;</td>
+  <td>&#x12D4;</td>
+  <td>&#x12D5;</td>
+  <td>&#x12D6;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12D8;#]</th>
+  <td>&#x12D8;</td>
+  <td>&#x12D9;</td>
+  <td>&#x12DA;</td>
+  <td>&#x12DB;</td>
+  <td>&#x12DC;</td>
+  <td>&#x12DD;</td>
+  <td>&#x12DE;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x12DF;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12E0;#]</th>
+  <td>&#x12E0;</td>
+  <td>&#x12E1;</td>
+  <td>&#x12E2;</td>
+  <td>&#x12E3;</td>
+  <td>&#x12E4;</td>
+  <td>&#x12E5;</td>
+  <td>&#x12E6;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x12E7;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12E8;#]</th>
+  <td>&#x12E8;</td>
+  <td>&#x12E9;</td>
+  <td>&#x12EA;</td>
+  <td>&#x12EB;</td>
+  <td>&#x12EC;</td>
+  <td>&#x12ED;</td>
+  <td>&#x12EE;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12F0;#]</th>
+  <td>&#x12F0;</td>
+  <td>&#x12F1;</td>
+  <td>&#x12F2;</td>
+  <td>&#x12F3;</td>
+  <td>&#x12F4;</td>
+  <td>&#x12F5;</td>
+  <td>&#x12F6;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x12F7;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x12F8;#]</th>
+  <td>&#x12F8;</td>
+  <td>&#x12F9;</td>
+  <td>&#x12FA;</td>
+  <td>&#x12FB;</td>
+  <td>&#x12FC;</td>
+  <td>&#x12FD;</td>
+  <td>&#x12FE;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x12FF;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1300;#]</th>
+  <td>&#x1300;</td>
+  <td>&#x1301;</td>
+  <td>&#x1302;</td>
+  <td>&#x1303;</td>
+  <td>&#x1304;</td>
+  <td>&#x1305;</td>
+  <td>&#x1306;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1307;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1308;#]</th>
+  <td>&#x1308;</td>
+  <td>&#x1309;</td>
+  <td>&#x130A;</td>
+  <td>&#x130B;</td>
+  <td>&#x130C;</td>
+  <td>&#x130D;</td>
+  <td>&#x130E;</td>
+  <td>&#x1310;</td>
+  <td>&#x1315;</td>
+  <td>&#x1312;</td>
+  <td>&#x1313;</td>
+  <td>&#x1314;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1318;#]</th>
+  <td>&#x1318;</td>
+  <td>&#x1319;</td>
+  <td>&#x131A;</td>
+  <td>&#x131B;</td>
+  <td>&#x131C;</td>
+  <td>&#x131D;</td>
+  <td>&#x131E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1320;#]</th>
+  <td>&#x1320;</td>
+  <td>&#x1321;</td>
+  <td>&#x1322;</td>
+  <td>&#x1323;</td>
+  <td>&#x1324;</td>
+  <td>&#x1325;</td>
+  <td>&#x1326;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1327;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1328;#]</th>
+  <td>&#x1328;</td>
+  <td>&#x1329;</td>
+  <td>&#x132A;</td>
+  <td>&#x132B;</td>
+  <td>&#x132C;</td>
+  <td>&#x132D;</td>
+  <td>&#x132E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x132F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1330;#]</th>
+  <td>&#x1330;</td>
+  <td>&#x1331;</td>
+  <td>&#x1332;</td>
+  <td>&#x1333;</td>
+  <td>&#x1334;</td>
+  <td>&#x1335;</td>
+  <td>&#x1336;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1337;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1338;#]</th>
+  <td>&#x1338;</td>
+  <td>&#x1339;</td>
+  <td>&#x133A;</td>
+  <td>&#x133B;</td>
+  <td>&#x133C;</td>
+  <td>&#x133D;</td>
+  <td>&#x133E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x133F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1340;#]</th>
+  <td>&#x1340;</td>
+  <td>&#x1341;</td>
+  <td>&#x1342;</td>
+  <td>&#x1343;</td>
+  <td>&#x1344;</td>
+  <td>&#x1345;</td>
+  <td>&#x1346;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1348;#]</th>
+  <td>&#x1348;</td>
+  <td>&#x1349;</td>
+  <td>&#x134A;</td>
+  <td>&#x134B;</td>
+  <td>&#x134C;</td>
+  <td>&#x134D;</td>
+  <td>&#x134E;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x134F;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr align="center">
+  <th>[#&#x1350;#]</th>
+  <td>&#x1350;</td>
+  <td>&#x1351;</td>
+  <td>&#x1352;</td>
+  <td>&#x1353;</td>
+  <td>&#x1354;</td>
+  <td>&#x1355;</td>
+  <td>&#x1356;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&#x1357;</td>
+  <td>&nbsp;</td>
+</tr>
+</table>
+
+<p>&nbsp;</p>
+
+<h3>Character Class Aliases</h3>
+
+<table border="0">
+<tr valign="top">
+  <td>
+<table border="1">
+  <tr>
+    <th>Alias</th>
+    <th>Equivalence of Form</th>
+  </tr>
+  <tr>
+   <th>[:ግዕዝ:]<br>[:geez:]</th>
+   <th>[#1#]</th>
+  </tr>
+  <tr>
+   <th>[:ካዕብ:]<br>[:kaib:]</th>
+   <th>[#2#]</th>
+  </tr>
+  <tr>
+   <th>[:ሣልስ:]<br>[:salis:]</th>
+   <th>[#3#]</th>
+  </tr>
+  <tr>
+   <th>[:ራብዕ:]<br>[:rabi:]</th>
+   <th>[#4#]</th>
+  </tr>
+  <tr>
+   <th>[:ኃምስ:]<br>[:hamis:]</th>
+   <th>[#5#]</th>
+  </tr>
+  <tr>
+   <th>[:ሳድስ:]<br>[:sadis:]</th>
+   <th>[#6#]</th>
+  </tr>
+  <tr>
+   <th>[:ሳብዕ:]<br>[:sabi:]</th>
+   <th>[#7#]</th>
+  </tr>
+  <tr>
+   <th>[:ዘመደ፡ግዕዝ:]<br>[:zemede:geez:]</th>
+   <th>[#8#]</th>
+  </tr>
+  <tr>
+   <th>[:ዘመደ፡ካዕብ:]<br>[:zemede:kaib:]</th>
+   <th>[#9#]</th>
+  </tr>
+  <tr>
+   <th>[:ዘመደ፡ሣልስ:]<br>[:zemede:salis:]</th>
+   <th>[#10#]</th>
+  </tr>
+  <tr>
+   <th>[:ዘመደ፡ራብዕ:]<br>[:zemede:rabi:]</th>
+   <th>[#11#]</th>
+  </tr>
+  <tr>
+   <th>[:ዘመደ፡ኃምስ:]<br>[:zemede:hamis:]</th>
+   <th>[#12#]</th>
+  </tr>
+</table>
+
+</td><td>&nbsp;</td><td>
+
+<table border="1">
+  <tr>
+    <th>Other Class</th>
+    <th>Expansion</th>
+  </tr>
+  <tr>
+   <th>[:አኃዝ:]<br>[:ahaz:]</th>
+   <th>[፩-፼]</th>
+  </tr>
+</table>
+</td>
+
+</tr>
+</table>
+
+<p>&nbsp;</p>
+<hr size="2">
+
+<h2><u>Character Classes From Regexp::Ethiopic::Amharic</u></h2>
+
+<table border=0">
+<tr valign="top">
+<td>
+
+<h3>Equivalence in Phono-Orthography</h3>
+<table border="1">
+  <tr>
+    <th>Class</th>
+    <th>Perl RE Expansion</th>
+  </tr>
+  <tr>
+   <th>[=ሀ=]<br>[=ሐ=]<br>[=ሃ=]<br>[=ሓ=]<br>[=ኀ=]<br>[=ኃ=]<br>[=ኻ=]</th>
+   <td>[ሀሃሐሓኀኃኻ]</td>
+  </tr>
+  <tr>
+   <th>[=ሁ=]<br>[=ሑ=]<br>[=ኁ=]<br>[=ኹ=]</th>
+   <td>[ሁሑኁኹ]</td>
+  </tr>
+  <tr>
+   <th>[=ሂ=]<br>[=ሒ=]<br>[=ኂ=]<br>[=ኺ=]</th>
+   <td>[ሂሒኂኺ]</td>
+  </tr>
+  <tr>
+   <th>[=ሄ=]<br>[=ሔ=]<br>[=ኄ=]<br>[=ኼ=]</th>
+   <td>[ሄሔኄኼ]</td>
+  </tr>
+  <tr>
+   <th>[=ህ=]<br>[=ሕ=]<br>[=ኅ=]<br>[=ኽ=]</th>
+   <td>[ህሕኅኽ]</td>
+  </tr>
+  <tr>
+   <th>[=ሆ=]<br>[=ሖ=]<br>[=ኆ=]<br>[=ኈ=]<br>[=ኾ=]<br>[=ዀ=]</th>
+   <td>[ሆሖኆኈኾዀ]</td>
+  </tr>
+  <tr>
+   <th>[=ሗ=]<br>[=ኋ=]<br>[=ዃ=]</td>
+   <td>[ሗኋዃ]</td>
+  </tr>
+  <tr>
+   <th>[=ሰ=]<br>[=ሠ=]</th>
+   <td>[ሰሠ]</td>
+  </tr>
+  <tr>
+   <th>[=ሱ=]<br>[=ሡ=]</th>
+   <td>[ሱሡ]</td>
+  </tr>
+  <tr>
+   <th>[=ሲ=]<br>[=ሢ=]</th>
+   <td>[ሲሢ]</td>
+  </tr>
+  <tr>
+   <th>[=ሳ=]<br>[=ሣ=]</th>
+   <td>[ሳሣ]</td>
+  </tr>
+  <tr>
+   <th>[=ሴ=]<br>[=ሤ=]</th>
+   <td>[ሴሤ]</td>
+  </tr>
+  <tr>
+   <th>[=ስ=]<br>[=ሥ=]</th>
+   <td>[ስሥ]</td>
+  </tr>
+  <tr>
+   <th>[=ሶ=]<br>[=ሦ=]</th>
+   <td>[ሶሦ]</td>
+  </tr>
+  <tr>
+   <th>[=ሷ=]<br>[=ሧ=]</th>
+   <td>[ሷሧ]</td>
+  </tr>
+  <tr>
+   <th>[=ቁ=]<br>[=ቍ=]</th>
+   <td>[ቁቍ]</td>
+  </tr>
+  <tr>
+   <th>[=ቆ=]<br>[=ቈ=]</th>
+   <td>[ቆቈ]</td>
+  </tr>
+  <tr>
+   <th>[=አ=]<br>[=ኣ=]<br>[=ዐ=]<br>[=ዓ=]</th>
+   <td>[አኣዐዓ]</td>
+  </tr>
+  <tr>
+   <th>[=ኡ=]<br>[=ዑ=]</th>
+   <td>[ኡዑ]</td>
+  </tr>
+  <tr>
+   <th>[=ኢ=]<br>[=ዒ=]</th>
+   <td>[ኢዒ]</td>
+  </tr>
+  <tr>
+   <th>[=ኤ=]<br>[=ዔ=]</th>
+   <td>[ኤዔ]</td>
+  </tr>
+  <tr>
+   <th>[=እ=]<br>[=ዕ=]</th>
+   <td>[እዕ]</td>
+  </tr>
+  <tr>
+   <th>[=ኦ=]<br>[=ዖ=]</th>
+   <td>[ኦዖ]</td>
+  </tr>
+  <tr>
+   <th>[=ኮ=]<br>[=ኰ=]</th>
+   <td>[ኮኰ]</td>
+  </tr>
+  <tr>
+   <th>[=ጎ=]<br>[=ጐ=]</th>
+   <td>[ጎጐ]</td>
+  </tr>
+  <tr>
+   <th>[=ጸ=]<br>[=ፀ=]</th>
+   <td>[ጸፀ]</td>
+  </tr>
+  <tr>
+   <th>[=ጹ=]<br>[=ፁ=]</th>
+   <td>[ጹፁ]</td>
+  </tr>
+  <tr>
+   <th>[=ጺ=]<br>[=ፂ=]</th>
+   <td>[ጺፂ]</td>
+  </tr>
+  <tr>
+   <th>[=ጻ=]<br>[=ፃ=]</th>
+   <td>[ጻፃ]</td>
+  </tr>
+  <tr>
+   <th>[=ጼ=]<br>[=ፄ=]</th>
+   <td>[ጼፄ]</td>
+  </tr>
+  <tr>
+   <th>[=ጽ=]<br>[=ፅ=]</th>
+   <td>[ጽፅ]</td>
+  </tr>
+  <tr>
+   <th>[=ጾ=]<br>[=ፆ=]</th>
+   <td>[ጾፆ]</td>
+  </tr>
+</table>
+
+</td><td>&nbsp;</td><td>
+
+
+<h3 align="center">Equivalence of Families</h3>
+<table border="1">
+  <tr>
+    <th>Class</th>
+    <th>Perl RE Expansion</th>
+  </tr>
+  <tr>
+    <th>[=#ሀ#=]<br>[=#ሐ#=]<br>[=#ኀ#=]<br>[=#ኸ#=]</th>
+    <td>[ሀ-ሆሐ-ሗኀ-ኆኈ-ኍኸ-ኾዀ-ዅ]</td>
+  </tr>
+  <tr>
+    <th>[=#ሰ#=]<br>[=#ሠ#=]</th>
+    <td>[ሰ-ሷሠ-ሧ]</td>
+  </tr>
+  <tr>
+    <th>[=#አ#=]<br>[=#ዐ#=]</th>
+    <td>[አ-ኧዐ-ዖ]</td>
+  </tr>
+  <tr>
+    <th>[=#ጸ#=]<br>[=#ፀ#=]</th>
+    <td>[ጸ-ጿፀ-ፆ]</td>
+  </tr>
+</table>
+
+</tr>
+</table>
+
+<p>&nbsp;</p>
+<hr size="2">
+
+<h2><u>Character Classes From Regexp::Ethiopic::Tigrigna</u></h2>
+
+
+<table border=0">
+<tr valign="top">
+<td>
+
+<h3>Equivalence in Phono-Orthography</h3>
+<table border="1">
+  <tr>
+    <th>Class</th>
+    <th>Perl RE Expansion</th>
+  </tr>
+  <tr>
+   <th>[=ሀ=]<br>[=ሃ=]<br>[=ኀ=]<br>[=ኃ=]</th>
+   <td>[ሀሃኀኃ]</td>
+  </tr>
+  <tr>
+   <th>[=ሁ=]<br>[=ኁ=]</th>
+   <td>[ሁኁ]</td>
+  </tr>
+  <tr>
+   <th>[=ሂ=]<br>[=ኂ=]</th>
+   <td>[ሂኂ]</td>
+  </tr>
+  <tr>
+   <th>[=ሄ=]<br>[=ኄ=]</th>
+   <td>[ሄኄ]</td>
+  </tr>
+  <tr>
+   <th>[=ህ=]<br>[=ኅ=]</th>
+   <td>[ህኅ]</td>
+  </tr>
+  <tr>
+   <th>[=ሆ=]<br>[=ኆ=]<br>[=ኈ=]</th>
+   <td>[ሆኆኈ]</td>
+  </tr>
+  <tr>
+   <th>[=ሐ=]<br>[=ሓ=]</th>
+   <td>[ሐሓ]</td>
+  </tr>
+  <tr>
+   <th>[=ሰ=]<br>[=ሠ=]</th>
+   <td>[ሰሠ]</td>
+  </tr>
+  <tr>
+   <th>[=ሱ=]<br>[=ሡ=]</th>
+   <td>[ሱሡ]</td>
+  </tr>
+  <tr>
+   <th>[=ሲ=]<br>[=ሢ=]</th>
+   <td>[ሲሢ]</td>
+  </tr>
+  <tr>
+   <th>[=ሳ=]<br>[=ሣ=]</th>
+   <td>[ሳሣ]</td>
+  </tr>
+  <tr>
+   <th>[=ሴ=]<br>[=ሤ=]</th>
+   <td>[ሴሤ]</td>
+  </tr>
+  <tr>
+   <th>[=ስ=]<br>[=ሥ=]</th>
+   <td>[ስሥ]</td>
+  </tr>
+  <tr>
+   <th>[=ሶ=]<br>[=ሦ=]</th>
+   <td>[ሶሦ]</td>
+  </tr>
+  <tr>
+   <th>[=ሷ=]<br>[=ሧ=]</th>
+   <td>[ሷሧ]</td>
+  </tr>
+  <tr>
+   <th>[=ቁ=]<br>[=ቍ=]</th>
+   <td>[ቁቍ]</td>
+  </tr>
+  <tr>
+   <th>[=ቆ=]<br>[=ቈ=]</th>
+   <td>[ቆቈ]</td>
+  </tr>
+  <tr>
+   <th>[=አ=]<br>[=ኣ=]</th>
+   <td>[አኣ]</td>
+  </tr>
+  <tr>
+   <th>[=ኮ=]<br>[=ኰ=]</th>
+   <td>[ኮኰ]</td>
+  </tr>
+  <tr>
+   <th>[=ዐ=]<br>[=ዓ=]</th>
+   <td>[ዐዓ]</td>
+  </tr>
+  <tr>
+   <th>[=ጎ=]<br>[=ጐ=]</th>
+   <td>[ጎጐ]</td>
+  </tr>
+  <tr>
+   <th>[=ጸ=]<br>[=ፀ=]</th>
+   <td>[ጸፀ]</td>
+  </tr>
+  <tr>
+   <th>[=ጹ=]<br>[=ፁ=]</th>
+   <td>[ጹፁ]</td>
+  </tr>
+  <tr>
+   <th>[=ጺ=]<br>[=ፂ=]</th>
+   <td>[ጺፂ]</td>
+  </tr>
+  <tr>
+   <th>[=ጻ=]<br>[=ፃ=]</th>
+   <td>[ጻፃ]</td>
+  </tr>
+  <tr>
+   <th>[=ጼ=]<br>[=ፄ=]</th>
+   <td>[ጼፄ]</td>
+  </tr>
+  <tr>
+   <th>[=ጽ=]<br>[=ፅ=]</th>
+   <td>[ጽፅ]</td>
+  </tr>
+  <tr>
+   <th>[=ጾ=]<br>[=ፆ=]</th>
+   <td>[ጾፆ]</td>
+  </tr>
+</table>
+
+</td><td>&nbsp;</td><td>
+
+<h3 align="center">Equivalence of Families</h3>
+<table border="1">
+  <tr>
+    <th>Class</th>
+    <th>Perl RE Expansion</th>
+  </tr>
+  <tr>
+    <th>[=#ሀ#=]<br>[=#ኀ#=]</th>
+    <td>[ሀ-ሆኀ-ኆኈ-ኍ]</td>
+  </tr>
+  <tr>
+    <th>[=#ሰ#=]<br>[=#ሠ#=]</th>
+    <td>[ሰ-ሷሠ-ሧ]</td>
+  </tr>
+  <tr>
+    <th>[=#ጸ#=]<br>[=#ፀ#=]</th>
+    <td>[ጸ-ጿፀ-ፆ]</td>
+  </tr>
+</table>
+
+</tr>
+</table>
+
+<p>&nbsp;</p>
+<hr size="2">
+
+<h2><u>Character Classes From Regexp::Ethiopic::Geez</u></h2>
+
+
+<table border=0">
+<tr valign="top">
+<td>
+
+<h3>Equivalence in Phono-Orthography</h3>
+<table border="1">
+  <tr>
+    <th>Class</th>
+    <th>Perl RE Expansion</th>
+  </tr>
+  <tr>
+   <th>[=ሀ=]<br>[=ሃ=]</th>
+   <td>[ሀሃ]</td>
+  </tr>
+  <tr>
+   <th>[=ሐ=]<br>[=ሓ=]</th>
+   <td>[ሐሓ]</td>
+  </tr>
+  <tr>
+   <th>[=ኀ=]<br>[=ኃ=]</th>
+   <td>[ኀኃ]</td>
+  </tr>
+  <tr>
+   <th>[=አ=]<br>[=ኣ=]</th>
+   <td>[አኣ]</td>
+  </tr>
+  <tr>
+   <th>[=ኮ=]<br>[=ኰ=]</th>
+   <td>[ኮኰ]</td>
+  </tr>
+  <tr>
+   <th>[=ዐ=]<br>[=ዓ=]</th>
+   <td>[ዐዓ]</td>
+  </tr>
+  <tr>
+   <th>[=ጎ=]<br>[=ጐ=]</th>
+   <td>[ጎጐ]</td>
+  </tr>
+</table>
+
+</td><td>&nbsp;</td><td>
+
+<h3 align="center">Equivalence of Families</h3>
+<div align="center"><em>none ocurring</em></div>
+
+</tr>
+</table>
+
+<p>&nbsp;</p>
+<hr size="2">
+
+<h3>Matching by Example</h3>
+
+<p align="justify"></p>
+
+The name "ዓለምፀሐይ" is a compound word formed from "ዓለም" (world) and "ፀሐይ" (sun).  It
+is a particularly useful word to test with because it has a great many possible
+renderings depending on the language and writing conventions.  Not all renderings that
+are possible are also probable:</p>
+
+<table border="1">
+<caption><strong>Probability Distribution of the 56 Renderings of ዓለምፀሐይ</strong></caption>
+<tbody>
+<tr>
+  <th></th>
+  <th>Amharic</th>
+  <th>Tigrigna-ER</th>
+  <th>Tigrigna-ET</th>
+  <th>Ge'ez</th>
+</tr>
+<tr>
+  <th>Valid and Probable</th>
+  <td>
+    ዓለምፀሐይ ዓለምጸሐይ ዓለምጸሃይ ዓለምፀሃይ
+    አለምፀሐይ አለምጸሐይ አለምጸሃይ አለምፀሃይ
+  </td>
+  <td>
+    ዓለምጸሓይ 
+  </td>
+  <td>
+    ዓለምፀሐይ ዓለምጸሐይ
+  </td>
+  <td>ዓለምፀሐይ</td>
+</tr>
+<tr>
+  <th>Intermediate Probablity</th>
+  <td>
+    አለምጸሀይ አለምፀሀይ ዓለምጸሀይ ዓለምፀሀይ 
+    ዐለምፀሐይ ዐለምጸሐይ 
+    ዐለምጸሃይ ዐለምፀሃይ ዐለምጸሀይ ዐለምፀሀይ 
+  </td>
+  <td>ዓለምጸሐይ ዐለምጸሓይ ዐለምጸሐይ ዓለምፀሐይ</td>
+  <td>ዓለምጸሓይ ዓለምፀሓይ</td>
+  <td>ዐለምፀሐይ</td>
+</tr>
+<tr>
+  <th>Valid but Improbable</th>
+  <td>
+    ዓለምጸኃይ ዓለምጸኀይ ዓለምፀኃይ ዓለምፀኀይ
+    ዓለምጸሓይ ዓለምፀሓይ ዓለምጸኻይ ዓለምፀኻይ
+    አለምጸኃይ አለምጸኀይ አለምፀኃይ አለምፀኀይ
+    አለምጸሓይ አለምፀሓይ አለምጸኻይ አለምፀኻይ
+    ዐለምጸኃይ ዐለምጸኀይ ዐለምፀኃይ ዐለምፀኀይ
+    ዐለምጸሓይ ዐለምፀሓይ ዐለምጸኻይ ዐለምፀኻይ
+    ኣለምፀሐይ ኣለምጸሐይ ኣለምጸሃይ ኣለምፀሃይ ኣለምጸሀይ ኣለምጸኃይ ኣለምጸኀይ 
+    ኣለምፀሀይ ኣለምፀኃይ ኣለምፀኀይ ኣለምጸሓይ ኣለምፀሓይ ኣለምጸኻይ ኣለምፀኻይ
+  </td>
+  <td>ዓለምፀሓይ ዐለምፀሐይ ዐለምፀሓይ</td>
+  <td>ዐለምፀሐይ ዐለምጸሐይ ዐለምጸሓይ ዐለምፀሓይ</td>
+  <td>ዓለምፀሓይ ዐለምፀሓይ</td>
+</tr>
+<tr>
+  <th>Impossible (Invalid Phonemes)</th>
+  <td>&nbsp;</td>
+  <td> <!-- Ti-ER -->
+              ዓለምጸሃይ ዓለምፀሃይ ዓለምጸሀይ ዓለምጸኃይ ዓለምጸኀይ
+ዓለምፀሀይ ዓለምፀኃይ ዓለምፀኀይ               ዓለምጸኻይ ዓለምፀኻይ
+
+አለምፀሐይ አለምጸሐይ አለምጸሃይ አለምፀሃይ አለምጸሀይ አለምጸኃይ አለምጸኀይ
+አለምፀሀይ አለምፀኃይ አለምፀኀይ አለምጸሓይ አለምፀሓይ አለምጸኻይ አለምፀኻይ
+
+              ዐለምጸሃይ ዐለምፀሃይ ዐለምጸሀይ ዐለምጸኃይ ዐለምጸኀይ
+ዐለምፀሀይ ዐለምፀኃይ ዐለምፀኀይ               ዐለምጸኻይ ዐለምፀኻይ
+
+ኣለምፀሐይ ኣለምጸሐይ ኣለምጸሃይ ኣለምፀሃይ ኣለምጸሀይ ኣለምጸኃይ ኣለምጸኀይ 
+ኣለምፀሀይ ኣለምፀኃይ ኣለምፀኀይ ኣለምጸሓይ ኣለምፀሓይ ኣለምጸኻይ ኣለምፀኻይ
+  </td>
+  <td> <!-- Ti-ET -->
+              ዓለምጸሃይ ዓለምፀሃይ ዓለምጸሀይ ዓለምጸኃይ ዓለምጸኀይ
+ዓለምፀሀይ ዓለምፀኃይ ዓለምፀኀይ               ዓለምጸኻይ ዓለምፀኻይ
+
+አለምፀሐይ አለምጸሐይ አለምጸሃይ አለምፀሃይ አለምጸሀይ አለምጸኃይ አለምጸኀይ
+አለምፀሀይ አለምፀኃይ አለምፀኀይ አለምጸሓይ አለምፀሓይ አለምጸኻይ አለምፀኻይ
+
+              ዐለምጸሃይ ዐለምፀሃይ ዐለምጸሀይ ዐለምጸኃይ ዐለምጸኀይ
+ዐለምፀሀይ ዐለምፀኃይ ዐለምፀኀይ               ዐለምጸኻይ ዐለምፀኻይ
+
+ኣለምፀሐይ ኣለምጸሐይ ኣለምጸሃይ ኣለምፀሃይ ኣለምጸሀይ ኣለምጸኃይ ኣለምጸኀይ 
+ኣለምፀሀይ ኣለምፀኃይ ኣለምፀኀይ ኣለምጸሓይ ኣለምፀሓይ ኣለምጸኻይ ኣለምፀኻይ
+  </td>
+  <td> <!-- Ge'ez -->
+       ዓለምጸሐይ ዓለምጸሃይ ዓለምፀሃይ ዓለምጸሀይ ዓለምጸኃይ ዓለምጸኀይ
+ዓለምፀሀይ ዓለምፀኃይ ዓለምፀኀይ ዓለምጸሓይ        ዓለምጸኻይ ዓለምፀኻይ
+
+አለምፀሐይ አለምጸሐይ አለምጸሃይ አለምፀሃይ አለምጸሀይ አለምጸኃይ አለምጸኀይ
+አለምፀሀይ አለምፀኃይ አለምፀኀይ አለምጸሓይ አለምፀሓይ አለምጸኻይ አለምፀኻይ
+
+       ዐለምጸሐይ ዐለምጸሃይ ዐለምፀሃይ ዐለምጸሀይ ዐለምጸኃይ ዐለምጸኀይ
+ዐለምፀሀይ ዐለምፀኃይ ዐለምፀኀይ        ዐለምጸሓይ ዐለምጸኻይ ዐለምፀኻይ
+
+ኣለምፀሐይ ኣለምጸሐይ ኣለምጸሃይ ኣለምፀሃይ ኣለምጸሀይ ኣለምጸኃይ ኣለምጸኀይ 
+ኣለምፀሀይ ኣለምፀኃይ ኣለምፀኀይ ኣለምጸሓይ ኣለምፀሓይ ኣለምጸኻይ ኣለምፀኻይ
+  </td>
+</tr>
+</tbody>
+</table>
+
+<p align="justify">
+The following shows by example how the character classes may be applied
+to the ዓለምፀሐይ example.  The majority of the examples also appear in
+the <code>overload.pl</code> script found in the <code>examples</code>
+directory.
+</p>
+
+<h4><u>Basic Property Matching</u></h4>
+
+<dl>
+  <dt>/([=አ=])ለም[=ጸ=][=ሃ=]ይ/</dt>
+  <dd>Will match <span style="color:red"><u>ዓ</u></span>ለም<span style="color:red"><u>ፀሐ</u></span>ይ
+      as ዓ is in the Amharic equivalence set of አ, ፀ is in the Amharic &amp; Tigrigna equivalence of ጸ
+      and ሐ is in the Amharic equivalence of ሃ.  This expression only matches for Amharic equivalence
+      classes.</dd><br/>&nbsp;<br/>
+  <dt>/([=ዐ=])ለም[=ጸ=][=ሓ=]ይ/</dt>
+  <dd>Will match <span style="color:red"><u>ዓ</u></span>ለም<span style="color:red"><u>ፀሐ</u></span>ይ
+      as ዓ is in the Amharic &amp; Tigrigna equivalence set of ዐ,
+      ፀ is in the Amharic &amp; Tigrigna equivalence of ጸ
+      and ሐ is in the Amharic &amp; Tigrigna equivalence of ሓ.
+      This expression matches for Amharic and Tigrigna equivalence classes.</dd><br/>&nbsp;<br/>
+  <dt>/[#ለ#]ም/</dt>
+  <dd>Will match ዓ<span style="color:red"><u>ለም</u></span>ፀሐይ as ለ
+      is a member of the "ለ family" and preceeds ም.</dd><br/>&nbsp;<br/>
+  <dt>/[#4#]ለ/</dt>
+  <dd>Will match <span style="color:red"><u>ዓለ</u></span>ምፀሐይ as ዓ
+      is a of the "4<sup>th</sup> form" and preceeds ለ.</dd>
+</dl>
+
+<h4><u>Form Range Matching</u></h4>
+
+<dl>
+  <dt>/[#4-6#]ለ/</dt>
+  <dd>Will match <span style="color:red"><u>ዓለ</u></span>ምፀሐይ as ዓ
+      is a of the "4<sup>th</sup> <em>through</em> 6<sup>th</sup> form" and preceeds ለ.</dd><br/>&nbsp;<br/>
+  <dt>/[#4,6#]ለ/</dt>
+  <dd>Will match <span style="color:red"><u>ዓለ</u></span>ምፀሐይ as ዓ
+      is a of the "4<sup>th</sup> <em>or</em> 6<sup>th</sup> form" and preceeds ለ.</dd><br/>&nbsp;<br/>
+  <dt>/[#ዘ-ገ#]/</dt>
+  <dd>Will match ዓለምፀሐ<span style="color:red"><u>ይ</u></span>as ይ
+      is a member of the "ዘ <em>through</em> ገ family range".</dd><br/>&nbsp;<br/>
+  <dt>/[#መነበ#]/</dt>
+  <dd>Will match ዓለ<span style="color:red"><u>ም</u></span>ፀሐይ as ም
+      is a member of the "መ <em>or</em> ነ <em>or</em> በ family".</dd>
+</dl>
+
+
+<h4><u>Form Range Operator Matching</u></h4>
+<dl>
+  <dt>/መ{#4-7#}/</dt>
+  <dd>Will match ዓለ<span style="color:red"><u>ም</u></span>ፀሐይ as ም
+      is the "6<sup>th</sup> form" of the "መ family" and is within the specified
+      form range of 4-7.</dd><br/>&nbsp;<br/>
+  <dt>/ፀ{#1,3-5,7#}/</dt>
+  <dd>Will match ዓለም<span style="color:red"><u>ፀ</u></span>ሐይ as ፀ
+      is the "1<sup>st</sup> form" of the "ፀ family" and is within the specified
+      form range of 1 or 3-5 or 7.</dd><br/>&nbsp;<br/>
+  <dt>/ጸ{#3#}/</dt>
+  <dd>Fails to match ዓለምፀሐይ as ጸ does not appear in the 3<sup>rd</sup> form.</dd><br/>&nbsp;<br/>
+  <dt>/[ሐጸ]{#4#}/</dt>
+  <dd>Fails to match ዓለምፀሐይ as ሐ or ጸ do not appear in the 4<sup>th</sup> form.</dd><br/>&nbsp;<br/>
+  <dt>/[ሐጸ]{#3,5#}/</dt>
+  <dd>Fails to match ዓለምፀሐይ as ሐ or ጸ do not appear in the 3<sup>rd</sup> or 5<sup>th</sup> form.</dd><br/>&nbsp;<br/>
+  <dt>/[ለ-መ]{#6#}/</dt>
+  <dd>Will match ዓለ<span style="color:red"><u>ም</u></span>ፀሐይ as ም
+      is of the "ለ through መ" families and is of the "6<sup>th</sup> form".</dd><br/>&nbsp;<br/>
+  <dt>/[ለ-መ]{#3,5#}/</dt>
+  <dd>Fails to match ዓለምፀሐይ as no member of the "ለ through መ families" are present in the 3<sup>rd</sup>
+      or 5<sup>th</sup> form.</dd><br/>&nbsp;<br/>
+  <dt>/[ለ-መ]{#3,5-7#}/</dt>
+  <dd>Will match ዓለ<span style="color:red"><u>ም</u></span>ፀሐይ as ም
+      is of the "ለ through መ families" and is of the "6<sup>th</sup> form" which is within
+      the specified range of 3<sup>rd</sup> or 5<sup>th</sup> through 7<sup>th</sup>.</dd><br/>&nbsp;<br/>
+  <dt>/[ጸለ-መ]{#4#}/</dt>
+  <dd>Fails to match ዓለምፀሐይ as no member of the "ጸ or ለ through መ families" are present in the 4<sup>th</sup> form.</dd><br/>&nbsp;<br/>
+  <dt>/[ጸለ-መ]{#3,5-7#}/</dt>
+  <dd>Will match ዓለ<span style="color:red"><u>ም</u></span>ፀሐይ as ም
+      is of the "ጸ or ለ through መ families" and is of the "6<sup>th</sup> form" which is within
+      the specified range of 3<sup>rd</sup> or 5<sup>th</sup> through 7<sup>th</sup>.</dd>
+</dl>
+
+<h4><u>Negation Matching</u></h4>
+<dl>
+  <dt>/[ሐጸ]{^#4#}/</dt>
+  <dd>Will match ዓለምፀ<span style="color:red"><u>ሐ</u></span>ይ as ሐ
+      is a member of "ሐ or ጸ family" and not of the 4<sup>th</sup> form.</dd><br/>&nbsp;<br/>
+  <dt>/[^ሐጸ]{#4#}/</dt>
+  <dd>Will match <span style="color:red"><u>ዓ</u></span>ለምፀሐይ as ዓ
+      is not a member of "ሐ or ጸ family" and is of the 4<sup>th</sup> form.</dd><br/>&nbsp;<br/>
+  <dt>/[^ሐጸ]{^#4#}/</dt>
+  <dd>Is equivalent to the last expression.  Only one negative is interpretted, this is because
+      a double negative remains negative in Ethio-Semetic grammar.</dd>
+</dl>
+
+<h4><u>Ethiopic Class Matching</u></h4>
+<dl>
+  <dt>if ( "ኩ" =~ /[#ከ#]/ )</dt>
+  <dd>Is a true expression because ኩ is a member of the ከ family.</dd><br/>&nbsp;<br/>
+  <dt>if ( "ኩ" =~ /[#2#]/ )</dt>
+  <dd>Is a true expression because ኩ is a of the 2<sup>nd</sup> form.</dd><br/>&nbsp;<br/>
+  <dt>if ( "ኩ" =~ /[:ካዕብ:]/ )</dt>
+  <dd>Is a true expression because ኩ is in the class of ካዕብ.</dd><br/>&nbsp;<br/>
+  <dt>if ( "ኩ" =~ /[:kaib:]/ )</dt>
+  <dd>Is a true expression because ኩ is in the class of kaib ("kaib" is a transcription of "ካዕብ").</dd>
+</dl>
+
+
+<h4><u>Amharic Family Equivalence Matching</u></h4>
+<dl>
+  <dt>/[=#ጸ#=]/</dt>
+  <dd>Will match ዓለም<span style="color:red"><u>ፀ</u></span>ሐይ as ሐ
+      is a member of "ጸ family equivalence" in Amharic and Tigrigna.</dt><br/>&nbsp;<br/>
+  <dt>/[=#ሀ#=]/</dt>
+  <dd>Will match ዓለምፀ<span style="color:red"><u>ሐ</u></span>ይ as ሐ
+      is a member of "ሀ family equivalence" in Amharic.  The expression does not match for
+      languages.</dt><br/>&nbsp;<br/>
+  <dt>/[=#ጸ#=]{#3-5#}/</dt>
+  <dd>Fails to match ዓለምፀሐይ as ጸ equivalence family members do not appear in the 3<sup>rd</sup> through 5<sup>th</sup> forms.</dd><br/>&nbsp;<br/>
+</dl>
+
+
+<p>&nbsp;</p>
+<hr size="2">
+
+<h3>Utility Functions</h3>
+
+<p align="justify">The Regexp::Ethiopic package (as well as subclasses) export
+a number of utility functions that operate on Ethiopic characters and strings.  Specify
+":utils" as an import option to bring the functions into the local namespace.
+</p>
+
+
+<h4>getForm( char )</h4>
+
+<p align="justify">A utility function to query the "form" of an Ethiopic syllable.  It will return an integer between 1 and 12 corresponding to the <code>[#\d+#]</code> classes.  The function used in the following example:</p>
+
+<dir>
+  <code>print getForm ( "አ" ), "\n";</code>
+</dir>
+
+<p align="justify">will print the number 1.</p>
+
+
+<h4>setForm( char, form )</h4>
+
+<p align="justify">A utility function to set the form number of a syllable.  The form number must be an integer between 1 and 12 corresponding to the <code>[#\d+#]</code> classes.  Useful in substitutions as per:</p>
+
+<dir>
+  <code>s/(.)/setForm($1, 1)/eg;</code>
+</dir>
+
+<p align="justify">where every matching character found will be converted into the first form.</p>
+
+
+<h4>subForm( char, form )</h4>
+
+<p align="justify">A utility function to set the form number of a syllable based on the form of another syllable.  Useful in substitutions as per:</p>
+
+<dir>
+  <code>s/(\w+)([#ፀ#])/$1.subForm('ጸ', $2)/eg;</code>
+</dir>
+
+<p align="justify">where every character in the class of <code>[#ፀ#])</code>
+will be converted to the 'ጸ' family in the form number of the matched character.  That is, if 'ፂ' is matched it will be converted to 'ጺ'.</p>
+
+
+<h4>formatForms( format, string )</h4>
+
+<p align="justify">A utility function somewhat analogous to <code>sprintf</code> for a sequence of syllables.  The first argument is the format where the desired symbol sequence is provided.  The second argument is the string to format.
+For example, the format string "%1%2%3%4" indicates that the first character of the argument should be in the first form, %1, the second character in the seconf form, %2, the third character in the third form %3, and the fourth character in the fourth form, %4.  For the argument "አበገደ":</p>
+
+<dir>
+  <code>print formatForms ( "%1%2%3%4", "አበገደ" ), "\n";</code>
+</dir>
+
+<p align="justify">the output would be "አቡጊዳ".</p>
+
+<h4>Alias Strings</h4>
+
+<p align="justify">Alias strings are also exported by the Regexp::Ethiopic
+package (as well as subclasses) that are assigned the the values 1-12
+corresponding to their form.    Specify ":forms" as an import option to bring
+the strings into the local namespace.  The names are assignments are given by:</p>
+
+<dir>
+  <code>
+  ($ግዕዝ, $ካዕብ, $ሣልስ, $ራብዕ, $ኃምስ, $ሳድስ, $ሳብዕ,
+  $ዘመደ_ግዕዝ, $ዘመደ_ካዕብ, $ዘመደ_ሣልስ, $ዘመደ_ራብዕ, $ዘመደ_ኃምስ) = (1 .. 12);
+  </code>
+</dir>
+
+<p align="justify">Example use:</p>
+
+<dir>
+  <code>if ( getForm ( $x ) == $ካዕብ ) {<br>
+    :<br>
+    :<br>
+  }</code>
+</dir>
+
+
+<p>&nbsp;</p>
+<hr size="2">
+
+<h3>Notes on Functional Use</h3>
+
+<p align="justify">The overloading of Perl's regular expressions mechanism
+is the preferred usage for the Regexp::Ethiopic package.  However, the
+overloading mechanism only applies to the constant part of the RE.  The
+following would not be handled by the Regexp::Ethipic package as expected:</p>
+
+<pre>
+use Regexp::Ethiopic 'overload';
+
+my $x = "ከ";
+    :
+    :
+if ( /[#$x#]/ ) {  # $x is a variable, /[#ከ#]/ is constant
+         :
+         :
+}
+</pre>
+
+<p align="justify">The above expression is not identical to <code>/[#ከ#]/</code>
+because 'ከ' is constant whereas <code>$x</code> is a variable.
+The package never gets to see the variable <code>$x</code> to then
+perform the RE expansion.  The work around is to use the package as per:</p>
+
+<pre>
+use Regexp::Ethiopic 'overload';
+
+my $x = "ከ";
+    :
+    :
+my $re = Regexp::Ethiopic::getRe ( "[#$x#]" );
+
+if ( /$re/ ) {
+       :
+       :
+}
+</pre>
+
+
+<p align="justify">This works as expected at the cost of one extra step.
+The overloading and functional modes of the Regexp::Ethiopic package may
+be used together without conflict.</p>
+
+
+<p>&nbsp;</p>
+<hr size="2">
+
+<h3>Notes on Notation</h3>
+
+<p align="justify">The initial philosophy applied to syllabic character
+class development was to stick with existing POSIX definitions and
+notation ([=x=], [:x:], etc) and simply apply them in the context of a syllabary.
+Shoe-horning syllabic classes into POSIX norms has proven at times to
+be both awkward and confusing.  After a lenghty experimentaiton period a clean
+break was made from the POSIX class symbols and class
+symbols are applied that appear to be intuitive and easy to type.</p>
+
+<p align"justify">In large part, a complication for working with Ethiopic
+character classes easily has been the difference between the greater number of
+Ethiopic classes and available (while somewhat applicable) POSIX abstractions.
+There are four types of character equivalence that are of interest in
+Ethiopic regular expressions:
+</p>
+
+<p align="justify">The syllable x is:
+<ul>
+  <li> <strong>[#xe#]:</strong>  a member of the "xe" family.</li>
+  <li> <strong>[#\d#]:</strong> in the syllabic form of \d.</li>
+  <li> <strong>[=y=]:</strong> homophonically equivalent in writing to other syllables in phoneme char "y".</li>
+  <li> <strong>[=#ze#=]:</strong> a member of a family that is homophonically equivalent in writing to other families (family equivalence "ze").</li>
+</ul>
+</p>
+
+<p align="justify">The choice of # has been made at this time for no other reason than that symbol itself looks like the <a href="#grid">grid</a> that the syllables are invariably presented in.
+The interpretation of the character between #s
+is made by the character's context as either a letter or numeral.  This notation has been stable for some time and has proven to be a good neumanic device.</p>
+
+<!-- p>Notation is of course subject to change. Putting theory into practice (and code!) and experimentation is the only real way to shake out the wilburries. Once settled GUS notation will be updated accordingly and I'll get back to IPA based pattern matching with GUS (aka "folding script").  Honest, for real this time... ;-) -->
+<hr size="2">
+
+<h4>References</h4>
+<ul>
+  <li><a href="http://yacob.org/presentations/yapc-na-2005/">Regular Expressions for Syllabaries (YAPC::NA 2005)</a>
+  <li><a href="http://syllabary.sourceforge.net/">The Grand Unified Syllabary Project</a></li>
+  <li><a href="http://syllabary.sourceforge.net/Articles/PatternMatching/">An Introduction to Syllabaries and Syllabic Pattern Matching</a></li>
+  <li><a href="http://syllabary.sourceforge.net/Articles/PatternMatching/EthiopicClasses.html">Ethiopic Character Classes (exert, 2001)</a></li>
+  <li><a href="http://syllabary.sourceforge.net/Articles/Folding/">Syllabic Form Folding</a></li>
+  <li><a href="ftp://ftp.ethiopic.org/pub/perl-unicode/regex992.ps.gz">Developing Amharic Regular Expressions in Perl (2/99)</a></li>
+  <li><a href="ftp://ftp.ethiopic.org/pub/perl-unicode/regex979.ps.gz">Thoughts on Regular Expressions for Ethiopic (9/97)</a></li>
+</ul>
+
+<hr size="2">
+
+</body>
+</html>

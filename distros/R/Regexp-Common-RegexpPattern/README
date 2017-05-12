@@ -1,0 +1,20 @@
+SYNOPSIS
+
+     use Regexp::Pattern 'RegexpPattern';
+    
+     say "Input does not look like YouTube video ID"
+         unless $input =~ $RE{RegexpPattern}{-pat => "YouTube::video_id"};
+
+DESCRIPTION
+
+    This is a bridge module between Regexp::Common and Regexp::Pattern. It
+    allows you to use Regexp::Pattern regexps from Regexp::Common.
+
+SEE ALSO
+
+    Regexp::Pattern::RegexpCommon, the counterpart.
+
+    Regexp::Common
+
+    Regexp::Pattern
+

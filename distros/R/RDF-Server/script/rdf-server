@@ -1,0 +1,209 @@
+#! /usr/bin/perl
+
+use RDF::Server;
+#use Carp::Always;
+use Log::Log4perl;
+
+my $options;
+eval {
+$options = RDF::Server::_::Conf -> new_with_options();
+};
+
+if( $@ =~ m{unknown option}i ) { # catches -h and --help as valid
+    exec "perldoc", "$0";
+}
+elsif( $@ ) {
+    die $@;
+}
+    
+
+my $class = RDF::Server -> build_from_config(
+    protocol => $options -> protocol,
+    interface => $options -> interface,
+    semantic => $options -> semantic,
+    with => ['MooseX::SimpleConfig', @{ $options -> roles } ],
+    pidfile => 'rdf-server',
+    renderers => $options -> renderers
+);
+
+if( $options -> has_log4perl ) {
+    Log::Log4perl::init( \${options -> log4perl} );
+}
+elsif( -e $options->log4perl_from ) {
+    Log::Log4perl::init_and_watch( $options -> log4perl_from, 10 );
+}
+else {
+    Log::Log4perl::init( \q{
+        log4perl.category.RDF.Server    = INFO, Screen
+        log4perl.appender.Screen        = Log::Log4perl::Appender::Screen
+        log4perl.appender.Screen.stderr = 0
+        log4perl.appender.Screen.layout = Log::Log4perl::Layout::SimpleLayout
+    });
+}
+
+my $daemon;
+my $command;
+
+
+if( $options -> configfile ) {
+    $daemon = $class -> new_with_config( configfile => "" . $options -> configfile );
+    ( $command ) = @{$options -> extra_argv || []};
+}
+else {
+    $daemon = $class -> new_from_options();
+    ( $command ) = @{$daemon -> extra_argv || []};
+}
+
+defined $command || die "No command specified";
+
+$daemon -> start if $command eq 'start';
+$daemon -> stop if $command eq 'stop';
+$daemon -> status if $command eq 'status';
+$daemon -> restart if $command eq 'restart';
+
+warn $daemon->status_message, "\n";
+exit $daemon->exit_code;
+
+BEGIN {
+
+package RDF::Server::_::Conf;
+
+use Moose;
+with 'MooseX::Getopt';
+with 'MooseX::SimpleConfig';
+
+has 'protocol' => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'HTTP'
+);
+
+has 'interface' => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'REST'
+);
+
+has 'semantic' => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'Atom'
+);
+
+has 'roles' => (
+    is => 'ro',
+    isa => 'ArrayRef[Str]',
+    default => sub { [ ] }
+);
+
+has 'renderers' => (
+    is => 'ro',
+    isa => 'HashRef[Str]',
+    default => sub { [ ] }
+);
+
+has 'log4perl' => (
+    is => 'ro',
+    isa => 'Str',
+    predicate => 'has_log4perl'
+);
+
+has 'log4perl_from' => (
+    is => 'ro',
+    isa => 'Str',
+    default => sub { '/etc/log4perl.conf' }
+);
+
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+rdf-server - standalone RDF server daemon
+
+=head1 SYNOPSIS
+
+ rdf-server -configfile path/to/config {stop|start|status|restart}
+
+=head1 DESCRIPTION
+
+This script manages an RDF::Server process based on the configuration in
+the supplied file.
+
+The configuration file can be in any format understood by Config::Any.  See
+L<Config::Any> for a list of those formats.
+
+=head1 CONFIGURATION
+
+The following configuration parameters are understood by the rdf-server
+script.  Additional configuration information may be used based on which
+protocol, interface, and semantic roles are loaded.  See the documentation
+for those roles for additional configuration parameters.
+
+The listed values are those which may be selected from the base
+RDF::Server distribution.  Additional roles may be installed and used.
+
+=over 4
+
+=item protocol
+
+This is a string specifying which protocol role to load: HTTP or FCGI.
+The rdf-server script expects the protocol to use the MooseX::Daemonize
+role for controlling the resulting server.
+
+=item interface
+
+This is a string specifying which interface role to load: REST.
+
+=item semantic
+
+This is a string specifying which semantic role to load: Atom or RDF.
+
+=item roles
+
+This is a list of strings specifying additional Moose-based roles to load.
+
+=item renderers
+
+This is a hash mapping the file extension to the formatting module.
+
+=back
+
+The script expects the server to respond to the same methods and
+configuration as MooseX::Daemonize.  Common and useful configuration
+parameters for MooseX::Daemonize are:
+
+=over 4
+
+=item pidfile
+
+The name of the file in which we store the PID of the running service.
+
+=item foreground
+
+A boolean value indicating if we should not fork and run in the background.
+If true, the process will remain in the foreground.  Useful for debugging.
+
+=back
+
+=head1 BUGS
+        
+There are bugs.  The test suite only covers a little over 90% of the code.
+Bugs may be reported on rt.cpan.org or by e-mailing bug-RDF-Server at
+rt.cpan.org.
+        
+=head1 AUTHOR
+         
+James Smith, C<< <jsmith@cpan.org> >>
+            
+=head1 LICENSE
+      
+Copyright (c) 2008  Texas A&M University.
+    
+This library is free software.  You can redistribute it and/or modify
+it under the same terms as Perl itself.
+        
+=cut

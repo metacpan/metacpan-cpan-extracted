@@ -1,0 +1,130 @@
+%# Started = release date
+
+<table width="100%" cellpadding=2><tr valign="top">
+    <td width="50%" class="poptable">
+	<& List, Item => $Item, List => $Tickets, Queue => $QueueObj->Id &>
+    </td>
+    <td width="3%" align="center" valign="middle">
+	<img src="/img/ArrowLevelGreen.png" width="13" height="25">
+    </td>
+    <td width="47%" class="poptable" valign="top">
+	<& Info, Parent => $Item, Transaction => $Transaction, Queue => $QueueObj->Id, ARGS => \%ARGS &>
+    </td>
+</tr></table>
+
+<%INIT>
+my ($Item, $Transaction);
+if ($id) {
+    $Item = RT::Ticket->new( $session{'CurrentUser'} );
+    $Item->Load($id);
+}
+if ($File) {
+    $Transaction = RT::Transaction->new( $session{'CurrentUser'} );
+    $Transaction->Load($File);
+}
+
+if ($ARGS{'Action-Upload'} and $Transaction) {
+    eval { $Transaction->Attachments->First->__Set(
+	Field => 'Subject',
+	Value => $Description,
+    ) };
+    if ($FileStatus eq 'deleted') {
+	eval {
+	    $Transaction->Attachments->First->Delete;
+	    $Transaction->DBIx::SearchBuilder::Record::Delete;
+	};
+
+	my $still_has_attachments;
+	my $transactions = $Item->Transactions();
+	while (my $trans = $transactions->Next()) {
+	    my $attachments = $trans->Attachments;
+	    $attachments->Limit( FIELD => 'Filename', OPERATOR => '!=', VALUE => '' );
+	    next unless $attachments->Count;
+	    $still_has_attachments++; last;
+	}
+	$Item->SetStatus('new') unless $still_has_attachments;
+    }
+}
+elsif ($ARGS{'Action-Upload'} and $Item and $ARGS{Attach}) {
+    # strip leading directories
+    my $subject = "$ARGS{'Attach'}";
+    Encode::_utf8_on($subject);
+
+    UPLOAD: { if (my $filename = $subject) {
+	$filename =~ s{.*[\\/]}{};
+	my $transactions = $Item->Transactions();
+	while (my $trans = $transactions->Next()) {
+	    my $attachments = $trans->Attachments;
+	    $attachments->Limit( FIELD => 'Filename', VALUE => $filename );
+	    next unless $attachments->Count;
+	    $m->print("<font color='red'>" . loc("Cannot upload; the filename already exists in this release."). "</font>");
+	    last UPLOAD;
+	}
+
+	my $attachment = MakeMIMEEntity(
+	    Subject             => "$ARGS{'Attach'}",
+	    Body                => "",
+	    AttachmentFieldName => 'Attach'
+	);
+
+	my $Message = MakeMIMEEntity(
+	    Subject  => $Description,
+	    Body     => "",
+	);
+	$Message->make_multipart;
+	$Message->add_part($attachment);
+
+	$Item->Comment( MIMEObj => $Message );
+	$Item->SetStatus('open') if $Item->Status eq 'new';
+    } }
+}
+elsif ($Subject and $Starts) {
+    if ($Subject !~ /^(?=\d)[.\w]*\w$/) {
+	$m->print("<font color='red'>" . loc("Version number must start with digit and consist of only digits, letters, dot and underscores, and does not end with a dot."). "</font>");
+    }
+    elsif ($Starts !~ m{^(\d\d\d\d+)\W(\d?\d)\W(\d?\d)} or !$1 or !$2 or !$3 or $2 > 12 or $3 > 31) {
+	$m->print("<font color='red'>" . loc("Date format invalid."). "</font>");
+    }
+    else {
+	# ok, let's new a release.
+	$Starts = sprintf("%04s-%02s-%02s", $1, $2, $3);
+
+	if (!$Item) {
+	    my $Tickets = RT::Tickets->new( $session{'CurrentUser'} );
+	    $Tickets->LimitType( VALUE => 'release' );
+	    $Tickets->LimitQueue( VALUE => $QueueObj->Id );
+	    $Tickets->LimitSubject( VALUE => $Subject, OPERATOR => '=' );
+	    $Item = eval { $Tickets->First };
+	}
+
+	if (!$Item) {
+	    $Item = RT::Ticket->new( $session{'CurrentUser'} );
+	    $Item->Create(
+		Queue	    => $QueueObj->Id,
+		Subject	    => $Subject,
+		Type	    => 'release',
+	    );
+	}
+
+	$Item->SetStarts($Starts);
+	$Item->SetSubject($Subject);
+	$Item->SetStatus($Status) if $Status;
+	undef $Item;
+    }
+}
+
+my $Tickets = RT::Tickets->new( $session{'CurrentUser'} );
+$Tickets->LimitQueue( VALUE => $QueueObj->Id );
+$Tickets->LimitType( VALUE => 'release' );
+$Tickets->OrderBy( FIELD => 'Starts' );
+</%INIT>
+<%ARGS>
+$QueueObj
+$Description	=> ''
+$Subject	=> ''
+$Starts		=> ''
+$Status		=> ''
+$FileStatus	=> ''
+$id		=> 0
+$File		=> 0
+</%ARGS>

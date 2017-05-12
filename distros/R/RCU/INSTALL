@@ -1,0 +1,16 @@
+
+You do not need a compiler unless you want to install one of the
+bundled low-level interface modules, either Irman or Lirc.
+
+1) Irman
+
+   You need the libirman library, version 0.4.2. The newest version
+   of libirman can be found at http://www.evation.com/libirman/
+
+2) Lirc
+
+   You need lirc (or better: the lirc_client library and include files).
+   The lirc homepage can be found at http://fsinfo.cs.uni-sb.de/~columbus/lirc
+
+Make sure the appripriate headers or libraries are where perl can find
+them.

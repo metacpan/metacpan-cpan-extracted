@@ -1,0 +1,15 @@
+Changes
+demo.pl
+MANIFEST
+Makefile.PL
+README
+lib/Running/Commentary.pm
+t/00.load.t
+t/critical.t
+t/fail.t
+t/quiet.t
+t/run_block.t
+t/run_system.t
+t/silent.t
+t/stealth.t
+META.yml                                 Module meta-data (added by MakeMaker)

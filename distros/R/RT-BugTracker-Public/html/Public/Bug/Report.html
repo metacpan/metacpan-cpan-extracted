@@ -1,0 +1,283 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%#
+%# COPYRIGHT:
+%#
+%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%#                                          <sales@bestpractical.com>
+%#
+%# (Except where explicitly superseded by other copyright notices)
+%#
+%#
+%# LICENSE:
+%#
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%#
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+%# 02110-1301 or visit their web page on the internet at
+%# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+%#
+%#
+%# CONTRIBUTION SUBMISSION POLICY:
+%#
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%#
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%#
+%# END BPS TAGGED BLOCK }}}
+<& /Elements/Header, Title => loc("Report a bug in [_1]", $Queue) &>
+<& /Elements/Tabs &>
+
+<div class="reporting-a-bug-instructions">
+<p>
+Thanks for taking the time to report a bug in <em><% $Queue %></em>.  You
+should be aware that each and every module available through CPAN is free
+software and that its author is a volunteer.  Because of this, there's no
+guarantee that your issue will be dealt with immediately. There are a few
+things you can do to help make sure that your issue gets the attention it
+deserves:
+</p>
+
+<ul>
+  <li>Be polite.</li>
+  <li>Be concise.</li>
+  <li>Be detailed.</li>
+</ul>
+
+<p>
+Try to include any information you think might help the developer isolate,
+reproduce and fix your problem.
+</p>
+
+<p style="font-weight: bold">
+This is a public bug tracking system. Any information provided in this
+system (such as your phone number in your email signature) will be
+public and indexed by search engines.
+</p>
+</div>
+
+<div id="reporting-a-bug">
+
+<& /Dist/Elements/ShowBugtracker, Queue => $QueueObj &>
+<& /Dist/Elements/ShowNotes, Queue => $QueueObj &>
+
+% if ( $session{'CurrentUser'}->Name eq $RT::WebPublicUser ) {
+
+<p style="font-weight: bold">
+  The quickest way to report a bug in <% $QueueObj->Name %> is by sending email to
+  <a style="font-size: 1.2em" href="#" data-bug-email="<% $QueueObj->Name %>">bug-<% $QueueObj->Name %> <i>[at]</i> rt.cpan.org</a>.
+</p>
+
+<p>
+  If you want to report a bug via the web, you must login with a Bitcard or
+  other account.  Accounts are required due to spam.
+  See the <a href="<% RT->Config->Get('WebPath') %>/NoAuth/Logout.html">login page</a> for details
+  on obtaining and logging in with a Bitcard account.
+</p>
+
+% } else {
+<form action="<%$RT::WebPath%>/Public/Bug/Report.html" method="POST" enctype="multipart/form-data" name="TicketCreate">
+<input type="hidden" class="hidden" name="id" value="new" />
+<input type="hidden" class="hidden" name="Status" value="new" />
+<div id="Ticket-Create-basics">
+<a name="basics"></a>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td class="label"><&|/l&>Distribution</&>:</td>
+<td class="value"><% $QueueObj->Name %>
+<input type="hidden" class="hidden" name="Queue" Value="<%$QueueObj->Name%>">
+</td>
+<tr>
+<td class="label">
+<&|/l&>Your email address</&>:
+</td>
+<td class="value" colspan="5">
+<input name="Requestors" Value="<% ($ARGS{Requestors}) || $session{CurrentUser}->EmailAddress %>" size="40">
+</td>
+</tr>
+<tr>
+<td class="label">
+<&|/l&>Subject</&>:
+</td>
+<td class="value" colspan="5">
+<input name="Subject" size="60" maxsize="100" value="<%$ARGS{Subject} || ''%>">
+</td>
+</tr>
+<tr>
+<td colspan="6">
+<& /Ticket/Elements/EditCustomFields, QueueObj => $QueueObj &>
+</td>
+</tr>
+% if ($TxnCFs->Count) {
+% while (my $CF = $TxnCFs->Next()) {
+<tr>
+<td align="RIGHT"><% $CF->Name %>:</td>
+<td><& /Elements/EditCustomField, CustomField => $CF, NamePrefix =>
+    "Object-RT::Transaction--CustomField-" &><em><% $CF->FriendlyType %></em></td>
+</td></tr>
+% }
+% }
+<tr>
+% if (exists $session{'Attachments'}) {
+<td class="label">
+<&|/l&>Attached file</&>:
+</td>
+<td colspan="5">
+<&|/l&>Check box to delete</&><br/>
+% foreach my $attach_name (keys %{$session{'Attachments'}}) {
+<input type="checkbox" class="checkbox" name="DeleteAttach-<%$attach_name%>" value="1"><%$attach_name%><br />
+% } # end of foreach
+</td>
+</tr>
+<tr>
+% } # end of if
+<td>
+<&|/l&>Attach file</&>:
+</td>
+<td class="value" colspan="5">
+<input type="FILE" name="Attach">
+<input type="SUBMIT" class="button" name="AddMoreAttach" value="<&|/l&>Add More Files</&>">
+</td>
+</tr>
+<tr>
+<td colspan="6">
+<&|/l&>Describe the issue below</&>:<br/>
+% if (exists $ARGS{Content}) {
+<& /Elements/MessageBox, Default => $ARGS{Content}, IncludeSignature => 0 &>
+% } else {
+<& /Elements/MessageBox, QuoteTransaction => $QuoteTransaction &>
+%}
+</td>
+</tr>
+<tr>
+<td align="RIGHT" colspan="2">
+</td>
+</tr>
+</table>
+<& /Elements/Submit, Label => loc("Create")&>
+</div>
+
+</form>
+% }
+</div>
+
+<div class="reporting-a-bug-instructions">
+<p>
+Be sure to include at least the following information:
+
+  <ul>
+    <li>Distribution name and version (For example, "DBIx-SearchBuilder-0.46")</li>
+    <li>Perl version (Find this by running the command <tt>perl -v</tt>)</li>
+    <li>Operating System vendor and version (Find this by running the command <tt>uname -a</tt>)</li>
+  </ul>
+</p>
+
+<p>
+Other things that are often helpful:
+
+  <ul>
+    <li>Details about your operating environment that might be related to the issue being described</li>
+    <li>Exact cut and pasted error or warning messages</li>
+    <li>The shortest, clearest code you can manage to write which reproduces the bug described.</li>
+    <li>A patch against the latest released version of this distribution which fixes this bug.</li>
+  </ul>
+</p>
+</div>
+
+<%INIT>
+$Queue =~ s/::/-/g;
+
+my $QueueObj = new RT::Queue($session{'CurrentUser'});
+$QueueObj->Load($Queue);
+
+if (not $QueueObj->Id) {
+    $m->comp('/Public/Elements/ErrorNoDist', %ARGS, Queue => $Queue);
+    $m->abort();
+}
+
+my $CFs = $QueueObj->TicketCustomFields();
+my $TxnCFs = $QueueObj->TicketTransactionCustomFields();
+
+my $ValidCFs = $m->comp(
+    '/Elements/ValidateCustomFields',
+    CustomFields => $CFs,
+    ARGSRef => \%ARGS
+);
+
+# if no due date has been set explicitly, then use the
+# queue's default if it exists
+if ($QueueObj->DefaultDueIn && !$ARGS{'Due'}) {
+    my $default_due = RT::Date->new($session{'CurrentUser'});
+    $default_due->SetToNow();
+    $default_due->AddDays($QueueObj->DefaultDueIn);
+    $ARGS{'Due'} = $default_due->ISO();
+}
+
+# {{{ deal with deleting uploaded attachments
+foreach my $key (keys %ARGS) {
+    if ($key =~ m/^DeleteAttach-(.+)$/) {
+	delete $session{'Attachments'}{$1};
+    }
+    $session{'Attachments'} = { %{$session{'Attachments'} || {}} };
+}
+
+# {{{ store the uploaded attachment in session
+if ($ARGS{'Attach'}) {			# attachment?
+    $session{'Attachments'} = {} unless defined $session{'Attachments'};
+
+    my $subject = "$ARGS{'Attach'}";
+
+    # strip leading directories
+    $subject =~ s#^.*[\\/]##;
+
+    my $attachment = MakeMIMEEntity(
+        Subject             => $subject,
+        Body                => "",
+        AttachmentFieldName => 'Attach'
+    );
+
+    $session{'Attachments'} = { %{$session{'Attachments'} || {}},
+				$ARGS{'Attach'} => $attachment };
+}
+# }}}
+
+# delete temporary storage entry to make WebUI clean
+unless (keys %{$session{'Attachments'}} and $ARGS{'id'} eq 'new') {
+    delete $session{'Attachments'};
+}
+
+
+# }}}
+
+if ((!exists $ARGS{'AddMoreAttach'}) and (($ARGS{'id'} || '') eq 'new') and $ValidCFs) { # new ticket?
+    $m->comp('Display.html', %ARGS);
+    $RT::Logger->crit("After display call; error is $@");
+    $m->abort();
+}
+</%INIT>
+<%ARGS>
+$DependsOn => undef
+$DependedOnBy => undef
+$MemberOf => undef
+$QuoteTransaction => undef
+$Queue => undef
+</%ARGS>

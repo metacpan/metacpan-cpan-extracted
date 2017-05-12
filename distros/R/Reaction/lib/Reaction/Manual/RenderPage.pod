@@ -1,0 +1,128 @@
+=head1 NAME
+
+Reaction::Manual::RenderPage - Page rendering
+
+=head2 A little overview
+
+  .---------------------------------------.
+  |           Controller Action           |
+  |---------------------------------------|
+  | Decides which logical part to provide |
+  '---------------------------------------'
+                      |
+                      v
+      .------------------------------.
+      |           ViewPort           |
+      |------------------------------|----------.
+      | A logical part of the page   |          |
+      '------------------------------'          |
+                      |                  Inner ViewPorts
+                      v                       Data      
+   .-------------------------------------.      |
+   |              LayoutSet              |      |
+   |-------------------------------------|------.
+   | A representational part of the page |      |
+   '-------------------------------------'      |
+                      |                       Looks  
+                      v                     Structure
+      .-------------------------------.         |
+      |            Widget             |         |
+      |-------------------------------|---------.
+      | A functional part of the page |         |
+      '-------------------------------'         |
+                                           Preparation
+                                            Structure 
+      .-------------------------------.         |
+      |            Output             |         |
+      |-------------------------------|<--------'
+      | The rendered part of the page |
+      '-------------------------------'
+
+=head2 Or, how to track why your page failed to render
+
+Catalyst's C<begin> and C<end> actions are supplied by
+L<Reaction::UI::Controller::Root>, which your C<Root> controller should inherit
+from, or at least the root controller of the part of your application that is
+using Reaction.
+
+The C<begin> action creates a new L<Reaction::UI::Window> and stores it in $c->stash->{window}.
+The C<end> action calls the flush() method on the stashed window object.
+L<Reaction::UI::Window/flush> then calls L<Reaction::UI::View/render_window>
+on the window's view.
+
+The View first fetches the root ViewPort from the Window's stack and
+creates a RenderingContext. The layout is chosen based on the ViewPort name or
+though the ViewPort's C<layout> attribute. The Widget is then used to render the
+content via the RenderingContext.
+
+Is your head spinning yet?
+
+Ingredients used:
+
+* A Reaction::UI::Skin object built from:
+
+    - The skin_name set on your View
+    - The View object
+    - The skin_base_dir (MyApp/share/skin)
+    - The share/skin/defaults.conf + share/skin/<my_skin>/skin.conf
+
+* A Reaction::UI::LayoutSet object built from:
+
+    - The layoutset file itself, found in the share/skin/<my_skin>/layout directory
+      or the share/skin/default/layout directory.
+    - The Skin object
+
+* A Reaction::UI::Widget object built from:
+
+    - It's class, determined from the name of the ViewPort or read from the 
+      layoutset file, and found in the widget_search_path.
+    - The View object
+    - The LayoutSet object
+
+* A Reaction::UI::RenderingContext::TT object built from:
+
+    - Nothing
+
+To render the window the correct Reaction::UI::Widget object is
+retrieved via the LayoutSet for the root ViewPort of the page. 
+
+The LayoutSet used defaults to the "layout" attribute on the
+ViewPort. If there is no layout attribute value set, it takes the
+class name of the ViewPort, extracts the parts following
+"::ViewPort::" and constructs the layoutset name from converting camel
+cased parts of the namespace to lower-case underscored, and namespace
+parts into directories.
+
+  ## eg:
+  My::ViewPort::Action::UserForm
+  ## becomes
+  action/user_form
+
+The layoutset file should exist in the skin_base_dir, in the "layout"
+directory under the "skin_name" dir set in your View config, or in the
+"default/layout" directory. [[ A LayoutSet object is created based on
+the layoutset name, skin object, source_file (path to file), top_skin
+(skin object), next_skin if exists ]].
+
+The layoutset file is parsed as the LayoutSet object is created, if a
+"=widget" line is found, the "widget_type" attribute is set.
+
+The class of the Widget object can be set in the layoutset object
+args, or it defaults to being fetched via the Skin. The type of widget
+is either specified in the layoutset file via the "=widget" directive
+or retrieved by recreating the camelcased name from the layoutset
+name. The Widget is assumed to be in the widget search path provided
+by defaults.conf or your skin.conf.
+
+The Widget itself is passed the ViewPort to render, and the
+RenderingContext. The initial fragment name to render is also passed,
+"widget".
+
+The render stack is created using the widget order. The widget order
+is fetched for the fragment from the layoutset, this is either the
+widget class/layoutset, or retrieved from the extended layouts. As the
+render_stack is built, the fragment methods in the Widget are called
+to assign values from the ViewPort to arguments for the layout. (Or
+other interesting things).
+
+The stack is passed to the RenderingContext to complete.

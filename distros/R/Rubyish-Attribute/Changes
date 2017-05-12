@@ -1,0 +1,25 @@
+Revision history for Perl extension Rubyish::Attribute.
+
+1.0   Nov 30 2008
+    - remove trivial assignment
+    - no longer pass by arrayref, now pass by list
+    - update EXAMPLE
+
+0.05  Nov 17 2008
+    - default import three functions, qw(:all) no longer required
+    - example for meta programming
+
+0.04  Nov 16 2008
+    - refine doc
+    - fix warn message
+    - add example
+
+0.03  Nov 14 2008
+    - return undef and print err msg while invoking forbidden accessor
+
+0.02  Nov 13 2008
+    - correct the writing format of POD
+
+0.01  Nov 12 2008
+    - original version; created by h2xs 1.23 with options
+        -X -n Rubyish::Attribute

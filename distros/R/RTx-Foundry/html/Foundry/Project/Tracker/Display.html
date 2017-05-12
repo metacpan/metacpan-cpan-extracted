@@ -1,0 +1,42 @@
+%# Never call a man a fool; borrow from him.
+
+% if (!$ARGS{url}) {
+</form><form action="Update.html">
+% }
+<& $url, %ARGS, NoUI => 1, Role => $role, Loc => 1, Queue => $Queue &>
+
+<%INIT>
+my $role = ($RT::Guest ? 'guest' : '');
+
+my $Ticket = RT::Ticket->new($session{'CurrentUser'});
+if ($id eq 'new') {
+    $role = 'requestor';
+}
+elsif ($id) {
+    $Ticket->Load($id);
+    if ($Ticket->OwnerObj and $Ticket->OwnerObj->Id eq $session{'CurrentUser'}->Id) {
+	$role = 'owner';
+    }
+    elsif (
+	eval { $Ticket->FirstRequestor->Id }
+	eq $session{'CurrentUser'}->Id
+    ) {
+	$role = 'requestor';
+    }
+    $Queue = $Ticket->Queue;
+}
+
+my $queue = RT::Queue->new($session{'CurrentUser'});
+$queue->Load($Queue);
+$m->notes(QueueObj => $queue);
+if ( $queue->HasWatcher($session{CurrentUser}->UserObj) ) {
+    $role = 'owner';
+}
+return $role if $NoUI == -1;
+</%INIT>
+<%ARGS>
+$Queue	    => 0
+$url	    => '/Work/Tickets/Display.html'
+$id	    => 0
+$NoUI	    => 0
+</%ARGS>

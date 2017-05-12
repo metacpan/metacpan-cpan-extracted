@@ -1,0 +1,67 @@
+=head1 NAME
+
+ResourcePool::Factory::Alzabo - An L<Alzabo|Alzabo> Factory for L<ResourcePool|ResourcePool>
+
+=head1 SYNOPSIS
+
+ use ResourcePool::Factory::Alzabo;
+
+ my $factory =  ResourcePool::Factory::Alzabo->new(
+                        $schema_name,
+                        $data_source,
+                        $username,
+                        $auth,
+                        \%attr);
+
+=head1 DESCRIPTION
+
+
+This class is a factory class for L<Alzabo::Runtime::Schema|Alzabo::Runtime::Schema> resources to be used with the ResourcePool.
+
+Please have a look at L<ResourcePool::Factory|ResourcePool::Factory> documentation to learn about the purpose of such a factory.
+
+=head2 S<ResourcePool::Factory::Alzabo-E<gt>new($schema_name, $data_source, $username, $auth, \%attr)>
+
+Takes the same arguments as the connect method of the L<DBI|DBI> perl module with the addition of the schema name to be loaded.
+
+=over 4
+
+=item $schema_name
+
+The L<Alzabo|Alzabo> schema name to load and associate with the L<DBI|DBI> handle.
+
+=item $data_source
+
+The L<DBI|DBI> data source.
+
+=item $username
+
+The username used to authenticate.
+
+=item $auth
+
+The password used to authenticate.
+
+=item \%attr
+
+L<DBI|DBI> attributes.
+
+=back
+
+=head1 SEE ALSO
+
+L<Alzabo::Runtime::Schema|Alzabo::Runtime::Schema>,
+L<DBI|DBI>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Factory|ResourcePool::Factory>
+
+=head1 AUTHOR
+
+Copyright (C) 2004 by Texas A&M University <jsmith@cpan.org>
+
+Based on ResourcePool::Factory::DBI
+
+Copyright (C) 2001-2003 by Markus Winand <mws@fatalmind.com>
+
+This program is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.

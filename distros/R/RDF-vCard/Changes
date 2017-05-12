@@ -1,0 +1,81 @@
+RDF-vCard
+=========
+
+Created:      2011-01-05
+Home page:    <https://metacpan.org/release/RDF-vCard>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-vCard>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.012	2014-09-17
+
+ - no warnings 'uninitialized'
+
+0.011	2014-09-17
+
+ [ Packaging ]
+ - Add IRC link.
+ - Switch to Dist::Inkt.
+
+ [ Other ]
+ - use warnings
+
+0.010	2012-06-23
+
+ [ Bug Fixes ]
+ - Fix various small issues around RDF::TrineShortcuts ->
+   RDF::TrineX::Functions switch.
+
+0.009	2012-06-22
+
+ [ Packaging ]
+ - Reduce dependencies - no longer need common::sense, RDF::TrineShortcuts
+   (thus RDF::Query) or parent.pm, but do need RDF::TrineX::Functions.
+ - Switch to Module::Package::RDF.
+
+0.008	2011-07-13
+
+ - Added: Add support for 'lang' option when converting vCards to RDF.
+ - Added: Include language tags on plain literals, if provided.
+ - Added: Use Content-Language HTTP header of downloaded vCards.
+ - Added: vcard2rdf script.
+
+0.007	2011-02-16
+
+ [ Bug Fixes ]
+ - Setting vcard_version to 3 outputted version 4 vcards.
+
+ [ Other ]
+ - Added: jCard output.
+
+0.006	2011-02-04
+
+ [ Bug Fixes ]
+ - Fix WithXmlSupport's string overloading.
+
+0.005	2011-01-30
+
+ - Added: Experimental vCard XML support.
+ - Added: Partial vCard 4.0 support.
+ - Added: nvalue method on RDF::vCard::Line.
+
+0.004	2011-01-23
+
+ - More flexibility for other classes wanting to subclass this -
+   particularly around different datatypes.
+
+0.003	2011-01-16	Two-way conversions.
+
+ - Added: Add RDF::vCard::Importer module.
+ - Added: RDF::vCard::Entity now has add_to_model() and node() methods.
+ - Added: RDF::vCard::Line now has an add_to_model() method.
+
+0.002	2011-01-12
+
+ - Added: Include vCard VERSION property in output.
+ - Improved support for 'data:' URIs in binary vCard properties.
+ - More consistent support for comma-escaping.
+ - Proper support for vCard CATEGORIES property.
+ - Support for RDF vCard 2006 v:homeTel property and its ilk.
+ - Tidied up export_card method.
+
+0.001	2011-01-06	Initial release. RDF to vCard only.

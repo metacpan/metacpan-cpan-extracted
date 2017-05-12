@@ -1,0 +1,45 @@
+<!-- build the release  -->
+<project name="perl_project" default="analyze">
+
+    <target name="compile" description="Verify all sources compile cleanly">
+      <exec executable="perl">
+        <arg value="Build.PL"/>
+        <arg value="${label}"/>
+        <arg value="${cctimestamp}"/>
+      </exec>
+
+      <exec executable="perl">
+        <arg value="Build"/>
+        <arg value="build"/>
+      </exec>
+    </target>
+
+    <target name="test" depends="compile" description="Verify all unit tests pass.">
+      <exec executable="perl">
+        <arg value="Build"/>
+        <arg value="test"/>
+      </exec>
+    </target>
+
+    <target name="package" depends="test" description="Produce all deliverables.">
+      <exec executable="perl">
+        <arg value="Build"/>
+        <arg value="dist"/>
+      </exec>
+      <move file="REST-Resource-${label}.tar.gz" todir="/opt/cruisecontrol-2.6/artifacts/REST-Resource/${cctimestamp}"/>
+    </target>
+
+    <target name="analyze" depends="package" description="Unit test code coverage.">
+      <exec executable="perl">
+        <arg value="Build"/>
+        <arg value="testcover"/>
+      </exec>
+      <chmod dir="cover_db" perm="ugo+rx" type="dir"/>
+      <chmod dir="cover_db" perm="ugo+rx" type="file"/>
+      <move todir="coverage">
+        <fileset dir="cover_db"/>
+      </move>
+      <move file="coverage/coverage.html" tofile="coverage/index.html"/>
+    </target>
+
+</project>

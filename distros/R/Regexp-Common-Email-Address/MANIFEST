@@ -1,0 +1,7 @@
+Changes
+lib/Regexp/Common/Email/Address.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/test.t

@@ -1,0 +1,285 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%# 
+%# COPYRIGHT:
+%#  
+%# This software is Copyright (c) 1996-2005 Best Practical Solutions, LLC 
+%#                                          <jesse@bestpractical.com>
+%# 
+%# (Except where explicitly superseded by other copyright notices)
+%# 
+%# 
+%# LICENSE:
+%# 
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%# 
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%# 
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+%# 
+%# 
+%# CONTRIBUTION SUBMISSION POLICY:
+%# 
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%# 
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%# 
+%# END BPS TAGGED BLOCK }}}
+<& /Admin/Elements/Header, Title => $title &>
+<& /Admin/Elements/QueueTabs, 
+    current_tab => $current_tab, 
+    Title => $title &>
+
+<& /Elements/ListActions, actions => \@errors &>
+
+% if ($queue->id) {
+
+Your new queue <%$queue->Name%> has been created.  To manage your new
+queue <a
+href="<%$RT::WebPath%>/Admin/Queues/Modify.html?id=<%$queue->id%>">click
+here.</a>
+
+% } else {
+<form ACTION="<%$RT::WebPath%>/QueueWizard/Admin/index.html" METHOD="post">
+
+This webform automatically sets up queue watchers and default scrips
+based on settings from another queue. All you need to do is enter the
+name for the new queue and email addresses for queue administrators
+and staff, and the que to pull default scrips and permissions from.
+All users need to have accounts in RT already.
+
+<br />
+<hr />
+<label name="Name"><&|/l&>Queue name</&></label><br/>
+<input type="text" name="Name" size="20" value="<%$ARGS{'Name'}%>" />
+<br />
+<br />
+<label name="Name"><&|/l&>Comma-separated list of aliases</&></label><br/>
+<input type="text" name="Aliases" size="20" value="<%$ARGS{'Aliases'}%>" />
+<br />
+<br />
+<label name="Clone"><&|/l&>Clone from</&></label><br />
+<& /Elements/SelectQueue, Name => "Clone", ShowNullOption => 0 &>
+<br />
+<br />
+<label name="Admin"><&|/l&>Queue Administrators</&></label><br />
+<i>(<&|/l&>Enter user email addresses, one per line</&>)</i><br />
+<textarea name="Admin" rows=10><%$ARGS{'Admin'}%></textarea>
+
+<br />
+<label name="Staff"><&|/l&>Queue Staff</&></label><br />
+<i>(<&|/l&>Enter user email addresses, one per line</&>)</i><br />
+<textarea name="Staff" rows=10><%$ARGS{'Staff'}%></textarea>
+
+
+<& /Elements/Submit &>
+
+% }
+</form>
+<%INIT>
+my @errors;
+
+my $current_tab = 'QueueWizard/Admin/index.html';
+my $title       = loc("Create a queue");
+
+my $queue = RT::Queue->new( $session{'CurrentUser'} );
+
+my %valid;
+
+
+# If we're asked to create a queue.
+if ($ARGS{'Name'} ) {
+
+# Validate all the staff and admin users for the queue
+foreach my $type qw(Staff Admin) {
+    @{ $valid{$type} } = ();
+    my @list = split( /[\n\r]+/, $ARGS{$type} );
+
+    foreach my $user (@list) {
+        next unless $user;
+        my $u = RT::User->new( $session{'CurrentUser'} );
+        $u->LoadByCols(EmailAddress => $user);
+        if ( !$u->id ) {
+            $u->Load($user);
+        }
+        if ( !$u->id ) {
+            push @errors, loc( "[_1] user '[_2]' not found.", $type, $user );
+        }
+        else {
+            push @{ $valid{$type} }, $u;
+        }
+    }
+
+}
+
+# Make sure we have a valid queue
+my $clone_queue = RT::Queue->new( $session{'CurrentUser'} );
+$clone_queue->Load($ARGS{Clone});
+if ( !$clone_queue->id ) {
+    push @errors, loc("Queue [_1] not found", $ARGS{Clone});
+}
+
+# Make sure there's a staff group to go for that queue
+my $clone_staff = RT::Group->new( $session{'CurrentUser'} );
+$clone_staff->LoadUserDefinedGroup($clone_queue->Name . "_support");
+if ( !$clone_staff->id ) {
+    push @errors, loc("Staff group [_1] for queue [_2] not found", $clone_queue->Name . "_support", $clone_queue->Name);
+}
+
+# Ditto for the admin group
+my $clone_admin = RT::Group->new( $session{'CurrentUser'} );
+$clone_admin->LoadUserDefinedGroup($clone_queue->Name . "_owners");
+if ( !$clone_admin->id ) {
+    push @errors, loc("Owner group [_1] for queue [_2] not found", $clone_queue->Name . "_owners", $clone_queue->Name);
+}
+
+if ( !@errors ) {
+
+    my %queue_defaults;
+    # Find properties of queue to clone from
+    for ($clone_queue->WritableAttributes) {
+        $queue_defaults{$_} = $clone_queue->$_();
+    }
+
+    my $staff_group = RT::Group->new( $session{'CurrentUser'} );
+    my $admin_group = RT::Group->new( $session{'CurrentUser'} );
+
+    # Find rights from clone queue's groups
+    my @Rights;
+    my %seen;
+    # Clone rights that involve the staff and admin groups, or the queue.
+    for my $obj ($clone_staff, $clone_admin, $clone_queue) {
+        # We care about both rights *on* that object, and *by* it (if possible).
+        for my $side (qw/on by/ ) {
+            my $acl = RT::ACL->new( $session{'CurrentUser'} );
+            if ($side eq "by") {
+                $acl->LimitToObject( $obj );
+            } elsif (UNIVERSAL::can($obj, "PrincipalObj")) {
+                $acl->LimitToPrincipal( Id => $obj->PrincipalObj->Id );
+            } else {
+                next;
+            }
+            while (my $ace = $acl->Next) {
+                my $by = $ace->PrincipalObj->Object;
+                my $on = $ace->Object;
+
+                # Skip user rights
+                next if $by->Type eq "UserEquiv" or UNIVERSAL::isa($on, "RT::User");
+                
+                # Do translation of clones values to new values
+                $by = $queue       if UNIVERSAL::isa($by, ref $clone_queue) and $by->Id == $clone_queue->Id;
+                $by = $staff_group if UNIVERSAL::isa($by, ref $clone_staff) and $by->Id == $clone_staff->Id;
+                $by = $admin_group if UNIVERSAL::isa($by, ref $clone_admin) and $by->Id == $clone_admin->Id;
+                
+                $on = $queue       if UNIVERSAL::isa($on, ref $clone_queue) and $on->Id == $clone_queue->Id;
+                $on = $staff_group if UNIVERSAL::isa($on, ref $clone_staff) and $on->Id == $clone_staff->Id;
+                $on = $admin_group if UNIVERSAL::isa($on, ref $clone_admin) and $on->Id == $clone_admin->Id;
+
+                # Watch out for duplicate values; hence the %seen
+                push @Rights, {
+                               By            => $by,
+                               RightName     => $ace->RightName,
+                               Object        => $on,
+                              }
+                  unless $seen{"$by-".$ace->RightName."-$on"};
+                $seen{"$by-".$ace->RightName."-$on"}++;
+            }
+        }
+    }
+    
+    # Create the queue
+    my ($id,$msg) = $queue->Create(
+        %queue_defaults,
+        Name              => $ARGS{'Name'},
+        Description       => $ARGS{'Name'},
+        CorrespondAddress => $ARGS{'Name'} . '@' . $RT::Organization,
+        CommentAddress => $ARGS{'Name'} . '.comment@' . $RT::Organization,
+    );
+
+    if (!$id) {
+        push @errors, $msg;
+    } else {
+        # Create the queue groups
+        $staff_group->CreateUserDefinedGroup( Name => $ARGS{'Name'} . "_support" );
+        foreach my $user ( @{ $valid{'Staff'} } ) {
+            $staff_group->AddMember( $user->id );
+        }
+        $queue->AddWatcher(
+                           Type        => 'AdminCc',
+                           PrincipalId => $staff_group->id
+                          );
+
+        $admin_group->CreateUserDefinedGroup( Name => $ARGS{'Name'} . "_owners" );
+        foreach my $user ( @{ $valid{'Admin'} } ) {
+            $admin_group->AddMember( $user->id );
+        }
+
+        # Set up rights for the groups, discovered above
+        foreach my $args (@Rights) {
+            my $right = RT::ACE->new( $session{'CurrentUser'} );
+            my %args = %{$args};
+            $args{PrincipalId}   = $args{By}->PrincipalObj->Id;
+            $args{PrincipalType} = $args{By}->PrincipalObj->PrincipalType;
+            ($id, $msg) = $right->Create(%args);
+            push @errors, $msg unless $id;
+        }
+
+        # Clone scrips
+        my $clone_scrips = RT::Scrips->new( $session{'CurrentUser'} );
+        $clone_scrips->LimitToQueue($clone_queue->Id);
+        while (my $clone_scrip = $clone_scrips->Next) {
+            my %scrip_defaults;
+            for ($clone_scrip->WritableAttributes) {
+                $scrip_defaults{$_} = $clone_scrip->$_();
+            }
+            my $scrip = RT::Scrip->new($session{'CurrentUser'});
+            $scrip_defaults{'Queue'} = $queue->id;
+            ($id, $msg) = $scrip->Create(%scrip_defaults);
+            push @errors, $msg unless $id;
+        }
+
+        # Add procmail aliases
+        my $file = "$RT::ProcmailDir/auto/rt-queue-".$queue->Id;
+        unless (open(FILTERS, ">$file")) {
+            push @errors, loc("Can't add alias to procmail file [_1]: [_2]", $file, $!);
+        } else {
+            my $name = $queue->Name;
+            print FILTERS $m->scomp("Elements/ProcmailRule",
+                                    name => $queue->Name,
+                                    aliases => [split /\s*,\s*/, $ARGS{'Aliases'}],
+                                   );
+            close FILTERS;
+
+            if (defined $RT::ProcmailControlFile) {
+              unless (open(LISTING, ">>$RT::ProcmailControlFile")) {
+                push @errors, loc("Can't add alias to procmail control file [_1]: [_2]",
+                                  $RT::ProcmailControlFile, $!);
+              } else {
+                print LISTING "INCLUDERC = $file\n";
+                close LISTING;
+              }
+            }
+        }
+    }
+
+}
+}
+</%INIT>

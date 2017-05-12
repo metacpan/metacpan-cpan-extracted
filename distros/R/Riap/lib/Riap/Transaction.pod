@@ -1,0 +1,162 @@
+# ABSTRACT: Transactions/undo/redo over Riap
+# PODNAME: Riap::Transaction
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Riap::Transaction - Transactions/undo/redo over Riap
+
+=head1 VERSION
+
+This document describes version 1.2.4 of Riap::Transaction (from Perl distribution Riap), released on 2015-09-04.
+
+=head1 SYNOPSIS
+
+This document specifies doing transactions/undo/redo over Riap.
+
+=head1 SPECIFICATION VERSION
+
+ 1.2
+
+=head1 SPECIFICATION
+
+This documentation specifies a set of Riap actions to do transaction/undo/redo
+over Riap. The actions basically correspond to TM's methods of the same/similar
+name, so please refer to L<Rinci::Transaction> for more details on each
+action/method.
+
+For these actions, Riap request key C<uri> can be set to C</> as it is
+irrelevant.
+
+=head2 Action: B<begin_tx>
+
+Additional Riap request keys: C<tx_id>
+
+=over 4
+
+=back
+
+Some notes:
+
+C<tx_id> should ideally be hard to guess by other clients, for security.
+
+C<tx_id> should be passed as a Riap request key to every subsequent C<call>
+request or any one of transaction-management actions described on this list,
+until the transaction is committed or rolled back.
+
+Riap requests which does not incorporate C<tx_id> key should not be affected by
+transaction management. But some servers, in order to maintain ACID property,
+can require that all subsequent C<call> requests be inside some transaction.
+Call without transaction can be responded with 412 status in such case.
+
+=head2 Action: C<commit_tx>
+
+Additional required Riap request keys: C<tx_id>.
+
+=head2 Action: B<savepoint_tx>
+
+Additional required Riap request keys: C<tx_id>, C<tx_spid>.
+
+=head2 Action: B<rollback_tx>
+
+Additional required Riap request keys: C<tx_id>
+
+Optional Riap request keys: C<tx_spid>
+
+Rollback the transaction, or (if C<tx_spid> is specified) rollback to a specific
+savepoint.
+
+=head2 Action: B<release_tx_savepoint>
+
+Additional required Riap request keys: C<tx_id>, C<tx_spid>
+
+=head2 Action: B<list_txs>
+
+Additional required Riap request keys: C<tx_id>
+
+List client's transactions. Should return an array containing transaction ID's.
+
+Optional request key: C<detail> (bool, default false, is set to true will return
+an array of result records instead), C<tx_status> (str, filter by transaction
+status).
+
+Example:
+
+ # Riap request
+ {"action":"list_txs", "uri":"/", "detail":1}
+
+ # result
+ [200, "OK",
+  [
+   {"tx_id": "TX1", "tx_status":"C", "tx_start_time":1336043060,
+    "tx_commit_time":1336043065, "tx_summary":"Some summary"},
+   {"tx_id": "TX2", "tx_status":"C", "tx_start_time":1336043070,
+    "tx_commit_time":1336043071, "tx_summary":null},
+   {"tx_id": "TX3", "tx_status":"i", "tx_start_time":1336043090,
+    "tx_commit_time":null, "tx_summary":"Some summary"},
+  ],
+  {"riap.v":1.2}
+ ]
+
+=head2 Action: B<undo>
+
+Optional Riap request keys: C<tx_id>.
+
+Undo a committed transaction (defaults to the newest committed transaction).
+
+=head2 Action: B<redo>
+
+Optional Riap request keys: C<tx_id>.
+
+Redo a committed transaction (defaults to the newest undone committed
+transaction).
+
+=head2 Action: B<discard_tx>
+
+Additional required Riap request keys: C<tx_id>.
+
+=head2 Action: B<discard_all_txs>
+
+Additional required Riap request keys: none.
+
+Discard all committed transactions for this client.
+
+=head1 SEE ALSO
+
+L<Riap>
+
+L<Rinci::Transaction>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Riap>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Riap>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Riap>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

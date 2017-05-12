@@ -1,0 +1,24 @@
+---
+abstract: 'RT Search-FullTextByDefault Extension'
+author:
+  - 'Thomas Sibley <trsibley@uw.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gplv2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RTx-Search-FullTextByDefault
+no_index:
+  directory:
+    - inc
+  package:
+    - RT::Search::Simple
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.01

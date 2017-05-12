@@ -1,0 +1,160 @@
+{
+   "abstract" : "Perl bindings for a Neo4j graph database",
+   "author" : [
+      "Mark A. Jensen"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "REST-Neo4p",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Mock::Quick" : "0",
+            "Module::Build" : "0",
+            "Mojo::Exception" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "experimental" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "HTTP::Thin" : "0",
+            "Mojo::UserAgent" : "0"
+         },
+         "requires" : {
+            "Exception::Class" : "1.3",
+            "HOP::Stream" : "0",
+            "JSON" : "2",
+            "JSON::XS" : "2",
+            "LWP::Protocol::https" : "6.06",
+            "LWP::UserAgent" : "6.04",
+            "Tie::IxHash" : "0",
+            "URI::Escape" : "3.3",
+            "experimental" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "REST::Neo4p" : {
+         "file" : "lib/REST/Neo4p.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Agent" : {
+         "file" : "lib/REST/Neo4p/Agent.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Agent::HTTP::Thin" : {
+         "file" : "lib/REST/Neo4p/Agent/HTTP/Thin.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Agent::LWP::UserAgent" : {
+         "file" : "lib/REST/Neo4p/Agent/LWP/UserAgent.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Agent::Mojo::UserAgent" : {
+         "file" : "lib/REST/Neo4p/Agent/Mojo/UserAgent.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Batch" : {
+         "file" : "lib/REST/Neo4p/Batch.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Constrain" : {
+         "file" : "lib/REST/Neo4p/Constrain.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Constraint" : {
+         "file" : "lib/REST/Neo4p/Constraint.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Constraint::NodeProperty" : {
+         "file" : "lib/REST/Neo4p/Constraint/Property.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Constraint::Property" : {
+         "file" : "lib/REST/Neo4p/Constraint/Property.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Constraint::Relationship" : {
+         "file" : "lib/REST/Neo4p/Constraint/Relationship.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Constraint::RelationshipProperty" : {
+         "file" : "lib/REST/Neo4p/Constraint/Property.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Constraint::RelationshipType" : {
+         "file" : "lib/REST/Neo4p/Constraint/RelationshipType.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Entity" : {
+         "file" : "lib/REST/Neo4p/Entity.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Exceptions" : {
+         "file" : "lib/REST/Neo4p/Exceptions.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Index" : {
+         "file" : "lib/REST/Neo4p/Index.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Node" : {
+         "file" : "lib/REST/Neo4p/Node.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::ParseStream" : {
+         "file" : "lib/REST/Neo4p/ParseStream.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Path" : {
+         "file" : "lib/REST/Neo4p/Path.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Query" : {
+         "file" : "lib/REST/Neo4p/Query.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Relationship" : {
+         "file" : "lib/REST/Neo4p/Relationship.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Schema" : {
+         "file" : "lib/REST/Neo4p/Schema.pm",
+         "version" : "0.3012"
+      },
+      "REST::Neo4p::Simple" : {
+         "file" : "lib/REST/Neo4p/Entity.pm",
+         "version" : "0.3012"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=REST-Neo4p"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/majensen/rest-neo4p.git"
+      }
+   },
+   "version" : "0.3012"
+}

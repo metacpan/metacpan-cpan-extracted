@@ -1,0 +1,118 @@
+README for RTF::Writer
+                                        Time-stamp: "2001-04-26 17:12:12 MDT"
+
+[Excerpted from the POD...]
+
+
+NAME
+     RTF::Writer - for generating documents in Rich Text Format
+
+SYNOPSIS
+       use RTF::Writer;
+       my $rtf = RTF::Writer->new_to_file("greetings.rtf");
+       $rtf->prolog( 'title' => "Greetings, hyoomon" );
+       $rtf->number_pages;
+       $rtf->paragraph(
+         \'\fs40\b\i',  # 20pt, bold, italic
+         "Hi there!"
+       );
+       $rtf->close;
+
+DESCRIPTION
+     This module is for generating documents in Rich Text Format.
+
+     This module is a class; an object belonging to this class
+     acts like an output filehandle, and calling methods on it
+     causes RTF text to be written.
+
+     Incidentally, this module also exports a few useful
+     functions, upon request.
+
+     The following documentation assumes some familiarity with
+     the RTF Specification.  Users not already intimately
+     familiar with RTF should look at RTF::Cookbook.
+
+[... RTF::Cookbook is included in this dist ...]
+
+COPYRIGHT AND DISCLAIMER
+     Copyright 2001 Sean M. Burke.
+
+     This library is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.
+
+     This program is distributed in the hope that it will be
+     useful, but without any warranty; without even the implied
+     warranty of merchantability or fitness for a particular
+     purpose.
+
+     The author of this document is not affiliated with the
+     Microsoft corporation.
+
+     Product and company names mentioned in this document may be
+     the trademarks or service marks of their respective owners.
+     Trademarks and service marks are not identified, although
+     this must not be construed as the author's expression of
+     validity or invalidity of each trademark or service mark.
+
+
+[...end pod excerpt]
+
+PREREQUISITES
+
+This suite requires perl 5.005 to run.  If you really need to run it
+under perl 5.004, email me and I'll suggest how to get it to work.
+
+
+INSTALLATION
+
+You install RTF::Writer et al, as you would install any Perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of RTF::Writer in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+See perldoc perlmodinstall for more information and advice.
+
+
+!!!!!!!!!!SPECIAL NOTE!!!!!!!!!!
+
+The distribution archive contains two files of some interest, in the
+examples/ directory.  They do not get installed anywhere by the "make
+install" command, but you should look at them:
+ demo_writer.pl -- sample program using RTF::Writer to generate output.
+ la_dame.rtf -- the "sample complete RTF file" from RTF::Cookbook.
+
+
+DOCUMENTATION
+
+POD-format documentation is included in RTF/Writer.pod and
+RTF/Cookbook.pod.  POD is readable with the 'perldoc' utility.  See
+ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just move the lib/RTF directory
+into your MacPerl site_lib or lib directory.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+RTF::Writer should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of this suite is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+

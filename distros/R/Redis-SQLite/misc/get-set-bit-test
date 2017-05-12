@@ -1,0 +1,161 @@
+#!/usr/bin/perl -I../lib/ -Ilib/
+#
+# The intention of this test is to validate our implementation of
+# getbit/setbit.
+#
+# We generate some random data, set it in a key, then we attempt to
+# lookup the value of each bit in that data - in both Redis and
+# Redis::SQLite - and confirm they match.
+#
+# Once that has been done we invert each bit, individually, and repeat
+# the test.
+#
+#
+
+
+use strict;
+use warnings;
+
+use File::Temp qw! tempfile !;
+use Test::More tests => 12055;
+
+
+BEGIN
+{
+    use_ok( "Redis",         "We could load the Redis module" );
+    use_ok( "Redis::SQLite", "We could load the Redis::SQLite module" );
+}
+
+# Create a new temporary file
+my ( $fh, $filename ) = tempfile();
+ok( -e $filename, "The temporary file was created" );
+unlink($filename);
+
+# Create a new Redis object
+my $r = Redis->new();
+isa_ok( $r, "Redis", "Created Redis object" );
+
+# Create a new Redis::SQLite object
+my $s = Redis::SQLite->new( path => $filename );
+isa_ok( $s, "Redis::SQLite", "Created Redis::SQLite object" );
+
+# Run the random test five times.
+for ( my $run = 0 ; $run < 5 ; $run++ )
+{
+    testRandom();
+}
+
+exit(0);
+
+
+sub testRandom
+{
+    my $length = 50;
+
+    print "Testing with a $length-byte string\n";
+
+    my $data = "";
+
+    while ( length($data) < $length )
+    {
+        $data .= chr( int( rand(250) + 1 ) );
+    }
+
+    dump_str( "Generated random data", $data );
+
+    $r->set( "blah", $data );
+    $s->set( "blah", $data );
+
+    is( $r->get("blah"), $data, "Storing the data worked" );
+    is( $s->get("blah"), $data, "Storing the data worked" );
+
+    # Compare each bit
+    for ( my $i = 0 ; $i <= ( 8 * $length ) ; $i++ )
+    {
+        my $rb = $r->getbit( "blah", $i );
+        my $sb = $s->getbit( "blah", $i );
+
+        is( $rb, $sb, "Redis & Redis::SQLite agree on bit $i" );
+    }
+
+    # Invert each bit
+    for ( my $i = 0 ; $i <= ( 8 * $length ) ; $i++ )
+    {
+        my $bit = $r->getbit( "blah", $i );
+        if ( $bit == 1 )
+        {
+            $r->setbit( "blah", $i, 0 );
+            $s->setbit( "blah", $i, 0 );
+
+            is( $r->getbit( "blah", $i ), 0, "Inverting the bit succeeded $i" );
+            is( $s->getbit( "blah", $i ), 0, "Inverting the bit succeeded $i" );
+
+        }
+        else
+        {
+            $r->setbit( "blah", $i, 1 );
+            $s->setbit( "blah", $i, 1 );
+
+            is( $r->getbit( "blah", $i ), 1, "Inverting the bit succeeded $i" );
+            is( $s->getbit( "blah", $i ), 1, "Inverting the bit succeeded $i" );
+        }
+    }
+
+    # Now we're back to where we started
+    my $rout = $r->get("blah");
+    my $sout = $s->get("blah");
+
+    # Ensure that the Redis + Redis::SQLite values are the same.
+    is( $rout, $sout, "The stored data matches expectations" );
+
+    # Now Compare each bit
+    for ( my $i = 0 ; $i <= ( 8 * $length ) ; $i++ )
+    {
+        my $rb = $r->getbit( "blah", $i );
+        my $sb = $s->getbit( "blah", $i );
+
+        is( $rb, $sb, "Redis & Redis::SQLite agree on bit $i" );
+    }
+
+    # Invert each bit
+    for ( my $i = 0 ; $i <= ( 8 * $length ) ; $i++ )
+    {
+        my $bit = $r->getbit( "blah", $i );
+        if ( $bit == 1 )
+        {
+            $r->setbit( "blah", $i, 0 );
+            $s->setbit( "blah", $i, 0 );
+
+            is( $r->getbit( "blah", $i ), 0, "Inverting the bit succeeded $i" );
+            is( $s->getbit( "blah", $i ), 0, "Inverting the bit succeeded $i" );
+        }
+        else
+        {
+            $r->setbit( "blah", $i, 1 );
+            $s->setbit( "blah", $i, 1 );
+
+            is( $r->getbit( "blah", $i ), 1, "Inverting the bit succeeded $i" );
+            is( $s->getbit( "blah", $i ), 1, "Inverting the bit succeeded $i" );
+        }
+    }
+
+    # Now we're back to where we started
+    $rout = $r->get("blah");
+    $sout = $s->get("blah");
+
+    # Ensure that the Redis + Redis::SQLite values are the same.
+    is( $rout, $sout, "The stored data matches expectations" );
+}
+
+
+sub dump_str
+{
+    my ( $prefix, $data ) = (@_);
+
+    print $prefix . ": ";
+    foreach my $b ( split //, $data )
+    {
+        print( sprintf( "%02X ", ord($b) ) );
+    }
+    print "\n";
+}

@@ -1,0 +1,100 @@
+=head1 NAME
+
+Reaction::Manual::Intro - Introduction to Reaction
+
+=head1 SYNOPSIS
+
+  Moose + Catalyst + Layered Models = eternal happiness
+
+=head1 MOTIVATION
+
+While L<Catalyst> is a very powerful and flexible web app 
+framework, many pieces end up being recoded for each 
+new application: user interfaces, in particular.
+
+Meanwhile, advances in Perl metaprogramming (especially L<Moose>)
+have opened up new possibilities in terms of introspection.
+Why not build user interfaces based on class metadata?  
+This would allow the user interface templates to be very general 
+where possible.
+
+Thus, Reaction is basically an extended MVC framework, which 
+leverages class metadata to reduce or eliminate UI coding.
+
+But it's much more....
+
+=head1 DOMAIN MODELS AND INTERFACE MODELS
+
+Many programmers are now comfortable using ORMs of one sort or 
+another - L<DBIx::Class>, L<Class::DBI>, Hibernate, etc.  These systems 
+are wonderful for bridging from the world of OO into the world of relational 
+databases (or other datastores).  This model is sometimes called a 
+"domain model", because it models the "nouns" of a problem domain in 
+the real world.  Domain models are easily shared accross applications, 
+and can enforce validation and other integrity constraints.
+
+However, over time, many application developers find themselves adding 
+business logic to the domain model.  This business logic is often 
+application-specific, and reduces the reusability of the domain model.
+Worse, business logic becomes spread between the model and the contoller.
+
+Reaction adds another layer, the Interface Model.  Interface models provide an 
+adaptor to the domain model, customized for a particular application (or group 
+of use cases).  This decouples the domain model from the application, 
+allowing it to be reused more freely.  Additionally, the Interface Model 
+becomes the natural location for business logic.
+
+Happily, Reaction again uses reflection to make the degenerate case easy - when your 
+IM has no customized functionality, it can simply delegate all work to the DM.  When 
+you need to add custom business logic, you can add or replace functionality as needed.
+
+The DM/IM split is sometimes referred to as a FacadeModel - see 
+L<http://www.twinforces.com/tf/docs/MFCV.html>, for example.
+
+=head1 WHAT YOU'LL NEED TO KNOW
+
+Reaction is based on the L<Catalyst> web application framework.  You'll certainly
+need to be familiar with L<Catalyst::Manual::Intro>.
+
+Currently, only L<DBIx::Class> is supported as a domain model.  At least basic 
+familiarity will be needed. L<DBIx::Class::Manual::Intro> is a good starting point.
+
+The default view renderer is L<Template::Toolkit>.  To edit your views, you'll 
+need to know something about it.
+
+While you don't need to know L<Moose> directly, a lot of the concepts of 
+metaprogramming will keep coming up as you work with Reaction.  
+Thus, getting to know L<Moose> will serve you well.
+
+=head1 NEXT STEPS
+
+The L<Reaction::Manual::Overview> document tries to tie the parts of reaction
+together to form a big picture.
+
+If you'd like an example, see L<Reaction::Manual::Example>.
+
+If you're ready to dive in and start learning step by step, see 
+L<Reaction::Manual::Tutorial>.
+
+As you encounter unfamiliar terms, or want to see how a particular term is used in the 
+context of the Reaction project, refer to the L<Reaction::Manual::Glossary>.
+
+=head1 SEE ALSO
+
+=over 
+
+=item * L<Reaction::Manual::Cookbook>
+
+=item * L<Reaction::Manual::FAQ>
+
+=back
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

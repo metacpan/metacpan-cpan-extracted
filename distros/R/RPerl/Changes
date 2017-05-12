@@ -1,0 +1,269 @@
+Revision history for Perl compiler RPerl.
+
+2.600000 2017-04-16 Codename Pisces
+
+    - HOLIDAY EDITION: Happy Easter!
+    - OO Class Property Inheritance, Disallow Name Masking
+    - OO Class Property Inheritance, Compatible With C++ Behavior, Upgrade Tests, CPPOPS_*TYPES
+    - Add Source Code Mode Command-Line Argument & Placeholder In $modes Hash
+    - Add Magic Mode Command-Line Argument & Placeholder In $modes Hash
+    - Create Initial GrammarMedium.eyp & Associated Utilities
+    - Inline::RPerl, Reserve Namespace
+    - Learning RPerl, Update 'DEV NOTE, CORRELATION #rp029' Sections As Already Done In script/rperl
+    - Learning RPerl, Exercises, Add Missing Newlines At End Of Files
+    - Pluto, Update URL To Official GitHub Repo
+    - Alien::astyle, Fix https Error In Appveyor, Require New Version In RPerl 
+
+2.450000 2017-02-14 Codename Perseus
+
+    - HOLIDAY EDITION: Happy Saint Valentine's Day!
+    - OO Class Property Inheritance, Compatible With C++ Behavior
+    - Parser, Fix False Errors Triggered By RPerl Debug Statements
+    - CPPOPS_CPPTYPES Mode, Bug Fix, Program Header Line Miscalculation
+    - CPPOPS_CPPTYPES Mode, Bug Fix, Execute Via Compiled Copy (Not Interpreted Copy)
+    - CPPOPS_CPPTYPES Mode, Enable Subroutines Inside Programs
+    - CPPOPS_CPPTYPES Mode, Enable Double-Quote Characters Within Single-Quoted & q-Quoted Strings
+    - Tests, Allow Single-Line Subroutines
+    - Compiler, Create RPerl::eval_use()
+    - Compiler, Optimize By Adding Missing Skip Entries In rperlnamespaces_generated.pm,
+        Split create_symtab_entries_and_accessors_mutators() Out Of INIT{}, 
+    - Compiler, Fix Uncompile Bug, Find Dependencies Via Static Analysis Only & Disable Dynamic Analysis
+
+2.410000 2017-01-13
+
+    - Bug Fix, Avoid False Failures Caused By Perl::Critic::Policy::Bangs::ProhibitBitwiseOperators
+    - Type System, Native Types, Support nvtype='long double'
+    - C++11 Compiler, GCC v4.7 Or Clang v3.3 Minimum Required, Makefile.PL 
+    - Perl v5.10 Minimum Required, Makefile.PL
+
+2.403000 2017-01-10
+
+    - Alien::astyle, More OS Support & Bug Fixes
+
+2.402000 2017-01-07
+
+    - Alien::astyle, Add Initial Support For Linux & BSD
+    - Parser Perl::Critic, Disable RequirePod; Set Theme To core To Disable Additional Policies Such As Perlsecret, etc.
+
+2.401000 2017-01-03
+
+    - Microsoft Windows OS Compatibility,
+        Require Inline::Filters v0.18 To Support Spaces In Directory Paths
+
+2.400000 2017-01-01 Codename Aurora
+
+    - HOLIDAY EDITION: Happy New Year!
+    - Publicly Available Via GitHub Login
+        http://cloudforfree.org/user/login
+    - Learning RPerl, Chapter 3 Complete
+        http://rperl.org/learning_rperl.html#CHAPTER_3%3A_ARRAY_VALUES_%26_VARIABLES
+    - Replace Subroutine Arguments @_ With @ARG In All RPerl Application Code
+    - Refactor Type System To Enable Integration With Catalyst & Other Non-RPerl Application Code
+    - Miscellaneous Bug Fixes
+    - Microsoft Windows OS Compatibility, CI.AppVeyor.com Relaxed Tests Passing
+
+2.200000 2016-10-31 Codename Luna
+
+    - HOLIDAY EDITION: Happy Halloween!
+    - Now Running On The Cloud
+        http://cloudforfree.org
+    - New Installer Script
+    - Greatly Simplified Installation Instructions
+        https://github.com/wbraswell/rperl/blob/master/INSTALL
+    - Correct Numeric Formatting: to_string(), integer_arrayref_to_string(), etc.
+    - Named Operator die
+    - Native Types, Enable Semi-Dynamic Auto-Configuration Of integer Format Code
+        Used By printf & Friends In CPPOPS Modes, Replaced %ld By %"INTEGER"
+    - Learning RPerl, Numerous Updates
+        http://rperl.org/learning_rperl.html
+    - Microsoft Windows OS Compatibility, Numerous Fixes
+    - Microsoft Windows OS Compatibility, Add CI.AppVeyor.com GitHub Webhook
+
+2.000000 2016-07-04 Codename Pioneer
+
+    - HOLIDAY EDITION: Happy Independence Day!
+    - Automatically Parallelize Loops, Part 1
+    - C++ Code Generator Tests
+    - Two-Dimensional Data Structures, Part 2; number_arrayref_arrayref & string_arrayref_arrayref
+    - Native Types, Allow Configuration Of integer & number To Match Perl & OS
+    - Integer Arithmetic & Bitwise Operator Support via 'use integer;'
+    - Microsoft Windows OS Compatibility, Numerous Fixes
+
+1.750100 2016-06-14
+
+    - MathPerl, Support For Linear Algebra, Part 1
+
+1.750000 2016-06-10 Codename Jepp
+
+    - Bugs, Numerous Fixes
+    - Learning RPerl, Numerous Updates
+
+1.700000 2016-04-01 Codename Tycho
+
+    - HOLIDAY EDITION: Happy April Fool's Day
+    - Generate Stand-Alone C++ Executable Files From *.pl Perl Source Code Input Files
+    - `rperl -uu` & `rperl -uuu` Uncompile Command-Line Options
+    - `rperl -vv` Version Command-Line Option
+    - `rperl -assemble` Subcompile Command-Line Option
+    - `rperl -archive` Subcompile Command-Line Option
+    - `rperl -shared` Subcompile Command-Line Option
+    - `rperl -static` Subcompile Command-Line Option
+    - `rperl -CXX` Subcompile Command-Line Option
+
+1.600000 2016-02-14 Codename Red Dwarf
+
+    - HOLIDAY EDITION: Happy St. Valentine's Day!
+    - `rperl -u` Uncompile Command-Line Option, Delete All Compiled Files
+    - Access To Compiled C++ Constants from Perl
+    - Logical Operators and, or, xor
+    - Two-Dimensional Data Structure integer_arrayref_arrayref, Part 1
+
+1.510000 2016-01-17
+
+    - Learning RPerl, TPF Grant Completion
+
+1.500000 2016-01-01 Codename Gemini
+
+    - HOLIDAY EDITION: Happy New Year!
+    - Learning RPerl, 0th Edition Pre-Release
+ 
+1.400000 2015-12-25 Codename Venus
+
+    - HOLIDAY EDITION: Merry Christmas!
+    - GMP Multi-Precision Integer Support
+        Subroutine Argument & Return Value, Automatic Packing & Unpacking
+    - Allow Hash Keys With Operator Names ('x', 'sin', etc.)
+    - Allow unsigned_integer Data Type As Loop Index
+    - Enable SSE & GMP Support Only When Needed
+    - Disable SSE On Arm Architectures
+    - Support OpenBenchmarks.org: Bubble Sort, n-Body, Pi Digits
+    - Support Perl v5.22
+
+1.300000 2015-11-26 Codename Pluto
+
+    - HOLIDAY EDITION: Happy Thanksgiving!
+    - Draft Copyright Assignment & Disclaimer Docs (CONTRIBUTING, ASSIGNMENT, EMPLOYERS)
+    - Disallow Non-Newline-Or-Tab (AKA Extraneous) Backslashes In Double-Quoted String Literals
+    - Learning Perl Outline & Chapters 1 - 6 Exercise Solutions
+    - Macintosh, Disable Failed Test 'Inline::CPP, call Airplane methods...'    
+        Temporarily Fixes Bug https://github.com/wbraswell/rperl/issues/34
+    - Begin Addding GMP Multi-Precision Integer Support
+
+1.200002 2015-11-07
+
+    - Re-enable 4 Tests, Fixed Error "Can't parse code: Unknown error parsing Perl document" In Perl v5.16 & Earlier, Enable Proper ECOGEASRP20 Support
+    - Learning RPerl, Chapter 3, Exercise 3, Fixed RequireCheckedSyscalls Failure
+        Filed Bug https://github.com/Perl-Critic/Perl-Critic/issues/671
+    - Fix Bugs In Support For All Named & Named Unary Operators AKA Builtins, PERLOPS_PERLTYPES Mode 
+    - Disable Inline::CPP Airplane Test, Macintosh Bug
+        Temporarily Fixes Bug https://github.com/wbraswell/rperl/issues/34
+ 
+1.200001 2015-11-01
+
+    - Disable 4 Tests To Avoid Perl::Critic Error "Can't parse code: Unknown error parsing Perl document" In Perl v5.16 & Earlier
+
+1.200000 2015-10-31 Codename Andromeda
+
+    - HOLIDAY EDITION: Happy Halloween!
+    - Split N-Body Code From RPerl Into PhysicsPerl & Geometric Algebra Code Into MathPerl
+    - Ensure Perfect Match For Compiled Algorithm.*, Sort.*, Bubble.*, Inefficient.* Files With Hand-Compiled *.CPPOPS_CPPTYPES versions
+    - Support For Special Characters in qw()
+    - Learning RPerl, All Exercises Parse
+    - Separate Operator::Expression::Operator::Named From NamedUnary
+    - Support For All Named & Named Unary Operators AKA Builtins, PERLOPS_PERLTYPES Mode 
+    - Test Non-Whitespace qw(foo*baz bar-hypenated bla+rgh)
+    - Test Compile-Time Constructor Type Mismatch In VariableDeclaration (ERROR ECOGEASRP20)
+    - Test Zero-Argument Named & Named Unary Operators (AKA Builtins) In VariableDeclaration, C-Style For Loop, & In General
+
+1.100002 2015-09-11
+
+    - Enable Subcompile Phase During Compile Time
+
+1.100001 2015-09-10
+
+    - Support Monolithic Modules, Multiple Classes Per Module
+
+1.100000 2015-09-05 Codename Jupiter
+
+    - Support N-Body Application In PhysicsPerl Suite, 
+        Solar System Simulator Used For Alioth Benchmark Game (AKA Shootout)
+    - Implement SSE Parallel 128-Bit Floating-Point Arithmetic, Performance Optimization
+    - Implement Arrays & Hashes Of Objects
+    - Implement Access To Raw Pointers Of Objects, Performance Optimization
+    - Implement Loop Iterator Pre-Declaration & Completion Condition Compensation, Performance Optimization
+    - Implement Sub-Accessors & Sub-Mutators,
+        Used For Individual Elements Of Object Property Arrays & Entries Of Object Property Hashes
+
+1.001001 2112-12-21 SOS
+
+    - Plan Support For Acme::Rush Module
+
+1.000007 2015-07-09
+
+    - Use Test::Number::Delta For Compatibility With Perls Compiled Using -Duselongdouble,
+        Fixes Duplicate Bugs
+        https://github.com/wbraswell/rperl/issues/24 &
+        https://rt.cpan.org/Ticket/Display.html?id=105781
+    - Disable Return Operator Parse Failures,
+        Temporarily Fixes Bug https://github.com/wbraswell/rperl/issues/25
+
+1.000006 2015-07-09
+
+    - Disable PAUSE Indexing For Data Type & Test Packages,
+        Fixes Bug https://rt.cpan.org/Ticket/Display.html?id=105757
+
+1.000005 2015-07-08
+
+    - Disable Perl::Critic PodSpelling To Avoid Aspell Error "No word lists can be found for the language",
+        Fixes Bug https://github.com/wbraswell/rperl/issues/26
+
+1.000004 2015-07-08
+
+    - Add $ENV{PATH} To `rperl` Command Search Path,
+        Fixes Bug https://github.com/wbraswell/rperl/issues/17
+    - Update Error Checking In Compiler Dependency Finder,
+        Fixes Bug https://github.com/wbraswell/rperl/issues/23
+    - Fix POD-to-POD 'See Also' Link
+
+1.000003 2015-07-07
+
+    - Perl v5.22 Compatibility, 'Unescaped left brace in regex',
+        Fixes Bug https://rt.cpan.org/Ticket/Display.html?id=105696
+    - Update POD Documentation
+    - Update Makefile.PL With CPAN Metadata
+    - Temporarily Resolve PAUSE Indexing Conflicts
+    - Add LICENSE, Artistic, and Copying Files
+
+1.000002 2015-07-06
+
+    - Add Changes File,
+        Fixes Bug https://rt.cpan.org/Ticket/Display.html?id=105663
+    - Add & Update POD Documentation
+
+1.000001 2015-07-04
+
+    - Fix Version Numbers
+
+1 2015-07-04 Codename Apollo
+
+    - HOLIDAY EDITION: Happy Independence Day!
+    - First Full Release
+
+1.000_003 2015-07-02 Beta 3
+
+    - Test & Prepare For v1.0
+
+1.000_002 2014-12-25 Beta 2
+
+    - HOLIDAY EDITION: Merry Christmas!
+    - EYAPP Grammar Demo
+	
+1.000_001 2014-01-01 Beta 1
+
+    - HOLIDAY EDITION: Happy New Year!
+    - PPI Hello World Demo
+
+0.000001 2013-01-01 Unreleased
+
+    - HOLIDAY EDITION: Happy New Year!
+    - Created RPerl

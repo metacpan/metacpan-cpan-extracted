@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel;
+use Ravenel::Document;
+use Ravenel::Block;
+
+sub example_tag {
+	my Ravenel::Block $block_obj = shift;
+	my ( $block_id ) = ( int(rand(2)) ? 'lucky_day' : undef );
+	my $block = $block_obj->get_block($block_id);
+	my $ta    = $block_obj->get_tag_arguments();
+
+	$block_obj->format($ta, $block_id);
+}
+
+my $res = Ravenel::Document->render( {
+	'data'         => qq(
+  <r:example_tag color="blue" length="25" format>
+    <p>Default content {color} {length}</p>
+    <block id="lucky_day"/>
+    <p>It's your lucky day! {color} {length} {color}</p>
+  </r:example_tag>
+),
+	'dynamic'      => 0,
+	'prefix'       => 'r:',
+	'content_type' => 'html',
+	'name'         => 'test',
+	'functions'    => { 'example_tag' => \&example_tag }, # Well, I should make it smart enough to scrape it's own functions
+} );
+
+print $res . "\n" if ( $ARGV[2] );
+
+eval $res;
+
+print $@ if ( $@ );
+
+print test->get_html_content() . "\n";
+

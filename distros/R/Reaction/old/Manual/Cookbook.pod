@@ -1,0 +1,74 @@
+=head1 NAME
+
+Reaction::Manual::Cookbook - Miscellaneous recipes
+
+=head1 RECIPES
+
+These should include some hopefully useful tips and tricks!
+
+=head2 Display
+
+These would typically go in your /root directory along with your other
+templates.
+
+=head3 Alternating listview row styles with CSS
+
+Filename: listview
+
+  [%
+  
+  PROCESS base/listview;
+  
+  row_block = 'listview_row_fancy';
+  
+  BLOCK listview_row_fancy;
+  
+    IF loop.count % 2 == 1;
+      attrs.class = 'dark';
+    ELSE;
+      attrs.class = 'light';
+    END;
+  
+    INCLUDE listview_row;
+  
+  END;
+  
+  %]
+
+=head3 Displaying heading on action forms
+
+Filename: form_base
+
+  [%
+  
+  PROCESS base/form_base;
+  
+  main_block = 'form_base_control_fancy';
+  
+  BLOCK form_base_control_fancy;
+  
+    action_class = self.action.meta.name.split('::').pop;
+    '<h3>'; action_class.split('(?=[A-Z])').join(' '); '</h3>';
+    INCLUDE form_base_control;
+  
+  END;
+  
+  %]
+
+=head2 Controllers
+
+Things
+
+=head2 Models
+
+Stuff
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

@@ -1,0 +1,301 @@
+$Id: api.txt,v 1.3 2000/10/22 10:59:00 aigan Exp $
+
+ THE INTERNAL STORAGE
+ --------------------
+
+The internal representation of the RDF data is separated from the
+interfaces storage format. We have to develop a way to quickly access
+the data retrieved from the interfaces.
+
+We want to do much more than these basic lookups.  We use 'selections'
+as a container of subjects.  Internally, the contents of selections
+can be stored as one or more subqueries. The atomic parts of a
+selection (formely called virtual model) is Interface, Model, Resouce
+and Subselection.  This will (sometimes) save a lot of time and space,
+because we don't have to know exactly what resources are containd in a
+selection until the agent actualy wants to iterate through the members
+or determine an exact size.
+
+
+An example of piling selections:
+
+$interface->select( type=>$Person )->select( memberOf=>$Group
+)->select( livesIn=>$Country )->name;
+
+Would be the same as:
+
+$service->select( interface=>$interface, type=>$Person,
+memberOf=>$Group, livesIn=>$Country )->name;
+
+The selection could use any combination of properties.  There are many
+little things that can be done to make efficient selections.  There
+will be the same types of considerations as in the optimizations of a
+database SQL query optimization.
+
+
+
+There are more types of queries than the above cases. (We haven't
+mentioned 'OR' or 'NOT' yet.)  But the important thing is that the
+data storage is general enough to allow for more advanced
+implementations in a later stage.
+
+
+
+
+ COMPARSION WITH ALPHA 1 API
+ ---------------------------
+
+Let us now list some of the basic queries implemented in the alpha 1,
+and make a few additions for the simplest cases of versioning and
+trust. (The digital signatures part is a question of authentication
+(and integrity) and can be separated from the trust question.)
+
+
+$preds = $node->get_preds_list()
+$arcs = $node->get_arcs_list()
+
+These should maby be replaced with { $node->arc->list } to get all
+the arcs there $node is subj, and { $node->rev_arc->list } for arcs
+there $node is obj.  Maby a construction like {
+$node->arc->pred->list } to get all the arcs predicates.
+
+
+$objs = $node->get_objects_list($pred)
+
+This is to get all objects for all arcs with a specified subject and
+predicate.  This should be changed to { $node->arc($pred)->obj->list }
+for the case of a variable predicate, as a equivalent to {
+$node->thePred->list }.  Maby we could use { $node->arc_obj( rev_arc
+=> { pred => $pred } )->list } as an alternative, or { $node->arc_obj(
+$pred )->list } as a shorter version.
+
+
+$nodes = $class->objects_list()
+
+This is a realy bad name.  how do we distinguish getting all objects
+of a specific class with all objects in a nodes property arcs?
+This should change to { $class->rev_arc($Type)->list }.  All the
+implicit types will be expanded. Maby we could use a shortcut here {
+$class->rev_type->list } and use { $node->type->list } to get a nodes
+types.  Maby 'rev_...' could be used for any property?
+
+
+
+
+ VERSIONING
+ ----------
+
+We want to get statements that are 1. correct and 2. current.  A
+statement (or all statements in a model) can be withdrawn.  TBL
+suggests the property truth for a model [1].  To get true properties
+of a node we could say { $node->arc( truth => 1 )->list } or maby, if
+we doesn't distribute the model truthness, { $node->arc( model =>
+{truth => 1} )->list }.
+
+To get the true english name of a thing, we could say { $thing->arc(
+pred => $name, truth => 1 )->obj( lang => $english )->value }.  The
+preference for true statements will probably be default. So we could
+say { $thing->name( lang => $english )->value } instead. And with a
+prespecified preference for english versions, we could say {
+$thing->name->value }.
+
+The second type of versioning says that some statement is true during
+a specific time period.  So let us specify that we want to know the
+properties of a thing, as it was in 1999. { $thing->arc( valid_during
+=> $date_range )->list }.  All this is dependent on that we decide on
+how to describe dates, and more.  The 'valid_during' talks about the
+arc and not the object.  The valid_during can be dynamicly calculated
+from other properties; for example from the model.
+
+
+
+
+ TRUST
+ -----
+
+Sometimes we only want trusted data. Other times, we want to see all
+data and decide for ourself. We cold then just get all data and order
+on trust.  We can also specify a orderd list of prefered sources. (As
+with the desired language.)  The details of inerited trust will be
+datailed later. For now, we just look at the agent behind a model
+containing a statement. We could check it agains the list of trusted
+agents by saying { $node->arc( model => { agent => [ $agent1, $agent2,
+$agent3 ] } ) }.
+
+But the default preference will be to only get true statements, and
+that will imply that they are trusted and current.  The handling of
+trust must be efficient even with a large amount of trusted sources.
+Let's say we have a third party service saying what models, agents or
+namespaces we can trust.  This would be done by a interface defining
+the trust() method/property and could be used by saying { $node->arc(
+trusted => 1 ) }.  That will call the trusted() method once for every
+arc of the node.  It's up to the interface implementing the method to
+do what it have to do to be fast.
+
+The property trusted() are an example of properties that have diffrent
+values depending on the context.  The defining context must be clear.
+In this case, the property will probably be based on the agent of the
+session.  This means that the session agent will be used in the
+caching.  This problem is related to the implementation of inferenced
+properties.  For now, we will just let the methods do their job on
+returning the right value, without caching the result.
+
+
+
+
+ SYNTAX SUMMARY
+ --------------
+
+Properties can be used in the place of predicates either as criterions
+or as method names.  For a property to be used in this way, they have
+to be declared as the abbrevation of their full URI.
+
+Elements in [] are ORed together and pairs in {} are ANDed together.
+The special props { and => [...] } and { or => {} } changes that
+behaviour.  { not => [...] } and { not => {...} } negates the effect
+of [] and {}.
+
+
+  Return a selection of all arcs with $node as subj:
+
+      $node->arc()
+
+
+
+  Return a selection of all arcs with $node as subj and $pred as pred:
+
+      $node->arc($pred)
+
+
+
+  Return a selection of all arcs with $node as subj and one of $pred1,
+  pred2 or $pred3 as pred
+
+      $node->arc([$pred1, $pred2, $pred3])
+
+
+
+  Return a selection of all arcs with $node as subj, $pred as pred and
+  that has a property with the key $x and value $y.  All the criterions
+  must be matched. The 'pred' property are used as a short for the
+  RDF:predicate property:
+
+      $node->arc({pred => $pred, $x => $y })
+
+
+
+  The property $x must have the value of *either* $y or $z:
+
+      $node->arc({ $x => [ $y, $z ] });
+
+
+
+  I hope that this is much more pover than actualy needed in practical
+  use.  This would be the same as "for each arc that has node as
+  subject, return all arcs for which the following is true; ( (
+  (P(a)==b) OR ( (P(c)==d) AND (P(e)==f) ) ) AND ( (P(g)==h) ) )".
+
+      $node->arc({and=>[[{$a=>$b},{$c=>$d,$e=>$f}],{$g=>$h}]})
+
+
+
+  Return all arcs that has a property $a those value is a resource
+  that has the property $b with the value $c:
+
+      $node->arc({ $a => { $b => $c } })
+
+
+
+  The same, but create the section as the union of the result from each
+  nodes in the parent selection:
+
+      $selection->select_arc(...)
+
+
+
+  The same, but substitute the subj with the obj:
+
+      $selection->select_rev_arc(...)
+
+
+
+  Return object (and *not* a selection) (matching the criterions) of
+  an arc:
+
+      $arc->obj(...)
+
+
+
+  Return all objects of all arcs that has $node as subj:
+
+      $node->arc_obj()
+
+
+
+  Return all objects that has a reverse arc with $pred as predicate
+  and $node as subj.  That is the same as "all the values of the $node
+  property $pred":
+
+      $node->arc_obj( $pred )
+
+
+
+  Same as arc_obj, but substitute obj with subj:
+
+      $node->arc_subj( $pred )
+
+
+
+  Return the only match from a container (or selection), or die:
+
+      $container->li()
+
+
+
+  Return element 8 (counting from 1) in the container:
+
+      $container->li( 8 )
+
+
+
+  Return the only resource from a container matching the citerions, or
+  die if there was many matches:
+
+      $container->li( ... )
+
+
+
+  Return a selection of containers (including models and selections)
+  matching the specified criterions and including this $node:
+
+      $node->rev_li( ... )
+
+
+
+  The same as li() but returns a selection instead of a single
+  resource:
+
+      $container->select( ... )
+
+
+
+  Return all objects of the arcs that has $node as subj and XXX as
+  pred, matching the specified criterions.  XXX here is any predicate
+  registred as an abbrevation:
+
+      $node->XXX( ... )
+
+
+
+  The same as XXX() but substitute subj with obj:
+
+      $node->rev_XXXX( ... )
+
+
+
+
+
+
+
+
+[1] http://www.w3.org/DesignIssues/Toolbox.html#Assertion

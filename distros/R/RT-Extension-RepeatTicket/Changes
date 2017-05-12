@@ -1,0 +1,32 @@
+Revision history for RT-Extension-RepeatTicket
+
+1.10 2015-05-11
+
+ - allow to disable Repeat Ticket for some queues
+
+1.00 2014-12-16
+ - Add a missing WebPath to Original Ticket link
+ - Improve display on RT 4.2
+ - Support a lead time of 0 days
+ - Packaging and documentation updates
+
+0.07 2014-02-13
+ - Styling on RT 4.2
+ - Use <label>s to make radio button selection easier
+ - Fix translation strings to use phrases, not words
+
+0.06 2013-12-11
+ - Fix copying of RefersTo links on repeated tickets
+
+0.05 2013-10-10
+ - Updates for RT 4.2
+
+0.04 2013-07-01
+ - Fixed bug with CFs on repeated tickets
+ - Added subject format config option
+ - Move tests to xt
+ - Add note on supported versions of RT
+
+0.03 2013-03-28
+ - First version, released on an unsuspecting world.
+

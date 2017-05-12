@@ -1,0 +1,70 @@
+{
+   "abstract" : "he's a bit slow, but he's sure good lookin'",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::11 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-TrineX-Serializer-MockTurtleSoup",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "RDF::Prefixes" : "0.003",
+            "RDF::Trine" : "1.000",
+            "Sort::Key" : "0",
+            "match::smart" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON" : "2.00"
+         }
+      }
+   },
+   "provides" : {
+      "RDF::TrineX::Serializer::MockTurtleSoup" : {
+         "file" : "lib/RDF/TrineX/Serializer/MockTurtleSoup.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Serializer-MockTurtleSoup/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=RDF-TrineX-Serializer-MockTurtleSoup"
+      },
+      "homepage" : "https://metacpan.org/release/RDF-TrineX-Serializer-MockTurtleSoup",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-rdf-trinex-serializer-mockturtlesoup.git",
+         "web" : "https://github.com/tobyink/p5-rdf-trinex-serializer-mockturtlesoup"
+      }
+   },
+   "version" : "0.006"
+}

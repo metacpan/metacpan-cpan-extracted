@@ -1,0 +1,7 @@
+Revision history for Redis-RateLimit
+
+1.0001  2016-12-14 14:10:06 PST
+  - remove dependency on Redis::ScriptCache
+
+1.0000  2016-12-14 11:47:33 PST
+  - ported ratelimit.js to Redis::RateLimit

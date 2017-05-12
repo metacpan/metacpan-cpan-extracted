@@ -1,0 +1,33 @@
+<%ARGS>
+$ARGSRef => {}
+$checks_failure
+$skip_create
+$results => []
+</%ARGS>
+<%INIT>
+return if $$skip_create;
+return if $checks_failure;
+
+my $queue = RT::Queue->new( $session{'CurrentUser'} );
+$queue->Load( $ARGSRef->{'Queue'} );
+return unless $queue->id;
+
+return if $queue->CurrentUserHasRight('NoCaptchaOnCreate');
+
+my ($captcha) = ($ARGSRef->{'CaptchaString'});
+unless ( $captcha ) {
+    push @$results, loc("You have to solve CAPTCHA");
+    $$skip_create = 1;
+}
+elsif ( !$session{'Captcha'}{'String'} ) {
+    push @$results, loc("Don't play with me. You must solve CAPTCHA");
+    $$skip_create = 1;
+}
+elsif ( lc($captcha) ne lc $session{'Captcha'}{'String'} ) {
+    delete $session{'Captcha'};
+    push @$results, loc("Not equal. Give you another CAPTCHA");
+    $$skip_create = 1;
+}
+return;
+</%INIT>
+

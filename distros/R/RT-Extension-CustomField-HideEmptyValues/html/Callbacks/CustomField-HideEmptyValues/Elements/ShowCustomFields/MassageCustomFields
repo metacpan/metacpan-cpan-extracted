@@ -1,0 +1,43 @@
+<%ARGS>
+$Object => undef
+$CustomFields
+</%ARGS>
+<%INIT>
+# only RT 3.8.6 pass Object
+$Object ||= $m->caller_args(1)->{'Object'};
+
+return unless $Object && $Object->id;
+
+my $ocfv_alias = $CustomFields->Join(
+    TYPE   => 'LEFT',
+    ALIAS1 => 'main',
+    FIELD1 => 'id',
+    TABLE2 => 'ObjectCustomFieldValues',
+    FIELD2 => 'CustomField',
+);
+$CustomFields->Limit(
+    LEFTJOIN => $ocfv_alias,
+    ALIAS    => $ocfv_alias,
+    FIELD    => 'Disabled',
+    VALUE    => 0,
+);
+$CustomFields->Limit(
+    LEFTJOIN => $ocfv_alias,
+    ALIAS    => $ocfv_alias,
+    FIELD    => 'ObjectType',
+    VALUE    => ref $Object,
+);
+$CustomFields->Limit(
+    LEFTJOIN => $ocfv_alias,
+    ALIAS    => $ocfv_alias,
+    FIELD    => 'ObjectId',
+    VALUE    => $Object->id,
+);
+
+$CustomFields->Limit(
+    ALIAS    => $ocfv_alias,
+    FIELD    => 'id',
+    OPERATOR => 'IS NOT',
+    VALUE    => 'NULL',
+);
+</%INIT>

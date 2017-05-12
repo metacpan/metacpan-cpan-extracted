@@ -1,0 +1,275 @@
+=head1 NAME
+
+Ref::Store::Guts - Implementation details
+
+=head1 INTRODUCTION
+
+Ref::Store (The name might change) aims to implement a dynamically garbage
+collected object lookup table. Lookup objects, and index by objects.
+
+=head1 IMPLEMENTATION
+
+
+All insertion operations consist of attaching a perl magic structure
+to the underlying SV object. This magic structure is used for chained
+garbage collection. The magic structure contains one more of an 
+HR_Action structure which contains specifiers and hints about which
+type of action.
+
+In effect, this is a second layer of back-referencing which extends the
+weakref concept (a common design pattern in general). I will call this
+I<back-deletion>.
+
+Values MUST be references, and keys are internally converted and/or
+encapsulated into (opaque) references themselves. More about this later.
+
+=head2 LOOKUP TABLES
+
+There are three primary lookup tables which are accessed internally:
+
+=over
+
+=item Scalar Lookup Table
+
+This table maps scalar 'user' strings to internal key objects. These 'strings'
+can also be object references, but have in common that they represent a user-
+provided identifier for our lookup. It looks something like this:
+
+    $hash->store("foo", $value);
+        # =>
+        my $object_key = make_new_object_key("foo");
+        $hash->scalar_lookup->{$foo} = $object_key;
+
+=item Forward Lookup Table
+
+This maps user strings to value objects. There is not much happening here.
+
+=item Reverse Lookup Table
+
+This maps a value object to its associated keys and attribute objects. The idea
+being that the value will 'own' its lookup properties. In the case of key lookups,
+the value acquires exclusive ownership, and in the case of attributes, it has
+shared ownership.
+
+What this actually means is that the key object's primary reference is stored
+under the value's reverse lookup. Thus, when a value is deleted along with its
+reverse lookup table. Thus, it looks something like this;
+
+    $reverse_lookup->{$value_address} = {
+        $key1_address => $key1_object,
+        $key2_address => $key2_object,
+    };
+
+=back
+
+=head2 KEY LOOKUPS
+
+When a value is inserted into the database, two entries are created for it;
+one is a forward entry which maps the key to the value, and the other 
+is an entry which maps the value back to the key. Since a value can
+have more than one key, the reverse lookup really contains multiple
+keys. The keys themselves are converted to objects, and what is stored
+in the value's reverse lookup table are key object references; each key
+object has a weak (or strong) reference indexed by its reference address.
+
+In order to map the scalar/string key to a key object, yet another lookup
+table exists - a scalar lookup, which maps strings to their key objects.
+
+Keys are converted to object references in order to aid garbage collection.
+Key objects contain back-deletes to their scalar lookup table as well as 
+to their forward entries.
+
+When either a key or a value is destroyed, the other always goes along with
+it. If a value is destroyed, the key's last strong reference (in the reverse
+table) is destroyed as well. When the last key is destroyed, its entry in the
+forward table is deleted as well -- and if this is the last key for the value,
+then the value is deleted as well.
+
+To visualize in perl code, it would look something like
+
+    $scalar_lookup->{"scalar string"} = $weak_reference_to_key;
+    $reverse_lookup->{$value_refaddr}->{$key_refaddr} = $strong_reference_to_key;
+    $forward_lookup->{"scalar string"} = $weak_or_strong_reference_to_value;
+
+=head3 OBJECT-ENCAPSULATING KEYS
+
+This lookup table supports not only simple scalar string keys, but also object
+keys. Object keys provide more versatility; for example, one can have a value
+automatically be deleted when its object key is destroyed, or vice versa. It
+thus allows creation of one-to-many mutual dependency relationships.
+
+Object key implementation is a bit complex. Whereas string keys are always only
+deleted via the API, object keys can also be deleted whenever their encapsulating
+object goes out of scope.
+
+As a result, some of the magic attached to a normal key object is transferred to
+the encapsulated object. Specifically, the encapsulated object will trigger deletion
+of the key object when the former is destroyed. The key object then also implements
+a DESTROY/cleanup method which does a subset of value deletion (if necessary).
+
+=head2 ATTRIBUTE LOOKUPS
+
+Attributes are different from keys in the sense that a single key can only
+hold a single value at any given time. Attributes can contain multiple
+values. A key is a unique identity of an object (though an object can have
+multiple identities, so long as they are unique), whereas an attribute is
+a property or state of any number of objects.
+
+Attributes have a similar external API as keys, but are implemented slightly
+differently. Attributes cannot have an exclusive mapping to objects like keys
+do, and thus their implementation is slower and more complex.
+
+The lookup mechanism for attributes is a bit more complex.
+Attribute objects reside inside an attribute lookup table (which is
+really the same as the scalar lookup table). Unlike keys, however, which
+store only a weak reference in the scalar lookup, attributes store a strong
+reference.
+
+Attribute objects contain an internal hash which contains references to
+the value entries contained therein. References are optionally weak
+or strong, depending on user configuration, and values contain back-deletions
+to this internal hash structure.
+
+The internal hash is special because it is tied. Every deletion operation
+is monitored, and when the key count becomes 0; that is, when no more
+values are using this attribute, the entry is deleted from the attribute
+lookup table.
+
+
+=head2 PERFORMANCE AND OPERATIONS
+
+=head3 KEY STORE:
+
+new keys:
+
+=over
+
+=item 1
+
+Convert string to key object
+
+=item 2
+
+Store key object in the scalar lookup table
+
+=item 3
+
+Initialize magic on the key object
+
+=item 4
+
+Add back-delete to scalar lookup
+
+=item 5
+
+Insert into value's reverse hash
+
+=item 6
+
+If this is an encapsulating key, add magic to the object
+
+=back
+
+
+new values:
+
+=over
+
+=item 1
+
+Initialize magic on value
+
+=item 2
+
+Initialize value's reverse entry
+
+=item 3
+
+Insert key in reverse entry. If the key is encapsulating, add back-delete for
+individual key's entry in reverse entry (This is needed to trigger the removal
+of magic from the encapsulated object).
+
+=item 4
+
+Add back-delete for reverse entry
+
+=back
+
+
+=head3 KEY FETCH
+
+=over
+
+=item 1
+
+Look up user string and map to key object
+
+=item 2
+
+Lookup key-object ID in forward table, and return result
+
+=back
+
+
+=head3 KEY DELETE
+
+=over
+
+=item 1
+
+Fetch (see FETCH)
+
+=item 2
+
+Remove key from scalary lookup
+
+=item 3
+
+Remove key from value's reverse lookup.
+
+=item 4
+
+Check if this is the last key for the value, if so then:
+
+=over
+
+=item *
+
+Delete vaue's reverse entry
+
+=item *
+
+De-initialize value's magic
+
+=back
+
+=back
+
+=head3 VALUE DELETE
+
+=over
+
+=item 1
+
+Fetch reverse entry
+
+=item 2
+
+Delete all scalar entries for each value in the private reverse table
+
+=item 3
+
+Chain key-specific cleanup hooks
+
+=back
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 M. Nunberg,
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

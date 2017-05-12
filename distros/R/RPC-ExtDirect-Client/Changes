@@ -1,0 +1,55 @@
+1.25  Thu Oct 13 00:00:17 PDT 2016
+    - Another attempt at solving mysterious CPAN smoker failures in 05_upload.t
+    - Updated dependencies on core modules
+
+1.24  Wed Oct 12 22:02:14 PDT 2016
+    - Added a client option to specify connection protocol other than HTTP
+    - Connection timeout in unit tests lowered to 1 second
+    - Fixed tests to use ref_ok instead of isa_ok
+    - Refactored Client.pm to avoid using `each` hash iterator
+    - Version bumped to 1.24 to align with Server and core modules
+
+1.20  Thu May 14 22:10:34 PDT 2015
+    - Updated to support metadata feature in RPC::ExtDirect 3.20+
+    - More tests, as usual
+
+1.03  Tue Jun 24 21:23:54 2014
+    - Client initialization with a local API instance works properly now,
+      with a bunch of tests added
+
+1.02  Mon Jun 23 17:49:55 2014
+    - Fixed a typo in Makefile.PL that caused build failure when
+      ExtUtils::MakeMaker version happened to be between 6.46 and 6.64
+
+1.01  Fri Jun 20 21:18:36 2014
+    - Ext.Direct Method argument checking now happens in the Method
+      itself; Client is updated to take advantage of that
+    - Minimal RPC::ExtDirect version bumped to 3.01 for above changes
+    - Improved tests, added many new ones
+    - Miscellaneous fixes
+
+1.00  Thu Jun 12 21:47:21 2014
+    - Updated to accommodate for the changes in RPC::ExtDirect 3.0
+      and RPC::ExtDirect::Server 1.0
+    - Major internal refactoring and tune-up to support the async
+      client as a subclass (See RPC::ExtDirect::Client::Async)
+    - Many, many improvements and bug fixes
+    - Many new tests
+    - Tons of documentation
+    - Compatible with Perl 5.6.2.
+
+0.22  Fri Mar 29 18:35:48 2013
+    - Added handling for Methods that do not specify how they need
+      their parameters. We assume by-name without strict checking.
+
+0.21  Wed Mar 27 22:15:03 2013
+    - Published get_api method. Made all code and tests runnable
+      under Perl 5.8.
+
+0.2   Fri Nov  9 23:52:39 2012
+    - Added an option to pass cookies either with HTTP::Cookies object
+      or raw hashref
+
+0.01  Wed Jun 20 18:13:21 2012
+	- original version; code runs and tests pass but lacks documentation
+

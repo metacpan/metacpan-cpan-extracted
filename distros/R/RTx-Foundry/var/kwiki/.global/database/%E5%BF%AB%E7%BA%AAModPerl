@@ -1,0 +1,35 @@
+Apache 的 mod_perl 让 Perl 应用程序在重度使用的时候也能够跑得更快更好。搭配 mod_perl 使用快纪可以说是小意思。
+
+首先你得有一份编译时就选择要支持 mod_perl 的 Apache 服务器。这方面的信息请见 http://perl.apache.org 。
+
+然后按照一般的[安装快纪]步骤来安装。
+
+最后在你的 Apache 组态设定档里加上这些东西：
+
+  Alias /kwiki/ /home/ingy/kwiki/
+  <Directory /home/ingy/kwiki/>
+      Order allow,deny
+      Allow from all
+      AllowOverride None
+      Options None
+      SetHandler perl-script
+      PerlHandler CGI::Kwiki
+  </Directory>
+  <Directory /home/ingy/kwiki/css/>
+      Order allow,deny
+      Allow from all
+      AllowOverride None
+      Options None
+      SetHandler none
+  </Directory>
+  <Directory /home/ingy/kwiki/javascript/>
+      Order allow,deny
+      Allow from all
+      AllowOverride None
+      Options None
+      SetHandler none
+  </Directory>
+
+这样就行了！你马上就可以体会到 *效能暴增* 的快感。
+
+你可以在任何时候把标准的 CGI 安装转移到 mod_perl 。

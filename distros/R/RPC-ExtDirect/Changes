@@ -1,0 +1,167 @@
+3.24  Wed Oct 12 00:34:02 PDT 2016
+    - Fixed test suite failure when running under Perl 5.8.2
+    - Refactored test suite not to use isa_ok to avoid an issue found
+      while debugging the above failure
+    - Refactored core modules not to use `each` iterator
+
+3.23  Mon Oct 10 19:31:34 PDT 2016
+    - Fixed another issue with unescaped curly bracket warning in Perl 5.23.6+
+    - Misc documentation fixes
+
+3.22  Mon Aug  1 11:32:17 PDT 2016
+    - Fixed the issue with unescaped curly bracket warning in Perl 5.23.6+
+
+3.21  Thu May 14 20:38:51 PDT 2015
+    - Fixed a bug when exceptions could be thrown as ARRAY instead of a string
+      in ExtDirect attribute handler
+
+3.20  Tue Mar 31 21:37:10 PDT 2015
+    - Added support for call metadata available in Ext JS 5.1+
+    - Added support for JSON argument decoding in Form handlers
+    - Updated the documentation
+    - Tests, more tests
+    - Version bumped to 3.20 in concert with gateway releases
+
+3.03  Thu Jan 29 22:58:24 PST 2015
+    - Fixed outdated attribute parser check that required at least one
+      name in params arrayref for named Methods
+    - Named Methods with empty params will force !strict in constructor
+    - Misc documentation fixes
+
+3.02  Mon Oct 27 17:36:12 PDT 2014
+    - Added timeout and max_retries API config options
+    - Some test fixes and improvements
+    - Miscellaneous doc fixes
+
+3.01  Thu Jun 19 23:01:25 PDT 2014
+    - Minor refactoring of the Method argument checking; it now happens
+      in the Method itself, as opposed to be divided among other modules.
+      It should have been this way since the beginning, but oh well.
+    - Tests updated to accommodate for the Method changes
+    - ExtDirect attribute parsing is more robust now, and tested
+    - Fixed several minor but very embarrassing bugs uncovered by the
+      new attribute parser tests
+    - Assorted tiny fixes here and there
+
+3.00  Thu Jun 12 17:54:23 PDT 2014
+    - Major refactoring of the RPC::ExtDirect module internals
+    - Configuration is now instance-based with RPC::ExtDirect::Config
+    - Package global variables are deprecated
+    - API tree is now kept in an RPC::ExtDirect::API instance rather
+      than internal data structures; Action and Method are full fledged
+      objects with public API
+    - API tree can now be initialized from a hashref as an alternative
+      to sub attributes
+    - Class-based Serialize and Deserialize packages are deprecated
+      in favor of combined instance based Serializer
+    - Improved authorization support for API generation and Method
+      invocation
+    - Tests used in all gateways are now unified and shipped with the
+      core RPC::ExtDirect package
+    - Tons of other changes and fixes, and no doubt more bugs
+
+2.15  Tue May 6  17:44:10 2014
+    - Fixed failing tests due to changes in JSON::XS error output
+
+2.14  Mon Nov 11 10:43:54 2013
+    - Fixed a memory leak in hook handling
+
+2.13  Fri Mar 29 18:38:11 2013
+    - Additional round of refactoring: moved hook initialization
+      to RPC::ExtDirect::add_method, this allows adding methods
+      explicitly without using ExtDirect attributes.
+
+      Added support for methods without parameter declaration;
+      it is assumed that parameters are passed by-name without
+      strict checking.
+
+2.12  Fri Mar 8  21:20:11 2013
+    - Some more refactoring; no API changes.
+
+2.11  Wed Feb 27 20:42:23 2013
+    - Refactored some packages internally, to provide better
+      extensibility. No major code changes.
+
+2.10  Sun Sep 30 22:36:48 2012
+    - Split UNIVERSAL::ExtDirect sub declaration into separate
+      modules for Perls < 5.12 and 5.12+, which makes RPC::ExtDirect 2.x
+      compatible with Perl 5.6+ again. With older Perls, ExtDirect
+      attribute handler will be processed in CHECK phase as it was
+      in 1.x; with 5.12+ the handler is processed in BEGIN phase
+      to make it compatible with Apache2/mod_perl. So now we have
+      the both of two worlds and it is no longer necessary to keep
+      RPC::ExtDirect 1.x for older Perls.
+
+2.02  Wed Jun 20 17:03:38 2012
+    - Fixed a small bug in request handling.
+
+2.01  Tue Jun 19 10:34:11 2012
+    - Pod reformatted for more compatibility with HTML generators.
+
+    - Minor documentation tweaks.
+
+2.00  Mon Jun 18 12:16:32 2012
+    - Added new feature: Hooks. See documentation for details.
+
+    - Added new feature: Environment objects. See documentation
+      for details.
+
+    - Moved ExtDirect attribute handling to BEGIN phase for
+      better compatibility with Apache/mod_perl environment.
+      This change breaks compatibility with Perls below 5.12.
+
+    - Improved attribute error messages.
+
+    - Updated documentation and test suite.
+
+    - Fixed some bugs in documentation.
+
+1.31  Thu Jun  7 11:13:32 2012
+    - Fixed a bug in RPC::ExtDirect::Router that allowed some
+      misformed method output to break result serialization
+      without catching the error, leading to route() finishing
+      prematurely.
+
+    - Added bugtracker and repository properties in Makefile.PL.
+
+1.30  Wed Jun  6 09:43:58 2012
+    - Fixed a bug in RPC::ExtDirect::Router: form/file upload
+      responses improperly escaped double quotes, which didn't
+      play well with client side.
+
+    - Fixed small misfeature: API definition no longer include
+      Ext.app namespace declaration. That seemed like a good
+      idea at the time, but turned out to be more trouble than
+      it was worth.
+
+    - More diagnostics for attribute handler in RPC::ExtDirect.
+
+    - Fixed a couple of bugs in RPC::ExtDirect documentation and
+      expanded it a bit.
+
+1.21  Mon Nov 21 00:39:12 2011
+    - Fixed dependency on Attribute::Handlers version >= 0.87 as
+      an attempt to fix failing tests reported by CPAN testers.
+
+      Removed versions from all packages except RPC::ExtDirect.
+      No point in versioning submodules, it only confuses me.
+
+1.20  Tue Oct  4 21:16:00 2011
+    - Fixed a bug in RPC::ExtDirect::API: Methods with 0 numbered
+      parameters (i.e. no parameters at all) were not defined
+      properly in generated JavaScript API string.
+
+1.10  Sat Oct  1 20:41:28 2011
+    - Fixed improper exception handling: RPC::ExtDirect::Exception
+      object did not contain required 'action', 'method' and 'tid'
+      properties which prevented client side from knowing which
+      request raised an exception.
+
+1.02  Fri Sep 30 11:18:13 2011
+    - Fixed an embarrassing error in RPC::ExtDirect Pod.
+
+1.01  Fri Sep 30 00:00:39 2011
+    - Minor changes to documentation; added $VERSION to Demo modules.
+
+1.00  Thu Sep 29 14:42:39 2011
+	- Original version.

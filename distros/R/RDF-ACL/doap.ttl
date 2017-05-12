@@ -1,0 +1,123 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-ACL/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Data::UUID"^^doap-deps:CpanId ], [ doap-deps:on "Error"^^doap-deps:CpanId ], [
+		doap-deps:on "RDF::TrineX::Functions"^^doap-deps:CpanId;
+	], [ doap-deps:on "RDF::Query"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Query::Client"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ], [ doap-deps:on "URI"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-ACL>;
+	doap:created         "2010-01-20"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/RDF-ACL>;
+	doap:homepage        <https://metacpan.org/release/RDF-ACL>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "RDF-ACL";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-01>, <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-101>, <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-102>, <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-103>, <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-104>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rdf-acl>;
+	];
+	doap:shortdesc       "access control lists for the semantic web"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-01>
+	a                    doap:Version;
+	dc:issued            "2010-01-20"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-ACL-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string;
+	rdfs:comment         "Original version"@en.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-100>
+	a                    doap:Version;
+	dc:issued            "2010-06-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Support recent addition to ACL vocabulary - acl:Append."@en;
+		], [ rdfs:label "use Scalar::Util."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-01>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-ACL-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-101>
+	a                    doap:Version;
+	rdfs:label           "We're not dead yet!"@en;
+	dc:issued            "2011-02-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Copyright 2011."@en;
+		], [ rdfs:label "Minor cleanups."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-100>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-ACL-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-102>
+	a                    doap:Version;
+	rdfs:label           "Still alive!"@en;
+	dc:issued            "2012-05-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Drop RDF::TrineShortcuts dependency; use RDF::TrineX::Functions."@en;
+		], [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Copyright 2012."@en;
+		], [ rdfs:label "Cleanups."@en ], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-101>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-ACL-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-103>
+	a                    doap:Version;
+	dc:issued            "2013-07-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Copyright 2013."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Stop bundling early paleolithic version of Scalar::Util."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/86723>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-102>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-ACL-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-ACL/v_0-104>
+	a                    doap:Version;
+	dc:identifier        "RDF-ACL-0.104"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-ACL-0.104.tar.gz>;
+	doap:revision        "0.104"^^xsd:string.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

@@ -1,0 +1,25 @@
+---
+abstract: "A perl module for translating RT tickets to IODEF messages and also maps IODEF to RT's Custom Fields based on their description tag"
+author:
+  - 'Barely3am Solutions <wes@barely3am.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-IODEF
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+requires:
+  XML::IODEF::Simple: 0.02
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.08

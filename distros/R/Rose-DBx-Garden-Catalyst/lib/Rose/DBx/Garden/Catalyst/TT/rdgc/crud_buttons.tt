@@ -1,0 +1,1 @@
+[% PROCESS crud/crud_buttons.tt %]

@@ -1,0 +1,15 @@
+2011-12-14  Raphaël Pinson v0.004
+
+	* Improve errors.
+
+2011-12-01  Raphaël Pinson v0.003
+
+	* Report unknown key errors.
+
+2011-11-30  Raphaël Pinson v0.002
+
+	* Report check errors in the $uploaders->{errors} array.
+
+2011-11-29  Raphaël Pinson v0.001
+
+	* Initial release

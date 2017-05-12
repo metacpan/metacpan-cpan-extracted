@@ -1,0 +1,14 @@
+<div id="Ticket-Update-captcha"><a name="captcha"></a><& /Elements/Captcha &></div>
+<%ARGS>
+$ARGSRef => {}
+$Ticket  => undef
+</%ARGS>
+<%INIT>
+
+unless ( $Ticket ) {
+    $Ticket = LoadTicket( $ARGSRef->{'id'} );
+}
+return if $Ticket->CurrentUserHasRight('NoCaptchaOnUpdate');
+
+</%INIT>
+

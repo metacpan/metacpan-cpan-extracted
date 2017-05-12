@@ -1,0 +1,14 @@
+<div id="for-authors">
+<h3><% loc('For CPAN authors') %></h3>
+<p>
+<% loc('You can use the form below to log in with your PAUSE userid and password.') %>
+</p>
+</div>
+<script type="text/javascript">
+Event.observe(window, 'load', function() {
+    var authors = document.getElementById("for-authors");
+    var login = document.getElementById("login");
+    authors.parentNode.removeChild(authors);
+    login.insertBefore(authors, login.firstChild);
+});
+</script>

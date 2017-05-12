@@ -1,0 +1,51 @@
+NAME
+    RT::Extension::CustomField::HideEmptyValues - don't show custom fields
+    without values
+
+DESCRIPTION
+    It's sometimes desirable to hide custom fields without values in the UI
+    of Request Tracker when you view a ticket or another object.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::CustomField::HideEmptyValues');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::CustomField::HideEmptyValues));
+
+        or add RT::Extension::CustomField::HideEmptyValues to your existing
+        @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-CustomField-HideEmptyValues@rt.cpan.org|mailto:bug-RT-Extension-CustomField-HideEmptyValues@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-CustomField-HideEmptyValues>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2009-2014 by Best Pracical Solutions,
+    LLC.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

@@ -1,0 +1,52 @@
+=head1 Hot path detection using decaying bloom filters
+
+Instead of using a hash of pointer to counter, implement the following:
+
+	- allocate a bitfield of size N. More bits = more accuracy. Maybe look into
+	  dynamic bloom filters, to accomodate growing optree. Not really
+	  important.
+
+	- prepare K hash functions (simple galois field multiplications over random
+	  primes or sth)
+
+	- for every opcode address that matches the opmask, apply:
+
+		bitfield, bloom_fill;
+	
+		do {
+			bitoffset = hash(i++, ptr); /* ptr is a CV or a PL_op */
+		} while ( i < k && bitfield[bitoffset] );
+
+		if ( i < k ) {
+			if ( ++bloom_fill > max_fill ) {
+				/* if the bloom filter is too full implement random decay */
+				for ( i = 0; i < chunk; i ++ ) {
+					bitfield[random] = 0;
+					bloom_fill--;
+				}
+			}
+
+			/* finally set the bit for hash(k, PL_op */
+			bitfield[bitoffset] = 1;
+		} else {
+			/* opcode exceeded threshold, execute trigger */
+		}
+
+		The bloom filter is a constant size, relatively low overhead
+		alternative to a hash, which can produce false positives, but
+		not false negative. The hot path is pretty much guaranteed to be found,
+		but a cold path could be mis identified as a hot path.
+
+		By adding decaying when the bloom filter is too full we can dynamically
+		identify a changing hot path.
+
+		Guesstimating that a pretty large (accurate) bloom filter with K at
+		around 3-4 and max_fill set fairly low should provide good results with
+		relatively low overhead.
+
+=head1 CV tracing
+
+Allow conditional tracing of ENTERSUB based on the CV it will invoke, instead
+of/in addition to the PL_op of the ENTERSUB.
+
+

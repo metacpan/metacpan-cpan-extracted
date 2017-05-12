@@ -1,0 +1,127 @@
+{
+   "http://id.crossref.org/contributor/kiyoshi-mabuchi-y2ol1uygjx72" : {
+      "foaf_name" : [
+         "Kiyoshi Mabuchi@en"
+      ],
+      "a" : [
+         "foaf_Person"
+      ],
+      "foaf_familyName" : [
+         "Mabuchi@"
+      ],
+      "foaf_givenName" : [
+         "Kiyoshi@"
+      ]
+   },
+   "http://id.crossref.org/contributor/daichi-uchijima-y2ol1uygjx72" : {
+      "foaf_givenName" : [
+         "Daichi@"
+      ],
+      "foaf_familyName" : [
+         "Uchijima@"
+      ],
+      "a" : [
+         "foaf_Person"
+      ],
+      "foaf_name" : [
+         "Daichi Uchijima@en"
+      ]
+   },
+   "http://dx.doi.org/10.2474/trol.7.147" : {
+      "prism21_volume" : [
+         "7@"
+      ],
+      "owl_sameAs" : [
+         "doi:10.2474/trol.7.147",
+         "info:doi/10.2474/trol.7.147"
+      ],
+      "prism21_doi" : [
+         "10.2474/trol.7.147@"
+      ],
+      "bibo_doi" : [
+         "10.2474/trol.7.147@"
+      ],
+      "dct_date" : [
+         "2012^xsd_gYear"
+      ],
+      "prism21_startingPage" : [
+         "147@"
+      ],
+      "bibo_pageStart" : [
+         "147@"
+      ],
+      "bibo_volume" : [
+         "7@"
+      ],
+      "dct_title" : [
+         "Frictional Coefficient under Banana Skin@"
+      ],
+      "dct_creator" : [
+         "<http://id.crossref.org/contributor/daichi-uchijima-y2ol1uygjx72>",
+         "<http://id.crossref.org/contributor/kensei-tanaka-y2ol1uygjx72>",
+         "http://id.crossref.org/contributor/kiyoshi-mabuchi-y2ol1uygjx72",
+         "http://id.crossref.org/contributor/rina-sakai-y2ol1uygjx72"
+      ],
+      "dct_publisher" : [
+         "Japanese Society of Tribologists@",
+         "http://d-nb.info/gnd/5027072-2"
+      ],
+      "dct_isPartOf" : [
+         "<http://id.crossref.org/issn/1881-2198>"
+      ],
+      "prism21_endingPage" : [
+         "151@"
+      ],
+      "bibo_pageEnd" : [
+         "151@"
+      ],
+      "dct_identifier" : [
+         "10.2474/trol.7.147@"
+      ]
+   },
+   "http://id.crossref.org/contributor/rina-sakai-y2ol1uygjx72" : {
+      "foaf_familyName" : [
+         "Sakai@"
+      ],
+      "foaf_givenName" : [
+         "Rina@"
+      ],
+      "foaf_name" : [
+         "Rina Sakai@en"
+      ],
+      "a" : [
+         "foaf_Person"
+      ]
+   },
+   "http://id.crossref.org/contributor/kensei-tanaka-y2ol1uygjx72" : {
+      "a" : [
+         "foaf_Person"
+      ],
+      "foaf_name" : [
+         "Kensei Tanaka@en"
+      ],
+      "foaf_givenName" : [
+         "Kensei@"
+      ],
+      "foaf_familyName" : [
+         "Tanaka@"
+      ]
+   },
+   "http://id.crossref.org/issn/1881-2198" : {
+      "bibo_issn" : [
+         "1881-2198@"
+      ],
+      "a" : [
+         "bibo_Journal"
+      ],
+      "prism21_issn" : [
+         "1881-2198@"
+      ],
+      "dct_title" : [
+         "Tribology Online@"
+      ],
+      "owl_sameAs" : [
+         "urn:issn:1881-2198"
+      ]
+   }
+}

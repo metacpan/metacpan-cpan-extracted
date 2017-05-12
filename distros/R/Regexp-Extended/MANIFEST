@@ -1,0 +1,11 @@
+Makefile.PL
+MANIFEST
+README
+Extended.pm
+Extended/Match.pm
+Extended/MatchArray.pm
+Extended/MatchGroup.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+t/00-basic.t
+t/01-newfeatures.t
+t/02-match.t

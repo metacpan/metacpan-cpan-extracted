@@ -1,0 +1,6 @@
+<NLQUESTION language="EN">
+    VERBOSE=0
+    REGEXFORM = 1
+    UNION = 0
+    SEMANTICTYPECORRESPONDANCE  = "etc/nlquestion/SemanticTypeCorresp.rc"
+</NLQUESTION>

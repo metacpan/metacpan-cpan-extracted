@@ -1,0 +1,129 @@
+NAME
+    Regexp::Log::DateRange - construct regexps for filtering log data by
+    date range
+
+SYNOPSIS
+    Code:
+
+            use Regexp::Log::DateRange;
+            my $rx = Regexp::Log::DateRange-> new('syslog', [qw(1 1 0 0)], [qw(3 18 13 59)]);
+            print "Testing against $rx\n";
+            $rx = qr/$rx/i;  # <-- note the 'i' qualifier
+            for (
+                    'Feb  4 00:00:01',
+                    'May  4 00:00:01'
+            ) {
+                    print "Date '$_' ",  (m/$rx/ ? 'matched' : 'not matched'), "\n";
+            }
+
+    Result:
+
+            Testing against (?:(?:jan|feb)\s+|mar\s+(?:(?:0?[1-9]|1[0-7])\s+|18\s+(?:0?\d|1[0-3])\:))
+            Date 'Feb  4 00:00:01' matched
+            Date 'May  4 00:00:01' not matched
+
+DESCRIPTION
+    The module was written as a hack, for the task at hand, to scan a log
+    file and account for the lines within a date range. The initial trivial
+    implementation, for the log file conducted by syslog
+
+      Feb  4 00:00:01 moof postfix/smtpd[1138]: connect from localhost[127.0.0.1]
+      Feb  4 00:00:01 moof postfix/smtpd[1138]: BED3B70625: client=localhost[127.0.0.1]
+
+    is as simple as it gets, where the line filtering condition would be
+    written as
+
+       /^(\w+)\s+(\d+)\s+(\d\d):(\d\d)/ and $months{lc $1} < $some_month and $2 < 15
+
+    and so on and so on, - you get the idea. That was considered not fun
+    enough, and instead this module was written to construct a regexp that
+    would tell whether a date is within a particular date range - and to do
+    it fast, too. In the example below it is explained how to construct
+    something along the lines of
+
+      (?:(?:jan|feb)\s+|mar\s+(?:(?:0?[1-9]|1[0-7])\s+|18\s+(?:0?\d|1[0-3])\:))
+
+    that matches a given date range within a single call.
+
+USAGE
+    The module sees date range as two integer arrays, where each integer is
+    a date order, such that
+
+        [ 4, 1, 12, 00 ]
+
+    is 1st of April, 12:00 ( thus, the format allows constructing various
+    range regexps, not necessarily date range regexps only). Two such date
+    arrays and a template that defines the order and intermediate matching
+    code, are enough to generate a regexp sufficient for arbitrary
+    multi-order range matching.
+
+    First, we select the date range. Say, these will be January 1 and March
+    18, 13:59. The module doesn't do the actual date vs date array
+    conversion, one has to do it by other means; here I'll simply code a
+    magic date converter:
+
+            my $date1 = [ qw(1 1 0 0) ]; # my_magic_date_converter( 'Jan 1');
+            my $date2 = [ qw(3 18 13 59) ]; # my_magic_date_converter( 'Mar 18 13:59');
+
+    Second, we select a template describing how to the match log entries.
+    The module currently contains the only template, 'syslog', that defines
+    the date array item ranges and the regexp codes between these:
+
+            syslog => [
+                    [ '\\s+', 1, 12, [ qw(. jan feb mar apr may jun jul aug sep oct nov dec)]],
+                    [ '\\s+', 1, 31, undef, '0?'],
+                    [ '\\:', 0, 23, undef, '0?' ],
+                    [ '\\:', 0, 59, undef, '0?' ],
+            ],
+
+    which does basically mean that first entry defines months, so that the
+    final regexp must match months and then match "\s+", then days, in the
+    range 1-31, then spaces again, then hours and minutes. The module
+    doesn't provide the seconds entry, but it is trivial to construct a
+    template with one (the date array must contain 5 elements then).
+
+    Finally, to construct a regexp ( all code together ):
+
+            use Regexp::Log::DateRange;
+            my $rx = Regexp::Log::DateRange-> new('syslog', [qw(1 1 0 0)], [qw(3 18 13 59)]);
+            print "Testing against $rx\n";
+            $rx = qr/$rx/i;  # <-- note the 'i' qualifier
+            for (
+                    'Feb  4 00:00:01',
+                    'May  4 00:00:01'
+            ) {
+                    print "Date '$_' ",  (m/$rx/ ? 'matched' : 'not matched'), "\n";
+            }
+
+    And the result is
+
+            Testing against (?:(?:jan|feb)\s+|mar\s+(?:(?:0?[1-9]|1[0-7])\s+|18\s+(?:0?\d|1[0-3])\:))
+            Date 'Feb  4 00:00:01' matched
+            Date 'May  4 00:00:01' not matched
+
+    If the first parameter of "new" is not a template array, the template is
+    looked up in the list of the existing templates ( that way, the module
+    can be easily extended for other log formats ). The result of "new" is a
+    string, that is to be interpolated by "qr//i" - note the i, the months
+    names in log files come in all cases.
+
+    The resulting regexp cannot be used to match the date correctness; as
+    can be seen in the example, a line beginning with "May" is discarded
+    very quickly and is not checked in full. One can rather think of these
+    regexps as two tests, telling if both the date is correct AND the date
+    is withing the given range.
+
+EXTENSIBILITY
+    The code should be extensible enough for defining other kinds of log
+    formats, by defining the match template. It is not possible though to
+    extend it for as to catch the date elements in $1, $2, etc.
+
+COPYRIGHT
+    Copyright (c) 2005 catpipe Systems ApS. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Dmitry Karasik <dk@catpipe.net>
+

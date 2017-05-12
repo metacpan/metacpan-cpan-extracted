@@ -1,0 +1,13 @@
+Changes
+lib/Rinchi/XMLSchema.pm
+lib/Rinchi/XMLSchema/HFP.pm
+Makefile.PL
+MANIFEST
+README
+Rinchi-XMLSchema.ppd
+t/Rinchi-XMLSchema.t
+test.pl
+test_src/datatypes.xsd
+test_src/hasFacetAndProperty.xsd
+test_src/schema.xsd
+META.yml                                 Module meta-data (added by MakeMaker)

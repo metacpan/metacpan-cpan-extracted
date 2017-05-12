@@ -1,0 +1,37 @@
+---
+abstract: 'Rest API visualizer in HTML'
+author:
+  - 'Václav Dovrtěl <vaclav.dovrtel@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Rest-HtmlVis
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  File::ShareDir: '0'
+  JSON::XS: '0'
+  Plack::Request: '0'
+  URI::Escape::XS: '0'
+  YAML::Syck: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/vasekd/Rest-HtmlVis/issues
+  homepage: https://github.com/vasekd/Rest-HtmlVis
+  repository: https://github.com/vasekd/Rest-HtmlVis.git
+version: '0.13'
+x_contributors:
+  - 'Zbynek Mares <zbynek.mares@gmail.com>'

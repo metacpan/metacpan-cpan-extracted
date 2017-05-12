@@ -1,0 +1,41 @@
+---
+abstract: 'utility to generate reports'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Clone: 0.30
+  DBD::CSV: 0.30
+  DBD::Sys: 0.102
+  File::Copy: 0
+  File::Path: 0
+  Template: 2.00
+  Template::Plugin::CSV: 0
+  Template::Plugin::DBI: 2.65
+  Test::More: 0.90
+  YAML::Any: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Report-Generator
+provides:
+  Report::Generator:
+    file: lib/Report/Generator.pm
+    version: 0.002
+  Report::Generator::Render:
+    file: lib/Report/Generator/Render.pm
+    version: 0.002
+  Report::Generator::Render::TT2:
+    file: lib/Report/Generator/Render/TT2.pm
+    version: 0.002
+requires:
+  Carp: 0
+  Config::Any: 0
+  File::ShareDir: 1.00
+  Params::Util: 1.00
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.002

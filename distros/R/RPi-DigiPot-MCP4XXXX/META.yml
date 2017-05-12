@@ -1,0 +1,29 @@
+---
+abstract: 'Interface to the MCP4xxxx series digital potentiometers on the Raspbery Pi'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires:
+  Mock::Sub: '1.07'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.72'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RPi-DigiPot-MCP4XXXX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  RPi::WiringPi::Constant: '0.02'
+  WiringPi::API: '2.3608'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/stevieb9/rpi-digipot-mcp4xxxx/issues
+  repository: https://github.com/stevieb9/rpi-digipot-mcp4xxxx.git
+version: '2.3603'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

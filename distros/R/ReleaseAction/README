@@ -1,0 +1,17 @@
+Perl 5 has reliable destruction mechanics.
+
+That is you know when a variable is going to be destroyed (when
+the last copy of it goes out of scope), and can have arbitrary
+actions take place at that time.  This module combines that with
+closures to make it easy to produce opaque handles which will
+cause an arbitrary action to take place when Perl uses them.
+
+This is useful for cases where you want to do something and then
+be sure to undo it.  For instance select a filehandle for a
+while, move to a directory for a limited time, hold a lock for
+and then release it.
+
+Be warned though that final decisions have not been made on
+whether to support reliable destruction mechanics in Perl 6.
+While I and many others want that, it has to be admitted that
+there is a cost in language design and implementation...

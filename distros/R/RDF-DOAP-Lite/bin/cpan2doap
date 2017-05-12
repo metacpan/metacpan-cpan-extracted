@@ -1,0 +1,193 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+require Getopt::Long;
+
+my %options = (
+	'meta-file'     => 'META.json',
+	'changes-file'  => 'Changes',
+	'output-file'   => 'doap.rdf',
+	'output-format' => 'auto',
+);
+
+Getopt::Long::GetOptions(
+	\%options,
+	'meta-file|m=s',
+	'changes-file|c=s',
+	'output-file|o=s',
+	'output-format=s',
+	'help|usage|h',
+	'version|V',
+);
+
+if ($options{'version'})
+{
+	printf("cpan2doap (RDF::DOAP::Lite %s)\n", RDF::DOAP::Lite->VERSION);
+	exit(0);
+}
+
+if ($options{'help'})
+{
+	print <<"HELP"; exit;
+Usage: $0 [options]
+
+Options:
+
+   --meta-file=F,  -m F     Input file name conforming to CPAN::Meta::Spec.
+                            Defaults to 'META.json'.
+   
+   --changes-file=F,  -c F  Input file name conforming to CPAN::Changes::Spec.
+                            Defaults to 'Changes'.
+   
+   --output-file=F,  -o F   File name for output. Defaults to 'doap.rdf'.
+   
+   --output-format=X        Output format. One of 'xml', 'ttl' or 'auto'.
+   
+   --help, --usage, -h      Shows this help.
+   
+   --version, -V            Show version information.
+
+HELP
+}
+
+my %attrs;
+
+if (-f $options{'meta-file'})
+{
+	require CPAN::Meta;
+	$attrs{'meta'} = 'CPAN::Meta'->load_file($options{'meta-file'});
+}
+else
+{
+	die("Input file $options{'meta-file'} does not exist!\n");
+}
+
+if (-f $options{'changes-file'})
+{
+	if (eval { require CPAN::Changes })
+	{
+		$attrs{'changes'} = 'CPAN::Changes'->load($options{'changes-file'});
+	}
+	else
+	{
+		warn("Changes file cannot be processed without CPAN::Changes.\n");
+	}
+}
+else
+{
+	warn("Input file $options{'changes-file'} does not exist!\n");
+}
+
+require RDF::DOAP::Lite;
+my $doap = 'RDF::DOAP::Lite'->new(%attrs);
+
+my $method = 'doap_xml';
+if (lc($options{'output-format'}) eq 'ttl')
+{
+	$method = 'doap_ttl';
+}
+elsif (lc($options{'output-format'}) eq 'xml')
+{
+	$method = 'doap_xml';
+}
+elsif ($options{'output-file'} =~ /\.(ttl|turtle|n3|txt)$/i)
+{
+	$method = 'doap_ttl';
+}
+
+$doap->$method($options{'output-file'});
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+cpan2doap - generate DOAP data from a CPAN distribution's root directory
+
+=head1 SYNPOSIS
+
+B<cpan2doap> [options]
+
+=head1 DESCRIPTION
+
+The B<cpan2doap> command generates DOAP data in either RDF/XML or Turtle
+serialization from the 'META.json' and 'Changes' files often found in a
+CPAN distribution's root directory.
+
+=head1 OPTIONS
+
+=over
+
+=item B<< --meta-file=F, -m F >>
+
+Input file name conforming to CPAN::Meta::Spec.
+Defaults to 'META.json'.
+
+=item B<< --changes-file=F, -c F >>
+
+Input file name conforming to CPAN::Changes::Spec.
+Defaults to 'Changes'.
+   
+=item B<< --output-file=F, -o F >>
+
+File name for output. Defaults to 'doap.rdf'.
+   
+=item B<< --output-format=X >>
+
+Output format. One of 'xml', 'ttl' or 'auto'.
+   
+=item B<< --help, --usage, -h >>
+
+Shows help.
+   
+=item B<< --version, -V >>
+
+Show version information.
+
+=back
+
+=head1 EXAMPLES
+
+For many distributions, accepting the defaults is adequate:
+
+	cpan2doap
+
+For older distributions which use 'META.yml' instead of 'META.json':
+
+	cpan2doap -m META.yml
+
+To output data in Turtle format (less verbose than RDF/XML):
+
+	cpan2doap -o doap.ttl
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=RDF-DOAP-Lite>.
+
+=head1 SEE ALSO
+
+L<RDF::DOAP::Lite>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

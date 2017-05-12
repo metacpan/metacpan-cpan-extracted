@@ -1,0 +1,39 @@
+<& /Elements/Header, Title => loc("Reported tickets") &>
+<& /Elements/Tabs &>
+
+<& /Elements/ListActions, actions => \@results &>
+
+<p>
+<% loc('Tickets reported as spam by others without rights to delete tickets.') %>
+<% loc('Confirm by clicking "S".') %>
+<% loc('If you have rights to delete tickets then they will be deleted.') %>
+</p>
+
+<& /Elements/CollectionList, 
+    Rows         => 100,
+    OrderBy      => 'id',
+    Order        => 'DESC',
+    %ARGS,
+    Class        => 'RT::Tickets',
+    Query        => $Query,
+    Format       => $Format,
+    AllowSorting => 1,
+    ShowEmpty    => 1,
+&>
+
+
+<%ARGS>
+$Format => undef
+</%ARGS>
+<%INIT>
+my $Query = 'HasAttribute = "SpamReports"';
+my @results;
+
+$Format ||= qq{
+    '<b><a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a></b>/TITLE:#',
+    '<b><a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a></b>/TITLE:Subject',
+    Requestors,
+    QueueName,
+    ReportSpam
+};
+</%INIT>

@@ -1,0 +1,10 @@
+Revision history for Radioactive::Decay.
+
+1.00  Tue Sep  6 19:03:35 UTC 2005
+	- move test to Test::More
+
+0.02  Marty, Wed Nov 1, 2000
+	- better halflife algorithm
+
+0.01  Tony Bowden, Tue Oct 31, 2000
+

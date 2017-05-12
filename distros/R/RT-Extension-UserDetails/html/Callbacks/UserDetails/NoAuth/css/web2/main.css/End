@@ -1,0 +1,10 @@
+div#userdetails {
+    position: fixed;
+    left: 12.4em;
+    top: 8.5em;
+    z-index: 100;
+    background-color: #ffffff;
+    border: solid 2px #000000;
+    padding: 1em;
+}
+

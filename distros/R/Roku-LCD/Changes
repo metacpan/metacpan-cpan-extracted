@@ -1,0 +1,14 @@
+Revision history for Roku-RokuLCD
+
+0.01  May 12, 2008
+		Deemed acceptable for initial release
+
+0.02  June 3, 2008
+		Ironed out some niggles with ticker, and finally have a script to release with the module
+
+0.03  April 19, 2014
+		Proper CPAN packaging and moved to using Roku::RCP as a base rather than the non-CPAN RokuUI module
+
+0.04  May 23, 2014
+        Followed advice - change name to Roku::LCD ; added constants ; improved code legibility ; started turning development tests into distribution tests 
+		

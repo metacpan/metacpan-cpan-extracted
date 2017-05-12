@@ -1,0 +1,32 @@
+%# You can make it illegal, but you can't make it unpopular.
+
+% if (!@$List) {
+<tr><td bgcolor="white">(<&|/l&>none</&>)</td></tr>
+% }
+
+% foreach my $UserObj (@$List) {
+%     $RoleCache->{$UserObj->Id} = $Role;
+%     next if $UserObj->Disabled;
+%     if ($ReadOnly or $UserObj->Id == $session{CurrentUser}->Id) {
+<tr><td align="center" bgcolor="white"><% $UserObj->Name %></td></tr>
+%     } else {
+<tr><td align="center" bgcolor="white"><a href="?UserString=<% $UserObj->Name %>"><% $UserObj->Name %></a></td></tr>
+%     }
+% }
+
+<%INIT>
+my $List = $Watchers->MembersObj->ItemsArrayRef;
+@$List = sort { lc($a->Name) cmp lc($b->Name) } map { $_->MemberObj->Object } @$List;
+</%INIT>
+
+<%ARGS>
+$QueueObj => undef
+$Watchers => undef
+$Nonempty => undef
+$ReadOnly => undef
+$RoleCache => {}
+$Role => undef
+</%ARGS>
+
+
+

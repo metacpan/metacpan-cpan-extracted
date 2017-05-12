@@ -1,0 +1,34 @@
+Revision history for RT-Extension-ConditionalCustomFields
+
+0.05 2017-03-31
+ - Fix reload of Config, avoid duplicating plugins
+
+0.04 2017-03-31
+ - Test and submit form for admin CF with WWW:Mechanize::PhantomJS
+ - Add AJAX handler to select values available for selected CF
+ - Use CurrentUserHasRight instead of CurrentUserCanSee for RT 4.2 compatibility
+ - Format pod
+
+0.03 2017-03-29
+ - Add some tests for assets with WWW:Mechanize::PhantomJS
+ - Add some tests for articles with WWW:Mechanize::PhantomJS
+ - Add Child tests for user summary
+ - Add some tests for modifying queue with WWW:Mechanize::PhantomJS
+ - Add some tests for user summary with WWW:Mechanize::PhantomJS
+ - Add some tests for modifying user with WWW:Mechanize::PhantomJS
+ - Remove bad copy/paste
+ - Extend ConditionalCustomField to user displayed (via $UserSummaryExtraInfo)
+ - Fix mispelled method
+ - Add some tests for groups with WWW::Mechanize::PhantomJS
+ - Add some tests for modifying tickets with WWW::Mechanize::PhantomJS
+ - Remove unused params in call to RT::Attribute->Delete
+ - Rename CF with name already taken
+ - Remove unneeded undefs
+ - Move tests from subdirectory
+ - Add some tests for ticket with WWW::Mechanize::PhantomJS
+
+0.02 2017-03-25
+ - Add a linefeed to please PAUSE
+
+0.01 2017-03-25
+ - Initial commit

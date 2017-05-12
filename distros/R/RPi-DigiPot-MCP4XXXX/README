@@ -1,0 +1,194 @@
+NAME
+    RPi::DigiPot::MCP4XXXX - Interface to the MCP4xxxx series digital
+    potentiometers on the Raspbery Pi
+
+DESCRIPTION
+    This distribution allows you to interface directly with the MCP41xxx and
+    MCP42xxx series digital potentiomenters attached to the SPI bus on the
+    Raspberry Pi.
+
+    The MCP41xxx units have a single built-in potentiometer, where the
+    MCP42xxx units have two.
+
+    Both series will operate on either 3.3V or 5V, as the potentiometers do
+    not send anything back to the Pi's GPIO.
+
+    This software requires wiringPi to be installed, as we use its SPI
+    library to communicate to the potentiometer over the SPI bus.
+
+SYNOPSIS
+        # GPIO pin number connected to the potentiometer's
+        # CS (Chip Select) pin
+
+        my $cs = 18;  
+
+        # SPI bus channel
+
+        my $chan = 0;
+
+        my $dpot = RPi::DigiPot::MCP4XXXX->new($cs, $chan);
+
+        # potentiometer's output level (0-255).
+        # 127 == ~50% output
+
+        my $output = 127; 
+
+        # set the output level
+
+        $dpot->set($output);
+
+        # shutdown (put to sleep) the potentiometer
+
+        $dpot->shutdown;
+
+METHODS
+  new
+    Instantiates a new RPi::DigiPot::MCP4XXXX object, initiates
+    communication with the SPI bus, and returns the object.
+
+    Parameters:
+
+        $cs
+
+    Mandatory: Integer, the GPIO pin number that connects to the
+    potentiometer's Chip Select `CS' pin. This is the pin we use to start
+    and finish communication with the device over the SPI bus.
+
+        $channel
+
+    Mandatory: Integer, represents the SPI bus channel that the
+    potentiometer is connected to. `0' for `/dev/spidev0.0' or `1' for
+    `/dev/spidev0.1'.
+
+        $speed
+
+    Optional: Integer. The clock speed to communicate on the SPI bus at.
+    Defaults to `1000000' (ie: `1MHz').
+
+  set
+    This method allows you to set the variable output on the
+    potentiometer(s). These units have 256 taps, allowing that many
+    different output levels.
+
+    Parameters:
+
+        $data
+
+    Mandatory: Integer bewteen `0' for 0% output and `255' for 100% output.
+
+        $pot
+
+    Optional: Integer, instructs the software which of the onboard
+    potentiometers to set the output voltage on. `1' for the first
+    potentiometer, `2' for the second, and `3' to change the value on both.
+    Defaults to `1'.
+
+    NOTE: Only the MCP42xxx units have dual built-in potentiometers, so if
+    you have an MCP41xxx unit, leave the default `1' set for this parameter.
+
+  shutdown
+    The onboard potentiometers allow you to shut them down when not in use,
+    resulting in electricity usage. Using `set()' will bring it out of
+    sleep.
+
+    Parameters:
+
+        $pot
+
+    Optional: Integer, the built-in potentiometer to shut down. `1' for the
+    first potentiometer, `2' for the second, and `3' to change the value on
+    both. Defaults to `1'.
+
+    NOTE: Only the MCP42xxx units have dual built-in potentiometers, so if
+    you have an MCP41xxx unit, leave the default `1' set for this parameter.
+
+TECHNICAL INFORMATION
+    View the MCP4XXX datasheet.
+
+  OVERVIEW
+    The MCP4xxxx series digital potentiometers operate as follows:
+
+        - CS pin goes LOW, signifying data is about to be sent
+        - exactly 16 bits are sent over SPI to the digipot (first 8 bits for control
+          second 8 bits for data)
+        - CS pin goes HIGH, signifying communication is complete
+
+    There must be exactly 16 bits of data clocked in, or the commands and
+    data will be thrown away, and nothing accomplished.
+
+    Here's a diagram of the two bytes combined into a single bit string,
+    showing the respective positions of the bits, and their function:
+
+             |<-Byte 1: Control->|<-Byte 0: Data->|
+             |                   |                |
+        fcn: | command | channel |      data      |
+             |---------|---------|----------------|
+        bit: | 7 6 5 4 | 3 2 1 0 | 7 6 5 4 3 2 1 0|
+             --------------------------------------
+               ^                                 ^
+               |                                 |
+           MSB (bit 15)                      LSB (bit 0)
+
+  CONTROL BYTE
+    The control byte is the most significant byte of the overall data being
+    clocked into the potentiometer, and consists of a command nibble and a
+    channel nibble.
+
+    COMMAND
+    The command nibble is the most significant (leftmost) 4 bits of the
+    control byte (bits 7-4 in the above diagram). The following diagram
+    describes all possible valid values.
+
+        Bits    Value
+        -------------
+
+        0000    NOOP
+        0001    set a new resistance value
+        0010    put potentiometer into 'shutdown' mode
+        0011    NOOP
+
+    CHANNEL
+    The channel nibble is the least significant 4 bits (rightmost) of the
+    control byte (bits 3-0 in the above diagram). Valid values follow. Note
+    that the MCP41xxx series units have only a single potentiometer built
+    in, there's but one valid value for them.
+
+        Bits    Value
+        -------------
+
+        0001    potentiometer 0
+        0010    potentiometer 1 (MCP42xxx only)
+        0011    both 0 and 1    (MCP42xxx only)
+
+  DATA BYTE
+    The data byte consists of the least significant 8 bits (rightmost) of
+    the 16 bit combined data destined to the potentiometer. Both the
+    MCP41xxx and MCP42xxx series potentiometers contain 256 taps, so the
+    mapping of this byte is simple: valid values are `0' (0% output) through
+    `255' (100% output).
+
+  REGISTER BIT SEQUENCE
+    Here's an overview of the bits in order:
+
+    `15-14': Unused ("Don't Care Bits", per the datasheet)
+
+    `13-12': Command bits
+
+    `11-10': Unused
+
+    `9-8': Channel (built-in potentiomenter) select bits
+
+    `7-0': Potentiometer tap setting data (0-255)
+
+AUTHOR
+    Steve Bertrand, `<steveb at cpan.org>'
+
+LICENSE AND COPYRIGHT
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.69.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d7ed5e86ee5a719b406aae29eb16f692c515b187 MANIFEST
+SHA1 b3bb2a66af99891a3805e4293d152f9da2a676ea META.yml
+SHA1 eac25a34ad2cc0753ec1bf8239fa2bf740914866 Makefile.PL
+SHA1 ae8aa22d968a60b639a96a4eae6aadebe499ee79 README
+SHA1 d90f58f750c3ad57515ffc58c1f50e6a89318e33 etc/initialdata
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 9ceabadaa50fa253b9a0d3972c82e9b7fb310b72 inc/Module/Install/RTx.pm
+SHA1 ac48900ca998a08baa4b03997df0abbce9c8c48e inc/Module/Install/RTx/Factory.pm
+SHA1 dc94326a076aca41452c1d65bf52a255feeb9ef7 inc/Module/Install/ReadmeFromPod.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 4897159e0878fd7e872adace6ce6abef20159f8a lib/RT/Action/NotifyAtTicketLevel.pm
+SHA1 b911144086525bdda449829637328ed4182b2bf1 lib/RT/Action/NotifyAtTicketLevelAsComment.pm
+SHA1 7089eb25f7ca5d6000012614f60e6d6c7321c883 lib/RT/Condition/Owner.pm
+SHA1 018225a2aba021a3035dc921ac11f456dc07a68d lib/RT/Extension/NotifyBasedOnOwnership.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFRQLngHdv9ZfNcOAcRAlz/AKCQxMCbPRgXCSPNs7WgU0JOcOTmygCeLwMq
+uC/87QeH7DDg/jdgExibPkE=
+=K8PU
+-----END PGP SIGNATURE-----

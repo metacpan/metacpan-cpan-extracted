@@ -1,0 +1,19 @@
+use strict;
+use warnings;
+
+our @Initial = (sub {
+    my $attributes = RT::Attributes->new(RT->SystemUser);
+    $attributes->Limit( FIELD => "ObjectType", VALUE => "RT::Queue" );
+    $attributes->Limit( FIELD => "Name", VALUE => "SubjectTag" );
+    while (my $attr = $attributes->Next) {
+        my $tag   = $attr->Content;
+        my $queue = $attr->Object;
+        RT->Logger->info("Migrating tag '$tag' for queue @{[$queue->Name]}");
+        my ($ok, $msg) = $queue->SetSubjectTag($tag);
+        unless ($ok) {
+            RT->Logger->error("Unable to set subject tag for queue @{[$queue->Name]}: $msg");
+            next;
+        }
+        $attr->Delete;
+    }
+});

@@ -1,0 +1,336 @@
+0.06    2006-05-13 21:35    Andrew Sterling Hanenkamp
+
+    * Added Repository::Simple::Permission to hold the permission constants to
+      avoid a compile-time Catch 22.
+    * Updated t/repository.t for the permission constant change.
+    * Updated t/engine_memory.t for the permission constant change.
+    * Corrected the updatable property on the 'fs:handle' property type to true.
+    * Updated t/engine_file_system.t for the permission constant change and to
+      correct the value of the updatable property on 'fs:handle' properties.
+    * Added a call to check_permission() in root_node() and get_item() of
+      Repository::Simple.
+    * Added sanity checks to check_permission() in Repository::Simple.
+    * Added @CARP_NOT to all classes to improve error handling.
+    * Added a call to check_permission() in save() of
+      Repository::Simple::Property.
+    * Added a call to check_permission() in parent() of
+      Repository::Simple::Node.
+    * Added a call to check_permission(), which filters the results without
+      throwing an exception, in nodes() and properties() of
+      Repository::Simple::Node.
+    * Addeda  call to check_permission() in get_scalar(), get_handle(),
+      set_handle(), and set_scalar() in Repository::Simple::Value.
+    * Fixed some typos in error messages and made some minor documentation
+      updates.
+
+0.05    2006-05-11 22:13    Andrew Sterling Hanenkamp
+
+    * Added specification for writes with get_handle(), added set_scalar(),
+      set_handle(), and save_property() to Repository::Simple::Engine.
+    * Added save() to Repository::Simple::Property.
+    * Added implementations of the new get_handle(), set_scalar(), set_handle(),
+      and save_property() functionality to Repository::Simple::Engine::Memory,
+      and Repository::Simple::Engine::FileSystem.
+    * Changed fs:ctime to a fs:scalar-static property.
+    * Added set_scalar() and set_handle() methods to Repository::Simple::Value.
+    
+0.04    2006-04-18 06:56    Andrew Sterling Hanenkamp
+    
+    * Added the check_permission() method to Repository::Simple and the
+      has_permission() method to the interface for Repository::Simple::Engine.
+    * t/repository.t: Added tests for check_permission()
+    * t/engine_memory.t: Added tests for has_permission()
+    * t/engine.t: Added tests for has_permission()
+    * t/engine_file_system.t: Added tests for has_permission()
+    * lib/Repository/Simple.pm: Added the check_permission() method and the
+      constants $ADD_NODE, $SET_PROPERTY, $REMOVE, and $READ.
+    * lib/Repository/Simple/Engine.pm: Added the has_permission() method to the
+      interface.
+    * lib/Repository/Simple/Engine/Memory.pm: Added the has_permission() method
+      to the memory engine.
+    * lib/Repository/Simple/Engine/FileSystem.pm: Added the has_permission()
+      method to the file system engine.
+
+0.03    2006-04-15 09:14    Andrew Sterling Hanenkamp
+
+    * Added the Memory storage engine.
+    * t/engine_memory.t: Added a test for Repository::Simple::Engine::Memory.
+    * t/engine_file_system.t: Fixed one of the subtests which had the expected
+      and got values mixed up.
+    * lib/Repository/Simple/Engine/Memory.pm: Added a very simple engine for
+      storing nodes and properties in transient pure-Perl memory structures.
+    * lib/Repository/Simple/Engine/FileSystem.pm: Fixed a typo in the SYNOPSIS.
+
+0.02    2006-04-13 21:10    Andrew Sterling Hanenkamp
+
+    * Added rudimentary namespaces support.
+    * Changes: Added a better delineation in the changelog as to why the version
+    * numbers suddenly change.
+    * t/repository.t: Added a test for the namespaces() method.
+    * t/engine.t: Added a test for the namespaces() method.
+    * t/engine_file_system.t: Added a test for the namespaces() method.
+    * lib/Repository/Simple.pm: Added the namespaces() method.
+    * lib/Repository/Simple/Engine.pm: Added the namespaces() method.
+    * lib/Repository/Simple/Engine/FileSystem.pm: Added the namespaces() method.
+
+0.01    2006-04-11 20:54    Andrew Sterling Hanenkamp
+
+    * This is a fork of File::System called Repository::Simple. As of this
+      version, this is only an experiment. See the documentation in
+      Repository::Simple for goals.
+    * lib/File/System.pm: Renamed to lib/Repository/Simple.pm
+	* lib/Repository/Simple/Factory.pm: Changed new() to attach(). Updated
+	  implementation and altered documentation.
+    * lib/File/System/Object.pm: Renamed to lib/Repository/Simple/Engine.pm
+	* lib/Repository/Simple/Engine.pm: Completely rewrote the innards and
+	  documentation from before.
+    * lib/File/System/Real.pm: Renamed to
+      lib/Repository/Simple/Engine/FileSystem.pm
+	* lib/Repository/Simple/Engine/FileSystem.pm: Rewrote implementation.
+    * lib/File/System/Layered.pm: Removed.
+    * lib/File/System/Table.pm: Removed.
+    * lib/File/System/Passthrough.pm: Removed.
+    * lib/File/System/Util.pm: Added a utility library with some helpful
+      subroutines--useful both to the core and to engine implementations.
+    * lib/File/System/Globber.PL: Removed.
+    * lib/File/System/Test.pm: Removed.
+    * lib/Repository/Simple/Property.pm: Added to represent property objects.
+    * lib/Repository/Simple/Node.pm: Added to represent node objects.
+    * lib/Repository/Simple/Type.pod: Added to documented the different kinds
+      of type in the content repository system.
+    * lib/Repository/Simple/Type/Property.pm: Added to represent property type
+      objects.
+    * lib/Repository/Simple/Type/Node.pm: Added to represent node type objects.
+    * lib/Repository/Simple/Type/Value.pm: Added to represent value type
+      objects.
+    * lib/Repository/Simple/Type/Value/Scalar.pm: Added to implement the most
+      generic value type.
+    * lib/Repository/Simple/Value.pm: Added this helper for storing and
+      performing value checking, inflation, and deflation.
+    * Build.PL: Rewrote to reflect the new package name.
+	* t/01_normalize_path.t, t/02_glob.t, t/03_real.t, t/04_table_basic.t,
+	  t/05_table_multimount.t, t/06_table_mount.t, t/07_layered.t,
+	  t/08_passthrough.t: Removed the old test files.
+	* t/use.t: Added a simple test for just "use Repository::Simple".
+	* t/factory.t: Added tests for Repository::Simple::Factory.
+	* t/repository.t: Added tests for Repository::Simple.
+	* t/node.t: Added tests for Repository::Simple::Node.
+	* t/node_type.t: Added tests for Repository::Simple::Type::Node.
+    * t/engine_dbi.t: Added a stub for tests of
+      Repository::Simple::Engine::DBI.
+    * t/property.t: Added tests for Repository::Simple::Property.
+    * t/engine_xml.t: Added a stub for tests of
+      Repository::Simple::Engine::XML.
+    * t/property_type.t: Added tests for Repository::Simple::Type::Property.
+    * t/engine_memory.t: Added a stub for tests of
+    * Repository::Simple::Engine::Memory.
+    * t/engine_layered.t: Added a stub for tests of
+    * Repository::Simple::Engine::Layer.
+    * t/engine.t: Added tests for Repository::Simple::Engine.
+    * t/engine_file_system.t: Added tests for
+      Repository::Simple::Engine::FileSystem.
+    * t/value.t: Added tests for Repository::Simple::Value.
+    * t/pod.t: Added tests for POD errors.
+    * t/engine_table.t: Added tests for Repository::Simple::Engine::Table.
+	* t/root, t/root/foo, t/root/bar, t/root/baz, t/root/baz/qux: Added some
+	  files for testing upon.
+
+==== REFACTORED FROM File::System ==============================================
+
+1.16    2005-12-03 16:34    Andrew Sterling Hanenkamp
+
+    * t/07_layered.t: Added additional tests to reveal a bug that causes
+      the root-level of the layered file systems to be treated as in the current
+      directory during calls to children(), children_paths(), and
+      has_children().
+    * lib/File/System/Layered.pm: Paths passed to lookup() are normalized as
+      they should be.
+    * lib/File/System/Layered.pm: Updated has_children(), children_paths(),
+      children(), and child() so that they will treat layers besides the current
+      properly.
+    * lib/File/System/Object.pm: Updated has_content() and is_container() to
+      make sure they always return a scalar.
+    * lib/File/System/Test.pm: Improved the diagnostics messages of most
+      methods in File::System::Test so that it is more obvious which part of a
+      test failed.
+
+1.15	2005-11-22 09:58	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Real.pm: Added more croaking when open() and opendir()
+	  failures occur to make errors a little more explicit.
+    * lib/File/System/Object.pm: Fixed a bug where the glob() method would
+      incorrectly call children_paths() on non-containers. This caused parts of
+      the File::System::Table tests to fail since it depends upon the generic
+      glob() implementation due to the improved error handling in
+      File::System::Real.
+    * lib/File/System/Real.pm: Removed a remaining call to
+      File::Basename::dirname() that should have already been replaced with
+      dirname_of_path().
+    * lib/File/System/Table.pm: Added better debugging information to the
+      methods generated by an eval.
+    * lib/File/System/Object.pm: Rearranged the module author documentation to
+      make it more accessible and make the docs easier for non-module authors
+      to read.
+    * lib/File/System/Object.pm, lib/File/System.pm: Moved the section titled
+      "FILE SYSTEM MODULE AUTHORS" out of File::System::Object and into
+      File::System titled "VIRTUAL FILE SYSTEM" with some modifications.
+
+1.14	2005-09-26 21:05	Andrew Sterling Hanenkamp
+
+	* FIXED [cpan #14771] t/01_normalize_path.t, lib/File/System/Object.pm:
+	  Fixed a tiny off-by-one error that caused ".."'s to be mistreated by the
+	  normalize_path() method.
+	* FIXED [cpan #13514] lib/File/System/Object.pm, lib/File/System/Table.pm,
+	  lib/File/System/Test.pm, lib/File/System/Real.pm: Removed basename/dirname
+	  calculations using the Perl File::Basename package. There's some
+	  controversy about the correct way to do this and the docs already specify
+	  that we do things the way Unix likes too anyway. That'll keep things
+	  consistent. Thanks to Zev Benjamin for the heads up.
+
+1.13	2005-06-21 09:31	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Object.pm: Removed the Parse::RecDescent parser grammar
+	  that is used with the internal globber.
+	* lib/File/System/Globber.PL: At build time this script generates a file
+	  named lib/File/System/Globber.pm containing the precompiled parser
+	  grammar, which ought to save a fraction of a second that was spend parsing
+	  the grammar and then compiling the Perl generated. Now, it just needs to
+	  compile the generated Perl.
+
+1.12	2005-06-08 21:26	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Passthrough.pm: Updated the passthrough driver so that
+	  want subroutine passed to find() is passed objects of the same type as the
+	  current object, rather than objects of the wrapped type. This behavior is
+	  more consistent and allows a derivation to add new methods that the
+	  wrapped object may not have.
+
+1.11	2005-05-19 09:37	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Layered.pm: Fixed find(), which was returning strange
+	  results in some of the layers did not contain an entry for a directory.
+
+1.10	2005-05-18 20:53	Andrew Sterling Hanenkamp
+
+	* t/03_real.t, t/04_table_basic.t, t/05_table_multimount.t,
+	  t/06_table_mount.t, t/07_layered.t, t/08_passthrough.t: Added tests for
+	  find() and glob() for directories within the root.
+	* lib/File/System/Layered.pm: Fixed a bug that occurred when trying to glob
+	  a directory that existed in some, but not all roots.
+	* lib/File/System/Object.pm: Corrected the way that glob() works so that it
+	  actually works.
+	* lib/File/System/Test.pm: Corrected the test suite to allow for testing of
+	  glob() and find() not in the root.
+	* lib/File/System/Real.pm: Altered glob() to use File::Glob::bsd_glob()
+	  which doesn't split globs on whitespace.
+
+1.09	2005-05-18 08:50	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Layered.pm: Fixed a find() bug that caused it to fail to
+	  ever return when a path was passed (instead of using $self).
+	* lib/File/System/Object.pm: Fixed a find() bug that caused it to fail to
+	  return anything when a path was passed (instead of using $self).
+	* lib/File/System/Test.pm: Created additional tests within
+	  is_glob_and_find_consistent() to check that find() properly handles passed
+	  paths and that glob() works the same from the root as from a local object.
+
+1.08	2005-05-08 21:39	Andrew Sterling Hanenkamp
+
+	* lib/File/System.pm: This is repository fix because of a missed commit from
+	  1.06.
+
+1.07	2005-05-08 21:38	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Object.pm: Results of glob() and find() sorted.
+	* lib/File/System/Real.pm: Results of glob() sorted.
+
+1.06	2005-04-30 17:25	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Object.pm: Improved the "ne", "eq", and "cmp" operators
+	  through the use of some extra (and currently undocumented) methods.
+
+1.05	2005-04-28 10:36	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Passthrough.pm: Added a passthrough driver that doesn't do
+	  anything on it's own. It's useful for subclassing.
+	* t/08_passthrough.t: Copied the tests from t/03_real.t and modified the
+	  call to the constructor.
+
+1.04	2005-04-23 09:39	Andrew Sterling Hanenkamp
+
+	* Build.PL: Added support for Makefile.PL compatibility.
+
+1.03	2005-04-16 23:17	Andrew Sterling Hanenkamp
+
+	* ilb/File/System/Real.pm: Added an error check to the is_creatable()
+	  method.
+	* lib/File/System/Layered.pm: Added the guts to File::System::Layered
+	* t/07_layered.t: Added tests for File::System::Layered
+
+1.03	2005-04-16 13:27	Andrew Sterling Hanenkamp
+
+	* lib/File/System.pm: Fixed the POD abstract to meaningful for the whole
+	  File-System package.
+	* lib/File/System/Table.pm: Fixed a documentation bug that refered to
+	  mkfile() still and replaeced it with a reference to create().
+	* lib/File/System/Layered.pm: Created a shell with documentation only.
+
+1.02	2005-04-16 12:32	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Object.pm: Changed API again to add the create() method to
+	  replace the old (and inconsistent) mkdir/mfile methods.
+	* lib/File/System/Object.pm: Added the is_creatable() method to the API.
+	* lib/File/System/Real.pm: Removed the "special" methods mkdir() and
+	  mkfile() and replaced them with create() and added is_creatable().
+	* lib/File/System/Table.pm: Removed the mkdir() and mkfile() methods and
+	  replaced them with create() and added is_creatable().
+	* t/03_real.t: Altered tests for API changes.
+	* t/04_table_basic.t: Altered tests for API changes.
+	* t/05_table_multimount.t: Altered tests for API changes.
+	* t/06_table_mount.t: Altered tests for API changes.
+	* lib/File/System.pm: Updated the documentation.
+
+1.02	2005-04-10 21:15	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Table: Altered the exists method to fit the new
+	  requirements.
+	* t/04_table_basic.t: Altered this test to use the new test suite.
+	* t/05_table_multimount.t: Added this test to test starting mounts.
+	* t/06_table_mount.t: Added this test to test mount table changes.
+	* *: Refactored the canonify method by renaming it to normalize_path.
+	* *: Refactored the canonify_real method by renaming it to
+	  normalize_real_path.
+	* t/01_canonify.t: Renamed to t/01_normalize_path.t
+
+1.02	2005-04-08 08:46	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Test.pm: Finished the initial version of the test suite.
+	* t/03_real.t: Altered this test to use the new test suite.
+	* lib/File/System/Object.pm: Added a new requirement for module authors that
+	  the exists method should fallback to $self->path if none given. Added the
+	  necessary to the exists method to do that.
+	* lib/File/System/Real.pm: Altered exists for new requirement.
+	* lib/File/System/Object.pm: The canonify method complains if it is given
+	  undef for a path.
+	* lib/File/System.pm: The factory method croaks better error messages.
+
+1.02	2005-04-06 20:57	Andrew Sterling Hanenkamp
+
+	* lib/File/System/Object.pm: Removed documentation for mkdir/mkfile API.
+	  We'll just pretend they don't exist for now. :)
+	* lib/File/System/Real.pm: Added documentation for the special methods,
+	  mkdir and mkfile.
+	* lib/File/System/Test.pm: Added a special test suite to help validate the
+	  creation of new file system drivers.
+
+1.02    2005-03-28 07:47	Andrew Sterling Hanenkamp
+
+	* lib/File/System.pm: Added comment about mkfile and mkdir API issue.
+	* lib/File/System/Table.pm: Added a new file system object for mounting
+	  other file systems.
+
+1.01	2005-03-26 16:01	Andrew Sterling Hanenkamp
+
+	* README: Initial release.
+	* lib/File/System/Object.pm: Contains an alpha version of the API.
+	* lib/File/System/Real.pm: Initial implementation of a real FS.

@@ -1,0 +1,15 @@
+[% USE Latex -%]
+[%- MACRO latextable(d)
+    BLOCK;
+	tattr = {
+	    header = [ d.cols ],
+	    data   = d.data,
+	};
+	copyattr = [ 'caption', 'label', 'left', 'right', 'center', 'fontfamily', 'sideways', 'type', 'callback' ];
+	FOREACH ca IN copyattr;
+	    IF d.$ca;
+		tattr.$ca = d.$ca;
+	    END;
+	END;
+       Latex.table( tattr );
+    END -%]

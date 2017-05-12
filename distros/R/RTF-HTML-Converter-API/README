@@ -1,0 +1,94 @@
+RTF/HTML/Converter/API version 0.01
+===================================
+
+NAME
+    RTF::HTML::Converter:API - an OO API to Philippe Verdret's
+    RTF::HTML::Convertor.
+
+SYNOPSIS
+	use RTF::HTML::Converter::API;
+
+	my $rtf = new RTF::HTML::Converter::API (dir => "D:/temp/",);
+	$rtf->process;
+	foreach (@{$rtf->{files}}){
+			warn $_;
+			warn $_->{filename};
+			warn $_->{html},"//end//";
+			warn "\n";
+	}
+
+	my $rtf = new RTF::HTML::Converter::API;
+	warn $rtf->convert_file("D:/temp/rtf-test.rtf");
+	foreach (@{$rtf->{files}}){
+			warn $_;
+			warn $_->{filename};
+			warn $_->{html},"//end//";
+			warn "\n";
+	}
+	exit;
+
+DESCRIPTION
+    An OO API to Philippe Verdret's RTF::HTML::Convertor module.
+
+    Define the class variable "CHAT" to have a value if you wish realtime
+    output of what's going on.
+
+CONSTRUCTOR new
+    Arguments in "key="value> pairs:
+
+    dir:
+        the directory to process.
+
+  METHOD process
+
+    Does everything in one method call.
+
+  METHOD get_filenames
+
+    Optional argument is a directory to process: default is in
+    "$self-"{dir}> required at construction time.
+
+  METHOD convert_files
+
+    Calls the "RTF::HTML::Converter" (see the RTF::HTML::Converter manpage)
+    on every file in our "files" list: takes the filenames from the
+    "filename" slot of each hash, and placing the resulting HTML into the
+    "html" slot fo each hash.
+
+  METHOD convert_file
+
+    Accepts the object reference and the path to a file to convert. Pushes
+    into the object's "files" array a hash with a key "filename" against the
+    passed filename, and a key "html" with the value returned by the
+    "RTF::HTML::Converter" (see the RTF::HTML::Converter manpage).
+
+    Incidentally returns a reference to the HTML created.
+
+    Does not check to see if the object already contains the processed
+    result.
+
+    Does not use the object's "dir" slot.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	RTF::HTML::Convertor
+
+AUTHOR
+    Lee Goddard (lgoddard@CPAN.org).
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) Lee Goddard, 2002. All rights reserved. This software is
+    made available under the same terms as Perl itself.
+

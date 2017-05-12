@@ -1,0 +1,77 @@
+NAME
+    RDF::DOAP::Lite - write DOAP data quickly and easily
+
+SYNOPSIS
+       use CPAN::Changes;
+       use CPAN::Meta;
+       use RDF::DOAP::Lite;
+   
+       my $changes = CPAN::Changes->load('Changes');
+       my $meta    = CPAN::Meta->load_file('META.json');
+       my $doap    = RDF::DOAP::Lite->new(meta => $meta, changes => $changes);
+   
+       $doap->doap_ttl('doap.ttl');
+       $doap->doap_xml('doap.xml');
+
+DESCRIPTION
+    This is a small companion module to RDF::DOAP, enabling you to output DOAP
+    data easily from standard CPAN distribution files.
+
+  The Straight DOAP
+    So what is DOAP? This explanation is lifted from Wikipedia
+    <http://en.wikipedia.org/wiki/DOAP>.
+
+    *DOAP (Description of a Project) is an RDF Schema and XML vocabulary to
+    describe software projects, in particular free and open source software.*
+
+    *It was created and initially developed by Edd Dumbill to convey semantic
+    information associated with open source software projects.*
+
+    *It is currently used in the Mozilla Foundation's project page and in
+    several other software repositories, notably the Python Package Index.*
+
+  Constructor
+    `new(%attributes)`
+        Moose-style constructor (though this module does not use Moose).
+
+  Attributes
+    `meta`
+        This is a required attribute; a CPAN::Meta object.
+
+    `changes`
+        This is an optional attribute; a CPAN::Changes object.
+
+  Methods
+    `doap_ttl($file)`
+        Writes DOAP data in the Turtle serialization to the file. The file may
+        be provided as a filename (string) or a file handle.
+
+    `doap_xml($file)`
+        Writes DOAP data in the RDF/XML serialization to the file. The file
+        may be provided as a filename (string) or a file handle.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-DOAP-Lite>.
+
+SEE ALSO
+    This module comes with a bundled command-line tool, cpan2doap.
+
+    For parsing DOAP data, see RDF::DOAP.
+
+    For general RDF processing, use RDF::Trine and RDF::Query.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,44 @@
+% layout 'nodes';
+% title "Nodes";
+<h2>Nodes</h2>
+
+<p>This table list all nodes known to the current project. These nodes are generated out of the groups in your <i>Rexfiles</i>.</p>
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Nodes</div>
+  <div class="panel-body">
+
+    <table id="server" class="display" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Group</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <th>Name</th>
+          <th>Group</th>
+        </tr>
+      </tfoot>
+      <tbody>
+  % for my $srv (@{ $project->all_server }) {
+        <tr>
+          <td><%= $srv->{name} %></td>
+          <td><%= $srv->{group} %></td>
+        </tr>
+  % }
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+
+<script>
+$(document).ready(function() {
+  $('#server').dataTable();
+} );
+</script>
+

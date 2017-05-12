@@ -1,0 +1,5 @@
+=for layout widget
+
+<img [% img_attrs %] />
+
+=cut

@@ -1,0 +1,43 @@
+%# So far as I can remember, there is not one word in the Gospels in
+%# praise of intelligence.
+%#                -- Bertrand Russell
+<%INIT>
+# first, look to see if something already matchs the Ticket Id.
+if ( $Query =~ /^\s*#?\d+\s*$/ ) {
+    my $TicketObj = RT::Ticket->new($session{CurrentUser});
+    $TicketObj->Load( $Query );
+    return $m->comp(
+	'/Foundry/Elements/Redirect',
+	URL => '/Foundry/Project/Tracker/Display.html?SearchType=Ticket'.
+		'&Queue=' . $TicketObj->Queue . '&id=' . $TicketObj->Id
+    ) if $TicketObj->Id and $TicketObj->CustomFieldValue('Type');
+}
+
+# otherwise, it's a subject search
+my $List = RT::Tickets->new($session{CurrentUser});
+$List->Limit(
+    FIELD => 'Subject',
+    VALUE => $Query,
+    OPERATOR => 'LIKE',
+    CASESENSITIVE => 0,
+);
+$List->OrderBy( FIELD => 'Id', ORDER => 'DESC' );
+my $count = $List->Count or return;
+
+# final chance -- if only one thing matches, jump to it
+if ( $count == 1 ) {
+    return $m->comp(
+	'/Foundry/Elements/Redirect',
+	URL => '/Foundry/Project/Tracker/Display.html?SearchType=Ticket' .
+		'&Queue=' . $List->First->QueueObj->Id .
+		'&id=' . $List->First->Id,
+    ) unless $List->First->QueueObj->Disabled;
+}
+
+# okay, we really have a list.
+$List = [ grep { ($_ and !$_->QueueObj->Disabled) } @{$List->ItemsArrayRef||[]} ];
+return $List;
+</%INIT>
+<%ARGS>
+$Query
+</%ARGS>

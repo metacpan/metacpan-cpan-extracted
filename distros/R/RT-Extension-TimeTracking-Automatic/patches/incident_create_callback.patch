@@ -1,0 +1,20 @@
+commit 529b8ed73764058b8b88d5ad6421aa4dc2cf54b2
+Author: Dave Goehrig <dave@bestpractical.com>
+Date:   Tue Oct 4 15:28:34 2016 -0400
+
+    add afterhidden callback to incident/create.html
+
+diff --git a/html/RTIR/Incident/Create.html b/html/RTIR/Incident/Create.html
+index 330dcbb..c81c978 100644
+--- a/html/RTIR/Incident/Create.html
++++ b/html/RTIR/Incident/Create.html
+@@ -79,6 +79,9 @@ if ( $ChildObj && $ChildObj->id && !$ChildObj->CurrentUserHasRight('ModifyTicket
+ % if ( $Split ) {
+ <input type="hidden" name="Split"        value="<% $SplitObj->id %>" />
+ % }
++
++% $m->callback( CallbackName => 'AfterHidden', ARGSRef => \%ARGS );
++
+ <a name="top"></a>
+ 
+ <& /Elements/Crypt/SignEncryptWidget:ShowIssues, self => $gnupg_widget &>

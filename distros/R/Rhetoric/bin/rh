@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+use common::sense;
+use File::Which qw(which where);
+
+# This is useful during development.
+if (-d "bin") {
+  $ENV{PATH} = "./bin:$ENV{PATH}";
+}
+
+my $subcommand = shift;
+if ($subcommand) {
+  my $command = "rh-$subcommand";
+  if (my $exe = which($command)) {
+    exec("$exe", @ARGV);
+  } else {
+    die("$command not found");
+  }
+} else {
+  die("Usage: rhetoric <SUBCOMMAND> [ARGS]...\n");
+}

@@ -1,0 +1,10 @@
+lib/RTSP/Proxy.pm
+lib/RTSP/Proxy/Session.pm
+lib/RTSP/Proxy/StreamBuffer.pm
+lib/RTSP/Proxy/Transport.pm
+lib/RTSP/Proxy/Transport/RTP.pm
+Makefile.PL
+MANIFEST
+README
+t/RTSP-Proxy.t
+META.yml                                 Module meta-data (added by MakeMaker)

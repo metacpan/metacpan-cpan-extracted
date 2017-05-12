@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY version SYSTEM "version.xml">
+]>
+<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
+  <bookinfo>
+    <title>Redland RDF Application Framework Manual</title>
+    <releaseinfo>for Redland &version;</releaseinfo>
+  </bookinfo>
+
+  <chapter id="redland">
+    <title>Redland Overview</title>
+    <para>
+Redland is a general-purpose Resource Description Framework (RDF)
+library providing APIs to the RDF model and it's concepts.
+    </para>
+
+  </chapter>
+
+   <xi:include href="redland-chapter-intro.xml"/>
+
+  <part>
+    <title>Tutorial</title>
+  </part>				  
+
+  <part>
+    <title>Reference Manual</title>
+    <xi:include href="redland-chapter-objects.xml"/>
+    <xi:include href="xml/world.xml"/>
+    <xi:include href="xml/concepts.xml"/>
+    <xi:include href="xml/digest.xml"/>
+    <xi:include href="xml/files.xml"/>
+    <xi:include href="xml/hash.xml"/>
+    <xi:include href="xml/heuristics.xml"/>
+    <xi:include href="xml/iterator.xml"/>
+    <xi:include href="xml/list.xml"/>
+    <xi:include href="xml/log.xml"/>
+    <xi:include href="xml/model.xml"/>
+    <xi:include href="xml/node.xml"/>
+    <xi:include href="xml/parser.xml"/>
+    <xi:include href="xml/query.xml"/>
+    <xi:include href="xml/query_results.xml"/>
+    <xi:include href="xml/serializer.xml"/>
+    <xi:include href="xml/statement.xml"/>
+    <xi:include href="xml/storage.xml"/>
+    <xi:include href="xml/stream.xml"/>
+    <xi:include href="xml/unicode.xml"/>
+    <xi:include href="xml/uri.xml"/>
+    <!-- <xi:include href="xml/unused.xml"/> -->
+  </part>
+  <index>
+    <title>Index</title>
+  </index>
+</book>

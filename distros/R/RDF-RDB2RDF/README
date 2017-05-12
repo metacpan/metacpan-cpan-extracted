@@ -1,0 +1,55 @@
+NAME
+    RDF::RDB2RDF - map relational database to RDF declaratively
+
+SYNOPSIS
+     print RDF::RDB2RDF->new(R2RML => $r2rml)->process_turtle($dbh);
+
+DESCRIPTION
+    It's quite common to want to map legacy relational (SQL) data to RDF. This
+    is usually quite simple to do by looping through database tables and
+    spitting out triples. Nothing wrong with that; I've done that in the past,
+    and that's what RDF::RDB2RDF does under the hood.
+
+    But it's nice to be able to write your mapping declaratively. This
+    distribution provides three modules to enable that:
+
+    *   RDF::RDB2RDF::Simple - map relational database to RDF easily
+
+    *   RDF::RDB2RDF::R2RML - map relational database to RDF using R2RML
+
+    *   RDF::RDB2RDF::DirectMapping - map relational database to RDF directly
+
+    `RDF::RDB2RDF` itself provides a wrapper for constructing mapper objects,
+    and acts as a base class for the three implementations.
+
+    There is also a module RDF::RDB2RDF::DirectMapping::Store which uses the
+    same mapping as RDF::RDB2RDF::DirectMapping but provides the same
+    interface as RDF::Trine::Store.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDB2RDF>.
+
+SEE ALSO
+    RDF::Trine.
+
+    RDF::RDB2RDF::Simple, RDF::RDB2RDF::R2RML, RDF::RDB2RDF::DirectMapping.
+
+    RDF::RDB2RDF::DirectMapping::Store.
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2011-2013 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

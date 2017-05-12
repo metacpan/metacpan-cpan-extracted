@@ -1,0 +1,214 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6eca646ee9a9ffc2d8857a309b9f52eba3f6d249 Changes
+SHA1 cc087c3dd6e1b519c680e68cd0231735a68300a0 LICENSE
+SHA1 3acc29e2f83793688567991e3d43e13fc5ae8580 MANIFEST
+SHA1 636df985378402f0f55222b8336059df0d5e5807 META.yml
+SHA1 5391cc35db658809505db2be59d47aa2f073c376 Makefile.PL
+SHA1 d52d83df139795d60dd34d6e17c5e2a4c9c2fe71 README
+SHA1 1273f77f877991d3352cf6a5309f0f6914736a1e TODO
+SHA1 ac3c1ba031ddd3212aaa17ec165b31a57c681f9d examples/rdfa-distiller-psgi/README
+SHA1 d799108c75a6832d73a519f46829ee5a4075b9e2 examples/rdfa-distiller-psgi/app.cgi
+SHA1 5ab972a6f1e4131cda56785db249785d889490c7 examples/rdfa-distiller-psgi/app.html
+SHA1 f7309f30f72d08393f258da1e20ddf526c393563 examples/rdfa-distiller-psgi/app.psgi
+SHA1 d884d36734412091fd5b0819addf7c4af7bcf807 examples/rdfa10-to-ntriples.pl
+SHA1 eb1a8c8df6a1c14329925e7fae0425f6670fc33b examples/rdfa11-to-ntriples.pl
+SHA1 832f344929ab00b7cf7cb4db96f5ff5ecb45f21e examples/xml_rdfa11-to-ntriples.pl
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 fe90649a1723238dd2ce9821cc60cedddef41698 inc/Module/Install/Share.pm
+SHA1 b86d0385e10881db680d28bde94f275e49e34a27 inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 6b807287940754cc31a3db59f2b22e363d5525be inc/Module/Package/Dist/RDF.pm
+SHA1 e31c281782183601e1e057c5914f63269e043932 inc/Scalar/Util.pm
+SHA1 5eae2f71c45a996a296d2445b18d0589307111f0 inc/Scalar/Util/PP.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 8105c0510a773b56840995fb4dd2dc64fe9ddaee inc/unicore/Name.pm
+SHA1 e5881a5a25ecffa20e136df6ab8c2f7f966d27fb lib/RDF/RDFa/Parser.pm
+SHA1 e5b835af18daf9c491f4d11f4615b18b9680b6f7 lib/RDF/RDFa/Parser/Config.pm
+SHA1 ea13fecd90afc5f605e5ec4bddc479abb0c006a7 lib/RDF/RDFa/Parser/InitialContext.pm
+SHA1 5394b2fc884602b62b2f0fb508b7eab5ed942122 lib/RDF/RDFa/Parser/OpenDocumentObjectModel.pm
+SHA1 98ef8ac59753c8ebacb52929eba462aeb19edf6f lib/RDF/TrineX/Parser/RDFa.pm
+SHA1 325256abf9414ac270e505e884ef3ae0f7530970 meta/changes.ttl
+SHA1 62f51df6ba01008bfc22f7ce7a55a2604b07588d meta/doap.ttl
+SHA1 626e69fe73a90dee1ec4c8d4b9a5438d033d20b7 meta/earl/README
+SHA1 ebda5f62b38830e7e2bd497c13839afed82d583f meta/earl/atom-rdfa10-tests.ttl
+SHA1 fd76754e4893926aab3789aed01c59ffad5e85ae meta/earl/atom-rdfa11-tests.ttl
+SHA1 c28cf36efea31edf9f48d59970cfd180925af152 meta/earl/datarss-rdfa10-tests.ttl
+SHA1 c189fba978d5108ef303b2ec6765b0d013915700 meta/earl/datarss-rdfa11-tests.ttl
+SHA1 b3805fc7aa5c5bf8e81773374f5a1134af01ba5c meta/earl/html4-rdfa10-tests.ttl
+SHA1 20fb526b3051f85a92a7c53bac92e2b03bb10ca1 meta/earl/html4-rdfa11-tests.ttl
+SHA1 0739cffd57d0485d0e30c26a547d6b74636054cb meta/earl/html5-rdfa10-tests.ttl
+SHA1 85ef0b89059579ca4bc31c6932eeabac074f2ee0 meta/earl/html5-rdfa11-role-tests.ttl
+SHA1 c1ba1c61c8ed0b501925e21d17afaaff1a883b57 meta/earl/html5-rdfa11-tests.ttl
+SHA1 513d8abe50f25e4d253062879ecb59db64f4d89c meta/earl/svg-rdfa11-tests.ttl
+SHA1 2943b1e2476c9b2eb149119c38364b299203b925 meta/earl/xhtml1-rdfa10-tests.ttl
+SHA1 815b7ebc440641bfc64fb4f7f48d23796567c364 meta/earl/xhtml1-rdfa11-role-tests.ttl
+SHA1 7d5ed8961f67e803f48c35b88bb8c41f54c16448 meta/earl/xhtml1-rdfa11-tests.ttl
+SHA1 79aeac65a649f32fca02b484e7f6daee958c48d0 meta/earl/xhtml5-rdfa11-role-tests.ttl
+SHA1 868adf46ee5b783cba7c1891c4af613f2b8de21c meta/earl/xhtml5-rdfa11-tests.ttl
+SHA1 ba8d6cfa51d498edc93cb6fbdba70e41a33ac39f meta/earl/xml-rdfa11-role-tests.ttl
+SHA1 cbf555c4cab08c741e57ce3cf38dd7dd65ca167a meta/earl/xml-rdfa11-tests.ttl
+SHA1 c276f86c44b9c1438341d2ef996b7486af3dd9fe meta/makefile.ttl
+SHA1 ef2d6d99d8dfea7159e583f9b5ad35d5814f2271 share/catalogue/index.xml
+SHA1 9a3157a5419d575ea91bd0b912d139573423c94c share/catalogue/www.w3.org/MarkUp/DTD/aria-attributes-1.mod
+SHA1 88053f10e8d2fd58ccbab81dc2bbdfdf90016c3c share/catalogue/www.w3.org/MarkUp/DTD/html4-rdfa-1.dtd
+SHA1 d55b46d983dca97519d862fe48101e81f434c12c share/catalogue/www.w3.org/MarkUp/DTD/html4-rdfa.cat
+SHA1 e2dd164fa62e125effd8aebb7f8da02942e67fb2 share/catalogue/www.w3.org/MarkUp/DTD/html401-rdfa-1.dtd
+SHA1 9d8ddac508e58e52b672cae377334dc8ecac112f share/catalogue/www.w3.org/MarkUp/DTD/xframes-1.dtd
+SHA1 4c98eeeecab127b7cb3e1b0abaa135b6bd317217 share/catalogue/www.w3.org/MarkUp/DTD/xframes-qname-1.mod
+SHA1 785e7ecb39b6ce37bb3dcecc36861e5bb3b56910 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-access-1.mod
+SHA1 eecd82cd172e9e003fe61bc6b1682896a0e65e6c share/catalogue/www.w3.org/MarkUp/DTD/xhtml-access-qname-1.mod
+SHA1 8e0a6daaaa6ef77528f9ecccbfab0583a53b166d share/catalogue/www.w3.org/MarkUp/DTD/xhtml-applet-1.mod
+SHA1 21e935140e2156097ae11c4fd00fc06b36656cec share/catalogue/www.w3.org/MarkUp/DTD/xhtml-arch-1.mod
+SHA1 47b80c164a5dd120bdade94d237263922f351d1c share/catalogue/www.w3.org/MarkUp/DTD/xhtml-aria-1.dtd
+SHA1 f00cf2d9bee93d92a6e84f55699dd4ca33ea124e share/catalogue/www.w3.org/MarkUp/DTD/xhtml-attribs-1.mod
+SHA1 19a1208f80c699956c1360237510f11999672c6a share/catalogue/www.w3.org/MarkUp/DTD/xhtml-base-1.mod
+SHA1 912349b7dce2b3840e03d4819a6346501ff34134 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic-form-1.mod
+SHA1 cdfdd9467d0983c8303a08ea5b53f61fcb717231 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic-table-1.mod
+SHA1 debe5f265dd6d696d96dbbf0fa0b98221dccfc5e share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic10-f.dtd
+SHA1 861f8a97b1f3a6ba3c4bece5f86ba17f0da62ca8 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic10-model-1.mod
+SHA1 5426d6e810c76c972d6b984d93d788c733dd6177 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic10.cat
+SHA1 23452703964cc1cebf785f8a46121eb67b1700d8 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic10.dtd
+SHA1 8e3c96bf6113acdc00a6a1960bb945c37e041d96 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic11-f.dtd
+SHA1 b14e0ed24f6808477d0cce0389e403f0fc029cac share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic11-model-1.mod
+SHA1 5a6553675f3f2f2cd00d4ab1cf53241f72df6b2d share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic11.cat
+SHA1 3a2b871480be4a79c9234d972d9f11319ee88a5f share/catalogue/www.w3.org/MarkUp/DTD/xhtml-basic11.dtd
+SHA1 52b32e1ae21b292a1321e782d90134513f343a5d share/catalogue/www.w3.org/MarkUp/DTD/xhtml-bdo-1.mod
+SHA1 196a2247a20a2f826bb2ef398564fe35f1a7dc3b share/catalogue/www.w3.org/MarkUp/DTD/xhtml-blkphras-1.mod
+SHA1 ca5fc34a294fd78bb186402f1d5fd8309e1b746b share/catalogue/www.w3.org/MarkUp/DTD/xhtml-blkpres-1.mod
+SHA1 0c8a5707221ee37592014ede3dd4d19c05b99c22 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-blkstruct-1.mod
+SHA1 183479946275071697c6f500cdecd500a6dd5038 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-charent-1.mod
+SHA1 951b14223dbaf8baaf2f60c751333a0e3532e994 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-csismap-1.mod
+SHA1 102094405f7ce9520b560c4c27cf11ee3aa8c49c share/catalogue/www.w3.org/MarkUp/DTD/xhtml-datatypes-1.mod
+SHA1 dbf6e495e4336ada1f554f2bc65efcd14b3617a2 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-edit-1.mod
+SHA1 ccc07bbfda024443c16a56b8d09c3069b3d53605 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-events-1.mod
+SHA1 50a7aebfa0b695f0aa80703d6496e7c0866a30f8 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-form-1.mod
+SHA1 f58d6d6994ab4433c8e01d7902888d3641870795 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-frames-1.mod
+SHA1 36a16328636b2b7f456921d39563f05ce2ef32e5 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-framework-1.mod
+SHA1 eb7d74965ff63d1184ce5217a3c5bb172ee927ff share/catalogue/www.w3.org/MarkUp/DTD/xhtml-hyperAttributes-1.mod
+SHA1 391df247bc6978daaca3c938e9ed9b743272c8fb share/catalogue/www.w3.org/MarkUp/DTD/xhtml-hypertext-1.mod
+SHA1 09a567e6f24457045e9cea0ca0c1fbe9548f2580 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-iframe-1.mod
+SHA1 e2d2125647986f1a886e9eda5e1330d3bbe9dfc0 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-image-1.mod
+SHA1 d9db0c28af9d123de100b75469be67e5060b9826 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-inlphras-1.mod
+SHA1 7efe9715319071e7ee230964ee673e3f1adc41bd share/catalogue/www.w3.org/MarkUp/DTD/xhtml-inlpres-1.mod
+SHA1 b3d9a392ffac16f06ea811255a96e8267cc98ed9 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-inlstruct-1.mod
+SHA1 aa3681956de62ea41d0138528527e1a51dcb973c share/catalogue/www.w3.org/MarkUp/DTD/xhtml-inlstyle-1.mod
+SHA1 c50e55a7cdb43b4984182f7cc644b081fb6f1b0c share/catalogue/www.w3.org/MarkUp/DTD/xhtml-inputmode-1.mod
+SHA1 88048ec1c9eccf0482ea6504589627021f8ef155 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-lat1.ent
+SHA1 4067d7d1d3032f24a91e6a781acf6dfb4215c27e share/catalogue/www.w3.org/MarkUp/DTD/xhtml-legacy-1.mod
+SHA1 b22f99775ae565d64889a9fb0f56a5c2dfa12b8e share/catalogue/www.w3.org/MarkUp/DTD/xhtml-legacy-redecl-1.mod
+SHA1 d373be3ad9dc487d852a9e5fd69ab8b4a7825bd7 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-link-1.mod
+SHA1 03634b27b28d0db8a735cf7be6c8a53d637fe2ee share/catalogue/www.w3.org/MarkUp/DTD/xhtml-list-1.mod
+SHA1 b7007a7d998a151aa2059f440d56db0984c6b383 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-math11-f.dtd
+SHA1 79b5effbbf6ba25a0cca08316f4aad916de3bb92 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-meta-1.mod
+SHA1 29a9fa2d7657a1c6bcd74a69640720ef39fde20c share/catalogue/www.w3.org/MarkUp/DTD/xhtml-meta-2.mod
+SHA1 bcfb72402c8a9bc0bd5ec40ddb24c04069a7aa53 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-metaAttributes-1.mod
+SHA1 acf53b57880136e6cad484fa644ae3a5bfb1cb72 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-metaAttributes-2.mod
+SHA1 3afcada11619902cce164eefacc045a756b2227a share/catalogue/www.w3.org/MarkUp/DTD/xhtml-nameident-1.mod
+SHA1 6a1fec22438ff251adab130aa56b912777c07aa9 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-notations-1.mod
+SHA1 4be7fbb1acaeb0d1b7a909408c9bfc52a724c989 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-object-1.mod
+SHA1 0eab428a3357db0ff1368ebe4a105cd4a02eecc8 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-param-1.mod
+SHA1 b9e70a717b03ba10abc6f1a340e142c07b94c5e9 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-pres-1.mod
+SHA1 6750636edcd6161ee7649a1399ee2e817d265de5 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-print10-model-1.mod
+SHA1 23b3cf2c7097b4898a761e7469576198241b13a1 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-print10.dtd
+SHA1 12ec9ec66cee614e0299ea7cfa9bb447867130c3 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-qname-1.mod
+SHA1 884c11d278bdf3b2a70334096c5f849e8f775db3 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd
+SHA1 4b5ad50ad9b940dbbbbf420c5f984515e6145e04 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd
+SHA1 87e22379d545a43d0dec73d91120b3f13bb04e72 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-rdfa-model-1.mod
+SHA1 43327c4802b8174a893212522bbd2deaadeae7d0 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-rdfa-model-2.mod
+SHA1 5b62e9f3768fe5653257c110fc948aa4933ca1b1 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-rdfa-qname-1.mod
+SHA1 4e6f5192caeb85b7b303a9f863f0bed10d9d06c7 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-rdfa.cat
+SHA1 5295e618ece397b5bcc8f9aeccd29be4dae1176b share/catalogue/www.w3.org/MarkUp/DTD/xhtml-role-1.mod
+SHA1 35a038d310f47be367b9dbe86357a302b7641563 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-role-qname-1.mod
+SHA1 229b6bc2344ccf37145d566629b754c0a471dd13 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-ruby-1.mod
+SHA1 5694c086e51d78a64931ca8e8f39f15f209593c6 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-script-1.mod
+SHA1 66ab3c2645be36945235cc1a4347f47b337883da share/catalogue/www.w3.org/MarkUp/DTD/xhtml-special.ent
+SHA1 32f02f0400b079de976ed0e52926367dbfc8926d share/catalogue/www.w3.org/MarkUp/DTD/xhtml-ssismap-1.mod
+SHA1 0bafee22c06701ffb5a167549bdcb9aa4965fd77 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-struct-1.mod
+SHA1 6cbd59fe08d4b7d3d84ebfaac3dd1935cc9499c3 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-style-1.mod
+SHA1 814a229ffee098e8ed8e66ba9e4a3a90abab8c8a share/catalogue/www.w3.org/MarkUp/DTD/xhtml-symbol.ent
+SHA1 1329df62ee260613923d105808e97bd05c483407 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-table-1.mod
+SHA1 39b65f9422b3cefea54ec06d9ec1fb67e8635142 share/catalogue/www.w3.org/MarkUp/DTD/xhtml-target-1.mod
+SHA1 dfd30cc70c2b214a40e3ec724bba9bf024af745a share/catalogue/www.w3.org/MarkUp/DTD/xhtml-text-1.mod
+SHA1 31d7fb6418f62a4338c2d5f388f912198493d71f share/catalogue/www.w3.org/MarkUp/DTD/xhtml.cat
+SHA1 77dc43d1cfd009f9a7326f0686a6e984d9a71b27 share/catalogue/www.w3.org/MarkUp/DTD/xhtml.soc
+SHA1 1cb12b5832bdaae022b60f2aeffdf2a81bebdaae share/catalogue/www.w3.org/MarkUp/DTD/xhtml1-frameset.dtd
+SHA1 4dd0bd23307a09b53595d4b76225a5286ed0ba35 share/catalogue/www.w3.org/MarkUp/DTD/xhtml1-strict.dtd
+SHA1 34f1ec1ef75f8cd3d865cd6ab4c7e4ee75e3c3a9 share/catalogue/www.w3.org/MarkUp/DTD/xhtml1-transitional.dtd
+SHA1 0e2aaceb682778b0d20df1c9e49ff45b54ae1059 share/catalogue/www.w3.org/MarkUp/DTD/xhtml1.dcl
+SHA1 8c60737b5862b6f8fe44d042a81e128d744c3fa6 share/catalogue/www.w3.org/MarkUp/DTD/xhtml11-flat.dtd
+SHA1 aadfc25875e07c9ea537e5951e7a2a41cfd3c0b9 share/catalogue/www.w3.org/MarkUp/DTD/xhtml11-model-1.mod
+SHA1 f88f36a1c4516a8b1b4ec7a986d32ef5e98ec212 share/catalogue/www.w3.org/MarkUp/DTD/xhtml11.cat
+SHA1 eddcdf7bb099179b04d7423d90b672c2d9895346 share/catalogue/www.w3.org/MarkUp/DTD/xhtml11.dtd
+SHA1 74870a3da498fb9cec257a92a30ea1406ee71fc6 share/catalogue/www.w3.org/MarkUp/DTD/xhtml2.dtd
+SHA1 e284d164b83cefd48de249bf98b139d282d07ae9 share/catalogue/www.w3.org/MarkUp/DTD/xml-events-1.mod
+SHA1 fdb2c66e02d581c82b1d2bf39d51cd45e047ed92 share/catalogue/www.w3.org/MarkUp/DTD/xml-events-2.mod
+SHA1 f43afccf3e9aa3b7e56b33c146a1d2a4165cfbb6 share/catalogue/www.w3.org/MarkUp/DTD/xml-events-qname-1.mod
+SHA1 074efc3e7faff75b6c45b831144bdc57cef2c89d share/catalogue/www.w3.org/MarkUp/DTD/xml-events-qname-2.mod
+SHA1 ad976103518b3593af7b46c33d4f93ceb37ab316 share/catalogue/www.w3.org/MarkUp/DTD/xml-handlers-1.mod
+SHA1 aba5b195820b6ebef1561d0654dedf6b6e6a5537 share/catalogue/www.w3.org/MarkUp/DTD/xml-handlers-2.mod
+SHA1 27ecfdc429eb43b6f8b1754799ccc0f4a79ea916 share/catalogue/www.w3.org/MarkUp/DTD/xml-script-1.mod
+SHA1 d29647abd66c8b3348bd06b8fcbd1f3d72b6a9b1 share/catalogue/www.w3.org/MarkUp/DTD/xml1.dcl
+SHA1 a97c09dad9fe7e0eb9f28572d69575c5f8d0ca69 share/catalogue/www.w3.org/MarkUp/DTD/xml1n.dcl
+SHA1 7bcaf7931ad7ded6ff03b67d915f2eed806fd1df share/catalogue/www.w3.org/TR/ruby/xhtml-ruby-1.mod
+SHA1 dd24725cd1e565015c0f0a59802409977849f6a2 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-base-1.mod
+SHA1 b2e1b8f4e129d2e569176c5875f4e4d50fd0a5e7 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-basic-form-1.mod
+SHA1 2f799006c96f19857b13641393aa72fab7404d98 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-basic-table-1.mod
+SHA1 dc1226849f03632a2ae30d43849f323690fb92ef share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-framework-1.mod
+SHA1 c054a5a4e648719f827ce65b6e6bc4ebe630ffa0 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-hypertext-1.mod
+SHA1 efa1d876dfd51d19b13aad80a78b7c22d07843e0 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-image-1.mod
+SHA1 02931af653c83749526a38d264e10b0750541065 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-inlstyle-1.mod
+SHA1 690d8747790b265cd586fa1958df78963469b405 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-link-1.mod
+SHA1 53a6d187fcb697b67199ad4081bf515964be2026 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-list-1.mod
+SHA1 e2783e100910dcd2e205d63a481900be874f4d3b share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-meta-1.mod
+SHA1 c78d0fa4fc27ac6ef82adfe632f24f2e093b9720 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-object-1.mod
+SHA1 0a751f191b785e3936dc630ca2e5bb16e99932e4 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-param-1.mod
+SHA1 df8d33d3e1a032093563cd0317cd73c1df2e2f3a share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-pres-1.mod
+SHA1 5e65326765771811d49edd74fd97c5313f16f101 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-script-1.mod
+SHA1 5140a6bdaab1af9370872c149d660ad6de3cb7d3 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-struct-1.mod
+SHA1 b485dc7003d87f5569c5e47996a406c159469c46 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-style-1.mod
+SHA1 2dcb85ac1afb3a4b823398e1150df4f0995180d4 share/catalogue/www.w3.org/TR/xhtml-modularization/DTD/xhtml-text-1.mod
+SHA1 f45bda612e668ca3b7ad1f04001a40056e8a03a0 t/01basic.t
+SHA1 1f33ef730cf46869276331fd47b494864c7169be t/02curie.t
+SHA1 42d330e4fc22c11ea3d4801350e848ef41dd2181 t/03lang.t
+SHA1 33348996811f3b630acc5b73470efc160e5e3063 t/04xmlliteral.t
+SHA1 02dde52dfe7b0dbd8230ffa5e435e68fd40a1baa t/05namedgraphs.t
+SHA1 b2340c8bce4d33e4f01ba2ca25a1c3d904f6f4f6 t/06xmlbase.t
+SHA1 2ba0149b0dd5ca8a950032dfdd660dcf1b2dd68d t/07rdfxml.t
+SHA1 2227c12c1acdc5802ceb16a16b470886b5e7b3ae t/08atom.t
+SHA1 1ae46578afb987cff79ddf20cceea226ea8e37ea t/09opendocument.odt
+SHA1 7c7af2572beef1952d66c6240b1976a71a067a2f t/09opendocument.t
+SHA1 4f1a216653b9761eeddb107efa681484dbe4d6b8 t/10trine.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk/QY8IACgkQzr+BKGoqfTnzZwCdEoo62Iku2473ym/3lceNDHUt
+d+QAn2495OZ9iBypev8C/2wfB+oRuClY
+=SEtM
+-----END PGP SIGNATURE-----

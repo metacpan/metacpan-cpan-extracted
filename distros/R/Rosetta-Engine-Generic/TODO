@@ -1,0 +1,198 @@
+CURRENT DOCUMENTATION: TODO
+
+Preamble: The following will have external coordinated changes in
+Rosetta::Validator so that they can be tested and, where needed, Rosetta,
+Rosetta::Model, and Rosetta::Utility::SQLBuilder also.  The SQL:2003 standard
+will continue to be used for primary guidance.  Free database products that
+run under Mac OS X 10.3 and have a well-maintained DBD module will get the
+early priority simply because I can easily download and install them on my
+computer.  Other databases will get supported when I can get access to
+them, or someone else does it for me.
+
+* Convert all class objects to be of the inside-out variety rather than
+hash-based, so to gain rigorous protection against external code directly
+accessing our object attributes, and to avoid related maintenance problems.
+
+* Do some serious refactoring / design changing of Generic.pm.
+
+* Add the necessary functionality to support the creation of tables and
+performance of inserts and trivial selects against tables on a SQLite 3.2.x
+database.
+
+* Once the above are done, announce Rosetta Developer Release #4.
+
+* Add support for the same activities, plus all pre-existing abilities,
+against SQLite 2.8.x and multiple MySQL versions (5.0.x, 4.1.x, 4.0.x,
+3.23.58).  Also add support for talking to multiple versions of the same
+database at once, and for properly auto-detecting SQLite databases.  Also
+set things up so that CATALOG_OPEN will *not* create a new SQLite database
+if it doesn't exist (behave like other dbs).
+
+* Start off the Rosetta::Utility::SQLParser module.  Add support to the module
+set for reverse-engineering tables from all database types.  For this
+release, do reverse-engineering manually, since its simple.  Once that's
+done, announce Rosetta Developer Release #5.
+
+* Make the previous stuff work with PostgreSQL 8.0, and possibly 7.4 also.
+
+* Add support for updates and deletes against tables.  Once that's done,
+announce Rosetta Developer Release #6.
+
+* Make non-trivial selects work with all database types.  For some engines
+such as MySQL 3.23 and 4.0, this will require some emulation.  Once that's
+done, announce Rosetta Developer Release #7.
+
+* Start testing generation and reverse-engineering of more complicated
+database schema objects like views and routines.  From now on, SQL
+tokenizing will probably be handled by a new dependency, such as
+Parse::RecDescent, as it is a lot more complicated.  Once that's done,
+announce Rosetta Developer Release #8.
+
+* Start working on the schema-to-schema or db-to-db cloning features, and
+the insert-cursor features.
+
+* Start the Rosetta::Emulator::DBI module and try to get it working on
+something simple, like connecting to a database and selecting records.
+Maybe table creation and IUD also.
+
+* Some time around now, any or all of the primary Rosetta framework modules
+may be updated to 'alpha' development status, up from 'pre-alpha'.  I may
+want to change the License around then too.
+
+* Announce the Rosetta Generally Available Release #1.
+
+* Get it to work with Oracle, OpenBase, other commonly used database
+products.
+
+* Start working on the Proxy modules, eventually.
+
+* Whatever else needs doing ...
+
+OLDER DOCUMENTATION: TODO
+
+Preamble: This was first written early in 2003 and hasn't been changed
+since.
+
+* Connect to (or open) an existing database as a registered or anonymous
+user, which establishes a current working context for doing anything else,
+and close it; multiple simultaneous connections should be supported; the
+database and users must already exist.
+
+* Create new database instances or remove them, if that can be done easily.
+
+* Create new users in the current database or remove them or alter their
+privileges or validate any settings for user existence or privileges; note
+that Rosetta will not enforce user privileges or lacks of them for any
+RDBMS products that don't do this internally.
+
+* Create tables (including temporary) within the default schema context
+that you connected to (eg: an Oracle "user/schema" in an "instance"), with
+nullability or unique key (including primary key) or foreign key
+constraints or indexes that are not constraints or default column values,
+and alter or remove or validate them, assuming the connected user has said
+privileges; the same operations will also be supported against neighbouring
+contexts (if any) for which said user is permitted; note that Rosetta will
+not enforce any constraints on tables as that is up to the RDBMS product,
+although it may try to enforce some constraints in a far-away release for
+RDBMS products that don't do it themselves, but that would be slower and
+less reliable.
+
+* Create or alter or remove sequences within the default schema context,
+and use them in table definitions or data modifying operations.
+
+* Scan an existing database and create a data dictionary (as objects) that
+describes its tables and sequences, including any constraints that the
+database knows about.
+
+* Start a transaction, which is an operating context within which all table
+data changes must succeed or none will be saved, and end it either with a
+commit (keep changes) or rollback (discard changes); this type of data
+integrity will not work unless the RDBMS product being used supports
+transactions; far-off releases of Rosetta may implement transactional data
+integrity at the Perl level for non-supporting RDBMS products, but using a
+supporting RDBMS is better; multiple simultaneous transactions within a
+single database connection should be supported.
+
+* Select data from single or related multiple tables, including the use of
+equal or left outer joins, full and unique unions (similar to full outer
+joins), derived tables (in sql-from), sub-selects (in sql-where),
+hierarchical queries (eg: an Oracle start-with and connect-by), and
+including the use of calculations or formulas (including logicals like
+choose-when) in the returned column list or in the row filter or grouping
+conditions; the select results can be accessed either with row cursors
+(memory efficient) or all at once with an array (for small result sets
+only); also, insert or update or delete against single tables.
+
+* Obtain locks on table data for when you want atomic selects and updates,
+and release them; the same caveats that apply to transaction support in the
+RDBMS product being used also applies here.
+
+* Utilities for backing up or restoring the tables in a database, both
+schema and data, either with another database or a set of text files.
+
+* Insert or update or delete against multiple related related tables at
+once, as if they were a single table; the Rosetta objects that define the
+multiple table selection will be used to know how to map said data changes
+against the correct tables; it may not be possible for Rosetta to issue
+changes against some selects, since some required mapping information may
+be lacking; in that case, the application logic will have to handle it
+against single tables.
+
+* Create stored procedures and functions within the default schema context
+that you connected to, and alter or remove them, and invoke them directly;
+initially this feature will require you to define a separate version of a
+stored procedure or function for each RDBMS product you are going to use,
+because it is too difficult to implement an abstracted definition and
+generation of such things for earlier Rosetta releases; there are two ways
+to do this, one of which involves writing the functionality in pure Perl
+(which can be done once for all RDBMS products, particularly those that
+don't support stored procedures at all, but is slower), and the other way
+involves a hand-crafted SQL string implementing the procedure plus a shim
+Perl function that calls it; your main application is still RDBMS generic
+because any multiplicity of stored procedure implementations will be keyed
+to a Rosetta Engine, so the right one is used at the right time; in any
+event, the standard RNI means of calling a stored procedure is calling
+something that looks externally like a Perl function, which won't change,
+so you will still have to make at least the interface in Perl; also modify
+or delete them, or validate those added through Rosetta.
+
+* Call stored functions within select queries and so forth; this would
+likely only work when the stored item is actually in the database, and is
+not a pure Perl implementation.
+
+* Create stored triggers, with the same caveats as stored procedures and
+functions regarding multiplicity of implementations, or update or remove
+them, or validate those added through Rosetta; initially this feature will
+not work at all unless the underlying RDBMS supports triggers, since early
+Rosetta releases will not interrupt or scan data UID operations to
+implement triggers in Perl.
+
+* Create or alter or remove "public synonyms" in Oracle or other RDBMS that
+support the concept of this convenient aliasing system.
+
+* Create views, which are select queries whose definitions are stored in a
+database for convenience and pre-processing speed, within the default
+schema context that you connected to, and alter or remove them; validating
+views will at first only be possible if the same version of Rosetta created
+them, because it is done by a simple string compare for databases that
+store views as sql statements, so that the sql won't have to be parsed.
+
+* Also scan the views in an existing database and parse their definition
+sql so that generated data dictionaries can describe both tables, views,
+and seqs.
+
+* Also extract the stored procedures and functions and triggers and so
+forth in their raw form, unparsed, for backup or restore to the same kind
+of RDBMS that they came from.
+
+* Emulate other database interfaces (like DBI or ODBC or OCI or whatever)
+on top of Rosetta; this would require being able to parse SQL like for data
+selection or modification, or table and view creation, and so forth, as
+well as pass through unparsed the creation sql of stored procedures and
+functions and triggers for use as is (latter not portable).
+
+* Get around to parsing or generating sql for stored procedures or
+functions or triggers, and representing them abstractly for a data
+dictionary.
+
+* Whatever else is needed.

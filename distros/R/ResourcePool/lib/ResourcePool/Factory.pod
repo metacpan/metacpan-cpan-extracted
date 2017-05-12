@@ -1,0 +1,79 @@
+=head1 NAME
+
+ResourcePool::Factory - A factory to create L<ResourcePool::Resource|ResourcePool::Resource> objects
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Factory;
+ 
+ my $factory = ResourcePool::Factory->new();
+
+=head1 DESCRIPTION
+
+
+This class acts as a base class for factories which are used together with the L<ResourcePool|ResourcePool>. The purpose of a ResourcePool::Factory derived class is to store all required data to construct a L<ResourcePool::Resource|ResourcePool::Resource> derived object as required. In other words, the factory stores the arguments required for the constructor of the Resource and creates one when asked to do so.
+
+The L<ResourcePool|ResourcePool> takes a ResourcePool::Factory on construction and will use it to create the required resources as configured.
+
+=head2 S<ResourcePool::Factory-E<gt>new>
+
+The new method is called to create a new factory.
+
+Usually this method just stores the parameters somewhere and will use it later L<create_resource|/create_resource> is called.
+
+
+=head2 S<$factory-E<gt>create_resource>
+
+This method is used to actually create a resource according to the parameters given to the new method.
+
+You must override this method in order to do something useful.
+
+B<Returns:> a reference to a ResourcePool::Resource object
+
+=head2 S<$factory-E<gt>info>
+
+This method is used for reporting purposes. It doesn't take any arguments and just returns some human readable string to identify the factory (and the related resource).
+
+You are not required to override this method, but its highly recommended for reporting purposes.
+
+B<Returns:> A human readable string describing the factory
+
+=head2 S<$factory-E<gt>mk_singleton_key>
+
+This method is used to create the key which separates instances of a class which should not considered being the same when using L<ResourcePool::Singleton|ResourcePool::Singleton>.
+
+Remember, the key difference between the L<ResourcePool::Singleton|ResourcePool::Singleton> and other singleton implementations is that L<ResourcePool::Singleton|ResourcePool::Singleton> can take parameters into account. This means that, for example, two instances of the same class (e.g. DBI) with different parameters (e.g. database names) are NOT considered to be the same!
+
+This function must return a string which holds all information which separates such instances from each other. The default implementation does just return a stringified representation of the $self reference (using L<Data::Dumper|Data::Dumper>). This is usually what you want. But if you configure some parameters to your factory which should not separate the factories (e.g. a transaction/request id which is used by the L<info()|/info> method for reporting purposes), you must override this method to take only the required information into account.
+
+Performance might be another aspect why to override this method. This method is called every time you construct a L<ResourcePool|ResourcePool> even if the new method of L<ResourcePool|ResourcePool> does return a previously constructed reference. Keep in mind: the default implementation is generic but slow.
+
+
+=head2 S<$factory-E<gt>singleton>
+
+This function is used by L<ResourcePool|ResourcePool> on construction. Even if you develop you own factory, you do usually not get in touch with this method. But anyway, documentation is provided for better understanding:
+
+Used to implement the singleton behavior of the factory. The new method of this class does NOT return a singleton reference! Instead, you have to call this method to obtain a singleton reference of this factory. This is required to allow factories to not require all parameters which have to be taken into account for the singleton separation on construction.
+
+The L<ResourcePool::Factory::Net::LDAP|ResourcePool::Factory::Net::LDAP> makes use of this feature. So you have the possibility to configure your factory using some more function calls (like L<the bind() method of ResourcePool::Factory::Net::LDAP|ResourcePool::Factory::Net::LDAP/bind> and afterwards call the singleton() method to get a singleton reference which takes also the bind() parameters into consideration.
+
+Normally you do not get in touch with this method, if you derive your home-build factories from this class, everything will work as expected. This way of handling the singleton behaviour of factories was introduces with version 0.9909 of ResourcePool. The change is transparent to your previously developed factories if you derive your factory from this class.
+
+
+=head1 SEE ALSO
+
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Resource|ResourcePool::Resource>,
+L<ResourcePool::Factory::DBI|ResourcePool::Factory::DBI>,
+L<ResourcePool::Factory::Net::LDAP|ResourcePool::Factory::Net::LDAP>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

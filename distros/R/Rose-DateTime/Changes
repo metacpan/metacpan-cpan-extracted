@@ -1,0 +1,120 @@
+0.540 (12.08.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Handle object return value from DateTime->DefaultLocale.
+
+0.539 (10.03.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a typo in the documentation. (RT 89224)
+
+0.538 (03.20.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Ensure that "today" is parsed as a DateTime with the time set to
+      00:00:00.  (RT 84068)
+
+0.537 (05.04.2011) - John Siracusa <siracusa@gmail.com>
+
+    * Well that was fast.  DateTime 0.69 fixes RT 67928.  Tests updated.
+
+0.536 (05.03.2011) - John Siracusa <siracusa@gmail.com>
+
+    * Account for changes in DateTime 0.67 and later and work around
+      http://rt.cpan.org/Public/Bug/Display.html?id=67928
+
+0.535 (01.24.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Handle pre-0.4 version of DateTime::Locale.  (RT 65070)
+
+0.534 (03.22.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Updated to avoid calling methods that were deprecated in
+      DateTime::Locale version 0.44 and later.
+
+0.533 (10.16.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Updated eval blocks to avoid stomping on $@ from an outer scope.
+
+0.532 (10.23.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Made compatible with DateTime 0.35 and DateTime::Locale 0.31.
+      (Patch by Lucian Dragus)
+
+0.531 (10.06.2006) - John Siracusa <siracusa@gmail.com>
+
+    * parse_date() now accepts "now!" as an alias for "now".
+    * Fixed a typo in the documentation.
+
+0.53 (06.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * parse_date() now accepts epoch values in the full range, not
+      just 9 or 10 digit numbers.
+    * Added parse_epoch() function to resolve the now-ambiguous parse_date()
+      behavior with respect to epochs and YYYYMMDD values.
+
+0.522 (04.08.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Updated the test suite to account for systems that can't handle
+      negative epoch values.  (Thanks to Michael Lackhoff)
+
+0.521 (04.05.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Removed stray "._*" files from module distribution.
+
+0.52 (04.04.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Allow negative and fractional epoch values in parse_date().
+    * Fixed a bug in the yyyy-mm-dd date parsing that caused it to
+      incorrectly match 10-digit seconds-since-epoch values.
+      (Reported by Peter Karman)
+
+0.51 (03.16.2006) - John Siracusa <siracusa@gmail.com>
+
+    * The european_dates() setting is now initialized as appropriate for
+      the current locale, discovered via to DateTime->DefaultLocale().
+      (Suggested by Michael Lackhoff)
+
+0.50 (03.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for Euorpean-style (dd/mm/yyyy) dates.
+    * Big version number bump to reflect progress towards 1.0.
+
+0.0134 (08.22.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed incorrect version number in one file.
+
+0.0133 (08.20.2005) - John Siracusa <siracusa@gmail.com>
+
+    * POD fixes.
+
+0.0131 (03.10.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed POD errors in Rose::DateTime::Util.
+
+0.013 (02.26.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Changed default time zone from 'local' to 'floating' in
+      Rose::DateTime::Util in order to avoid unnecessary overhead
+      when setting the time zone explicitly.
+
+0.0122 (12.14.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Ho hum, another day, another release.  Documentation patch 
+      again to fix more typos and further clarify local time zone
+      shenanigans.
+
+0.0121 (12.13.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Documentation patch to fix typos and clarify local time zone
+      shenanigans.
+
+0.012 (12.08.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Fix attempt to fail gracefully when the local time zone cannot
+      be determined.
+
+0.011 (11.14.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Added copyright info.  Version 0.01 removed.
+
+0.01 (11.13.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Initial release.

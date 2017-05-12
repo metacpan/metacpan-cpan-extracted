@@ -1,0 +1,23 @@
+1.02 2017-02-20
+ - Drop support for RT 4.0
+ - Fix display of RT-Send-To header on RT 4.2 and above
+ - Switch to autocomplete technique from RT 4.2 and above
+
+1.01 2016-12-01
+ - Respect RT 4.4.2's HideOneTimeSuggestions config
+
+1.00 2015-02-27
+ - Bump minimum version to 4.0.11, and drop the patch
+ - Packaging updates
+
+0.04 2013-01-22
+ - Note that the patch isn't needed once 4.0.11 is out
+ - tweak inc/ in the repository for non-devs working from github
+
+0.03 2013-01-22
+ - Overhaul the doc
+ - Grab one-time recipient suggestions from previous One-time To addresses
+ - Bug fix: Ensure the One-time To suggestion checkboxes remain checked
+ - Use the RT standard EscapeJS function which is bulletproof compared to
+   the previous manual escaping
+

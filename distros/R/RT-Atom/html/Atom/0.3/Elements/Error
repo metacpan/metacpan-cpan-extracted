@@ -1,0 +1,9 @@
+<%INIT>
+$r->content_type('text/html');
+$r->headers_out->{$_} = $ARGS{$_} for sort keys %ARGS;
+$r->status($Status);
+$m->abort unless $ENV{FCGI_ROLE};
+</%INIT>
+<%ARGS>
+$Status => 500
+</%ARGS>

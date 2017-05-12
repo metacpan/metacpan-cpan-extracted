@@ -1,0 +1,229 @@
+=pod
+
+=head1 NAME
+
+RPC::ExtDirect::Server::Util - Ext.Direct server utility functions
+
+=head1 SYNOPSIS
+
+=head2 Using in test scripts
+
+    use Test::More tests => n;
+    use RPC::ExtDirect::Server::Util;
+    
+    my ($host, $port) = maybe_start_server();
+    ok $port, "Got host: $host and port: $port";
+    
+    ...
+    
+    # Optional, will be called automatically
+    stop_server()
+
+=head2 Running test scripts
+
+Run with no command line options to fork a child process, instantiate
+a new server and run the tests against the child process (normal mode):
+    
+    perl t/01_test.t
+    
+    1..x
+    
+    ...
+
+=head2 Debugging test scripts
+
+In one terminal session, run a script in debugging mode:
+
+    perl t/01_test.t -fet 1
+    
+    1..x
+    RPC::ExtDirect::Server is listening on 127.0.0.1:31302
+
+    Loading DB routines from perl5db.pl version 1.33
+    Editor support available.
+    
+    DB<1>
+
+In another terminal session, run the same script against the process
+started above by specifying the port it listens on:
+
+    perl t/01_test.t -p 31302
+    
+    1..x
+    ...
+
+=head1 DESCRIPTION
+
+This package contains utility functions for starting and stopping
+L<RPC::ExtDirect::Server> instances. It is most commonly used in
+test scripts, both for running the tests and debugging the code when
+test failures happen.
+
+=head1 EXPORTED SUBROUTINES
+
+This package exports the following functions:
+
+=over 4
+
+=item C<start_server>
+
+Start a new instance of RPC::ExtDirect::Server or derived class, wait
+for it to bind to a port and return the actual host and port number
+values. If an instance has already been started, return its host and
+port.
+
+The server instance by default will be started in background
+(forked process), or optionally in foreground. See L</foreground>
+parameter below.
+
+If a port to listen to was not specified in arguments, a random
+value between 30,000 and 40,000 will be generated. If the server
+instance is unable to bind to the generated port, a new random value
+will be generated and a new attempt to bind to that port will be made,
+until an unused port is found.
+
+If a port value was provided in arguments, but the server is unable
+to bind to that port, no attempts will be made to bind to another port;
+C<start_server> will die with an error.
+
+This function returns C<< ($host, $port) >> values in list context,
+or C<"$host:$port"> string in scalar context.
+
+The following arguments are accepted by name in a hash:
+
+=over 8
+
+=item C<server_class>
+
+Name of the class to use instead of L<RPC::ExtDirect::Server> when
+instantiating a new server object. This should be a subclass of
+RPC::ExtDirect::Server.
+
+=item C<timeout>
+
+Interval in seconds to wait for the server to bind to a port; after
+that the child process will be killed and C<start_server> will die
+with an error.
+
+This parameter defaults to 30 seconds and is only meaningful when
+server is started in background.
+
+=item C<foreground>
+
+If set to a truthy value the server instance will be instantiated
+and executed in the current process, instead of forking a child
+process. 
+
+=item C<enbugger>
+
+If set to a truthy value, an attempt will be made to C<require>
+the L<Enbugger> module.
+
+=item C<set_timer>
+
+Interval in seconds to wait before dropping to debugger prompt
+by calling C<< Enbugger->stop() >>. This is useful to set breakpoints
+after the server has been initialized and bound to a port. Usually 1
+second is enough for this, but starting up may take longer when
+heavyweight modules like L<Moose> are used in your code.
+
+=item other
+
+Any other arguments are passed to the L</server_class> constructor.
+See L<RPC::ExtDirect::Server/new> for more information.
+
+=back
+
+=item C<maybe_start_server>
+
+This function will process command line options from C<@ARGV>
+and optionally start a new server instance by calling L</start_server>.
+
+If the L</-p> option was given, the host and port will be returned
+immediately instead of attempting to start a server. This allows
+using the the same function both to debug test scripts and run them
+normally; see examples in L</SYNOPSIS>.
+
+This function accepts named arguments in a hash; all arguments will be
+passed to L</start_server> except when modified by command line options
+described below:
+
+=over 8
+
+=item C<-h>
+
+Host name or IP address to use either when starting a server process,
+or connecting to a separately started process. Defaults to C<127.0.0.1>.
+
+See L</host> in L</start_server>.
+
+=item C<-p>
+
+Port number that should be used to connect to a separately started
+server process. Specifying this option will cause L</maybe_start_server>
+to return the host and port immediately instead of trying to start
+a new server instance.
+
+=item C<-l>
+
+Port number to bind to when starting a new process. If no port number
+is given, a random port will be generated.
+
+See L</port> in L</start_server>.
+
+=item C<-s>
+
+Directory to use as the static content root; the value will be passed
+to the server constructor as C<static_dir> parameter. See
+L<RPC::ExtDirect::Server/new>.
+
+=item C<-f>
+
+Run the server instance in foreground instead of in a forked process.
+
+See L</foreground> parameter in L</start_server>.
+
+=item C<-e>
+
+Require the L<Enbugger> module.
+
+See L</enbugger> parameter in L</start_server>.
+
+=item C<-t>
+
+Interval in seconds to wait before dropping into debugger prompt.
+
+See L</set_timer> parameter in L</start_server>.
+
+=back
+
+=item C<stop_server>
+
+Stop the server instance in a forked child process, if it has been
+started already. This function accepts an optional process id number
+of the child process.
+
+This function will be called automatically in an C<END> block to
+ensure that the server instance has been stopped when the script
+finishes. This automatic cleanup can be prevented; see L</no_shutdown>.
+
+=back
+
+This function is not exported:
+
+=over 4
+
+=item C<no_shutdown>
+
+Pass a truthy value to this function to prevent automatic server
+instance cleanup:
+
+    RPC::ExtDirect::Server::Util::no_shutdown(1);
+
+=back
+
+=head1 SEE ALSO
+
+This module and its functions are used heavily in L<Test::ExtDirect>.
+
+=cut

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Rose-Conf
+version:      0.021
+version_from: lib/Rose/Conf.pm
+installdirs:  site
+requires:
+    File::Spec:                    0
+    Rose::Object:                  0
+    Tie::Hash:                     0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

@@ -1,0 +1,11 @@
+ROAD MAP:
+
+     Add example support to use something like Atom responses instead
+     of just "xml".  This will be "application/atom+xml" and will
+     likely override the default "xml" XML::Dumper implementation.
+
+BLUE SKY IDEAS:
+
+     Look at Atom Publishing Protocol support.  The samples are
+     functional, but they are doing work that arguably should be done
+     at the base class.

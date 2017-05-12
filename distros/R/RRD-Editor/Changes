@@ -1,0 +1,11 @@
+Revision history for RRD-Editor
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.06	Misc portability fixes (dealing with NaN, different precisions in calculations, different time zones etc)
+0.07	Added support for SPARC and SH4
+0.08	More portability tweaks to handle NaN, Inf on older systems
+0.09	Handling NaN, Inf on windows systems
+0.10	Better file opening (readonly handling), minor code tweaks.  Thanks to John LoVerso.
+0.12	Further portability testing - Irix
+0.15	Minor bug fixes (template handling, open files)	

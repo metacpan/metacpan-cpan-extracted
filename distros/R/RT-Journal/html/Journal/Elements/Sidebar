@@ -1,0 +1,8 @@
+<a href="<& Attr, User => $User, Name=>'BaseURL'&>"><& Attr, User => $User, Name => 'Title'&></a><br>
+<a href="<%$RT::WebBaseURL%>Journal/Prefs.html"><&|/l&>Preferences</&> (<&|/l&>Requires login</&>)</a><br>
+% if ($session{'CurrentUser'} && $session{'CurrentUser'}->Id) {
+<a href="<%$RT::WebBaseURL%>NoAuth/Logout.html?URL=<& Attr, User => $User, Name=>'BaseURL'&>"><&|/l&>Logout</&></a><br>
+% }
+<%ARGS>
+$User
+</%ARGS>

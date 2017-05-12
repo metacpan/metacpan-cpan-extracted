@@ -1,0 +1,22 @@
+Revision history for Router::Pygmy
+
+0.05 Thursday, Mar. 31 2016
+
+- properly handled paths containing '0' parts
+
+0.04 Tuesday, Oct. 07 2014
+
+- match_named returns [ key => value, ... ]
+
+0.03 Sunday, Sep. 28th 2014
+
+- routes can be supplied in constructor
+
+0.02 Thursday, Jul. 03th  2014
+
+- @CARP_NOT set in Router::Pygmy::Route
+
+0.01 Wednesday, Apr. 23th  2014
+
+- initial release
+

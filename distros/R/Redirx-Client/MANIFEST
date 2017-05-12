@@ -1,0 +1,7 @@
+Changes
+lib/Redirx/Client.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/test.t

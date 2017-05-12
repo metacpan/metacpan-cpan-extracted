@@ -1,0 +1,45 @@
+NAME
+    Regexp::Trie - builds trie-ized regexp
+
+SYNOPSIS
+      use Regexp::Trie;
+      my $rt = Regexp::Trie->new;
+      for (qw/foobar fooxar foozap fooza/){
+        $rt->add($_);
+      }
+      print $rt->regexp, "\n" # (?-xism:foo(?:bar|xar|zap?))
+
+DESCRIPTION
+    This module is a faster but simpler version of Regexp::Assemble or
+    Regexp::Optimizer. It builds a trie-ized regexp as above.
+
+    This module is faster than Regexp::Assemble but you can only add
+    literals. "a+b" is treated as "a\+b", not "more than one a's followed by
+    b".
+
+    I wrote this module because I needed something faster than
+    Regexp::Assemble and Regexp::Optimizer. If you need more minute control,
+    use those instead.
+
+TIPS
+    See t/dict2rx.pl to find how to convert a big dictionary into a single
+    regexp that can be later loaded as:
+
+      my $rx = do 'dict.rx';
+
+  EXPORT
+    None.
+
+SEE ALSO
+    Regexp::Optimizer, Regexp::Assemble, Regex::PreSuf
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

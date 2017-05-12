@@ -1,0 +1,26 @@
+@prefix : <http://usefulinc.com/ns/doap#> .
+
+`RDF-RDFa-Generator`
+	:shortdesc      "generate some data in RDFa"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/RDF-RDFa-Generator> ;
+	:download-page  <https://metacpan.org/release/RDF-RDFa-Generator> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDFa-Generator> ;
+	:repository     [ a :HgRepository; :browse <https://bitbucket.org/tobyink/p5-rdf-rdfa-generator> ] ;
+	:maintainer     cpan:TOBYINK ;
+	:developer      cpan:TOBYINK ;
+	:documenter     cpan:TOBYINK ;
+	:tester         cpan:TOBYINK ;
+	:created        2010-05-05 ;
+	:license        <http://dev.perl.org/licenses/> ;
+	:category
+		[ label "RDF" ],
+		[ label "RDFa" ],
+		[ label "Semantic Web" ],
+		[ label "Generator" ],
+		[ label "Serializer" ],
+		[ label "Serialiser" ],
+		[ label "Output" ],
+		[ label "Writer" ],
+		[ label "HTML" ],
+		[ label "XHTML" ] .

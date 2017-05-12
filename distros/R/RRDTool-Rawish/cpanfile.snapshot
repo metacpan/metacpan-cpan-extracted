@@ -1,0 +1,189 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Capture-Tiny-0.42
+    pathname: D/DA/DAGOLDEN/Capture-Tiny-0.42.tar.gz
+    provides:
+      Capture::Tiny 0.42
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Spec 0
+      File::Temp 0
+      IO::Handle 0
+      Scalar::Util 0
+      perl 5.006
+      strict 0
+      warnings 0
+  ExtUtils-Config-0.008
+    pathname: L/LE/LEONT/ExtUtils-Config-0.008.tar.gz
+    provides:
+      ExtUtils::Config 0.008
+    requirements:
+      Data::Dumper 0
+      ExtUtils::MakeMaker 6.30
+      strict 0
+      warnings 0
+  ExtUtils-Helpers-0.022
+    pathname: L/LE/LEONT/ExtUtils-Helpers-0.022.tar.gz
+    provides:
+      ExtUtils::Helpers 0.022
+      ExtUtils::Helpers::Unix 0.022
+      ExtUtils::Helpers::VMS 0.022
+      ExtUtils::Helpers::Windows 0.022
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.30
+      File::Basename 0
+      File::Copy 0
+      File::Spec::Functions 0
+      Module::Load 0
+      Text::ParseWords 3.24
+      strict 0
+      warnings 0
+  ExtUtils-InstallPaths-0.011
+    pathname: L/LE/LEONT/ExtUtils-InstallPaths-0.011.tar.gz
+    provides:
+      ExtUtils::InstallPaths 0.011
+    requirements:
+      Carp 0
+      ExtUtils::Config 0.002
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      perl 5.006
+      strict 0
+      warnings 0
+  File-Which-1.21
+    pathname: P/PL/PLICEASE/File-Which-1.21.tar.gz
+    provides:
+      File::Which 1.21
+    requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.006
+  Module-Build-0.4218
+    pathname: L/LE/LEONT/Module-Build-0.4218.tar.gz
+    provides:
+      Module::Build 0.4218
+      Module::Build::Base 0.4218
+      Module::Build::Compat 0.4218
+      Module::Build::Config 0.4218
+      Module::Build::Cookbook 0.4218
+      Module::Build::Dumper 0.4218
+      Module::Build::Notes 0.4218
+      Module::Build::PPMMaker 0.4218
+      Module::Build::Platform::Default 0.4218
+      Module::Build::Platform::MacOS 0.4218
+      Module::Build::Platform::Unix 0.4218
+      Module::Build::Platform::VMS 0.4218
+      Module::Build::Platform::VOS 0.4218
+      Module::Build::Platform::Windows 0.4218
+      Module::Build::Platform::aix 0.4218
+      Module::Build::Platform::cygwin 0.4218
+      Module::Build::Platform::darwin 0.4218
+      Module::Build::Platform::os2 0.4218
+      Module::Build::PodParser 0.4218
+    requirements:
+      CPAN::Meta 2.142060
+      CPAN::Meta::YAML 0.003
+      Cwd 0
+      Data::Dumper 0
+      ExtUtils::CBuilder 0.27
+      ExtUtils::Install 0
+      ExtUtils::Manifest 0
+      ExtUtils::Mkbootstrap 0
+      ExtUtils::ParseXS 2.21
+      File::Basename 0
+      File::Compare 0
+      File::Copy 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0.82
+      File::Temp 0.15
+      Getopt::Long 0
+      Module::Metadata 1.000002
+      Parse::CPAN::Meta 1.4401
+      Perl::OSType 1
+      Pod::Man 2.17
+      TAP::Harness 3.29
+      Test::More 0.49
+      Text::Abbrev 0
+      Text::ParseWords 0
+      perl 5.006001
+      version 0.87
+  Module-Build-Tiny-0.039
+    pathname: L/LE/LEONT/Module-Build-Tiny-0.039.tar.gz
+    provides:
+      Module::Build::Tiny 0.039
+    requirements:
+      CPAN::Meta 0
+      DynaLoader 0
+      Exporter 5.57
+      ExtUtils::CBuilder 0
+      ExtUtils::Config 0.003
+      ExtUtils::Helpers 0.020
+      ExtUtils::Install 0
+      ExtUtils::InstallPaths 0.002
+      ExtUtils::ParseXS 0
+      File::Basename 0
+      File::Find 0
+      File::Path 0
+      File::Spec::Functions 0
+      Getopt::Long 2.36
+      JSON::PP 2
+      Pod::Man 0
+      TAP::Harness::Env 0
+      perl 5.006
+      strict 0
+      warnings 0
+  PadWalker-2.2
+    pathname: R/RO/ROBIN/PadWalker-2.2.tar.gz
+    provides:
+      PadWalker 2.2
+    requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.008001
+  Test-Fatal-0.014
+    pathname: R/RJ/RJBS/Test-Fatal-0.014.tar.gz
+    provides:
+      Test::Fatal 0.014
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      Test::Builder 0
+      Try::Tiny 0.07
+      strict 0
+      warnings 0
+  Test-Mock-ExternalCommand-0.03
+    pathname: T/TS/TSUCCHI/Test-Mock-ExternalCommand-0.03.tar.gz
+    provides:
+      Test::Mock::ExternalCommand 0.03
+    requirements:
+      Capture::Tiny 0
+      ExtUtils::MakeMaker 6.59
+      Test::More 0
+      Variable::Expand::AnyLevel 0
+      perl 5.010
+  Try-Tiny-0.24
+    pathname: E/ET/ETHER/Try-Tiny-0.24.tar.gz
+    provides:
+      Try::Tiny 0.24
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      constant 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Variable-Expand-AnyLevel-0.03
+    pathname: T/TS/TSUCCHI/Variable-Expand-AnyLevel-0.03.tar.gz
+    provides:
+      Variable::Expand::AnyLevel 0.03
+    requirements:
+      ExtUtils::MakeMaker 6.36
+      Module::Build::Tiny 0.035
+      PadWalker 0
+      Test::More 0
+      parent 0

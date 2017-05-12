@@ -1,0 +1,22 @@
+Makefile.PL
+Changes
+README
+MANIFEST
+lib/ResourcePool/Resource/DBI.pm
+lib/ResourcePool/Resource/DBI.pod
+lib/ResourcePool/Factory/DBI.pm
+lib/ResourcePool/Factory/DBI.pod
+lib/ResourcePool/Command/DBI/Common.pm
+lib/ResourcePool/Command/DBI/Select.pm
+lib/ResourcePool/Command/DBI/Select.pod
+lib/ResourcePool/Command/DBI/SelectRow.pm
+lib/ResourcePool/Command/DBI/SelectRow.pod
+lib/ResourcePool/Command/DBI/Execute.pm
+lib/ResourcePool/Command/DBI/Execute.pod
+t/02FactorySingleton.t
+t/03ResourcePoolSingleton.t
+t/30DBI.t
+t/50Command_Execute.t
+t/51Command_Select.t
+t/60Command_connected.t
+META.yml                                 Module meta-data (added by MakeMaker)

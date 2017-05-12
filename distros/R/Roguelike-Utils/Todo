@@ -1,0 +1,20 @@
+TODO:
+
+Add cross-platform ability to detect the shift and control keys held down while moving.
+
+Find a number pad and test/get it to work on linux/windows.
+
+Figure out how to resize the console on windows. 
+
+Try to get terminal size info via telnet negotiation for non-tty connections in the ANSI lib.
+
+Include a "wilderness" generator.
+
+Maze generators should be loaded like DBI modules... with "genmaze" taking a "method"
+ argument, which coresponds to a .pm module sitting in a directory somewhere.
+
+MAYBE:
+
+Maybe switch the map entries over to Area::Entry objects that stringify to symbols
+
+Maybe move Item, Mob over to the Utils namespace?  Maybe wait to see how they develop?

@@ -1,0 +1,72 @@
+NAME
+    Runops::Recorder - Runops replacement which saves what is being
+    performed
+
+SYNOPSIS
+      # will save to a rr-<timestamp> directory in the current directory
+      perl -MRunops::Recorder <program>
+
+      # will save to a custom directory 
+      perl -MRunops::Recorder=my_recording <program>
+  
+      # and then to view the recording
+      rr-viewer <path to recording>
+
+DESCRIPTION
+    Runops::Recorder is an alternative runops which saves what it does into
+    a file that can later be viewed using the rr-viewer tool.
+
+HOW TO RECORD
+    Simply use this module and it'll replace perl's standard runloop with
+    its own. By default a recording goes into a directory named
+    rr-<date>-_<time>. If you want an alternate name just pass it as the
+    first argument to the use (eg -MRunops::Recorder=foo).
+
+    Sometimes perl will optimize away COPs and this may look confusing when
+    viewing. If you want to turn of the optimizer pass "-noopt" when using
+    this module.
+
+    It's possible to adjust the buffer size which is how much it'll keep in
+    memory before flushing it to disk. This is done by passing "-bs=SIZE"
+    where SIZE is a number followed by an optional G/M/K/g/m/k to denote the
+    multiple. G, M and K are base-2 and g, m, k base-10. So 512K would be
+    524288 bytes. If ommited a default of 64K is used. The minimum size is
+    128 bytes.
+
+    It is possible to prevent continous store to disk with "-nostore". This
+    is ment to be used with "-die" that dumps the buffer to disk when an
+    exception occurs.
+
+VIEWING THE RECORDING
+    Use the 'rr-viewer' tool. It just takes the path with the recording as
+    an argument. Press 'q' to quit or any other key to step to the next
+    event. Press 's' to skip any events in the current file until end of
+    recording. Press 'a' to toggle wether we should skip whatever is in @INC
+    when the recorder what loaded. Press 'h' for help.
+
+    The environment variable RR_AUTORUN tells the viewer to run automaticly.
+    The value should be the sleep time until stepping. And yes, it uses
+    Time::HiRes so you can give it fracitonal seconds.
+
+    If you set RR_SKIP_INC the autorun will not show @INC files as the 'a'
+    option does.
+
+FUNCTIONS
+    dump ( $name )
+        Dumps the buffer as *$name* in the recording. Adds .dump to the
+        $name if ommited.
+
+TODO
+    Record more things such as changes to variables, opened file descriptors
+    etc.
+
+AUTHOR
+    Claes Jakobsson, <claesjac@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Claes Jakobsson
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

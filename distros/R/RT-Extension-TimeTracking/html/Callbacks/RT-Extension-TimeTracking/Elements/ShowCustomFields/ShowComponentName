@@ -1,0 +1,9 @@
+<%INIT>
+$$Name = 'ShowCustomFieldActor' if $CustomField->Name eq 'Actor' && $CustomField->LookupType eq 'RT::Queue-RT::Ticket-RT::Transaction';
+</%INIT>
+
+<%ARGS>
+$Object
+$CustomField
+$Name
+</%ARGS>

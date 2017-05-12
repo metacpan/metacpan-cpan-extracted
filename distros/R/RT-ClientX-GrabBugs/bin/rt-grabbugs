@@ -1,0 +1,3 @@
+#!perl
+use RT::ClientX::GrabBugs;
+RT::ClientX::GrabBugs->main(@ARGV);

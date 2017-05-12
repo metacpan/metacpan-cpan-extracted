@@ -1,0 +1,238 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="rivescript.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#Interactive-Mode">Interactive Mode</a></li>
+      <li><a href="#JSON-Mode">JSON Mode</a>
+        <ul>
+          <li><a href="#Standard-Input-or-Data">Standard Input or Data</a></li>
+          <li><a href="#End-of-Message">End of Message</a></li>
+        </ul>
+      </li>
+      <li><a href="#TCP-Mode">TCP Mode</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>rivescript - A command line frontend to the Perl RiveScript interpreter.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  $ rivescript [options] [path to RiveScript documents]</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a command line front-end to the RiveScript interpreter. This script obsoletes the old <code>rsdemo</code>, and can also be used non-interactively by third party programs. To that end, it supports a variety of input/output and session handling methods.</p>
+
+<p>If no RiveScript document path is given, it will default to the example brain that ships with the RiveScript module, which is based on the Eliza bot.</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<dl>
+
+<dt id="debug--d">--debug, -d</dt>
+<dd>
+
+<p>Enables debug mode. This will print all debug data from RiveScript to your terminal. If you&#39;d like it to log to a file instead, use the <code>--log</code> option instead of <code>--debug</code>.</p>
+
+</dd>
+<dt id="log-FILE">--log FILE</dt>
+<dd>
+
+<p>Enables debug mode and prints the debug output to <code>FILE</code> instead of to your terminal.</p>
+
+</dd>
+<dt id="json--j">--json, -j</dt>
+<dd>
+
+<p>Runs <code>rivescript</code> in JSON mode, for running the script in a non-interactive way (for example, to use RiveScript in a programming language that doesn&#39;t have a native RiveScript library). See <a href="#JSON-Mode">&quot;JSON Mode&quot;</a> for details.</p>
+
+</dd>
+<dt id="data-JSON_DATA">--data JSON_DATA</dt>
+<dd>
+
+<p>When using the <code>--json</code> option, you can provide the JSON input message as a command line argument with the <code>--data</code> option. If not provided, then the JSON data will be read from standard input instead. This option is helpful, therefore, if you don&#39;t want to open a two-way pipe, but rather pass the message as a command line argument and just read the response from standard output. See <a href="#JSON-Mode">&quot;JSON Mode&quot;</a> for more details.</p>
+
+</dd>
+<dt id="listen--l-ADDRESS:-PORT">--listen, -l [ADDRESS:]PORT</dt>
+<dd>
+
+<p>Runs <code>rivescript</code> in TCP mode, for running the script as a server daemon. If an address isn&#39;t specified, it will bind to <code>localhost</code>. See <a href="#TCP-Mode">&quot;TCP Mode&quot;</a> for details.</p>
+
+</dd>
+<dt id="strict---nostrict">--strict, --nostrict</dt>
+<dd>
+
+<p>Enables strict mode for the RiveScript parser. It&#39;s enabled by default, use <code>--nostrict</code> to disable it. Strict mode prevents the parser from continuing when it finds a syntax error in the RiveScript documents.</p>
+
+</dd>
+<dt id="depth-50">--depth=50</dt>
+<dd>
+
+<p>Override the default recursion depth limit. This controls how many times RiveScript will recursively follow redirects to other replies. The default is <code>50</code>.</p>
+
+</dd>
+<dt id="utf8--u">--utf8, -u</dt>
+<dd>
+
+<p>Use the UTF-8 option in RiveScript. This allows triggers to contain foreign characters and relaxes the filtering of user messages. This is not enabled by default!</p>
+
+</dd>
+<dt id="help">--help</dt>
+<dd>
+
+<p>Displays this documentation in your terminal.</p>
+
+</dd>
+</dl>
+
+<h1 id="USAGE">USAGE</h1>
+
+<h2 id="Interactive-Mode">Interactive Mode</h2>
+
+<p>This is the default mode used when you run <code>rivescript</code> without specifying another mode. This mode behaves similarly to the old <code>rsdemo</code> script and lets you chat one-on-one with your RiveScript bot.</p>
+
+<p>This mode can be used to test your RiveScript bot. Example:</p>
+
+<pre><code>  $ rivescript /path/to/rs/files</code></pre>
+
+<h2 id="JSON-Mode">JSON Mode</h2>
+
+<p>This mode should be used when calling from a third party program. In this mode, data that enters and leaves the script are encoded in JSON.</p>
+
+<p>Example:</p>
+
+<pre><code>  $ rivescript --json /path/to/rs/files</code></pre>
+
+<p>The format for incoming JSON data is as follows:</p>
+
+<pre><code>  {
+    &quot;username&quot;: &quot;localuser&quot;,
+    &quot;message&quot;:  &quot;Hello bot!&quot;,
+    &quot;vars&quot;: {
+      &quot;name&quot;: &quot;Aiden&quot;
+    }
+  }</code></pre>
+
+<p>Here, <code>username</code> is a unique name for the user, <code>message</code> is their message to the bot, and <code>vars</code> is a hash of any user variables your program might be keeping track of (such as the user&#39;s name and age).</p>
+
+<p>The response from <code>rivescript</code> will look like the following:</p>
+
+<pre><code>  {
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;reply&quot;:  &quot;Hello, human!&quot;,
+    &quot;vars&quot;: {
+      &quot;name&quot;: &quot;Aiden&quot;
+    }
+  }</code></pre>
+
+<p>Here, <code>status</code> will be <code>&quot;ok&quot;</code> or <code>&quot;error&quot;</code>, <code>reply</code> is the bot&#39;s response to your message, and <code>vars</code> is a hash of the current variables for the user (so that your program can save them somewhere).</p>
+
+<h3 id="Standard-Input-or-Data">Standard Input or Data</h3>
+
+<p>By default, JSON mode will read from standard input to receive your JSON message. As an alternative to this, you can provide the <code>--data</code> option to <code>rivescript</code> to present the incoming JSON data as a command line argument.</p>
+
+<p>This may be helpful if you don&#39;t want to open a two-way pipe to <code>rivescript</code>, and would rather pass your input as a command line argument and simply read the response from standard output.</p>
+
+<p>Example:</p>
+
+<pre><code>  $ rivescript --json --data &#39;{&quot;username&quot;: &quot;localuser&quot;, &quot;message&quot;: &quot;hello&quot; }&#39; \
+    /path/to/rs/files</code></pre>
+
+<p>This will cause <code>rivescript</code> to print its JSON response to standard output and exit. You can&#39;t have a stateful session using this method.</p>
+
+<h3 id="End-of-Message">End of Message</h3>
+
+<p>There are two ways you can use the JSON mode: &quot;fire and forget,&quot; or keep a stateful session open.</p>
+
+<p>In &quot;fire and forget,&quot; you open the program, print your JSON input and send the EOF signal, and then <code>rivescript</code> sends you the JSON response and exits.</p>
+
+<p>In a stateful session mode, you must send the text <code>__END__</code> on a line by itself after you finish sending your JSON data. Then <code>rivescript</code> will process it, return its JSON response and then also say <code>__END__</code> at the end.</p>
+
+<p>Example:</p>
+
+<pre><code>  {
+    &quot;username&quot;: &quot;localuser&quot;,
+    &quot;message&quot;: &quot;Hello bot!&quot;,
+    &quot;vars&quot;: {}
+  }
+  __END__</code></pre>
+
+<p>And the response:</p>
+
+<pre><code>  {
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;reply&quot;: &quot;Hello, human!&quot;,
+    &quot;vars&quot;: {}
+  }
+  __END__</code></pre>
+
+<p>This way you can reuse the same pipe to send and receive multiple messages.</p>
+
+<h2 id="TCP-Mode">TCP Mode</h2>
+
+<p>TCP Mode will make <code>rivescript</code> listen on a TCP socket for incoming connections. This way you can connect to it from a different program (for example, a CGI script or a program written in a different language).</p>
+
+<p>Example:</p>
+
+<pre><code>  $ rivescript --listen localhost:2001</code></pre>
+
+<p>TCP Mode behaves similarly to <a href="#JSON-Mode">&quot;JSON Mode&quot;</a>; the biggest difference is that it will read and write using a TCP socket instead of standard input and output. Unlike JSON Mode, however, TCP Mode <i>always</i> runs in a stateful way (the JSON messages must end with the text &quot;<code>__END__</code>&quot; on a line by itself). See <a href="#End-of-Message">&quot;End of Message&quot;</a>.</p>
+
+<p>If the <code>__END__</code> line isn&#39;t found after 20 lines of text are read from the client, it will give up and send the client an error message (encoded in JSON) and disconnect it.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>RiveScript</a>, the Perl RiveScript interpreter.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Noah Petherbridge, http://www.kirsle.net</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<pre><code>  RiveScript - Rendering Intelligence Very Easily
+  Copyright (C) 2012 Noah Petherbridge
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</code></pre>
+
+
+</body>
+
+</html>
+
+

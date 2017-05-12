@@ -1,0 +1,21 @@
+Revision history for RPG-Traveller-Person
+1.020     2013-03-05 20:16:26 America/New_York
+
+1.010     2013-03-04 14:37:57 America/New_York
+
+First Production version 
+
+
+0.600     2013-03-04 10:25:57 America/New_York
+Bugs discovered and killed.  Some of which:
+
+	uwp2string was renamed appropriately to upp2string
+	toString function was not processing passed in blessed object
+
+
+
+0.502     2013-02-27 08:31:37 America/New_York
+Added more functionality in preparation for RPG::Traveller::Person::CTB1
+to be released.
+
+0.500     2013-02-22 16:38:11 America/New_York

@@ -1,0 +1,17 @@
+abstract: Convert RT1 installations to RT3
+author: Kevin Falcone  C<< <falcone@bestpractical.com> >>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: RT-Extension-Converter
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor::Fast: 0
+  Date::Format: 0
+  MIME::Parser: 0
+  RT: 3.6
+  Test::More: 0
+version: 0.03

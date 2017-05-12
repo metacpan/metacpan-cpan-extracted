@@ -1,0 +1,120 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Role-Inspector/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "mop::role"^^doap-deps:CpanId ], [ doap-deps:on "Moose::Role 2.0600"^^doap-deps:CpanId ], [ doap-deps:on "Mouse::Role 1.00"^^doap-deps:CpanId ], [ doap-deps:on "Moo::Role 1.000000"^^doap-deps:CpanId ], [
+		doap-deps:on "Role::Tiny 1.000000"^^doap-deps:CpanId;
+	], [ doap-deps:on "Role::Basic"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Modern 0.006"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Role-Inspector>;
+	doap:created         "2014-04-08"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Role-Inspector>;
+	doap:homepage        <https://metacpan.org/release/Role-Inspector>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Role-Inspector";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-role-inspector>;
+	];
+	doap:shortdesc       "introspection for roles".
+
+<http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Role-Inspector-0.001"^^xsd:string;
+	dc:issued            "2014-04-08"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Inspector-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Role-Inspector-0.002"^^xsd:string;
+	dc:issued            "2014-04-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Correct name for @Role::Inspector::SCANNERS in example.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Inspector-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Role-Inspector-0.003"^^xsd:string;
+	dc:issued            "2014-04-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Tests added for Role::Tiny and Moose::Role roles when Moo is in memory.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Tests added for Moo::Role roles when Moose is in memory.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Inspector-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Role-Inspector-0.004"^^xsd:string;
+	dc:issued            "2014-04-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Include 'provides' and 'requires' keys in the returned hashref.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Inspector-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Inspector/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Role-Inspector-0.005"^^xsd:string;
+	dc:issued            "2014-09-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Provide the `does_role` function.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Tests for indirect consumption of roles.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Split documentation for `learn` and `@SCANNERS` into a separate section.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Split documentation for method call style into a separate section.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Inspector-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

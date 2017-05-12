@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+lib/RPM/Payload.pm
+perl-RPM-Payload.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

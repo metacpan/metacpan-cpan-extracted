@@ -1,0 +1,42 @@
+This module creates an RPM package from a description hashref.
+
+Before writing this, I found several existing modules that do roughly
+the same thing.  They had varying strengths and emphases.  But none met
+all the criteria I wanted:
+
+   * Driven by a single spec hashref.  A single static method turns the
+     hashref into an RPM.
+
+     Among other things, this means you can trivially use a JSON spec.
+     (See JSON::DWIW)
+
+   * Lets you specify empty directories to create at RPM install time.
+
+   * Lets you specify the permissions, owner and group of each file and
+     directory in the spec hashref.
+
+   * Lets you specify dependencies and pre/post install scripts.
+
+   * Fails on errors.
+
+One reason RPM creation is very confusing is that it confounds source code
+compilation with packaging.
+
+Another is that it confuses (by default) destination file paths - where
+the files will land - with source file paths - where the files come from
+at package creation time.
+
+This module tries to remedy this confusion.  The module focuses only
+on building RPMs for distribution, not on compiling source.  And it
+clearly separates source and destination paths.
+
+(Under the covers, this module uses the rpmbuild command to create the RPM.
+It also creates a temporary dir, which it removes if all went well.)
+
+
+INSTALL:
+
+perl Makefile.PL
+make
+make test
+make install

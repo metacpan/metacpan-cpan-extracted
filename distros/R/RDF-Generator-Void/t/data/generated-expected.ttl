@@ -1,0 +1,125 @@
+@base <http://localhost/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix wv: <http://vocab.org/waiver/terms/norms> .        
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix rel: <http://purl.org/vocab/relationship/> .
+
+
+<http://example.org/> a void:Dataset ;
+	   void:triples 4667 ;
+	   void:entities 558 ;
+	   void:properties 17 ;
+	   void:distinctSubjects 756 ;
+	   void:distinctObjects 3525 ;
+
+#     	   void:propertyPartition 
+# 	   [ 
+#              void:property foaf:name;
+#        	     void:triples 320;
+# 	   ],
+# 	   [	   
+# 	     void:property dc:date ;
+#       	     void:triples 298 ;
+# 	   ],	     
+# 	   [	     
+# 	     void:property rdfs:comment ;
+# 	     void:triples 337 ;
+# 	   ],
+# 	   [
+# 	     void:property dc:issued ;
+# 	     void:triples 260 ;
+# 	   ],
+# 	   [ 
+# 	     void:property rel:friendOf ;
+#        	     void:triples 207 ;
+# 	   ],
+# 	   [ 
+# 	     void:property foaf:homepage ;
+#        	     void:triples 231 ;
+# 	   ],
+# 	   [ 
+# 	     void:property rel:ancestorOf ;
+#        	     void:triples 224 ;
+# 	   ],
+# 	   [ 
+# 	     void:property rel:childOf ;
+#        	     void:triples 213 ;
+# 	   ],
+# 	   [ 
+# 	     void:property rdf:type ;
+# 	     void:triples 687 ;
+# 	   ],
+# 	   [ 
+# 	     void:property dc:subject ;
+#        	     void:triples 207 ;
+# 	   ],
+# 	   [ 
+# 	     void:property owl:sameAs ;
+#        	     void:triples 108 ;
+# 	   ],
+# 	   [
+# 	     void:property rdfs:label ;
+#        	     void:triples 322 ;
+# 	   ],
+# 	   [
+# 	     void:property dc:language ;
+#        	     void:triples 311 ;
+# 	   ],
+# 	   [
+# 	     void:property rel:apprenticeTo ;
+#        	     void:triples 198 ;
+# 	   ],
+# 	   [
+# 	     void:property rel:hasMet ;
+#        	     void:triples 222 ;
+# 	   ],
+# 	   [
+#  	     void:property dc:title ;
+#        	     void:triples 314 ;
+# 	   ],		     
+# 	   [ 
+#              void:property foaf:knows;
+#        	     void:triples 208;
+# 	   ];
+		
+ 	   void:classPartition 
+# 	   [
+# 	     void:class foaf:Person;
+#              void:triples 99;
+#     	   ],
+# 	   [
+# 	     void:class dc:Event ;
+# 	     void:triples 112 ;
+# 	   ],
+# 	   [
+# 	     void:class foaf:Agent ;
+#       	     void:triples 113 ;
+# 	   ],
+# 	   [
+# 	     void:class dc:Text ;
+#        	     void:triples 127 ;
+# 	   ],
+ 	   [
+ 	     void:class dc:Sound ;
+       	     void:triples 107 ;
+ 	   ],
+	   [
+ 	     void:class foaf:Organization ;
+       	     void:triples 129 ;
+	   ];
+
+    	   void:uriSpace "http://example.org/subjects/";
+	   void:vocabulary <http://purl.org/dc/terms/>, 
+	   		   <http://purl.org/vocab/relationship/>, 
+			   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>, 
+			   <http://www.w3.org/2000/01/rdf-schema#>, 
+			   <http://www.w3.org/2002/07/owl#>, 
+			   <http://xmlns.com/foaf/0.1/> .
+

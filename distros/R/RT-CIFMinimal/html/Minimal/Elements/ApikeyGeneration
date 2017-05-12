@@ -1,0 +1,56 @@
+<h1>Key Generation</h1>
+<& ApikeyWarning &>
+<br><br>
+        <form method="post">
+<table>
+    <tr>
+        <td><b>Key Description<b></td>
+        <td><input type='text' name='key_description' size=30 value='myapp'/></td>
+    </tr>
+    <tr>
+        <td>
+            <b>Key Groups</b><br>
+            <i>Groups this key should<br>be able to access</i>
+        </td>
+        <td align="right">
+            <select name="add_groups" multiple="multiple">
+% foreach(@sorted){
+                <option value='<% $_ %>' selected="selected"><% $_ %></option>
+% }
+
+            </select>
+        </td>
+    <tr>
+        <td>
+            <b>Default Group</b><br>
+            <i>What group this key's searches<br>should be exposed to</i>
+        </td>
+        <td align="right">
+            <select name="default_group">
+% foreach(@sorted){
+% my $selected = ($sorted[0] eq $_) ? " selected='selected'" : '';
+                <option value='<% $_ %>'<% $selected %>><% $_ %></option>
+% }
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>
+            <& /Elements/Submit, Name => 'GenerateKey', Label => loc('Generate Key') &>
+        </td>
+    </tr>
+</table>
+
+
+<%INIT>
+my @sorted = sort { $groups{$a} <=> $groups{$b} } keys(%groups);
+my @guid = map { CIF::Utils::genSourceUUID($_) } @sorted;
+</%INIT>
+
+<%ARGS>
+$GenerateKey => undef
+$key_description => undef
+@results => undef
+%groups => undef
+</%ARGS>

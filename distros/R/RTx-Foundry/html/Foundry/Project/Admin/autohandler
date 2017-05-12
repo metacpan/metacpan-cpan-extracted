@@ -1,0 +1,54 @@
+%# One way to stop a runaway horse is to bet on him.
+
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	    <tr> 
+		<td><& /Edit/Elements/Tabs, Map => $Map, URL => $url &></td>
+              </tr>
+			  <tr> 
+			    <td class="poptable" bgcolor="#C4E1F0">
+% $m->call_next;
+			    </td>
+			  </tr>
+			</table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  </td>
+</tr>
+</table>
+<br>
+<& /Foundry/Elements/Footer &>
+<%INIT>
+my $prefix = '/Foundry/Project/Admin/';
+my $Map = [
+    ''			    => 'Queue=' . $QueueObj->Id,
+    $prefix		    => 'Basics',		# loc
+    $prefix . "Members/"    => 'Members',		# loc
+    $prefix . "Upload/"     => 'Release Files',		# loc
+    $prefix . "Forum/"   => 'Forums',		# loc
+    $prefix . "CustomField/"      => 'Tracker Fields',		# loc
+    $prefix . "Stats/"      => 'Statistics',		# loc
+];
+
+my $url = $r->uri;
+$url =~ s/\w+\.html$//;
+if ($url =~ m{List\.html/wws/\w+/(.*)}) {
+    push @$Map, $1 => $1;
+    $url = $1;
+}
+
+</%INIT>
+<%ATTR>
+Tab2	=> 'Project Admin'
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>

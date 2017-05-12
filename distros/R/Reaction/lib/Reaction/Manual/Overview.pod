@@ -1,0 +1,260 @@
+=head1 NAME
+
+Reaction::Manual::Overview - Orientation in Reaction
+
+=head1 DESCRIPTION
+
+This document aims at describing the modular parts of L<Reaction> and explain
+how they are tied together.
+
+=head1 WHAT IS REACTION
+
+Reaction is a L<Catalyst> extension providing you with:
+
+=over 4
+
+=item *
+
+Model mutations abstracted into Action objects.
+
+=item *
+
+Reflection to generate interface models using the Action objects from a L<DBIx::Class>
+schema.
+
+=item *
+
+An abstract UI expression system based on L<view|Reaction::UI::View::TT>, 
+L<skin|Reaction::UI::Skin>, L<rendering context|Reaction::UI::RenderingContext>,
+L<widget|Reaction::UI::Widget> and L<layout set|Reaction::UI::LayoutSet>.
+
+=item *
+
+Stylable via skins. Parts of the skins can be extended and flexibly from large
+down to very small parts.
+
+=item *
+
+Full separation of interface rendering structure and templating, making re-usable
+extensions even easier.
+
+=bac
+
+=head1 THE BIG PICTURE
+
+          .=========.
+          | Request |
+          '========='
+               |
+               |
+               v
+    .--------------------.   .============================.
+    |  Web Application   |   |      Interface Model       |
+    | Action Dispatching |<--| Object, Collection, Action |
+    '--------------------'   '============================'
+               |                            ^
+               v                            |
+    .====================.        .-------------------.
+    |      ViewPort      |        |   Domain Model    |
+    | Plain, Collection, |        |  Business Logic,  |
+    |   Object, Action   |        | Persistence Layer |
+    '===================='        '-------------------'
+               |
+               v
+    .====================.
+    |     FocusStack     |
+    | Contains ViewPorts |
+    '===================='
+               |
+               v
+         .-----------.     .===================.
+         |   View    |     | RenderingContext  |
+         | HTML, PDF |---->| Template Toolkit  |----.
+         '-----------'     '==================='    |
+               |                     ^              |
+               v                     |              |
+   .======================.          |              |
+   | LayoutSet / ViewPort |          |              |
+   | Layouts: widget, foo |          |              |
+   '======================'          |              |
+               |                     |              |
+               v                     |              |
+  .========================.         |              |
+  |   Widget / LayoutSet   |         |              |
+  | Fragments: widget, foo |---------'              v
+  '========================'                  .==========.
+                                              | Response |
+                                              '=========='
+
+=head1 APPLICATION
+
+A Reaction application is really a L<Catalyst> application under the hood. Reaction
+uses reflection to build more flexible and re-usable Catalyst components.
+
+The main application module (usually called C<MyApp> or C<MyApp.pm> in documentation)
+looks exactly like a typical Catalyst application module. Reaction's modular architecture
+allows it therefor to be integrated into other Catalyst applications, or to integrate
+other Catalyst extensions and components itself.
+
+=head1 CONTROLLERS
+
+Usually in Catalyst applications the controller's actions will take their arguments,
+maybe modify them or clean them up. After that they are processed by the model and then
+stashed away to be later used by the view.
+
+Reactions approach is a bit different. The cleanup and validation of values, and the
+involvement of the model are abstracted into a L<Reaction::InterfaceModel::Action>
+subclass. Examples for such actions would be C<Create>, C<Update> or C<Delete> in a 
+CRUD situation.
+
+Controllers that use Reaction have to inherit from L<Reaction::UI::Controller> or a
+subclass of it. Some other useful controller base classes are:
+
+=over
+
+=item *
+
+L<Reaction::UI::Controller::Root> should be the base for the root controller to
+every chain of Reaction actions. It will provide a C<base> action you can chain
+to which will make sure the L<window viewport|/VIEWPORTS> and 
+L<focus stack|/FOCUS STACK> are set up.
+
+=item * 
+
+L<Reaction::UI::Controller::Collection> to ease the creation of components that act
+on collections as their model (database results for example). It provides actions
+to list and view the collection items.
+
+=item *
+
+L<Reaction::UI::Controller::Collection::CRUD> is a subclass of the above and provides
+additional C<create>, C<update>, C<delete> and C<delete_all> actions.
+
+=back
+
+=head1 VIEWPORTS
+
+Viewports represent the components that render your page when combined.
+
+The C<begin> action in L<Reaction::Controller::Root> creates a new L<Reaction::UI::Window>
+object and stores it as C<window> in the stash. The L<focus stack|/FOCUSSTACKS> of that
+window object is used as the base focus stack for the request.
+
+You can add a new inner viewport to the focus stack with the C<push_viewport> method
+available on your controller:
+
+  $controller->push_viewport($viewport_class, %viewport_args);
+
+This will add a new instance of C<$viewport_class> to the current focus stack using
+C<%viewport_args> as arguments. For more information on the usage and other options
+(for example the C<next_action> option, which redirects afterwards) see
+L<Reaction::UI::FocusStack> and L<Reaction::UI::ViewPort>.
+
+You can use the L<Reaction::UI::ViewPort::Action> viewport to build viewports
+that perform typical form actions like OK, Apply and Close.
+
+=head1 FOCUSSTACKS
+
+Viewports are pushed onto the current focus stack. The C<end> action in 
+L<Reaction::Controller::Root> will C<flush> the L<Reaction::UI::Window>
+object stored as C<window> in the stash.
+
+=head1 DOMAIN MODELS
+
+The domain models should be completely decoupled from the application and it's business
+logic. Normally, you need to decide whether to put your business logic in your controller
+or in your model. Reaction solves this problem by using L<interface models|/INTERFACE MODELS>
+as a separation between the two.
+
+If you want your domain model to be reflectable (L<DBIx::Class> for example) you will have
+to use L<Moose> to add attribute metadata to those classes.
+
+=head1 INTERFACE MODELS
+
+The interface models contain your business logic. That is, the application specific logic
+representing the model your application will use.
+
+An interface model consists of action classes subclassing L<Reaction::InterfaceModel::Action>.
+These instances will have both the request context and the target model available and can do
+their work in a C<do_apply> method.
+
+To allow your own models to be tied in to reflective controllers like
+L<Reaction::Controller::Collection>, you can subclass L<Reaction::InterfaceModel::Object>.
+That will provide you with a way to let the viewports introspect the actions that your
+interface model defines for this model.
+
+An example of this would be:
+
+  - MyApp::Controller::Foo is a Reaction::Controller::Collection::CRUD 
+    for MyApp::Model::Foo
+  - The model_name config setting is 'Model::Foo'
+  - User calls action MyApp::Controller::Foo->delete_old
+  - The 'delete_old' controller action will call 
+    $self->basic_model_action($c, \%vp_args)
+  - The 'target' option in %vp_args will be asked for an action that
+    corresponds with the 'delete_old' controller action
+  - An instance of MyApp::Model::Foo::Action::DeleteOld is
+    returned
+  - This is passed as 'model' to a new instance of
+    Reaction::UI::ViewPort::Action which is then pushed
+    onto the focus stack.
+
+Form processing as provided by L<Reaction::UI::ViewPort::Action> is a very good
+example of Reaction's usefulness; Instead of creating a new dialog for every
+form using myriads of helper functions, you provide a controller baseclass
+rendering the dialog by introspecting an interface model object with fields and
+actions.
+
+Then you just need to create a new controller and interface model for your new
+dialog and it just works.
+
+If your model is a L<DBIx::Class::Schema> and contains L<Moose> metadata, you
+can let L<Reaction::InterfaceModel::Reflector::DBIC> set up your interface
+model objects and actions.
+
+=head1 SKINS, LAYOUTS AND WIDGETS
+
+When you push a viewport onto the focus stack like this:
+
+  $controller->push_viewport('Reaction::UI::ViewPort::SiteLayout');
+
+Reaction will look for a layout file named
+C<$search_path/skin/$skin_name/layout/site_layout.tt>. If it can't find it,
+it will also look in the base skin and search paths.
+
+You can also provide a specific layout:
+
+  $controller->push_viewport(
+    'Reaction::UI::ViewPort::SiteLayout',
+    layout => 'my_site_layout',
+  );
+
+A new instance of L<Reaction::UI::LayoutSet> will be created using the layout
+file. It is then used to determine the class of widget to create. The widget
+contains the Perl code counterpart of the templating part in the layout file.
+
+The widget is either determined by the C<=widget> template directive in the
+layout file or by the L<Reaction::UI::Skin> object created to represent the
+skin.
+
+The details of skins or layouts are documented in L<Reaction::Manual::Templates>.
+
+=head1 SEE ALSO
+
+=over 
+
+=item * L<Reaction::Manual>
+
+=item * L<Reaction::Manual::Intro>
+
+=back
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

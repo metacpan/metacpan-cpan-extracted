@@ -1,0 +1,19 @@
+<%args>
+$ARGSRef
+</%args>
+<%init>
+return if $ARGSRef->{Queue};
+return unless $ARGSRef->{Problem} and $ARGSRef->{Problem} =~ /^(\d+)-(.*)/;
+
+my ($Queue, $ProblemValue) = ($1, $2);
+$ARGSRef->{Queue} = $Queue;
+
+my $QueueObj = RT::Queue->new($session{'CurrentUser'});
+$QueueObj->Load($Queue) or return;
+
+my $cf = $QueueObj->CustomField("Problem Type");
+return unless $cf->Id;
+
+$ARGSRef->{"CustomField-".$cf->Id} = $ProblemValue;
+$ARGSRef->{"Subject"} = $ProblemValue;
+</%init>

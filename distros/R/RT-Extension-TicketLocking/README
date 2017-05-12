@@ -1,0 +1,176 @@
+NAME
+    RT::Extension::TicketLocking - Enables users to place advisory locks on
+    tickets
+
+RT VERSION
+    Works with RT 4.0, 4.2 and 4.4.
+
+DESCRIPTION
+    Locks can be of several different types. Current types are:
+
+    hard (manual) lock
+        A lock can be initiated manually by clicking the "Lock" link on one
+        of the pages for the ticket. However, hard locks are available only
+        to users who can ModifyTicket.
+
+    take lock
+        This is only applicable within RTIR. See "RTIR" section below.
+
+    auto lock
+        A lock is created whenever a user performs an action on a ticket
+        that takes multiple steps if a hard lock is not already in place for
+        that ticket.
+
+        An auto lock is removed once the user is done with whatever he was
+        doing on the page (e.g., when he clicks "Save Changes" on the Edit
+        page). It is also removed if the Unlock link is clicked from a page
+        that generated an auto lock.
+
+        Auto-lock is set for the following actions in RT:
+
+            - Comment
+            - Reply
+            - Resolve
+
+        RTIR's user may find list of actions below.
+
+    Locks are advisory: if a ticket is locked by one user, other users will
+    be given a notification (in red) that another user has locked the
+    ticket, with the locking user's name and how long he has had it locked
+    for, but they will still be allowed to edit and submit changes on the
+    ticket.
+
+    When a user locks a ticket (auto lock or hard lock), they are given a
+    notification informing them of their lock and how long they have had the
+    ticket locked (in some other color - currently green).
+
+  Removing locks
+    Locks will remain in place until:
+
+    *   The user is done editing/replying/etc. (for auto locks, if there is
+        no hard lock on the ticket)
+
+    *   A lock can be removed manually by clicking the "Unlock" link on one
+        of the pages for the ticket. This removes any type of lock.
+
+    *   The user logs out
+
+    *   A configurable expiry period has elapsed (if the $LockExpiry config
+        variable has been set to a value greater than zero)
+
+    When a user unlocks a ticket (auto unlock or hard unlock), they are
+    given a notification informing them that their lock has been removed,
+    and how long they had the ticket locked for.
+
+  Merging tickets
+    When a locked ticket (hard or take lock) is merged into another ticket,
+    the ticket being merged into will get the lock type of the ticket being
+    merged from. This lock shift is conditional upon priority, as usual - if
+    the merged from ticket has a lock of a lower priority than the merged-to
+    ticket, the merged-to ticket will retain its lock. If the merged-to
+    ticket is locked by a different user, that user will retain the lock.
+    Basically, the merged-to ticket will retain its lock if it is higher
+    priority than the lock on the ticket being merged from.
+
+  RTIR
+    Within RTIR auto locks are applied for the following actions:
+
+        - Edit
+        - Split
+        - Merge
+        - Advanced
+        - Reply
+        - Resolve
+        - Reject
+        - Comment
+        - Remove
+
+    As well, there is special type of lock implemented in RTIR. When a user
+    clicks the "Take" link for an RTIR Incident ticket, a Take lock is
+    added. This lock will only be removed when the IR is linked to a new or
+    existing Incident. If RTIR is not installed, this type will not be
+    available.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::TicketLocking');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::TicketLocking));
+
+        or add RT::Extension::TicketLocking to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+  LockExpiry option
+    In the config you can set LockExpiry option to a number of seconds, the
+    longest time a lock can remain without being automatically removed, for
+    example:
+
+        Set( $LockExpiry, 5*60 ); # lock expires after five minutes
+
+    If you don't wish to have your locks automatically expire, simply set
+    $LockExpiry to a false (zero or undef) value. This is the default if you
+    do not provide a $LockExpiry.
+
+  Allowing users to use 'MyLocks' portlet
+    The extension comes with a portlet users can place on thier home page
+    RT's or RTIR's. Using this portlet user can easily jump to locked
+    tickets, remove particular lock or all locks at once.
+
+    If you want the MyLocks portlet to be available then you have to place
+    it in the list of allowed components.
+
+    For RT:
+
+        Set($HomepageComponents, [qw(
+            MyLocks 
+            ... list of another portlets ...
+        )]);
+
+    People can then choose to add the portlet to their homepage in
+    Preferences -> 'RT at a glance'.
+
+    If you are running RTIR, and want the portlet to be available from the
+    RTIR home page, you will need to do something similar to set the
+    RTIR_HomepageComponents array in your config file, like this:
+
+        Set(@RTIR_HomepageComponents, qw(
+            MyLocks
+            ... list of another portlets ...
+        ));
+
+    People can then choose to add the portlet to their homepage in
+    Preferences -> 'RTIR Home'.
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-TicketLocking@rt.cpan.org|mailto:bug-RT-Extension-TicketLocking@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-TicketLocking>.
+
+COPYRIGHT
+    This extension is Copyright (C) 2007-2014 Best Practical Solutions, LLC.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

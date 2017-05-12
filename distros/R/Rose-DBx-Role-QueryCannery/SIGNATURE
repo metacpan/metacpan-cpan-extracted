@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dd77a1efa95d1fc34bdcd173d68d7d36dc550c65 Build.PL
+SHA1 425cbbe73c4a082723025ba1d1de33d4e72a3803 Changes
+SHA1 b19050e341f3205e7b8156c62ed619bd6fb1ad59 INSTALL
+SHA1 43f3c49260f3153aa5383cac22a44685b35b7d56 MANIFEST
+SHA1 ea62c42f6de7d274c64ba754fef39a23679df45c META.json
+SHA1 ec58cd540f66e6d57ec9d970fd83e34fdfae3df3 Makefile.PL
+SHA1 df7aedf72f1df177a5881b6a7cfc6f6467112a26 lib/Rose/DBx/Role/QueryCannery.pm
+SHA1 fc7db9961de757dbae7af901fa0052e7d0873958 t/00-report-prereqs.dd
+SHA1 a6070fe95cff376c10a692cfe013759a38ddffa4 t/00-report-prereqs.t
+SHA1 17e3c380d69b87e91d922364e8e1c6dedac3ef69 t/basic.t
+SHA1 4b60d4b75424696d7bc0d6ef3f5a3b68b2d6546a t/canning_simply.t
+SHA1 f560352f03b8d8ecbff92e545b4a83df5404afb9 t/canning_sweetly.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJV5h8JAAoJEFXmkwhreRSJUQ8IAI7mHsWZLpgQOFCm7CGwa9L+
+zu9trvIWHvz7M3bvqGAq23c3U+nUwS364WISFLVLT/4goVPA5yyyf9QzVIsZ0DTH
+bxpxTpMZlCkWYp+sFj8kKRShD8+SRidlYvQ2zC55alwQlKKL5ap1/pGFRGr9b+3W
+AR5+NXkPyMYNNqKXYZiOg2kH8FMTwlgpmbDiEMQYN7Mbb25x38OpItWHdOGEAIFO
+VyCDlevxBgaNxp1/aGr5PlPjVrb4s+KyS6k7CZNFoiSSPxyi8+tOO4qUEPxO0l+P
+bb1ugH8gYINJbjtzOZMLiAgk+sKDVeTxIkjNkHpljIvG3ZFR6hR3lLCpNdPSyyo=
+=p7Qm
+-----END PGP SIGNATURE-----

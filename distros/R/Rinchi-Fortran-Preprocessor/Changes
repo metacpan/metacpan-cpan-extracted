@@ -1,0 +1,9 @@
+Revision history for Perl extension Rinchi::Fortran::Preprocessor.
+
+0.01  Tue Mar 11 18:31:43 2008
+	- original version; created by h2xs 1.23 with options
+		-A -n Rinchi::Fortran::Preprocessor
+
+0.02  Tue Mar 29 18:47:21 2008
+	- Added xml_output and new_source methods and default handlers.
+

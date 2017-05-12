@@ -1,0 +1,347 @@
+                       Rosetta-Utility-SQLBuilder
+----------------------------------------------------------------------
+
+2006-01-13   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta-Utility-SQLBuilder Release 0.22.0 (SVN r1184).
+
+    * This is a retroactive release, made on intended to help ease the
+    transition between the first and second major code bases of the Rosetta
+    database access framework.  (The first codebase was written mainly
+    between 2002-12 and 2005-09, while the second rewritten code base was
+    mainly between 2005-10 and later.)  While this release actually takes
+    place on January "Friday The Thirteenth" 2006 and is affected by recent
+    design decisions, it is for the most part as identical as possible to
+    the most recent (2005-09-28) other release of the first code base.
+    Think of this retroactive release as having been made on 2005-09-29, in
+    regards to its dependency versions, design decisions, documentation for
+    SVN repository location, TODO, etc.  Some of the details being
+    published now, like the SVN location, is already false (its actually at
+    http://svn.utsl.gen.nz/trunk/Rosetta-old/), but they are maintained as
+    they were for historical posterity.
+
+    * The changes with this release are all summed up by that there is no
+    longer a distinct "SQL::Routine" name space, and all packages that were
+    in that name space are now in the "Rosetta" name space.  There are no
+    actual functionality changes, just a shifting around of components;
+    your existing code that used the old packages will remain compatible
+    with just some renaming of your package references.
+
+    * As of this release, the distribution has been renamed from
+    SQL-Routine-SQLBuilder to Rosetta-Utility-SQLBuilder;
+    "Rosetta-Utility-SQLBuilder-0.22.0" is the next version after
+    "SQL-Routine-SQLBuilder-0.21.2".
+
+    * All of the packages have been renamed as follows:
+    SQL::Routine::SQLBuilder -> Rosetta::Utility::SQLBuilder,
+    SQL::Routine::SQLBuilder::L::en -> Rosetta::Utility::SQLBuilder::L::en.
+
+    * All t/* files have been renamed: t/SRT_SB_*.t -> t/ROS_U_SB_*.t,
+    t/lib/t_SRT_SB_*.t -> t/lib/t_ROS_U_SB_*.t.
+
+    * New code file versions are: SQLBuilder.pm 0.22.0 and en.pm 0.3.0.
+
+    * Updated external dependency on Rosetta::Model (was SQL::Routine) to
+    0.71.0.
+
+    * Renamed all Locale::KeyedText Message and Template keys from
+    "SRT_[|SB_]*" to "ROS_[M_|U_SB_]*".  Er, you may have to update your
+    code to account for this also, to avoid breakage.
+
+    * In SQLBuilder.pm, replaced 29 "', '" each with "q{, }".
+
+2005-09-28   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine-SQLBuilder Release 0.21.2 (SVN r878).
+
+    * New code file versions are: SQLBuilder.pm 0.21.2 and en.pm 0.2.2.
+
+    * From now on, any ordinary 'use [|only ]Foo' statements that appear
+    within *.pm files will be located in different places than before; the
+    'use' statements for modules that do not export anything, particularly
+    object oriented modules, will appear near the top of the file, above
+    all package declarations, but just below the use-pragma statements; the
+    'use' statements for modules whose exported functions we are using will
+    be placed just below the declarations of each package in which the
+    relevant exported functions are used.
+
+    * Removed any line-trailing whitespace from all distribution files; the
+    one exception was those inside the SRT_SB_10_Generic.t here-docs.
+
+    * Reformatted all code by swapping various string quoting delimiters.
+
+    * Reformatted SQLBuilder.pm to un-cuddle all 'else' and 'elsif' blocks.
+
+    * Updated SQLBuilder.pm and t_SRT_SB_Util.pm to replace all of their
+    'unless' conditionals with equivalent 'if' conditionals.
+
+    * Updated SQLBuilder.pm to rename all of its 'foreach' loops to 'for'.
+
+    * Updated SQLBuilder.pm to reformat the 5 '|' delimited regular
+    expressions as '/' delimited ones.
+
+    * Updated SQLBuilder.pm to reformat all 5 regular expressions so that
+    they use the /x flag.
+
+    * Reformatted all code to change any "if( ... ) {" to "if (...) {".
+
+    * Updated SQLBuilder.pm to reformat all 4 'while' like the 'if' were.
+
+    * Added named constant $EMPTY_STR to SQLBuilder.pm.
+
+    * Updated SQLBuilder.pm to add labels to the 1 un-labeled
+    [next|last|redo] statement, and its innermost bounding loop control.
+
+    * Reformatted all code so that any uses of the named unary operators
+    [defined|ref] no longer have parenthesis around their argument.
+
+    * Updated SQLBuilder.pm to reformat 1 use of 'exists', 2 uses of 'uc',
+    and 1 use of 'lc' like with 'ref'.
+
+    * Removed 1 superfluous use of 'scalar' in SQLBuilder.pm.
+
+    * Updated SQLBuilder.pm to replace 2 "<condition> and return ...;" each
+    with "return ... if <condition>;".
+
+    * Updated SQLBuilder.pm to replace 2 "<condition> or $self->_throw ..."
+    each with "$self->_throw ... if <reverse-condition>".
+
+    * Updated t_SRT_SB_Util.pm to replace 1 "if ... return ..." with its
+    postfix-if equivalent.
+
+    * Updated SQLBuilder.pm to rearrange 4 conditional '_throw...' statements
+    so they have postfix-if conditionals.
+
+    * Reformatted all code, in SQLBuilder.pm, so that any uses of the
+    built-in operators or functions named [bless|join|push|split|unpack] no
+    longer have parenthesis around their argument lists; either the parens
+    were just removed, or they were moved to surround both the
+    operator/function name and its arguments.
+
+    * Added new external dependency on the honorary built-in function
+    List::MoreUtils::all() to SQLBuilder.pm.  Then updated the
+    build_schema_or_app_table_create() method to use this function rather
+    than a last-terminated for-loop when determining whether all columns in
+    an index are mandatory.  Specifically, List::MoreUtils versions 0.12
+    and up are required, since versions 0.11 and below didn't export some
+    functions.
+
+    * Split up some long lines in en.pm.
+
+    * Updated any DEPENDENCIES documentation to reformat any indented
+    sections as paragraphs, and show version ranges like 'only' takes them.
+
+    * Reformatted all code so that every occurance of the string
+    concatenation operator (.) has a space between the operator and each of
+    its 2 arguments, rather than their all being in contact.  Also
+    reformatted any lines that are split on this operator so the operator
+    appears at the start of the second line, rather than the end of the
+    first line.
+
+    * Reformatted a few multi-line statements so that any [=|and|or] that
+    are split on appear at the start of a line rather than the end of one.
+
+    * Reformatted all of the code comments at the top of SQLBuilder.pm,
+    where its object property names, and constant values, are declared,
+    so that all comment lines don't exceed the 75 character line length.
+
+    * In SQLBuilder.pm, reformatted 18 cascading ternary statements into
+    aligned columns.
+
+    * Other miscellaneous code line alignments and splitting.
+
+2005-09-12   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine-SQLBuilder Release 0.21.1 (SVN r808).
+
+    * New code file versions are: SQLBuilder.pm 0.21.1 and en.pm 0.2.1.
+
+    * Updated all POD-containing files to re-wrap any non-indented POD
+    paragraphs to a 75 character width, which is 5 less than the 80
+    character width they were wrapped to before.  This change should make
+    it easier to copy and paste a diff or patch of this documentation into
+    an email message, where it is quoted at least once, without any line
+    wrapping occurring.  Likewise, these standard documentation files were
+    re-wrapped to 75 characters: ReadMe, INSTALL, LGPL|GPL, Changes, TODO.
+
+    * Revised this Changes file to replace all detail entries for releases
+    0.18 thru 0.21.0 with a significant release list for the same period;
+    also added references to when all 'Rosetta developer release' (#s 1-3)
+    were.
+
+2005-09-08   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine-SQLBuilder Release 0.21.0 (SVN r787), containing
+    SQL::Routine::SQLBuilder 0.21.0, was released on CPAN.  This is the
+    first release of this distribution and its modules for which they had
+    3-part version numbers, rather than floating point version numbers.
+
+    * These were the current versions cited by the public announcement for
+    Rosetta/SQL-Routine developer release #3.
+
+2005-09-01   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine-SQLBuilder Release 0.20, containing
+    SQL::Routine::SQLBuilder 0.20, was released on CPAN.  This is the last
+    release of this distribution and its modules for which they had
+    floating point version numbers, rather than 3-part version numbers.
+
+2005-04-03   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine-SQLBuilder Release 0.17, containing
+    SQL::Routine::SQLBuilder 0.17, was released on CPAN.
+
+    * These were the current versions cited by the public announcement for
+    SQL-Routine/Rosetta developer release #2.
+
+2005-03-19   Darren Duncan <perl@DarrenDuncan.net>
+
+    * SQL-Routine-SQLBuilder Release 0.16, containing
+    SQL::Routine::SQLBuilder 0.16, was released on CPAN; this is the first
+    release of the SQL-Routine-SQLBuilder distribution.  This is the first
+    release of any distribution to contain SQL::Routine::SQLBuilder, which
+    was renamed from Rosetta::Utility::SQLBuilder.  This is the first
+    release for this module where it explicitly has a version number
+    matching its distribution.
+
+2005-03-18   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta-Extensions Release 0.15, containing
+    Rosetta::Utility::SQLBuilder 0.15, was released on CPAN; this is the
+    last release of the Rosetta-Extensions distribution.  This is the last
+    release of any distribution to contain Rosetta::Utility::SQLBuilder.
+    This is the last release for this module where it does not explicitly
+    have a version number matching its distribution.
+
+2004-08-06   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta-Extensions Release 0.06, containing
+    Rosetta::Utility::SQLBuilder 0.06, was released on CPAN.
+
+    * These were the current versions cited by the public announcement for
+    Rosetta/SQL-SyntaxModel developer release #1.
+
+2004-04-10   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta-Extensions Release 0.01, containing
+    Rosetta::Utility::SQLBuilder 0.01, was released on CPAN; this is the
+    first release of the Rosetta-Extensions distribution.  This is the
+    first release of any distribution to contain
+    Rosetta::Utility::SQLBuilder.  This is the first release of any
+    distribution for which some of the existing work that became the
+    SQL-Routine-SQLBuilder distribution was in the form of executable code,
+    and not just design documentation.
+
+2004-03-25   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.29 was released on CPAN.  This is the last release
+    of any distribution for which all of the existing work that became the
+    SQL-Routine-SQLBuilder distribution was purely in the form of design
+    documentation, without executable code of any kind.
+
+2004-03-21   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.27 was released on CPAN.  This is the first release
+    of any distribution where the proposal documentation for
+    SQL::Routine::SQLBuilder uses the name Rosetta::Utility::SQLBuilder for
+    it; it was renamed from Rosetta::Engine::Common::SQLBuilder.
+
+2004-03-08   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.26 was released on CPAN.  This is the last release
+    of any distribution for which the documented name of the proposed
+    module that became SQL::Routine::SQLBuilder was given the name
+    Rosetta::Engine::Common::SQLBuilder.
+
+2004-02-23   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.24 was released on CPAN.  This is the first release
+    of any distribution where the proposal documentation for
+    SQL::Routine::SQLBuilder uses the name
+    Rosetta::Engine::Common::SQLBuilder for it; it was renamed from
+    Rosetta::Driver::Common::SQLBuilder.
+
+2004-02-12   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.23 was released on CPAN.  This is the last release
+    of any distribution for which the documented name of the proposed
+    module that became SQL::Routine::SQLBuilder was given the name
+    Rosetta::Driver::Common::SQLBuilder.
+
+2003-04-15   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.07 was released on CPAN.  This is the first release
+    of any distribution to have proposal documentation that splits out SQL
+    generation code into its own module, whereas prior to this the
+    documentation included SQL generation as one of several functions
+    performed by several distinct modules.  The proposed name for this
+    module is Rosetta::Driver::Common::SQLBuilder.
+
+2003-01-27   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Rosetta Release 0.02 was released on CPAN; this is the first release
+    of the Rosetta distribution.  Early versions of the design
+    documentation that became the SQL-Routine-SQLBuilder distribution were
+    included.
+
+2003-01-05   Darren Duncan <perl@DarrenDuncan.net>
+
+    * DBIx-Portable Release 0.01 was released on CPAN; this is the only
+    release of the DBIx-Portable distribution.  This is the first release
+    of any distribution to contain design documentation that became the
+    SQL-Routine-SQLBuilder distribution.
+
+2002-11-12   Darren Duncan <perl@DarrenDuncan.net>
+
+    * Began development on the modules which became the
+    SQL-Routine-SQLBuilder distribution as their own entity that is
+    separate from my application, for open-source distribution on CPAN.
+    The modules were to comprise an RDBMS-generic DB framework for any
+    application to use.
+
+    * Modules based on a template created by h2xs 1.18.
+
+2002-07-28
+
+    * Posted the first significant update to the second prototype, which
+    added an index or cache for data that was expensive to calculate for
+    each page request, and involved rewriting about a fourth of the perl
+    code.
+
+2002-06-07
+
+    * Posted to my website the second public prototype demo of the new
+    self-proprietary database driven application, whose database schema,
+    user interface, feature set, and Perl application code was almost
+    completely rewritten. The new version explicitly had separate modules
+    for database communication and the web interface logic, with
+    MySQL-specific code and database generic or data dictionary code in
+    separate files, and separate files for parts of the web interface.  The
+    program used the same generic CPAN modules as in the first prototype,
+    DBI/MySQL and CGI::Portable.
+
+    * This is when I started writing self-contained code components that
+    were explicitly designed to enable external code that used them to work
+    seamlessly on multiple database products, and hence 2002 is the start
+    of my declared copyright date range for SQL::Routine::SQLBuilder.
+
+2001-11-24
+
+    * Posted the last update to the first prototype.
+
+2001-07-12
+
+    * Posted to my website the first public prototype demo of a new
+    self-proprietary database driven application, which is like a cross
+    between a multimedia metadata catalogue and a repository for historical
+    or genealogical data.  This application contained the first prototypes
+    of code that ended up in these modules.  All of this application's
+    code, for database communication and web interface logic, was situated
+    in a single module, with the rest of the program being more generic
+    CPAN modules like DBI (and DBD for MySQL) and CGI::Portable.
+
+2000-05-17
+
+    * Requested MySQL database privileges on my web host so I have
+    something to start developing, testing and deploying database driven
+    applications on.

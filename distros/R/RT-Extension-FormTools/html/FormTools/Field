@@ -1,0 +1,309 @@
+<%args>
+$name
+$label              => undef
+$item_labels        => {}
+$render_as          => 'normal'
+$default            => undef
+$cols               => undef
+$rows               => undef
+$empty_allowed      => 1
+$show_validation    => 0
+$show_label         => 1
+$disables           => {}
+$enabled_by         => []
+$container_selector => undef
+$after_label        => ''
+$after_input        => ''
+</%args>
+<%init>
+use RT::Extension::FormTools;
+my $queue      = $m->notes('queue');
+my $ticket     = $m->notes('ticket');
+my $field_type = 'custom';
+my $field_label ||= $label;
+my $cf;
+
+my @values;
+
+$queue = $ticket->QueueObj
+    if !$queue && $ticket;
+
+my $input_name = '';
+if ( RT::Extension::FormTools::is_core_field($name) ) {
+    $field_type = 'core';
+    my $res = $m->notes(
+        core_fields_on_page => [ @{$m->notes('core_fields_on_page')||[]}, $name ] );
+    $field_label ||= $name;
+    $default ||= $ticket->$name if $ticket && $ticket->_Accessible($name, 'read');
+    $input_name = $name;
+} else {
+
+    $cf = RT::CustomField->new( $session{'CurrentUser'} );
+    $cf->SetContextObject($ticket) if $cf->can('SetContextObject');
+
+    # try loading CFs for this Queue, followed by Global, followed by any CF of given $name
+    $cf->LoadByName( Name => $name, Queue => $queue->id ) if (defined $queue);
+    $cf->LoadByName( Name => $name, Queue => 0 ) unless ( $cf->id );
+    unless ( $cf->Id ) {
+        # Clear context object because previous call made it global
+        # Not needed for RT >= 4.2.5 where this is fixed in LoadByName
+        $cf->SetContextObject(undef) if $cf->can('SetContextObject');
+        $cf->LoadByName( Name => $name );
+    }
+    unless ( $cf->id ) {
+        my $msg = "Could not find a custom field called $name";
+        $msg .= " for the queue ".$queue->Name if (defined $queue);
+        die $msg;
+    }
+
+    $m->notes( cfs_on_page => [ @{$m->notes('cfs_on_page')||[]}, $cf->id ] );
+    $field_label ||= $cf->Name;
+
+    if ($ticket) {
+        @values = map { $_->Content } @{ $cf->ValuesForObject($ticket)->ItemsArrayRef };
+        $default ||= $values[0];
+    }
+
+    if (RT::Interface::Web->can("GetCustomFieldInputName")) {
+        $input_name = GetCustomFieldInputName(
+            Object      => $ticket,
+            CustomField => $cf,
+        );
+    } else {
+        $input_name = "Object-RT::Ticket-"
+                       . ($ticket ? $ticket->id : '')
+                       . "-CustomField-" . $cf->id .'-Value';
+        $input_name .= "s" if $render_as =~ /^(radio|check|boolean)/
+    }
+}
+
+
+unless ( $default ) {
+    my $request_args = $m->request_args();
+    if ( $field_type eq 'core' && $request_args->{$name} ) {
+        $default = $request_args->{$name};
+    } elsif ( $field_type eq 'custom' &&  $cf->Id ) {
+        $default = ($request_args->{ $input_name } || 
+                    $request_args->{ $input_name .'s' } );
+    }
+}
+
+$default = '' unless defined $default;
+
+</%init>
+
+% if ( @$enabled_by ) {
+%    my $escape = sub { my $res = shift; $res =~ s/'/\\'/; "'$res'" };
+    <script>
+    jQuery(function () {
+        var fields = [<% join ', ', map $escape->($_->{'field'}), @$enabled_by |n %>];
+        var values = new Array();
+% foreach my $e ( @$enabled_by ) {
+        values[<% $escape->($e->{'field'}) |n %>] = [<% join ', ', map $escape->($_), ref($e->{'value'})? (@{ $e->{'value'} }) : ($e->{'value'}) |n %>];
+% }
+        for ( var i = 0; i<fields.length; i++ ) {
+            var field = fields[i];
+            jQuery('*[name="'+ field +'"], *[name="'+ field +'s"]').filter('input,select').change( function(e) {
+                disable_form_field( should_disable_form_field(fields, values), <% $escape->( $container_selector ) |n %> );
+            });
+        }
+    });
+    jQuery(function () {
+        var fields = [<% join ', ', map $escape->($_->{'field'}), @$enabled_by |n %>];
+        var values = new Array();
+% foreach my $e ( @$enabled_by ) {
+        values[<% $escape->($e->{'field'}) |n %>] = [<% join ', ', map $escape->($_), ref($e->{'value'})? (@{ $e->{'value'} }) : ($e->{'value'}) |n %>];
+% }
+        disable_form_field( should_disable_form_field(fields, values), <% $escape->( $container_selector ) |n %> );
+    });
+    </script>
+% }
+
+% if ($field_type eq 'core' && $name eq 'Content') {
+
+<& /Elements/MessageBox,
+    Name => $name,
+    ($rows ? (Height => $rows) : ()),
+    ($cols ? (Width => $cols) : ()),
+    IncludeSignature => 0,
+    Default => $default,
+&>
+
+% } else {
+
+% if ($render_as ne 'hidden' && $show_label) { # no label if hidden
+<table style="display: inline; "><tr><th valign="top"><label><%$field_label%></label><% $after_label |n %></th><td style="display:block;">
+% }
+
+% if ($field_type eq 'core') {
+
+% if ($name eq 'Attach') {
+
+<input name="<%$name%>" type="file" />
+<input type="hidden" class="hidden" name="UpdateAttach" value="1" />
+
+% } elsif ($render_as eq 'hidden') {
+
+<input type="hidden" name=<%$name%> value="<%$default%>">
+
+% } elsif ($render_as eq 'readonly' or $render_as eq 'readonly_plus_values') {
+
+% if (@values > 1) {
+    <ul>
+% for (@values) {
+    <li class="readonly"><% $_ %></span>
+%   if ($render_as eq 'readonly_plus_values') {
+    <input type="hidden" name="<% $input_name %>" value="<% $_ %>"/>
+%   }
+% }
+    </ul>
+% } else {
+    <span class="readonly"><% $default %></span>
+%   if ($render_as eq 'readonly_plus_values') {
+    <input type="hidden" name="<% $input_name %>" value="<% $default %>"/>
+%   }
+% }
+
+% } elsif ($name =~ /^(Requestors|Cc|AdminCc)$/ ) {
+<& /Elements/EmailInput,
+    Name                 => $name,
+    Default              => $default,
+    AutocompleteMultiple => 1,
+    (exists $ARGS{cols} ? (Size => $cols) : ()),
+&>
+% } elsif ( $name eq "Due" ) {
+<& /Elements/SelectDate, Name => $name, Default => $default, current => 0, (defined $cols ? (Size => $cols) : ()) &>
+% } else {
+<input type="text" name="<%$name%>" size="<% $cols || 20 %>" value="<%$default%>">
+% }
+
+% } else { # CF
+
+% unless ($render_as eq 'normal') {
+<input type="hidden" class="hidden" name="<% $input_name %>-Magic" value="1" />
+% }
+
+
+% if ($render_as eq 'hidden') {
+    <input type="hidden" class="hidden" name=<% $input_name %> value="<% $default %>">
+% } elsif ($render_as eq 'normal') {
+    <& /Elements/EditCustomField, CustomField => $cf,
+            ($cf->Type =~ /text/i) ? (Cols => $cols ||60) : (),
+            ($cf->Type =~ /freeform/i) ? (Cols => $cols ||30) : (),
+            Rows => $rows || 6,
+            QueueObj => $queue,
+            ($default ? (Default => $default) : ())
+            &>
+% if ($show_validation && $cf->FriendlyPattern) {
+    <% loc("Input must match [_1]", $cf->FriendlyPattern) %>
+%}
+
+% } elsif ($render_as =~ /^radio/)  {
+%       my $selected = 0;
+% if ($empty_allowed) {
+        <input type="radio" name="<% $input_name %>" value="" <% !$default ?  'CHECKED' : '' %>><span class="radio-label"><&|/l&>(no value)</&></span>
+%        if ($render_as =~ /vertical/) { 
+            <br/>
+%        }
+
+% }
+% my $CFVs = $cf->Values;
+% while ($CFVs and my $value = $CFVs->Next ) {
+        <input type="radio" name="<% $input_name %>"  value="<%$value->Name%>" 
+%  if ($default) {
+%       if (ref $default) {
+            <% (grep { $_ eq $value->Name} @$default) ? 'CHECKED' : '' %>
+%       } else {
+            <% ($default eq $value->Name) ? 'CHECKED' : '' %>
+%       }
+% }
+            ><span class="radio-label"><% $value->Name%></span>
+
+%        if ($render_as =~ /vertical/) { 
+            <br/>
+%        }
+
+% }
+% } elsif ($render_as =~  /^check/i)  {
+% my $CFVs = $cf->Values;
+% while ($CFVs and my $value = $CFVs->Next ) {
+        <input type="checkbox" name="<% $input_name %>"  value="<%$value->Name%>" 
+%  if ($default) {
+%       if (ref $default) {
+            <% (grep { $_ eq $value->Name} @$default) ? 'CHECKED' : '' %>
+%       } else {
+            <% ($default eq $value->Name) ? 'CHECKED' : '' %>
+%       }
+% }
+            ><% $value->Name%>
+
+% if (defined $item_labels->{$value->Name}) {
+    <% $item_labels->{$value->Name} %>
+% }
+
+%        if ($render_as =~ /vertical/) { 
+            <br/>
+%        }
+
+% }
+% } elsif ($render_as =~  /^boolean/i)  {
+%       my $value = 'Yes';
+        <input type="checkbox" name="<% $input_name %>"  value="<% $value %>"
+% my $checked = 0;
+%  if ($default) {
+%       $checked = ref $default? (grep { $_ eq $value} @$default) : $default eq $value;
+% }
+        <% $checked? 'CHECKED' : '' %>
+% if ( my $disable = $disables->{$value} ) {
+        onclick="disable_form_field(this.checked, '<% $disable %>');"
+% }
+        />
+
+% if ( $checked and my $disable = $disables->{$value} ) {
+    <script>
+        jQuery(function() { disable_form_field(true, '<% $disable %>') } );
+    </script>
+% }
+
+% } elsif ($render_as =~  /^date/i)  {
+<& /Elements/SelectDate, Name => $input_name .'s', current => 0, 
+                         ($default ? (Default => $default) : ()) &>
+
+% } elsif ($render_as eq 'readonly' or $render_as eq 'readonly_plus_values') {
+
+% if (@values > 1) {
+    <ul>
+% for (@values) {
+    <li name="<% $input_name %>" class="readonly"><% $_ %></li>
+%   if ($render_as eq 'readonly_plus_values') {
+    <input type="hidden" name="<% $input_name %>" value="<% $_ %>"/>
+%   }
+% }
+    </ul>
+    <script>
+% foreach my $disable ( grep $_, map $disables->{$_}, @values ) {
+        jQuery(function() { disable_form_field(true, '<% $disable %>') } );
+% }
+    </script>
+
+% } else {
+    <span name="<% $input_name %>" class="readonly"><% $default %></span>
+%   if ($render_as eq 'readonly_plus_values') {
+    <input type="hidden" name="<% $input_name %>" value="<% $default %>"/>
+%   }
+% if ( my $disable = $disables->{ $default } ) {
+    <script>
+        jQuery(function() { disable_form_field(true, '<% $disable %>') } );
+    </script>
+% }
+% }
+
+% } else {
+% die "'$render_as' isn't a valid rendering option for field '$name'";
+%}
+
+% }
+% if ($render_as ne 'hidden' && $show_label) {
+</td><% $after_input |n %></tr></table>
+% }
+% }

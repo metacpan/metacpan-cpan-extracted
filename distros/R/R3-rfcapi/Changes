@@ -1,0 +1,20 @@
+Revision history for Perl extension R3::rfcapi.
+
+0.32  1999-11-15
+	Incorrect handling of I/INT4/TYPINT in itab corrected.
+	Better error message for RFC_EXCEPTION when not declared in
+	interface (not returned by RFC_GET_FUNCTION_INTERFACE).	
+
+0.31  1999-11-10
+	Better support for N/NUMC/TYPNUM (character fields with only numbers).
+
+0.30  1999-11-05
+	Added support for R/3 release < 40A.
+	
+0.21  1999-10-29
+	Changed test.pl to allow different sysnr than 0.
+	Corrected bug in r3_del_itab and r3_del_func; memory
+	was not freed correctly in 0.20.
+
+0.20  1999-10-28
+	Last changes before first upload to CPAN.

@@ -1,0 +1,12 @@
+######################################################################
+Revision history for Perl extension Rose::DBx::Object::InternalPager
+
+0.03  2007/06/21
+   (ms) Added start_page parameter
+
+0.02  2007/05/31
+   (ms) Added prereq on Rose::DB
+   (ms) Changed test suite to use a tempdir instead of a tempfile
+
+0.01  2007/05/24
+   (ms) Where it all began.

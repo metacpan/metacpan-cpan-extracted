@@ -1,0 +1,35 @@
+<%ARGS>
+$TicketObj => undef
+$ARGSRef => {}
+$Actions => []
+</%ARGS>
+<%INIT>
+return unless $TicketObj;
+
+my $Ticket = $$TicketObj;
+return unless $Ticket;
+return unless my $qid = $ARGSRef->{'Queue'};
+
+my $queue = RT::Queue->new( $Ticket->CurrentUser );
+$queue->Load( $qid );
+return unless $queue->id;
+
+my $current = $Ticket->QueueObj;
+
+my ($status, $msg) = RT::Extension::MoveRules->Check(
+    From => $current, To => $queue,
+    Ticket => $Ticket,
+);
+return if $status;
+
+push @$Actions, $msg unless @$Actions;
+
+my $key = Digest::MD5::md5_hex( rand(1024) );
+push @{ $session{"Actions"}{$key} ||= [] }, @$Actions;
+$session{'i'}++;
+RT::Interface::Web::Redirect(
+    RT->Config->Get('WebURL') ."Ticket/Modify.html"
+        ."?id=". $Ticket->id
+        ."&results=". $key
+);
+</%INIT>

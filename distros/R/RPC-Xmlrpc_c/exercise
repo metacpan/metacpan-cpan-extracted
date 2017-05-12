@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use English;
+use Data::Dumper;
+use ExtUtils::testlib;
+use RPC::Xmlrpc_c::Value;
+use RPC::Xmlrpc_c::Client;
+use RPC::Xmlrpc_c::ClientSimple;
+use RPC::Xmlrpc_c::Client::Curl;
+
+my $TRUE=1; my $FALSE = 0;
+
+sub testValue() {
+    print("Testing Value - simple\n");
+    my $testData = [ 1,
+                     2,
+                     [ 'alpha', 'beta' ],
+                     {red=>'hello', green=>'goodbye'},
+                     undef
+                     ];
+
+    my $testValue = RPC::Xmlrpc_c::Value->newSimple($testData);
+
+    my $recoveredValue = $testValue->valueSimple();
+
+    print STDERR Data::Dumper->Dump([ \$recoveredValue ],
+                                    [ "recoveredValue" ]);
+
+    print("Testing Value - regular\n");
+
+    my $testValue2 =
+        RPC::Xmlrpc_c::Value->newArray(
+            [ RPC::Xmlrpc_c::Value->newInt(1),
+              RPC::Xmlrpc_c::Value->newString(2),
+              RPC::Xmlrpc_c::Value->newArray(
+                  [ RPC::Xmlrpc_c::Value->newString('alpha'),
+                    RPC::Xmlrpc_c::Value->newString('beta')
+                  ]),
+              RPC::Xmlrpc_c::Value->newStruct(
+                  { red   => RPC::Xmlrpc_c::Value->newString('hello'),
+                    green => RPC::Xmlrpc_c::Value->newString('goodbye'),    
+                  }),
+              RPC::Xmlrpc_c::Value->newNil()
+             ]
+                                       );
+
+    print STDERR Data::Dumper->Dump([ $testValue2->valueSimple() ],
+                                    [ "testValue2" ]);
+
+    print STDERR Data::Dumper->Dump([ $testValue2->value() ],
+                                    [ "testValue2" ]);
+}
+
+
+
+sub testCallXml() {
+    print("Testing Client::callXml\n");
+
+    my @params = (RPC::Xmlrpc_c::Value->newInt(5),
+                  RPC::Xmlrpc_c::Value->newInt(7));
+              
+    RPC::Xmlrpc_c::Client::callXml(METHOD => 'sample.add',
+                                   PARAMS => \@params,
+                                   XML    => \my $xml,
+                                   ERROR  => \my $error);
+    
+    if ($error) {
+        print STDERR ("Failed.  $error\n");
+    } else {
+        print("XML: '$xml'\n");
+    }
+}
+
+
+
+sub testClient() {
+    print("Testing Client\n");
+
+    RPC::Xmlrpc_c::Client::Curl->createObject(TRANSPORT      => \my $transport,
+                                              TRANSPORTPARMS => {},
+                                              ERROR          => \my $error);
+
+    if ($error) {
+        print STDERR ("Failed to create Curl transport.  $error\n");
+    } else {
+        RPC::Xmlrpc_c::Client->createObject(TRANSPORT => $transport,
+                                            CLIENT    => \my $client,
+                                            ERROR     => \my $error);
+
+          if ($error) {
+              print STDERR ("Failed to create client.  $error\n");
+          } else {
+              my @params = (RPC::Xmlrpc_c::Value->newInt(5),
+                            RPC::Xmlrpc_c::Value->newInt(7));
+              
+              print("Testing call() with XML-RPC values\n");
+              
+              $client->call(CARRIAGEPARM  => {
+                                SERVERURL => 'http://localhost:8080/RPC2',
+                                             },
+                            METHOD        => 'sample.add',
+                            PARAMS        => \@params,
+                            RESULT_XMLRPC => \my $result,
+                            ERROR         => \my $error);
+                       
+              if ($error) {
+                  print STDERR ("Failed.  $error\n");
+              } else {
+                  print("result: '" . $result->value() . "'\n");
+              }
+          }
+      }
+}
+
+
+
+sub testClientSimple() {
+
+    print("Testing ClientSimple\n");
+
+    my $client = RPC::Xmlrpc_c::ClientSimple->new();
+
+    if (!$client) {
+        print STDERR ("Failed to create ClientSimple.\n");
+    } else {
+        print("Testing call() with basic Perl variables\n");
+
+        $client->call(SERVERURL => 'http://localhost:8080/RPC2',
+                      METHOD    => 'system.methodHelp',
+                      PARAMS    => ['sample.add'],
+                      RESULT    => \my $result,
+                      ERROR     => \my $error);
+                       
+        if ($error) {
+            print STDERR ("Failed.  $error\n");
+        } else {
+            print("result: $result\n");
+        }
+    }
+}
+
+
+
+sub testTransport() {
+
+    print("Use debugger to verify transport parameters:\n");
+    print("Set debugger breakpoint on " .
+          "xmlrpc_curl_transport.c:getXportParms()\n");
+    print("in /usr/bin/perl, pid $PID\n");
+    print("press ENTER\n");
+    <STDIN>;
+    print("When breakpoint triggers, look at *curlXportParmsP\n");
+
+    RPC::Xmlrpc_c::Client::Curl->createObject(
+        TRANSPORT      => \my $transport,
+        TRANSPORTPARMS => {
+            network_interface => 'mynetwork_interface',
+            no_ssl_verifypeer => 0,
+            no_ssl_verifyhost => 1,
+            user_agent        => 'myuseragent',
+            ssl_cert          => 'mysslcert',
+            sslcerttype       => 'mysslcerttype',
+            sslcertpasswd     => 'mysslcertpasswd',
+            sslkey            => 'mysslkey',
+            sslkeytype        => 'mysslkeytype',
+            sslkeypasswd      => 'mysslkeypasswd',
+            sslengine         => 'mysslengine',
+            sslengine_default => 1,
+            sslversion        => 'SSLv2',
+            cainfo            => 'mycainfo',
+            capath            => 'mycapath',
+            randomfile        => 'myrandomfile',
+            egdsocket         => 'myegdsocket',
+            ssl_cipher_list   => 'myssl_cipher_list',
+        },
+        ERROR          => \my $error);
+
+    if ($error) {
+        print STDERR ("Failed to create Curl transport.  $error\n");
+    }
+}
+
+
+
+###############################################################################
+#                             MAINLINE
+###############################################################################
+
+testValue();
+
+testCallXml();
+
+testClient();
+
+testClientSimple();
+
+testTransport();

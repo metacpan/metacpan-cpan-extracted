@@ -1,0 +1,1081 @@
+=head1	NAME
+
+Remedy::ARSTools - a perl wrapper to the ARSperl project, providing a simplified object interface with field
+definition caching.
+
+
+
+
+=head1	SYNOPSIS
+
+	use Remedy::ARSTools;
+	
+	#create a new object with a new field definition data cache
+	my $Remedy = new Remedy::ARSTools(
+		Server		=> $server_host_or_ip,
+		User		=> $username,
+		Pass		=> $password,
+		ConfigFile	=> $file_to_cache_field_definition_data,
+		Schemas		=> [ 'list', 'of', 'schema names', 'to get', 'field data for' ]
+	) || die ($Remedy::ARSTools::errstr);
+	
+	#create a ticket
+	my $ticket_number = $Remedy->CreateTicket(
+		Schema	=> $schema_name,
+		Fields	=> { 
+			'fieldName1' => "value1", 
+			'fieldName2' => "value2,
+			... etc ...
+		}
+	) || die $Remedy->{'errstr'};
+	
+	#merge ticket
+	my $ticket_number = $Remedy->MergeTicket(
+	        Schema           => $schema_name,
+	        MergeCreateMode  => "Overwrite",
+	        Fields	         => { 
+			'fieldName1' => "value1", 
+			'fieldName2' => "value2,
+			... etc ...
+		}
+        ) || die $Remedy->{'errstr'};
+	
+	#modify a ticket
+	$Remedy->ModifyTicket(
+		Schema	=> $schema_name,
+		Ticket	=> $ticket_number,
+		Fields	=> {
+			'fieldName1' => "value1", 
+			'fieldName2' => "value2,
+			... etc ...
+		}
+	) || die $Remedy->{'errstr'};
+	
+	#query for tickets
+	$tickets = $Remedy->Query(
+		Schema	=> $schema_name,
+		QBE		=> $qbe_string,
+		Fields	=> ['array', 'of', 'fieldNames', 'to', 'retrieve']
+	) || die $Remedy->{'errstr'};
+	
+	#create or update (PushFields)
+	my $result = $Remedy->PushFields(
+		Schema			=> "User",
+		QBE			=> "'Full Name' = " . '"SpongeBob SquarePants"',
+		NoMatchAction		=> "Create",
+		MultipleMatchAction	=> "UpdateFirst",
+		MatchAction		=> "Update",
+		Fields	=> {
+			'Login Name'                     => "sbsqrpnts",
+			'Full Name'                      => "SpongeBob SquarePants",
+			'Password'   	                 => "fryc00k",
+			'Group List'	                 => "Work Order Master",
+			'License Type'                   => "Fixed",
+			'Email Address'                  => 'sbsqrpnts@krustykrab.com',
+			'Status'	 		 => "Current",
+			'Force Password Change On Login' => "Yes"
+		}
+	) || die $Remedy->{'errstr'};
+	
+	#delete a ticket
+	$Remedy->DeleteTicket(
+		Schema	=> $schema_name,
+		Ticket	=> $ticket_number
+	) || die $Remedy->{'errstr'};
+	
+	
+	#parse a raw diary entry
+	$parsed_diary = $Remedy->ParseDBDiary(
+		Diary		  	=> $raw_diary_data_from_database,
+		ConvertDate        	=> 1,
+		DateConversionTimeZone	=> -6
+	) || die $Remedy->{'errstr'};
+	
+	#construct a raw diary entry from a perl data structure
+	$big_diary_string = $Remedy->EncodeDBDiary(
+		Diary	=> [
+			#entry #1
+			{ 'timestamp'	=> "Mon Jan 27 11:16:47 CST 2014",
+			  'user'	=> "ahicox",
+			  'value'	=> "it's the end of the world as we know it"
+			},
+			#entry #2
+			{ 'timestamp'	=> "Mon Jan 27 11:17:50 CST 2014",
+			  'user'	=> "mstipe",
+			  'value'	=> "I feel fine"
+		        },
+		        #entry #3
+		        { 'timestamp'   => "Mon Jan 27 11:18:41 CST 2014",
+		          'user'	=> "lbruce",
+		          'value'	=> "well, I'm not afraid"
+		        }
+		]
+	) || die $Remedy->{'errstr'};
+	
+	#import an ARS object definition
+	$Remedy->ImportDefinition(
+		Definition	=> $string_containing_def
+		DefinitionType	=> "xml",
+		ObjectName	=> "Remedy:ARSTools:CrazyActiveLink",
+		ObjectType	=> "active_link",
+		UpdateCache	=> 1
+	) || die $Remedy->{'errstr'};
+	
+	#export an ARS object definition
+	$definition = $Remedy->ExportDefinition(
+		ObjectName	=> "Remedy:ARSTools:CrazyActiveLink",
+		ObjectType	=> "active_link",
+		DefinitionType	=> "xml",
+	) || die $Remedy->{'errstr'};
+	
+	#delete an ARS Object
+	$Remedy->DeleteObjectFromServer(
+		ObjectName	=> "Remedy:ARSTools:CrazyActiveLink",
+		ObjectName	=> "active_link"
+	) || die $Remedy->{'errstr'};
+	
+	#tunnel an sql query over the api
+	my $data = $Remedy->TunnelSQL(
+		SQL	=> "select viewname from arschema where name = 'User'"
+	) || die $Remedy->{'errstr'};
+	
+	#log out of remedy
+	$Remedy->Destroy();
+
+
+
+=head1	OVERVIEW & DEPENDENCIES
+
+First things first, you need ARSperl installed for this module to work. ARSperl is the perl interface to the 
+Remedy C API, and provides all the "magic" of talking to your Remedy server. This module is a perl wrapper
+that sits atop ARSperl. The purpose of this module is to provide a nice, simplified interface to ARSperl that 
+is independent of the particular version of ARSperl and the Remedy C API that you have installed.
+
+You will need the following items to be installed prior to attempting to use this module:
+
+=over
+
+=item	Remedy C API
+
+This comes as part of your Remedy server installation. This API is proprietary, and owned by the
+Remedy corporation (or BMC, or Peregrin or whom ever owns them this week). You can usually find
+this under the 'api' directory under the remedy installation directory on your remedy server. 
+The Remedy C API is required by the ARSperl installation.
+
+=item	ARSperl
+
+as mentioned earlier, this is the perl interface to the Remedy C API. You can download ARSperl 
+from your local CPAN mirror, or also from the sourceforge project page:
+
+	http://sourceforge.net/projects/arsperl/
+	
+=item	Data::DumpXML
+
+this perl module is available from your local CPAN mirror. It is used to serialize field definition
+data into a configuration file.
+
+=back
+
+
+
+
+=head1	A NOTE ON FIELD DEFINITION DATA
+
+Remedy assigns a unique 'field_id' to each field in a schema. In order to do pretty much anything with 
+that field in the Remedy API, you must know the field_id rather than the name. For instance 'entry_id'
+is typically field_id '1', however it gets a lot more complicated from there. Additionally, Remedy 
+implements fields with enumerated values in a unique way, assigning an integer to each enumerated value
+starting at 0. For instance, 'Status' = "New" = 0. One must also know the enum value corresponding to the
+'human readable' value when performing operations using the API. 
+
+This module attempts to hide all of that, allowing you to reference fields directly by name, and
+enumerated field values by their 'human readable' (string) value (rather than by integer). However, to do so, 
+the module needs to maintain a mapping of field id's and enumerated values. The mapping can be loaded from
+the remedy server when you create a Remedy::ARSTools object, however, this is a rather time-consuming 
+task, and is also network intensive. As an alternative, you can specify a special file in which the object
+will store field definition data. This file acts as a field definition data cache, and it's contents are 
+automatically updated.
+
+Use of an external file in which to cache field definition data is highly recommended for speed improvments,
+but is not completely necessary. The 'penalty' for not using the file, is that it takes much longer to 
+instantiate new objects.
+
+
+=head1	A NOTE ON DATE, DATETIME & TIME OF DAY VALUES
+
+Remedy has three date/time data types: DATETIME (specifies a date and time), DATE (specifies a single day), and TIME_OF_DAY (specifies a specific
+time within a 24 period). Remedy models these date fields as an integer (either a number of seconds or number of days -- more on that below). 
+When you get or set the value of a datetime, date, or time_of_day field on the Remedy C API, the value is specified in the Remedy-native format 
+(so, an integer representing either days or seconds). As you can imagine, this is a hassle. 
+
+As such, starting with version 1.06, Remedy::ARSTools will automatically attempt to translate datetime, date & time_of_date values for you. You can 
+override this behavior by setting the 'DateTranslate' option on the Remedy::ARSTools option to "0" (it is "1" by default -- see "new" method below 
+for more information).
+
+For calls to CreateTicket, ModifyTicket & MergeTicket, Remedy::ARSTools will automatically convert string values on datetime, date and time_of_day to their
+integer equivalents. For calls to Query, Remedy::ARSTools will automatically convert integer datetime, date & time_of_day values to their human-readable 
+string equivalents. 
+
+More info on how we handle each type:
+
+=over
+
+=item	DATETIME
+
+Datetime values represent a complete date & time. Remedy stores this in what is commonly 
+referred to as "epoch" or "unix" time format, which is an integer representing the number of seconds elapsed since
+1/1/1970 00:00:00 GMT (for instance "7/29/1985 14:36:00 CDT" = 491513760)
+
+On the CreateTicket, ModifyTicket & MergeTicket methods, Remedy::ARSTools will translate string values submitted on DATETIME fields into the unix "epoch" 
+format, any format accepted by the Date::Parse module can be specified. 
+
+On the Query method, Remedy::ARSTools will translate the integer value returned by the Remedy API into a human-readable string representing time in the 
+GMT (aka "UTC") timezone. You can specify an alternate timezone by specifying a GMT offset in number of hours on the 'DateConversionTimeZone' option to
+the Query mehod. For instance CST would be 'DateConversionTimeZone' => -6. For more information see documentation for the Query method (below).
+
+=item	DATE
+
+The Date type specifies a specific day (for instance "7/29/1985"). Remedy stores this as the number of days elapsed since 1/1/4713 00:00:00 GMT, B.C.E 
+(seriously, can't make this kinda thing up). 
+
+=item	TIME_OF_DAY
+
+The time_of_day type specifies a specific time-coordinate within a 24 hour period (for instance: 14:36:00). Remedy stores this as the number of seconds elapsed
+since 00:00:00 (midnight, the first second of the day). 
+
+For TIME_OF_DAY fields, Remedy::ARSTools knows but one string format. Calls to Query will translate the integer value into this format. Calls to CreateTicket,
+ModifyTicket & MergeTicket will translate strings in this format into the integer equivalent:
+
+=over
+
+=item	HH:MM:SS AM/PM (for instance: "05:30:00 AM", "05:30:00 PM", "17:30:00")
+
+Zero-padding of single digits is not necessary (so "2:15:36 PM" will work as well as "02:15:36 PM"). 
+If AM/PM is NULL, we presume you are specifying 24-hour ("military time") notation.
+Specifying "zero" values is completely necessary. So "2:15:00 PM" will pass muster, "2:15 PM" will generate an error.
+if you prefer 24 hour (aka "military time") output from Query, you can set the object global TwentyFourHourTimeOfDay option to a nonzero value.
+
+=back
+
+=back
+
+=head1	new
+
+This is, of course, the object constructor. Upon failure, the method will return the undef value, and an error
+message will be written to $Remedy::ARSTools::errstr. At object creation, the field definition data is loaded
+either directly from the remedy server, or from the provided config file.
+
+=head2	syntax
+
+	my $Remedy = new Remedy::ARSTools([ options ]) || die $Remedy::ARSTools::errstr;
+	
+=head2	options
+
+the following options are accepted by the new() function:
+
+=over
+
+=item	Server	(required)
+
+this is the hostname or ip address of the remedy server to which access is desired.
+
+=item	User	(required)
+
+the 'Login Name' of the Remedy account to be used for access to 'Server'
+
+=item	Pass	(required)
+
+the password for 'User'
+
+=item	ConfigFile
+
+this is the full path and filename of the file in which field definition data should be cached (and 
+which may already contain field definition data).
+
+=item	LoginOverride
+
+if a non-zero value is specified for this option, the function will not attempt to login to the 
+remedy server until a function requiring it is called.
+
+=item	Port
+
+if specified, will instruct the C API to communicate with the Remedy server only on the specified TCP port.
+
+=item	RPCNumber
+
+if specified, will instruct the C API to communicate with the Remedy server using only the specified RPC
+port (note only supported where ARSPerl > 8.001 is installed, also note, RPCNumber and Port are mutually
+exclusive).
+
+=item	Language
+
+The language the user is using. If not specified, the default will be used.
+
+=item	AuthString
+
+It's here because it's in ARSPerl, and it's in ARSperl because it's in the C API. It "has something to do
+with the Windows Domain", according to the ARSperl documentation. You can specify it here, and it'll be passed
+on to ARSperl, if you know what to do with it.
+
+=item	ReloadConfigOK
+
+if 0 or the undef value are supplied on this argument, the module will not attempt to update cached field
+definition data in the specified config, if it is found to be out of date.
+
+=item	GenerateConfig
+
+if 0 or the undef value are supplied on this argument, an error is generated if the specified ConfigFile
+does not already contain field definition data. The specified ConfigFile will not be created if it does
+not already exist.
+
+=item	TruncateOK
+
+If a non-zero value is specified on this argument, functions which write data into remedy will silently 
+truncate field data values if they are too long to fit in their specified fields. This is a short cut to 
+setting this option individually on every function call.
+
+=item	DateTranslate
+
+If NULL, this option will default to a value of 1. To override, you must explicity set a value of "0".
+If a non-zero value is specified (again, the default value), then Remedy::ARSTools will attempt to 
+automaticlly convert date, datetime, and time_of_day field values to and from human-readable strings
+(see "A NOTE ON DATE, DATETIME & TIME OF DAY VALUES" above).
+
+=item	TwentyFourHourTimeOfDay
+
+if NULL, this option will default to a value of 0. To override, you must explicitly set a non-zero value.
+If a non-zero value is specified, this will cause the Query method to translate time_of_day values into
+24-hour (aka "military time") values (no AM or PM designation)
+
+=item	OverrideJoinSubmitQuery
+
+if NULL, this option will default to a value of 0. To override, you must explicitly set a non-zero value.
+If a value of "1" is specified on this option, the CreateTicket function will NOT attempt to query for 
+a the new entry_id(s) created when submitting to a JOIN form. All submits to join forms will return the
+undef value and be treated as an exception.
+
+
+=back
+
+
+
+
+=head1	LoadARSConfig
+
+This function loads field definition data from the 'ConfigFile' specified in the object, or directly
+from the Remedy server (if 'ConfigFile' dosen't exist, or the internal 'staleConfig' flag is set). 
+
+Normally, this function is called only internally, but it can be used externally, to force an object
+to reload it's field definition data.
+
+=head2	syntax
+
+	$Remedy->LoadARSConfig() || die $Remedy->{'errstr'};
+
+
+
+
+=head1	ARSLogin
+
+This function connects to the remedy server specified by the 'Server' in the object, obtaining a 
+"control token" from the remedy server. If the object is already logged into the Remedy server, 
+this function will return without doing anything. If the object's internal 'staleLogin' flag is set
+true, or if the object is not yet connected to the Remedy server (such as when 'loginOverride' is specified
+at object instantiation), the function will connect.
+
+=head2	syntax
+
+	$Remedy->ARSlogin() || die $Remedy->{'errstr'};
+
+
+
+
+=head1	Destroy
+
+This is the object destructor. This function releases the "control token" back to the Remedy server, 
+clearing the user's session. This also completely destroys the object.
+
+=head2	syntax
+
+	$Remedy->Destroy();
+
+
+
+=head1	CheckFields
+
+This function checks a hash containing field name and value pairs against field definition data.
+If a field value is too long, it is truncated (if the object's TruncateOK is set), otherwise an 
+error is returned. Also string values provided for enum fields are converted to their integer values.
+
+This function is unique, in that if no errors are found, the undef value is returned, with the string "ok"
+on the object's errstr. If errors are found a string containing a concatenation of all errors found in
+the field list is returned. If a more serious error is encountered (not relating to field values), then
+the undef value is returned with a string other than "ok" on the object's errstr.
+
+This is most definitely called internally, though it can be useful externally for data validation. 
+
+=head2	syntax
+
+	my $errors = $Remedy->CheckFields( [ options ] ) || do {
+		die $Remedy->{'errstr'} if ($remedy->{'errstr'} ne "ok");
+	};
+	
+	if ($errors !~/^\s*/){ print $errors, "\n"; }
+	
+=head2	options
+
+the CheckFields function accepts the following options
+
+=over
+
+=item	Schema		(required)
+
+the name of the schema in which the fields that values should be checked for exist.
+
+=item	Fields		(required)
+
+a hash reference in the form of { 'field_name' => $value  ... }, where each 'field_name' refers to a field
+in 'Schema', and each $value represents a value for the field.
+
+NOTE: the referenced hash will be modified (values truncated, or strings translated to integers for enum fields)
+
+=back
+
+
+
+
+=head1	CreateTicket
+
+Create a new record in the specified Schema containing the specified field values.
+
+A WORD ABOUT DIARY FIELDS. You are executing a create transaction with this function, meaning any value you specify
+for a diary field on the 'Fields' option, will be interpreted as the first *entry* in the diary field as opposed to 
+creating an entire diary in one go (if you want to do that, see the MergeTicket function). As such, send a string value
+on Diary fields for this function. If you send a diary data structure (see output of ParseDBDiary function) on a diary
+field here, Remedy::ARSTools *will* try to serialize it into a whole diary entry ... which will likely create some 
+seriously amuzing diary entries.
+
+A WORD ABOUT JOIN FORMS. Technically you cannot "create a ticket" in a join form. However, the ARS API will indeed let
+you create a SUBMIT TRANSACTION against a join form. The submit transaction, in and of itself does absolutely nothing,
+other than to fire the submit filters for the join form. So, presuming you have filters in place to fire on submit and
+push appropriate records to the supporting forms, then indeed, the submit transaction will "create a ticket in the join
+form". As it turns out this is basically how the entire AST:* class of forms in ITSM works. 
+
+As of version 1.11, the CreateTicket function will abstract submit into join forms for you. It will create the submit
+transaction on the API with the given Schema and Field values, and will then attempt to subsequently query the join form
+for the record(s) that may or may not have been created by workflow as a result of the submit transaction. CreateTicket
+attempts to do this by using the supplied Field values to generate a QBE string to query by. If we find something,
+we return the entry_id (field 1) value and treat it as a successful submit. If we find nothing, we return undef and 
+treat it as an exception.
+
+In the case that we find MORE THAN ONE record in the join form matching the input Fields, CreateTicket will sort them
+by create date and return the most recently created one. This may or may not indicate success, but there's not any
+way for ARSTools to reasonably know this, so we treat the condition as success and return the entry_id. Setting the object's 
+Debug flag to 1 will allow you to view details in this scenario.
+
+If you wish to override the ARSTools automatically generated post-submit query for join forms, specify an alternate
+QBE string on the JoinFormPostSubmitQuery option.
+
+NOTE: if you DO NOT want ARSTools to attempt to identify new records created by CreateTicket calls to join forms, set the
+OverrideJoinSubmitQuery option to 1 on the object prior to executing the CreateTicket call. 
+
+=head2	syntax
+
+	my $ticket_number = $Remedy->CreateTicket( [ options ] ) || die $Remedy->{'errstr'};
+
+=head2	options
+
+the following options are accepted by the CreateTicket function
+
+=over
+
+=item	Schema
+
+the name of the schema in which the record should be created
+
+=item	Fields
+
+a hash reference in the form of { 'field_name' => $value ... }, where each 'field_name' is the name of a
+field in 'Schema' and each $value is a value to place in that field.
+
+=item	JoinFormPostSubmitQuery (optional)
+
+IF you are submitting to a join form, and do NOT wish to use ARSTools' automatically generated post-submit
+query (for instance if workflow modifies the values of fields you send in on the create transaction), you
+can specify a QBE string on this option, and it will be used instead of the auto-generated query to look 
+for the record created from the join form submit transaction.
+
+=back
+
+
+
+
+=head1	ModifyTicket
+
+Change the specified field values in the specified record, in the specified Schema
+
+The same caveat about diary fields (see CreateTicket above) applies here. This is a modify transaction on the API, meaning
+ARS will interpret any value sent for a diary field as the N'th *entry* in the diary rather than an attempt to replace the
+entire diary (see MergeTicket function to do that). So send string values for your diary fields here.
+
+=head2	syntax
+
+	$Remedy->ModifyTicket( [ options ] ) || die $Remedy->{'errstr'};
+
+=head2	options
+
+the following options are accepted by the ModifyTicket function:
+
+=over
+
+=item	Ticket
+
+the 'ticket number' (or 'entry id', or 'record number' ... field id number 1, that is) of the record
+that we wish to modify.
+
+=item	Schema
+
+the name of the schema in which 'Ticket' exists
+
+=item	Fields
+
+a hash reference in the form of { 'field_name' => $value ... }, where each 'field_name' is the name of a
+field in 'Ticket' and $value is the value to set on that field.
+
+=back
+
+
+
+=head1	PushFields
+
+This is a perl implementation of the ARS "Push-Fields" action. This allows you to create or update a record
+(or records) matching a given qualification. The qualification is specified in QBE (as with the Search fuction).
+
+=head2	syntax
+
+	$result = $Remedy->PushFields( [ options ] ) || die $Remedy->{'errstr'};
+	
+=head2	return value
+
+The PushFields function returns a hash reference containing two keys:
+
+=over
+
+=item	records
+
+this is an array rerference containing a list of entry ids in the specified Schema that were either created or modified
+
+=item	disposition
+
+this will be one of three strings: "created" (indicating that each of the entry id values in 'records' was newly created),
+"updated" (indicationg that each of the 'records' was modified to contain the provided field values), or "matched" (indicating
+the records matched the QBE, but that MatchAction was set to "Nothing".
+
+=back
+
+=head2	options
+
+the following options are accepted by the PushFields function:
+
+=over
+
+=item	Schema
+
+indicates the schema in which we will be creating or modifying records
+
+=item	QBE
+
+this is the QBE string to qualify matching records (for more info, see the 'Search' function notes)
+
+=item	Fields
+
+this is a hash reference containing field/value pairs to create or update records in the specified Schema (see also 'CreateTicket', 'ModifyTicket')
+
+=item	NoMatchAction	(optional)
+
+if no value is given, this option defaults to a value of "Create". This tells the function how to behave if no record(s) match the given QBE 
+qualification. If given a value of "Create", the function will create a new record in the target Schema, if a value of "Error" is given, the 
+function will return the undef value, treating a no-match condition as an exception.
+
+=item	MultipleMatchAction	(optional)
+
+if no value is given, this option defaults to a value of "UpdateFirst". This tells the function how to behave if multiple records match the given
+QBE qualification. If given a value of "UpdateFirst", the function will update ONLY the first record returned by the API on the search (this should
+correspond to the form's result list sort order, as the ARS PushFields function does). If a value of "UpdateAll" is given, the function will update
+all records returned from the QBE search. If "Error" is given, the function will return the undef value and treat a multiple-match condition as an
+exception.
+
+=item	MatchAction	(optional)
+
+if no value is given, this option defaults to a value of "Update". This tells the function how to behave if ANY record(s) match the given QBE 
+qualification. If a value of "Update" is specified, the function will update the record(s) with the given field values. If "Error" is specified
+the function will return the undef value and treat an any-match condition as an exception. If "Nothing" is specified no action will be taken
+in an any-match condition, but the entry_ids of the matched records will be returned with a 'disposition' of "matched".
+
+=item	AlternateSortOrder	(optional)
+
+If the 'MultipleMatchAction' is "UpdateFirst" or "UpdateAll", by default the records are updated in the sort order returned from the API (which
+should correspond to the sort order set on the Schema's properties. This option allows you to override the default sort order with one of four
+alternate sort orders:
+
+=over
+
+=item	CreateDateAscending
+=item	CreateDateDescending
+=item	ModifiedDateAscending
+=item	ModifiedDateDescending
+
+=back
+
+Obviously, this option has the most impart to the "UpdateFirst" MultipleMatchAction as it determines which record is modified.
+
+=back
+
+
+
+
+
+=head1	DeleteTicket
+
+Remove the specified record from the specified Schema. Obviously, this will fail if the 'User' specified
+at instantiation, does not have administrator permissions.
+
+=head2	syntax
+
+	$Remedy->DeleteTicket( [ options ] ) || die $Remedy->{'errstr'};
+	
+=head2	options
+
+=over
+
+=item	Ticket
+
+the 'ticket number' (or 'entry id', or 'record number' ... field id number 1, that is) of the record
+that we wish to delete.
+
+=item	Schema
+
+the name of the schema in which 'Ticket' exists
+
+=back
+
+
+
+
+=head1	Query
+
+Return selected field values from Tickets matching the specified query string in the specified Schema. 
+It should be noted that having external processes query through the ARS API presents a lot of overhead
+on the server, is slower than a direct SQL query to the underlying database. However, If you're here, 
+I'll presume you have your reasons ;-).
+
+Data is returned as an array reference. Each element of the array is a hash reference, representing a ticket 
+which matched the specified query string. The hash reference is in the form of { 'field_name' => $value ... }, 
+where each 'field_name' is the name of a field in the ticket and $value is the value for that field.
+
+=head2	syntax
+
+	my $tickets = $Remedy->Query( [ options ] ) || die $Remedy->{'errstr'};
+	
+=head2	options
+
+the Query function accepts the following arguments:
+
+=over
+
+=item	Schema
+
+the name of the schema that you want to return matching records from
+
+=item	QBE
+
+this is the "Query By Example" string, or 'query string' or "that thing you type in the 'Search Criteria'
+line when you click the 'Advanced' button in the client". You know what I'm talking about probably.
+Just remember, it's not exactly the same thing as an SQL 'where' clause.
+
+=item	Fields
+
+An array contianing the list of field names corresponding to selected field values we'd like returned from
+matching records in 'Schema'. You may find it helpful to build the array reference inline with the 
+function call like so:
+ 
+	Fields => ['field1','field2','field3']
+
+=item	DateConversionTimeZone
+
+if the object's 'DateTranslate' option is active (it is by default), this will cause the Query function to 
+attempt to translate DATE, DATETIME and TIME_OF_DAY type'd fields to a human-readable strings (see 
+"A NOTE ON DATE, DATETIME & TIME OF DAY VALUES" above). For DATETIME strings, we must translate from the 
+unix epoch (number of seconds elapsed since 1/1/1970 00:00:00 GMT) into the human-readable string in a 
+specific timezone. By default, that timezone is GMT. If you want Query to return datetimes in a different
+timezone, you can specify a number of hours to offset GMT (so for instance, if I wanted dates in CST 
+(American Central Standard Time), I would speficy a DateConversionTimeZone value of -6.
+
+Remedy::ARSTools is not aware of Daylight Savings Time in your geographic area. You'll have to keep track
+of that one yourself and apply the correct offset for your time of year (if you're into that kinda thing).
+	
+=back
+
+
+
+
+=head1	ParseDBDiary
+
+Remedy stores diary fields as a CLOB (i.e. a big text field) in the database. As you are probably aware, 
+diary fields are separated into multiple entries which have a timestamp and user associated with them. 
+So what you get when you select a diary field from your database, is each diary entry separated by some trash. 
+This 'trash' is the username and timestamp. This function parses a raw dairy entry from the database (for instance
+such as may be returned from the TunnelSQL() method above, and translates it into the same perl data structure as
+would be returned by ARS::getField.
+
+This data structure is an array reference. Each element in the array is, in turn, a hash reference. Each nested 
+hash contains three fields 'timestamp', 'user', and 'value'. The array is sorted chronologically, with
+the earliest entries first. Here's another look at what the data-structure looks like:
+
+	\@DIARY = [
+		{ 'timestamp' => $date, 'user' => $user, 'value' => $diary_entry }
+		...
+	];
+
+=head2	syntax
+
+	my $diary_entries = $Remedy->ParseDiary( [ options ] ) || die $Remedy->{'errstr'};
+	
+	-or-
+	
+	my $diary_entries = ParseDiary( [ options ] ) || die $Remedy::ARSTools:errstr;
+
+=head2	options
+
+the following options are accepted by the ParseDiary function:
+
+=over
+
+=item	Diary
+
+a big ol' text string from the database containing an unparsed diary
+
+=item	ConvertDate
+
+if a non-zero value is specified on this option, the timestamp field of each diary entry will
+be converted from 'epoch' time to a human readable date-time string in the GMT timezone 
+
+=item	DateConversionTimeZone
+
+if specified, this is a number of hours to offset the GMT date-time conversion for diary entries. For instance, if I wished
+to see diary dateteimes in US/Central Standard Time, I'd use 'DateConversionTimeZone' => -6
+
+=back
+
+=head1	EncodeDBDiary
+
+this is the inverse of ParseDBDiary. Given an array of hashes, where each nested hash contains the 'timestamp', 'user'
+and 'value' keys, this function will serialize a text data structure suitable for insertion directly into a database table.
+This function is exported for procedural calls (as is ParseDBDiary), but it is also used internally by the MergeTicket function
+to set an entire diary field at once versus making a new entry in a diary field (as would be the case on a merge transaction
+as opposed to a modify or create transaction). See also: additional notes on the MergeTicket, CreateTicket and ModifyTicket functions
+in relation to diary fields.
+
+=head2	syntax
+
+	my $diary_string = $Remedy->EncodeDBDiary( [ options ] ) || die $Remedy->{'errstr'};
+	
+	-or-
+	
+	my $diary_string = EncodeDBDiary( [ options ] ) || die $Remedy::ARSTools:errstr;
+	
+=head2	options
+
+the following options are accepted by the EncodeDBDiary function:
+
+=over
+
+=item	Diary
+
+this is an array of hashes where each hash must contain the 'timestamp', 'user' and 'value' keys. See also the output data structure
+of ParseDBDiary and the output of the Query function (when returning a diary field).
+
+=back
+
+=head1 MergeTicket
+
+Pretty much the same thing as CreateTicket, but with a merge transaction, allowing you all of the freedoms
+and responsibilities that come with that (for heaven's sake: be careful, mmmkay?).
+
+The returned value is one of two things. If you are in MergeMode = 'Create' or 'Error', this will return the
+entry_id (i.e. "ticket number, aka "field id = 1") of the record you just merged. If you are in 
+MergeMode = "Overwrite", AND the entry_id value you specified already exists this will contain the string
+"overwritten" (you may now see my point about being careful).
+
+A WORD ABOUT DIARY FIELDS. You are merge-ing records into Remedy with this function, which means you are 
+replacing the *entire* database record at once. ARS will literally delete and re-insert the entire row. This means you've got
+to write the entire diary at once, versus creating each individual entry. To do this, create a perl data structure representing the entire
+diary, and send a reference to it as the value of the diary field in the 'Fields' option. The data structure should be an array of hash references, 
+where each nexted hash has the 'timestamp', 'user' and 'value' keys (this is the same format sent back by Query when returning a 
+diary field, or the output of ParseDBDiary).
+
+=head2  syntax
+
+        my $ticket_number = $Remedy->MergeTicket( [options] ) || die $Remedy->{'errstr'}
+
+=head2  options
+
+=over
+
+=item   Schema
+
+the name of the schema (i.e. "form") in which the record should be merged.
+
+=item   Fields
+
+a hash reference in the form of { 'field_name' => $value ... }, where each 'field_name' is the name of a
+field in 'Schema' and each $value is a value to place in that field. Just like CreateTicket
+
+=item   MergeCreateMode
+
+this controls what happens when the record you want to merge has the same value for field_id = 1 as an existing
+record. That is to say, what happens in the situation where you specify an existing ticket number on Fields. There
+are three values:
+
+=over
+
+=item   Error
+
+Throw an error and exit if there is an existing record in the spefified Schema with the same ticket number
+
+=item   Create
+
+Create a new record with a different ticket number. So, basically ignore your speficied field_id = 1 (ticket number) value
+and create a new record with the rest of the field values, and return the new ticket number.
+
+=item   Overwrite
+
+This is the funny biznezz. If you specify this option, it will overwrite the existing ticket number with your values, and
+the function will return "overwritten" instead of a ticket number. You have been warned :-).
+
+=back
+
+=item   AllowNullFields
+
+if you specify a non-null value on this option, it will give the API permission to bypass required fields (excepting of course
+the ARS system fields ... 'status', 'short description', yadda yadda).
+
+=item   SkipFieldPatternCheck
+
+if you specify a non-null value on this option, it will give the API permission to bypass field pattern checking (menus, etc).
+Obviously, it will not let you set out of range enums and the like, but you'd never get that far anyhow ... this module would
+throw a field check error before that, but I digress. Set this if you want to set goofy field values and get away with it.
+
+=back
+
+=head1	ImportDefinition
+
+import a serialized ARS Object definition onto the ARServer. Serialized ARS Object definitions may be in *.def or *.xml format. 
+be careful m'kay?
+
+=head2  syntax
+
+        $Remedy->ImportDefinition( [options] ) || die $Remedy->{'errstr'}
+
+=head2  options
+
+=over	
+
+=item	Definition	(required)
+
+a string containing the serialized object definition in XML or DEF format
+
+=item	DefinitionType	(required)
+
+a value of either "xml" or "def" identifies the format of the serialized object definition
+
+=item	ObjectName	(required)
+
+indicates the name of the object to import
+
+=item	ObjectType	(required)
+
+indicates the type of object to import. This is one of the following:
+
+=item 	"schema"
+=item	"filter"
+=item	"active_link"
+=item	"char_menu"
+=item	"escalation"
+=item	"dist_map"
+=item	"container"
+=item	"dist_pool" 
+
+=back
+
+=item	UpdateCache	(optional, default value: 0)
+
+if a non-zero value is set on this option, Remedy::ARSTools will insert the newly created object into it's cache
+after import is compelted.
+
+=item	OverwriteExistingObject		(optional, default value: 0)
+
+if a non-zero value is set on this option, we will NOT generate an error if an object with the same name & type
+already exists (in that case we will simply overwrite it with the new version), otherwise we're gonna throw an error.
+This defaults to 0 (off -- i.e. throwing errors if the object already exists). Turn off with caution.
+
+=back
+
+
+=head1	ExportDefinition
+
+export a serialized object definition from the ARServer.
+
+=head2  syntax
+
+        $Remedy->ImportDefinition( [options] ) || die $Remedy->{'errstr'}
+
+=head2  options
+
+=over	
+
+=item	ObjectName	(required)
+
+indicates the name of the object to export
+
+=item	ObjectType	(required)
+
+indicates the type of object to export. This is one of the following:
+
+=over
+
+=item 	"schema"
+=item	"filter"
+=item	"active_link"
+=item	"char_menu"
+=item	"escalation"
+=item	"dist_map"
+=item	"container"
+=item	"dist_pool" 
+
+=back
+
+=item	DefinitionType	(required)
+
+a value of either "xml" or "def" identifies the format to export the serialized object definition into
+NOTE: as of ARS 7.6.04 XML definition export of forms with overlays applied does NOT work (though def format does).
+BMC Support Ticket: ISS04238696 is open on this issue.
+
+=back
+
+=head1	DeleteObjectFromServer
+
+this will delete an ARS Object from the ARServer. It probably goes without saying but you know ... 
+indescriminate use of this function can turn a perfectly good day of gainful employment into a hellacious nightmare
+that ends with standing in line at the unemployment office ... so ... be careful m'kay?
+
+BE AWARE: deleting schemas causes ARS to cascade delete all the workflow associated to that form that isn't shared.
+
+=head2  syntax
+
+        $Remedy->DeleteObjectFromServer( [options] ) || die $Remedy->{'errstr'}
+
+=head2  options
+
+=over	
+
+=item	ObjectName	(required)
+
+indicates the name of the object to DELETE from the ARServer.
+
+=item	ObjectType	(required)
+
+indicates the type of object to DELETE. This is one of the following:
+
+=over
+
+=item 	"schema"
+=item	"filter"
+=item	"active_link"
+=item	"char_menu"
+=item	"escalation"
+
+=back
+
+=back
+
+=head1	TunnelSQL
+
+this will tunnel an SQL statement over the API. The SQL statement will execute as the 'aradmin' database user. Like DeleteObjectFromServer
+this is a function you can EASILY hork an ARServer with, if you're not careful. With great power, comes great responsibility and all that.
+
+Data is returned in an array of arrays. Each nested array represents a row of data returned. Fields are returned in the order they were specified
+in the SQL query. For instance:
+
+my $data = $Remedy->TunnelSQL(SQL => "select schemaid, viewname from arschema where name = 'User'");
+$data->[0]->[0] == the value of schemaid column
+$data->[0]->[1] == the value of viewname column
+
+=head2  syntax
+
+        $data = $Remedy->TunnelSQL( [options] ) || die $Remedy->{'errstr'}
+
+=head2  options
+
+=over
+
+=item	SQL (required)
+
+the sql you wish to execute as ARADMIN.
+
+=back
+
+=head1	EXAMPLES
+
+#create a new ticket in Users schema
+my $ticket_number = $Remedy->CreateTicket(
+	Schema		=> "User",
+	Fields		=> {
+		'Login Name'		=> "sbsqrpnts",
+		'Password'			=> "tar-t4r-s4us3",
+		'Group List'		=> "fryCooks jellyFishers",
+		'Full Name'			=> "Squarepants, Sponge B.",
+		'Email Address'		=> 'sbsqrpnts@krustykrab.com',
+		'License Type'		=> "Fixed",
+		'Assigned To'		=> "sbsqrpnts"	
+	}
+) || die ($Remedy->{'errstr'});
+
+#query for tickets
+my $tickets = $Remedy->Query(
+	Schema	=> "Users",
+	QBE 	=> "'Login Name' = \"sbsqrpnts\"",
+	Fields	=> [ "Request ID", "Login Name" ]
+) || die ($Remedy->{'errstr'});
+
+#modify a ticket
+$Remedy->modifyTicket(
+	Ticket	=> $tickets->[0]->{'Request ID'},
+	Schema	=> "User",
+	Fields	=> { 'Full Name' => "SpongeBob Squarepants" }
+) || die ($Remedy->{'errstr'});
+
+#delete a ticket
+$Remedy->DeleteTicket(
+	Schema	=> "User",
+	Ticket	=> $tickets->[0]->{'Request ID'}
+) || die ($Remedy->{'errstr'});
+
+#log out
+$Remedy->Destroy();
+
+
+
+=head1	AUTHOR
+
+Andrew N. Hicox	<andrew@hicox.com>
+Studio BootyQuake
+http://www.hicox.com
+
+
+
+
+=head1	LICENSE
+
+This module is released under the licensing terms of Perl itself.
+http://www.arsperl.org/artistic.txt

@@ -1,0 +1,63 @@
+Revision history for Perl extension RPi::ADC::ADS
+
+1.01    2017-01-11
+        - removed _lsb() and _msb() as they were no longer needed or referenced
+        - slight POD corrections
+
+1.00    2017-01-11
+        - combined all the config register subs into a BEGIN block, we now auto
+          generate them all and put them into the symbol table. This reduces a
+          lot of code copy/paste
+
+0.07    2017-01-10
+        - POD fixes
+        - added _bit_set(), and consolodated a lot of repetitive config
+          register bit switching
+        - removed _register_default(). We now set this in the new() call to
+          0x80 (MSB) and 0x00 (LSB)
+
+0.06    2017-01-10
+        - all configuration register options are now available (less bits 4 and
+          2)
+        - complete overhaul on setting the config register
+        - we now unset and set the config register using bitwise operators
+          instead of math hackery
+        - nearly everything has tests
+        - added extensive documentation for the software, along with all the
+          specifications of the configuration register settings
+
+0.05    2017-01-09
+        - major POD cleanup
+        - layout fixes in XS file
+        - removed parameters from pod method headings
+        - SYNOPSIS fixes
+        - typo fixes
+
+0.04    2017-01-09
+        - POD fix
+        - cleaned up parameter listing in pod (removed =head3 tags)
+        - added clarifications in POD
+        - added optional parameters and defaults in SYNOPSIS
+        - added parameter checking in all methods
+        - added tests for all functionality
+        - reworked the write_buf parameter to accept the two elements in proper
+          order, and modified calls that send them in
+        - added POD for missing methods and the C functions
+        - added Travis-CI and Coveralls.io integration
+
+0.03    2017-01-08
+        - remove comments from C code
+        - layout/cleanup of XS code
+        - lowercase vars in XS
+        - changed to OO format
+        - C fetch() now accessible to library only
+        - added config register details in POD
+        - renamed distribution from RPi::ADS1x15
+        - added raw(), percent() and volts()
+        - we now properly bit-shift when we're on 16-bit resolution ADC models
+
+0.02    2017-01-07
+        - POD additions/cleanup
+
+0.01    2017-01-07
+        - initial version

@@ -1,0 +1,45 @@
+package <tmpl_var name=prefix>::Rose::<tmpl_var name=module>::Form;
+
+use strict;
+
+use base 'Rose::HTML::Form';
+
+# -------------------------------------------------
+
+sub object_class
+{
+	return '<tmpl_var name=prefix>::Rose::<tmpl_var name=module>';
+}
+
+sub init_with_<tmpl_var name=table>
+{
+	my($self) = shift;
+
+	$self -> init_with_object(@_);
+}
+
+sub <tmpl_var name=table>_from_form
+{
+	my($self) = shift;
+
+	$self -> object_from_form(@_);
+}
+
+sub build_form
+{
+	my($self) = shift;
+    
+	$self -> add_fields
+	(<tmpl_loop name=column_loop>
+	<tmpl_var name=column> =>
+	{
+	<tmpl_var name=definition>
+	},</tmpl_loop>
+	);
+    
+	return $self -> SUPER::build_form(@_);
+}
+
+# -------------------------------------------------
+
+1;

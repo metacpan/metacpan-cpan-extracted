@@ -1,0 +1,12 @@
+Revision history for Rapid7-NeXpose-API
+
+
+0.03	2011-01-13 08:45
+	Fixes in inline documentation, better descriptions
+
+0.02	2011-01-05 08:17
+	Fixes to prereqs. Added meta tags like repo+tracker.. Also pwd fix.
+
+0.01    2010-12-22 06:09
+        First version, released on an unsuspecting world.
+

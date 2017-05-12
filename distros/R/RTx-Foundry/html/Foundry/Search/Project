@@ -1,0 +1,66 @@
+%# Keep Cool, but Don't Freeze
+%#                - Hellman's Mayonnaise
+<%INIT>
+# first, look to see if something already matchs the Queue Name.
+my $QueueObj = RT::Queue->new($session{CurrentUser});
+$QueueObj->LoadByCols( Name => $Query );
+
+if ( $QueueObj->Id ) {
+    return $m->comp(
+	'/Foundry/Elements/Redirect',
+	URL => '/Foundry/Project/?Queue=' . $QueueObj->Id
+    ) unless $QueueObj->Disabled;
+}
+
+# next, we see if any of the unixnames match.
+
+my $Origins = RT::Tickets->new($session{CurrentUser});
+$Origins->LimitCustomField(
+    CUSTOMFIELD => 'UnixName',
+    QUEUE => 'NewProject',
+    VALUE => $Query,
+);
+
+if ( $Origins->Count == 1 and $QueueObj->Load($Origins->First->CustomFieldValue('ProjectName'))) {
+    return $m->comp(
+	'/Foundry/Elements/Redirect',
+	URL => '/Foundry/Project/?Queue=' . $QueueObj->Id
+    ) unless $QueueObj->Disabled;
+}
+
+# okay -- it's a regular search. return the info set.
+my $List = RT::Queues->new($session{CurrentUser});
+#$List->Limit(
+#    FIELD => 'Name',
+#    VALUE => $Query,
+#    OPERATOR => 'LIKE',
+#    CASESENSITIVE => 0,
+#);
+$List->LimitToEnabled;
+$List->OrderBy( FIELD => 'Name' );
+
+my $count = $List->Count or return;
+my $query = lc($Query);
+$List = [
+    grep {
+	index(lc($_->Name), $query) > -1
+	    or 
+	index(lc($_->OriginObj->CustomFieldValue('UnixName')), $query) > -1
+    } @{$List->ItemsArrayRef}
+];
+
+# final chance -- if only one thing matches, jump to it
+if ( @$List == 1 ) {
+    return $m->comp(
+	'/Foundry/Elements/Redirect',
+	URL => '/Foundry/Project/?Queue=' . $List->[0]->Id
+    );
+}
+
+# okay, we really have a list.
+return $List;
+
+</%INIT>
+<%ARGS>
+$Query
+</%ARGS>

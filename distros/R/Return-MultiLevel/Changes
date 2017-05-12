@@ -1,0 +1,19 @@
+Revision history for Return-MultiLevel
+
+0.04    2014-09-07
+        - switch to Data::Munge::eval_string
+        - make with_return a named sub to improve stack traces
+        - cache runtime generated trampolines; should cut down on the need to
+          eval strings at runtime
+        - document RETURN_MULTI_LEVEL_PP
+        - add RETURN_MULTI_LEVEL_DEBUG for capturing with_return stacks
+
+0.03    2013-08-06
+        - require 5.8 because 5.6 segfaults for some reason
+
+0.02    2013-08-01
+        - drop dependency on Scope::OnExit::Wrap
+
+0.01    2013-01-04
+        First version, released on an unsuspecting world.
+

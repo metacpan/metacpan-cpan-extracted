@@ -1,0 +1,6 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@base <http://example.org/> .
+@prefix jita: <http://aims.fao.org/aos/jita/> .
+
+<foo> skos:broader jita:foo .

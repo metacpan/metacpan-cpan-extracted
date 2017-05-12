@@ -1,0 +1,121 @@
+#====================================================================#
+#  The release file for RDF-Core                                     #
+#====================================================================#
+
+Version 0.51
+February 19, 2007
+----------------
+	- Makefile reporting dependencies in CPAN-compatible way
+	- added basic test suite
+	- minor fixes
+Version 0.50
+July 14, 2006
+----------------
+	- a major bug in storing language tags and datatypes for
+	  literals fixed (bug 3148, thanks to Pierluigi Miraglia and
+	  Gregory Williams), it affects all types of storages (Memory,
+	  DB_File, Postgres). The new version is NOT compatible with old
+	  storages, so you will have to serialize your data, create new
+	  storages and parse it back.
+Version 0.40
+March 2, 2006
+----------------
+	- some code cleanup (thanks to Gregory Williams)
+	- a new method equals() added to literal object, datatype 
+	  and laguage tag are taken into account (bug 2306)
+	- escaping characters in rdf:about attribute fixed (bug 1630, 
+	  thanks to Norman Walsh)
+	- rdf:nodeID is produced by serializer when necessary, instead
+	  of incorrect deanonymizing resource
+Version 0.31
+August 11, 2004
+----------------
+        - Typo in RDF::Core::NodeFactory fixed
+	- RDF::Core::Model::Serializer callback functions can be
+	  overriden now
+Version 0.30
+March 14, 2003
+----------------
+	Specification changes:
+	- datatype and language information are handled wherever
+	  needed (parser, serializer, storages, literal object, 
+	  NTriples output)	
+	- RDF/XML: rdf:nodeID attribute is handled in parser 
+	- RDF/XML: rdf:parseType="Literal" asserts typed literal 
+	- RDF/XML: rdf:parseType="Collection" attribute value is
+	  handled
+
+	Fixed bugs:
+	- rdf namespace is prepended to about attribute in serializer
+	- Namespace/local value separation is kept where
+	  RDF::Core::Resource->clone() is called. (reported by Dan Berrios)  
+Version 0.20
+October 14, 2002
+----------------
+	- several bugs fixed
+        - external variables binding supported in query 
+          (prepare() and execute() methods)
+        - comments are allowed in query syntax
+	- query language syntax changes for (hopefully) better 
+	  readability
+
+Version 0.16
+May 27, 2002
+----------------
+	- a second variable binding is added to query language (binds 
+	  variable to property itself instead of property value)
+	- member() - of container - function added to query language 
+	  functions
+	- a method "equals" is added to RDF::Core::Resource
+	- a new module Schema is added, which provides access to RDF 
+	  Schema
+	- query tokenizer bug corrected (bug 854)
+
+Version 0.15
+April 16, 2002
+----------------
+	- parser recognizes and handles xml:base attribute (bug 771)
+	- parser bug with rdf:bagID fixed (bug 774)
+	- parser bug with rdf:li fixed (bug 776)
+	- query results are not returned in array of rows, a callback 
+	  function is called for each row instead
+	- query evaluation speed was improved by applying conditions 
+	  as soon as possible
+	- DB_File storage handles SIGINT to protect data consistency
+	- DB_File storage has a new option Sync which says how often
+	  it should synchronize cache with disk
+
+
+Version 0.11
+March 28, 2002 
+----------------
+	- the damned README added (was missing in 0.10 again)
+
+Version 0.10
+March 27, 2002 
+----------------
+	- countStmts now works with DBMS storage (bug 768)
+	- USE section added to query (defining namespace prefixes)
+	- a binary relation not equal (!=) added to query language
+	- BNF diagram of the query language added to Query pod
+	- class operator (::) is allowed in From section of query now
+
+Version 0.04
+March 22, 2002
+----------------
+	- README  file added
+
+
+Version 0.03
+March 21, 2002
+----------------
+	- blank (anonymous) nodes don't have URI, but _:<name>
+
+
+Version 0.01  
+October 3, 2001
+----------------
+	- original version; created by h2xs 1.20 
+
+
+Note: Bug references refer to http://bugzilla.gingerall.cz/ .

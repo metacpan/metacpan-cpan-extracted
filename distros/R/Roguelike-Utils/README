@@ -1,0 +1,39 @@
+NAME
+    Roguelike-Library - Roguelike Library for Perl
+
+SYNOPSIS
+ package myworld;
+ use base 'Games::Roguelike::World';
+
+ $r = myworld->new(w=>80,h=>50,dispw=>40,disph=>18);     # creates a world with specified width/height & map display width/height
+ $r->area(new Games::Roguelike::Area(name=>'1'));                       # create a new area in this world called "1"
+ $r->area->genmaze2();                                   # make a cavelike maze
+ $char = Games::Roguelike::Mob->new($r->area, sym=>'@', pov=>8);      # add a mobile object with symbol '@'
+ $r->setvp($char);                                       # set viewpoint to be from $char's perspective
+ $r->drawmap();                                          # draw the active area map from the current perspective
+ while (!((my $c = $r->getch()) eq 'q')) {
+        $char->kbdmove($c);
+        $r->drawmap();
+ }
+
+DESCRIPTION
+    Library for pulling together field of view, character handling and map
+    drawing code.
+
+            * ::World is the main "world" object
+            * uses the ::Console library to draw the map
+            * assumes the user will be using overridden ::Mob's as characters in the game
+
+    Please also see the examples and test scripts located in the "scripts" directory included
+    with this distribution.  Some of the examples are fully working mini-games.
+
+AUTHOR
+    Erik Aronesty "earonesty@cpan.org"
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html> or the included
+    LICENSE file.
+

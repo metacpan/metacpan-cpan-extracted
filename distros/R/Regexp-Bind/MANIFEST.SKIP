@@ -1,0 +1,10 @@
+\bCVS\b
+^blib/
+^Makefile$
+^Makefile\.old$
+~$
+\.html$
+\.old$
+^MakeMaker\d
+^MANIFEST.bak
+^pm_to_blib

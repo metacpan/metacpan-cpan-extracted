@@ -1,0 +1,153 @@
+NAME
+
+    Redis::RateLimit - Sliding window rate limiting with Redis
+
+VERSION
+
+    version 1.0001
+
+SYNOPSIS
+
+        use Redis;
+        use Redis::RateLimit;
+    
+        my $rules = [
+            { interval => 1, limit => 5 },
+            { interval => 3600, limit => 1000, precision => 100 },
+        ];
+    
+        my $redis_client = Redis->new;
+        my $limiter = Redis::RateLimit->new(
+            redis => $redis_client,
+            rules => $rules,
+        );
+    
+        for ( 1..10 ) {
+            say 'Is rate limited? ', $limiter->incr('127.0.0.1') ? 'true' : 'false';
+        };
+
+    Output:
+
+        Is rate limited? false
+        Is rate limited? false
+        Is rate limited? false
+        Is rate limited? false
+        Is rate limited? false
+        Is rate limited? true
+        Is rate limited? true
+        Is rate limited? true
+        Is rate limited? true
+        Is rate limited? true
+
+DESCRIPTION
+
+    A Perl library for efficient rate limiting using sliding windows stored
+    in Redis.
+
+    This is a port of RateLimit.js <http://ratelimit.io/> without the
+    non-blocking goodness.
+
+ Features
+
+      * Uses a sliding window for a rate limit rule
+
+      * Multiple rules per instance
+
+      * Multiple instances of RateLimit side-by-side for different
+      categories of users.
+
+      * Whitelisting/blacklisting of keys
+
+ Background
+
+    See this excellent articles on how the sliding window rate limiting
+    with Redis works:
+
+      * Introduction to Rate Limiting with Redis Part 1
+      <http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with.html>
+
+      * Introduction to Rate Limiting with Redis Part 2
+      <http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html>
+
+    For more information on the `weight` and `precision` options, see the
+    second blog post above.
+
+ TODO
+
+      * Port the middleware for Plack
+
+ATTRIBUTES
+
+ redis
+
+    Redis client. If none is provided, a default is constructed for
+    127.0.0.1:6379.
+
+ prefix
+
+    A prefix to be included on each redis key. This prevents collisions
+    with multiple applications using the same Redis DB. Defaults to
+    'ratelimit'.
+
+ client_prefix
+
+    Set this to a true value if using a Redis client that supports
+    transparent prefixing. Defaults to 0.
+
+ rules
+
+    An arrayref of rules, each of which is a hashref with interval, limit,
+    and optionally precision values.
+
+METHODS
+
+ check($key | \@keys)
+
+    Returns true if any of the keys are rate limited.
+
+ incr($key | \@keys [, $weight ])
+
+    Returns true if any of the keys are rate limited, otherwise, it
+    increments counts and returns false.
+
+ keys
+
+    Returns all of the rate limiter's with prefixes removed.
+
+ violated_rules($key | \@keys)
+
+    Returns a list of rate limit rules violated for any of the keys, or an
+    empty list.
+
+ limited_keys($key | \@keys)
+
+    Returns a list of limited keys.
+
+ whitelist($key | \@keys)
+
+    Adds the keys to the whitelist so they are never rate limited.
+
+ unwhitelist($key | \@keys)
+
+    Removes the keys from the whitelist.
+
+ blacklist($key | \@keys)
+
+    Adds the keys to the blacklist so they are always rate limited.
+
+ unblacklist($key | \@keys)
+
+    Removes the keys from the blacklist.
+
+AUTHOR
+
+    Marc Mims <marc@questright.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Marc Mims.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

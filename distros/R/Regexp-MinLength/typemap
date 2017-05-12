@@ -1,0 +1,10 @@
+regexp *        T_PKGIV
+
+
+INPUT
+
+T_PKGIV
+
+OUTPUT
+
+I32

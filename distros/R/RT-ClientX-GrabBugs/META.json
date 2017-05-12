@@ -1,0 +1,84 @@
+{
+   "abstract" : "download bugs from an RT queue and dump them as RDF",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.014, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RT-ClientX-GrabBugs",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "RDF::TrineX::Serializer::MockTurtleSoup" : "0"
+         },
+         "requires" : {
+            "Getopt::ArgvFile" : "0",
+            "Getopt::Long" : "0",
+            "Moose" : "2.0600",
+            "Path::FindDev" : "0",
+            "RDF::Trine" : "0.130",
+            "RT::Client::REST" : "0",
+            "RT::Client::REST::Queue" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0.038",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "RT::ClientX::GrabBugs" : {
+         "file" : "lib/RT/ClientX/GrabBugs.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=RT-ClientX-GrabBugs"
+      },
+      "homepage" : "https://metacpan.org/release/RT-ClientX-GrabBugs",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/tobyink/p5-rt-clientx-grabbugs"
+      }
+   },
+   "version" : "0.002",
+   "x_provides_scripts" : {
+      "rt-grabbugs" : {
+         "file" : "bin/rt-grabbugs"
+      }
+   }
+}

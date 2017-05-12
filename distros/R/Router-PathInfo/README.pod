@@ -1,0 +1,148 @@
+=head1 NAME
+
+B<Router::PathInfo> - PATH_INFO router, based on search trees
+
+=head1 DESCRIPTION
+
+Allows balancing PATH_INFO to static and controllers.
+It has a simple and intuitive interface.
+
+=head1 SYNOPSIS
+
+    use Router::PathInfo;
+    
+    # or
+    use Router::PathInfo as => singletone;
+    # this allow to call after new: instance, clear_singleton
+    
+    my $r = Router::PathInfo->new( 
+        static => {
+            allready => {
+                path => '/path/to/static',
+                first_uri_segment => 'static'
+            }
+        },
+        cache_limit => 300
+    );
+        
+    $r->add_rule(
+        connect         => '/foo/:name(type):enum(bar|baz)/:re(^\d{4}$)/:any', 
+        action          => $some_thing,
+        mthods          => ['GET','DELETE'],
+        match_callback  => $code_ref
+    );
+    
+    my $env = {PATH_INFO => '/foo/bar/2011/baz', REQUEST_METHOD => 'GET'};
+    
+    my $res = $r->match($env);
+    # or
+    my $res = $r->match('/foo/bar/2011/baz'); # GET by default
+    
+    # $res = {
+    #     type => 'controller',
+    #     action => $some, # result call $code_ref->($match, $env)
+    #     name_segments => {type => 'bar'}
+    # }
+    
+    $env = {PATH_INFO => '/static/img/some.jpg'};
+    
+    $res = $r->match($env);
+    
+    # $res = {
+    #     type  => 'static',
+    #     file  => '/path/to/static/img/some.jpg',
+    #     mime  => 'image/jpeg'
+    # }    
+
+See more details L<Router::PathInfo::Controller>, L<Router::PathInfo::Static>
+
+=head1 PACKAGE VARIABLES
+
+=head2 $Router::PathInfo::as_singleton
+
+Mode as singletone. By default - 0.
+You can pick up directly, or:
+
+    use Router::PathInfo as => singletone;
+    # or
+    require Router::PathInfo;
+    Router::PathInfo->import(as => singletone);
+    # or
+    $Router::PathInfo::as_singleton = 1
+    
+If you decide to work in singletone mode, raise the flag before the call to C<new>. 
+
+=cut
+
+=head1 SINGLETON
+
+When you work in a mode singletone, you have access to methods: C<instance> and C<clear_singleton>
+
+=cut
+
+
+=head1 METHODS
+
+=head2 new(static => $static, cache_limit => $cache_limit)
+
+Constructor. All arguments optsioanlny.
+
+static - it hashref arguments for the constructor L<Router::PathInfo::Static>
+
+cache_limit - limit of matches stored by the rules contain tokens C<:re> and C<:any>, statics and errors. By default - 200.
+All matches (that occur on an accurate description) cached without limit.
+
+=cut
+
+=head2 add_rule
+
+See C<add_rule> from L<Router::PathInfo::Controller>
+
+=cut
+
+=head2 match({PATH_INFO => $path_info, REQUEST_METHOD => $method})
+
+Search match. Initially checked for matches on static, then according to the rules of the controllers.
+In any event returns hashref coincidence or an error.
+
+Example:
+
+    {
+      type  => 'error',
+      code => 400,
+      desc  => '$env->{PATH_INFO} not defined'  
+    }
+    
+    {
+      type  => 'error',
+      code => 404,
+      desc  => sprintf('not found for PATH_INFO = %s with REQUEST_METHOD = %s', $env->{PATH_INFO}, $env->{REQUEST_METHOD}) 
+    }
+    
+    {
+        type => 'controller',
+        action => $action,
+        type => $hashref_of_names_segments 
+    }
+    
+    {
+        type  => 'static',
+        file  => $serch_file,
+        mime  => $mime_type
+    }
+
+=cut
+
+=head1 SOURSE
+
+git@github.com:mrRico/p5-Router-Path-Info.git
+
+=head1 SEE ALSO
+
+L<Router::PathInfo::Static>, L<Router::PathInfo::Controller>
+
+=head1 AUTHOR
+
+mr.Rico <catamoose at yandex.ru>
+
+=cut

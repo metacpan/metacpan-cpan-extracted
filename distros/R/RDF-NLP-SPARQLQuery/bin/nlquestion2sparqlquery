@@ -1,0 +1,394 @@
+#!/usr/bin/perl
+
+use strict;
+use utf8;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use RDF::NLP::SPARQLQuery;
+
+binmode(STDIN, ':utf8');
+binmode(STDOUT, ':utf8');
+binmode(STDERR, ':utf8');
+
+my $verbose = 0;
+my $help;
+my $man;
+
+my $input;
+my $output;
+my $configFile;
+my $debug;
+my $outStr;
+my $answer;
+my $format="SPARQL";
+
+my $infh;
+my $outfh;
+
+if (scalar(@ARGV) ==0) {
+    $help = 1;
+}
+
+Getopt::Long::Configure ("bundling");
+
+GetOptions('help|?'     => \$help,
+	   'debug|D' => \$debug,
+	   'man'     => \$man,
+	   'verbose|v+'     => \$verbose,
+	   'input|i=s' => \$input,
+	   'output|o=s' => \$output,
+	   'rcfile|c=s' => \$configFile,
+	   'answer|a' => \$answer,
+	   'format|f=s' => \$format,
+    );
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if (defined $answer) {
+    $answer="ANSWERS";
+}
+
+if ((!defined $configFile)||($configFile eq "")) {
+    $configFile="/etc/nlquestion/nlquestion.rc";
+
+    if (! (-f $configFile)) {
+	die "configuration file $configFile: no such file\n";
+    }
+}
+
+if ((!defined $input) || ($input eq "-")) {
+    $infh = \*STDIN;
+    $input = "stdin";
+} else {
+    if (! (-f $input)) {
+	die "Input file $input: no such file\n";
+    } else {
+	open $infh, "<:utf8", $input;
+    }
+}
+if ((!defined $output) || ($output eq "-"))  {
+    $outfh = \*STDOUT;
+    $output = "stdout";
+} else {
+    if (-f $output) {
+	warn "* Output file $output already exists\n";
+    }
+    open $outfh, ">:utf8", $output;
+}
+
+if (defined $debug) {
+    warn "input: $input\n";
+    warn "output: $output\n";
+    warn "rcfile: $configFile\n";
+    warn "verbose: $verbose\n";
+}
+
+#warn "$format$answer\n";
+my $NLQuestion = RDF::NLP::SPARQLQuery->new();
+$NLQuestion->verbose($verbose);
+$NLQuestion->format("$format$answer");
+$NLQuestion->configFile($configFile);
+$NLQuestion->loadConfig;
+#$NLQuestion->_loadSemtypecorresp('en');
+#$NLQuestion->_loadSemtypecorresp('fr');
+
+$NLQuestion->loadInput($input);
+
+#my $question = $NLQuestion->getQuestionFromId("qald-4_biomedical_test-6");
+
+my $count = $NLQuestion->Questions2Queries(\$outStr);
+
+print $outfh $outStr;
+
+if (defined $debug) {
+    warn "$count questions have been processed\n";
+}
+if ($output ne "stdout") {
+    close $outfh;
+}
+########################################################################
+
+=encoding utf8
+
+=head1 NAME
+
+nlquestion2sparqlquery - Perl script for converting Natural Language
+Questions in SPARQL queries
+
+
+=head1 SYNOPSIS
+
+nlquestion2sparqlquery [option] --input <FILENAME>
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item *
+
+B<--input=filename>, B<-i filename>
+
+This option defines the input file to load. If the filename is C<->
+(or the option is not specified), the input data is read on STDIN.
+
+=item *
+
+--output <filename>
+
+This option defines the output file to load. If the filename is C<->
+(or the option is not specified), the output data is print on STDOUT.
+
+=item *
+
+B<--rcfile=file>, B<-c file>      
+
+Load the given configuration file.
+
+=item *
+
+B<--answer>, B<-a>
+
+This option specifies if the answers are returned (otherwise, the SPARQL query is returned)
+
+
+=item *
+
+B<--format [XML|SPARQL]>, B<-f [XML|SPARQL]>
+
+This option defines the format of the output: 
+
+=over 4
+
+=item *
+
+B<XML>: the output is in XML, as required by the QALD challenge
+
+=item *
+
+B<SPARQL>: the output is the SPARQL query or the list of answers
+
+=back
+
+=item *
+
+B<--help>
+
+Print help message for using C<nlquestion2sparqlquery>
+
+=item *
+
+B<--man>
+
+Print man page of C<nlquestion2sparqlquery>
+
+=item *
+
+B<--verbose>, B<-v>
+
+Go into the verbose mode. Note that the verbosity can be
+ increased by using several times the option.
+
+=item *
+
+B<--debug>, B<-D>
+
+Switch in debug mode for the script C<nlquestion2sparqlquery> (the
+switch has no influence on the object code).
+
+=back
+
+=head1 DESCRIPTION
+
+This script aims at querying RDF knowledge base with questions
+expressed in Natural language. Natural language questions are
+converted in SPARQL queries. The method is based on rules and
+resources.  Resources are provided for querying the Drugbank
+(<http://www.drugbank.ca>), Diseasome (<http://diseasome.eu>) and
+Sider (<http://sideeffects.embl.de>).
+
+The Natural language question has been already annotated with
+linguistic and semantic information. Input file provides this
+information (see details regarding the format in the section INPUT
+FORMAT).
+
+If you use this software, please cite:
+
+Natural Language Question Analysis for Querying Biomedical Linked Data
+Thierry Hamon, Natalia Grabar, and Fleur Mougin. Natural Language
+Interfaces for Web of Data (NLIWod 2014). 2014. To appear.
+
+
+
+=head1 EXAMPLES of USE
+
+Tu run the script, a configuration file is needed (usually
+nlquestion.rc in C</etc/nlquestion> - see section CONFIGURATION FILE
+FORMAT for more details. An example of the configuration file is
+available in C<etc/nlquestion/nlquestion.rc> from the archive
+directory.
+
+=over 4
+
+=item *
+
+The most common command line to run nlquestion2sparqlquery is
+
+C<nlquestion2sparqlquery -i example1.qald>
+
+It is assumed that the directory containing the program nlquestion2sparqlquery is in
+your PATH variable and that the configuration file is
+C</etc/nlquestion/nlquestion.rc>.
+
+The SPARQL query is printed on the STDOUT in QALD XML format.
+
+=item *
+
+If you are not allow to copy the configuration file
+C<nlquestion.rc> in the directory C</etc/nlquestion> (or create this
+directory), or if you want to use your own configuration file, you can
+specify the file with its path by using the option C<--rcfile>
+
+C<nlquestion2sparqlquery --rcfile nlquestion2.rc -i example1.qald>
+
+=item *
+
+you can also change the format and record the results in a file
+
+C<nlquestion2sparqlquery --rcfile nlquestion2.rc -i example1.qald -f SPARQL -a -o example1.out>
+
+
+=back
+
+
+=head1 INPUT FORMAT
+
+The input file is composed of several parts providing linguistic and semantic information on the natural language question:
+
+=over 4
+
+=item *
+
+the identifier of the question is introduced by C<DOC:> on one line. For instance:
+
+ DOC: question1
+
+The end of the information associated to the document is marked by the keyword C<_END_DOC_> .
+
+=item *
+
+the definition of the language of the question is defined with C<language:> on one line. For instance: 
+
+ language: EN
+
+
+=item *
+
+the list of the sentence(s) is introducted by the keyword C<sentence:> and ends with the keyword C<_END_SENT_> (both in one line). For instance:
+
+ sentence:
+ Which diseases is Cetuximab used for?
+ _END_SENT_
+
+
+=item *
+
+the morpho-syntactic information associated to each word is introduced by the keyword C<word information:> ends with the keyword C<_END_POSTAG_> (both in one line). Each line contains 4 information separated by tabulations: the inflected form of the word, its part-of-speech tag, its lemma and its offset (in number of characters). For instance:
+
+
+ word information:
+ Which	WDT	which	10	
+ diseases	NNS	disease	16	
+ is	VBZ	be	25	
+ Cetuximab	VBN	Cetuximab	28	
+ used	VBN	use	38	
+ for	IN	for	43	
+ ?	SENT	?	46	
+ _END_POSTAG_
+
+
+=item *
+
+the semantic entities and associated semantic information is introduced by the keyword C<semantic units:> ends with the keyword C<_END_SEM_UNIT_> (both in one line). Each line contains 5 information separated by tabulations: the semantic entity, its canonical form, its semantic types (separated by column), its start offset and its end offset (in number of characters). For instance:
+
+
+ semantic units:
+ # term form<tab>term canonical form<tab>semantic features<tab>offset start<tab>offset end (ended by _END_SEM_UNIT_)
+ diseases	diseas	disease:disease	16	23
+ Cetuximab	Cetuximab	drug/drugbank/gen/DB00002:drug/drugbank/gen/DB00002	28	36
+ used for	used for	possibleDrug:possibleDrug	38	45
+ Cetuximab	Cetuximab	drug/drugbank/gen/DB00002:drug/drugbank/gen/DB00002	28	36
+ diseases	diseas	disease:disease	16	23
+ used for	used for	possibleDrug:possibleDrug	38	45
+ _END_SEM_UNIT_
+
+Semantic types can be decomposed in subtypes. They are coded in the
+same way as a unix file path.
+
+=back
+
+NB: Comments are introduced by the character C<#>. Empty lines are ignored.
+
+Examples of files are available in the C<example> of the archive.
+
+=head1 CONFIGURATION FILE FORMAT
+
+The configuration file format is similar to the Apache configuration
+format. The module C<Config::General> is used to read the file.  There
+are sections named C<NLQUESTION> for each language (identified with
+the attribute C<language>). Each section defines the following
+variables defining the behaviour of the script:
+
+=over 4
+
+=item *
+
+C<VERBOSE>: it defines the verbose mode level similarly to the option C<--verbose>. It is overwritten by this option.
+
+=item *
+
+C<REGEXFORM>: this boolean variable indicates if in case of use of regex, the inflected form (value 1) or canonical form (value 0) is used.
+
+=item *
+
+C<UNION>: this boolean variable indicates if the union is used or not
+
+=item *
+
+C<SEMANTICTYPECORRESPONDANCE>: this variable defines the file containing the semantic information (rewriting rules, semantic correspondance, etc.) to generate the SPARQL queries
+
+=item *
+
+C<URL_PREFIX>: it specifies the begining of the URL (before the SPARQL query) when the query is sent to a virtuoso server.
+
+=item *
+
+C<URL_SUFFIX>: it specifies the end of the URL (before the SPARQL query) when the query is sent to a virtuoso server.
+
+=back
+
+
+
+=head1 SEE ALSO
+
+QALD challenge web page: <http://greententacle.techfak.uni-bielefeld.de/~cunger/qald/index.php?x=task2&q=4>
+
+Natural Language Question Analysis for Querying Biomedical Linked Data
+Thierry Hamon, Natalia Grabar, and Fleur Mougin. Natural Language
+Interfaces for Web of Data (NLIWod 2014). 2014. To appear.
+
+=head1 AUTHOR
+
+Thierry Hamon, E<lt>hamon@limsi.frE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 Thierry Hamon
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.14.2 or, at your
+option, any later version of Perl 5 you may have available.
+
+=cut

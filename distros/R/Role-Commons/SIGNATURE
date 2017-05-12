@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ed98ec4ee6e188b24a914aa66f53bd40f78361df COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 e760295e68d1e4af096a06b1dc1de36ec86692d0 Changes
+SHA1 12a5fc40c0b78f8148b795bf5be1c5ee42af3e3a INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 9ab58fcd800610e6776cb1c209dc6d2ffb42b7fa MANIFEST
+SHA1 c545eabff54bf55156863351bfb6875a662c7b92 META.json
+SHA1 ab5d202787470cff6cba740ebffc6c398e108aae META.yml
+SHA1 8ca528349972a8b25efd5931c21c7b4557059078 Makefile.PL
+SHA1 49a41167dfc9e40e0d450ad8ecabac799ac78466 README
+SHA1 a3b2c7abba52141fd8cf1e0cca50d31b51ceb9c5 dist.ini
+SHA1 001aa6c93a7165d481afed114e970a0f3fdf2c34 doap.ttl
+SHA1 441d786b9c7ab84346405c9e046b34321386cdb0 lib/Object/AUTHORITY.pm
+SHA1 f480170179b9473faaa1d927a5b0e8e91d707c3b lib/Role/Commons.pm
+SHA1 574ee98c1cf439c23b875f4872fa988126f20b06 lib/Role/Commons/Authority.pm
+SHA1 080467a33742f6518af8b78fb92ff7e49f8d712b lib/Role/Commons/ObjectID.pm
+SHA1 9fcf5913c3f826b00468faf081e81a2049ea0b01 lib/Role/Commons/Tap.pm
+SHA1 53acb49d3d14625252221e3e21b6666fe48d0e1e t/01basic.t
+SHA1 ba9b56441d49ffc9e58bafb1d377b2eed623f70f t/02oaa.t
+SHA1 304c22f406f9c3595fdceaa80136c01adc37709d t/Object-AUTHORITY/01basic.t
+SHA1 6f9bab9fa817005dc0e07df8896b283acb54a449 t/Object-AUTHORITY/02return.t
+SHA1 6b2e2e7acea0853e3cd0232d6c7de61c35df7e49 t/Object-AUTHORITY/03croak.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRKJ6EACgkQzr+BKGoqfTmTMgCdGrAF0hoQ/uxH+OLK99ysHmF+
+554AoKsvBNQYA9L1Dksr3mYZpGrpnTqc
+=Q4Dj
+-----END PGP SIGNATURE-----

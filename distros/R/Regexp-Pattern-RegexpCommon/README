@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     use Regexp::Pattern;
+    
+     my $re = re('RegexpCommon::pattern', pattern => ['num', 'real']);
+
+DESCRIPTION
+
+    This is a bridge module between Regexp::Common and Regexp::Pattern. It
+    allows you to use Regexp::Common regexps from Regexp::Pattern. Apart
+    from being a proof of concept, normally this module should not be of
+    any practical use.
+
+SEE ALSO
+
+    Regexp::Common::RegexpPattern, the counterpart.
+
+    Regexp::Common
+
+    Regexp::Pattern
+

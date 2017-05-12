@@ -1,0 +1,6 @@
+%# $File: //depot/RT/rt/local/html/Callbacks/Journal/Elements/Tabs/Default $ $Author: autrijus $
+%# $Revision: #2 $ $Change: 6418 $ $DateTime: 2003/06/10 05:54:47 $
+% $toptabs->{D_Journal} = { title => loc('Journal'), path => 'Journal/index.html' };
+<%ARGS>
+$toptabs
+</%ARGS>

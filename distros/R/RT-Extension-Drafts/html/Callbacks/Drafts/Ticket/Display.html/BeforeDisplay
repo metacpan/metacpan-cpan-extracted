@@ -1,0 +1,15 @@
+<%init>
+my $ARGSRef = $ARGS{'ARGSRef'};
+if ($$ARGSRef{'id'} ne 'new'){
+    my $Ticket = LoadTicket($$ARGSRef{'id'});
+    if ( $$ARGSRef{'UpdateContent'} ) {
+        my $Draft = RT::Attribute->new( $session{'CurrentUser'} );
+        $Draft->LoadByNameAndObject( Object => $session{'CurrentUser'}->UserObj, Name => 'Draft-'.$Ticket->id );
+        $Draft->Delete if ( $Draft && $Draft->Id );
+    }
+}
+</%init>
+
+<%args>
+$Actions => []
+</%args>

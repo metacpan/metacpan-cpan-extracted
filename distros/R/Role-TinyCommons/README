@@ -1,0 +1,9 @@
+DESCRIPTION
+
+    This module is currently empty. Use the Role::TinyCommons::* directly.
+
+SEE ALSO
+
+    Role::TinyCommons is just like Role::Commons, except the roles are
+    using Role::Tiny instead of Moo::Role
+

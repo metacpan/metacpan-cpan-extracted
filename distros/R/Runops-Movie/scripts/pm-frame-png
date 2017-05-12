@@ -1,0 +1,81 @@
+#!perl
+use strict;
+use warnings;
+use 5.010_000;
+use feature ':5.10';
+use Getopt::Long qw( GetOptions );
+use Runops::Movie::Util qw( pretty_size );
+use File::Spec::Functions qw( catfile );
+use Carp::Always;
+use Runops::Movie::TM::Input::Edge;
+use Runops::Movie::TM::Output::Imager;
+use Runops::Movie::TM::Squarified;
+
+GetOptions(
+    help         => sub { die 'pod2usage( -verbose => 2 )' },
+    'dir=s'      => \my($dir),
+    'width=i'    => \my($width),
+    'height=i'   => \my($height),
+    'sum-size=s' => \my($in_sum_size),
+    'edge=s'     => \my($in_edge),
+    'type=s'     => \my($in_type),
+    'name=s'     => \my($in_name),
+    'font=s'     => \my($in_font),
+    'png=s'      => \my($out_png),
+)
+  or die 'pod2usage( -verbose => 2 )';
+
+$width //= 1024;
+$height //= 768;
+
+# --dir automagic
+#
+if ( $dir ) {
+    $in_sum_size //= catfile( $dir, 'frame.sum-size' );
+    $in_edge //= catfile( $dir, 'frame.edge' );
+    $in_type //= catfile( $dir, 'frame.type' );
+    $in_name //= catfile( $dir, 'frame.name' );
+
+    $out_png //= catfile( $dir, 'frame.png' );
+}
+
+# Locate ImUgly.ttf, default font at lib/Runops/Movie/ImUgly.ttf
+if ( ! $in_font ) {
+    for ( @INC ) {
+        my $path = "$_/Runops/Movie/ImUgly.ttf";
+        next if ! -e $path;
+        $in_font = $path;
+        last;
+    }
+}
+
+if ( ! -e $in_font ) {
+    die "Missing $in_font";
+}
+
+say "Read $_ (@{[ pretty_size( -s $_ ) ]})" for $in_sum_size, $in_edge, $in_type, $in_name;
+my $input = Runops::Movie::TM::Input::Edge->new;
+$input->load(
+    size => $in_sum_size,
+    edge => $in_edge,
+	type => $in_type,
+    names => $in_name,
+);
+
+my $output = Runops::Movie::TM::Output::Imager->new(
+    WIDTH => $width,
+    HEIGHT => $height,
+    FONT_FILE => $in_font,
+);
+
+my $treemap = Runops::Movie::TM::Squarified->new(
+    INPUT  => $input,
+    OUTPUT => $output,
+);
+
+say 'Mapping';
+$treemap->map;
+
+$output->save( $out_png );
+say "Wrote $out_png (@{[ pretty_size( -s $out_png ) ]})";
+exit;

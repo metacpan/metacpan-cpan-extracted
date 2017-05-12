@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Redland RDF Application Framework - Perl RDF::Redland::Model Class</title>
+</head>
+<body>
+
+<h1 style="text-align:center">Redland RDF Application Framework - Perl RDF::Redland::Model Class</h1>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+        <li><a href="#name">NAME</a></li>
+        <li><a href="#synopsis">SYNOPSIS</a></li>
+        <li><a href="#description">DESCRIPTION</a></li>
+        <li><a href="#constructors">CONSTRUCTORS</a></li>
+        <li><a href="#methods">METHODS</a></li>
+        <li><a href="#older_methods">OLDER METHODS</a></li>
+        <li><a href="#see_also">SEE ALSO</a></li>
+        <li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<h2><a name="name" id="name">NAME</a></h2>
+<p>RDF::Redland::Model - Redland RDF Model Class</p>
+
+<h2><a name="synopsis" id="synopsis">SYNOPSIS</a></h2>
+<pre>
+  use RDF::Redland;
+  my $storage=new RDF::Redland::Storage("hashes", "test", "new='yes',hash-type='memory'");
+  my $model=new RDF::Redland::Model($storage, "");
+  ...
+</pre>
+<pre>
+  my(@sources)=$model-&gt;targets($predicate_node, $object_node);
+</pre>
+<pre>
+  ...
+</pre>
+
+<h2><a name="description" id="description">DESCRIPTION</a></h2>
+<p>Manipulate the RDF model.</p>
+
+<h2><a name="constructors" id="constructors">CONSTRUCTORS</a></h2>
+<dl>
+<dt><strong><a name="item_new_storage_options_string" id="item_new_storage_options_string">new STORAGE OPTIONS_STRING</a></strong></dt>
+<dt><strong><a name="item_new_with_options_storage_options_hash" id="item_new_with_options_storage_options_hash">new_with_options STORAGE OPTIONS_HASH</a></strong></dt>
+<dd>
+<p>Create a new RDF::Redland::Model object using RDF::Redland::Storage object <em>STORAGE</em> with a options. The options can be given either as a string in the first form as <em>OPTIONS_STRING</em>. The options take the form key1='value1',key2='value2'. The quotes are required. In the second case <em>OPTIONS_HASH</em> is a reference to a Perl hash of options.</p>
+</dd>
+</dl>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_new_from_model" id="item_new_from_model">new_from_model MODEL</a></strong></dt>
+</dl>
+</div>
+<p>Create a new model from an existing RDF::Redland::Model <em>MODEL</em> (copy constructor).</p>
+
+<h2><a name="methods" id="methods">METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_size" id="item_size">size</a></strong></dt>
+<dd>
+<p>Return the size of the model (number of statements).</p>
+</dd>
+</dl>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_sync" id="item_sync">sync</a></strong></dt>
+</dl>
+</div>
+<p>Synchronise the model to the underlying storage.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_add" id="item_add">add SUBJECT PREDICATE OBJECT</a></strong></dt>
+</dl>
+</div>
+<p>Add a new statement to the model with <em>SUBJECT</em>, <em>PREDICATE</em> and <em>OBJECT</em>. These can be RDF::Redland::Node, RDF::Redland::URI or perl URI objects.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_add_typed_literal_statement_subject_predicate_stri" id="item_add_typed_literal_statement_subject_predicate_stri">add_typed_literal_statement SUBJECT PREDICATE STRING [XML_LANGUAGE [DATATYPE]]</a></strong></dt>
+</dl>
+</div>
+<p>Add a new statement to the model containing a typed literal string object <em>STRING</em> with (optional) XML language (xml:lang attribute) <em>XML_LANGUAGE</em> and (optional) datatype URI <em>DATATYPE</em>. <em>XML_LANGUAGE</em> or <em>DATATYPE</em> can either or both be set to undef.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_add_statement_statement__5bcontext_5d__7c_node_nod" id="item_add_statement_statement__5bcontext_5d__7c_node_nod">add_statement STATEMENT [CONTEXT] | NODE NODE NODE [CONTEXT]</a></strong></dt>
+</dl>
+</div>
+<p>Add RDF::Redland::Statement <em>STATEMENT</em> or the statement formed by <em>NODE NODE NODE</em> to the model. If the optional <em>CONTEXT</em> is given, associate it with that context. Any of <em>NODE</em> or <em>CONTEXT</em> can be a RDF::Redland::Node, RDF::Redland::URI or perl URI object.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_add_statements_stream__5bcontext_5d" id="item_add_statements_stream__5bcontext_5d">add_statements STREAM [CONTEXT]</a></strong></dt>
+</dl>
+</div>
+<p>Add the statements from the RDF::Redland::Stream <em>STREAM</em> to the model. If the optional <em>CONTEXT</em> is given, associate it with that context. <em>CONTEXT</em> can be a RDF::Redland::Node, RDF::Redland::URI or perl URI object.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_remove_statement_statement__5bcontext_5d__7c_node_" id="item_remove_statement_statement__5bcontext_5d__7c_node_">remove_statement STATEMENT [CONTEXT] | NODE NODE NODE [CONTEXT]</a></strong></dt>
+</dl>
+</div>
+<p>Remove RDF::Redland::Statement <em>STATEMENT</em> or the statement formed by <em>NODE NODE NODE</em> from the model. If the optional <em>CONTEXT</em> is given, remove only the statement stored with that context. Any of <em>NODE</em> or <em>CONTEXT</em> can be a RDF::Redland::Node, RDF::Redland::URI or perl URI object.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_remove_context_statements" id="item_remove_context_statements">remove_context_statements CONTEXT</a></strong></dt>
+</dl>
+</div>
+<p>Remove all RDF::Redland::Statement <em>STATEMENT</em>s from the model with the given <em>CONTEXT</em> context. <em>CONTEXT</em> can be a RDF::Redland::Node, RDF::Redland::URI or perl URI object.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_contains_statement" id="item_contains_statement">contains_statement STATEMENT</a></strong></dt>
+</dl>
+</div>
+<p>Return non 0 if the model contains RDF::Redland::Statement <em>STATEMENT</em>.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_as_stream__5bcontext_5d" id="item_as_stream__5bcontext_5d">as_stream [CONTEXT]</a></strong></dt>
+</dl>
+</div>
+<p>Return a new RDF::Redland::Stream object seralising the entire model, or just those statements with <em>CONTEXT</em>, as RDF::Redland::Statement objects. If given, <em>CONTEXT</em> can be a RDF::Redland::Node, RDF::Redland::URI or perl URI object.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_find_statements_statement__5bcontext_5d" id="item_find_statements_statement__5bcontext_5d">find_statements STATEMENT [CONTEXT]</a></strong></dt>
+</dl>
+</div>
+<p>Find all matching statements in the model matching partial RDF::Redland::Statement <em>STATEMENT</em> (any of the subject, predicate, object RDF::Redland::Node can be undef). If <em>CONTEXT</em> is given, finds statements only in that context.</p>
+<p>In an array context, returns an array of the matching RDF::Redland::Statement objects. In a scalar context, returns the RDF::Redland::Stream object representing the results.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_sources" id="item_sources">sources ARC TARGET</a></strong></dt>
+</dl>
+</div>
+<p>Get all source RDF::Redland::Node objects for a given arc <em>ARC</em>, target <em>TARGET</em>&gt; RDF::Redland::Node objects as a list of RDF::Redland::Node objects.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_arcs" id="item_arcs">arcs SOURCE TARGET</a></strong></dt>
+</dl>
+</div>
+<p>Get all arc RDF::Redland::Node objects for a given source <em>SOURCE</em>, target <em>TARGET</em> RDF::Redland::Node objects as a list of RDF::Redland::Node objects.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_targets" id="item_targets">targets SOURCE ARC</a></strong></dt>
+</dl>
+</div>
+<p>Get all target RDF::Redland::Node objects for a given source <em>SOURCE</em>, arc <em>ARC</em> RDF::Redland::Node objects as a list of RDF::Redland::Node objects.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_sources_iterator" id="item_sources_iterator">sources_iterator ARC TARGET</a></strong></dt>
+</dl>
+</div>
+<p>Get all source RDF::Redland::Node objects for a given arc <em>ARC</em>, target <em>TARGET</em> RDF::Redland::Node objects as an RDF::Redland::Iterator or undef on failure.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_arcs_iterator" id="item_arcs_iterator">arcs_iterator SOURCE TARGET</a></strong></dt>
+</dl>
+</div>
+<p>Get all arc RDF::Redland::Node objects for a given source <em>SOURCE</em>, target <em>TARGET</em> RDF::Redland::Node objects as an RDF::Redland::Iterator or undef on failure.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_targets_iterator" id="item_targets_iterator">targets_iterator SOURCE ARC</a></strong></dt>
+</dl>
+</div>
+<p>Get all target RDF::Redland::Node objects for a given source <em>SOURCE</em>, arc <em>ARC</em> RDF::Redland::Node objects as an RDF::Redland::Iterator or undef on failure.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_source" id="item_source">source ARC TARGET</a></strong></dt>
+</dl>
+</div>
+<p>Get one source RDF::Redland::Node object that matches a given arc <em>ARC</em>, target <em>TARGET</em> RDF::Redland::Node objects or undef if there is no match.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_arc" id="item_arc">arc SOURCE TARGET</a></strong></dt>
+</dl>
+</div>
+<p>Get one arc RDF::Redland::Node object that matches a given source <em>SOURCE</em>, target <em>TARGET</em> RDF::Redland::Node objects or undef if there is no match.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_target" id="item_target">target SOURCE ARC</a></strong></dt>
+</dl>
+</div>
+<p>Get one target RDF::Redland::Node object that matches a given source <em>SOURCE</em>, arc <em>ARC</em> RDF::Redland::Node objects or undef if there is no match.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_contexts" id="item_contexts">contexts</a></strong></dt>
+</dl>
+</div>
+<p>Get all context RDF::Redland::Node objects in the model</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_feature_uri__5bvalue_5d" id="item_feature_uri__5bvalue_5d">feature URI [VALUE]</a></strong></dt>
+</dl>
+</div>
+<p>Get/set a model feature. The feature is named via RDF::Redland::URI <em>URI</em> and the value is a RDF::Redland::Node. If <em>VALUE</em> is given, the feature is set to that value, otherwise the current value is returned.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_query_execute" id="item_query_execute">query_execute QUERY</a></strong></dt>
+</dl>
+</div>
+<p>Execute the <em>QUERY</em> RDF::Redland::Query against the model returning a result set RDF::Redland::QueryResults or undef on failure.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_load_uri__5bsyntax_2dname__5b_mime_2dtype__5bsynta" id="item_load_uri__5bsyntax_2dname__5b_mime_2dtype__5bsynta">load URI [SYNTAX-NAME [ MIME-TYPE [SYNTAX-URI [HANDLER ]]]</a></strong></dt>
+</dl>
+</div>
+<p>Load content from <em>URI</em> into the model, guessing the parser.</p>
+<div style="margin-left: 2em">
+<dl>
+<dt><strong><a name="item_to_string__5bbase_2duri__5bsyntax_2dname__5b_mime_" id="item_to_string__5bbase_2duri__5bsyntax_2dname__5b_mime_">to_string [BASE-URI [SYNTAX-NAME [ MIME-TYPE [SYNTAX-URI]]]</a></strong></dt>
+</dl>
+</div>
+<p>Serialize the model to a syntax. If no serializer name is given, the default serializer RDF/XML is used.</p>
+
+<h2><a name="older_methods" id="older_methods">OLDER METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_serialise" id="item_serialise">serialise</a></strong></dt>
+<dt><strong><a name="item_serialize" id="item_serialize">serialize</a></strong></dt>
+<dd>
+<p>Return a new RDF::Redland::Stream object seralising the model as RDF::Redland::Statement objects. Replaced by as_stream to reduce confusion with the RDF::Redland::Serializer class.</p>
+</dd>
+</dl>
+
+<h2><a name="see_also" id="see_also">SEE ALSO</a></h2>
+<p><a href="Storage.html">the RDF::Redland::Storage manpage</a>, <a href="Node.html">the RDF::Redland::Node manpage</a> and <a href="Statement.html">the RDF::Redland::Statement manpage</a></p>
+
+<h2><a name="author" id="author">AUTHOR</a></h2>
+<p>Dave Beckett - <a href="http://purl.org/net/dajobe/">http://purl.org/net/dajobe/</a></p>
+<hr />
+
+<p>(C) Copyright 2000-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, (C) Copyright 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>

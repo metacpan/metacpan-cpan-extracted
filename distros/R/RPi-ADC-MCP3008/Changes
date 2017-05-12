@@ -1,0 +1,14 @@
+Revision history for RPi-ADC-MCP3008
+
+2.36.3  2016-03-13
+        - removed unnecessary C includes
+        - changed version numbering scheme from 2.36.x to 2.360x
+
+2.36.2  2017-03-11
+        - changed percent return to a 2 digit float from an int, perl the
+          documentation
+        - added Fritzing docs and the datasheet
+        - updated POD
+
+2.36.1  2017-03-11
+        - initial release

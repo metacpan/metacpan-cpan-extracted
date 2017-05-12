@@ -1,0 +1,36 @@
+Revision history for Rose-DBx-Object-MoreHelpers
+
+0.100 22 April 2014
+ - fix primary_key_uri_escaped() to check explicitly for ref() eq ARRAY
+   in case the primary key is an object (e.g. BigInt)
+
+0.09 13 Nov 2012
+ - added fetch_count() method (fcahoon@msi.umn.edu)
+ - support column alias names in primary_key_value()
+
+0.08 13 May 2010
+ - change primary_key_uri_escaped() (again) to match
+   CatalystX::CRUD::Controller, also escaping any / marks.
+
+0.07 13 May 2010
+ - change primary_key_uri_escaped() implementation to avoid sprintf().
+
+0.06 10 Nov 2008
+ - add moniker() and unique_value() methods
+
+0.05 4 Nove 2008
+ - oops. fix 0.04 fix to always turn **integer** not object.
+
+0.04 4 Nov 2008
+ - has_related() now checks if $self can $rel . _count and tries to handle
+   it sanely if _count is not a method
+
+0.03 16 Sept 2008
+ - flatten now just a thin wrapper around as_tree() core Helper method
+
+0.02 26 Aug 2008
+ - add column_is_boolean method
+
+0.01 20 Aug 2008
+ - First version, released on an unsuspecting world.
+

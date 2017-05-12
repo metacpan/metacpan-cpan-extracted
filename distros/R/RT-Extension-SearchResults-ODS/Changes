@@ -1,0 +1,18 @@
+Revision history for RT-Extension-SearchResults-ODS
+
+0.05    Mon, 12 Oct 2015 17:45:48 +0200
+        Fix empty file when exporting from RT SimpleSearch
+
+0.04    Wed, 22 Jan 2014 16:24:17 +0100
+        Don't try to set the menu entry on ticket display
+
+0.03    Wed, 22 Jan 2014 16:11:01 +0100
+        Add support for RT 4.2.x
+        Require RT >= 4.2.0
+
+0.02    Wed, 25 May 2011 11:53:10 +0200
+        Add Tab for RT 4
+
+0.01    Wed, 26 Jan 2011 17:43:34 +0100
+        Initial release.
+

@@ -1,0 +1,10 @@
+RPM4 v0.01
+============
+
+A module to manipulate rpm files.
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

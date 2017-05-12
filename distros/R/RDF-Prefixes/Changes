@@ -1,0 +1,51 @@
+RDF-Prefixes
+============
+
+Created:      2010-09-04
+Home page:    <https://metacpan.org/release/RDF-Prefixes>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Prefixes>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.005	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.004	2013-07-02
+
+ - Updated: Copyright 2013.
+ - Updated: Drop usage of smartmatch operator.
+
+0.003	2012-05-31
+
+ [ Documentation ]
+ - Fix typo.
+   Saašha Metsärantala++
+
+ [ Packaging ]
+ - Add test case covering utf8 support.
+ - Add test case covering warning message.
+
+ [ Other ]
+ - Disallow other vocabularies squatting on 'xsd' prefix.
+   Saašha Metsärantala++
+ - Remove some redundant regular expressions.
+   Saašha Metsärantala++
+ - Remove unneeded dependencies.
+ - Review regular expressions for QNames.
+   Saašha Metsärantala++
+ - Updated: Copyright 2012.
+
+0.002	2011-11-09
+
+ [ Bug Fixes ]
+ - Occasionally a new prefix was defined when we could have reused an old
+   one.
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Updated: use 5.010
+
+0.001	2010-09-06	Initial release

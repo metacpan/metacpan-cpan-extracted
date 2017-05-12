@@ -1,0 +1,23 @@
+%# Perfect day for scrubbing the floor and other exciting things.
+
+% for my $option ( @types, '') {
+<LABEL><INPUT <% $Disabled && "DISABLED" %> TYPE="RADIO" VALUE="<%$option%>" NAME="<% $Name %>" <%$option eq $Default && "CHECKED"%>><%loc($RoleMap->{$option}||$option)%></LABEL>
+% }
+
+<%INIT>
+my @types;
+if ($Scope =~ 'queue') {
+   @types = qw(Cc AdminCc);
+}
+else { 
+   @types = qw(Requestor Cc AdminCc);
+}
+
+</%INIT>
+<%ARGS>
+$Disabled => ''
+$Default => undef
+$Scope => 'ticket'
+$Name => 'WatcherType'
+$RoleMap => {}
+</%ARGS>

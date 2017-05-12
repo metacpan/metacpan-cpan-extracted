@@ -1,0 +1,41 @@
+<& /Elements/PageLayout,
+    current_toptab => $current_toptab,
+    current_tab => $current_tab,
+    toptabs => $tabs,
+    topactions => $actions,
+    title => $Title
+&>
+<a name="skipnav" id="skipnav" accesskey="8"></a>
+<%INIT>
+
+my $queue = RT::Queue->new($session{'CurrentUser'});
+$queue->Load('Incident Reports');
+my $queue_id = $queue->Id();
+
+my ($tab);
+my $tabs = { 
+	A 	=> { title => loc('Home'), 		path => 'Minimal/index.html', },
+	B 	=> { title => loc('New Observation'), 	path => 'Minimal/Observation.html' },
+    C   => { title => loc('Apikeys'), path => 'Minimal/Apikeys.html' },
+};
+
+if(my $help = RT->Config->Get('CIFMinimal_HelpUrl')){
+    $tabs->{Z} = { title => loc('Help'), path => $help, }
+}
+
+if($session{'CurrentUser'}->HasRight( Right => 'ModifySelf', Object => $RT::System )) {
+        $tabs->{X} = { title => loc('Preferences'), path => 'Minimal/Prefs.html'};
+}
+
+
+my $actions = {
+	C => { html => $m->scomp('Search') }
+};
+
+</%INIT>
+<%ARGS>
+$Title => undef
+$current_toptab => undef
+$current_tab => undef
+</%ARGS>
+

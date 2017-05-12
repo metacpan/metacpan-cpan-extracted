@@ -1,0 +1,106 @@
+<& /Elements/Header, Title => loc("Authentication Tools") &>
+<& /Elements/Tabs, 
+    current_toptab => 'Developer/AuthTool/index.html', 
+    current_tab => 'Developer/AuthTool/index.html',
+    Title => loc("Auth Tools") &>
+
+% if (@actions) {
+<& /Elements/ListActions, actions => [ $actions[1] ] &>
+
+<h3>The URL for this call</h3>
+
+POST <input style="width: 80%" readonly value="<% $r->uri %>?<% join(';', map "$_=$ARGS{$_}", sort keys %ARGS) %>">
+
+<hr>
+<a href="index.html">&lt;&lt; <&|/l&>Back</&></a>
+%    return;
+% }
+
+<h2>Query Rights</h2>
+
+<p>
+See the <a href="/NoAuth/AuthTool.html">Query Form</a> if you want to query
+whether a user has a specific right.
+</p>
+
+<h2>Set Rights - Type</h2>
+
+<ul>
+% foreach my $key (sort keys %RT::ACE::OBJECT_TYPES) {
+<li><a href="?ObjectType=<% $key %>"><% $key %></a></li>
+% }
+</ul>
+
+% return if !$ObjectType;
+
+<%DOC>
+<h2><% $ObjectType %> Objects</h2>
+% my $Objects = $ObjectType->AvailableRights;
+% return if !defined $ObjectId;
+</%DOC>
+
+<h2><% $ObjectType %> Rights</h2>
+
+% require join('/', split(/::/, $ObjectType)).'.pm';
+% my $Rights = $ObjectType->AvailableRights;
+<ul>
+% foreach my $key (sort keys %$Rights) {
+% next if $RightName and $RightName ne $key;
+<li><a href="?ObjectType=<% $ObjectType %>;RightName=<% $key %>"><% $key %></a> - <% loc($Rights->{$key}) %></li>
+% }
+</ul>
+
+% return if !$RightName;
+
+<h2>Set <% $RightName %> Right on <% $ObjectType %></h2>
+
+<form method="post" action="index.html">
+<input type="hidden" name="RightName" value="<% $RightName %>">
+<input type="hidden" name="ObjectType" value="<% $ObjectType %>">
+
+<table><tr><td>
+<label><input name="PrincipalType" type="radio" value="RT::User" checked><&|/l&>User</&></label><br>
+<label><input name="PrincipalType" type="radio" value="RT::Group"><&|/l&>Group</&></label>
+</td><td>
+<label><&|/l&>Name</&>/<&|/l&>Id</&>: <input name="PrincipalId"></label><br>
+</td></tr>
+<tr><td>
+<% $ObjectType %>
+</td><td>
+<&|/l&>Name</&>/<&|/l&>Id</&>: <input name="ObjectId" value="0"></label>
+</td></tr>
+<tr><td><&|/l&>Action</&></td>
+<td>
+<label><input name="Action" type="radio" value="Grant" checked><&|/l&>Grant</&></label>
+<label><input name="Action" type="radio" value="Revoke"><&|/l&>Revoke</&></label>
+</td></tr>
+</table>
+
+<p>
+<& /Elements/Submit, Label => loc('Submit') &>
+</form>
+
+<%INIT>
+my @actions;
+if (!grep !length, map $ARGS{$_}, qw(Action RightName ObjectId ObjectType PrincipalId PrincipalType)) {
+    my $princ = $PrincipalType->new($session{CurrentUser});
+    $princ->Load($PrincipalId);
+
+    my $ace = RT::ACE->new( $princ->CurrentUser );
+    @actions = $ace->Create(
+        ObjectId        => $ObjectId,
+        ObjectType      => $ObjectType,
+        PrincipalId     => $princ->Id,
+        PrincipalType   => $PrincipalType,
+        RightName       => $RightName,
+    );
+}
+</%INIT>
+<%ARGS>
+$RightName => undef
+$ObjectId => undef
+$ObjectType => undef
+$PrincipalId => undef
+$PrincipalType => undef
+$Action => undef
+</%ARGS>

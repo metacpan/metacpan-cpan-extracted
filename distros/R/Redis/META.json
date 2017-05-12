@@ -1,0 +1,70 @@
+{
+   "abstract" : "Perl binding for Redis database",
+   "author" : [
+      "Pedro Melo <melo@cpan.org>",
+      "Damien Krotkine <dams@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.63_03",
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::Timeout" : "0.29",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IO::String" : "0",
+            "IPC::Cmd" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98",
+            "Test::SharedFork" : "0",
+            "Test::TCP" : "1.19"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlRedis/perl-redis/issues"
+      },
+      "homepage" : "https://github.com/PerlRedis/perl-redis",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/PerlRedis/perl-redis.git",
+         "web" : "https://github.com/PerlRedis/perl-redis"
+      }
+   },
+   "version" : "1.991"
+}
+

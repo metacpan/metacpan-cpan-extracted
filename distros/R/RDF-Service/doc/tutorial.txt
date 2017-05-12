@@ -1,0 +1,235 @@
+#  $Id: tutorial.txt,v 1.2 2000/10/30 01:41:05 aigan Exp $  -*-perl-*-
+
+# This file is created to be an example of the existing functions
+
+
+
+# The RDF::Service library requires perl v5.6
+#
+use 5.006;
+
+# Set the path to the library
+#
+use FindBin; use lib "$FindBin::Bin/../lib";
+
+# Load the library
+#
+use RDF::Service;
+
+# Constants used
+#
+use RDF::Service::Constants qw( NS_LD );
+
+
+
+# Create the session object.
+#
+# There is a diffrence between
+#
+# 1) the RDF::Service module,
+#
+# 2) the RDF::Service distribution package,
+#
+# 3) the RDF::Service installation,
+#
+# 4) the running (server) instance of RDF::Service and
+#
+# 5) the connection to the RDF::Service server.
+#
+# Our $s is a resouce object representing our *connection* to the
+# RDF::Service server.  That's why I call it a session resource.
+
+our $s = new RDF::Service( NS_LD."/session/S1" );
+
+# The URI will be diffrent between diffrent clients and times.  A
+# continued session should use the same session URI.  The parameter to
+# the constructor holds our session URI.
+#
+# The URI string used as parameter for the constructor are here
+# constructed by concatenating the constant NS_LD with a string.  NS_LD
+# stands for "Namespace local" and is here the namespace owned by the
+# running instance ot the RDF::Service server.
+#
+# The $s object holds information about the connected interfaces.
+# The interfaces are the modules that provides read and write access
+# to RDF statements.
+#
+# The constructor starts out by connecting to the base interface -
+# RDF::Service::Interface::Base::V01 - implementing the most basic
+# functions.
+
+
+
+# We continue by connecting to the RDFS interface.
+#
+# The interface gives you access to the RDF, RDFS and L (local)
+# schemas.  (This interface will probably be devided into three
+# separate interfaces in a later version.)
+#
+# The statements in the schema are hard coded into the module.
+# Nothing can be stored here.  This interface implements the class
+# inheritance that belongs to the RDFS schema.  It says that if a
+# resource is of type A and A is a subClassOf B, then it will add that
+# the resource also is of type B.
+
+$s->connect("RDF::Service::Interface::Schema::RDFS_200001");
+
+# The module embeds the schema version date in its name. (We will be
+# using the URI of the interface in later versions.)   Each session
+# can connect to diffrent interfaces and diffrent versions of
+# interfaces.  This means that the same question will give diffrent
+# answers, depending on what interfaces the session has connected to.
+#
+# The $s object is not actually a resource object, but a *context*
+# object.  All objects from the client perspective are context
+# objects.  They in turn holds the actual resource object and the
+# context.  The context will be used to refere to the session and the
+# local context in which the object was retrieved.
+
+
+
+# We will now connect to a database, used to store our localy created
+# statements.  Statements private to the session are not stored
+# anywhere and will dissapere then the program ends.
+
+our $db = $s->connect("RDF::Service::Interface::DBI::V01",
+		    {
+			connect  => "dbi:Pg:dbname=wraf_v01a",
+			name     => "wwwdata",
+			password => "secret",
+		    });
+
+# The named parameters here represents the properties of the
+# database.  The same interface can be used to connect to several
+# diffrent databases (or even the same databse, but with diffrent
+# authorizations).
+#
+# The interface object returned represents the *connection* to the
+# interface.  The URI of the interface connection will be constructed
+# from the interface module URI and all the parameters except the
+# password.  If another session uses the same interface module and the
+# same parameters, they will get the same interface connection resouce
+# object. (But placed in their own context.)
+
+
+
+# And now create a model in which our statements will be placed.  (The
+# session statements is placed in a server meta-model.)
+
+my $model = $s->get_model(NS_LD.'/model/M1');
+
+# get_model() is a combination of a couple of other methods.  It will
+# find the resource with the specified URI.  If that resource is not a
+# model, it will fail.  If the resource doesn't exist, it will be
+# created as a model.
+#
+# Statements (arcs) will be saved in the first interface that accepts
+# them.  In this case, it would be the DB interface.  Later version
+# could use $db->get_model() in order to explicitly state the
+# interface used for saving the arcs.
+
+
+# Define a new class.  $c_person stands for "the class named Person".
+
+my $c_person = $s->get(NS_LD.'/Class/Person')->set($model, [NS_RDFS,'Class']);
+
+# get() retrieves the existing resource.  If non can be find, it
+# creates a new one.  On the other hand; find() will fail no arc
+# mentioning the resource can be found.  (Will use the current
+# selection (calling object), rather than allways look in all
+# connected interfaces.
+#
+# The set() can be called with $node->set($model, $types, $props).
+# $types i a list of types for the $node and $props holds any
+# properties (in the form name/vale pairs) to set.  All the created
+# arcs will be placed in $model.  (Later versions will take $model
+# from the calling context instead.)
+#
+# The set() method sets *all* properties for the $node in the $model.
+# Any existing statements about the node in the same model will be
+# removed.
+#
+# (Future versions will check that you (the session agent) own the
+# model you are using and that the model is open.  Closed models can
+# never be changed.)
+
+
+
+# Create a person with first and last name.
+
+$s->get()->set($model, [$c_person],
+	     {
+		 NS_LD.'/Property/first_name' => ["Jonas"],
+		 NS_LD.'/Property/last_name'  => ["Liljegren"],
+	     }
+	    );
+
+# The empty get() generates a unique URI.  The types list consists of
+# the person class and the property list defines the first and last
+# name.  Each value in the name/value list is a reference to a list of
+# resource objects.  If a element is a string (as in this example), a
+# literal resouce will be created with a unique URI.  All this will be
+# placed in the provided $model and stored in the $db interface.
+
+
+
+# Get a list of all resources of type Person.
+
+my @persons = $c_person->rev_type->list;
+
+# rev_type() is the reverse of type().  type() returns a
+# selection of all the types for a node.  rev_type() returns all nodes
+# that has type of the calling node.
+#
+# A selection is a special type of resource that represents all
+# resources matching the specified criterions.  Those criterions can
+# (in later versions) be arbitrary complex.  New criterions can
+# (later) be added to existing selections.  Some criterions can be set
+# up for the session and get inherited to the context of the calling
+# node.
+#
+# The criterions doesn't have to be resolved until you actually want
+# to iterate through the members of the selection.  Later versions
+# will dynamicly create indexes for common criterions and optimize the
+# retrieval.
+
+
+
+# Get the first name of the first person.
+
+my $first_name = $persons[0]->arc_obj(NS_LD.'/Property/first_name')->li;
+print ${ $first_name->value };
+
+# arc_obj($pred) is a shorthand for arc($pred)->obj() which in turn is
+# a shorthand for arc({ pred => $pred })->obj().  They return a
+# selection of matched resources.
+#
+# The li() method assumes that the selection only has one resource.
+# Any more or less and the method throws an exception.  li() will also
+# be used to retrieve a specified from a selection, based on the list
+# number or extra criterions.
+#
+# value() expects the calling node to be a literal and returns a
+# reference to the literal value. References are used to prevent
+# copying in case of very large (maby binary) literals.
+
+
+
+# Change the name of the person.
+
+$first_name->set_literal($model, \"James");
+
+
+
+# Remove the person (recurseivly).
+
+$person[0]->delete( $model );
+
+# This deletes all statements with person 0 as subject, and does the
+# same for each object of those statements.  But only statements
+# beloning to the $model.
+
+
+
+# That's all.  There are other moethods/properties.  But you have to
+# read the source to find them. ;-)

@@ -1,0 +1,1 @@
+[% PROCESS crud/menu.tt %]

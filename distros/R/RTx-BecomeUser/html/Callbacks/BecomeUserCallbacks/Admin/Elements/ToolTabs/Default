@@ -1,0 +1,12 @@
+<%INIT>
+   if ($session{'CurrentUser'}->HasRight( Right => 'SuperUser', Object => $RT::System )) {
+       $tabs->{B} = {
+                        title => loc('Become User'),
+                        path => 'Admin/Tools/BecomeUser.html',
+                    };
+   }
+</%INIT>
+
+<%ARGS>
+$tabs 
+</%ARGS>

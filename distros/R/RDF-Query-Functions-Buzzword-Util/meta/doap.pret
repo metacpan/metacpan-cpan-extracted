@@ -1,0 +1,24 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`RDF-Query-Functions-Buzzword-Util`
+	:programming-language "Perl" ;
+	:shortdesc            "plugin for buzzword.org.uk utility functions";
+	:homepage             <https://metacpan.org/release/RDF-Query-Functions-Buzzword-Util>;
+	:download-page        <https://metacpan.org/release/RDF-Query-Functions-Buzzword-Util>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Query-Functions-Buzzword-Util>;
+	:repository           [ a :HgRepository; :browse <https://bitbucket.org/tobyink/p5-rdf-query-functions-buzzword-util> ] ;
+	:created              2011-01-04;
+	:license              <http://dev.perl.org/licenses/>;
+	seealso               <http://buzzword.org.uk/2011/functions/util>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+
+cpan:TOBYINK
+	foaf:name  "Toby Inkster";
+	foaf:mbox  <mailto:tobyink@cpan.org>.
+

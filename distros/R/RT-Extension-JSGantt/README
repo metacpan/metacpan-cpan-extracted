@@ -1,0 +1,113 @@
+NAME
+    RT::Extension::JSGantt - Gantt charts for your tickets
+
+DESCRIPTION
+    This extension uses the Starts and Due dates, along with ticket
+    dependencies, to produce Gantt charts.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::JSGantt');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::JSGantt));
+
+        or add RT::Extension::JSGantt to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+        Set(
+            %JSGanttOptions,
+            DefaultFormat => 'day', # or week or month or quarter
+            ShowOwner     => 1,
+            ShowProgress  => 1,
+            ShowDuration  => 1,
+
+            # Configurable JSGantt options
+            # https://code.google.com/p/jsgantt/wiki/Documentation#4._Instantiate_JSGantt_using_()
+            # CaptionType       => 'Resource',
+            # ShowStartDate     => 1,
+            # ShowEndDate       => 1,
+            # DateInputFormat   => 'mm/dd/yyyy',
+            # DateDisplayFormat => 'mm/dd/yyyy',
+            # FormatArr         => q|'day','week','month','quarter'|,
+
+            # define your own color scheme:
+            # ColorScheme => ['ff0000', 'ffff00', 'ff00ff', '00ff00', '00ffff', '0000ff'],
+
+            # we color owners consistently by default, you can disable it via:
+            # ColorSchemeByOwner => 0,
+
+            # you can specify colors to use, unspecified owners will be
+            # assigned to some color automatically:
+            # ColorSchemeByOwner => { root => 'ff0000', foo => '00ff00' },
+
+            # if can't find both start and end dates, use this color
+            NullDatesColor => 333,
+
+            # to caculate day length
+            WorkingHoursPerDay => 8,
+
+            # used to set start/end if one exists but the other does not
+            DefaultDays => 7,
+        );
+
+METHODS
+  AllRelatedTickets
+    Given a ticket, return all the relative tickets, including the original
+    ticket.
+
+  TicketsInfo
+    Given tickets, resolve useful info for jsgantt.js Returns a 2 elements
+    array, 1st is the ids arrayref, 2nd is the info hashref.
+
+  GetTimeRange
+    Given a ticket, resolve it's start/end. Returns an array like (
+    $start_obj, $start, $end_obj, $end ) $start and $end are strings like
+    3/21/2011
+
+UPGRADING
+  DateDayBeforeMonth
+    Prior to version 1.02, there was an undocumented RT config option
+    DateDayBeforeMonth. If you have DateDayBeforeMonth set in your RT, you
+    can make JSGantt do the same thing by setting DateDisplayFormat in
+    RT_SiteConfig.pm:
+
+        Set(
+            %JSGanttOptions,
+            ...
+            # DateDisplayFormat => 'dd/mm/yyyy',
+            ...
+        );
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-JSGantt@rt.cpan.org|mailto:bug-RT-Extension-JSGantt@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-JSGantt>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2014 by Best Practical Solutions
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

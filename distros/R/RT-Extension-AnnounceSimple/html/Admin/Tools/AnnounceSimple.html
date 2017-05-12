@@ -1,0 +1,47 @@
+<& /Admin/Elements/Header, Title => loc('Global Announce') &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form method="post" enctype="multipart/form-data" action="<% RT->Config->Get('WebPath') %>/Admin/Tools/AnnounceSimple.html">
+
+<input type="text" name="announce" style="width: 50%;" value="<% $announce %>" />
+
+<div>
+% if ($attr) {
+<input type="submit" name="delete" value="<&|/l&>Delete</&>" />
+% }
+<input type="submit" name="save" value="<&|/l&>Save</&>" />
+</div>
+
+</form>
+<%init>
+unless ($session{'CurrentUser'}->HasRight( Object=> RT->System, Right => 'SuperUser')) {
+    Abort(loc('This feature is only available to system administrators.'));
+}
+
+my @results;
+
+my $system = RT::System->new( $session{CurrentUser} );
+
+if ( $ARGS{'save'} and length $announce ) {
+    my ($status, $msg) = $system->SetAttribute(
+        Name        => 'AnnounceSimple',
+        Description => 'AnnounceSimple text',
+        Content     => $announce,
+    );
+
+    push @results, loc("Unable to update Announce text: [_1]", $msg)
+        unless $status;
+} elsif ( $ARGS{'delete'} ) {
+    my ($status, $msg) = $system->DeleteAttribute('AnnounceSimple');
+
+    push @results, loc("Unable to delete Announce text: [_1]", $msg)
+        unless $status;
+}
+
+my $attr = $system->FirstAttribute('AnnounceSimple');
+$announce = $attr ? $attr->Content : '';
+</%init>
+<%args>
+$announce => ''
+</%args>

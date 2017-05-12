@@ -1,0 +1,7 @@
+#topactions {
+ min-width: 51em;
+}
+
+#topactions #goto_queue {
+ float: left;
+}

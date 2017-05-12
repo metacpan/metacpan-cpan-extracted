@@ -1,0 +1,94 @@
+NAME
+    Refinements - safer monkey-patching; Ruby-2.0-style refinements for Perl
+
+SYNOPSIS
+       BEGIN {
+          package LwpDebugging;
+          use Refinements;
+      
+          refine 'LWP::UserAgent::request' => sub
+          {
+             my $next = shift;  # like Moose's "around" modifier
+             my $self = shift;
+         
+             warn sprintf 'REQUEST: %s %s', $_[0]->method, $_[0]->uri;
+         
+             return $self->$next(@_);
+          };
+       };
+   
+       {
+          package MyApp;
+      
+          use LWP::UserAgent;
+      
+          my $ua  = LWP::UserAgent->new;
+          my $req = HTTP::Request->new(GET => 'http://www.example.com/');
+      
+          {
+             use LwpDebugging;
+         
+             my $res = $ua->request($req);   # issues debugging warning
+         
+             # $ua->get internally calls $ua->request
+             my $res2 = $ua->get('http://www.example.org/');  # no warning
+          }
+      
+          my $res = $ua->request($req);  # no warning
+       }
+
+DESCRIPTION
+    Refinements allows you to define Ruby-2.0-style refinements. Refinements
+    are a lexically-scoped monkey-patch. In the SYNOPSIS example, we're using
+    a refinement that overrides LWP::UserAgent's `request` method. The
+    refinement only gets applied in the small block of code where `use
+    LwpDebugging` appears. Calling the `request` method from outside that
+    block ignores the refinement. Refinements are lexically-scoped rather than
+    dynamically-scoped.
+
+    Refinements can be used to add or override aspects of a class' behaviour,
+    as an alternative to subclassing.
+
+    Credit where it's due: all the hard work is done by Method::Lexical. The
+    Refinements module just provides an interface to Method::Lexical that may
+    be more comfortable to many users. Defining a refinement becomes much like
+    defining method modifiers in Moose or Moo.
+
+    In particular, the Refinements module does a two things:
+
+    1.  It makes your package inherit from Refinements::Package; and
+
+    2.  It exports a convenience function `refine` to your package.
+
+  Functions
+    The following function is exported:
+
+    `refine(@names, $coderef)`
+        This is roughly equivalent to:
+
+           $your_package->add_refinement($_, $coderef) for @names;
+
+        See "Methods" in Refinements::Package for further information on the
+        `add_refinement` method.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Refinements>.
+
+SEE ALSO
+    Refinements::Package, Method::Lexical.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

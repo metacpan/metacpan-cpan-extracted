@@ -1,0 +1,21 @@
+=extends NEXT
+
+=for layout widget
+
+[% label_fragment %]<br />
+[% message_fragment %]
+[% field %]
+
+=for layout field
+
+<div class="choose_many_field">
+  [% call_next %]
+</div>
+
+=for layout action_buttons
+
+<div class="choose_many_buttons">
+  [% call_next %]
+</div>
+
+=cut

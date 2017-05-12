@@ -1,0 +1,32 @@
+RAS::PortMaster.pm
+Version 1.14, December 21, 1999
+Gregor Mosheh (stigmata@blackangel.net)
+
+
+DESCRIPTION
+
+RAS::PortMaster is a PERL 5 module for interfacing with a Livingston 
+PortMaster remote access server. Using this module, one can very easily 
+construct programs to find a particular user in a bank of PMs, disconnect 
+users, get usage statistics, or execute arbitrary commands on a PM.
+
+
+PREREQUISITES AND INSTALLATION
+
+This module uses Jay Rogers' Net::Telnet module. If you don't have 
+Net::Telnet, get it from CPAN or this module won't do much for you.
+
+Installation is easy:
+   perl Makefile.PL && make && make test
+   make install
+
+
+DOCUMENTATION
+
+For more information, see the POD documentation in the module itself.
+Try "pod2text PortMaster.pm | more" or see the installed manpage.
+
+Check out the Examples section of the manpage for examples on how you'd 
+want to use this module.
+
+

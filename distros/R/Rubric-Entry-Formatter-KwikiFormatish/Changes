@@ -1,0 +1,10 @@
+Revision history for Rubric-Entry-Formatter-KwikiFormatish
+
+0.552     2013-07-07 09:29:42 America/New_York
+          repackage, update bugtracker
+
+0.551     2006-06-23
+          updated Module::Install
+
+0.01      2006-02-11
+          First version, released on an unsuspecting world.

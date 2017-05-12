@@ -1,0 +1,22 @@
+---
+abstract: 'Draw hairpin-like text figure from RNA  sequence and its secondary structure in dot-bracket notation.'
+author:
+  - 'Wei Shen <shenwei356@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RNA-HairpinFigure
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010000'
+version: '0.141212'

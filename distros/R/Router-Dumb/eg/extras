@@ -1,0 +1,6 @@
+# This is an example dumb routing file.  If you're not sure that it's all that
+# dumb, trust me... it is. -- rjbs, 2011-07-13
+/citizen/:num/dob  =>  /citizen/dob
+  num isa Int
+
+/blog/*            =>  /blog

@@ -1,0 +1,18 @@
+RT-ClientX-GrabBugs
+===================
+
+Created:      2012-01-29
+Home page:    <https://metacpan.org/release/RT-ClientX-GrabBugs>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RT-ClientX-GrabBugs>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-01-22	Mark II
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Almost total rewrite, using RT::Client::REST to do the bulk of the work
+   interfacing with RT.
+
+0.001	2012-01-29	Initial release

@@ -1,0 +1,111 @@
+#!perl
+use warnings;
+
+# this is run by other scripts in a `do "t/basic"' after setting
+# $OPEN_NAME and $CLOSE_NAME
+
+#$OPEN_NAME or die "\$OPEN_NAME wasn't set";
+#$CLOSE_NAME or die "\$CLOSE_NAME wasn't set";
+# use Regexp::NamedCaptures;
+# use Test::More tests => 9;
+# $OPEN_NAME  = '<';
+# $CLOSE_NAME = '>';
+
+# Runtime conversions
+is( Regexp::NamedCaptures::convert("(?$OPEN_NAME\\\$_$CLOSE_NAME...)"),
+    '(?{$_=undef})(...)(?{$_=$^N})',
+    "convert() transformed ok"
+);
+
+# Compile-time conversions
+is( eval(
+              "#line "
+            . ( 1 + __LINE__ ) . " \""
+            . __FILE__ . "\"\n"
+            . "use Regexp::NamedCaptures;\n"
+            . "qr/(?$OPEN_NAME\\\$_$CLOSE_NAME...)/"
+        )
+        || $@,
+    '(?-xism:(?{$_=undef})(...)(?{$_=$^N}))',
+    "qr/(?$OPEN_NAME\\\$_$CLOSE_NAME...)/ transformed ok"
+);
+
+# Compile-time concatenation
+my $nop = '(?#)';
+is( eval(
+              "#line "
+            . ( 1 + __LINE__ ) . " \""
+            . __FILE__ . "\"\n"
+            . "use Regexp::NamedCaptures;\n"
+            . "use re 'eval';\n"
+            . "qr/(?#)(?$OPEN_NAME\\\$_$CLOSE_NAME...)/"
+        )
+        || $@,
+    '(?-xism:(?{$_=undef})(?#)(...)(?{$_=$^N}))',
+    "qr/...\$_/ transformed ok"
+);
+is( eval(
+              "#line "
+            . ( 1 + __LINE__ ) . " \""
+            . __FILE__ . "\"\n"
+            . "use Regexp::NamedCaptures;\n"
+            . "use re 'eval';\n"
+            . "qr/(?$OPEN_NAME\\\$_$CLOSE_NAME\$nop...)/"
+        )
+        || $@,
+    '(?-xism:(?{$_=undef})((?#)...)(?{$_=$^N}))',
+    "qr/.../ transformed ok"
+);
+is( eval(
+              "#line "
+            . ( 1 + __LINE__ ) . " \""
+            . __FILE__ . "\"\n"
+            . "use Regexp::NamedCaptures;\n"
+            . "use re 'eval';\n"
+            . "qr/(?$OPEN_NAME\\\$_$CLOSE_NAME...\$nop)/"
+        )
+        || $@,
+    '(?-xism:(?{$_=undef})(...(?#))(?{$_=$^N}))'
+);
+is( eval(
+              "#line "
+            . ( 1 + __LINE__ ) . " \""
+            . __FILE__ . "\"\n"
+            . "use Regexp::NamedCaptures;\n"
+            . "use re 'eval';\n"
+            . "qr/(?$OPEN_NAME\\\$_$CLOSE_NAME...)\$nop/"
+        )
+        || $@,
+    '(?-xism:(?{$_=undef})(...)(?{$_=$^N})(?#))'
+);
+
+{
+    my $word;
+    my $re = eval( "#line "
+            . ( 1 + __LINE__ ) . " \""
+            . __FILE__ . "\"\n"
+            . "use Regexp::NamedCaptures;\n"
+            . "use re 'eval';\n"
+            . "qr/(?$OPEN_NAME\\\$word$CLOSE_NAME\\w+)/" )
+        || $@;
+    is( $re, '(?-xism:(?{$word=undef})(\w+)(?{$word=$^N}))' );
+    ok( " root " =~ $re );
+    is( $word, 'root' );
+}
+
+{
+    my $word = 'failed';
+    my $re   = eval( "#line "
+            . ( 1 + __LINE__ ) . " \""
+            . __FILE__ . "\"\n"
+            . "use Regexp::NamedCaptures;\n"
+            . "use re 'eval';\n"
+            . "qr/XXX(?$OPEN_NAME\\\$word$CLOSE_NAME\\w+)/" )
+        || $@;
+    ok( " numbers " !~ $re );
+TODO: {
+        local $TODO
+            = "The optimizer prevents the target clearing code from running";
+        is( $word, undef );
+    }
+}

@@ -1,0 +1,20 @@
+<select name="<%$Name%>">
+% foreach (@fields) {
+<option value="<%$_->[0]%>"><% $_->[1] %></option>
+% }
+</select>
+<%ARGS>
+$Name => 'LinksField'
+</%ARGS>
+
+<%INIT>
+my @fields = (
+    [ HasMember    => loc("Child") ],
+    [ MemberOf     => loc("Parent") ],
+    [ DependsOn    => loc("Depends on") ],
+    [ DependedOnBy => loc("Depended on by") ],
+    [ RefersTo     => loc("Refers to") ],
+    [ ReferredToBy => loc("Referred to by") ],
+    [ Linked       => loc("Links to") ],
+);
+</%INIT>

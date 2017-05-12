@@ -1,0 +1,55 @@
+% if ( $CustomField->Id ) {
+<script type="text/javascript">
+jQuery( function() {
+    var select = jQuery('select[name=ConditionalCF]');
+    select.change(function() {
+        var cf_id = jQuery(this).find('option:selected').val();
+        if (cf_id) {
+            jQuery.getJSON('/Helpers/SelectCondition', {CustomFieldId: cf_id}, function(values) {
+                if (values) {
+                    jQuery('select[name=ConditionedBy] option').each(function() {
+                        if (jQuery(this).val()) {
+                            jQuery(this).remove();
+                        }
+                    });
+                    jQuery.each(values, function(id, val) {
+                        jQuery('select[name=ConditionedBy]').append(jQuery('<option>', {value: id, text: val}));
+                    });
+                }
+            });
+            jQuery('.conditional-field-condition').show();
+        } else {
+            jQuery('select[name=ConditionedBy] option').each(function() {
+                if (jQuery(this).val()) {
+                    jQuery(this).remove();
+                }
+            });
+            jQuery('.conditional-field-condition').hide();
+        }
+    });
+});
+</script>
+<tr class="conditionedby"><td class="label"><&|/l&>Customfield is conditioned by</&></td><td>
+% my $default = 0;
+% $default = $CustomField->ConditionedByObj->CustomField if $CustomField->ConditionedByObj->id;
+<& /Admin/Elements/SelectCustomField,
+    Name => "ConditionalCF",
+    LookupType => $CustomField->LookupType,
+    Default => $default,
+    Not => $CustomField->id,
+&>
+<span class="conditional-field-condition"<% $CustomField->ConditionedByObj->id ? '' : 'style="display: none;"' |n%>>
+<span class="label">is</span>
+<select name="ConditionedBy">
+% if ($CustomField->ConditionedByObj->id) {
+%   my $ConditionedBy = $CustomField->ConditionedByObj->id;
+%   my $cf_values = $CustomField->ConditionedByObj->CustomFieldObj->Values;
+%   while (my $cf_value = $cf_values->Next) {
+<option value="<% $cf_value->id %>"<% $cf_value->id == $ConditionedBy ? qq[ selected="selected"] : '' |n%>><% $cf_value->Name %></option>
+%   }
+% }
+</select></span></td></tr>
+% }
+<%ARGS>
+$CustomField
+</%ARGS>

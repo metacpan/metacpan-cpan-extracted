@@ -1,0 +1,22 @@
+---
+abstract: 'This performs basic data corrections to Vehicle Identification Numbers.'
+author:
+  - 'Paul Frazier <books.pandl@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Reconcile-Accounts-Vin
+provides:
+  Reconcile::Accounts::Vin:
+    file: lib/Reconcile/Accounts/Vin.pm
+    version: '1.03'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '1.03'

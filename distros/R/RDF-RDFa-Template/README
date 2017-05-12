@@ -1,0 +1,67 @@
+README for RDF-RDFa-Template
+----------------------------
+
+This module is the beginning of a suggested simple RDFa-like
+templating language. It is not intended to be RDFa, it is intended to
+give template writers something that they are familiar with from the
+XML world, yet they can use an largely unmodified XML-based
+RDFa-parser to do the parsing. In this case, RDF::RDFa::Parser is
+used.
+
+For more information about the design of this templating language, see 
+
+  http://www.kjetil.kjernsmo.net/software/rat/
+
+BEWARE OF TODO-LIST:
+
+This is an initial release just to enable a meaningful
+discussion. Thus, there are many remaining tasks before this is a
+fully functional templating system. If you start experimenting with
+writing templates based on this module, it is important that you read
+the TODO list in the POD of RDF::RDFa::Template.
+
+The proper forum for discussing implementation details of this module
+is this mailing list:
+ http://lists.perlrdf.org/listinfo/dev
+or the IRC channel irc://irc.perl.org#perlrdf
+
+NON-CPAN DEPENDENCIES:
+
+You need libxml2, including header files, of at least 2.6.27 for
+canonicalisation to work properly, and this dependency is something
+CPAN will not bring along, so you will need to get it from your
+software distribution or http://xmlsoft.org/ . On some distributions,
+this package will be called libxml2-dev og libxml2-devel.
+
+RUNNING EXAMPLES:
+
+The distribution contains a script that sets up a very simple web
+server that can do the transformation and show the results. Where this
+script ends up depend on your installation method.
+
+If you have used cpanmin.us (cpanm) as a non-root user on UNIX-like
+system, you will probably find it in a directory looking like
+~/.cpanm/work/some.numbers/RDF-RDFa-Template-version/examples
+
+Another way to find is to use the locate command if it is installed on
+your system and access to update its index, you can run sudo updatedb
+locate dbpedia-mustang-range.input.xhtml
+
+cd to this directory.
+
+In there, there is a script called demoserver.pl. Again, if you used
+cpanmin.us as non-root, you will probably do something like
+perl -I$HOME/perl5/lib/perl5/ ./demoserver.pl
+
+If everything goes well, you will see a message saying:
+
+"You can connect to your server at http://localhost:8080/"
+
+Any template files in this directory can now be visited by a browser,
+and the script will run the template and perform SPARQL queries to
+insert values. For now, there is only one example, see
+
+http://localhost:8080/dbpedia-mustang-range.input.xhtml
+
+The demoserver.pl script itself is a nice illustration on how to set
+up a server to use the templating system.

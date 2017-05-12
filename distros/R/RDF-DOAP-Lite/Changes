@@ -1,0 +1,14 @@
+RDF-DOAP-Lite
+=============
+
+Created:      2013-09-16
+Home page:    <https://metacpan.org/release/RDF-DOAP-Lite>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-DOAP-Lite>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2013-03-13
+
+ [ Bug Fixes ]
+ - Fix issues parsing META.json's person-like strings.
+
+0.001	2013-09-17	Initial release

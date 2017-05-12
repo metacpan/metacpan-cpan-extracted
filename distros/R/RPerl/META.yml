@@ -1,0 +1,77 @@
+---
+abstract: 'Restricted Perl, The Optimizing Perl 5 Compiler'
+author:
+  - 'Will Braswell <wbraswell@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - rperl
+  - perl5
+  - optimizing
+  - compiler
+  - optimize
+  - compile
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RPerl
+no_index:
+  directory:
+    - t
+    - inc
+  namespace:
+    - RPerl::Test
+  package:
+    - array
+    - boolean
+    - hash
+    - integer
+    - method
+    - number
+    - object
+    - ref
+    - string
+    - unknown
+requires:
+  Alien::astyle: '0.009'
+  App::Pod2CpanHtml: '0.04'
+  CPAN::Meta: '2.150005'
+  Date::Format: '2.24'
+  ExtUtils::MakeMaker: '7.04'
+  File::Which: '1.21'
+  Filter::Simple: '0.91'
+  IO::Socket::SSL: '2.043'
+  IPC::Run3: '0.048'
+  Inline: '0.80'
+  Inline::C: '0.76'
+  Inline::CPP: '0.74'
+  Inline::Filters: '0.19'
+  List::MoreUtils: '0.33'
+  Math::BigInt::GMP: '1.46'
+  Module::Refresh: '0.17'
+  Module::ScanDeps: '1.19'
+  PadWalker: '2.1'
+  Parse::Eyapp: '1.182'
+  Perl::Critic: '1.121'
+  Perl::Tidy: '20140711'
+  Pod::PseudoPod: '0.18'
+  Test2::Suite: '0.000069'
+  Test::CPAN::Changes: '0.400002'
+  Test::Exception: '0.43'
+  Test::Number::Delta: '1.06'
+  Text::ASCIITable: '0.20'
+  Time::HiRes: '1.9726'
+  perl: '5.010000'
+resources:
+  IRC: irc://irc.perl.org/#perl11
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=RPerl
+  homepage: http://www.rperl.org
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/wbraswell/rperl.git
+version: '2.600000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

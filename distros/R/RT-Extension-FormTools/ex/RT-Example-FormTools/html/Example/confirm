@@ -1,0 +1,16 @@
+<&|/FormTools/Form, next => 'submit' &>
+<h1>Account Request</h1>
+
+<h2>Confirm Selections</h2>
+
+
+<& /FormTools/ShowChoices &>
+<hr/>
+<i><b>
+<p>What else should we know as we act on your request?</p>
+<p> Do you have special time constraints?</p>
+</b></i>
+<& /FormTools/Field, name => 'Content' &>
+
+<& /FormTools/Next &>
+</&>

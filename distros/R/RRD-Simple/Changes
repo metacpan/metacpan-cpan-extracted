@@ -1,0 +1,520 @@
+Version 1.44 - 24th Janurary 2008
+    + Fixed some small typos in the POD.
+
+    + Added "on_missing_ds" parameter to the new()
+      constructor method to detemine what action should
+      be taken when the user tries to update or insert
+      new data point values in an RRD for a data source
+      name that does not exist.
+
+    + Added "tmpdir" parameter to the new() constructor
+      method to force any temporary files to be created
+      in the specified directory. This is only used in
+      the add_source() / _modify_source code.
+
+    + Added a number of additional TRACE() statements
+      in the code to aid debugging with the DEBUG=1
+      environment variable.
+
+    + Changed graph() so that there is no longer an
+      AVERAGE VDEF vname generated for each data source
+      by default. See the updated example on drawing
+      average lines in RRD::Simple::Examples.
+
+    + Changed graph() method to allow undef or ''
+      (empty) values to be passed in for the sources
+      parameter. This is useful if you do not want to
+      draw and data source values directly on the graph
+      but instead only want to plot CDEF values. As a
+      result and requirement of this change, the DEF
+      statements for each and every data source in the
+      RRD file are always defined early on in the
+      commands passed on to RRDs.pm.
+
+    + Added a new example to RRD::Simple::Examples
+      to show how to generate predictive graphs to
+      provide basic capacity planning. See
+      examples/mem_usage-monthly.png for the example
+      output.
+
+    + Added a new "periods" parameter to the graph()
+      method to restrict which graphs will be
+      generated. For example, "weekly, month" could
+      be specified to only generate those two graphs.
+      This is useful if you want to use the SHIFT
+      command to produce a capacity planning graph
+      based on the last 6 months projecting in to the
+      next 6 months in an annual graphing period.
+
+    + Updated version of rrd.me.uk in the examples
+      sub-directory of this distribution, inside the
+      "rrd-server" directory.
+
+
+Version 1.43 - 5th March 2007
+    + Changed Build.PL to be more paranoid defaulting
+      to no while using $build->y_n to work around
+      potential removal of expected method functionality.
+
+    + Added complain.txt. 
+
+    + Added instructions for installing rrdtool and RRDs
+      under Debian/Ubuntu, RHEL and Fedora Core to the
+      INSTALL file.
+
+    + Various fixes and improvements to the POD.
+
+    + Added another example to RRD::Simple::Examples.
+
+    + Fixed typos in existing examples 1 to 5 in
+      RRD::Simple::Examples.
+
+
+Version 1.42 - 27th February 2007
+    + Increased the spacing on the graph between the
+      timestamps in the bottom right hand corner and
+      the legend if the "extended-legend" parameter is
+      NOT specified.
+
+    + Added the "file" parameter to the new() constructor
+      method to specify the RRD filename to be used for
+      by the resulting RRD::Simple object. Eventually
+      this will replace the (now optional) ability to
+      pass the RRD filename as the first parameter to
+      subsequent object methods.
+
+    + Changed the POD to reflect the above changes
+      to the new() constructor method regarding passing
+      of the RRD filename at object creation time.
+
+    + Added new unit text for the above changes
+      to the new() constructor method.
+
+    + Corrected minimum RRD::Simple version for
+      rrd-server.pl as documented in README.
+
+    + Updated the main POD to include data resolution
+      information for each of the 6 different data
+      retention period schemes.
+
+    + Changed to an inside out object. Use the DEBUG
+      environment variable to debug.
+
+    + Updated and renamed RRD::Simple::Examples from
+      a .pm file to a .pod file since it contains no
+      actual code (only documentation).
+
+
+Version 1.41 - 11th February 2007
+    + Added RRD::Simple::Examples POD.
+
+    + Added new requirement of POSIX to Build.PL.
+
+    + Added new timestamp parameter to the graph()
+      method.
+
+    + Added heartbeat() method and POD and unit
+      test for it.
+
+    + Documented some parameters to the new()
+      constructor method that were previously
+      undocumented.
+
+    + Updated version of examples/data_gathering/*
+      scripts, as currently used on http://rrd.me.uk
+
+
+Version 1.40 - 24th August 2006
+    + Some small changes to POD.
+
+    + Updated version of examples/data_gathering/*
+      scripts, as currently used on http://rrd.me.uk
+
+    + Changed RRDs::error calls to RRDs::error().
+
+    + Changed debug warn() calls to carp().
+
+    + Explicitly import fewer symbols from other
+      modules.
+
+    + Added rename_source() method and associated
+      POD and unit test.
+
+    + Changed the graph() method to recognise use
+      of command (GPRINT,PRINT,COMMENT,VRULE,.. etc)
+      over options and flags, so that they will be
+      added to the graph definition after the
+      data sources have been defined.
+
+    + Added new unit tests for new functionality.
+      t/35average_hrule.t tests and demonstrates
+      how the changes to the graph() method can be
+      used.
+
+    + Fixed a bug where an uninitialised variable
+      could cause unexpected behaviour if you tried
+      to add a new data source using add_source()
+      method. This only manifested itself with an
+      versions of RRDs earlier than 1.2013, and
+      where the rrdtool binary is not installed or
+      the path to the rrdtool binary is unknown.
+
+
+Version 1.39 - 26th June 2006
+    + Changed the return value from the graph()
+      method to be a hash instead of an array, so
+      that the data inside can be easily identified
+      as being generated by a specific graph (daily,
+      weekly, monthly, annual or 3year).
+
+    + Added the min, max and last values plotted in
+      each graph, and the filename of the image file
+      written to disk to the graph() method return
+      value.
+
+    + Added some more checks in unit tests t/23graph.t
+      and t/21synopsis.t to account for the changed
+      to the graph() method return value.
+
+    + Updated POD to reflect change in the return
+      value from the graph() method.
+
+    + Fixed an uninitialised value warning that
+      occured if the graph() method was passed too
+      few items in the 'sources' paramater compared
+      to the number of items passed in the
+      'source_drawtypes' or 'source_labels'
+      paramaters.
+
+    + Added client/server server monitoring scripts
+      in examples/data_gathering.
+
+    + Updated POD for update() method to make it
+      clearer that updating an RRD file that does not
+      exist will result it one being automatically
+      created for you using default values.
+
+
+Version 1.38 - 15th June 2006
+    + Fixed a major bug introduced in v1.37 where
+      add_source() method appends new data sources
+      instead of prepends. This would have swapped
+      historical RRA data with different data source
+      names if a new source was added during use
+      of version 1.37.
+
+    + Added examples/loadavg.pl
+
+    + Modified examples/meminfo.pl to create
+      swap-*.png graphs if /proc/meminfo is
+      available.
+
+
+Version 1.37 - 15th June 2006
+    + Changed the add_source() method so that new
+      data sources will be appended to the existing
+      data sources, instead of prepended as was done
+      before. This is useful if you are updating
+      your RRD file directly with RRDs.pm and are
+      assuming the order of the data source names
+      in the RRD file.
+
+    + Added ability to use the STACK draw type in
+      the graph() method. See examples/vmstat.pl and
+      examples/vmstat-cpu-daily.png an example of
+      how to use it and what the results can look
+      like.
+
+    + Added a couple more tests to t/26add_source.t
+
+    + $RRD::Simple::DEFAULT_DSTYPE and
+      $RRD::Simple::DEBUG will now no longer be
+      reset/overwritten when loading RRD::Simple,
+      if the values were already defined. The
+      existing documented logic will still work
+      as expected, assuming you do not explicitly
+      set the variable before loading RRD::Simple.
+      This behaviour is intented to reduce confusion.
+
+    + Added examples/processes.pl
+
+
+Version 1.36 - 13th June 2006
+    + Changed unit tests to skip tests if they find
+      that RRDs is not actually installed. RRDs is
+      clearly marked as a prerequisite for RRD::Simple
+      to work. The module should not even build if
+      RRDs is not installed. Submitting failed CPAN
+      tester reports because you failed to install
+      the prerequisite modules is stupid.
+
+    + Added some brief instructions to INSTALL for
+      installing RRDtool and RRDs.
+
+    + Added a README in the examples directory to
+      help briefly describe what each script does.
+
+    + Changed the following three modules used in
+      unit tests to be reccomended instead of required
+      for building, since the unit tests will quite
+      happily skip if they are not installed:
+            'Test::Pod'           => 1.20,
+            'Test::Pod::Coverage' => 1.06,
+            'Test::Deep'          => 0.093,
+
+    + Build.PL now makes an extra special point of
+      warning about missing RRDs.pm, stating where a
+      copy of RRDtool can be downloaded from, and
+      that more details can be found in INSTALL.
+
+    + Corrected a typo in examples/vmstat.pl in the
+      command line for vmstat.
+
+
+Version 1.35 - 10th June 2006
+    + Added some more example images and scripts in
+      the examples/ directory, and finished off
+      examples/iostat.pl and examples/df.pl.
+
+    + Added the "extended_legend" option to the graph()
+      method, to include recent values to be printed
+      next to the labels.
+
+    + Changed the order of the default set of colours
+      used to draw data sources in the graph() method,
+      and altered the second and third shade cycles to
+      make the colours slights more easily
+      distingustable from one another.
+
+
+Version 1.34 - 1st June 2006
+    + Fixed a small gotcha whereby _ and - characters
+      were not allowed in the "basename" paramater
+      passed to the graph() method.
+
+    + Fixed a typo in the code setting $VERSION.
+
+
+Version 1.33 - 1st May 2006
+    + Changed the default scheme from being 'year' to
+      'mrtg' instead.
+
+    + Added the "source_drawtypes" option to the graph
+      method, so that AREA as well as LINE types can
+      be plotted.
+
+    + Renamed the t/*.t unit test files and did a little
+      bit of refactoring of them. It's planned to
+      improve upon them in the future.
+
+
+Version 1.32 - 8th February 2006
+    + No longer set alt-autoscale and alt-y-grid to
+      on by default when creating graphs.
+
+    + Changed the graph() method to default the end
+      time for the graph to the last time the RRD
+      was updated, instead of the current time.
+
+    + Changed the default RRAs that are created in
+      RRD files to be only AVERAGE and MAX. This is to
+      reduce the file size and update times. To create
+      RRD files with MIN and LAST CFs you can still use
+      the "cf" parameter in the new() constructor method.
+
+    + Changed the retention schemes to be more uniform
+      and added an "mrtg" scheme that mimics the MRTG
+      retention priod.
+
+    + Updated unit tests to cope with code changes.
+
+
+Version 1.31 - 19th January 2006
+    + Fixed POD unit tests to run the right tests
+
+    + Added more unit tests.
+
+    + Added retention_period() to exports and documented
+      in the POD
+
+    + Bug fix whereby the add_source() wasn't finding
+      the best heartbeat (it was returning a source
+      name in some internal code instead of the correct
+      integer value).
+
+    + Added functionality for the graph() method to check
+      what RRA CFs are available before blindly graphing
+      the AVERAGE CF type. It will select best of the CFs
+      available, in order of preference, AVERAGE, MAX,
+      MIN, LAST.
+
+    + Added (undocumented) "cf" parameter inside the
+      new() constructor method to specify which CFs to use
+      when creating RRAs in a new RRD file. This may be
+      documented later if it's considered useful, and if
+      the parameter name is correct (ie, shouldn't be
+      named something else), or implemented in another way.
+
+    + Fixed a bug which (until this release) would not
+      and should not have been noticed since it only
+      effected the passing of default values to the
+      RRD::Simple $self object when used with indirect
+      method calls requiring the new "cf" paramater.
+
+
+Version 1.30 - 15th January 2006
+    + Removed notice about add_source() not working with
+      latest versions of RRD from the POD.
+
+    + Added Test::Pod and Test::Pod::Coverage unit tests
+
+    + The graph() method now allows arrays to be passed
+      as key value options, thus allowing many --colour
+      values to be set
+
+    + Added the "source_colors" parameter to the graph()
+      method to specify the plotted data source line colours
+
+    + Added the "source_labels" parameter to the graph()
+      method to specify data source labels in the legend/key
+
+    + Changed the add_source() method to try and use
+      the RRDs module for all the needed rrdtool
+      functionality, instead of having to spawn an external
+      copy of the rrdtool binary. A patch submitted to
+      Tobi on 2006/01/08 which should be available in the
+      1.2.13 release of rrdtool will allow RRDs::dump to
+      dump to a filename instead of STDOUT, this removing
+      the need for RRD::Simple to use the rrdtool binary
+      at all.
+
+    + Tweaked POD a little
+
+    + Fixed some typos in the code where "3year" and "3years"
+      were being mixed up. They have all been changed to be
+      "3years" now, as per the POD.
+
+    + Added the retention_period() method to return (in 
+      seconds) how long the RRD will store data for.
+
+    + The graph() method will now only generate graphs which
+      the RRD file has enough data for. (ie, a 1 week long
+      RRD file will not try and generate a 3 year graph etc)
+
+    + Fixed a bug whereby the create() method and the graph()
+      method were both getting the same values back from the
+      _seconds_in() function, which should not be the case.
+      This was resulting in blocky graphs because there was
+      not enough margin between RRA boundies to ensure that
+      each graph was getting the highest resolution data that
+      you would expect. Also, _seconds_in() was returning
+      slightly too high values, which indirectly caused the
+      X asis labels to overlap eachother in some instances.
+
+
+Version 1.29 - 6th January 2006
+    + Improved makefile version extraction.
+
+    + Changed license to Apache 2.0
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    + Changed escaping on date in graph() to only happen
+      with RRDs version 1.2 or greater (escaping should not
+      be used with version 1.0)
+
+    + Changed how the last values are pulled from the RRA
+      in the last_values() method so it's more reliable
+      now.
+
+    + Fixed add_source() to work with rrdtool 1.2x and RRD
+      version 0003 files.
+
+    + Added /usr/local/rrdtool*/bin/ to the search path
+      when looking for the rrdtool binary.
+
+    + Tweaked Makefile.PL
+
+
+Version 1.25 - 28th December 2005
+    + Added Changes file.
+
+    + Changed cluck warnings to only be output when perl
+      warnings are enabled ($^W is set true).
+
+    + t/04lazy_create_by_update.t
+      t/07correct_spelling.t
+      -- Disabled warnings being output for some unit tests
+         so as not to alarm people. (The warnings are
+         intentional when $^W is true, so it is deliberately
+         set to false for those tests).
+
+    + Modified Makefile.PL to send anonymous information to
+      http://perlgirl.org.uk/lib/usage.cgi if the user
+      agrees. This is so I can track which of my modules
+      are most heavily used and on what platforms, so I can
+      concentrate on maintaning the most popular ones in
+      my limited spare time.
+
+
+Version 1.24 - 26th December 2005
+    + Added explicit specification of a data retention
+      period (internally to RRD::Simple called a scheme).
+
+    + Added checking of RRD file versions before
+      attempting to add a new data source to an existing
+      RRD file. add_source() can only be used on RRD
+      version 001 files at the moment (rrdtool version
+      1.0.x). Unit tests have been updated to take this
+      in to account and skip if necessary.
+
+    + Tidied and improved some of the error messages that
+      are returned if the addition of a new data source
+      to an existing RRD file fails.
+
+    + Fixed escaping of the time date stamp that is added
+      to the graphs so that it is compatible with rrdtool
+      version 1.2.x.
+
+    + Altered parsing of arguments to the graph() method
+      so that _ characters are converted to - characters
+      before passing to the RRDs module. This negated the
+      need to quote a number or arguments that are passed
+      in to the graph() method.
+
+    + Added some more comments in the code.
+
+    + Added some more POD.
+
+
+Version 1.21 - 14th December 2005
+    + Added examples/ApacheAccessLogActivity.pl
+      -- Example script to import apache access log
+         files in to a simple RRD file for graphing
+
+    + Fixed a bug in the update() method to allow explicit
+      specification of data insertion time. Previously if no
+      RRD file was specified, the explicitly specified
+      insertion time would have incorrectly been used as the
+      RRD filename.
+
+    + Added an experimental last_values() method to return
+      the last values stored in the LAST CF RRA. This is not
+      currently documented because it does not function as
+      you would logically expect.
+
+    + Added t/09last_value.t
+      -- This test is essentially skipped because the output
+         is not as you might expect. It will be enabled once
+         the last_values() method is working better.
+
+    + Added the 'basename' argument to the graph() method.
+
+    + Added the 'sources' argument to the graph() method.
+
+    + Fixed a few minor typos in warning messages.
+
+    + Added more POD.
+
+    + Improved unit tests.
+
+

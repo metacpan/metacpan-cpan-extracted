@@ -1,0 +1,57 @@
+<%PERL>
+my $self = RT->Config->Get('WebURL') . "Developer/Perldoc?n=";
+
+# Find relevant files
+my @found;
+my %toc;
+File::Find::find(
+    {
+        untaint => 1,
+        follow  => ($^O ne 'MSWin32'),
+        wanted  => sub {
+            return unless /(\w+)\.(?:pm|pod)$/;
+            return if $1 eq "perllocal";
+            return if $1 =~ /_(Local|Vendor|Overlay)/;
+            my $name = $File::Find::name;
+            $name =~ s!.*?/lib/!!;
+            $name =~ s!\.(?:pm|pod)$!!i;
+            $name =~ s!\W!::!g;
+            $toc{$name} = "$self$name";
+            push @found, $name;
+        },
+    },
+    RT::OnlineDocs->lib_paths
+);
+$m->notes(toc => \%toc);
+
+my ($prev, $indent) = ("", 0);
+foreach my $file (sort @found) {
+    my ($parent, $name) = ($1, $2) if $file =~ /(?:(.*)::)?(\w+)$/;
+    $parent = "" unless defined $parent;
+    if ($file =~ /^$prev\::(.*)/) {
+        my $foo = $1;
+        while ($foo =~ s/(\w+):://) {
+            $indent++;
+            $m->print(qq{<span style="margin-left: @{[$indent]}em">$1</span><br />\n});
+        }
+        $indent++;
+    } elsif ($prev !~ /^$parent\::/) {
+        while ($parent =~ s/(\w+)//) {
+            next if $prev =~ s/\b$1:://;
+            while ($prev =~ s/:://) {
+                $indent--;
+            }
+            $m->print(qq{<span style="margin-left: @{[$indent]}em">$1</span><br />\n});
+            $indent++;
+        }
+    } elsif ($prev =~ /^$parent\::(.*::)/) {
+        my $foo = $1;
+        while ($foo =~ s/:://) {
+            $indent--;
+        }
+    }
+    $m->print(
+      qq{<a style="margin-left: @{[$indent]}em" href="$self$file">$name</a><br />\n} );
+    $prev = $file;
+}
+</%PERL>

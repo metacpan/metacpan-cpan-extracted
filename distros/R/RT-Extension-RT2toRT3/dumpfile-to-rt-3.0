@@ -1,0 +1,1043 @@
+#!/usr/bin/perl -w
+# (c) 1996-2004 Jesse Vincent <jesse@bestpractical.com>
+
+# VERSION 1.23
+
+package RT;
+use strict;
+use Storable;
+use warnings;
+no warnings qw/redefine/;
+$| = 1;
+
+use Data::Dumper;
+use MIME::Base64;
+BEGIN { $RT::DontCacheSearchBuilderRecords = 1; }
+use vars qw($dbh $debug %user_objects);
+$debug = 0;
+
+BEGIN {
+    if ( $] < 5.007 ) {
+        require Encode::compat;
+    }
+}
+use Encode;
+
+use vars qw/$ENCODING $DIR/;
+
+$ENCODING = "iso-8859-1";
+
+my $import_global_metadata = 1;
+my $import_users           = 1;
+my $import_groups          = 1;
+my $import_queues          = 1;
+my $import_tickets         = 1;
+my $import_links           = 1;
+my $merge_on_import        = 0;
+use lib ("/opt/rt3/lib");
+
+use Getopt::Long;
+
+use RT::Interface::CLI qw(CleanEnv GetCurrentUser GetMessageContent loc);
+use RT::Tickets;
+use RT::Template;
+use RT::CustomFields;
+use RT::Principals;
+use RT::Scrips;
+
+#*RT::Principal::HasRight = sub { 1 };;
+#Clean out all the nasties from the environment
+CleanEnv();
+
+# Load the config file
+RT::LoadConfig();
+
+#Connect to the database and get RT::SystemUser and RT::Nobody loaded
+RT::Init();
+
+my $DIR = shift @ARGV
+  || die "$0 requires that you specify a directory containing your RT2 dump";
+
+require $DIR . "/metadata";
+my $VAR1 = Data();
+
+$RT::LogStackTraces = 1;
+
+# optional second command line argument
+# tells us where to find mappings
+sub client_setup {};
+sub client_import_queue {};
+sub client_import_user {};
+sub client_import_ticket {};
+sub client_import_ticket_extra {};
+my $CLIENT_MAPPING = shift @ARGV;
+eval { require $CLIENT_MAPPING if $CLIENT_MAPPING };
+
+my $attachment_map;
+my $user_map;
+my $group_map;
+my $queue_map;
+my $cf_map;
+my $transaction_map;
+my $ticket_map;
+my $ticket_merge_map;
+my @errors;
+
+if ( ExportType() eq 'incremental' ) {
+    my $users = $VAR1->{'User'};
+    foreach my $user ( @{$users} ) {
+        encode_hashref($user);
+        my $obj = load_user( $user->{'Name'} );
+        if ( !$obj->Id && $user->{'EmailAddress'} ) {
+            $obj = load_user( $user->{'EmailAddress'} );
+        }
+        if ( $obj->Id ) {
+            $user_map->{ $user->{'id'} } = $obj->id;
+            delete $user->{'Name'};
+            delete $user->{'EmailAddress'};
+            delete $user->{'Privileged'};
+            delete $user->{'id'};
+            foreach my $field ( keys %$user ) {
+                $obj->__Set( Field => $field, Value => $user->{$field} );
+            }
+
+        }
+        else {
+            encode_hashref($user);
+            import_user($user);
+        }
+    }
+    import_tickets();
+
+}
+else {
+    check_import();
+    print "Importing scrips\n";
+    client_setup();
+    foreach my $scrip ( @{ $VAR1->{'Global'}->{'Scrip'} } ) {
+	print "s";
+        import_scrip( $scrip, 0 );
+    }
+    print "\n";
+
+    if ($import_users) {
+        print "Importing users\n";
+        my $users = $VAR1->{'User'};
+        unless ($merge_on_import) {
+            $RT::Handle->SimpleQuery("DELETE FROM Users where Name='root'");
+        }
+
+        foreach my $user ( @{$users} ) {
+            encode_hashref($user);
+            import_user($user);
+        }
+    }
+
+    # find all groups
+    if ($import_groups) {
+        print "Importing groups\n";
+        my $groups = $VAR1->{'Group'};
+
+        # foreach group
+        foreach my $group ( @{$groups} ) {
+            print "g";
+
+            #         create group
+            my $g      = RT::Group->new($RT::SystemUser);
+            my $old_id = $group->{'id'};
+            delete $group->{'id'};
+            my $members = $group->{'Member'};
+            delete $group->{'Member'};
+
+            encode_hashref($group);
+
+            if ($merge_on_import) {
+                $g->LoadUserDefinedGroup($group->{Name});
+                unless ($g->Id) {
+                    $g->CreateUserDefinedGroup( %{$group} );
+                }
+            } else {
+                $g->CreateUserDefinedGroup( %{$group} );
+            }
+
+            my $id = $g->Id();
+            print "\nFailed to create group for" . Dumper $groups->{$group} unless ($id);
+            $group_map->{$old_id} = $id;
+
+            #         import members
+
+            foreach my $member ( @{$members} ) {
+                unless ( $user_map->{$member} ) {
+                    print "\nCouldn't find user with RT2 userid " . $member
+                      . " - not adding to "
+                      . $g->Name . "\n";
+                }
+                else {
+                    $g->AddMember( $user_map->{$member} );
+                }
+            }
+        }
+	print "\n";
+    }
+
+    if ($import_global_metadata) {
+
+	print "Importing rights\n";
+        foreach my $right ( @{ $VAR1->{'Global'}->{'Right'} } ) {
+            print "r";
+            my $princ = RT::Principal->new($RT::SystemUser);
+            my $id;
+            if ( $right->{'PrincipalId'} ) {
+                if ( $right->{'PrincipalType'} eq 'User' ) {
+                    $id = $user_map->{ $right->{'PrincipalId'} };
+                }
+                else {
+                    $id = $group_map->{ $right->{'PrincipalId'} };
+
+                }
+                $princ->Load($id);
+                $princ->Id
+                  || print "\nCouldn't load principal $id to grant them "
+                  . $right->{'Name'}
+                  . " globally\n"
+                  . Dumper($right);
+            }
+            elsif ( $right->{'Role'} ) {
+                my $g = RT::Group->new($RT::SystemUser);
+                $g->LoadSystemInternalGroup( $right->{'Role'} );
+                unless ( $g->Id ) {
+                    $g->LoadSystemRoleGroup( $right->{'Role'} );
+                }
+                $id    = $g->Id;
+                $princ = $g->PrincipalObj;
+                $g->Id
+                  || print "\nCouldn't load principal "
+                  . $g->Id
+                  . " to grant them "
+                  . $right->{'Name'}
+                  . " globally\n"
+                  . Dumper($right);
+            }
+            $princ->GrantRight(
+                Object => $RT::System,
+                Right  => $right->{'Name'}
+            );
+        }
+	print "\n";
+
+	print "Importing custom fields\n";
+        foreach my $cf ( values %{ $VAR1->{'Global'}->{'CustomField'} } ) {
+            print "f";
+            my $type;
+            my $cfobj = RT::CustomField->new($RT::SystemUser);
+            if ( $cf->{'Single'} ) {
+                $type = 'SelectSingle';
+            }
+            else {
+                $type = 'SelectMultiple';
+            }
+            $cfobj->Create(
+                Name     => $cf->{'Name'},
+                Type     => $type,
+                Queue    => '0',
+                Disabled => ( $cf->{'Disabled'} || 0 )
+            );
+            unless ( $cfobj->Id ) {
+                print "\nCouldn't create custom field " . $cf->{'Name'}
+		    . "\n";
+            }
+            $cf_map->{ $cf->{'id'} } = $cfobj->Id;
+
+            foreach my $val ( @{ $cf->{'Value'} } ) {
+                $cfobj->AddValue( Name => $val );
+            }
+        }
+	print "\n";
+    }
+
+    # find all queues in RT 2.0
+
+    #
+    # for each queue
+    if ($import_queues) {
+	print "Importing queues\n";
+        $RT::Handle->SimpleQuery("DELETE FROM Queues where id = 1");
+
+        my $queues = $VAR1->{'Queue'};
+
+        foreach my $queue ( @{$queues} ) {
+            print "q";
+            $queue = client_import_queue($queue) || $queue;
+
+            my %temp;
+            foreach my $attr qw(id CustomField Watchers Scrip Right) {
+                $temp{$attr} = $queue->{$attr};
+                delete $queue->{$attr};
+            }
+            encode_hashref($queue);
+            $queue->{'Creator'}       = $user_map->{ $queue->{'Creator'} };
+            $queue->{'LastUpdatedBy'} =
+              $user_map->{ $queue->{'LastUpdatedBy'} };
+            my $queue_obj = RT::Queue->new($RT::SystemUser);
+            $queue_obj->LoadByCols( Name => $queue->{Name} );
+            my $id = $queue_obj->Id();
+            unless ($id) {
+                $queue_obj->Create( %{$queue} );
+                $id = $queue_obj->Id();
+            }
+            print "\nFailed to create queue for" . Dumper $queue unless ($id);
+            $queue_map->{ $temp{'id'} } = $id;
+
+            foreach my $watcher ( @{ $temp{Watchers} } ) {
+                $watcher->{'PrincipalId'} = $user_map->{ $watcher->{'id'} };
+                delete $watcher->{'id'};
+                $queue_obj->AddWatcher(%$watcher);
+            }
+
+            foreach my $right ( @{ $temp{'Right'} } ) {
+                my $princ = RT::Principal->new($RT::SystemUser);
+                my $id;
+                if ( $right->{'PrincipalId'} ) {
+                    if ( $right->{'PrincipalType'} eq 'User' ) {
+                        $id = $user_map->{ $right->{'PrincipalId'} };
+                    }
+                    else {
+                        $id = $group_map->{ $right->{'PrincipalId'} };
+
+                    }
+                    $princ->Load($id);
+                }
+                elsif ( $right->{'Role'} ) {
+                    my $g = RT::Group->new($RT::SystemUser);
+                    $g->LoadQueueRoleGroup(
+                        Type  => $right->{'Role'},
+                        Queue => $queue_obj->Id
+                    );
+                    unless ( $g->Id ) {
+                        $g->LoadSystemInternalGroup( $right->{'Role'} );
+                    }
+                    $id    = $g->Id;
+                    $princ = $g->PrincipalObj;
+                }
+                $princ->Load($id);
+                $princ->Id
+                  || print "\nCouldn't load principal $id to grant them "
+                  . $right->{'Name'}
+                  . " on queue "
+                  . $queue_obj->Name . "\n"
+                  . Dumper($right);
+                $princ->GrantRight(
+                    Object => $queue_obj,
+                    Right  => $right->{'Name'}
+                );
+            }
+            foreach my $cf ( @{ $temp{'CustomField'} } ) {
+                my $type;
+                encode_hashref($cf);
+                my $cfobj = RT::CustomField->new($RT::SystemUser);
+                if ( $cf->{'Single'} ) {
+                    $type = 'SelectSingle';
+                }
+                else {
+                    $type = 'SelectMultiple';
+                }
+                $cfobj->LoadByName(
+                    Name  => $cf->{Name},
+                    Queue => $queue_obj->Id
+                );
+
+                # look for an existing cf not assigned to this queue yet
+                unless ($cfobj->Id) {
+                    $cfobj->LoadByName( Name => $cf->{Name} );
+                    if ($cfobj->Id) {
+                        $cfobj->AddToObject( $queue_obj );
+                    }
+                }
+
+                unless ($cfobj->Id) {
+                    $cfobj->Create(
+                        Name     => $cf->{'Name'},
+                        Type     => $type,
+                        Disabled => ( $cf->{'Disabled'} || 0 ),
+                        Queue    => $queue_obj->Id
+                    );
+                }
+                unless ( $cfobj->Id ) {
+                    print "\nCouldn't create custom field " . $cf->{'Name'};
+                }
+
+                # sometimes we import the same CF a few times 
+                # and need to make it not disabled for those queues 
+                # that need it.
+                # We might want to not even create CFs that are disabled.
+                if ($cfobj->Id
+                    and not $cf->{Disabled}
+                    and $cfobj->Disabled) {
+                    $cfobj->SetDisabled(0);
+                }
+
+                $cf_map->{ $cf->{'id'} } = $cfobj->Id;
+
+                my %existing_values;
+                my $cfvalues = $cfobj->Values;
+                while (my $value = $cfvalues->Next) {
+                    $existing_values{$value->Name} = 1;
+                }
+
+                foreach my $val ( @{ $cf->{'Value'} } ) {
+                    next if $existing_values{$val};
+                    $cfobj->AddValue( Name => $val );
+                }
+            }
+            foreach my $scrip ( @{ $temp{'Scrip'} } ) {
+                import_scrip( $scrip, $queue_obj->Id );
+            }
+
+        }
+	print "\n";
+    }
+    import_tickets() if ($import_tickets);
+}
+
+if ($import_links) {
+    print "Importing links\n";
+    my $imported_links;
+    foreach my $link ( @{ $VAR1->{'Link'} } ) {
+        print "l";
+        my $l = RT::Link->new($RT::SystemUser);
+
+        $link->{'Base'}   =~ s#/(.*?)/ticket/#/ticket/#;
+        $link->{'Target'} =~ s#/(.*?)/ticket/#/ticket/#;
+
+        my ( $val, $msg );
+
+        my $target = $ticket_map->{$link->{LocalTarget}};
+        unless ($target) {
+            $target = $link->{Target};
+            $target =~ s/ticket\/(\d+)/ticket\/$ticket_map->{$1}/;
+        }
+
+        my $base   = $ticket_map->{$link->{LocalBase}};
+        unless ($base) {
+            $base = $link->{Base};
+            $base =~ s/ticket\/(\d+)/ticket\/$ticket_map->{$1}/;
+        }
+
+        if (my $dup = $imported_links->{"$target-$base-$link->{Type}"}) {
+            print "\nSkipping link creation " .
+                  "($link->{LocalBase} $link->{LocalTarget} $link->{Type})" .
+                  " because duplicate of $dup detected\n";
+            next;
+        }
+        eval {
+            my $uri = RT::URI::fsck_com_rt->new($RT::SystemUser);
+            my $prefix = $uri->LocalURIPrefix;
+            ( $val, $msg ) = RT::Record::Create($l,
+                Type   => $link->{'Type'},
+                LocalTarget => $target,
+                LocalBase   => $base,
+                Target => "$prefix/ticket/$target",
+                Base   => "$prefix/ticket/$base"
+            );
+        };
+        if ($@) {
+            print $@,$msg;
+        }
+
+        $imported_links->{"$target-$base-$link->{Type}"} = $l->Id;
+     
+        unless ( $l->Id ) {
+            if ( $link->{'LocalBase'} != $link->{'LocalTarget'} ) {
+                push( @errors,
+                        "Couldn't create link  from "
+                      . $link->{'Base'} . " to "
+                      . $link->{'Target'}
+                      . " because $msg" );
+            }
+        }
+    }
+    print "\n";
+}
+
+print join( "\n", @errors );
+
+sub encode_hashref {
+    my $argsref = shift;
+
+    foreach my $key ( keys %{$argsref} ) {
+        if ( !ref( $argsref->{$key} ) ) {
+            $argsref->{$key} = decode( $ENCODING, $argsref->{$key} );
+        }
+        elsif ( ref( $argsref->{$key} ) eq 'ARRAY' ) {
+            my @temp = @{ $argsref->{$key} };
+            undef $argsref->{$key};
+            foreach my $var (@temp) {
+                if ( ref($var) ) {
+
+                    push( @{ $argsref->{$key} }, $var );
+                }
+                else {
+                    push( @{ $argsref->{$key} }, decode( $ENCODING, $var ) );
+                }
+            }
+        }
+        else {
+            die "What do I do with $key for $argsref. It is a "
+              . ref( { $argsref->{$key} } );
+        }
+    }
+
+}
+
+sub import_scrip {
+    my $scrip = shift;
+    my $queue = ( shift || '0' );
+    encode_hashref($scrip);
+
+    my $so = RT::Scrip->new($RT::SystemUser);
+
+    $scrip->{'Template'}  =~ s/(.)([A-Z])/$1 $2/g;
+    $scrip->{'Condition'} =~ s/(.)([A-Z])/$1 $2/g;
+    $scrip->{'Action'}    =~ s/(.)([A-Z])/$1 $2/g;
+    $scrip->{'Action'}    =~ s/Admin Watchers/AdminCcs/;
+    $scrip->{'Action'}    =~ s/Admin Ccs/AdminCcs/;
+    $scrip->{'Action'}    =~ s/Requestor$/Requestors/;
+
+    my %params = (
+        Template       => $scrip->{'Template'},
+        ScripAction    => $scrip->{'Action'},
+        ScripCondition => $scrip->{'Condition'},
+        Queue          => $queue,
+        Description    => "Imported from RT 2.0"
+    );
+
+    #Notify All watchers is now two seperate scrips
+    if ( $params{'ScripAction'} =~ /^Notify All Watchers(.*)$/ ) {
+        $params{'ScripAction'} = 'Notify Owner' . $1;
+        my $ownerscrip = RT::Scrip->new($RT::SystemUser);
+
+        $ownerscrip->Create(%params);
+
+        unless ( $ownerscrip->Id ) {
+            use Data::Dumper;
+            push @errors,
+              "\nCould not create scrip: "
+              . $params{'ScripCondition'} . " "
+              . $params{'ScripAction'}
+              . " with template "
+              . $params{'Template'}
+              . " in queue"
+              . $params{'Queue'} . " -- "
+              . Dumper( \%params )
+              . "\n - may be due to a non-standard template, condition or action";
+        }
+        $params{'ScripAction'} = 'Notify Requestors, Ccs and AdminCcs' . $1;
+
+    }
+
+    $so->Create(%params);
+
+    unless ( $so->Id ) {
+        push @errors,
+          "\nCould not create scrip: "
+          . $params{'ScripCondition'} . " "
+          . $params{'ScripAction'}
+          . " with template "
+          . $params{'Template'}
+          . " in queue #"
+          . $params{'Queue'}
+          . "\n - may be due to a non-standard template, condition or action";
+    }
+
+}
+
+sub load_user {
+    my $user_id = shift;
+    if ( $user_objects{$user_id} && $user_objects{$user_id}->Id ) {
+        return ( $user_objects{$user_id} );
+    }
+    else {
+        $user_objects{$user_id} = RT::User->new($RT::SystemUser);
+        if ( $user_id =~ /^\d+$/ ) {
+            $user_objects{$user_id}->LoadByCols( id => $user_id );
+        }
+        elsif ( $user_id =~ /@/ ) {
+            $user_objects{$user_id}->LoadByCols( EmailAddress => $user_id );
+            unless ( $user_objects{$user_id}->id ) {
+                $user_objects{$user_id}->LoadByCols( Name => $user_id );
+            }
+        }
+        else {
+            $user_objects{$user_id}->Load($user_id);
+            unless ( $user_objects{$user_id}->id ) {
+                $user_objects{$user_id}->LoadByEmail($user_id) if ($user_id);
+            }
+        }
+
+        #                unless ($user_objects{$user_id}->id) {
+        #                  $user_objects{$user_id} = undef;
+        #                }
+        return ( $user_objects{$user_id} );
+    }
+
+}
+
+# {{{ import tickets
+sub import_tickets {
+    eval "sub Data {die 'Ticket files could not be loaded'}";
+    print "Importing tickets\n";
+    opendir( TOPDIR, $DIR ) || die "Couldn't open $DIR";
+    while ( my $subdir = readdir(TOPDIR) ) {
+        next unless ( $subdir =~ /^tickets-/i );
+        opendir( DIR, $DIR . "/" . $subdir ) || die "Couldn't open $subdir";
+        while ( my $file = readdir(DIR) ) {
+            next unless ( $file =~ /^t-(\d+)$/ );
+            print "$file: ";
+            my $ticket;
+            eval {
+                $ticket = Storable::retrieve("$DIR/$subdir/$file")
+                  || die
+"Couldn't load $DIR/$subdir/$file as a stored ticket. Trying as a dumped file\n";
+            };
+            if ($@) {
+                print STDERR $@;
+                require "$DIR/$subdir/$file"
+                  || die "Couldn't read ticket file $file";
+                $ticket = Data();
+            }
+
+            $ticket = client_import_ticket($ticket) || $ticket;
+
+#	    next if ($ticket->{'Status'} eq 'dead');
+
+            my %temp;
+
+            if ( ExportType() eq 'incremental' ) {
+                my $id = $ticket->{'id'};
+                my $t  = RT::Ticket->new($RT::SystemUser);
+                $t->Load($id);
+                if ( $t->Id ) {
+
+                    # Blow away ticket watchers
+                    $RT::Handle->SimpleQuery(
+"DELETE FROM Groups WHERE Domain = 'RT::Ticket-Role' AND INSTANCE = '$id'"
+                    );
+
+                    # Blow away ticket attachments
+                    my $txns = $t->Transactions;
+                    while ( my $txn = $txns->Next ) {
+                        my $att = $txn->Attachments();
+                        while ( my $attach = $att->Next ) {
+                            $attach->Delete();
+                        }
+                        $RT::Handle->SimpleQuery(
+                                "DELETE FROM Transactions WHERE id='"
+                              . $txn->id
+                              . "'" );
+                    }
+                    $RT::Handle->SimpleQuery(
+                        "DELETE FROM TicketCustomFieldValues WHERE Ticket = '$id'");
+                    $RT::Handle->SimpleQuery(
+                        "DELETE FROM Tickets WHERE id = '$id'");
+                }
+            }    # end of incremental
+
+            my $tick_object = RT::Ticket->new($RT::SystemUser);
+
+            $ticket->{'Status'} = 'deleted'
+              if ( $ticket->{'Status'} eq 'dead' );
+
+            $ticket->{'Owner'} = $user_map->{ $ticket->{'Owner'} };
+
+            $ticket->{'Creator'}       = $user_map->{ $ticket->{'Creator'} };
+            $ticket->{'LastUpdatedBy'} = $user_map->{ $ticket->{'LastUpdatedBy'} };
+
+            $ticket->{'_RecordTransaction'} = 0;
+            foreach my $attr qw(Watchers Transaction CustomFields) {
+                $temp{$attr} = $ticket->{$attr};
+                delete $ticket->{$attr};
+            }
+
+            encode_hashref($ticket);
+
+            foreach my $watcher ( @{ $temp{'Watchers'} } ) {
+		print "w";
+                my $val;
+		encode_hashref($watcher);
+                $val =
+                  ( $watcher->{'Email'} || $user_map->{ $watcher->{'Owner'} } );
+                push( @{ $ticket->{ $watcher->{'Type'} } }, $val );
+
+            }
+
+            encode_hashref($temp{CustomFields});
+            foreach my $cf ( keys %{ $temp{'CustomFields'} } ) {
+                print "f";
+                my $cfid = $cf_map->{$cf};
+                $ticket->{ 'CustomField-' . $cfid } =
+                  $temp{'CustomFields'}->{$cf};
+
+            }
+
+            my $original_ticket_id = $ticket->{id};
+            if ($merge_on_import) {
+                # no good way to do a load, unless we were going to 
+                # load on id + Subject, but that seems horribly error prone
+                delete $ticket->{id};
+                if ($ticket->{EffectiveId} == $original_ticket_id) {
+                    delete $ticket->{EffectiveId};
+                }
+            } 
+
+            my ( $tid, $ttrans, $msg ) = $tick_object->Create( %{$ticket} );
+
+            unless ( $tid ) {
+                print "\nCouldn't create TICKET: $msg";
+                print Dumper $ticket;
+                die;
+            }
+
+            # Told isn't handled in Ticket->Create
+            if ($ticket->{Told}) {
+                $tick_object->__Set( Field => 'Told', Value => $ticket->{Told} );
+            }
+
+            # we can't verify ids if we're merging into an existing RT instance
+            unless ($merge_on_import) {
+                unless ( $tid == $original_ticket_id ) {
+                    print "\nCouldn't create TICKET: $msg";
+                    die;
+                }
+                unless ( $tick_object->Id == $original_ticket_id ) {
+                    print "\nCouldn't create ticket $ticket " . Dumper($ticket);
+                }
+            }
+
+            if ( $merge_on_import ) { 
+                # we need to rewrite merged tickets
+                if ( $ticket->{EffectiveId} &&
+                     $ticket->{EffectiveId} != $original_ticket_id ) {
+                    if ( $ticket_map->{$ticket->{EffectiveId}} ) {
+                        $tick_object->__Set( Field => 'EffectiveId',
+                                             Value => $ticket_map->{$ticket->{EffectiveId}} );
+                    } else {
+                        # sometimes we haven't converted the ticket we're pointing to
+                        # so save it for later
+                        push @{$ticket_merge_map->{$ticket->{EffectiveId}}}, $tick_object->id;
+                    }
+                }
+
+                if ( $ticket_merge_map->{$original_ticket_id} ) {
+                    # this ticket was reference in EffectiveId on another ticket
+                    # so load that ticket up and tell it our new Id
+                    my $merged_ticket = RT::Ticket->new($RT::SystemUser);
+                    my $tickets_to_fix = delete $ticket_merge_map->{$original_ticket_id};
+                    foreach my $ticket_id ( @$tickets_to_fix ) {
+                        $merged_ticket->LoadById( $ticket_id );
+                        $merged_ticket->__Set( Field => 'EffectiveId',
+                                               Value => $tick_object->Id );
+                    }
+                }
+            }
+
+
+            $ticket_map->{$original_ticket_id} = $tick_object->Id;
+
+            #import ticket transactions
+            foreach my $t ( @{ $temp{Transaction} } ) {
+                print "t";
+                encode_hashref($t);
+                # rt-3.4.x can have conflicting IDs
+                # due to non-ticket transactions.
+                my $old_id = $t->{'id'};
+                delete $t->{'id'};
+
+                if ($merge_on_import) {
+                    $t->{Ticket} = $tick_object->Id;
+                }
+                
+                $t->{'ActivateScrips'} = 0;
+                if ( $t->{'Type'} eq 'Status' ) {
+                    if ( $t->{'NewValue'} eq 'dead' ) {
+                        $t->{'NewValue'} = 'deleted';
+                    }
+
+                    if ( $t->{'OldValue'} eq 'dead' ) {
+                        $t->{'OldValue'} = 'deleted';
+                    }
+
+                }
+                if ( $t->{'Type'} =~ /^AddWatcher$/ ) {
+                    $t->{'NewValue'} ||= $RT::Nobody->Id;
+                    my $u = load_user( $t->{'NewValue'} );
+
+                    unless ( $u->Id ) {
+                        my $new_user = RT::User->new($RT::SystemUser);
+
+                        my ( $Val, $Message ) = $new_user->Create(
+                            Name         => $t->{'NewValue'},
+                            EmailAddress => (
+                                  $t->{'NewValue'} !~ /\s/
+                                ? $t->{'NewValue'}
+                                : undef
+                            ),
+                            RealName   => $t->{'NewValue'},
+                            Privileged => 0,
+                            Comments   => 'Autocreated when added as a watcher'
+                        );
+                        unless ($Val) {
+                            print "\nFailed to create user '"
+                              . $t->{'NewValue'} . "': "
+                              . $Message . "\n";
+                        }
+                        $u = load_user( $new_user->Id );
+                    }
+                    $t->{'NewValue'} = $u->Id;
+                }
+
+                if ( $t->{'Type'} =~ /^DelWatcher$/ ) {
+                    my $u = load_user( $t->{'OldValue'} || 'Nobody' );
+                    unless ( $u->Id ) {
+
+                        my $new_user = RT::User->new($RT::SystemUser);
+
+                        my ( $Val, $Message ) = $new_user->Create(
+                            Name         => $t->{'OldValue'},
+                            EmailAddress => (
+                                  $t->{'OldValue'} !~ /\s/
+                                ? $t->{'NewValue'}
+                                : undef
+                            ),
+                            RealName   => $t->{'OldValue'},
+                            Privileged => 0,
+                            Comments   => 'Autocreated when added as a watcher'
+                        );
+                        unless ($Val) {
+                            print STDERR "\nFailed to create user '"
+                              . $t->{'OldValue'} . "': "
+                              . $Message . "\n";
+
+                        }
+                        $u = load_user( $new_user->Id );
+                    }
+                    $t->{'OldValue'} = $u->Id;
+                }
+
+                if ( $t->{'Type'} eq 'Set' and $t->{'Field'} eq 'Queue' ) {
+                    $t->{'OldValue'} = $queue_map->{ $t->{'OldValue'} };
+                    $t->{'NewValue'} = $queue_map->{ $t->{'NewValue'} };
+
+                }
+
+                if ( $t->{'Type'} =~ /^(Force|Give|Take|Untake)$/ ) {
+                    $t->{'OldValue'} = $user_map->{ $t->{OldValue} }
+                      || $RT::Nobody->Id;
+                    $t->{'NewValue'} = $user_map->{ $t->{NewValue} }
+                      || $RT::Nobody->Id;
+                }
+
+ 		# Map Keywords into CustomFields.
+ 		if ( $t->{'Type'} eq 'Keyword' ) {
+ 		    $t->{'Type'} = 'CustomField';
+ 		    $t->{'Field'} = $cf_map->{ $t->{'Field'} };
+ 		}
+
+                my $trans_obj = RT::Transaction->new($RT::SystemUser);
+                $t->{'Creator'} = $user_map->{ $t->{'Creator'} };
+                my $attach = $t->{'Attachment'};
+                delete $t->{'Attachment'};
+
+                # encode_hashref($t);
+                my ($Val, $Message) = $trans_obj->Create( %{$t} );
+                unless ( $Val ) {
+                    print "Couldn't create trans  "
+                      . $old_id . $Message . "\n"
+                      . Dumper($t);
+                    exit;
+                }
+                my $id = $trans_obj->Id();
+                $transaction_map->{$old_id} = $id;
+
+                my $attachment_parent;
+                foreach my $a ( @{$attach} ) {
+ 		    print "a";
+ 		    $a->{'TransactionId'} =
+ 			$transaction_map->{$a->{'TransactionId'}};
+ 		    foreach my $k (keys %$a) {
+ 			next if ($k eq 'Content');
+ 			$a->{$k} = decode($ENCODING, $a->{$k});
+ 		    }
+                    if ( $a->{'Headers'} =~ /^Content-Type: (.*?)$/m
+ 			 || $a->{'ContentType'} =~ /(.*)/ ) {
+                        my $content_type = $1;
+                        if ( $content_type =~ qr{(text/|message/rfc822)}i )
+                        {
+                            my $enc;
+                            if ( $content_type =~
+                                /charset=['"]?(.*?)(\s|\'|\"|;|$)/ )
+                            {
+                                $enc = $1;
+                            }
+                            else {
+                                $enc = $ENCODING;    #DEFAULT;
+                            }
+			    $enc = $ENCODING unless $enc;
+                            $enc =~ s/"'//gi;
+			    $enc = lc($enc);
+
+                            unless ( $enc eq 'utf-8' || $enc eq 'utf8' ) {
+                                eval {
+                                    Encode::from_to( $a->{'Content'},
+                                        $enc => 'utf8' );
+                                    $a->{'Headers'} .=
+                                      "X-RT-Original-Encoding: $enc\n";
+                                };
+                                if ($@) {
+                                    print $@;
+                                    eval {
+                                        $enc = $ENCODING;
+                                        Encode::from_to( $a->{'Content'},
+                                            $enc => 'utf8' );
+                                        $a->{'Headers'} .=
+                                          "X-RT-Original-Encoding: $enc\n";
+                                    };
+                                }
+                                if ($@) { print $@ }
+
+                            }
+                        } elsif ($a->{'ContentEncoding'} eq 'base64') {
+                            # rt2 decodes base64-encoded attachments
+                            # upon export.
+                            $a->{'Content'}
+                                = MIME::Base64::encode_base64($a->{'Content'});
+                        } elsif ($a->{'Headers'} =~ /^Content-Transfer-Encoding: base64$/mi) {
+                            $a->{'Content'}
+                                = MIME::Base64::encode_base64($a->{'Content'});
+			    $a->{'ContentEncoding'} = 'base64';
+			}
+		    }
+
+                    my $att = RT::Attachment->new($RT::SystemUser);
+                    if ($merge_on_import) {
+                        delete $a->{id};
+                        # attachments point to other attachments internally,
+                        # but since we're renumbering attachments, Parent
+                        # needs to change too.  They should always be sequential
+                        # but be paranoid
+                        if ($a->{Parent} && !$attachment_parent) {
+                            die "Trying to remap $a->{Parent} but don't know where to remap it";
+                        }
+                        if ($a->{Parent} && $attachment_parent) {
+                            $a->{Parent} = $attachment_parent;
+                        }
+                    }
+                    my ( $attid, $attmsg ) = $att->Import( %{$a} );
+
+                    unless ( $att->Id ) {
+                        print "\nCouldn't create attachment " . $attmsg . "\n";
+                        delete $a->{'Content'};
+                        print Dumper ($a);
+                        print "\n" . $RT::Handle->dbh->errstr . "\n";
+                        die;
+                    }
+                    if ($merge_on_import && !$a->{Parent}) {
+                        # if Parent == 0, we might have children in following rows
+                        $attachment_parent = $att->Id;
+                    }
+                    # Import clobbers our setting of ContentEncoding
+                    # we maybe could store things as binaries in the DB
+                    # but since Attachment->OriginalContent and Attachment->Content
+                    # will decode things with ContentEncoding eq 'base64' we'll
+                    # set that properly instead.
+                    if ($a->{ContentEncoding} eq 'base64' 
+                        && $a->{ContentEncoding} ne $att->ContentEncoding) {
+                        $att->__Set(Field => 'ContentEncoding',
+                                    Value => $a->{ContentEncoding});
+                    }
+                }
+            }
+            print " remapped to ".$tick_object->Id;
+            client_import_ticket_extra($tick_object);
+            print "\n";
+        }
+    }
+}
+
+# }}}
+# {{{ import_user
+sub import_user {
+    my $user = shift;
+
+    $user->{'Name'} = "Unnamed user " . $user->{'id'}
+      unless ( $user->{'Name'} );
+    print "Loading user " . $user->{'Name'} . "\n";
+
+    if ( $user->{'Name'} eq 'Nobody' ) {
+        $user_map->{ $user->{'id'} } = $RT::Nobody->Id;
+        next;
+    }
+
+    if ( $user->{'Name'} eq 'RT_System' ) {
+        $user_map->{ $user->{'id'} } = $RT::SystemUser->Id;
+        next;
+    }
+
+    #         import user
+    my $user_obj = RT::User->new($RT::SystemUser);
+    delete $user->{'Disabled'};
+    my $old_id = $user->{'id'};
+    delete $user->{'id'};
+    $user->{'CryptedPassword'} = $user->{'Password'}
+      unless ( $user->{'Password'} =~ '^\*' );
+    delete $user->{'Password'};
+    $user_obj = load_user( $user->{'EmailAddress'} || $user->{'Name'} );
+
+    if ( $user_obj->Id ) {
+        if ($merge_on_import && 
+            $user->{Privileged}  && 
+            !$user_obj->Privileged) {
+            # a priviledged user sometimes needs ot be merged with an 
+            # auto-created user in the newer RT instance
+            $user_obj->SetPrivileged(1);
+            if ($user->{CryptedPassword}) {
+                $user_obj->__Set(Field => 'Password',
+                                 Value => $user->{CryptedPassword});
+            }
+            $user_obj->SetName($user->{Name}) if $user->{Name};
+            $user_obj->SetRealName($user->{RealName}) if $user->{RealName};
+        }
+    } else {
+        print "Creating new user for $user->{Name}\n";
+        my ( $uid, $umsg ) = $user_obj->Create( %{$user} );
+    }
+    
+    my $id = $user_obj->Id();
+    print "Failed to create user for" . scalar Dumper $user unless ($id);
+    $user_map->{$old_id} = $id;
+
+    client_import_user($user_obj);
+}
+
+# }}}
+
+sub check_import {
+    return if $merge_on_import;
+
+    my $queues = RT::Queues->new($RT::SystemUser);
+    $queues->UnLimit(); 
+    while ( my $queue = $queues->Next ) {
+        if ($queue->Name eq 'general') {
+            die "You have more than just the 'general' queue.\n" .
+                "If this is not a clean RT install, set \$merge_on_import " .
+                "to enable merging of tickets.";
+        }
+    }
+
+    my $tickets = RT::Tickets->new($RT::SystemUser);
+    $tickets->Limit( FIELD => 'id', OPERATOR => "!=", VALUE => "0" );
+    if ($tickets->Count > 0) {
+        die "You already have tickets in this RT install\n" .
+            "If this is not a clean RT install, set \$merge_on_import " .
+            "to enable merging of tickets.";
+    }
+}

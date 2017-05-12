@@ -1,0 +1,27 @@
+        [% FOREACH post = posts %]
+        <div class="post">
+          <h2 class="title"><a href="[% R('Post', post.year, post.month, post.slug) %]">[% post.title %]</a></h2>
+          <p class="byline">Posted by <a href="#">[% post.author %]</a></p>
+          <p class="date">[% post.posted_on.strftime(time_format) %]</p>
+          <div class="entry">
+            [% post.body %]
+          </div>
+          <div class="meta">
+            <p class="links"><a href="[% R('Post', post.year, post.month, post.slug) %]" class="comments">Comments ([% post.comment_count %])</a></p>
+          </div>
+        </div>
+        [% END %]
+
+        <div class="pager">
+          [% IF pager.previous_page %]
+            [% IF pager.previous_page == 1 %]
+          <h3 class="previous"><a href="[% R('Home') %]">Newer</a></h3>
+            [% ELSE %]
+          <h3 class="previous"><a href="[% R('Home', pager.previous_page) %]">Newer</a></h3>
+            [% END %]
+          [% END %]
+          [% IF pager.next_page %]
+          <h3 class="next"><a href="[% R('Home', pager.next_page)     %]">Older</a></h3>
+          [% END %]
+        </div>
+

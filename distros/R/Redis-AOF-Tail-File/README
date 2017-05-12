@@ -1,0 +1,53 @@
+Redis-AOF-Tail-File version 0.06
+================================
+
+This extension can be used for synchronous data asynchronously from redis to MySQL.
+Maybe you can code like below.
+
+  use DBI;
+  use Redis::AOF::Tail::File;
+  use Storable qw(retrieve store);
+
+  # variables in this comment should be defined
+  # $data_source, $username, $auth, \%attr,
+  # some_func_translate_redis_command_to_sql()
+
+  my $dbh = DBI->connect($data_source, $username, $auth, \%attr);
+  my $aof_file       = "/var/redis/appendonly.aof";
+  my $seek_stor_file = "/var/redis/seek_stor_file";
+  my $aof_seek_pos   = 'eof';
+  $aof_seek_pos   = ${retrieve $seek_stor_file} if -s $seek_stor_file;
+
+  my $redis_aof = Redis::AOF::Tail::File->new(aof_filename => $aof_file, seekpos => $aof_seek_pos);
+  while (my ($pos, $cmd) = $redis_aof->read_command)
+  {
+    my $sql = some_func_translate_redis_command_to_sql($cmd);
+    store \$pos, $seek_stor_file if $dbh->do($sql);
+  }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  File::Tail::Lite
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2014 by Chen Gang
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

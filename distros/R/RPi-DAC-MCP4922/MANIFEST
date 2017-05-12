@@ -1,0 +1,23 @@
+Changes
+docs/breadboard/.placeholder
+docs/breadboard/dac_adc_bb.jpg
+docs/datasheet/mcp48xx.pdf
+docs/datasheet/mcp49xx.pdf
+docs/fritzing/.placeholder
+docs/fritzing/dac_adc.fzz
+docs/schematic/.placeholder
+docs/schematic/dac_adc_schem.jpg
+examples/init_prototyping.pl
+examples/test.pl
+lib/RPi/DAC/MCP4922.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MCP4922.xs
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

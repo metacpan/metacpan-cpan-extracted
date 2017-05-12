@@ -1,0 +1,2 @@
+%# This exists for 4.0 compatibility
+<& /Callbacks/RTx-RemoteLinks/Elements/EditLinks/ExtraLinkInstructions, %ARGS &>

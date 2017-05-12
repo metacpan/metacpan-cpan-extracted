@@ -1,0 +1,21 @@
+---
+abstract: RT Authen-CookieAuth Extension
+author:
+  - 'Mike Peachey <zordrak@cpan.org>'
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: GPL version 2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: RT-Authen-CookieAuth
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+    - t
+requires:
+  RT: 0
+  RT::Authen::ExternalAuth: 0
+version: 0.02

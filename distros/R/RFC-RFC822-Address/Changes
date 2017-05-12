@@ -1,0 +1,35 @@
+Version 2009110701
+- Fix prerequisites.
+----
+Version 2009110701
+- Modernized Makefile.PL
+- Added POD and Kwalitee tests
+----
+Version 2009040601
+- Moved to git and github.
+- Modernization
+----
+Revision 1.5  2000/08/29 22:15:01  abigail
+Changed group rule to make <leftop> part greedy.
+  (Damian Conway/Douglas Wilson)
+Added a test; removed $DEBUG part, now prints message on failures.
+Changed wording of license (using BSD/X style).
+----
+Revision 1.4  1999/10/04 09:12:58  abigail
+Fixed typo in pod.
+----
+Revision 1.3  1999/10/04 09:07:23  abigail
+Parsing of comments.
+Completed (?) test suite. Added --debug option to test.pl, to print
+   what was being matched, and what the result of validation was.
+Changed package name to RFC::RFC822::Address, to cope for 5.004 users;
+   MacPerl is still on 5.004.
+----
+Revision 1.2  1999/10/02 10:08:48  abigail
+Grammar is now aware of the whitespace rules.
+Comment rules still have to be implemented.
+used h2xs.
+Created initial test.pl file.
+----
+Revision 1.1  1999/10/01 08:50:13  abigail
+Initial revision

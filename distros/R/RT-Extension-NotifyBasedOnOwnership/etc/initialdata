@@ -1,0 +1,70 @@
+use strict;
+use warnings;
+
+# Owner-dependent On Create/Correspond/Comment conditions
+our @ScripConditions = (
+    {
+        Name                 => 'On Create and Unowned',
+        Description          => 'When a ticket is created owned by Nobody',
+        ApplicableTransTypes => 'Create',
+        ExecModule           => 'Owner',
+        Argument             => 'Nobody',
+    }, {
+        Name                 => 'On Create and Owned',
+        Description          => 'When a ticket is created with an owner',
+        ApplicableTransTypes => 'Create',
+        ExecModule           => 'Owner',
+        Argument             => '*',
+    }, {
+        Name                 => 'On Correspond and Unowned',
+        Description          => 'Whenever correspondence comes in on a ticket owned by Nobody',
+        ApplicableTransTypes => 'Correspond',
+        ExecModule           => 'Owner',
+        Argument             => 'Nobody',
+    }, {
+        Name                 => 'On Correspond and Owned',
+        Description          => 'Whenever correspondence comes in on a ticket with an owner',
+        ApplicableTransTypes => 'Correspond',
+        ExecModule           => 'Owner',
+        Argument             => '*',
+    }, {
+        Name                 => 'On Comment and Unowned',
+        Description          => 'Whenever comments comes in on a ticket owned by Nobody',
+        ApplicableTransTypes => 'Comment',
+        ExecModule           => 'Owner',
+        Argument             => 'Nobody',
+    }, {
+        Name                 => 'On Comment and Owned',
+        Description          => 'Whenever comments comes in on a ticket with an owner',
+        ApplicableTransTypes => 'Comment',
+        ExecModule           => 'Owner',
+        Argument             => '*',
+    },
+);
+
+# Ticket-level notifications
+our @ScripActions = (
+    {
+        Name        => 'Notify Requestors and Ticket Ccs',
+        Description => 'Send mail to ticket-level Requestors and Ccs only',
+        ExecModule  => 'NotifyAtTicketLevel',
+        Argument    => 'Requestor,TicketCc',
+    }, {
+        Name        => 'Notify Owner and Ticket AdminCcs',
+        Description => 'Send mail to ticket-level Owner and AdminCcs only',
+        ExecModule  => 'NotifyAtTicketLevel',
+        Argument    => 'Owner,TicketAdminCc',
+    }, {
+        Name        => 'Notify Requestors and Ticket Ccs as Comment',
+        Description => 'Send mail to ticket-level Requestors and Ccs only',
+        ExecModule  => 'NotifyAtTicketLevelAsComment',
+        Argument    => 'Requestor,TicketCc',
+    }, {
+        Name        => 'Notify Owner and Ticket AdminCcs as Comment',
+        Description => 'Send mail to ticket-level Owner and AdminCcs only',
+        ExecModule  => 'NotifyAtTicketLevelAsComment',
+        Argument    => 'Owner,TicketAdminCc',
+    },
+);
+
+1;

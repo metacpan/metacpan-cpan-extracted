@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+PrayTime.cgi
+t/Religion-Islam-PrayTime.t
+lib/Religion/Islam/PrayTime.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

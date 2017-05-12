@@ -1,0 +1,45 @@
+<%INIT>
+    # vim: syn=mason
+    use IPC::Run;
+
+    my $TicketObj = RT::Ticket->new( $session{'CurrentUser'} );
+    $TicketObj->Load( $id );
+    Abort('No ticket specified') unless $id =~ /\d/;
+
+    $TicketObj->CurrentUser->PrincipalObj->HasRights( Object => $TicketObj );
+    
+    my $title = loc("#[_1]: [_2]", $TicketObj->Id, $TicketObj->Subject || '');
+
+    # Untaint - don't allow random components
+    ($tpl) = $tpl =~ m/([\w.-]+)/;
+
+    my $html = $m->scomp( "/Ticket/PDF/$tpl.html", id => $id );
+
+    # Use installed converter to do the work.
+    my ($out, $err);
+    my @cmd = ("$RT::LocalPath/bin/wkhtmltopdf",
+        qw{ --grayscale  --print-media-type  --disable-external-links  - - });
+
+    IPC::Run::run \@cmd, \$html, \$out, \$err
+        or Abort("Error: $err");
+
+    # Only show html that will be converted in debug mode.
+    if ($debug) {
+        $m->out( "<pre>$err</pre>" ) if $debug > 1;
+        $m->out( $html );
+        $m->abort;
+    }
+
+    # print pdf headers and content
+    my $fn = "RT_". $TicketObj->id . "-$tpl.pdf";
+    $r->content_type('application/pdf; charset=utf-8');
+
+    $r->headers_out->{'Content-disposition'} = "filename=$fn";
+    $m->out( $out );
+    $m->abort;
+</%INIT>
+<%ARGS>
+    $id    => undef
+    $tpl   => 'Display'
+    $debug => 0
+</%ARGS>

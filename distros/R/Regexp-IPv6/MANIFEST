@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Regexp-IPv6.t
+lib/Regexp/IPv6.pm
+META.yml                                 Module meta-data (added by MakeMaker)

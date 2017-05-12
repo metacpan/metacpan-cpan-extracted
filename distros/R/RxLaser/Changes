@@ -1,0 +1,8 @@
+Revision history for Perl extension RxLaser.
+
+0.01  Thu Oct 22 11:11:26 1998
+	- original version; created by h2xs 1.18
+0.14 
+	- used successfully for 485/487 forms
+0.15 Thu Jan 14 10:50:14 EST 1999
+	- gave up entirely on LetterGothic in favor of lineprinter

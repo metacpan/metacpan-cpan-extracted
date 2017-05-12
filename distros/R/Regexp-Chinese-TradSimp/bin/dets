@@ -1,0 +1,53 @@
+#!perl -w
+
+use strict;
+use utf8;
+
+use Encode;
+use Regexp::Chinese::TradSimp;
+
+=encoding utf8
+
+=head1 NAME
+
+dets - B<de>sensitise the B<t>raditional-B<s>implified nature of a
+string of Chinese characters.
+
+=head1 SYNOPSIS
+
+  % dets 鮮蝦韮菜餃
+
+=head1 USAGE
+
+  % grep `dets 燒賣` *menu*.txt
+
+=head1 DESCRIPTION
+
+Given a string of Chinese text, transforms it into another string
+containing a regexp that can be used to match both the simplified and
+the traditional version of that text.
+
+=cut
+
+my $text = join( " ", @ARGV );
+if ( $text ) {
+    $text = decode( "utf8", $text );
+    print Regexp::Chinese::TradSimp->desensitise( $text ) . "\n";
+}
+
+=head1 SEE ALSO
+
+L<Regexp::Chinese::TradSimp> - the module that does that actual transforming.
+
+=head1 AUTHOR
+
+Kake L Pugh <kake@earth.li>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010 Kake L Pugh.  All Rights Reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

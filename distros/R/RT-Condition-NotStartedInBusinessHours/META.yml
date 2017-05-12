@@ -1,0 +1,34 @@
+--- #YAML:1.0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Condition-NotStartedInBusinessHours
+version: 0.3
+abstract: 'Check for unstarted tickets within business hours'
+author:
+  - 'Benjamin Heisig <bheisig@synetics.de>'
+license: perl
+distribution_type: module
+requires:
+  perl: 5.10.0
+  Date::Manip: 6.34
+  rt: 4.0.0
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+no_index:
+  directory:
+    - etc
+    - inc
+    - t
+keywords:
+  - RT
+  - Request Tracker
+  - Business Hours
+  - Condition
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/bheisig/rt-condition-notstartedinbusinesshours.git
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=RT-Condition-NotStartedInBusinessHours
+generated_by: Benjamin Heisig <bheisig@synetics.de>

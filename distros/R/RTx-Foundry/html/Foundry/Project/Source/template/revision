@@ -1,0 +1,26 @@
+[%|l(rev)%]revision %1[%END%] - [% author || '(no author)' %] - [% date %]:<br />
+<p>
+[% msg | html | html_line_break %]
+</p>
+[% FOREACH path = paths %]
+[% path.value.action %] -
+[% IF path.value.isdir %]
+<a href="[% script %]/[% repos %]/browse[% path.key %]/?rev=[% rev %]">[% path.key %]</a>
+[% IF path.value.copyfrom %]
+<a href="[% script %]/[% repos %]/browse[% path.value.copyfrom %]/?rev=[% path.value.copyfromrev %]">[%|l(path.value.copyfrom, path.value.copyfromrev)%](from %1:%2)[%END%]</a>
+[% END %]
+
+[% ELSE %]
+[% IF path.value.action == 'D' %]
+[% path.key %]
+[% ELSE %]
+<a href="[% script %]/[% repos %]/log[% path.key %]#rev[% rev %]">[% path.key %]</a>
+<a href="[% script %]/[% repos %]/checkout[% path.key %]?rev=[% rev %]">[%|l%](checkout)[%END%]</a>
+[% END %]
+[% IF path.value.copyfrom %]
+<a href="[% script %]/[% repos %]/log[% path.value.copyfrom %]#rev[% path.value.copyfromrev %]">[%|l(path.value.copyfrom, path.value.copyfromrev)%](from %1:%2)[%END%]</a>
+[% END %]
+[% END %]
+
+<br />
+[% END %]

@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Regexp/NamedCaptures.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+SIGNATURE
+t/00signature.t
+t/01pod.t
+t/02pod-coverage.t
+t/03yaml.t
+t/10use.t
+t/11basic.t
+t/12quote.t
+t/14interp.t
+t/15code.t
+t/16regexp.t
+t/20validate.t
+t/21warn.t
+t/basic
+SIGNATURE    Added here by Module::Build

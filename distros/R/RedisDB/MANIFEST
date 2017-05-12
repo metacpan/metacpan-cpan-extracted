@@ -1,0 +1,32 @@
+Changes
+eg/no_raise_error_1.pl
+eg/server_failover.pl
+lib/RedisDB.pm
+lib/RedisDB/Cluster.pm
+lib/RedisDB/Error.pm
+lib/RedisDB/Sentinel.pm
+lib/Test/RedisDB.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/auth.t
+t/basic_redis.t
+t/cluster.t
+t/network.t
+t/no-leak.t
+t/redis_commands.t
+t/restore_subscriptions.t
+t/send_command_cb.t
+t/subscribe.t
+t/transactions.t
+t/url.t
+t/utf8.t
+util/benchmark.pl
+util/generate_key_positions.pl
+util/pipeline.pl
+xt/manifest.t
+xt/pod.t
+xt/podspell.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

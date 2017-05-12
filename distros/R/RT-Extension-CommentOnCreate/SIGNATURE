@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 407e65c1257159a56732e6ce10a79fc6e58f9ce5 Changes
+SHA1 9d8a1011204eae04efdf67d701cd140ad0d91449 MANIFEST
+SHA1 e5d392ce1ea12035e80f54a4706031ee9cb1e736 META.yml
+SHA1 d59185d3a7e0986e07266b6d68c6bf4fc27608c0 Makefile.PL
+SHA1 b28937b074d017105a644f40075a70b01355dc6c README
+SHA1 4f177a7a79d2234865049c36be47c8b5207349a8 html/Callbacks/RT-Extension-CommentOnCreate/Ticket/Create.html/AfterMessageBox
+SHA1 c7f42c957e17fa12adfdbdf84ffa6c7c7c888f7c html/Callbacks/RT-Extension-CommentOnCreate/Ticket/Display.html/BeforeDisplay
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 d44d96acd20793306dd201030c688e2a7d3083ee inc/Module/Install/Include.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 6e010ba20a9d0ae23d8d0ff516868c1e571c2d44 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 8a1b9a11dfa98fad3bf63757447fc7c28764cc06 lib/RT/Extension/CommentOnCreate.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSPaDAACgkQMflWJZZAbqCMxwCglq3/v+EDK//A0qTpiLQ5LXDl
+e6AAn26s2ovP/tQpGxQ8GTqRbG7W2v2m
+=FBcV
+-----END PGP SIGNATURE-----

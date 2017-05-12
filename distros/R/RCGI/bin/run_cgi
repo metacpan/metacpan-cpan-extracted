@@ -1,0 +1,89 @@
+#!/usr/local/bin/perl
+#
+# perl script to run a job remotely
+#
+
+use RCGI;
+
+my($base_url);
+my($as_text);
+my($nph);
+my($method);
+my($username);
+my($password);
+my($user_agent);
+my($timeout);
+my(%cgi_form);
+
+map {
+    if (/^\s*\-help/) {
+	Usage();
+    } elsif (/^\s*\-astext/) {
+	$as_text = 1;
+    } elsif (/^\s*\-direct/) {
+	$nph = 1;
+    } elsif (/^\s*\-timeout/) {
+	($timeout) = /\=(\d+)\s*/;
+    } elsif (/^\s*\-user_agent/) {
+	($user_agent) = /\=(.*)\s*/;
+    } elsif (/^\s*\-method\=/) {
+	$method = ( /\=[Gg][Ee][Tt]\s*/ ) ? 1 : 0;
+#	print STDERR "Method is: ", (($method) ? 'GET' : 'POST'), "\n";
+    } elsif (/^\s*\-username\=/) {
+	($username) = /\=(.*)\s*/;
+    } elsif (/^\s*\-password\=/) {
+	($password) = /\=(.*)\s*/;
+    } else {
+	if (!defined($base_url)) {
+	    $base_url = $_;
+	}
+	($param, $value) = /^\s*([^\=]+)\=(.*)\s*$/;
+	$cgi_form{$param} = $value;
+    }
+} @ARGV;
+
+if (!defined($base_url)) {
+    Usage();
+}
+
+my($result);
+$result = RCGI::run_cgi_command($base_url, \%cgi_form,
+				method => $method,
+				username => $username,
+				password => $password,
+				timeout => $timeout,
+				user_agent => $user_agent,
+				nph => $nph);
+
+
+# Strip HTML codes
+if ($as_text) {
+    my($new_result);
+    # Split on <TABLE> and </TABLE> to remove table's newlines
+    $result =~ s/\r//gm;
+    $result =~ s/\<[Tt][Aa][Bb][Ll][Ee][^\>]*\>/\r\<TABLE\>/gm;
+    $result =~ s/\<\/[Tt][Aa][Bb][Ll][Ee][^\>]*\>/\r/gm;
+    map {
+	if (/\<TABLE\>/) {
+	    s/\n//gm;
+	    s/\<\/[Tt][DdHh][^\>]*\>[\s\n]*/\t/gm;
+	    s/\<\/[Tt][Rr][^\>]*\>[\s\n]*/\n/gm;
+	    s/\<[Bb][Rr][^\>]*\>[\s\n]*/ /gm;
+	    s/ +/ /gm;
+	    s/\t\n/\n/gm;
+	} else {
+	    s/\<[Bb][Rr][^\>]*\>[\s\n]*/\n/gm;
+	}
+	s/\<[^\>]*\>//gm;
+	s/\&nbsp;/ /gm;
+	s/\&quot;/\'/gm;
+	$new_result .= $_;
+    } split("\r",$result);
+    $result = $new_result;
+}
+
+print $result;
+
+sub Usage {
+    die "Usage is: run_cgi http://base_url [-direct] [-timeout=#secs] [-user_agent=user_agent] [-astext] [-method={GET|POST}] [-username=user -password=password] [[parameter=value] [...]]\n";
+}

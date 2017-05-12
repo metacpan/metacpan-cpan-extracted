@@ -1,0 +1,14 @@
+Revision history for Perl extension Resource::Manager.
+
+0.03  Mon Apr 28 15:47:19 2003
+	- renamed 'code' to 'what'
+	- renamed 'args' to 'whatargs'
+	- added support for 'whenargs'. 
+	- added examples/subclass/
+
+0.02  Fri Apr 25 09:23:22 2003
+	- documentation overhaul
+	- added examples/synopsis.pl
+
+0.01  Wed Apr 23 16:33:30 2003
+	- original version

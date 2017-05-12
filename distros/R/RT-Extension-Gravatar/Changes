@@ -1,0 +1,29 @@
+Revision history for RT::Extension::Gravatar
+
+2.01 2016-09-08
+ - update Module::Install
+ - load Gravatar always by https
+ - improve Gravatar image position
+
+2.00 2016-03-11
+ - avoid duplicate callback code
+ - RT 4.4 compatibility
+
+1.01 2014-12-22
+ - update license from Perl to GPLv2 to match RT license
+ - update Module::Install
+
+1.00 2013-10-28
+ - use 'class' instead of 'id' attribute for the Gravatar div
+ - minor code improvements
+ - show Gravatar on User Summary page for RT 4.2
+ - update Module::Install for RT 4.2 compatibility
+
+0.03 2011-05-20
+ - update Module::Install for RT 4.0 compatibility
+
+0.02 2010-06-13
+ - update Module::Install
+
+0.01 2010-03-17
+ - initial release

@@ -1,0 +1,139 @@
+Revision history for Perl module RTx::Shredder
+
+v0.07
+    * fix: update requirement for module Exception::Class,
+           we need version 1.23.
+
+v0.06
+    Thanks to Philip Kime and Konstantin Naryzhniy for bug
+    reports and a lot of helpful debug information.
+    * fix: in the previouse version a regression was introduced
+           that caused terrible slowdown during tickets deletion.
+    * doc: added section about database indexes
+
+v0.05
+    * fea: no_tickets option in Users plugin
+    * fix: no validation of mail and name in Users plugin as
+           it's been broken
+    * fix: there was typo in the Users plugin
+    * fix: delete scrips with queues
+    * fix: with a template delete scrips using it
+    * fix: delete txns that refer to the current record with
+           ReferenceType, OldReference and NewReference fields
+    * fix: delete {Add,Del}Watcher transactions with principals
+    * fea: more tests
+
+v0.04
+    * fix: RT::Links->Next skip links that point to
+           deleted records, and we were leaving them too
+    * fix: any record may have links, move code into RT::Record
+           from RT::Ticket
+    * fea: delete AddLink transactions when wipe Link
+    * fea: more tests
+
+v0.03_03
+    * fix: typo in docs
+    * fix: load exceptions class where we use it
+
+v0.03_02
+    * fix: on some configurations Shredder WebUI was failing with
+           404 (not found) error
+
+v0.03_01
+    * WARN: API changes, see repository logs
+    * doc: new reworked INSTALLation instructions
+    * fea: initial DB transactions support
+    * fix: WebUI JavaScript in Opera and IE didn't work, now it
+           works in Opera and should work in IE (please test and report)
+    * fix: ObjectCFValues was not cleaned absolutly correct
+    * fea: $RT::ShredderStoragePath config option, see `perldoc RTx::Shredder`
+    * doc: API documentation
+    * fea: changes in errors handling code, no more useless stack traces
+
+v0.03
+    * no significant changes against 0.02_03
+
+v0.02_03
+    * api: mutliple values for the arguments of the plugins
+    * doc: docs in the Plugin class
+    * fea: --object has been deprecated by plugin 'Objects'
+
+v0.02_02
+	* fix: search for users by name fixed
+	* fix: returned patch because RT 3.4.0 and 3.4.1 has no code in mainline
+	* fea: check/uncheck all objects at once in WebUI
+	* api: generic mask handling via $plugin->ConvertMaskToSQL
+
+v0.02_01
+	* fea: Web interface
+	* fea: plugins framework
+	* fea: Plugins for Tickers, Attachments and Users
+	* fea: new CLI options: --plugin, --plugin list and --plugin help
+	* fea: messages from CLI now are more useful
+	* upd: doc updates
+	* fea: RTx::Shredder::PutObjects method now support array references
+	       you can put any objects PutObjects support into array.
+	* upd: constants description update
+	* fix: deletion of GroupMember object also delete CachedGroupMember records
+	       + tests
+	* fix: Group(ACLEquivalence), User deletion
+
+v0.02
+
+	* upd: update docs to be more consisten with current env
+	* upd: author email address changed
+	* upd: Makefile.PL requires RT 3.4 now
+	* upd: perltidy on the t/utils.pl
+	* upd: documentation about testing
+
+v0.01_03
+	* WARN: rtx-validator may fails, I don't update it
+	* fix: ObjectCFV issues
+	* fea: tests framework!!!
+	* upd: basic tests
+	* upd: 00skeleton.t file
+	* fea: shredder dies if some methods are redefined
+	       this is done to be forward compatible
+	       and die before we could break something
+	* upd: Todo changes
+
+v0.01_02
+	* WARN: basic RT >= 3.4.x support
+	* fix: Users shredding was not loaded at all
+	* fea: --force, never ask questions, for cron users
+	* fea: --sqldump, Shredder generates INSERT queries
+		that allow you restore DB after shredding
+	* inv: When delete users from groups we should delete delegated rights
+	* fix: SYNOPSYS in Shredder.pm has bad example
+	* fix: User should delete itself from GroupMembers and from Cached
+	* fix: CachedGroupMember should delete other CGMs that are 'Via' current
+	* upd: New documentation, README should be more clean
+	* fea: get rid of configure script and all .in files
+	       now we use Module::Install::Substitute
+	* upd: rtx-shredder args parsing cleanup
+	* upd: Distribution doesn't require Getopt::Simple any more
+	* fea: new --object option for rtx-shredder script
+	* fix: Transactions, ObjectCustomFieldValues, Attributes are handled
+
+v0.01_01
+	* WARN: this is last version you can use with RT 3.0.x
+	* fix: validator now works
+v0.01
+	* fea: rtx-validator
+	* fix: nested Attachments handling if Atachment is requested for wiping directly.
+	* fea: M::I::Skip integration, no more Shredder.pm.in installing
+	* fix: tests doesn't use old installation any more
+
+v0.00_03
+	* Disribution clean up, get rid from auto* files
+	* fix: Ticket vs Links handling
+	* fix: Ticket vs merged in parts
+	* Templates, Queues... cover
+	* Partly Users coverage
+	* Now almost all Objects in RT 3.0.x covered
+	* Big design rework
+
+v0.00_01
+	* Initial commit
+
+

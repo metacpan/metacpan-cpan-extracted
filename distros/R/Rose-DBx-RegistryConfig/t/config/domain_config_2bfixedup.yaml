@@ -1,0 +1,15 @@
+#
+# DOMAIN_CONFIG template
+#
+# Suppose that this is a template DOMAIN_CONFIG file.  It should not contain
+# passwords, so these will be "fixed up" using auto_load_fixups() and ROSEDBRC.
+#
+production:
+    defaults:
+        driver:     mysql
+        host:       the-almighty-production-server
+        username:   _user_dummy_
+        password:   _pass_dummy_
+    db1:
+    db2:
+    db3:

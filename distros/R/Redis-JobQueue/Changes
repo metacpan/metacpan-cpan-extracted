@@ -1,0 +1,239 @@
+Revision history for Redis::JobQueue package
+
+1.19 Fri Feb  24 2017
+    CHANGES:
+    - Ability to force re-connection with Redis on error ('reconnect_on_error' attribute).
+    - $DEFAULT_CONNECTION_TIMEOUT, $DEFAULT_OPERATION_TIMEOUT constants added.
+    - connection_timeout, operation_timeout attributes added.
+    - Added the service module Redis::JobQueue::Util.
+    - Attempt to protect against used_memory > maxmemory.
+    - Added the 'queue_length' method.
+
+1.18 Thu May  31 2016
+    BUGFIXES:
+    - Fix MANIFEST.
+
+1.17 Thu May  26 2016
+    BUGFIXES:
+    - Tests corrected.
+    - Require perl 5.10 core modules version.
+    - Data::Dumper 'Sparseseen' method not used now.
+
+1.16 Thu Sep  03 2015
+    CHANGES:
+    - In the parameters of the constructor 'redis' may be either a Redis object
+      or a server string or a hash reference of parameters to create a Redis object.
+    - Redis::JobQueue does not close connection to redis server (including '->quit' method)
+      if it was provided by user.
+
+1.15 Tue Oct  28 2014
+    CHANGES:
+    - Time::HiRes::time is used for storing internal attributes.
+    - Redis::JobQueue->queue_status returns a floating seconds since the epoch
+      for the following information related to the queue:
+      max_job_age, min_job_age, lifetime.
+    - The Redis::JobQueue->quit method does not close connection to Redis during
+      global destruction phase (Perl version 5.14 and above).
+    FIXES:
+    - Fixed test 't/01_JobQueue/16_utf8.t'
+
+1.13 Tue May  27 2014
+    CHANGES:
+    - Re-factoring of tests.
+
+1.12 Thu May  23 2014
+    CHANGES:
+    - Added argument 'check_maxmemory' to the Redis::JobQueue->new
+      (thanks to Danny Sterne).
+
+1.11 Fri Mar  14 2014
+    CHANGES:
+    - Change the port used for testing.
+
+1.10 Thu Feb  20 2014
+    CHANGES:
+    - Small test improvement.
+
+1.09 Fri Jan  10 2014
+    CHANGES:
+    - Added method Redis::JobQueue->get_next_job_id.
+
+1.08 Fri Nov  15 2013
+    CHANGES:
+    - Deleted argument 'encoding' from the Redis::JobQueue->new
+      (Starting with version 1.963, Redis module doesn't support encoding).
+
+1.07 Mon Oct  28 2013
+    CHANGES:
+    - Added to META.yml the list of the modules provided by this distribution.
+
+1.06  Fri Oct  25 2013
+    CHANGES:
+    - 'delete_job' removes job id record from the queue list.
+      This helps to properly diagnose cases when job data was removed by Redis OOM handler
+      rather than explicitly deleted by user.
+    - Use single hash for storing all job data on Redis server.
+    - Removed 'NS_METADATA_SUFFIX' constant.
+    FIXES:
+    - Fix runtime loading of Test::*
+
+1.05  Wed Sep  18 2013
+    CHANGES:
+    - Use Try::Tiny for proper preservation of $@ .
+
+1.04  Thu Sep  05 2013
+    CHANGES:
+    - Method 'clear_variability' renamed to 'clear_modified'.
+    - Redis server updates only updated data, if you change the metadata,
+      not all of the metadata.
+    - Change the 'completed' attribute sets 'failed' to 0,
+      the change 'failed' sets 'completed' to 0.
+      The attributes 'completed' and 'failed' are mutually exclusive.
+    - Method 'update_job' accesses the Redis server only if there is some
+      data to update.
+    FIXES:
+    - $@ is localized before we attempt to catch an exception.
+
+1.03  Tue Jun  25 2013
+    FIXES:
+    - Added description of the Redis::JobQueue::Job attributes:
+      'progress', 'message'.
+
+1.02  Mon Jun  17 2013
+    CHANGES:
+    - Added standard job field: Time when job was 'failed' (user settable).
+    - Added a method 'last_error'.
+
+    FIXES:
+    - 'add_job', 'update_job', 'load_job' not cause 'clear_variability' for metadata.
+
+1.01  Tue May  28 2013
+    CHANGES:
+    - Minor changes in documentation.
+
+    FIXES:
+    - Checking OS in Makefile.PL
+      Tests hang on Windows.
+
+1.00  Mon May  07 2013
+
+    !!! This is a major upgrade that changes API. It's strongly advised to study
+    revised documentation and update your code where necessary !!!
+
+    CHANGES:
+    - Needs Redis server version 2.6 or higher as module uses Redis Lua scripting.
+    - Improved handling of transactions.
+    - Method Redis::JobQueue::Job->job_attributes returns a sorted list.
+    - Fields 'result' and 'workload':
+      It is possible to use any data structure (SCALAR, HASH, ARRAY, OBJECT).
+      It is automatically serialized.
+      Allowable size of the data is determined based on the size of the
+      serialized string.
+    - Added standard job fields:
+      Times when job was: 'created', 'started', 'completed', 'updated'
+      (user settable),
+      Job 'progress' (0...1) and arbitrary status 'message'.
+      Appropriate methods added.
+    - The job 'updated' field automatically changes with every change to a job.
+    - Added a method 'Redis::JobQueue::Job->elapsed'.
+    - A set of constants to reflect job status:
+      CREATED, WORKING, FAILED, COMPLETED, the user can specify own value
+      for status.
+      Moved from module Redis::JobQueue to module Redis::JobQueue::Job.
+    - Added working with the jobs metadata
+      (additional information related to the job):
+      It is automatically serialized.
+      Methods 'Redis::JobQueue::Job->meta_data',
+      'Redis::JobQueue->get_job_meta_fields'.
+    - Constant MAX_DATASIZE moved to module Redis::JobQueue.
+    - No longer used constants EMAXMEMORYPOLICY, STATUS_DELETED, EXPIRE_DELETED.
+    - Added a method 'queue_status' for monitoring the state of the queue.
+    - Method 'get_job_status' removed.
+      Method 'get_job_data' added instead for receiving data from the standard
+      set of fields.
+    - Method 'delete_job' removes Redis data structures that are associated
+      with the job.
+    - Method 'get_jobs' renamed to 'get_job_ids'.
+      Jobs can be filtered by queue name or status.
+    - Method 'add_job' updates Redis::JobQueue::Job object, if it was passed
+      as the first argument.
+    - 'encoding => undef' for Redis used, if 'new' invoked without
+      the first argument being an object of 'Redis::JobQueue' or 'Redis' class.
+    - Exception for not serialized utf8 text fields, when Redis object set
+      to 'encoding => undef'.
+    - Added test using 'utf8' data (t/01_JobQueue/t_utf8.t).
+    - Added new functionality testing.
+    - Change to user-friendly constant names.
+
+0.16  Tue Mar  12 2013
+    CHANGES:
+    - Added method 'server'
+
+0.15  Tue Mar  12 2013
+    BUGFIXES:
+    - Attribute 'attribute' renamed 'meta_data'
+
+0.14  Mon Mar  11 2013
+    CHANGES:
+    - Attribute 'attribute' renamed 'meta_data'
+    - Methods 'check_job_...' renamed 'get_job_...'
+
+0.13  Sat Mar  09 2013
+    CHANGES:
+    - Attribute 'attribute' in the structure of jobs added
+
+0.12  Fri Mar  08 2013
+    CHANGES:
+    - The tests are executed even if the installed Redis server is not running
+
+0.11  Fri Mar  08 2013
+    CHANGES:
+    - Added method 'ping'
+
+0.10  Mon Feb  26 2013
+    CHANGES:
+    - Error codes returned by last_errorcode method complies with an array
+      of descriptions @Redis::JobQueue::ERROR
+
+0.09  Wed Feb  13 2013
+    CHANGES:
+    - 'new' indirectly detects no connection to the Redis server
+
+0.08  Tue Dec  18 2012
+    CHANGES:
+    - The 'job' attribute of the job performs only informational role
+    - Checking Perl version in Makefile.PL
+
+0.07  Wed Sep  26 2012
+    CHANGES:
+    - The 'get_next_job' can take a queue name or a reference to an array of queue names
+
+0.06  Thu Sep  13 2012
+    BUGFIXES:
+    - The 'get_next_job' method work correctly when 'blocking' is true
+
+0.05  Mon Sep  10 2012
+    CHANGES:
+    - Author and release tests moved to 'xt' directory
+
+    BUGFIXES:
+    - Eliminate unnecessary Data::UUID object construction
+
+0.04  Sat Sep  01 2012
+    BUGFIXES:
+    - t/00_Job/01_new.t
+      Disable checking leads to "Out of memory!" for systems with limited memory
+
+0.03  Thu Aug  30 2012
+    CHANGES:
+    - Added test 't/94_fixme.t'
+
+    BUGFIXES:
+    - Fixed version number to 'use 5.010'
+
+0.02  Tue Aug  28 2012
+    BUGFIXES:
+    - Minor changes in documentation
+
+0.01  Mon Aug  27 2012
+    - Original version

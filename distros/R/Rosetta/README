@@ -1,0 +1,67 @@
+                                  Rosetta
+---------------------------------------------------------------------------
+
+by Darren Duncan <perl@DarrenDuncan.net>
+
+PREFACE
+
+This distribution features the Perl 5 module named "Rosetta", as well as
+"Rosetta::Model" and "Rosetta::Validator" and "Rosetta::Engine::Example";
+see the files lib/Rosetta.pm, lib/Rosetta/Model.pm and
+lib/Rosetta/Language.pod for the roots of the main documentation, which is
+in POD format, plus the Dependencies and Copyright (temporarily, also see
+lib/Rosetta/Overview.pod, lib/Rosetta/TODO.pod, and lib/Rosetta/Copying.pod
+for more of the same).  The distribution also includes a Changes file to
+say what changes already happened, and a TODO file to say what changes have
+yet to happen.  The file INSTALL should help with installation issues.  The
+extra file docs/OSCON2005LightningTalk.txt contains a snapshot of what
+Rosetta both was and was intended to be as of early 2005.08; it is the
+pristine text of a brief talk I gave then.  The extra file
+docs/OSCON2006SessionProposal.txt contains a similar snapshot for early
+2006.02; it proposes a 45 minute talk that ended up non-approved.  Read
+below for how to get support or keep up to date.
+
+KEEPING UP TO DATE
+
+My module set is constantly under development.  The canonical copies are
+all linked to through my website, "http://www.DarrenDuncan.net/", on the
+page called "Perl Libraries I Made" (name subject to change).
+
+For those of you that are interested in the bleeding edge of development, I
+have all parts of this "Rosetta" distribution in one or more public
+Subversion repositories; these repositories only contain revisions made in
+mid-2005 and later.  The "Rosetta" modules exist in 2 distinct code major
+bases, separated by a ground-up rewrite process.  The first major code
+base, whose development had started in late 2002 and ended as of 2005.09.28
+(but for a retroactive 2006.01.13 release that was as-of 2005.09.29), is at
+"http://svn.utsl.gen.nz/trunk/Rosetta-old/".  The second major code base,
+whose development had started on 2005.09.30 and continues thru to the
+present, is available in 2 parallel versions at
+"http://svn.openfoundry.org/pugs/ext/Rosetta/" (Perl 6) and at
+"http://svn.utsl.gen.nz/trunk/Rosetta/" (Perl 5).
+
+You can download slightly older versions of all of my modules from the
+public CPAN archives at "http://www.cpan.org/authors/id/D/DU/DUNCAND/", or
+on my own web server at "http://www.DarrenDuncan.net/d/perl".
+
+CPAN also extracts the POD from modules and maintains that documentation in
+an organized and searchable fashion.  Their main search site is at
+"http://search.cpan.org", and my own DUNCAND author page is at
+"http://search.cpan.org/search?author=DUNCAND".
+
+You can download my oldest tarred and gzipped distributions from BACKPAN,
+at "http://history.perl.org/backpan/authors/id/D/DU/DUNCAND/", or from my
+web server, at "http://www.DarrenDuncan.net/d/perl/archives/", right back
+to the libdwg 1.0, first released on 2000 July 23.
+
+SUPPORT
+
+Currently I don't have any support arranged with other people, lists,
+newsgroups, or otherwise.  Feel free to ask me if you can't figure things
+out on your own, or another person whom you know has used this.  I may
+start a mailing list for support issues later, so that users of my modules
+can help each other with them.
+
+FIN
+
+Share and Enjoy!

@@ -1,0 +1,13 @@
+0.03  2016-09-09
+    - remove "from initial collection" debug log
+
+0.02  2016-09-09
+    - fix some corner cases in ExcludedDates filter
+    - debug logging for filters and choosers
+    - testing infrastructure
+    - reduce log level for "no automatic assignment config"
+    - add an evaluation context for dry_run and filtering/choosing at a time
+          other than "now"
+
+0.01  2016-08-19
+    - initial release

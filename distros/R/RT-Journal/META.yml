@@ -1,0 +1,12 @@
+name: RT-Journal
+version: 0.03
+abstract: RT Journal Extension
+author: Jesse Vincent <jesse@bestpractical.com>
+license: GPLv2
+distribution_type: module
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+generated_by: Module::Install version 0.33

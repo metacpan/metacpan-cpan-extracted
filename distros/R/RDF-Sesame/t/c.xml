@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tableQueryResult>
+	<header>
+		<columnName>date</columnName>
+		<columnName>child_count</columnName>
+	</header>
+	<tuple>
+		<literal>2006-01-03</literal>
+
+		<literal>1</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-23</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+
+		<literal>2006-01-06</literal>
+		<literal>1</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-21</literal>
+		<literal>0</literal>
+	</tuple>
+
+	<tuple>
+		<literal>2006-01-09</literal>
+		<literal>1</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-20</literal>
+		<literal>0</literal>
+
+	</tuple>
+	<tuple>
+		<literal>2006-01-12</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-15</literal>
+
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-29</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+
+		<literal>2006-01-04</literal>
+		<literal>1</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-08</literal>
+		<literal>1</literal>
+	</tuple>
+
+	<tuple>
+		<literal>2006-01-17</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-07</literal>
+		<literal>1</literal>
+
+	</tuple>
+	<tuple>
+		<literal>2006-01-16</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-01</literal>
+
+		<literal>1</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-02</literal>
+		<literal>1</literal>
+	</tuple>
+	<tuple>
+
+		<literal>2006-01-05</literal>
+		<literal>1</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-10</literal>
+		<literal>1</literal>
+	</tuple>
+
+	<tuple>
+		<literal>2006-01-11</literal>
+		<literal>1</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-22</literal>
+		<literal>0</literal>
+
+	</tuple>
+	<tuple>
+		<literal>2006-01-24</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-25</literal>
+
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-26</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+
+		<literal>2006-01-27</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-28</literal>
+		<literal>0</literal>
+	</tuple>
+
+	<tuple>
+		<literal>2006-01-30</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-13</literal>
+		<literal>0</literal>
+
+	</tuple>
+	<tuple>
+		<literal>2006-01-14</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-18</literal>
+
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+		<literal>2006-01-19</literal>
+		<literal>0</literal>
+	</tuple>
+	<tuple>
+
+		<literal>2006-01-31</literal>
+		<literal>0</literal>
+	</tuple>
+</tableQueryResult>

@@ -1,0 +1,21 @@
+                                            $Date: 1998/03/13 23:10:00 $
+
+These are features that would be nice to have and might even happen someday.
+The order of items does not reflect priority.
+
+  o  Save the result dump in a file for batch mode
+
+  o  Save the arguments in a file for queued batch mode
+
+  o  Log RCGI load balancing jobs
+
+  o  Change run_cgi_command to do multipart/form-data by passing a subroutine
+     for the content (not pull all of the content into memory--just an upload
+     file at a time) (like REDIRECT_MFORM.pm does)
+
+  o  More documentation
+
+  o  More tests
+
+  o  Fix bugs, if there are any...
+

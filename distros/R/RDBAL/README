@@ -1,0 +1,46 @@
+Copyright 1998, Washington University School of Medicine,
+Institute for Biomedical Computing. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. 
+
+This perl library uses perl5 objects to make it easy to retrieve information
+about a particular Sybase ,MS SQL, or Oracle databases's schema.  The database
+connection is cached in the schema object. Objects and their fields properties
+and index information are retrieved when the schema object is created. Table
+relationship information is retrieved for all tables when the first
+relationship information is requested. 
+
+
+Schema information available includes: 
+
+Objects: tables, views, and procedures 
+Objects' fields (or parameters) 
+Objects' fields' properties: type, length, precision, scale, identity column,
+     nullable 
+Tables' indexes and primary keys 
+Parent => child relations between tables including primary key/foreign key
+     equivalences. 
+Views' and Procedures' definitions (Comments). 
+A view's underlying tables. 
+
+
+INSTALLATION: 
+
+If you wish to change the location of the schema cache directory from the
+default value of '/usr/local/schema_cache', edit Config.pm.
+
+If you wish to add new lower layers or change the search/preference order
+for the middlelayes, edit Config.pm.
+
+To install this package, just change to the directory in which this file is
+found and type the following: 
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+and to create the schema cache directory:
+
+	make schema_cache

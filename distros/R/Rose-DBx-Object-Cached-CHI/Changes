@@ -1,0 +1,82 @@
+Revision history for Perl module Rose::DBx::Object::Cached::CHI
+
+0.22 Fri Oct 26 08:41:31 EDT 2012
+    - Make sure cache sets are successful.  If the object cannot
+      be remembered clear it from the cache so that inconsistencies
+      do not exist between saved objects in the DB and the cache.
+
+      An example would be if the size of a new object is too large
+      to store in Memcached and gets rejected without clearing the 
+      previous value.  The new value would be stored in the DB 
+      while the cache value would remain as the old value.
+
+      - For unique key storage all keys must be defined
+
+0.21 Thu Oct  4 19:39:29 EDT 2012
+    - Same created_at fix but for Objects by ID
+
+0.20 Mon Oct  1 13:51:17 EDT 2012
+    - Fix for calling created_at on undef value
+
+0.19 Mon Aug 20 00:28:47 EDT 2012
+    - Keep modified columns from original object
+      when saving to cache
+
+0.17 Sat Nov 14 22:40:49 EST 2009
+    - Fix for columns that use aliases.  
+      Need to call the column's accessor function
+
+0.16 Thu Aug  6 09:26:16 EDT 2009
+    - set $expire_in variable to reduce function calls in remember()
+    - Making is_cached_in_sync an OPTIONAL function that MUST BE TURNED ON
+      The extra call to get the CHI object slows down speed of the module considerably
+    - Also made the default memory store work with the latest version of CHI
+
+0.14 Thu Feb  5 20:53:10 EST 2009
+    - The CHI Object is returning undef even if the set is successful.  This appears to be something
+      within the CHI module, but needs to be investigated further.  For now the workaround proposed 
+      by Chris Alef is being used.
+    - LEVEL seperators were changed to '&' for full compatibility with memcached. Thanks to Joshua Braegger.
+
+
+0.13 Sat Dec  6 10:00:01 EST 2008
+    - Needed to acount for columns that have triggers associted with them.  CODEREFs were not being
+      handeled correctly by Storable.
+
+0.12 Tue Nov 11 01:24:48 EST 2008
+    - Too many function calls occuring in remember(). Created a safe object at the top of the subroutine
+      to be used for all the cache set() calls. Thanks David Bourget
+
+0.11 Mon Nov 10 22:59:04 EST 2008
+    - Sorry for all the updates so close together, actually wrote some more tests.  Found bugs.
+    - Check for valid response on setting objects. Thanks David Bourget
+    - Some objects were not expiring correctly.  This has been fixed with a call directly to the meta class
+
+0.08
+    - Since save() ends up calling the insert() or the update() methods we do not need to also implement save()
+
+0.07 Mon Sep 22 18:29:44 EDT 2008
+    - Adding a default_cached_objects_settings class method 
+    - Fixed how expires_in is checked
+    - Adding local insert and update methods so these objects will be remembered by the cache.
+
+0.06 Mon Sep 22 11:14:26 EDT 2008
+    - Fixed perldoc
+
+0.05 Sun Sep 21 19:52:01 EDT 2008
+    - Fixed number of tests to skip if no DB
+    - use Rose::DB::Object::Helpers ()
+
+0.04 Sat Sep 20 00:38:38 EDT 2008
+    - Included all tests in the MANIFEST file
+    - Removed un-needed commented out code
+    - Now reference functions that did not change from Rose::DB::Object::Cached 
+    - Renamed subs clone and strip to internal names as not to conflict with Rose::DB::Object::Helpers
+
+0.03 Fri Sep 19 10:38:38 EDT 2008
+    - first working version deployed to CPAN
+
+0.01 Thu Sep 18 16:08:20 2008
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

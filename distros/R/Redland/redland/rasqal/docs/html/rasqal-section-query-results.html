@@ -1,0 +1,631 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Query Results</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Rasqal RDF Query Library Manual">
+<link rel="up" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="prev" href="rasqal-section-query.html" title="Query">
+<link rel="next" href="rasqal-section-query-results-formatter.html" title="Query Results Formatter">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="rasqal.html" title="Rasqal Overview">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="rasqal-section-query.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt01.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Rasqal RDF Query Library Manual</th>
+<td><a accesskey="n" href="rasqal-section-query-results-formatter.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2578169" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2607625" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="rasqal-section-query-results"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2578169"></a><span class="refentrytitle">Query Results</span>
+</h2>
+<p>Query Results &#8212; Query results as variable bindings, boolean or RDF graphs.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a>;
+void        <a href="rasqal-section-query-results.html#rasqal-free-query-results">rasqal_free_query_results</a>       (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-finished">rasqal_query_results_finished</a>   (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+const unsigned char* <a href="rasqal-section-query-results.html#rasqal-query-results-get-binding-name">rasqal_query_results_get_binding_name</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results,
+                                             int offset);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-query-results.html#rasqal-query-results-get-binding-value">rasqal_query_results_get_binding_value</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results,
+                                             int offset);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-query-results.html#rasqal-query-results-get-binding-value-by-name">rasqal_query_results_get_binding_value_by_name</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results,
+                                             unsigned char *name);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-get-bindings">rasqal_query_results_get_bindings</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results,
+                                             unsigned char ***names,
+                                             <a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> ***values);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-get-bindings-count">rasqal_query_results_get_bindings_count</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-get-boolean">rasqal_query_results_get_boolean</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-get-count">rasqal_query_results_get_count</a>  (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-triples.html#raptor-statement"
+>raptor_statement</a>* <a href="rasqal-section-query-results.html#rasqal-query-results-get-triple">rasqal_query_results_get_triple</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-is-bindings">rasqal_query_results_is_bindings</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-is-boolean">rasqal_query_results_is_boolean</a> (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-is-graph">rasqal_query_results_is_graph</a>   (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-next">rasqal_query_results_next</a>       (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-next-triple">rasqal_query_results_next_triple</a>
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);
+int         <a href="rasqal-section-query-results.html#rasqal-query-results-write">rasqal_query_results_write</a>      (<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-iostream.html#raptor-iostream"
+>raptor_iostream</a> *iostr,
+                                             <a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *results,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *format_uri,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *base_uri);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2607625"></a><h2>Description</h2>
+<p>
+A query results object is only ever constructed by the internal
+query engine evaluating a <a href="rasqal-section-query.html#rasqal-query"><span class="type">rasqal_query</span></a> with <a href="rasqal-section-query.html#rasqal-query-execute"><code class="function">rasqal_query_execute()</code></a>.
+It provides interface to the multiple types of result supported.
+</p>
+<p>
+There are a large set of methods for returning all or parts of a
+variable binding query result including the names, values or
+individuals.  A boolean result is straightforward to get with
+<a href="rasqal-section-query-results.html#rasqal-query-results-get-boolean"><code class="function">rasqal_query_results_get_boolean()</code></a> and an RDF graph returns a
+sequence of raptor triples than can be easily passed to the Raptor
+library for serializing to a syntax.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2607678"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2607688"></a><h3>
+<a name="rasqal-query-results"></a>rasqal_query_results</h3>
+<a class="indexterm" name="id2607700"></a><pre class="programlisting">rasqal_graph_query_results* query_results;
+</pre>
+<p>
+Rasqal query results class.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2607720"></a><h3>
+<a name="rasqal-free-query-results"></a>rasqal_free_query_results ()</h3>
+<a class="indexterm" name="id2607732"></a><pre class="programlisting">void        rasqal_free_query_results       (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Destructor - destroy a rasqal_query_results.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2617717"></a><h3>
+<a name="rasqal-query-results-finished"></a>rasqal_query_results_finished ()</h3>
+<a class="indexterm" name="id2617730"></a><pre class="programlisting">int         rasqal_query_results_finished   (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Find out if binding results are exhausted.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if results are finished or query failed
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2617799"></a><h3>
+<a name="rasqal-query-results-get-binding-name"></a>rasqal_query_results_get_binding_name ()</h3>
+<a class="indexterm" name="id2617812"></a><pre class="programlisting">const unsigned char* rasqal_query_results_get_binding_name
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results,
+                                             int offset);</pre>
+<p>
+Get binding name for the current result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>offset</code></em>&#160;:</span></td>
+<td> offset of binding name into array of known names
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a pointer to a shared copy of the binding name or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2617905"></a><h3>
+<a name="rasqal-query-results-get-binding-value"></a>rasqal_query_results_get_binding_value ()</h3>
+<a class="indexterm" name="id2617918"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_query_results_get_binding_value
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results,
+                                             int offset);</pre>
+<p>
+Get one binding value for the current result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>offset</code></em>&#160;:</span></td>
+<td> offset of binding name into array of known names
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a pointer to a shared <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> binding value or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621451"></a><h3>
+<a name="rasqal-query-results-get-binding-value-by-name"></a>rasqal_query_results_get_binding_value_by_name ()</h3>
+<a class="indexterm" name="id2621465"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_query_results_get_binding_value_by_name
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results,
+                                             unsigned char *name);</pre>
+<p>
+Get one binding value for a given name in the current result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> variable name
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a pointer to a shared <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> binding value or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621563"></a><h3>
+<a name="rasqal-query-results-get-bindings"></a>rasqal_query_results_get_bindings ()</h3>
+<a class="indexterm" name="id2621577"></a><pre class="programlisting">int         rasqal_query_results_get_bindings
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results,
+                                             unsigned char ***names,
+                                             <a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> ***values);</pre>
+<p>
+Get all binding names, values for current result.
+</p>
+<p>
+If names is not NULL, it is set to the address of a shared array
+of names of the bindings (an output parameter).  These names
+are shared and must not be freed by the caller
+</p>
+<p>
+If values is not NULL, it is set to the address of a shared array
+of <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a>* binding values.  These values are shaerd
+and must not be freed by the caller.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>names</code></em>&#160;:</span></td>
+<td> pointer to an array of binding names (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>values</code></em>&#160;:</span></td>
+<td> pointer to an array of binding value <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if the assignment failed
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621716"></a><h3>
+<a name="rasqal-query-results-get-bindings-count"></a>rasqal_query_results_get_bindings_count ()</h3>
+<a class="indexterm" name="id2621730"></a><pre class="programlisting">int         rasqal_query_results_get_bindings_count
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Get the number of bound variables in the result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> &lt;0 if failed or results exhausted
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621799"></a><h3>
+<a name="rasqal-query-results-get-boolean"></a>rasqal_query_results_get_boolean ()</h3>
+<a class="indexterm" name="id2621812"></a><pre class="programlisting">int         rasqal_query_results_get_boolean
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Get boolean query result.
+</p>
+<p>
+The return value is only meaningful if this is a boolean
+query result - see <a href="rasqal-section-query-results.html#rasqal-query-results-is-boolean"><code class="function">rasqal_query_results_is_boolean()</code></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> boolean query result - &gt;0 is true, 0 is false, &lt;0 on error or finished
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622994"></a><h3>
+<a name="rasqal-query-results-get-count"></a>rasqal_query_results_get_count ()</h3>
+<a class="indexterm" name="id2623007"></a><pre class="programlisting">int         rasqal_query_results_get_count  (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Get number of bindings so far.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> number of bindings found so far or &lt; 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623075"></a><h3>
+<a name="rasqal-query-results-get-triple"></a>rasqal_query_results_get_triple ()</h3>
+<a class="indexterm" name="id2623088"></a><pre class="programlisting"><a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-triples.html#raptor-statement"
+>raptor_statement</a>* rasqal_query_results_get_triple
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Get the current triple in the result.
+</p>
+<p>
+The return value is a shared <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-triples.html#raptor-statement"
+><span class="type">raptor_statement</span></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-triples.html#raptor-statement"
+><span class="type">raptor_statement</span></a> or NULL if failed or results exhausted
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623176"></a><h3>
+<a name="rasqal-query-results-is-bindings"></a>rasqal_query_results_is_bindings ()</h3>
+<a class="indexterm" name="id2623189"></a><pre class="programlisting">int         rasqal_query_results_is_bindings
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Test if rasqal_query_results is variable bindings format.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if true
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623258"></a><h3>
+<a name="rasqal-query-results-is-boolean"></a>rasqal_query_results_is_boolean ()</h3>
+<a class="indexterm" name="id2623271"></a><pre class="programlisting">int         rasqal_query_results_is_boolean (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Test if rasqal_query_results is boolean format.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if true
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623339"></a><h3>
+<a name="rasqal-query-results-is-graph"></a>rasqal_query_results_is_graph ()</h3>
+<a class="indexterm" name="id2623352"></a><pre class="programlisting">int         rasqal_query_results_is_graph   (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Test if rasqal_query_results is RDF graph format.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if true
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623419"></a><h3>
+<a name="rasqal-query-results-next"></a>rasqal_query_results_next ()</h3>
+<a class="indexterm" name="id2623431"></a><pre class="programlisting">int         rasqal_query_results_next       (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Move to the next result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if failed or results exhausted
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623498"></a><h3>
+<a name="rasqal-query-results-next-triple"></a>rasqal_query_results_next_triple ()</h3>
+<a class="indexterm" name="id2623511"></a><pre class="programlisting">int         rasqal_query_results_next_triple
+                                            (<a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *query_results);</pre>
+<p>
+Move to the next triple result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if failed or results exhausted
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2618296"></a><h3>
+<a name="rasqal-query-results-write"></a>rasqal_query_results_write ()</h3>
+<a class="indexterm" name="id2618308"></a><pre class="programlisting">int         rasqal_query_results_write      (<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-iostream.html#raptor-iostream"
+>raptor_iostream</a> *iostr,
+                                             <a href="rasqal-section-query-results.html#rasqal-query-results">rasqal_query_results</a> *results,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *format_uri,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *base_uri);</pre>
+<p>
+Write the query results to an iostream in a format.
+</p>
+<p>
+This uses the <a href="rasqal-section-query-results-formatter.html#rasqal-query-results-formatter"><span class="type">rasqal_query_results_formatter</span></a> class
+and the <a href="rasqal-section-query-results-formatter.html#rasqal-query-results-formatter-write"><code class="function">rasqal_query_results_formatter_write()</code></a> method
+to perform the formatting. See
+<a href="rasqal-section-query-results-formatter.html#rasqal-query-results-formats-enumerate"><code class="function">rasqal_query_results_formats_enumerate()</code></a> 
+for obtaining the supported format URIs at run time.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>iostr</code></em>&#160;:</span></td>
+<td> <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-iostream.html#raptor-iostream"
+><span class="type">raptor_iostream</span></a> to write the query to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>results</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query-results.html#rasqal-query-results"><span class="type">rasqal_query_results</span></a> query results format
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>format_uri</code></em>&#160;:</span></td>
+<td> <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+><span class="type">raptor_uri</span></a> describing the format to write (or NULL for default)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+><span class="type">raptor_uri</span></a> base URI of the output format
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

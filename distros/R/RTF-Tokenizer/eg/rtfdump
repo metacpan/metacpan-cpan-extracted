@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use RTF::Tokenizer 1.01;
+use strict;
+
+my $tokenizer = RTF::Tokenizer->new( file => $ARGV[0] );
+
+while (1) {
+
+    my ( $token, $type, $argument ) = $tokenizer->get_token();
+
+    last if $token eq 'eof';
+
+    print "['$token', '$type', '$argument'],\n";
+}
+

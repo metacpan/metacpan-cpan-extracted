@@ -1,0 +1,20 @@
+Changes
+lib/RPi/PIGPIO.pm
+lib/RPi/PIGPIO/Assistant.pm
+lib/RPi/PIGPIO/Device/ADC/MCP300x.pm
+lib/RPi/PIGPIO/Device/BMP180.pm
+lib/RPi/PIGPIO/Device/DHT22.pm
+lib/RPi/PIGPIO/Device/DSM501A.pm
+lib/RPi/PIGPIO/Device/LED.pm
+lib/RPi/PIGPIO/Device/MH_Z14.pm
+lib/RPi/PIGPIO/Device/Switch.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_modules_compile.t
+t/00_pod_test.t
+t/01_connect.t
+t/02_pin_mode.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

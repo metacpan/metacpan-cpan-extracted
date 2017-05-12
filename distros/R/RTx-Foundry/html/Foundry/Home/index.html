@@ -1,0 +1,58 @@
+%# Never call a man a fool; borrow from him.
+
+<& /Foundry/Elements/Header, Title => 'My Page' &>
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td><& /Foundry/Elements/Tabs, Text => 'Overview' &></td>
+  </tr>
+  <tr> 
+    <td valign="top"> 
+      <table border="0" cellspacing="0" cellpadding="4" class="poptable" width="100%">
+        <tr> 
+          <td valign="top"> 
+
+<table width="100%" border="0" cellspacing="4" cellpadding="0" class="tableEmboss">
+  <tr>
+    <td width="156">&nbsp;</td>
+    <td width="14"><img src="/img/3Dtoolbar.png" width="2" height="20"></td>
+    <td> 
+      <table border="0" cellspacing="2" cellpadding="0" width="594">
+        <tr>
+	  <td width="270"><&|/l&>Refresh</&>
+<& /Elements/Refresh, Name => 'HomeRefreshInterval', Default => $session{'home_refresh_interval'} &>
+	    <input type="image" border="0" name="Action-Search" src="/img/Go.png" width="23" height="19" align="middle">
+	  </td>
+	</tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width="50%" align="center" valign="top">
+<& /Work/Elements/MyRequests, URL => '/Foundry/Project/Tracker/Display.html', MoreURL => '/Foundry/Home/MyRequests.html' &>
+    </td>
+    <td width="50%" align="center" valign="top" rowspan="2">
+<& /Foundry/Home/Elements/Quicksearch &>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top" align="center">
+<& /Work/Elements/MyTickets, URL => '/Foundry/Project/Tracker/Display.html', MoreURL => '/Foundry/Home/MyTickets.html', ShowRequestor => 1 &>
+    </td>
+  </tr>
+</table>
+</table>
+<br>
+<& /Foundry/Elements/Footer &>
+
+<%INIT>
+if ($RT::Guest) {
+    return $m->subexec('/Foundry/Home/Guest/index.html', %ARGS);
+}
+$session{'home_refresh_interval'} = $HomeRefreshInterval;
+</%INIT>
+<%ARGS>
+$HomeRefreshInterval => 0
+</%ARGS>

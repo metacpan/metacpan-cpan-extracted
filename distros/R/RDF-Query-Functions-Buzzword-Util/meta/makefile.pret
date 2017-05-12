@@ -1,0 +1,12 @@
+# This file provides instructions for packaging.
+
+`RDF-Query-Functions-Buzzword-Util`
+	perl_version_from m`RDF::Query::Functions::Buzzword::Util`;
+	version_from      m`RDF::Query::Functions::Buzzword::Util`;
+	readme_from       m`RDF::Query::Functions::Buzzword::Util`;
+	test_requires     p`Test::More 0.61`;
+	requires          p`Data::UUID 0`;
+	requires          p`RDF::Query 2.903`;
+	requires          p`XML::LibXML 1.60`;
+.
+

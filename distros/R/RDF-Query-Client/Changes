@@ -1,0 +1,119 @@
+RDF-Query-Client
+================
+
+Created:      2009-11-10
+Home page:    <https://metacpan.org/release/RDF-Query-Client>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Query-Client>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.114	2014-09-13
+
+ [ Test Suite ]
+ - Use Test::RequiresInternet.
+
+ [ Other ]
+ - Drop dependency on Role::Commons.
+ - General tidy up.
+
+0.113	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.112	2013-07-16
+
+ - Prefer SPARQL results in XML over JSON. (This partially rolls back a
+   change from 0.104.)
+
+0.111	2013-07-02
+
+ [ Bug Fixes ]
+ - Stop bundling old version of Scalar::Util in 'inc'.
+
+0.110	2012-03-13
+
+ [ Bug Fixes ]
+ - sparql.org changed some URIs, breaking our tests.
+   Fixes RT#75676.
+   <https://rt.cpan.org/Ticket/Display.html?id=75676>
+
+0.109	2012-02-08
+
+ [ Bug Fixes ]
+
+
+0.108	2012-02-08
+
+ - Updated: Stop using deprecated UNIVERSAL::AUTHORITY.
+   Jonas Smedegaard++
+
+0.107	2011-12-03
+
+ [ Bug Fixes ]
+ - Update to newer Module::Package::RDF
+
+0.106	2011-11-26
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - General tidy-up.
+ - Support 'Content-Type: application/sparql-(query|update)'.
+ - Support HTTP 'PATCH' method.
+ - Updated: use 5.010
+
+0.105	2011-03-04
+
+ - Fix annoying warning message.
+
+0.104	2011-02-23
+
+ - Accept (and prefer) JSON results format.
+ - Clean up media-type handling.
+ - Delegate media-type-to-parser mapping to RDF::Trine.
+
+0.103	2010-07-08
+
+ [ Bug Fixes ]
+ - use Scalar::Util qw'blessed'
+
+0.102	2010-07-07
+
+ [ Bug Fixes ]
+ - Construct HTTP::LRDD object just in time.
+
+0.101	2010-07-03
+
+ [ Bug Fixes ]
+ - Possibly this will fix some cpan-tester fails, though I'm not entirely
+   sure.
+
+0.100	2010-06-30
+
+ - Added: Automatic endpoint discovery.
+
+0.05	2010-03-20
+
+ - Minor documentation improvements.
+ - Updated: Test script now checks HTTP connectivity to sparql.org before
+   using it for tests.
+
+0.04	2010-01-27
+
+ - Updated: Use my new build system.
+
+0.03	2009-12-07
+
+ - Makefile.PL compatibility with earlier Perl versions.
+ - Remove documentation for RDF::Query-compatible stub functions; issue
+   warnings when they're called.
+
+0.02	2009-11-12
+
+ - Add security notes to documentation
+ - Added: Implement get() method
+ - Added: Support for HTTP Basic Auth
+ - lib/RDF/Query/Client.pm: use 5.006
+
+0.01	2009-11-10

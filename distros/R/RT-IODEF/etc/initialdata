@@ -1,0 +1,20 @@
+@Initial = (sub{ return 1; });
+
+@ScripActions = (
+	{
+		Name		=> 'IODEF ProcessMessage',
+		Description	=> 'IODEF_ProcessMessage',
+		ExecModule	=> 'IODEF_ProcessMessage',
+	},
+);
+
+@Scrips = (
+	{
+		Description	=> 'zIODEF_ProcessMessage',
+		Queue		=> ['General'],
+		ScripCondition	=> 'On Create',
+		ScripAction	=> 'IODEF ProcessMessage',
+		Template	=> 'Blank',
+	},
+);
+1;

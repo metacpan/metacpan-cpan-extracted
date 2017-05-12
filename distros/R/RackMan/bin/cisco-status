@@ -1,0 +1,410 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename;
+use Getopt::Long;
+use List::Util      qw< max >;
+use Net::Telnet::Cisco;
+use RackMan;
+use RackMan::Config;
+use RackMan::Device::Switch::Cisco_Catalyst;
+use Term::ANSIColor qw< :constants >;
+
+
+$::PROGRAM = "Cisco switch status";
+$::VERSION = "1.02";
+$::COMMAND = basename($0);
+
+
+use constant {
+    CONFIG_SECTION  => RackMan::Device::Switch::Cisco_Catalyst->CONFIG_SECTION,
+};
+
+
+#
+# main
+#
+MAIN: {
+    if (not caller()) {
+        run();
+        exit RackMan->status;
+    }
+}
+
+
+#
+# run()
+# ---
+sub run {
+    # detect if stdout is connected to a terminal
+    (-t STDOUT ? $Term::ANSIColor::AUTORESET : $ENV{ANSI_COLORS_DISABLED}) = 1;
+    $|++;
+
+    # default options
+    my %options = (
+        config  => "/usr/local/etc/rack.conf",
+    );
+
+    # parse options
+    Getopt::Long::Configure(qw< no_auto_abbrev no_ignore_case >);
+    GetOptions(\%options, qw{
+        help|usage|h!  man!  version|V!
+        verbose|v!  config|c=s
+        device_login|device-login=s  device_password|device-password=s
+    }) or pod2usage(0);
+
+    # handle --version, --help and --man
+    $options{man}       and pod2usage(2);
+    $options{help}      and pod2usage(1);
+    $options{version}   and print "$::PROGRAM v$::VERSION\n" and exit;
+
+    # if there's no argument, print the usage
+    pod2usage(1) if @ARGV == 0;
+
+    # read configuration file
+    my $config = RackMan::Config->new(-file => $options{config});
+
+    # instanciate the backend object
+    my $rackman = RackMan->new({ options => \%options, config => $config });
+
+    # do the actual work
+    process($rackman, @ARGV);
+}
+
+
+#
+# pod2usage()
+# ---------
+sub pod2usage {
+    my ($n) = @_;
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ -exitval => 0, -verbose => $n, -noperldoc => 1 });
+}
+
+
+#
+# process()
+# -------
+sub process {
+    my ($rackman, @args) = @_;
+
+    my $device_name = shift @args;
+    my $racktables = $rackman->racktables;
+
+    # fetch the corresponding RackObject
+    my $rackobj = $rackman->device($device_name);
+
+    # check that the device is actually a Cisco switch
+    print STDERR "error: '$device_name' is not a Cisco device\n" and return
+        unless $rackobj->DOES("RackMan::Device::Switch::Cisco_Catalyst");
+
+    # fetch the access password
+    $rackman->config->set_current_rackobject($rackobj);
+    my $ios_password = $rackman->options->{device_password}
+        || $rackman->config->val(CONFIG_SECTION, "ios_password")
+        or RackMan->error("missing IOS access password");
+
+    # connect to the device
+    my $host = $rackobj->attributes->{FQDN} || $rackobj->object_name;
+    print $rackobj->object_name, " ($host, ";
+    my $session = Net::Telnet::Cisco->new(Host => $host);
+    $session->login(Password => $ios_password);
+    $session->cmd("terminal length 0");
+
+    # fetch and parse information from the device
+    my @out = $session->cmd("show version");
+    my %version = parse_version(@out);
+    print "$version{model}, IOS $version{ios})\n";
+
+    @out = $session->cmd("show etherchannel summary");
+    my %group = parse_etherchannels(@out);
+
+    @out = $session->cmd("show mac address-table dynamic");
+    my %addr = parse_mac_address_table(@out);
+
+    @out = $session->cmd("show interfaces status");
+    my %interface = parse_interfaces_status(@out);
+
+    # associate the MAC addresses of a channel with the physical
+    # interfaces that compose the channel
+    for my $channel (keys %group) {
+        for my $port (keys %{ $group{$channel}{ports} }) {
+            $addr{$port} = $addr{$channel}
+                if not $addr{$port} or not @{ $addr{$port} };
+        }
+    }
+
+    my $m = max map length, keys %interface;
+    my %port_status = (
+        connected   => GREEN ("[+]"),
+        disabled    => RED   ("[X]"),
+        notconnect  => YELLOW("[ ]"),
+    );
+
+    for my $name (sort by_interface keys %interface) {
+        next if $group{$name};  # skip port channels
+        my $n = ref $addr{$name} ? @{ $addr{$name} } : 0;
+        my $hilight = $interface{$name}{status} eq "connected" ? BOLD : "";
+
+        printf "- %-${m}s %s%s %s%-7s %6s/%-6s%s  ",
+            $name,
+            $hilight,
+            $port_status{ $interface{$name}{status} },
+            $hilight,
+            $interface{$name}{vlan} eq "trunk" ? "trunk"
+                : "vlan:$interface{$name}{vlan}",
+            $interface{$name}{duplex}, 
+            $interface{$name}{speed}, 
+            $interface{$name}{status} eq "connected" ? RESET : "",
+            ;
+
+        if (0 < $n and $n <= 2) {
+            # fetch the MAC address associated to the interface
+            my $peer_mac = lc shift @{ $addr{$name} };
+            my ($peer_name, $peer_iface) = ("", "");
+
+            if (index($peer_mac, "00005e0001") == 0) {
+                # detect VRRP addresses
+                $peer_name = "(VRRP)";
+            }
+            else {
+                # find the corresponding device
+                my $peer_obj = $racktables->resultset("RackObject")->search(
+                    { l2address => $peer_mac },
+                    { join => "ports" },
+                )->first;
+                $peer_name = eval { $peer_obj->name };
+
+                if ($peer_name) {
+                    my $peer = $rackman->device($peer_name);
+                    my ($peer_port)
+                        = grep { lc($_->{l2address} || "") eq $peer_mac }
+                            @{ $peer->ports };
+                    $peer_iface = "[$peer_port->{name}]";
+                }
+            }
+
+            # format the MAC address in the usual way
+            my $peer_addr = $peer_mac;
+            $peer_addr =~ s/(\w\w)/$1:/g;
+            $peer_addr =~ s/:$//;
+
+            $peer_name ||= YELLOW("unknown");
+            print "$peer_addr = $peer_name $peer_iface ";
+        }
+
+        print $/;
+    }
+}
+
+
+#
+# by_interface()
+# ------------
+sub by_interface {
+    my @a = split "/", $a;
+    my @b = split "/", $b;
+    $a[0] cmp $b[0] || $a[1] <=> $b[1] || $a[2] <=> $b[2]
+}
+
+
+#
+# parse_version()
+# -------------
+sub parse_version {
+    my (@out) = @_;
+
+    chomp @out;
+    my %version = ( ios => "unkown", model => "unkown" );
+
+    for (@out) {
+        /Cisco IOS Software.*Version (\S+),/ and $version{ios} = $1;
+        /Model number\s*:\s*(\S+)/ and $version{model} = $1;
+    }
+
+    return %version
+}
+
+
+#
+# parse_etherchannels()
+# -------------------
+sub parse_etherchannels {
+    my (@out) = @_;
+
+    chomp @out;
+    my %channel;
+
+    for (@out) {
+        s/^ *//;  # remove leading blanks
+        next if /^Flags/ .. /^----/;  # skip the header
+        my ($num, $name, $proto, @ports) = split / +/;
+        next unless $num and $num =~ /^\d+$/;
+
+        # extract the group name and flags
+        $name =~ s/\((\w+)\)$//;
+        my %flags = map { $_ => 1 } split //, $1;
+
+        my %ports;
+
+        # extract each port name and flags
+        for my $port (@ports) {
+            (my $name = $port) =~ s/\((\w+)\)$//;
+            my %flags = map { $_ => 1 } split //, $1;
+            $ports{$name} = { flags => \%flags };
+        }
+
+        $channel{$name} = {
+            flags => \%flags,
+            proto => $proto,
+            ports => \%ports,
+        };
+    }
+
+    return %channel
+}
+
+
+#
+# parse_mac_address_table()
+# -----------------------
+sub parse_mac_address_table {
+    my (@out) = @_;
+
+    chomp @out;
+    my %table;
+
+    for (@out) {
+        s/^ *//;  # remove leading blanks
+        next if /^Mac/ .. /^---- /;  # skip the header
+        my ($num, $addr, $type, $port) = split / +/;
+        next unless $num and $num =~ /^\d+$/;
+
+        $addr =~ s/\W//g;  # normalize MAC address
+        push @{ $table{$port} ||= [] }, $addr;
+    }
+
+    return %table
+}
+
+
+#
+# parse_interfaces_status()
+# -----------------------
+sub parse_interfaces_status {
+    my (@out) = @_;
+
+    chomp @out;
+    my %interface;
+
+    for my $line (@out) {
+        $line =~ s/^ *//;  # remove leading blanks
+        next if $line =~ /^$/;
+
+        # extract the port name
+        $line =~ s/^(\S+)\s+//;
+        my $name = $1 or next;
+
+        # extract the fixed fields
+        $line =~ s/\s*((?:connected|disabled|notconnect).*)$// or next;
+        my $rest = $1;
+        my ($status, $vlan, $duplex, $speed, $type) = split / +/, $rest, 5;
+
+        # what's left should be the port description, if any
+        my $desc = length $line ? $line : "";
+        $line =~ s/^(\S+)\s+//;
+
+        $interface{$name} = {
+            desc => $desc,  status => $status,  vlan => $vlan,
+            duplex => $duplex,  speed => $speed,  type => $type,
+        };
+    }
+
+    return %interface
+}
+
+
+1
+
+__END__
+
+=head1 NAME
+
+cisco-status - Display the status of a Cisco network switch
+
+=head1 SYNOPSIS
+
+    cisco-status [--config /etc/rack.conf] <switch-name>
+    cisco-status { --help | --man | --version }
+
+
+=head1 OPTIONS
+
+=head2 Standard options
+
+=over
+
+=item B<-c>, B<--config> I<path>
+
+Specify the path to the configuration file.
+Default to F</usr/local/etc/rack.conf>
+
+=item B<-v>, B<--verbose>
+
+Run the program in verbose mode.
+
+=back
+
+=head2 Program options
+
+=over
+
+=item B<--device-login> I<username>
+
+Specify an alternate login for connecting onto the device.
+
+=item B<--device-password> I<password>
+
+Specify an alternate password for connecting onto the device.
+
+=back
+
+=head2 Help options
+
+=over
+
+=item B<-h>, B<--help>
+
+Print a short usage description, then exit.
+
+=item B<--man>
+
+Print the manual page of the program, then exit.
+
+=item B<-V>, B<--version>
+
+Print the program name and version, then exit.
+
+=back
+
+
+=head1 DESCRIPTION
+
+This program prints the status of a Cisco network switch, displaying,
+whenever possible, for each physical interface, the MAC address of the
+device connected onto it, with its name and interface name (resolved
+from the RackTables database).
+
+
+=head1 CONFIGURATION
+
+See L<rack(1)>
+
+
+=head1 AUTHOR
+
+Sebastien Aperghis-Tramoni (sebastien@aperghis.net)
+
+=cut
+

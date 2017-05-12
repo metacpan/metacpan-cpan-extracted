@@ -1,0 +1,23 @@
+%# Time is nature's way of making sure that everything doesn't happen at once.
+<%INIT>
+my $UserObj = RT::User->new($RT::SystemUser);
+return unless ($UserObj->Load($User) and $UserObj->EmailAddress eq '0');
+
+my $email = eval {
+    $UserObj->OriginObj->CustomFieldValue('Email')
+} or return;
+
+my $real_name = $UserObj->OriginObj->CustomFieldValue('RealName');
+$UserObj->SetRealName('') if !$real_name and length($UserObj->RealName);
+
+my $u = RT::User->new($RT::SystemUser);
+$u->Load($email);
+if ($u and $u->EmailAddress eq $email) {
+    $u->SetEmailAddress('');
+    $u->SetDisabled(1);
+    $UserObj->SetEmailAddress($email);
+}
+</%INIT>
+<%ARGS>
+$User
+</%ARGS>

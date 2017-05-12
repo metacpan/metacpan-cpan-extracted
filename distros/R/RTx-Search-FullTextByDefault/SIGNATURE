@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2b9f828982fb730ca6ea7a02e0340a90625ab825 MANIFEST
+SHA1 30b2407d4b73b6c749b6161aebef6c81c61c76d4 MANIFEST.SKIP
+SHA1 5586fed66b4fadbc9afc477cdc6a0f44252cdc8d META.yml
+SHA1 28d9c1700cb97abf49ab2488769858cdf889395b Makefile.PL
+SHA1 5fa7dc56a01752831b6797b22271a5fe3fa6aac2 README
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 40df6f8d889b52eef379f04af6227f9302b23bf9 inc/Module/Install/RTx.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 0ccfb1510537e1d8fbca4551ce9b5cb1a1dd4449 lib/RTx/Search/FullTextByDefault.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (Darwin)
+
+iQEVAwUBUur03mDwnESVNIQzAQK2iQf/aa3tRb7IRFyj6M2CcHbh06Lm6p5wZsTL
+ieMwIIvHtoHBcSn9Z0aE9nLBLwNGpuQcpbaripmTD9O6PXi0JyEEvNzjBGrAR86J
+L3DKncsXFWP1xPXjGOOGZLobia3mgQkCbF8SX5VAclA3Hajxu/+rIPISBFlPI2g+
+ZiqiUKrztMk2/0Az4LGStChKnGnQY8w1uzQWLnJajofWE9LfcI8jwfHet1KM3Nzj
+aePv2VOyG0QhxGoyPEJsubnE0mQHf6SJrhZ0wVwnFVaGWvYQqGTOktIa0hrZYaDf
+pXQyGFg8/ePsYFPId3b+C7TFX/5//uiS/8igSgDiFNRflRx6YplGDA==
+=Km72
+-----END PGP SIGNATURE-----

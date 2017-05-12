@@ -1,0 +1,44 @@
+1.96      2015-04-02 09:54:18CEST+0200 Europe/Amsterdam
+
+1.95      2015-02-10 21:14:06 Europe/Amsterdam
+   * removed support for AnyEvent, it'll be provided as a separate module
+
+1.94      2014-07-23 14:29:18 Europe/Amsterdam
+
+   * more mem leaks fix, documentation, and better exception message (and trace)
+
+1.93      2014-07-22 15:05:51 Europe/Amsterdam
+
+   * chase down memory leaks (Ivan + dams)
+
+1.92      2014-07-12 23:20:44 Europe/Amsterdam
+
+   * fix requires
+
+1.91      2014-07-11 11:41:55 Europe/Amsterdam
+
+   * faster AnyEvent mode
+   * supports Links setting, Link Walking, etc.
+   * minor fixes.
+   * better documentation
+
+1.90      2014-06-29 23:11:22 Europe/Amsterdam
+
+   * complete rewrite from scratch
+   * AnyEvent mode
+   * callback mode
+   * supports Map Reduce
+   * bugfixes, documentation, tests
+
+0.11      2013-11-21 14:16:06 Europe/Amsterdam
+   * fix networking code issues (handle EINTR and fix bug) (ivan)
+   * implements get_buckets + (get|set)_bucket_props (ivan)
+   * other bugfixes
+
+0.10      2013-11-20 17:29:38 Europe/Amsterdam
+   * almost rewrote it from scratch (dams)
+   * a lot of refactoring (dams)
+   * removed the autodie option (dams)
+   * added pbc protocol (dams)
+   * better dist.ini (dams)
+   * Initial version, forked from Riak::Light (dams)

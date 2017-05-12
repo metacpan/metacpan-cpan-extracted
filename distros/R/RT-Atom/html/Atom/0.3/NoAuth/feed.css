@@ -1,0 +1,140 @@
+feed {
+  display:block;
+  text-align:center;
+  font-family:verdana, sans-serif;
+}
+
+info {
+  margin:10px 0px 3px 0px;
+  background:black;
+  display:block;
+  padding:1px;
+  border-bottom: 1px #b0b0b0 solid;
+}
+
+title {
+  font-size:150%;
+  color:#000000;
+  display:block;
+  text-align:left;
+  font-weight:bold;
+}
+
+tagline, author {
+  text-align:left;
+  display:block;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a {
+  padding: 1px 5px 1px 5px;
+  font-size: xx-small;
+  color: #000000;
+  border: 1px dotted #999999;
+}
+
+a.nav {
+  background:#aaaaff;
+}
+
+a.html {
+  background-color: #003366;
+  color: #ccccff;
+}
+
+a.add {
+  background-color: #99ff99;
+}
+
+a.index {
+  background-color: #cccccc;
+}
+
+a.top {
+  background-color: #cccccc;
+}
+
+a.show {
+  background-color: #dddd66;
+}
+
+a.update {
+  background-color: #ffcccc;
+}
+
+entry title {
+  font-size:125%;
+  font-weight:bold;
+  color:#003366;
+  display:block;
+  padding:5px 0px 0px 0px;
+  margin:0px 0px 0px 0px;
+  border-top:solid 1px #dddddd;
+  background:#eeeeee;
+}
+
+generator {
+  margin:3px 0px 0px 0px;
+  background:#b0b0b0;
+  display:block;
+  padding-bottom: 1px;
+  border-bottom: 1px black solid;
+}
+
+id, modified, created, issued, url, head {
+  display:none;
+}
+
+entry modified {
+  display:inline;
+  font-style: italic;
+}
+
+content {
+  background:#eeeeee;
+  display:block;
+  padding:5px 3% 10px 3%;
+  border-bottom:solid 1px #999999;
+  font-family: courier;
+  font-size: xx-small;
+}
+
+
+
+entry {
+  text-align:left;
+  display:block;
+  background:#ffffff;
+  padding:5px 0px 0px 0px;
+  margin:5px 5px 0px 10px;
+  font-family:verdana, sans-serif;
+}
+
+issued, modified, created, name, id {
+  color:#999999;
+  font-size:80%;
+  margin-top:25px;
+}
+
+name {
+  font-weight: bold;
+}
+
+a.poweredby {
+  font-weight: bold;
+  text-decoration: underline;
+  border: 2px ridge #9999ff;
+  background:#aaaaff;
+}
+
+dl {
+  padding-bottom: 5px;
+  border-bottom: 2px black ridge;
+}

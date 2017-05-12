@@ -1,0 +1,34 @@
+Regexp::English 
+---------------
+
+Perl module to create regular expressions more verbosely
+
+INSTALLATION
+
+	$ perl Build.PL
+	$ perl ./Build
+	$ perl ./Build test
+	# perl ./Build install
+
+There's also a Makefile.PL file, but I don't use it.
+
+DESCRIPTION
+
+    Regexp::English provides an alternate regular expression syntax, one
+    that is slightly more verbose than the standard mechanisms. In addition,
+    it adds a few convenient features, like incremental expression building
+    and bound captures.
+
+AUTHOR
+
+	chromatic, chromatic at wgz.org, with many suggestions from Vahe Sarkissian
+	and Damian Conway.
+
+COPYRIGHT
+
+    Copyright (c) 2001-2002, 2005, 2011 by chromatic.  Most rights reserved.
+
+	This program is free software; you can use, modify, and redistribute it
+	under the same terms as Perl 5.12 itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html.

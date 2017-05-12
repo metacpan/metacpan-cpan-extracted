@@ -1,0 +1,164 @@
+Revision history for Reply
+
+0.42  2016-08-23
+      - make tests pass again if Term::ReadKey is not installed (andk, #52)
+
+0.41  2016-08-16
+      - add #vars command to list currently in scope variable names (garu, #39)
+      - add Reply::Plugin::Pager to page long results (y, #47)
+
+0.40  2016-06-25
+      - fix docs (y, #49)
+
+0.39  2016-05-29
+      - allow ~/ in the history_file option to ReadLine (y, #48)
+
+0.38  2015-12-02
+      - fix running reply without the Package plugin (2shortplanks, #45)
+
+0.37  2014-11-18
+      - internal refactoring for extensibility (sergeyromanov, #41)
+
+0.36  2014-11-16
+      - unshift onto @INC instead of pusing directories set with -l/-b/-I
+        (ilmari, #40)
+
+0.35  2014-07-04
+      - allow executing snippets and files from the argument list (suggested by
+        tobyink, #36)
+
+0.34  2013-08-29
+      - fix running reply without the ReadLine plugin (lestrrat, #26)
+
+0.33  2013-08-16
+      - Support Term::ReadLine::Caroline (tokuhirom, #24)
+
+0.32  2013-07-18
+      - Fix test failures if Carp::Always isn't installed (djerius, #21)
+      - Clarify ReadLine documentation about the location of the history file
+        (Kosuke Asami)
+
+0.31  2013-07-18
+      - fix a ReadLine bug introduced in the previous release (Kosuke Asami,
+        #22)
+
+0.30  2013-07-17
+      - better support for Term::ReadLine::Perl5 (Kosuke Asami, #20)
+
+0.29  2013-07-10
+      - Make CollapseStack always run under Carp::Always (#13)
+      - Fix lexical subs (#19)
+
+0.28  2013-07-10
+      - remove accidentally added dep on 'mro', which doesn't exist on 5.8
+
+0.27  2013-07-10
+      - Add completion plugin for #-commands (#18)
+      - More completion edge case fixes
+      - More internal refactorings
+
+0.26  2013-07-08
+      - Let Data::Printer handle coloring in the DataPrinter plugin. (Sawyer X)
+      - Add a CollapseStack plugin, to make working with large stack traces
+        easier. (sartak)
+
+0.25  2013-07-05
+      - The DataDump plugin now respects object stringification overloads by
+        default. This behavior can be disabled by setting the
+        'respect_stringification' option to 0.
+
+0.24  2013-07-04
+      - use Devel::LexAlias to ensure that the lexical environment is persisted
+        properly (gh #10)
+      - a few internal refactorings
+
+0.23  2013-07-03
+      - use the correct #! line (reported by SREZIC, RT86669)
+
+0.22  2013-07-02
+      - few more completion edge cases
+
+0.21  2013-07-01
+      - check inheritance in method completions
+      - fix a couple more completion edge cases
+
+0.20  2013-06-28
+      - completion for packages declared in the repl (Toby Inkster, gh-#7)
+      - completion for functions (Toby Inkster, gh-#8)
+
+0.19  2013-06-28
+      - fix test failures (reported by brunobuss)
+
+0.18  2013-06-27
+      - tab completion support (with help from sartak)
+      - lots of internal refactorings to make writing plugins easier
+
+0.17  2013-06-27
+      - support color on windows (aero)
+
+0.16  2013-06-26
+      - bump the Getopt::Long dep, for installing on older perls
+
+0.15  2013-06-26
+      - add default command of #q for exiting the repl
+
+0.14  2013-06-26
+      - add -l, -b, -I, and -M options (requested by Toby Inkster, RT86341)
+
+0.13  2013-06-26
+      - allow plugins to configure the current package to use through the
+        'package' parameter in the compile callback
+
+0.12  2013-06-25
+      - make the AutoRefresh plugin use the new track_require functionality
+        in Class::Refresh (fixes a problem reported by Michael Reddick)
+
+0.11  2013-06-24
+      - report failure to load of plugins which use modules that fail to load
+        (reported by Michael Reddick)
+
+0.10  2013-06-24
+      - don't pollute main::, since that's where the default configuration
+        drops the user (reported by miyagawa)
+
+0.09  2013-06-21
+      - fix tests
+
+0.08  2013-06-21
+      - add AutoRefresh plugin (Michael Reddick)
+
+0.07  2013-06-08
+      - expose a 'step' method to run single iterations of the repl
+      - plugins specified in the 'plugins' constructor parameter are now run
+        after loading config rather than before (this should give them more
+        control over what actually runs - if this is a problem, i might add
+        separate options for "before config" and "after config")
+      - config handling is split out into a separate Reply::Config class for
+        better reuse of the config loading logic
+      - DataDumper plugin now sets Terse and Sortkeys, since that produces
+        output that looks better
+      - plugins can now set multiple independent lexical environments, to allow
+        them to override the actual logical environment without wiping out
+        special vars set by other plugins
+
+0.06  2013-06-08
+      - add Timer plugin (Arthur Axel fREW Schmidt)
+      - fix DataPrinter plugin when ~/.dataprinter has a custom value for
+        'alias' (Charles Bailey)
+
+0.05  2013-06-04
+      - avoid test failures from DataPrinter, since it's optional
+
+0.04  2013-06-04
+      - add a bit of option parsing to the reply script, to support choosing an
+        alternate configuration file
+      - Data::Printer plugin (creaktive)
+
+0.03  2013-06-03
+      - fix LexicalPersistence plugin (reported by tokuhirom)
+
+0.02  2013-06-03
+      - packaging and pod fixes
+
+0.01  2013-06-03
+      - Initial release

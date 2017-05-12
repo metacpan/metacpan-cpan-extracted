@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.63.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6fe1c11e18df07fcfd55f7fb5c216a11db509e9c Changes
+SHA1 94d60196b14fd677430d2327f243f1ad47720be1 Changes.ttl
+SHA1 0df10a4595aae1a3c6e376fbc4a5e125384d7b29 MANIFEST
+SHA1 af2bc46179a0d54796d137e95a542d8bc84d42b9 MANIFEST.SKIP
+SHA1 f3f69a2a3daeaf2f45a02034784821604a9a0b4d META.yml
+SHA1 759a4e84aca96e670c04b25c28d57e4252dc98fb Makefile.PL
+SHA1 641f8b4ede6985d8350b494fbc21c9f42194442d README
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 7dc35fbe1e7a4ce02ce00b02470cbf1d4eddce19 inc/Module/Install/Bugtracker.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 73a28c770d5e9324eaa586f03252c5a8a6f3c941 inc/Module/Install/DOAPChangeSets.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 a615bb050ca0b2d79bfa0224addcb83019a53b09 inc/Module/Install/ReadmeFromPod.pm
+SHA1 fd81bc0e85a1193f278760edb82928d8b4dff2c1 inc/Module/Install/Repository.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 3667ae2a6db0a7a5ad2486efdef888e4c593ad6d lib/RDF/Trine/Node/Literal/XML.pm
+SHA1 da55e7244d6b6860530a1d1c8c7807577e602bd8 t/lang.t
+SHA1 58b1a4b14dccaef4b781ccf6b589729e0689b131 t/namespaces.t
+SHA1 d5db8e7206d614b849abca2bba755e290b87f2d3 t/xmlliteral.t
+SHA1 4a32b860277df7f42ec67244b4aca1783f55f52a xt/00signature.t
+SHA1 0fa2eea249b2e10d44c7a7c5cb536547118cd961 xt/01critic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFNcVlSlE/Gp2pqC7wRAudXAJ4sCAzGwDMV3JLqY7MdBUwieguSxQCeOmvB
+U8CFAkO+wGnlkWP8Q3y16S8=
+=ytuQ
+-----END PGP SIGNATURE-----

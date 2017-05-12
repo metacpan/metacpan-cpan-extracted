@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+use strict;
+
+my($waittime) = shift;
+if (!defined($waittime)) {
+    die "sar: can't open /var/adm/sa/sa13\nNo such file or directory\n";
+}
+my($jiffy) = 100;
+print "\n" . `uname -a` . "\n";
+
+my($start_user,$start_nice,$start_sys,$start_idle) = proc_stat();
+Print_Values('%usr','%sys','%wio','%idle');
+sleep $waittime;
+my($user,$nice,$sys,$idle) = proc_stat();
+# Subtract starting value
+$user -= $start_user;
+$nice -= $start_nice;
+$sys -= $start_sys;
+$idle -= $start_idle;
+# Adjust time by number of cpus
+my($num_cpus) = num_cpus();
+$user /= $num_cpus;
+$nice /= $num_cpus;
+$sys /= $num_cpus;
+$idle /= $num_cpus;
+# user + nice_user = total user
+$user += $nice;
+# Calculate total
+my($total) = ($waittime * $jiffy);
+# Calculate IO Wait as total time - other used time
+my($iow) = $total - ($user + $sys + $idle);
+# Calculate percentages
+my($puser) = int( $user * 100 / $total);
+my($psys) = int( $sys * 100 / $total);
+my($piow) = int( $iow * 100 / $total);
+my($pidle) = int( $idle * 100 / $total);
+Print_Values($puser,$psys,$piow,$pidle);
+
+sub Print_Values {
+    my($user,$sys,$wio,$idle) = @_;
+    my($mday, $mon, $year);
+    my($sec, $min, $hour, $mday, $mon, $year) = localtime(time());
+    $mon++;
+    my($time) = sprintf("%2.2d:%2.2d:%2.2d",$hour,$min,$sec);
+    print sprintf("%s %7s %7s %7s %7s\n",$time,$user,$sys,$wio,$idle);
+}
+
+sub num_cpus {
+    my($cpunum);
+    my($maxcpu);
+    open(PROCSTAT,"/proc/stat");
+    while(<PROCSTAT>) {
+	if (/^cpu\d+\s+/) {
+	    ($cpunum) = /^cpu(\d+)\s+/;
+	    if ($cpunum > $maxcpu) {
+		$maxcpu = $cpunum
+	    }
+	}
+    }
+    close(PROCSTAT);
+    return ++$maxcpu;
+}
+
+sub proc_stat {
+    my($user,$nice,$sys,$iow,$idle);
+    open(PROCSTAT,"/proc/stat");
+    while(<PROCSTAT>) {
+	if (/^cpu\s+/) {
+	    ($user, $nice, $sys, $idle) =
+		/^cpu\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
+	}
+    }
+    close(PROCSTAT);
+    return ($user, $nice, $sys, $idle);
+}

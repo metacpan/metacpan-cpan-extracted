@@ -1,0 +1,11 @@
+Revision history for RPi-BMP180
+
+2.3603  2017-03-13
+        - changed version numbering from 2.36.x to 2.360x
+        - changed prereq vers as well
+
+2.36.2  2017-02-02
+        - fix typo in prereq ver of WiringPi::API, 2.36.6 -> 2.36.4
+
+2.36.1  2017-02-02
+        - initial standalone version harvested from RPi::WiringPi

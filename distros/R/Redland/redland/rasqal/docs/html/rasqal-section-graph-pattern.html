@@ -1,0 +1,636 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Graph patterns</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Rasqal RDF Query Library Manual">
+<link rel="up" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="prev" href="rasqal-section-expression.html" title="Expressions">
+<link rel="next" href="rasqal-section-literal.html" title="Literal">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="rasqal.html" title="Rasqal Overview">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="rasqal-section-expression.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt01.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Rasqal RDF Query Library Manual</th>
+<td><a accesskey="n" href="rasqal-section-literal.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2594842" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2601808" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="rasqal-section-graph-pattern"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2594842"></a><span class="refentrytitle">Graph patterns</span>
+</h2>
+<p>Graph patterns &#8212; Collections of triple patterns, sub-graph patterns with operators.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a>;
+int         <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-add-constraint">rasqal_graph_pattern_add_constraint</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             <a href="rasqal-section-expression.html#rasqal-expression">rasqal_expression</a> *expr);
+void        <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-add-sub-graph-pattern">rasqal_graph_pattern_add_sub_graph_pattern</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern,
+                                             <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *sub_graph_pattern);
+<a href="rasqal-section-expression.html#rasqal-expression">rasqal_expression</a>* <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-get-constraint">rasqal_graph_pattern_get_constraint</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             int idx);
+<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-sequence.html#raptor-sequence"
+>raptor_sequence</a>* <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-get-constraint-sequence">rasqal_graph_pattern_get_constraint_sequence</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp);
+int         <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-get-flags">rasqal_graph_pattern_get_flags</a>  (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern);
+int         <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-get-index">rasqal_graph_pattern_get_index</a>  (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp);
+<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-operator">rasqal_graph_pattern_operator</a> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-get-operator">rasqal_graph_pattern_get_operator</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern);
+<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a>* <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-get-sub-graph-pattern">rasqal_graph_pattern_get_sub_graph_pattern</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern,
+                                             int idx);
+<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-sequence.html#raptor-sequence"
+>raptor_sequence</a>* <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-get-sub-graph-pattern-sequence">rasqal_graph_pattern_get_sub_graph_pattern_sequence</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern);
+<a href="rasqal-section-triple.html#rasqal-triple">rasqal_triple</a>* <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-get-triple">rasqal_graph_pattern_get_triple</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern,
+                                             int idx);
+enum        <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-operator">rasqal_graph_pattern_operator</a>;
+const char* <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-operator-as-string">rasqal_graph_pattern_operator_as_string</a>
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-operator">rasqal_graph_pattern_operator</a> op);
+void        <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-print">rasqal_graph_pattern_print</a>      (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             FILE *fh);
+int         (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-visit-fn">*rasqal_graph_pattern_visit_fn</a>)
+                                            (<a href="rasqal-section-query.html#rasqal-query">rasqal_query</a> *query,
+                                             <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             void *user_data);
+int         <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-visit">rasqal_graph_pattern_visit</a>      (<a href="rasqal-section-query.html#rasqal-query">rasqal_query</a> *query,
+                                             <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-visit-fn">rasqal_graph_pattern_visit_fn</a> fn,
+                                             void *user_data);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2601808"></a><h2>Description</h2>
+<p>
+Graph patterns form a a tree structure that build a <a href="rasqal-section-query.html#rasqal-query"><span class="type">rasqal_query</span></a>
+top-level graph pattern (see <a href="rasqal-section-query.html#rasqal-query-get-query-graph-pattern"><code class="function">rasqal_query_get_query_graph_pattern()</code></a>)
+which may have sub-graph patterns.  Graph patterns at the leaf of the
+tree operate over triple patterns (<a href="rasqal-section-triple.html#rasqal-triple"><span class="type">rasqal_triple</span></a>) matching the
+RDF triples in the data sources for <a href="rasqal-section-graph-pattern.html#RASQAL-GRAPH-PATTERN-OPERATOR-BASIC:CAPS"><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_BASIC</code></a>
+or <a href="rasqal-section-graph-pattern.html#RASQAL-GRAPH-PATTERN-OPERATOR-OPTIONAL:CAPS"><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_OPTIONAL</code></a>.  Other graph patterns
+operators operate over sub graph patterns and group them, union them
+or apply a GRAPH matching keyword (<a href="rasqal-section-graph-pattern.html#RASQAL-GRAPH-PATTERN-OPERATOR-GRAPH:CAPS"><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_GRAPH</code></a>).
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2601885"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2601896"></a><h3>
+<a name="rasqal-graph-pattern"></a>rasqal_graph_pattern</h3>
+<a class="indexterm" name="id2601907"></a><pre class="programlisting">rasqal_graph_pattern* graph_pattern;
+</pre>
+<p>
+Rasqal graph pattern class.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2601927"></a><h3>
+<a name="rasqal-graph-pattern-add-constraint"></a>rasqal_graph_pattern_add_constraint ()</h3>
+<a class="indexterm" name="id2601941"></a><pre class="programlisting">int         rasqal_graph_pattern_add_constraint
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             <a href="rasqal-section-expression.html#rasqal-expression">rasqal_expression</a> *expr);</pre>
+<p>
+Add a constraint expression to the graph_pattern.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>gp</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> query object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>expr</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-expression.html#rasqal-expression"><span class="type">rasqal_expression</span></a> expr
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2602037"></a><h3>
+<a name="rasqal-graph-pattern-add-sub-graph-pattern"></a>rasqal_graph_pattern_add_sub_graph_pattern ()</h3>
+<a class="indexterm" name="id2602052"></a><pre class="programlisting">void        rasqal_graph_pattern_add_sub_graph_pattern
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern,
+                                             <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *sub_graph_pattern);</pre>
+<p>
+Add a sub graph pattern to a graph pattern .</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>graph_pattern</code></em>&#160;:</span></td>
+<td> graph pattern to add to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>sub_graph_pattern</code></em>&#160;:</span></td>
+<td> graph pattern to add inside
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591031"></a><h3>
+<a name="rasqal-graph-pattern-get-constraint"></a>rasqal_graph_pattern_get_constraint ()</h3>
+<a class="indexterm" name="id2591045"></a><pre class="programlisting"><a href="rasqal-section-expression.html#rasqal-expression">rasqal_expression</a>* rasqal_graph_pattern_get_constraint
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             int idx);</pre>
+<p>
+Get a constraint in the sequence of constraint expressions in the query.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>gp</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> query object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>idx</code></em>&#160;:</span></td>
+<td> index into the sequence (0 or larger)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a <a href="rasqal-section-expression.html#rasqal-expression"><span class="type">rasqal_expression</span></a> pointer or NULL if out of the sequence range
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591143"></a><h3>
+<a name="rasqal-graph-pattern-get-constraint-sequence"></a>rasqal_graph_pattern_get_constraint_sequence ()</h3>
+<a class="indexterm" name="id2591157"></a><pre class="programlisting"><a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-sequence.html#raptor-sequence"
+>raptor_sequence</a>* rasqal_graph_pattern_get_constraint_sequence
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp);</pre>
+<p>
+Get the sequence of constraints expressions in the query.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>gp</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-sequence.html#raptor-sequence"
+><span class="type">raptor_sequence</span></a> of <a href="rasqal-section-expression.html#rasqal-expression"><span class="type">rasqal_expression</span></a> pointers.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591240"></a><h3>
+<a name="rasqal-graph-pattern-get-flags"></a>rasqal_graph_pattern_get_flags ()</h3>
+<a class="indexterm" name="id2591254"></a><pre class="programlisting">int         rasqal_graph_pattern_get_flags  (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern);</pre>
+<p>
+Get the graph pattern flags .
+</p>
+<p>
+<em class="parameter"><code>deprecated</code></em>: Always returns 0</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>graph_pattern</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> graph pattern object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> 0
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591330"></a><h3>
+<a name="rasqal-graph-pattern-get-index"></a>rasqal_graph_pattern_get_index ()</h3>
+<a class="indexterm" name="id2591344"></a><pre class="programlisting">int         rasqal_graph_pattern_get_index  (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp);</pre>
+<p>
+Get the graph pattern absolute index in the array of graph patterns.
+</p>
+<p>
+The graph pattern index is assigned when <a href="rasqal-section-query.html#rasqal-query-prepare"><code class="function">rasqal_query_prepare()</code></a> is
+run on a query containing a graph pattern.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>gp</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> graph pattern
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> index or &lt;0 if no index has been assigned yet
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591426"></a><h3>
+<a name="rasqal-graph-pattern-get-operator"></a>rasqal_graph_pattern_get_operator ()</h3>
+<a class="indexterm" name="id2591440"></a><pre class="programlisting"><a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-operator">rasqal_graph_pattern_operator</a> rasqal_graph_pattern_get_operator
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern);</pre>
+<p>
+Get the graph pattern operator .
+</p>
+<p>
+The operator for the given graph pattern. See also
+<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-operator-as-string"><code class="function">rasqal_graph_pattern_operator_as_string()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>graph_pattern</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> graph pattern object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> graph pattern operator
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2591522"></a><h3>
+<a name="rasqal-graph-pattern-get-sub-graph-pattern"></a>rasqal_graph_pattern_get_sub_graph_pattern ()</h3>
+<a class="indexterm" name="id2591537"></a><pre class="programlisting"><a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a>* rasqal_graph_pattern_get_sub_graph_pattern
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern,
+                                             int idx);</pre>
+<p>
+Get a sub-graph pattern inside a graph pattern.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>graph_pattern</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> graph pattern object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>idx</code></em>&#160;:</span></td>
+<td> index into the sequence of sub graph_patterns in the graph pattern
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> or NULL if out of range
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2611822"></a><h3>
+<a name="rasqal-graph-pattern-get-sub-graph-pattern-sequence"></a>rasqal_graph_pattern_get_sub_graph_pattern_sequence ()</h3>
+<a class="indexterm" name="id2611836"></a><pre class="programlisting"><a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-sequence.html#raptor-sequence"
+>raptor_sequence</a>* rasqal_graph_pattern_get_sub_graph_pattern_sequence
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern);</pre>
+<p>
+Get the sequence of graph patterns inside a graph pattern .</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>graph_pattern</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> graph pattern object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>  a <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-sequence.html#raptor-sequence"
+><span class="type">raptor_sequence</span></a> of <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> pointers.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2611911"></a><h3>
+<a name="rasqal-graph-pattern-get-triple"></a>rasqal_graph_pattern_get_triple ()</h3>
+<a class="indexterm" name="id2611922"></a><pre class="programlisting"><a href="rasqal-section-triple.html#rasqal-triple">rasqal_triple</a>* rasqal_graph_pattern_get_triple
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *graph_pattern,
+                                             int idx);</pre>
+<p>
+Get a triple inside a graph pattern.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>graph_pattern</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> graph pattern object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>idx</code></em>&#160;:</span></td>
+<td> index into the sequence of triples in the graph pattern
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <a href="rasqal-section-triple.html#rasqal-triple"><span class="type">rasqal_triple</span></a> or NULL if out of range
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612016"></a><h3>
+<a name="rasqal-graph-pattern-operator"></a>enum rasqal_graph_pattern_operator</h3>
+<a class="indexterm" name="id2612030"></a><pre class="programlisting">typedef enum {
+  RASQAL_GRAPH_PATTERN_OPERATOR_UNKNOWN   = 0,
+  RASQAL_GRAPH_PATTERN_OPERATOR_BASIC     = 1,
+  RASQAL_GRAPH_PATTERN_OPERATOR_OPTIONAL  = 2,
+  RASQAL_GRAPH_PATTERN_OPERATOR_UNION     = 3,
+  RASQAL_GRAPH_PATTERN_OPERATOR_GROUP     = 4,
+  RASQAL_GRAPH_PATTERN_OPERATOR_GRAPH     = 5,
+
+  RASQAL_GRAPH_PATTERN_OPERATOR_LAST=RASQAL_GRAPH_PATTERN_OPERATOR_GRAPH
+} rasqal_graph_pattern_operator;
+</pre>
+<p>
+Graph pattern operators</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a name="RASQAL-GRAPH-PATTERN-OPERATOR-UNKNOWN:CAPS"></a><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_UNKNOWN</code></span></td>
+<td> Internal.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-GRAPH-PATTERN-OPERATOR-BASIC:CAPS"></a><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_BASIC</code></span></td>
+<td> Just triple patterns and constraints.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-GRAPH-PATTERN-OPERATOR-OPTIONAL:CAPS"></a><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_OPTIONAL</code></span></td>
+<td> Set of graph patterns (ANDed) and constraints.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-GRAPH-PATTERN-OPERATOR-UNION:CAPS"></a><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_UNION</code></span></td>
+<td> Set of graph patterns (UNIONed) and constraints.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-GRAPH-PATTERN-OPERATOR-GROUP:CAPS"></a><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_GROUP</code></span></td>
+<td> Set of graph patterns (ANDed) and constraints.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-GRAPH-PATTERN-OPERATOR-GRAPH:CAPS"></a><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_GRAPH</code></span></td>
+<td> A graph term + a graph pattern and constraints.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-GRAPH-PATTERN-OPERATOR-LAST:CAPS"></a><code class="literal">RASQAL_GRAPH_PATTERN_OPERATOR_LAST</code></span></td>
+<td> Internal.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612225"></a><h3>
+<a name="rasqal-graph-pattern-operator-as-string"></a>rasqal_graph_pattern_operator_as_string ()</h3>
+<a class="indexterm" name="id2612238"></a><pre class="programlisting">const char* rasqal_graph_pattern_operator_as_string
+                                            (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-operator">rasqal_graph_pattern_operator</a> op);</pre>
+<p>
+Get a string for the query verb.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>op</code></em>&#160;:</span></td>
+<td> the <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-operator"><span class="type">rasqal_graph_pattern_operator</span></a> verb of the query
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> pointer to a shared string label for the query verb
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612311"></a><h3>
+<a name="rasqal-graph-pattern-print"></a>rasqal_graph_pattern_print ()</h3>
+<a class="indexterm" name="id2612323"></a><pre class="programlisting">void        rasqal_graph_pattern_print      (<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             FILE *fh);</pre>
+<p>
+Print a <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> in a debug format.
+</p>
+<p>
+The print debug format may change in any release.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>gp</code></em>&#160;:</span></td>
+<td> the <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fh</code></em>&#160;:</span></td>
+<td> the <span class="type">FILE</span>* handle to print to
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612416"></a><h3>
+<a name="rasqal-graph-pattern-visit-fn"></a>rasqal_graph_pattern_visit_fn ()</h3>
+<a class="indexterm" name="id2612429"></a><pre class="programlisting">int         (*rasqal_graph_pattern_visit_fn)
+                                            (<a href="rasqal-section-query.html#rasqal-query">rasqal_query</a> *query,
+                                             <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             void *user_data);</pre>
+<p>
+User function to visit an graph_pattern and operate on it with
+<a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-visit"><code class="function">rasqal_graph_pattern_visit()</code></a> or <a href="rasqal-section-query.html#rasqal-query-graph-pattern-visit"><code class="function">rasqal_query_graph_pattern_visit()</code></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query.html#rasqal-query"><span class="type">rasqal_query</span></a> containing the graph pattern
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>gp</code></em>&#160;:</span></td>
+<td> current graph_pattern
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data passed in
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> 0 to truncate the visit
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612559"></a><h3>
+<a name="rasqal-graph-pattern-visit"></a>rasqal_graph_pattern_visit ()</h3>
+<a class="indexterm" name="id2612571"></a><pre class="programlisting">int         rasqal_graph_pattern_visit      (<a href="rasqal-section-query.html#rasqal-query">rasqal_query</a> *query,
+                                             <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern">rasqal_graph_pattern</a> *gp,
+                                             <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern-visit-fn">rasqal_graph_pattern_visit_fn</a> fn,
+                                             void *user_data);</pre>
+<p>
+Visit a user function over a <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a>
+</p>
+<p>
+If the user function <em class="parameter"><code>fn</code></em> returns 0, the visit is truncated.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-query.html#rasqal-query"><span class="type">rasqal_query</span></a> to operate on
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>gp</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-graph-pattern.html#rasqal-graph-pattern"><span class="type">rasqal_graph_pattern</span></a> graph pattern
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fn</code></em>&#160;:</span></td>
+<td> pointer to function to apply that takes user data and graph pattern parameters
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data for applied function 
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> 0 if the visit was truncated.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

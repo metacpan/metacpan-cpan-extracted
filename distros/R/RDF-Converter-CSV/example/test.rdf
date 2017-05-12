@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:ars="http://ncbs.org/">
+ <rdf:Description rdf:about="http://ncbs.org/1HT9">
+  <ars:Structure_of_swapped_region>C-terminal &amp;-alpha helix</ars:Structure_of_swapped_region>
+  <ars:ID>1HT9</ars:ID>
+  <ars:PDB_PQS>PDB</ars:PDB_PQS>
+  <ars:Sequence_of_Hingeloop>SLLKGMS</ars:Sequence_of_Hingeloop>
+  <ars:Biological_unit>Homodimer</ars:Biological_unit>
+  <ars:Residues_per_subunit>76</ars:Residues_per_subunit>
+  <ars:PUBMED_ID>11316872</ars:PUBMED_ID>
+  <ars:Residues_in_Hinge_loop>SER38-SER44 (7)</ars:Residues_in_Hinge_loop>
+  <ars:Residues_in_swapped_domain>THR45-GLN75 (31)</ars:Residues_in_swapped_domain>
+  <ars:Extent_of_swapping>67.1</ars:Extent_of_swapping>
+  <ars:HINGE_REGION>EFPSLLKGMSTLD</ars:HINGE_REGION>
+  <ars:Chain_ID>A, B</ars:Chain_ID>
+  <ars:Sequence_of_swapped_domain>TLDELFEELDKNGDGEVSFEEFQVLVKKISQ</ars:Sequence_of_swapped_domain>
+  <ars:OLD>Homodimer</ars:OLD>
+ </rdf:Description>
+ <rdf:Description rdf:about="http://ncbs.org/1I1D">
+  <ars:Structure_of_swapped_region>C-terminal &amp;-beta strand</ars:Structure_of_swapped_region>
+  <ars:ID>1I1D</ars:ID>
+  <ars:PDB_PQS>PQS</ars:PDB_PQS>
+  <ars:Sequence_of_Hingeloop>GF</ars:Sequence_of_Hingeloop>
+  <ars:Biological_unit>Homodimer</ars:Biological_unit>
+  <ars:Residues_per_subunit>159</ars:Residues_per_subunit>
+  <ars:PUBMED_ID>11278591</ars:PUBMED_ID>
+  <ars:Residues_in_Hinge_loop>GLY147-PHE148 (2)</ars:Residues_in_Hinge_loop>
+  <ars:Residues_in_swapped_domain>SER149-LYS159 (11)</ars:Residues_in_swapped_domain>
+  <ars:Extent_of_swapping>20.2</ars:Extent_of_swapping>
+  <ars:HINGE_REGION>EKCGFSNA</ars:HINGE_REGION>
+  <ars:Chain_ID>A, B, C, D</ars:Chain_ID>
+  <ars:Sequence_of_swapped_domain>SNAGVEMQIRK</ars:Sequence_of_swapped_domain>
+  <ars:OLD>Homodimer</ars:OLD>
+ </rdf:Description>
+ <rdf:Description rdf:about="http://ncbs.org/1I21">
+  <ars:Structure_of_swapped_region>C-terminal &amp;-beta sheet</ars:Structure_of_swapped_region>
+  <ars:ID>1I21</ars:ID>
+  <ars:PDB_PQS>PDB</ars:PDB_PQS>
+  <ars:Sequence_of_Hingeloop>GF</ars:Sequence_of_Hingeloop>
+  <ars:Biological_unit>Homodimer</ars:Biological_unit>
+  <ars:Residues_per_subunit>159</ars:Residues_per_subunit>
+  <ars:PUBMED_ID>11278591</ars:PUBMED_ID>
+  <ars:Residues_in_Hinge_loop>GLY147-PHE148 (2)</ars:Residues_in_Hinge_loop>
+  <ars:Residues_in_swapped_domain>SER149-ARG158 (10)</ars:Residues_in_swapped_domain>
+  <ars:Extent_of_swapping>18.5</ars:Extent_of_swapping>
+  <ars:HINGE_REGION>EKCGFSNA</ars:HINGE_REGION>
+  <ars:Chain_ID>A, B, F, E</ars:Chain_ID>
+  <ars:Sequence_of_swapped_domain>SNAGVEMQIR</ars:Sequence_of_swapped_domain>
+  <ars:OLD>Homohexamer</ars:OLD>
+ </rdf:Description>
+ <rdf:Description rdf:about="http://ncbs.org/1I4M">
+  <ars:Structure_of_swapped_region>C-terminal &amp;-alpha helix</ars:Structure_of_swapped_region>
+  <ars:ID>1I4M</ars:ID>
+  <ars:PDB_PQS>PQS</ars:PDB_PQS>
+  <ars:Sequence_of_Hingeloop>VTTTTKGENF (last few residues of helix 2 in monomer=switch region in dimer)</ars:Sequence_of_Hingeloop>
+  <ars:Biological_unit>Homodimer</ars:Biological_unit>
+  <ars:Residues_per_subunit>108 (fragment 119-226)</ars:Residues_per_subunit>
+  <ars:PUBMED_ID>11524679</ars:PUBMED_ID>
+  <ars:Residues_in_Hinge_loop>VAL189-PHE198 (10)</ars:Residues_in_Hinge_loop>
+  <ars:Residues_in_swapped_domain>THR199-TYR226 (28)</ars:Residues_in_swapped_domain>
+  <ars:Extent_of_swapping>38.49</ars:Extent_of_swapping>
+  <ars:HINGE_REGION>QHTVTTTTKGENFTET</ars:HINGE_REGION>
+  <ars:Chain_ID>A</ars:Chain_ID>
+  <ars:Sequence_of_swapped_domain>TETDVKMMERVVEQMCITQYERESQAYY</ars:Sequence_of_swapped_domain>
+  <ars:OLD>Homodimer</ars:OLD>
+ </rdf:Description>
+</rdf:RDF>

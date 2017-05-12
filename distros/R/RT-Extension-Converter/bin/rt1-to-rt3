@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# this may need to change depending on your installation
+use lib qw(/opt/rt3/lib);
+use lib qw(lib); # assumes you run this uninstalled
+
+use Data::Dumper;
+
+use RT;
+
+    RT::LoadConfig();
+    RT::Init();
+
+use RTx::Converter;
+
+my $rt1 = RTx::Converter->new( type => 'RT1' );
+my $rt3 = RTx::Converter->new( type => 'RT3' );
+
+# should probably read a config file here
+# perldoc RTx::Converter::RT1::Config RTx::Converter::RT3::Config for options
+$rt1->config->debug(1);
+$rt3->config->debug(1);
+
+print "Migrating Users\n";
+migrate_users();
+print "\n\nMigrating Queues\n";
+migrate_queues();
+print "\n\nMigrating Tickets\n";
+migrate_tickets();
+print "\n\nDone.  Time to check all the data\n";
+
+sub migrate_users {
+    $RT::Handle->SimpleQuery("DELETE FROM Users where Name = 'root'");
+    while (my $user = $rt1->get_user) {
+        my $user_obj = $rt3->create_user(%$user);
+        unless ($user_obj) {
+            die "Failed to import user ".Dumper($user);
+        }
+    }
+}
+
+sub migrate_queues {
+    while (my $queue = $rt1->get_queue) {
+        if ($queue->{Name} =~ /^general$/i) {
+            # RT1 didn't have a default queue, so the client might have named
+            # it "problems" and confused things in rt3 that want a general queue.
+            $RT::Handle->SimpleQuery("DELETE FROM Queues where Name = 'general'");
+        }
+        my $queue_obj = $rt3->create_queue(%$queue);
+        unless ($queue_obj) {
+            die "Failed to import queue ".Dumper($queue);
+        }
+
+        # handle "Areas", turning them into CFs
+        while (my $area = $rt1->get_area( Name => $queue_obj->Name )) {
+            if (my $msg = $rt3->create_queue_area( Queue => $queue_obj, 
+                                                   Area  => $area->{area} )) {
+                die "Failed to create area $area->{area} for queue ".$queue_obj->Name." $msg";
+            }
+        }
+
+        # convert the old Queue ACLs into new RT rights
+        while (my $acl = $rt1->get_queue_acl( Name => $queue_obj->Name )) {
+            if (my $msg = $rt3->create_queue_acl( Queue => $queue_obj, 
+                                                  Acl   => $acl )) {
+                die "Failed to create acl ".Dumper($acl)." for queue ".$queue_obj->Name." $msg";
+            }
+        }
+    }
+}
+
+sub migrate_tickets {
+    while (my $ticket = $rt1->get_ticket) {
+        print "\n $ticket->{id}.";
+        my $tick_obj = $rt3->create_ticket(%$ticket);
+        my $transactions = $rt1->get_transactions($tick_obj->Id);
+        $rt3->create_transactions( Ticket => $tick_obj, Transactions => $transactions,
+                                   Path => $rt1->config->data_directory );
+    }
+    print "\nCreating links\n\n";
+    $rt3->create_links;
+}
+

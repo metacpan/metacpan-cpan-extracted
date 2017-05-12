@@ -1,0 +1,74 @@
+<!-- ##### SECTION Title ##### -->
+Unused items
+
+<!-- ##### SECTION Short_Description ##### -->
+Not used
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO RASQAL_API ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT rasqal_expression_s ##### -->
+<para>
+
+</para>
+
+@usage: 
+@op: 
+@arg1: 
+@arg2: 
+@arg3: 
+@literal: 
+@variable: 
+@value: 
+@name: 
+@args: 
+
+<!-- ##### STRUCT rasqal_literal_s ##### -->
+<para>
+
+</para>
+
+@usage: 
+@type: 
+@string: 
+@string_len: 
+
+<!-- ##### STRUCT rasqal_triples_match_s ##### -->
+<para>
+
+</para>
+
+@user_data: 
+@bind_match: 
+@next_match: 
+@is_end: 
+@finish: 
+
+<!-- ##### STRUCT rasqal_triples_source_s ##### -->
+<para>
+
+</para>
+
+@query: 
+@user_data: 
+@init_triples_match: 
+@triple_present: 
+@free_triples_source: 
+

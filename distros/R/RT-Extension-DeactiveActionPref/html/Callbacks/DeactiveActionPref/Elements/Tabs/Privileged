@@ -1,0 +1,35 @@
+<%args>
+$Path
+</%args>
+<%init>
+
+return unless $Path =~ m{^/Ticket/} && $DECODED_ARGS->{'id'} &&  $DECODED_ARGS->{'id'} =~ /^(\d+)$/;
+
+my $id  = $1;
+my $ticket = RT::Ticket->new( $session{'CurrentUser'} );
+$ticket->Load($id);
+
+return unless $ticket && $ticket->id;
+
+my $actions = PageMenu()->child( 'actions' );
+my $pref = $session{CurrentUser}->Preferences(RT->System, {});
+return unless $pref && $pref->{DeactiveAction};
+my $update_type = $pref->{DeactiveAction};
+
+my $current = $ticket->Status;
+my $lifecycle = $ticket->LifecycleObj;
+
+for my $info ( $lifecycle->Actions($current) ) {
+    my $next = $info->{'to'};
+    my $key = $info->{'label'} || ucfirst($next);
+    my $action = $actions->child($key);
+
+    next unless $action;
+    next unless $lifecycle->IsInactive($next);
+
+    my $original_action = $info->{'update'} || '';
+    next if $update_type eq $original_action;
+
+    $action->{path} =~ s!(?<=\bAction=)\w+!$update_type!;
+}
+</%init>

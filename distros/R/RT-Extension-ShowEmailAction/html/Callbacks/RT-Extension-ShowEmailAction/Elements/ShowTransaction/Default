@@ -1,0 +1,29 @@
+%# vim:ft=mason:sts=4:sw=4:et:
+<%ARGS>
+$Transaction
+$EmailRecordPath
+$Actions
+</%ARGS>
+<%INIT>
+
+if ($Transaction->ObjectType eq 'RT::Ticket'
+        and $Transaction->HasContent
+        and $EmailRecordPath) {
+
+    # find the top-level attachment
+    my $Attachment = $Transaction->Attachments->First;
+    while ($Attachment->ParentObj) {
+        $Attachment = $Attachment->ParentObj;
+    }
+
+    push( @$Actions, {
+        title  => loc('Show'),
+        target => '_blank',
+        path => $EmailRecordPath
+            . '?id=' . $Transaction->ObjectId
+            . '&Transaction=' . $Transaction->Id
+            . '&Attachment=' . $Attachment->Id
+    } );
+}
+
+</%INIT>

@@ -1,0 +1,77 @@
+{
+    "_comment": "Identifiers of key fields",
+    "key_fields": {
+        "1": "ACCOUNT_ID",
+        "5": "SWITCH_ID"
+    },
+
+    "_comment": [
+        "Databases.",
+        "'type' field may contain: mysql, Pg, SQLite (character case is important!).",
+        "For SQLite 'database' field contains an absolute path to the database file"
+    ],
+    "databases": {
+        "users": {
+            "database": "users",
+            "type": "mysql",
+            "host": "localhost",
+            "port": "3306",
+            "username": "root",
+            "password": "1"
+        },
+        "ip": {
+            "database": "/home/rt/ip_addresses.db",
+            "type": "SQLite",
+            "username": "",
+            "password": ""
+        }
+    },
+
+    "_comment": "Data sources for Custom Fields",
+    "field_sources": {
+
+        "_comment": [
+            "IP-addresses (CF id == 2)",
+            "To get data from DB you need to specify DB identifier and SQL query."
+        ],
+        "2": [
+            {
+                "database": "users",
+                "sql"     : "SELECT ip FROM ip_address WHERE account_id = ACCOUNT_ID"
+            }
+        ],
+
+        "_comment": [
+            "Phone number (CF id == 3)",
+            "To get data from external command you need to specify this command",
+            "(with full path and all the required command line options)."
+        ],
+        "3": [
+            {
+                "command": "/bin/echo 'hello ACCOUNT_ID'"
+            }
+        ],
+
+        "_comment": "Address (CF id == 4)",
+        "4": [
+            {
+                "database": "users",
+                "sql": "SELECT address FROM user_address WHERE account_id = ACCOUNT_ID"
+            }
+        ],
+
+        "_comment": "Ticket body",
+        "Body":    [
+            { "command": "/bin/cat /home/rt/ACCOUNT_ID" },
+            { "command": "/bin/cat /home/rt/ACCOUNT_ID" },
+            { "command": "/bin/cat /home/rt/ACCOUNT_ID" },
+            { "Text": "This is a plain text. Acc. ID: ACCOUNT_ID" },
+            { "Text": "This is a plain text without Acc. ID" }
+        ],
+
+        "_comment": "Subject of the ticket",
+        "Subject": [
+            { "command": "/bin/echo 'this is a subject, account: ACCOUNT_ID'" }
+        ]
+    }
+}

@@ -1,0 +1,18 @@
+Revision history for Perl module Rose::DBx::Object::Cached::FastMmap
+
+0.05 Mon Dec 26 13:18:25 EST 2011
+    - Fix for remember() setting all fields as changed 
+        by: David Bourget
+
+0.04 Sat Nov 14 22:40:49 EST 2009
+    - Fix for columns that use aliases.
+      Need to call the column's accessor function
+
+
+0.03 Wed May 27 01:36:13 EDT 2009
+    - Forcing any Unique Key look-ups that do not have any defined values from being stored in the cache.
+
+0.01 Sat Dec  6 16:48:41 2008
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

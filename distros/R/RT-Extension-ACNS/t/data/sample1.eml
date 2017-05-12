@@ -1,0 +1,68 @@
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Date:         Sun, 7 Apr 2013 03:41:10 -0500
+From:         root@localhost
+Subject: Copyright Infringement - Notice ID # 22273283246
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+04-07-2013
+
+free form will be ignored.=0A=0A- ---Start ACNS XM=
+L=0A<?xml version=3D"1.0" encoding=3D"UTF-8"?>=20
+<Infringement xsi:schemaLocation=3D"http://www.acns.net/ACNS http://www.=
+acns.net/v1.2/ACNS2v1_2.xsd" xmlns=3D"http://www.acns.net/ACNS" xmlns:xs=
+i=3D"http://www.w3.org/2001/XMLSchema-instance"> 	<Case>
+		<ID>A1234567890</ID>=20
+		<Status>OPEN</Status>=20
+		<Severity>Normal</Severity>=20
+		<Ref_URL></Ref_URL>
+	</Case>
+	<Complainant>
+		<Entity>Trust</Entity>=20
+		<Contact>Friend</Contact>=20
+		<Address>Hell</Address>=20
+		<Phone>666</Phone>=20
+		<Email>you.took.my.toy@example.com</Email>=20
+	</Complainant>
+	<Service_Provider>
+		<Entity>IT Dude</Entity>=20
+		<Contact>Admin</Contact>=20
+		<Address>Server Room</Address>=20
+		<Phone>911</Phone>
+		<Email>dirty.beardy.smelly@example.com</Email>=20
+	</Service_Provider>
+	<Source>
+		<TimeStamp>2013-04-06T20:02:41.99Z</TimeStamp>=20
+		<IP_Address>123.123.123.123</IP_Address>=20
+		<Port>39671</Port>=20
+		<DNS_Name>some.name.example.com</DNS_Name>
+		<Type>P2P</Type>=20
+		<SubType BaseType=3D"P2P" Protocol=3D"BITTORRENT" />
+		<Number_Files>1</Number_Files>=20
+		<IsSource>false</IsSource>
+	</Source>
+	<Content>
+		<Item>
+			<TimeStamp>2013-04-06T20:02:41.99Z</TimeStamp>=20
+			<AlsoSeen Start=3D"2013-04-06T19:59:43.46Z" End=3D"2013-04-06T20:00:3=
+6.27Z"></AlsoSeen>
+			<Title>booo</Title>=20
+			<Artist></Artist>
+			<FileName>example.file.exe</FileName>=20
+			<FileSize>1234567890</FileSize>=20
+			<Type>Game</Type>=20
+			<Hash Type=3D"SHA1">1234567890</Hash>
+		</Item>
+	</Content>
+<History></History>=20
+<Notes></Notes>
+</Infringement>=0A- ---End ACNS XML=0A-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (MingW32)
+
+iEYEARECAAYFAlFhMSYACgkQxDbGXOV1jVIojQCdF6XVD/kYs3aQpZzSdeG01Ryj
+TvgAmgOaTCP3G6Mne2oQlsZfZRhNSEg+
+=3DQZUp
+-----END PGP SIGNATURE-----

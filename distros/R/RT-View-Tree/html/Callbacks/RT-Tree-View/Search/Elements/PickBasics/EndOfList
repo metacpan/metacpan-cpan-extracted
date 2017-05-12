@@ -1,0 +1,20 @@
+<%args>
+</%args>
+<%init>
+</%init>
+<TR>
+<TD align="right">
+<&|/l&>Type</&>
+</TD>
+<TD>
+<& /Elements/SelectBoolean, Name => "TypeOp",
+                True => loc("is"),
+                False => loc("isn't"),
+                TrueVal=> '=',
+                FalseVal => '!='
+&>
+</TD>
+<TD>
+<input type="text" size="10" name="ValueOfType">
+</TD>
+</TR>

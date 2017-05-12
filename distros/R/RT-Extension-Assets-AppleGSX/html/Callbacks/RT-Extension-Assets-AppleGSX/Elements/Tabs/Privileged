@@ -1,0 +1,25 @@
+<%init>
+if ($session{CurrentUser}->HasRight(Object => RT->System, Right  => 'SuperUser')) {
+    my $assets = Menu();
+    $assets = $assets->child($_) for qw/admin assets/;
+    $assets->child(gsx => title => "Apple GSX", path => "/Admin/Assets/GSX/");
+}
+
+
+my $request = $r->path_info;
+   $request =~ s{/+}{/}g;
+
+return unless $request =~ m{^/Asset/};
+my $id = $DECODED_ARGS->{id};
+return unless $id and $id =~ /^\d+$/;
+
+my $asset = RT::Asset->new( $session{CurrentUser} );
+my ($ok, $msg) = $asset->Load($id);
+return unless $asset->id;
+
+PageMenu()->child("actions")->child( "applegsx",
+    title => loc("Update from Apple GSX"),
+    path => "/Asset/Display.html?id=$id&AppleGSXUpdate=1"
+);
+
+</%init>

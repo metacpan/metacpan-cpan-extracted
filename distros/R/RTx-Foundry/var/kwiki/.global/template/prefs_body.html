@@ -1,0 +1,10 @@
+<form>
+<span style="color:red">[% error_msg %]</span>
+[% checkbox(show_changed) %] {{Show changed message at bottom of display.}}<br />
+[% checkbox(select_diff) %] {{Show diff pulldown at bottom of display.}}<br />
+[% checkbox(show_diff) %] {{Show latest diff at bottom of display.}}<br />
+<br />
+<input type="submit" name="button-save" value="{{SAVE}}">
+<b>{{(Click the SAVE button after making changes)}}</b>
+<input type="hidden" name="action" value="prefs">
+</form>

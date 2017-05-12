@@ -1,0 +1,36 @@
+bin/rex_endpoint_http
+lib/Rex/Endpoint/HTTP.pm
+lib/Rex/Endpoint/HTTP/Base.pm
+lib/Rex/Endpoint/HTTP/Execute.pm
+lib/Rex/Endpoint/HTTP/File.pm
+lib/Rex/Endpoint/HTTP/Fs.pm
+lib/Rex/Endpoint/HTTP/Interface/Exec.pm
+lib/Rex/Endpoint/HTTP/Interface/Exec/Base.pm
+lib/Rex/Endpoint/HTTP/Interface/Exec/Posix.pm
+lib/Rex/Endpoint/HTTP/Interface/Exec/Windows.pm
+lib/Rex/Endpoint/HTTP/Interface/File.pm
+lib/Rex/Endpoint/HTTP/Interface/File/Base.pm
+lib/Rex/Endpoint/HTTP/Interface/File/Posix.pm
+lib/Rex/Endpoint/HTTP/Interface/File/Windows.pm
+lib/Rex/Endpoint/HTTP/Interface/Fs.pm
+lib/Rex/Endpoint/HTTP/Interface/Fs/Base.pm
+lib/Rex/Endpoint/HTTP/Interface/Fs/Posix.pm
+lib/Rex/Endpoint/HTTP/Interface/Fs/Windows.pm
+lib/Rex/Endpoint/HTTP/Interface/System.pm
+lib/Rex/Endpoint/HTTP/Interface/System/Base.pm
+lib/Rex/Endpoint/HTTP/Interface/System/Windows.pm
+lib/Rex/Endpoint/HTTP/Login.pm
+lib/Rex/Endpoint/HTTP/Mojolicious/Plugin/Auth.pm
+lib/Rex/Endpoint/HTTP/Os/Windows/Memory.pm
+lib/Rex/Endpoint/HTTP/Os/Windows/Swap.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+t/exec.t
+t/file.t
+t/fs.t
+t/login.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

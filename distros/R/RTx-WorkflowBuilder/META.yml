@@ -1,0 +1,22 @@
+---
+abstract: 'Helpers for building workflow for queues in RT'
+author:
+  - 'Chia-liang Kao <clkao@bestpractical.com>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: 'GPL version 2'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RTx-WorkflowBuilder
+no_index:
+  directory:
+    - etc
+    - html
+    - po
+    - var
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+version: 1.02

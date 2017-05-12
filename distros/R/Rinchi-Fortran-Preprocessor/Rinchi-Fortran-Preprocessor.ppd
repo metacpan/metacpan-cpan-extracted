@@ -1,0 +1,10 @@
+<SOFTPKG NAME="Rinchi-Fortran-Preprocessor" VERSION="0,02,0,0">
+    <TITLE>Rinchi-Fortran-Preprocessor</TITLE>
+    <ABSTRACT>An Fortran to XML preprocessor extension for preprocessing Fortran files </ABSTRACT>
+    <AUTHOR>Brian M. Ames &lt;bmames@apk.net&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <OS NAME="linux" />
+        <ARCHITECTURE NAME="i386-linux-thread-multi" />
+        <CODEBASE HREF="" />
+    </IMPLEMENTATION>
+</SOFTPKG>

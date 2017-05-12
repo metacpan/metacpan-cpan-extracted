@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<RDF
+    xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:dc="http://dublincore.org/2000/03/13-dces#" >
+
+<rdf:Statement rdf:ID="123">
+      <rdf:subject rdf:resource="http://xml.jrc.it/RDFStore" />
+      <rdf:predicate rdf:resource="http://dublincore.org/2000/03/13-dces#creator" />
+      <rdf:object>A really stupid italian guy</rdf:object>
+      <dc:language>English</dc:language>
+</rdf:Statement>
+
+</RDF>

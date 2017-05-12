@@ -1,0 +1,28 @@
+Changes
+
+2012-01-19  - v0.08
+    - cleaned up some of the doc
+
+2011-10-13  - v0.07
+    - removed etc/initdata +IR dep
+    - cleaned up Makefile.PL a bit
+    - added warning for RT4 users that this hasn't been tested yet
+    - updated README
+
+2011-01-05  - v0.06
+    - cleaned up to work with XML::IODEF::Simple
+
+2010-02-04 - v0.03_1
+    - migrated to 2007 RFC 5070 (official release)
+    - fixed an RT::IR dep
+
+2009-09-28 - v0.02_1
+    - cleaned up licence for cpan release
+    - removed IR dependancy
+
+2009-06-02 - v0.01_2
+	- Split from RT-SES trunk
+	- Cleaned up a bunch of code
+
+2009-04-05 - v0.01_1
+	- Initial Release

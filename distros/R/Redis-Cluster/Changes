@@ -1,0 +1,24 @@
+Revision history for Perl extension Redis::Cluster.
+
+0.14  Wed Jul 29 15:19:21 2015
+  - Fix redirect inside 'watch'
+
+0.13  Wed Jul 29 12:46:33 2015
+  - New get_random_master() and get_random_slave() methods
+  - POD fixed / improved
+  - Tests added / fixed
+
+0.12  Tue Jul 28 12:36:47 2015
+  - Some tests should be optional
+
+0.11  Mon Jul 27 23:31:44 2015
+  - Add MANIFEST
+
+0.1  Mon Jul 27 22:29:05 2015
+  - Support of multiple Redis Clusters (cluster state is not static anymore)
+  - Automatic cluster state refresh is now optional (instead of default
+    refresh interval)
+
+0.02  Thu Jul 24 19:06:55 2015
+	- Initial version
+

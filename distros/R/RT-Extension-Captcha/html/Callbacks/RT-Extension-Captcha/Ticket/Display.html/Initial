@@ -1,0 +1,54 @@
+<%ARGS>
+$ARGSRef => {}
+</%ARGS>
+<%INIT>
+my ($is_create, $is_update);
+if ( ($ARGSRef->{'id'}||'') eq 'new' ) {
+    my $queue = RT::Queue->new( $session{'CurrentUser'} );
+    $queue->Load( $ARGSRef->{'Queue'} );
+    return unless $queue->id;
+
+    return if $queue->CurrentUserHasRight('NoCaptchaOnCreate');
+    $is_create = 1;
+}
+elsif ( $ARGSRef->{'UpdateContent'} ) {
+    my $ticket = LoadTicket( $ARGSRef->{'id'} );
+    return if $ticket->CurrentUserHasRight('NoCaptchaOnUpdate');
+    $is_update = 1;
+}
+else {
+    return;
+}
+
+my ($captcha) = ($ARGSRef->{'CaptchaString'});
+if ( !$captcha || lc($captcha) ne lc($session{'Captcha'}{'String'}||'') ) {
+    my $key = Digest::MD5::md5_hex( rand(1024) );
+    push @{ $session{"Actions"}->{ $key } ||= [] },
+        loc("You have to solve CAPTCHA");
+    $session{'i'}++;
+
+    if ( $is_create ) {
+        RT::Interface::Web::Redirect(
+            RT->Config->Get('WebURL')
+            ."Ticket/Create.html"
+            ."?Queue=". $m->interp->apply_escapes( $ARGSRef->{'Queue'}, 'u' )
+            ."&results=". $key
+        );
+    }
+    elsif ( $is_update ) {
+        RT::Interface::Web::Redirect(
+            RT->Config->Get('WebURL')
+            ."Ticket/Update.html"
+            ."?id=". $m->interp->apply_escapes( $ARGSRef->{'id'}, 'u' )
+            ."&results=". $key
+        );
+    } else {
+        $RT::Logger->crit("Something wrong in captcha code");
+        return;
+    }
+    return $m->abort;
+}
+
+delete $session{'Captcha'};
+return;
+</%INIT>

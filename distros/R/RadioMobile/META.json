@@ -1,0 +1,45 @@
+{
+   "abstract" : "A Perl interface to Radio Mobile .net file",
+   "author" : [
+      "Emiliano Bruni <info@ebruni.it>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RadioMobile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::AsObject" : 0,
+            "Class::Container" : 0,
+            "Class::MethodMaker" : 0,
+            "File::Binary" : 0,
+            "IO::Scalar" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.11"
+}

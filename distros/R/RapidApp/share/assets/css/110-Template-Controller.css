@@ -1,0 +1,120 @@
+/* Styles for inline Template editing (RapidApp::Template::Controller) */
+
+/* Templates directly within ExtJS Panel Bodys (i.e. Tabs)  
+   should fill the full area for max flexibility:    */
+.x-panel-body>.ra-template {
+  height: auto;
+  width: 100%;
+}
+
+/* Special case for templates with template_css_class set to
+   'ra-doc' (default). Set the padding *only* on the topmost
+   template. This needs to be set here instead of in ra-doc.css
+   because we don't want it applied to nested templates */
+.ra-scoped-reset.ra-doc {
+  padding: 2px 5px;
+}
+
+.ra-template {
+  position: relative;
+  min-height: 40px;
+  min-width: 40px;
+}
+
+.ra-template>.edit {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  height: 40px;
+  width: 40px;
+  opacity: 0.2;
+  display:none;
+}
+
+/* Nesting - handled up to 5 levels deep */
+.ra-template .ra-template>.edit {
+  top: 2px;
+  right: 15px;
+  opacity: 0.16;
+}
+.ra-template .ra-template .ra-template>.edit {
+  top: 4px;
+  right: 30px;
+  opacity: 0.12;
+}
+.ra-template .ra-template .ra-template .ra-template>.edit {
+  top: 6px;
+  right: 45px;
+  opacity: 0.08;
+}
+.ra-template .ra-template .ra-template .ra-template .ra-template>.edit {
+  top: 8px;
+  right: 60px;
+  opacity: 0.04;
+}
+.ra-template .ra-template .ra-template .ra-template .ra-template .ra-template>.edit {
+  top: 10px;
+  right: 75px;
+  opacity: 0.02;
+}
+
+.ra-template:hover>.edit {
+  display: block;
+}
+
+.ra-template>.edit:hover {
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+.ra-template>.not-exist, .ra-template>.tpl-error {
+  margin: 10px;
+  padding: 15px;
+  border-width: 1px;
+  background-color: #FAFAFA;
+  border-color: orange;
+  border-style: dashed;
+  color: #2F2F2F;
+  font-size: 16px;
+  font-weight: bolder;
+  font-family: arial, verdana, tahoma, sans-serif;
+  display: block;
+}
+
+.ra-template>.tpl-error {
+  border-color: crimson;
+}
+
+.ra-template>.tpl-error>.error-msg {
+  color: crimson;
+  font-size: 13px;
+  padding-top: 10px;
+  padding-left: 20px;
+  padding-bottom: 5px;
+}
+
+.ra-template .tpl-name {
+  font-size: 18px;
+  padding-left: 4px;
+  padding-right: 4px;
+  color: navy;
+  font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
+}
+
+.ra-template>.not-exist>.create {
+  margin: 5px;
+  padding-bottom: 1px;
+  padding-top: 4px;
+  padding-right: 5px;
+  padding-left: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #06e;
+  border-bottom: 1px dotted #888;
+}
+
+.ra-template>.not-exist>.create:hover {
+  color: #00e;
+  border-bottom: 1px solid #00e;
+}

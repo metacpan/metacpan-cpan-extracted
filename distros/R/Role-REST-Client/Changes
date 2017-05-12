@@ -1,0 +1,80 @@
+Revision history for Role-REST-Client
+
+0.19    2016-11-08 08:08:16 Europe/Copenhagen
+ - The standard is not clear on this, and some servers don't allow them, but it seems that DELETE can take a request body.
+ - Added serializer_options so it's possible to instantiate the serializer w/ parameters
+ - Fixed "Use of uninitialized value in concatenation (.) or string" warning when $self->server is not initialized
+ - Changes for rt #118413. Thanks to abraxxa
+   http_headers return a combined hashref of http_headers and persistent_headers
+   new method, clear_all_headers
+
+0.18    2014-06-26 22:28:12 Europe/Copenhagen
+ - Decode the content even for http codes >= 400. There might be some information there (idea: moltar)
+
+0.17    2014-04-22 19:58:08 Europe/Copenhagen
+ - Prevent 'redefined' warnings and updated dependency list (Breno G. de Oliveira)
+
+0.16    2013-09-26 07:51:17 Europe/Copenhagen
+ - Mooify Role::REST::Client (Matt Phillips)
+ - Start deserializing text/javascript without a warning (Mark Stosberg)
+ - Replace HTTP::Tiny with HTTP::Thin
+ - Use HTTP::Response to determine if a request failed
+
+0.15    2013-03-28 22:38:29 Europe/Copenhagen
+ - Only update httpheaders from persistent_headers if they are not already set.
+
+0.14    2013-03-28 21:17:06 Europe/Copenhagen
+
+ - Fix URI encode process (Wallace Reis)
+ - self->_persistent_headers was sometimes undef and there was no lazy bit.
+ - dist.ini corrections
+ - Improved Docs (Mark Stosberg) 
+
+0.13    2012-11-11 12:45:40 Europe/Copenhagen
+ -  Change json/yaml/xml serializers to recommends instead of requires (Matt Phillips)
+ -  Fix httpheaders attr - must be lazy since builder depends on persistent_headers (Wallace Reis).
+ -  Remove MooseX::Declare from the dependency chain (Mark Stosberg)
+ -  Don't require HTTP::Tiny to be loaded if it is never used (Mark Stosberg)
+
+0.12    2012-06-26 19:08:09 Europe/Copenhagen
+ -  Fix httpheaders attr - must be lazy since builder depends on persistent_headers (Wallace Reis).
+
+0.11    2012-06-14 20:47:25 Europe/Copenhagen
+ - Init methods remember the persistent headers (Thanks to Wallace Reis for the tests).
+
+0.10    2012-06-01 14:07:37 Europe/Copenhagen
+ - Add HTTP HEAD method (Wallace Reis).
+
+0.09    2012-05-29 14:59:38 Europe/Copenhagen
+ - Use Data::Serializer::Raw instead of Data::Serializer
+ - Fix content-length missmatch issue (Wallace Reis).
+ - Factor out request step (Wallace Reis).
+
+0.08    2012-05-29 07:24:24 Europe/Copenhagen
+ - Lazily deserialize the response (Wallace Reis).
+ - Allow use of a custom UA object (Wallace Reis).
+ - Defer the building of serializer obj until really necessary (Wallace Reis).
+ 
+0.07    2012-05-24 07:22:16 Europe/Copenhagen
+ - Make new_serializer and serializer_class public method and attr,
+   respectively (Wallace Reis).
+
+0.06    2012-05-19 18:32:07 Europe/Copenhagen
+ - Add preserve_headers option and persistent_headers to allow sticky headers.
+
+0.05    2012-04-02 22:57:55 Europe/Copenhagen
+ - Response and serializer are now easy overridable [Matt Phillips].
+
+0.04    2012-03-30 11:02:47 Europe/Copenhagen
+ - Don't use 5.010; we don't have particular needs for that
+
+0.03    2012-03-19 19:50:25 Europe/Copenhagen
+ - Clear headers AFTER the request, Makes it possible to set any http header except content-type
+   and any header set by authentication roles.
+
+0.02    2012-03-01 20:58:30 Europe/Copenhagen
+ - Turn _ua into an attribute
+ - Add support for Auth modules (See http://search.cpan.org/dist/Role-REST-Client-Auth-Basic/)
+
+0.01    2012-02-20 17:28:59 Europe/Copenhagen
+ - First version, with functionality taken from Catalyst::Model::REST

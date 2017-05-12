@@ -1,0 +1,28 @@
+--- #YAML:1.0
+abstract: 'Enforce users to fill standard fields when creating a ticket'
+author:
+  - 'Benjamin Heisig <bheisig@synetics.de>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+requires:
+  rt: 4.0.0
+  perl: 5.10.0
+distribution_type: module
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-MandatoryFields
+no_index:
+  file:
+    - TODO
+  directory:
+    - html
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.benjaminheisig.net/rt-extension-mandatoryfields.git
+version: 0.6

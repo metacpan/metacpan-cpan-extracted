@@ -1,0 +1,46 @@
+%# Democracy is good.  I say this because other systems are worse.
+%# 		-- Jawaharlal Nehru
+
+<& /Edit/Elements/List,
+    %ARGS,
+    Data  => [
+	[ '10%', loc('Id'),		sub { $_[0]{Id} } ],
+	[ '15%', loc('Date'),		sub { $_[0]{Date} } ],
+	[ '15%', loc('Time'),		sub { $_[0]{Time} } ],
+	[ '15%', loc('User'),		sub { $_[0]{User} } ],
+	[ '45%', loc('Description'),	sub { $_[0]{Description} } ],
+    ],
+    Link => sub { '.' },
+    List => \@List,
+    Size => 14,
+    Item => {}
+&>
+<%INIT>
+our $Get;
+$Get->('?root=' . $QueueObj->OriginObj->CustomFieldValue('UnixName'));
+
+my $Item = {};
+my @List;
+foreach my $rev (1..$m->notes('revision')) {
+    my $out = $Get->(
+	"/*revision*/?rev=$rev&root=" .
+	$QueueObj->OriginObj->CustomFieldValue('UnixName')
+    );
+    $out =~ /\("(\d+)-(\d+)-(\d+)T(..:..:..)[^"]*" "([^"]+)" "(.+)"\)/s or next;
+    my $item = {
+	Id => $rev,
+	Date => "$1/$2/$3",
+	Time => $4,
+	User => $5,
+	Description => $6,
+    };
+    unshift @List, $item;
+}
+
+</%INIT>
+<%ATTR>
+Tab3	=> 'Revisions'
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>

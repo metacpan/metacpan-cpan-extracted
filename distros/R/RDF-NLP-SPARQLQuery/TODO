@@ -1,0 +1,4 @@
+- Use of union operator when several semantic types can match at a higher level
+  (see qald-4_biomedical_train-14 and qald-4_biomedical_train-5)
+
+- USe of RDF::Trine::Pattern ?

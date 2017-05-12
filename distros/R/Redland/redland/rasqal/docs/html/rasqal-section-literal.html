@@ -1,0 +1,928 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Literal</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Rasqal RDF Query Library Manual">
+<link rel="up" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="prev" href="rasqal-section-graph-pattern.html" title="Graph patterns">
+<link rel="next" href="rasqal-section-prefix.html" title="Prefixes">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="rasqal.html" title="Rasqal Overview">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="rasqal-section-graph-pattern.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt01.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Rasqal RDF Query Library Manual</th>
+<td><a accesskey="n" href="rasqal-section-prefix.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2600028" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2608684" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="rasqal-section-literal"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2600028"></a><span class="refentrytitle">Literal</span>
+</h2>
+<p>Literal &#8212; RDF literals and RDF query-specific literals.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>;
+enum        <a href="rasqal-section-literal.html#rasqal-literal-type">rasqal_literal_type</a>;
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-boolean-literal">rasqal_new_boolean_literal</a>  (int value);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-decimal-literal">rasqal_new_decimal_literal</a>  (unsigned char *decimal);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-double-literal">rasqal_new_double_literal</a>   (double d);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-floating-literal">rasqal_new_floating_literal</a> (double f);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-integer-literal">rasqal_new_integer_literal</a>  (<a href="rasqal-section-literal.html#rasqal-literal-type">rasqal_literal_type</a> type,
+                                             int integer);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-pattern-literal">rasqal_new_pattern_literal</a>  (unsigned char *pattern,
+                                             const char *flags);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-simple-literal">rasqal_new_simple_literal</a>   (<a href="rasqal-section-literal.html#rasqal-literal-type">rasqal_literal_type</a> type,
+                                             unsigned char *string);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-string-literal">rasqal_new_string_literal</a>   (unsigned char *string,
+                                             const char *language,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *datatype,
+                                             unsigned char *datatype_qname);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-uri-literal">rasqal_new_uri_literal</a>      (<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *uri);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-variable-literal">rasqal_new_variable_literal</a> (<a href="rasqal-section-variable.html#rasqal-variable">rasqal_variable</a> *variable);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-new-literal-from-literal">rasqal_new_literal_from_literal</a>
+                                            (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);
+void        <a href="rasqal-section-literal.html#rasqal-free-literal">rasqal_free_literal</a>             (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);
+<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* <a href="rasqal-section-literal.html#rasqal-literal-as-node">rasqal_literal_as_node</a>      (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);
+const unsigned char* <a href="rasqal-section-literal.html#rasqal-literal-as-string">rasqal_literal_as_string</a>
+                                            (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);
+const unsigned char* <a href="rasqal-section-literal.html#rasqal-literal-as-string-flags">rasqal_literal_as_string_flags</a>
+                                            (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l,
+                                             int flags,
+                                             int *error);
+<a href="rasqal-section-variable.html#rasqal-variable">rasqal_variable</a>* <a href="rasqal-section-literal.html#rasqal-literal-as-variable">rasqal_literal_as_variable</a> (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);
+int         <a href="rasqal-section-literal.html#rasqal-literal-compare">rasqal_literal_compare</a>          (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l1,
+                                             <a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l2,
+                                             int flags,
+                                             int *error);
+int         <a href="rasqal-section-literal.html#rasqal-literal-equals">rasqal_literal_equals</a>           (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l1,
+                                             <a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l2);
+void        <a href="rasqal-section-literal.html#rasqal-literal-print">rasqal_literal_print</a>            (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l,
+                                             FILE *fh);
+void        <a href="rasqal-section-literal.html#rasqal-literal-print-type">rasqal_literal_print_type</a>       (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l,
+                                             FILE *fh);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2608684"></a><h2>Description</h2>
+<p>
+A class for handling RDF terms (URI, blank nodes, strings, datatyped
+literals) as well as those natively used in a query such as
+boolean, double, floating, integer, regex pattern and variables.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2608703"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2608714"></a><h3>
+<a name="rasqal-literal"></a>rasqal_literal</h3>
+<a class="indexterm" name="id2608726"></a><pre class="programlisting">typedef struct rasqal_literal_s rasqal_literal;
+</pre>
+<p>
+Rasqal literal class.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608746"></a><h3>
+<a name="rasqal-literal-type"></a>enum rasqal_literal_type</h3>
+<a class="indexterm" name="id2608759"></a><pre class="programlisting">typedef enum {
+  /* internal */
+  RASQAL_LITERAL_UNKNOWN,
+  RASQAL_LITERAL_BLANK,
+  RASQAL_LITERAL_URI,
+  RASQAL_LITERAL_STRING,
+  RASQAL_LITERAL_BOOLEAN,
+  RASQAL_LITERAL_INTEGER,
+  RASQAL_LITERAL_DOUBLE,
+  /* deprecated */
+  RASQAL_LITERAL_FLOATING = RASQAL_LITERAL_DOUBLE,
+  RASQAL_LITERAL_FLOAT,
+  RASQAL_LITERAL_DECIMAL,
+  RASQAL_LITERAL_DATETIME,
+  /* internal */
+  RASQAL_LITERAL_FIRST_XSD = RASQAL_LITERAL_BOOLEAN,
+  /* internal */
+  RASQAL_LITERAL_LAST_XSD = RASQAL_LITERAL_DATETIME,
+  RASQAL_LITERAL_PATTERN,
+  RASQAL_LITERAL_QNAME,
+  RASQAL_LITERAL_VARIABLE,
+  /* internal */
+  RASQAL_LITERAL_LAST= RASQAL_LITERAL_VARIABLE
+} rasqal_literal_type;
+</pre>
+<p>
+Types of literal.
+</p>
+<p>
+The order in the enumeration is significant as it encodes
+the SPARQL term ordering conditions:
+</p>
+<p>
+  Blank Nodes &lt;&lt; IRIS &lt;&lt; RDF literals &lt;&lt; typed literals
+</p>
+<p>
+which coresponds to in enum values
+</p>
+<p>
+  BLANK &lt;&lt; URI &lt;&lt; STRING &lt;&lt; 
+    (BOOLEAN | INTEGER | DOUBLE | FLOAT | DECIMAL | DATETIME)
+    (RASQAL_LITERAL_FIRST_XSD ... RASQAL_LITERAL_LAST_XSD)
+</p>
+<p>
+Not used (internal): PATTERN, QNAME, VARIABLE
+</p>
+<p>
+See <a href="rasqal-section-literal.html#rasqal-literal-compare"><code class="function">rasqal_literal_compare()</code></a> when used with flags
+<a href="rasqal-section-expression.html#RASQAL-COMPARE-XQUERY:CAPS"><code class="literal">RASQAL_COMPARE_XQUERY</code></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-UNKNOWN:CAPS"></a><code class="literal">RASQAL_LITERAL_UNKNOWN</code></span></td>
+<td> Internal.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-BLANK:CAPS"></a><code class="literal">RASQAL_LITERAL_BLANK</code></span></td>
+<td> RDF blank node literal (SPARQL r:bNode)
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-URI:CAPS"></a><code class="literal">RASQAL_LITERAL_URI</code></span></td>
+<td> RDF URI Literal (SPARQL r:URI)
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-STRING:CAPS"></a><code class="literal">RASQAL_LITERAL_STRING</code></span></td>
+<td> RDF Literal / xsd:string (SPARQL r:Literal)
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-BOOLEAN:CAPS"></a><code class="literal">RASQAL_LITERAL_BOOLEAN</code></span></td>
+<td> Boolean literal xsd:boolean.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-INTEGER:CAPS"></a><code class="literal">RASQAL_LITERAL_INTEGER</code></span></td>
+<td> Integer literal xsd:integer.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-DOUBLE:CAPS"></a><code class="literal">RASQAL_LITERAL_DOUBLE</code></span></td>
+<td> Double floating point literal xsd:double.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-FLOATING:CAPS"></a><code class="literal">RASQAL_LITERAL_FLOATING</code></span></td>
+<td> Deprecated <a href="rasqal-section-literal.html#RASQAL-LITERAL-DOUBLE:CAPS"><code class="literal">RASQAL_LITERAL_DOUBLE</code></a>.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-FLOAT:CAPS"></a><code class="literal">RASQAL_LITERAL_FLOAT</code></span></td>
+<td> Floating point literal xsd:float.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-DECIMAL:CAPS"></a><code class="literal">RASQAL_LITERAL_DECIMAL</code></span></td>
+<td> Decimal integer xsd:decimal.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-DATETIME:CAPS"></a><code class="literal">RASQAL_LITERAL_DATETIME</code></span></td>
+<td> Date/Time literal xsd:dateTime.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-FIRST-XSD:CAPS"></a><code class="literal">RASQAL_LITERAL_FIRST_XSD</code></span></td>
+<td> Internal.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-LAST-XSD:CAPS"></a><code class="literal">RASQAL_LITERAL_LAST_XSD</code></span></td>
+<td> Internal.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-PATTERN:CAPS"></a><code class="literal">RASQAL_LITERAL_PATTERN</code></span></td>
+<td> Pattern literal for a regex.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-QNAME:CAPS"></a><code class="literal">RASQAL_LITERAL_QNAME</code></span></td>
+<td> XML Qname literal.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-VARIABLE:CAPS"></a><code class="literal">RASQAL_LITERAL_VARIABLE</code></span></td>
+<td> Variable literal.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RASQAL-LITERAL-LAST:CAPS"></a><code class="literal">RASQAL_LITERAL_LAST</code></span></td>
+<td> Internal.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608919"></a><h3>
+<a name="rasqal-new-boolean-literal"></a>rasqal_new_boolean_literal ()</h3>
+<a class="indexterm" name="id2608930"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_boolean_literal  (int value);</pre>
+<p>
+Constructor - Create a new Rasqal boolean literal.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>value</code></em>&#160;:</span></td>
+<td> non-0 for true, 0 for false
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608998"></a><h3>
+<a name="rasqal-new-decimal-literal"></a>rasqal_new_decimal_literal ()</h3>
+<a class="indexterm" name="id2609010"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_decimal_literal  (unsigned char *decimal);</pre>
+<p>
+Constructor - Create a new Rasqal decimal literal.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>decimal</code></em>&#160;:</span></td>
+<td> decimal literal
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609077"></a><h3>
+<a name="rasqal-new-double-literal"></a>rasqal_new_double_literal ()</h3>
+<a class="indexterm" name="id2609089"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_double_literal   (double d);</pre>
+<p>
+Constructor - Create a new Rasqal double literal.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>d</code></em>&#160;:</span></td>
+<td> double literal
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609157"></a><h3>
+<a name="rasqal-new-floating-literal"></a>rasqal_new_floating_literal ()</h3>
+<a class="indexterm" name="id2609169"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_floating_literal (double f);</pre>
+<p>
+<em class="parameter"><code>Deprecated</code></em>: Use <a href="rasqal-section-literal.html#rasqal-new-double-literal"><code class="function">rasqal_new_double_literal()</code></a>.
+</p>
+<p>
+Constructor - Create a new Rasqal double literal.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>f</code></em>&#160;:</span></td>
+<td>  floating literal
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615092"></a><h3>
+<a name="rasqal-new-integer-literal"></a>rasqal_new_integer_literal ()</h3>
+<a class="indexterm" name="id2615102"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_integer_literal  (<a href="rasqal-section-literal.html#rasqal-literal-type">rasqal_literal_type</a> type,
+                                             int integer);</pre>
+<p>
+Constructor - Create a new Rasqal integer literal.
+</p>
+<p>
+The integer decimal number is turned into a rasqal integer literal
+and given a datatype of xsd:integer</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>type</code></em>&#160;:</span></td>
+<td> Type of literal such as RASQAL_LITERAL_INTEGER or RASQAL_LITERAL_BOOLEAN
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>integer</code></em>&#160;:</span></td>
+<td> int value
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615187"></a><h3>
+<a name="rasqal-new-pattern-literal"></a>rasqal_new_pattern_literal ()</h3>
+<a class="indexterm" name="id2615198"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_pattern_literal  (unsigned char *pattern,
+                                             const char *flags);</pre>
+<p>
+Constructor - Create a new Rasqal pattern literal.
+</p>
+<p>
+The pattern and flags are input parameters and are stored in the
+literal, not copied.  The set of flags recognised depends
+on the regex engine and the query language.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>pattern</code></em>&#160;:</span></td>
+<td> regex pattern
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>flags</code></em>&#160;:</span></td>
+<td> regex flags
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615284"></a><h3>
+<a name="rasqal-new-simple-literal"></a>rasqal_new_simple_literal ()</h3>
+<a class="indexterm" name="id2615295"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_simple_literal   (<a href="rasqal-section-literal.html#rasqal-literal-type">rasqal_literal_type</a> type,
+                                             unsigned char *string);</pre>
+<p>
+Constructor - Create a new Rasqal simple literal.
+</p>
+<p>
+The string is an input parameter and is stored in the
+literal, not copied.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>type</code></em>&#160;:</span></td>
+<td> RASQAL_LITERAL_BLANK or RASQAL_LITERAL_BLANK_QNAME
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> the UTF-8 string value to store
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615381"></a><h3>
+<a name="rasqal-new-string-literal"></a>rasqal_new_string_literal ()</h3>
+<a class="indexterm" name="id2615392"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_string_literal   (unsigned char *string,
+                                             const char *language,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *datatype,
+                                             unsigned char *datatype_qname);</pre>
+<p>
+Constructor - Create a new Rasqal string literal.
+</p>
+<p>
+All parameters are input parameters and if present are stored in
+the literal, not copied.
+</p>
+<p>
+The datatype and datatype_qname parameters are alternatives; the
+qname is a datatype that cannot be resolved till later since the
+prefixes have not yet been declared or checked.
+</p>
+<p>
+If the string literal is datatyped and of certain types recognised
+it may be converted to a different literal type by
+rasqal_literal_string_to_native.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> UTF-8 string lexical form
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>language</code></em>&#160;:</span></td>
+<td> RDF language (xml:lang) (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>datatype</code></em>&#160;:</span></td>
+<td> datatype URI (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>datatype_qname</code></em>&#160;:</span></td>
+<td> datatype qname string (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615528"></a><h3>
+<a name="rasqal-new-uri-literal"></a>rasqal_new_uri_literal ()</h3>
+<a class="indexterm" name="id2615538"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_uri_literal      (<a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *uri);</pre>
+<p>
+Constructor - Create a new Rasqal URI literal from a raptor URI.
+</p>
+<p>
+The uri is an input parameter and is stored in the literal, not copied.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+><span class="type">raptor_uri</span></a> uri
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615610"></a><h3>
+<a name="rasqal-new-variable-literal"></a>rasqal_new_variable_literal ()</h3>
+<a class="indexterm" name="id2615621"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_variable_literal (<a href="rasqal-section-variable.html#rasqal-variable">rasqal_variable</a> *variable);</pre>
+<p>
+Constructor - Create a new Rasqal variable literal.
+</p>
+<p>
+variable is an input parameter and stored in the literal, not copied.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>variable</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-variable.html#rasqal-variable"><span class="type">rasqal_variable</span></a> to use
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> New <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615692"></a><h3>
+<a name="rasqal-new-literal-from-literal"></a>rasqal_new_literal_from_literal ()</h3>
+<a class="indexterm" name="id2615705"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_new_literal_from_literal
+                                            (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);</pre>
+<p>
+Copy Constructor - create a new rasqal_literal object from an existing rasqal_literal object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object to copy
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615774"></a><h3>
+<a name="rasqal-free-literal"></a>rasqal_free_literal ()</h3>
+<a class="indexterm" name="id2615784"></a><pre class="programlisting">void        rasqal_free_literal             (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);</pre>
+<p>
+Destructor - destroy an rasqal_literal object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>l</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615835"></a><h3>
+<a name="rasqal-literal-as-node"></a>rasqal_literal_as_node ()</h3>
+<a class="indexterm" name="id2615845"></a><pre class="programlisting"><a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a>* rasqal_literal_as_node      (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);</pre>
+<p>
+Turn a literal into a new RDF string, URI or blank literal.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the new <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615912"></a><h3>
+<a name="rasqal-literal-as-string"></a>rasqal_literal_as_string ()</h3>
+<a class="indexterm" name="id2615923"></a><pre class="programlisting">const unsigned char* rasqal_literal_as_string
+                                            (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);</pre>
+<p>
+Return the string format of a literal.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> pointer to a shared string format of the literal.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615986"></a><h3>
+<a name="rasqal-literal-as-string-flags"></a>rasqal_literal_as_string_flags ()</h3>
+<a class="indexterm" name="id2615998"></a><pre class="programlisting">const unsigned char* rasqal_literal_as_string_flags
+                                            (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l,
+                                             int flags,
+                                             int *error);</pre>
+<p>
+Return the string format of a literal according to flags.
+</p>
+<p>
+flag bits affects conversion:
+  RASQAL_COMPARE_XQUERY: use XQuery conversion rules
+</p>
+<p>
+If <em class="parameter"><code>error</code></em> is not NULL, *error is set to non-0 on error</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>flags</code></em>&#160;:</span></td>
+<td> comparison flags
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>error</code></em>&#160;:</span></td>
+<td> pointer to error
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> pointer to a shared string format of the literal.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2616114"></a><h3>
+<a name="rasqal-literal-as-variable"></a>rasqal_literal_as_variable ()</h3>
+<a class="indexterm" name="id2616125"></a><pre class="programlisting"><a href="rasqal-section-variable.html#rasqal-variable">rasqal_variable</a>* rasqal_literal_as_variable (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l);</pre>
+<p>
+Get the variable inside a literal.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the <a href="rasqal-section-variable.html#rasqal-variable"><span class="type">rasqal_variable</span></a> or NULL if the literal is not a variable
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2616192"></a><h3>
+<a name="rasqal-literal-compare"></a>rasqal_literal_compare ()</h3>
+<a class="indexterm" name="id2616203"></a><pre class="programlisting">int         rasqal_literal_compare          (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l1,
+                                             <a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l2,
+                                             int flags,
+                                             int *error);</pre>
+<p>
+Compare two literals with type promotion.
+</p>
+<p>
+The two literals are compared across their range.  If the types
+are not the same, they are promoted.  If one is a double or float, the
+other is promoted to double, otherwise for integers, otherwise
+to strings (all literals have a string value).
+</p>
+<p>
+The comparison returned is as for strcmp, first before second
+returns &lt;0.  equal returns 0, and first after second returns &gt;0.
+For URIs, the string value is used for the comparsion.
+</p>
+<p>
+flag bits affects comparisons:
+  RASQAL_COMPARE_NOCASE: use case independent string comparisons
+  RASQAL_COMPARE_XQUERY: use XQuery comparison and type promotion rules
+</p>
+<p>
+If <em class="parameter"><code>error</code></em> is not NULL, *error is set to non-0 on error</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l1</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> first literal
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>l2</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> second literal
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>flags</code></em>&#160;:</span></td>
+<td> comparison flags
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>error</code></em>&#160;:</span></td>
+<td> pointer to error
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> &lt;0, 0, or &gt;0 as described above.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2616356"></a><h3>
+<a name="rasqal-literal-equals"></a>rasqal_literal_equals ()</h3>
+<a class="indexterm" name="id2616366"></a><pre class="programlisting">int         rasqal_literal_equals           (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l1,
+                                             <a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l2);</pre>
+<p>
+Compare two literals with no type promotion.
+</p>
+<p>
+If the l2 data literal value is a boolean, it will match
+the string "true" or "false" in the first literal l1.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l1</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> literal
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>l2</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> data literal
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if equal
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2616457"></a><h3>
+<a name="rasqal-literal-print"></a>rasqal_literal_print ()</h3>
+<a class="indexterm" name="id2616467"></a><pre class="programlisting">void        rasqal_literal_print            (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l,
+                                             FILE *fh);</pre>
+<p>
+Print a Rasqal literal in a debug format.
+</p>
+<p>
+The print debug format may change in any release.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l</code></em>&#160;:</span></td>
+<td> the <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fh</code></em>&#160;:</span></td>
+<td> the <span class="type">FILE</span>* handle to print to
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2616547"></a><h3>
+<a name="rasqal-literal-print-type"></a>rasqal_literal_print_type ()</h3>
+<a class="indexterm" name="id2616558"></a><pre class="programlisting">void        rasqal_literal_print_type       (<a href="rasqal-section-literal.html#rasqal-literal">rasqal_literal</a> *l,
+                                             FILE *fh);</pre>
+<p>
+Print a string form for a rasqal literal type.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>l</code></em>&#160;:</span></td>
+<td> the <a href="rasqal-section-literal.html#rasqal-literal"><span class="type">rasqal_literal</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fh</code></em>&#160;:</span></td>
+<td> the <span class="type">FILE</span>* handle to print to
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

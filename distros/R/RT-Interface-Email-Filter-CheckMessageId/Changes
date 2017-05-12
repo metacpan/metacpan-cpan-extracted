@@ -1,0 +1,10 @@
+Revision history for RT-Interface-Email-Filter-CheckMessageId
+
+0.2 Mon Dec 16 20:18:12 CET 2013
+* add ChkMsgIdNoIfStatus option
+* Fix documentation
+* compatible with RT 3.6 (Eric Searcy <eric@linuxfoundation.org>)
+
+0.1 Fri Feb  8 00:06:44 CET 2013
+* Initial release.
+

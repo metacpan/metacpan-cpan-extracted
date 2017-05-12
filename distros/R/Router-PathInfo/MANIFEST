@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README.pod
+
+t/Router-PathInfo.t
+t/Router-PathInfo-Controller.t
+t/Router-PathInfo-Static.t
+
+lib/Router/PathInfo/Controller.pm
+lib/Router/PathInfo/Static.pm
+lib/Router/PathInfo.pm

@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 958d8938ab35c72ee9fc89396dde485b0703b6c6 Changes
+SHA1 e0225dc489f1c7d916c23025ac7040d5fb49e9f5 MANIFEST
+SHA1 175bc8860f5115649201ebf14e8e5f58952d65f0 META.yml
+SHA1 26275776f9d7b578e6f772a8c6117f1a93547675 Makefile.PL
+SHA1 f9fc3d7114f6caf52cce63e54860fdc30fb43094 README
+SHA1 b71e9e490e7d57baa7685bc573b8fd2ad27eb2e6 UPGRADING
+SHA1 3e032a39cc99b6266fac77cc2ee73d1f2da6d298 etc/initialdata
+SHA1 3020b3efc6bc071b208d5f26391c44d7b7a42259 etc/upgrade/3.06/content
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 780e868167858840d454ef6ad6bc2a2206f845e7 inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 fa4614fe516285a113826ab8843126a145dd63aa lib/RT/Action/ExtractCustomFieldValues.pm
+SHA1 35bfa9e18fd95282b04a519b1b4702984e5f4fe8 lib/RT/Action/ExtractCustomFieldValuesWithCodeInTemplate.pm
+SHA1 24d332d284427b3c953f60d457281d88e221c847 lib/RT/Extension/ExtractCustomFieldValues.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJW/YhUAAoJEBXncVGnZqUUGhYIALYLMVL3ECo6DVrhfdznoWo1
+/uchqGLnusmYEtYDjRKG5SZ9ztgNpJTepwfvM9DOTntp6nKlnUC9sNMu55FLGqs2
+cc/RR4Ka8af3x0bCqGB8NiMYO5ExExdZWc9KC4iYlRpoJ32+f/rKdTSp01l1hvBA
++1B6cGNPYiSahjBo0GaqK4RK45WMQRm1R2rb1IesP/tDgNk1Hr4fOTQ9J1hx7t0l
+T1va4QM+gQiPNo89jbsfjrXSiBqwsbG2WXb5NnbbApv6II8Ln7wjple2cpKFsng3
+em0C8hUZZLAbyElO6Xv9e6IAnPY4/aDteQT/moP9pBRM5cxB7xn1YZ+zOfLoIGo=
+=VbcB
+-----END PGP SIGNATURE-----

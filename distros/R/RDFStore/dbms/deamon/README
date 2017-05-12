@@ -1,0 +1,69 @@
+/*
+ *     Copyright (c) 2000-2006 Alberto Reggiori <areggiori@webweaving.org>
+ *		          Dirk-Willem van Gulik <dirkx@webweaving.org>
+ *
+ * NOTICE
+ *
+ * This product is distributed under a BSD/ASF like license as described in the 'LICENSE'
+ * file you should have received together with this source code. If you did not get a
+ * a copy of such a license agreement you can pick up one at:
+ *
+ *     http://rdfstore.sourceforge.net/LICENSE
+ *
+ */
+
+Tried sofar
+
+	fork per database, select loop
+
+	preforked per database, select loop
+
+	fork per connection, add locking
+
+	thread per connection, cheaper locking
+
+	thread per database, cheaper switching
+
+Conclusions sofar
+
+	on BSD	fork/dbase is good compromise; thread per database
+	is about the same speed but more overhead. thread per
+	connection is faster for few connections, but has a lot
+	more overhead. Forking sofar scales best < mmlimit. Above
+	that thread per connection is best, but by far best is single
+	select loop per database.
+
+Files
+
+	children.c	fork and msg passing
+	children_trd.c	thread; no msg passing
+	children_ltr.c  NSPR treads, msg passing
+
+	deamon.c	Handles fairly efficient read/write
+			to a socked. Without blocking where
+			needed.
+
+	handler.c	simple call outs to libDB
+
+			The nasty exception is get_dbp() which
+			has some funny return values due to the
+			internal fork() or pthread attaching.
+
+	loop.c		main select loop
+	loop_conn.c	main wait loop treaded case
+
+	main.c		process kick off
+
+	mymalloc.c	debugging malloc.
+
+	pathmake.c	misc.
+
+There are a couple of not so obvious optimizations where we
+build explicit tables or pointer lists to avoids doing for
+loops through lists of arrays; often at the expense of a
+some memory. Secondly we use some funny struc's which are
+linked and created in a way to kind of blow not to many
+caches if possible. The only big remaining niggle is that
+we should collapse more functions into just a few; as to
+get the heap/stack both as shallow as possible. As this
+seems to speeds up the NSPR and Pthreads greatly.

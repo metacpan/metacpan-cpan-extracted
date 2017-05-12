@@ -1,0 +1,6 @@
+MANIFEST
+README
+Makefile.PL
+lib/Regexp/Log/Helix.pm
+t/test_1.t
+META.yml                                 Module meta-data (added by MakeMaker)

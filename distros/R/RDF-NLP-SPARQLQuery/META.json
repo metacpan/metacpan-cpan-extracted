@@ -1,0 +1,67 @@
+{
+   "abstract" : "Perl extension for converting Natural Language Questions in SPARQL queries",
+   "author" : [
+      "Thierry Hamon, E<lt>hamon@limsi.frE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-NLP-SPARQLQuery",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Test::More" : "0.62"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : "0",
+            "Data::Dumper" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Request" : "0",
+            "LWP::UserAgent" : "0",
+            "Mouse" : "0",
+            "Pod::Usage" : "0",
+            "Storable" : "0",
+            "Test::More" : "0.62",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "URL::Encode" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "RDF::NLP::SPARQLQuery" : {
+         "file" : "lib/RDF/NLP/SPARQLQuery.pm",
+         "version" : "0.1"
+      },
+      "RDF::NLP::SPARQLQuery::Query" : {
+         "file" : "lib/RDF/NLP/SPARQLQuery/Query.pm",
+         "version" : "0.1"
+      },
+      "RDF::NLP::SPARQLQuery::Question" : {
+         "file" : "lib/RDF/NLP/SPARQLQuery/Question.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "0.1"
+}

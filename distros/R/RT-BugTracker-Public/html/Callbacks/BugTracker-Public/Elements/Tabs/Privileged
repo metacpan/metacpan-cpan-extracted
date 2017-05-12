@@ -1,0 +1,157 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%#
+%# COPYRIGHT:
+%#
+%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%#                                          <sales@bestpractical.com>
+%#
+%# (Except where explicitly superseded by other copyright notices)
+%#
+%#
+%# LICENSE:
+%#
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%#
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+%# 02110-1301 or visit their web page on the internet at
+%# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+%#
+%#
+%# CONTRIBUTION SUBMISSION POLICY:
+%#
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%#
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%#
+%# END BPS TAGGED BLOCK }}}
+<%init>
+# Only show the Public nav to the public user
+return unless RT::BugTracker::Public->IsPublicUser;
+
+# Save the About menu, if any (provided by RT::Extension::rt_cpan_org, for
+# example)
+my $about = Menu->child("about");
+
+# Save the Preferences menu ("Logged in as..") for Bitcard/OpenID users
+my $preferences = Menu->child("preferences");
+
+# Clear the decks
+RT::Interface::Web::InitializeMenu();
+
+PageWidgets()->child( simple_search => raw_html => $m->scomp(
+    '/Elements/SimpleSearch', SendTo => '/Public/Search/Simple.html' ));
+
+PageWidgets()->child( create_ticket => raw_html => $m->scomp(
+    '/Elements/CreateTicket', SendTo => '/Public/Bug/Report.html' ));
+
+Menu()->child(
+    search_dist => title => loc('Search Distributions'),
+    path        => '/Public/',
+);
+
+Menu()->child(
+    browse_dist => title => loc('Browse Distributions'),
+    path        => '/Public/Dist/Browse.html',
+);
+
+Menu->child( "about", menu => $about );
+
+if ($session{CurrentUser}->Name eq RT->Config->Get("WebPublicUser")) {
+    Menu->child(
+        'preferences' => title => loc( 'Welcome [_1]anonymous guest[_2].', '<span class="current-user">', '</span>' ),
+        escape_title  => 0,
+        sort_order    => 1000,
+    );
+
+    # Public user must logout to login
+    Menu->child(
+        "login",
+        title       => loc('Login as another user'),
+        path        => '/NoAuth/Logout.html',
+        sort_order  => 1001,
+    );
+} else {
+    # Preserve core RT generated "Logged in as" menu for other authenticated
+    # users from Bitcard and OpenID which also get the Public view
+    Menu->child("preferences", menu => $preferences);
+}
+
+my ($queue, $ticket);
+my $request_path = $HTML::Mason::Commands::r->path_info;
+   $request_path =~ s!^/{2,}!/!;
+
+if ( $request_path =~ m{^/Public/Bug/(?:Display|Update)\.html}
+     and my $id = $DECODED_ARGS->{id} )
+{
+    $ticket = RT::Ticket->new( $session{CurrentUser} );
+    $ticket->Load($id);
+    $queue = $ticket->QueueObj if $ticket->id;
+}
+elsif ( $request_path =~ m{^/Public/(?:Bug/Report|Dist/Display)\.html}
+        and my $name = ($DECODED_ARGS->{Name} || $DECODED_ARGS->{Queue}) )
+{
+    $queue = RT::Queue->new( $session{CurrentUser} );
+    $queue->Load($name);
+}
+
+if ( $queue and $queue->id ) {
+    my $escaped = $m->interp->apply_escapes($queue->Name, 'u');
+    PageMenu()->child(
+        active_bugs => title => loc("Active bugs"),
+        path => "/Public/Dist/Display.html?Status=Active;Name=" . $escaped,
+    );
+
+    PageMenu()->child( resolved_bugs =>
+            title => loc("Resolved bugs"),
+            path  => "/Public/Dist/Display.html?Status=Resolved;Name=". $escaped,
+    );
+
+    PageMenu()->child( rejected_bugs => 
+            title => loc("Rejected bugs"),
+            path  => "/Public/Dist/Display.html?Status=Rejected;Name=". $escaped,
+    );
+
+    PageMenu()->child( report => 
+            title => loc("Report a new bug"),
+            path  => '/Public/Bug/Report.html?Queue='. $escaped,
+    );
+
+    if ($ticket and $ticket->id
+        and $queue->Lifecycle->IsInactive($ticket->Status)
+        and $ticket->CurrentUserHasRight("OpenTicket")) {
+
+        PageMenu->child(
+            "reopen",
+            title       => loc("Re-open this bug"),
+            path        => "/Public/Bug/Display.html?Status=open;id=".$ticket->id,
+            sort_order  => -2,
+        );
+        PageMenu->child(
+            "ticket-queue-separator",
+            raw_html    => "<span style='display: block; padding: 0.75em 1em'>&mdash;</span>",
+            sort_order  => -1,
+        );
+    }
+}
+</%init>

@@ -1,0 +1,44 @@
+{
+   "abstract" : "a perl wrapper to the ARSperl project, providing a simplified object interface with field definition caching.",
+   "author" : [
+      "Andrew N. Hicox <andrew@hicox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Remedy-ARSTools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ARS" : "1.72",
+            "Data::DumpXML" : "1.03",
+            "Date::Parse" : "2.3",
+            "Time::Interval" : "1.233"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 1.21
+}

@@ -1,0 +1,25 @@
+Revision history for RT-Client-CLI
+
+4.2.11 2015-05-07
+ - Default to enabling error warnings to the screen for interactive commands
+ - Standardize --help, --quiet and --verbose options across tools
+ - Allow GSSAPI authentication with bin/rt (#25074)
+
+4.2.7 2014-10-27
+ - Allow status modification while commenting
+ - with 'rt ls', only ask for the fields that will be displayed
+
+4.2.2 2014-01-13
+ - Display original text in editor after errors
+ - Support searching for queues, users, and groups, on RT >= 4.2.2
+
+4.0.14 2013-07-25
+ - Allow creation of text/html correspondence/comments via -ct
+ - Support for attaching files on create
+
+4.0.13.1 2013-06-21
+ - Switch installer to ExtUtils::MakeMaker for less deps
+
+4.0.13 2013-05-29
+ - Initial release
+

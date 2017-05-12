@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use common::sense;
+use Rhetoric;
+use Module::Find;
+use File::ShareDir 'dist_dir';
+use File::Path::Tiny;
+use Getopt::Long;
+
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+  \%_,
+  "help|h",
+  "quiet|q",
+);
+
+*mk = \&File::Path::Tiny::mk;
+
+my @themes = usesub('Rhetoric::Theme');
+mk("htdocs/theme");
+for my $theme (@themes) {
+  my $theme_dist = $theme;
+  $theme_dist =~ s/::/-/g;
+  my $name = (split('-', $theme_dist))[-1];
+  my $share;
+  if ($theme_dist eq 'Rhetoric-Theme-BrownStone') {
+    $share = dist_dir('Rhetoric');
+  } else {
+    $share = dist_dir($theme_dist);
+  }
+  say "  $theme";
+  system("rsync -a '$share/theme/$name/' 'htdocs/theme/$name/'");
+}
+
+# XXX - this may move elsewhere
+my $share = dist_dir('Rhetoric');
+system("cp '$share/favicon.ico' htdocs") unless (-e 'htdocs/favicon.ico');

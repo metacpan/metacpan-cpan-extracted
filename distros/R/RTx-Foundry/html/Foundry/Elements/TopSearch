@@ -1,0 +1,13 @@
+%# Nobody said computers were going to be polite.
+<form action="/Foundry/Search/index.html" style="display: inline">
+<select name="SearchType">
+% foreach (qw( Project User Ticket )) {
+    <option value="<% $_ %>" <%
+	($m->request_args->{SearchType} eq $_)
+	    ? 'selected' : ''
+    %>><% loc($_) %></option>
+% }
+</select>
+<input name="Query" size="10" accesskey="0" value="<% $m->request_args->{Query} %>">
+<input type="image" border="0" name="Action-Search" src="/img/Go.png" width="23" height="19" align="middle">
+</form>

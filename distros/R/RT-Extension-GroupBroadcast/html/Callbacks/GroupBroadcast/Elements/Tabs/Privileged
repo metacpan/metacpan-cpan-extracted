@@ -1,0 +1,11 @@
+<%init>
+
+Menu()->child('tools')->child('config')->child('tools')->child( groupbroadcast =>
+    title => loc("Sent Group Broadcast Message"),
+    path  => "/Admin/GroupBroadcast.html",
+    description => 'Group Broadcast'
+);
+</%init>
+<%args>
+    $Actions => undef
+</%args>

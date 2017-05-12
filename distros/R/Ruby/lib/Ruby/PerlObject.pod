@@ -1,0 +1,125 @@
+=head1 NAME
+
+Ruby::PerlObject - Perl object operation in Ruby side
+
+=head1 SYNOPSIS
+
+	#!perl
+	use Ruby::Run;
+
+	p Perl::VERSION; # => "5.8.8", for example
+
+	Perl.eval('require LWP::Simple');
+
+	Perl.Package('LWP::Simple'){
+		p __PACKAGE__; # => "LWP::Simple"
+		getprint(Perl.String("http://www.ruby-lang.org/"));
+	}
+
+	Perl.eval('sub add{ $_[0] + $_[1] }');
+
+	p add(1, 2); # => 3
+
+	perlscalar = Perl["$scalar"];
+	perlarray  = Perl["@array"];
+	perlhash   = Perl["%hash"];
+	perlcode   = Perl["&code"];
+	perlglob   = Perl["*glob"];
+
+	# to_ref/deref
+
+	ref = perlscalar.to_ref; # \$scalar
+	ref.deref;               # $$ref
+
+	# Perl::SCALAR
+
+	perlscalar.undef?
+	perlscalar.yes?
+
+	perlscalar.to_int # and other to_*
+
+	perlscalar.empty?
+	perlscalar.length
+
+	perlscalar.succ # for Range
+	perlscalar << "add"
+
+	# Perl::ARRAY
+
+	perlarray.to_s
+	perlarray.join(sep)
+	perlarray.to_ary # convert to Ruby's native array
+
+	perlarray[idx]
+	perlarray[idx] = value
+
+	perlarray << "push"
+	perlarray.push # and (pop|shift|unshift|length|clear|empty?)
+
+	perlarray.each{ ... }
+
+	# Perl::HASH
+
+	perlhash.to_hash # convert to Ruby's native hash
+
+	p perlhash[key];
+	perlhash[key] = value
+
+	perlhash.exists # and other aliasis (?:has_key?|include?|key?|member?)
+
+	perlhash.clear # and delete
+
+	perlhash.each{ ... } # and each_(key|value|pair)
+
+	# Perl::CODE
+
+	perlcode.call(...)
+
+	# call with contexts
+	perlcode.want(:void).call(...);
+	perlcode.want(:scalar).call(...);
+	perlcode.want(:array).call(...);
+
+	proc = perlcode.to_proc;
+
+	# Perl::GLOB
+
+	perlglob[:SCALAR]; # *glob{SCALAR}
+	perlglob[:ARRAY];  # *glob{ARRAY}
+	perlglob[:HASH];   # *glob{HASH}
+	perlglob[:CODE];   # *glob{CODE}
+	perlglob[:IO];     # *glob{IO}
+	perlglob[:NAME];   # *glob{NAME}
+	perlglob[:PACKAGE];# *glob{PACKAGE} as Perl::Package
+	perlglob[:CLASS];  # *glob{PACKAGE} as Perl::Class
+
+
+	# Perl::Package
+
+	perlpackage = Perl::Package(name);
+	perlpackage.function(args);
+	perlpackage.want(:array).function(args); # call with a context
+
+	# Perl::Class
+
+	perlclass = Perl::Class(name);
+	perlclass = Perl[name]; # equivalent
+	perlclass.method(args);
+	perlclass.want(:array).method(args); # call with a context
+
+	# Perl::IO
+
+	Perl::STDIN # and STD(OUT|ERR)
+
+	Perl.open(path, mode_and_layers){ |io|
+		io.each{ |line|
+			# ...
+		}
+	}
+
+
+=head1 SEE ALSO
+
+L<Ruby>.
+
+=cut

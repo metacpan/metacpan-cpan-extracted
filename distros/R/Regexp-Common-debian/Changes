@@ -1,0 +1,144 @@
+      % Moving into refactoring (RE of deban package).
+      % Fixing README and Changes idiocy.
+      % Fixing *license* handling.
+
+      v0.2.13 20140205
+
+      % TS' data-sets made readable by all supported YAML readers
+          Breakage has been here for years.
+
+      % Adding YAML::XS reader
+      % Data::YAML left unsupported
+      % Adding *dynamic_config* to Build.PL
+          Breakage has been here for years.
+
+      v0.2.12 20140117
+
+      ~ $RE{debian}{architecture} (+26 -4 ~3 =42)
+          Lame attempt to be RL-correct has been removed -- any *os* and
+          *cpu* will fit; "any" can take over *os* and/or *cpu*.  Lists
+          of *os*es and *cpu*s have been updated.
+
+      ~ $RE{debian}{archive}{changes} (=41)
+          New *os* and *cpu* lists have been canibalized.  Using
+          "v5.10.0" features and requiring it.
+
+      ~ $RE{debian}{archive}{source_3_0_native} (+3 =66)
+      ~ $RE{debian}{archive}{source_3_0_quilt} (+1 =111)
+      ~ $RE{debian}{archive}{patch_3_0_quilt} (+1 =72)
+          "xz" suffix has been added.
+
+      ~ $RE{debian}{archive}{binary} (=59)
+          New *os* and *cpu* lists have been canibalized.
+
+      ~ $RE{debian}{preferences} (+4 =74)
+      ~ $RE{debian}{changelog} (=145)
+      ~ $RE{debian}{sourceslist} (=26)
+          Using "v5.10.0" features and requiring it.
+
+      - workaround for perl pre v5.10.0 for $RE{d}{version} (-45 =0)
+          Workaround has been retired.
+
+      % Test-suite support testing live-data from various sources
+          Filtering duplicates.  Adding some work-arounds about RL.
+
+      % Documentation fixes
+      = XXX scores 7
+      = TODO scores 16
+      = FIXME scores 17
+
+      v0.2.11 20100808
+
+      ~ $RE{debian}{version} (=45)
+          Support for versions with no leading number.
+
+      + $RE{debian}{archive}{source_3_0_native} (63)
+      + $RE{debian}{archive}{source_3_0_quilt} (110)
+      + $RE{debian}{archive}{patch_3_0_quilt} (71)
+          Support for filenames of "Format: 3.0".
+
+      + $RE{debian}{archive}{source_1_0} (+16 =59)
+      - $RE{debian}{archive}{source}
+          Follow up rename.  Support for versions with no leading
+          number.
+
+      + $RE{debian}{archive}{patch_1_0} (+13 =65)
+      - $RE{debian}{archive}{patch}
+          Follow up rename.  Support for versions with no leading
+          number.
+
+      ~ $RE{debian}{archive}{binary} (+9 =59)
+      ~ $RE{debian}{archive}{changes} (+7 =41)
+      ~ $RE{debian}{archive}{dsc} (+12 =62)
+          Support for versions with no leading number.
+
+      ~ $RE{debian}{changelog} (+30 =145)
+          Support for versions with no leading number.  Various fixes to
+          tolerate variations in emtpy lines, leading and separating
+          spaces.  Support for urgency comments.
+
+      ~ $RE{debian}{architecture} (+4 =20)
+          List of acceptable architectures has been updated.
+
+      ~ $RE{debian}{preferences} (-4 =70)
+      ~ $RE{debian}{sourceslist} (-4 =26)
+          Cosmetic changes.
+
+      % Test-suite support testing live-data from various sources
+      % Documentation fixes
+      = XXX scores 8
+      = TODO scores 12
+      = FIXME scores 13
+
+      v0.1.5 20090311
+
+      ~ $RE{debian}{changelog} (+34 =115)
+      % Documentation fixes.
+
+      v0.1.4 20090209
+
+      + $RE{debian}{sourceslist} (30)
+      + $RE{debian}{preferences} (74)
+      + $RE{debian}{changelog} (81)
+      % TestSuite.pm does one less string eval.
+      % Documentation upgraded.
+      % Various changes and updates to satisfy CPAN.
+
+      v0.0.11 20090103
+
+      % $RE{debian}{archive}{changes} was hardly broken.
+          Copy-paste issue, fixed.
+
+      % Requiring perl v5.6.0
+          Since our is in use.
+
+      % Cosmetic documentation updates-n-fixes.
+      ~ $RE{debian}{archive}{changes} (-16 =34)
+
+      v0.0.10 20081231
+
+      + $RE{debian}{package} (69)
+      + $RE{debian}{version} (45)
+      + workaround for perls pre v5.10.0 for $RE{d}{version} (45)
+      + $RE{debian}{architecture} (16)
+      + $RE{debian}{archive}{binary} (50)
+      + $RE{debian}{archive}{source} (43)
+      + $RE{debian}{archive}{patch} (52)
+      + $RE{debian}{archive}{dsc} (50)
+      + $RE{debian}{archive}{changes} (50)
+      = XXX scores 8
+      = TODO scores 5
+      = FIXME scores 8
+
+POD ERRORS
+
+  Hey! The above document had some coding errors, which are explained
+  below:
+
+  Around line 3:
+      You can't have =items (as at line 19) unless the first thing after
+      the =over is an =item
+
+  Around line 5:
+      Unknown directive: =itev
+

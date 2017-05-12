@@ -1,0 +1,9 @@
+---
+somedomain:
+    sometype:
+        database: somevalue
+---
+otherdomain:
+    othertype:
+        host: othervalue
+        port: 1234

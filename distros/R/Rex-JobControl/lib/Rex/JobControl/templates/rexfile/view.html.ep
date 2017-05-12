@@ -1,0 +1,89 @@
+% layout 'rexfile';
+% title "Project " . $project->name . " / Rexfile " . $rexfile->name;
+
+<div class="container">
+  <h2><%= $rexfile->name %></h2>
+  <p><%== $rexfile->description %></p>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">Options</div>
+  <div class="panel-body">
+    <div>
+      <div class="col-xs-2">
+        Name
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= $rexfile->name %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-xs-2">
+        URL
+      </div>
+      <div class="col-xs-10">
+        <div class="checkbox" style="display: inline;">
+          <%= $rexfile->url %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Servers</div>
+  <div class="panel-body">
+
+    <table id="server" class="display" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Group</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <th>Name</th>
+          <th>Group</th>
+        </tr>
+      </tfoot>
+      <tbody>
+    % for my $srv (@{ $rexfile->all_server }) {
+        <tr>
+          <td><%= $srv->{name} %></td>
+          <td><%= $srv->{group} %></td>
+        </tr>
+    % }
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+
+
+<hr>
+
+<a href="/project/<%= $project->directory %>/rexfile/<%= $rexfile->directory %>/reload" class="btn btn-sm btn-primary">Reload</a>
+<button
+  href="/project/<%= $project->directory %>/rexfile/<%= $rexfile->directory %>/delete"
+  rexfile_name="<%= $rexfile->name %>"
+  class="delete-rexfile-button btn btn-sm btn-danger">Remove</button>
+
+
+<script>
+$(document).ready(function() {
+  $('#server').dataTable();
+
+  $(".delete-rexfile-button").click(function() {
+    delete_rexfile("Remove " + $(this).attr("rexfile_name") + "?", $(this).attr("href"));
+  });
+
+} );
+</script>
+

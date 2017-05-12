@@ -1,0 +1,242 @@
+#!/usr/local/bin/perl
+#
+#
+
+use strict;
+use RCGI;
+
+my($module) = 'SAR';
+my($subroutine) = 'system_activity_report';
+
+my($config_file) = shift;
+if (!defined($config_file)) {
+    Usage();
+}
+my($pwd) = `pwd`;
+chomp($pwd);
+if ($config_file !~ /^\//) {
+    $config_file = "$pwd/$config_file";
+}
+my($log_file) = shift;
+if (!defined($log_file)) {
+    Usage();
+}
+if ($log_file !~ /^\//) {
+    $log_file = "$pwd/$log_file";
+}
+# Get timeperiod argument
+my($timeperiod) = shift;
+if (!defined($timeperiod)) {
+    $timeperiod = 4 * 60;	# every four minutes
+}
+my($verbose) = shift;
+if ($verbose) {
+    print STDERR "Starting $0 $config_file $log_file $timeperiod $verbose\n";
+}
+    
+
+my(%url);
+my(%library_path);
+my($machine, $url, $path);
+
+open(CONFIG,"$config_file");
+while(<CONFIG>) {
+    if (/^\s*\#/) {
+	next;
+    }
+    chomp;
+    ($machine, $url, $path) = split("\t");
+    $url{$machine} = $url;
+    $library_path{$machine} = $path;
+    if ($verbose) {
+	print STDERR "$machine $url{$machine} $library_path{$machine}\n";
+    }
+}
+close(CONFIG);
+
+if (!defined($machine)) {
+    die "No configuration--exiting ($config_file $log_file $timeperiod)\n";
+}
+# fork to become a background daemon
+my($pid) = fork();
+if ($pid) {			# parent exits
+    print STDERR "[1] $pid\n";	# print the pid like the shell does
+    exit;
+}
+setpgrp();			# set process group to be our pid
+
+
+# define and setup signal handler
+sub signal_handler {
+    # kill process group
+    kill 'QUIT', -1 * $$;
+    # hari kari
+    kill 'KILL', $$;
+    exit;
+}
+$SIG{INT} = \&signal_handler;
+$SIG{QUIT} = \&signal_handler;
+$SIG{KILL} = \&signal_handler;
+$SIG{TERM} = \&signal_handler;
+
+# define and setup HUP signal handler
+# This will try to restart the daemon--rereading the config file
+# This seems to work only once (???)
+sub signal_hup_handler {
+#    open(SARLOG,">sard.log");
+#    print SARLOG "Restarting $0 $config_file $log_file $timeperiod $verbose\n" .
+    `$0 $config_file $log_file $timeperiod $verbose`;
+    # Give it time to startup
+    sleep 10;
+#    close(SARLOG);
+    # kill process group
+    kill 'QUIT', -1 * $$;
+    # hari kari
+    kill 'KILL', $$;
+    exit;
+}
+$SIG{HUP} = \&signal_hup_handler;
+
+
+
+# start calls to other machines
+my(%sar);
+foreach $machine (keys %url) {
+    $sar{$machine} = new RCGI($url{$machine},$library_path{$machine},
+			      $module,$subroutine,
+			      'timeout' => 4000);
+    $sar{$machine}->Async(1);
+    $sar{$machine}->Wantarray(1);
+}
+
+
+my(%DATETIME, %IDLE, %DELTA_IDLE);
+my(%USR, %SYS, %WIO);
+my($delta_usr, $delta_sys, $delta_wio, $delta_idle);
+my($notdone);
+my(%done);
+
+# open dbm associated array
+my(%SAR);
+my(%start_time);
+dbmopen(%SAR,$log_file,0664);
+foreach $machine (keys %url) {
+    $sar{$machine}->Call($timeperiod);
+    $start_time{$sar{$machine}->{'pid'}} = time();
+    if ($verbose) {
+	print STDERR "Calling: $url{$machine} $library_path{$machine} $module $subroutine with timeout => 4000 and argument: $timeperiod\n";
+    }
+    ( $DATETIME{$machine}, $USR{$machine}, $delta_usr,
+     $SYS{$machine}, $delta_sys,
+     $WIO{$machine}, $delta_wio,
+     $IDLE{$machine} ,$delta_idle ) =
+	 split("\t",$SAR{$machine});
+}
+dbmclose(%SAR);
+
+my($child);
+# loop until killed
+while(1) {
+    undef %done;
+    $notdone = 1;
+    while($notdone) {
+	$notdone = 0;
+	foreach $machine (keys %url) {
+	    if ($verbose >= 10) {
+		print STDERR "Checking status of call to: $machine\n";
+	    }
+	    if ($sar{$machine}->Done()) {
+		$done{$machine} = 1;
+		if ($verbose) {
+		    print STDERR "Reading: $machine\n";
+		}
+		my($datetime, $usr, $sys, $wio, $idle) =
+		    $sar{$machine}->Read();
+		if ($verbose) {
+		    print STDERR "Calling: $url{$machine} $library_path{$machine} $module $subroutine with timeout => 4000 and argument: $timeperiod\n";
+		}
+		if (defined($sar{$machine}->{'pid'})) {
+		    $child = $sar{$machine}->{'pid'};
+		    kill 'QUIT', $child;
+		    sleep 5;
+		    kill 'KILL', $child;
+		}
+		$sar{$machine}->Call($timeperiod);
+		$start_time{$sar{$machine}->{'pid'}} = time();
+		if ($sar{$machine}->Success()) {
+		    $delta_usr = $usr - $USR{$machine};
+		    $delta_sys = $sys - $SYS{$machine};
+		    $delta_wio = $wio - $WIO{$machine};
+		    $delta_idle = $idle - $IDLE{$machine};
+		    $DATETIME{$machine} = $datetime;
+		    $USR{$machine} = $usr;
+		    $SYS{$machine} = $sys;
+		    $WIO{$machine} = $wio;
+		    $IDLE{$machine} = $idle;
+		    dbmopen(%SAR,$log_file,0664);
+		    delete $SAR{$machine . '_not_responding'};
+		    $SAR{$machine} = join("\t",
+					  ( $datetime, $usr, $delta_usr,
+					   $sys,$delta_sys,
+					   $wio,$delta_wio,
+					   $idle,$delta_idle) );
+		    dbmclose(%SAR);
+		    if ($verbose) {
+			print STDERR "$machine\t$datetime\t$usr($delta_usr)\t" .
+			    "$sys($delta_sys)\t$wio($delta_wio)\t$idle($delta_idle)\n";
+		    }
+		} else {
+		    if ($verbose) {
+			print STDERR "\nCall to:\n\t" . $sar{$machine}->Base_URL()
+			    . '?library_path=' . $sar{$machine}->Library_Path()
+				. '&module=' . $sar{$machine}->Module()
+				    . '&subroutine=' . $sar{$machine}->Subroutine() . "\n"
+					. "Failed with status: " . $sar{$machine}->Status()
+					    . ' ' . $sar{$machine}->Error_Message() . "\n";
+		    }
+		    dbmopen(%SAR,$log_file,0664);
+		    $SAR{$machine . '_not_responding'} = $SAR{$machine};
+		    delete $SAR{$machine};
+		    dbmclose(%SAR);
+		}
+	    } elsif (time() - $start_time{$sar{$machine}->{'pid'}} >
+		     ($timeperiod * 3)) {
+		# see if it has been too long since we tried it
+		# Kill children
+		map {
+		    $child = $sar{$_}->{'pid'};
+		    `kill $child > /dev/null 2>&1`;
+		    sleep 10;
+		    `kill -9 $child > /dev/null 2>&1`;
+		} (keys %sar);
+                # Restart and exit
+		`$0 $config_file $log_file $timeperiod $verbose`;
+		sleep 30;
+		# kill process group
+		kill 'QUIT', -1 * $$;
+		# hari kari
+		kill 'KILL', $$;
+		exit;
+#		$child = $sar{$machine}->{'pid'};
+#		`kill $child > /dev/null 2>&1`;
+#		sleep 10;
+#		`kill -9 $child > /dev/null 2>&1`;
+#		dbmopen(%SAR,$log_file,0664);
+#		if (!defined($SAR{$machine . '_not_responding'})) {
+#		    $SAR{$machine . '_not_responding'} = $SAR{$machine};
+#		}
+#		delete $SAR{$machine};
+#		dbmclose(%SAR);
+#		$done{$machine} = 1;
+	    } elsif (!$done{$machine}) {
+		$notdone = 1;
+
+	    }
+	}
+	sleep 30;
+    }
+}
+
+sub Usage {
+    die "Usage is: $0 config_file log_file [timeperiod_in_seconds]\n";
+}

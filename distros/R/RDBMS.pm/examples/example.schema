@@ -1,0 +1,29 @@
+#
+# For an explanation of the format of this file, you can do a:
+#
+#   man sqldef.pl
+# or
+#   perldoc sqldef.pl
+#
+
+# company table
+table:company:companies::
+cmpny_id:int::not null:Unique Id:PRIMARY::::0:0:
+cmpny_name:char:40::Company name:LABEL::::1:1:
+ind_id:int::not null:Industry Type:FOREIGN:ind_type:ind_id::1:1:
+
+# product table
+table:product:goods/services::
+prod_id:int::not null:Unique Id:PRIMARY::::0:0:
+prod_name:char:40::Product/services:LABEL::::1:1:
+
+# supply table
+# M:N (company:product)
+table:supply:supply of goods/services::
+supply_cmpny:int:::Company:PRIMARY+FOREIGN+LABEL:company:cmpny_id::1:1:
+supply_prod:int:::Product:PRIMARY+FOREIGN+LABEL:product:prod_id::1:1:
+
+# Industry types
+table:ind_type:industry types::
+ind_id:int::not null:Unique ID:PRIMARY::::0:0:
+ind_name:char:40::Industry Type:LABEL::::1:1:

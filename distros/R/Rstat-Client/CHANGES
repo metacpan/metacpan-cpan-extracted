@@ -1,0 +1,29 @@
+# $Id: //eai/perl5/Rstat-Client/2.2/src/distro/CHANGES#1 $
+
+Revision history for Perl extension Rstat::Client
+
+1.0 - 2002/05/19 by XL
+* initial version
+
+1.01 - 2002/05/22 by XL
+* added default rstat implementation for plattforms
+  lacking /usr/include/rpcsvc/rstat.x
+* Makefile.PL tweaking
+
+1.02 - 2002/05/26 by XL
+* rewrite pack.c using macros
+* added C++ guards
+
+2.0 - 2005/05/03 by RI
+* new pure-perl implementation
+* added the timeout option to fetch()
+
+2.1 - 2006/04/05 by RI
+* change to using a disconnected UDP socket for the request; if the
+  target is multi-homed and the response comes back on a different IP
+  address than the request, we'll never get it if we're specifically
+  listening for responses on the original IP address
+
+2.2 - 2008/04/15 by RI
+* update copyright/license for CPAN release
+* no code changes

@@ -1,0 +1,38 @@
+Revision history for RT-Extension-SearchResults-XLS
+
+0.09    Mon, 12 Oct 2015 17:38:43 +0200
+        Fix empty file when exporting from RT SimpleSearch
+
+0.08    Wed, 12 Mar 2014 17:17:53 +0100
+        Add support for RT 4.2.x
+        Require RT >= 4.2.0
+
+0.07    Wed, 11 May 2011 17:11:27 +0200
+        Add support for RT 4.x tabs format
+        Fix a bug where cells content starting by "=" as interpreted as
+        formulas
+
+0.06    Mon, 13 Sep 2010 10:46:46 +0200
+        Update to code changes of Results.tsv in 3.8.8
+
+0.05    Tue, 10 Feb 2009 11:26:41 +0100
+        Don't remove "\r" and "\n" in customfields values as this can be
+        handled by XLS format        
+        Change the way we check RT version in Callbacks by using a copy of
+        cmp_version function as it's not present in old RT versions.
+
+0.04    Wed, 17 Sep 2008 11:47:48 +0200
+        Use a new callback that will be included in RT > 3.8.1
+
+0.03    Tue, 16 Sep 2008 16:08:34 +0200
+        Upgrade inc/* (Module::Install, Module::Install::RTx)
+        Update Results.xls file to get improvement of Results.tsv file made in
+        RT 3.8.1
+        Tiny documentation update
+
+0.02    Mon,  5 May 2008 16:02:08 +0200
+        Upgrade inc/* (Module::Install, Module::Install::RTx)
+
+0.01    Wed,  2 Apr 2008 13:59:36 +0200
+        Initial release.
+

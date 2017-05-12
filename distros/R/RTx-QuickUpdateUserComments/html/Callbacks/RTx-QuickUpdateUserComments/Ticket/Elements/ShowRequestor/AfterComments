@@ -1,0 +1,18 @@
+<%args>
+$requestor
+$ShowComments => 1
+</%args>
+<%init>
+return unless $ShowComments
+          and $requestor->CurrentUserCanModify('Comments')
+          and $requestor->CurrentUserCanSee('Comments');
+</%init>
+<span style="font-weight: normal;">
+  [<a href="<% RT->Config->Get('WebPath') %>/User/Summary.html?id=<% $requestor->id %>"><% loc('edit') %></a>]
+</span>
+<script type="text/javascript">
+    if (document.currentScript) {
+        var me = jQuery(document.currentScript);
+        me.parent().find(".comments-about-user .label").append(me.prev());
+    }
+</script>

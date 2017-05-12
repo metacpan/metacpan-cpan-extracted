@@ -1,0 +1,22 @@
+etc/initialdata
+inc/Module/Install.pm
+inc/Module/Install/AutoManifest.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/ManifestSkip.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/RTx/Factory.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RT/Condition/OnAbandoned.pm
+lib/RT/Condition/OnOwned.pm
+lib/RT/Condition/OwnershipChanges.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE                                Public-key signature (added by MakeMaker)

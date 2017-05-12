@@ -1,0 +1,61 @@
+%# [POST PostURI] (Object)
+%# Updates an object.
+%# 207: Updated.  Body is the status code and messages for each update.
+%# 400: Request failed.  Body is error message in text/plain.
+%# 404: The specific object does not exist, or does not support this adverb.
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="<% $BaseURI %>/NoAuth/feed.css"?>
+<entry xmlns="http://purl.org/atom/ns#" xmlns:html="http://www.w3.org/1999/xhtml">
+  <content type="multipart/parallel" mode="xml">
+    <body>
+% foreach my $result (@results) {
+      <response status="<% $result->[0] %>"><% $result->[1] %></response>
+% }
+    </body>
+  </content>
+</entry>
+<%INIT>
+my %args = $m->request_args;
+my $type = delete $args{type};
+my @results;
+
+if ($type) {
+    die "$type not handled" unless $type =~ /^(?:Comment|Correspond)$/ and $Object->can($type);
+    if (exists $args{MIMEObj}) {
+        require MIME::Parser;
+        my $parser = MIME::Parser->new;
+        $parser->output_to_core(1);
+        $parser->tmp_to_core(1);
+        $args{MIMEObj} = $parser->parse_data(\$args{MIMEObj});
+    }
+    my ($trans, $msg, $obj) = $Object->$type( %args );
+    push @results, [($obj ? 200 : 400) => $msg];
+}
+else {
+    foreach my $key (sort grep /^[A-Z]/, keys %args) {
+        my ($property, $method) = split(/-/, $key, 2);
+        $method ||= 'Set';
+
+        my $value = $args{$key};
+        push @results, [$m->comp(
+            "../Elements/\u\L$method\EProperty",
+            Object => $Object, 
+            Property => $property,
+            Value => $_,
+        )] for (UNIVERSAL::isa($value, 'ARRAY') ? @$value : $value);
+    }
+}
+
+$r->status(207);
+</%INIT>
+<%ARGS>
+$ShowLink
+$ShowEntry
+$BaseURI
+$Path
+$CollectionClass
+$X
+
+$Object
+$Resource
+</%ARGS>

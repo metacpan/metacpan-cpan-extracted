@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dd89376a84985989b0e4611c01b59e25af3917e7 Changes
+SHA1 ef4453884dc138e0e4ccd23c9a7ac1a5b1908a38 LICENSE
+SHA1 2aac046fd0632c6dc73cc2a331a2c570e0563f65 MANIFEST
+SHA1 b7465b3fe70f471009d3d5513429cf448811e1ea META.yml
+SHA1 e7a2e25d79e25ecb164483db1cc86adfbb96ee8b Makefile.PL
+SHA1 7e01b4af6c402468232bbf3202af4cab1716cba6 README
+SHA1 d7168d70bebc5159716643dcdab911e093dcbfc1 README.release
+SHA1 d0586fe2e6671b398c9a3f83cfd98dfd4429d81c lib/Regexp/Common/Chess.pm
+SHA1 a376f793dc58d53390e13488cf52a514b8dd7eaf t/00-dist.t
+SHA1 b88a1decb1675d02ec7ac05ab884a6f74105a3bb t/01-san.t
+SHA1 0b85866472d33087d226e4be5d1632674e14bc57 t/02-real_games.t
+SHA1 8d95cb2a89693fedd142e95072488469d71b5d83 t/03-capture.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk6d/P4ACgkQCPS7eH/A+7q68QCcDh5s4S+5XlcfYTBoZZXbvLNU
+PKgAnjbz+e3Sasmr49WvteYSsCt71Jt8
+=gflI
+-----END PGP SIGNATURE-----

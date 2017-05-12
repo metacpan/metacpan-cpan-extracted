@@ -1,0 +1,24 @@
+---
+name: RT-Authen-Federation
+version: 1.2.2
+abstract: Allows RT to federate the authentication via Shibboleth, PAPI
+author: Carlos Fuentes <carlos.fuentes@rediris.es>
+license: GPL version 2
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+no_index:
+  directory:
+    - html
+    - inc
+requires:
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+

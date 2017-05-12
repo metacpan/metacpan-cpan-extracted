@@ -1,0 +1,49 @@
+---
+abstract: 'Perl extension to access redis database'
+author:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+build_requires:
+  Digest::SHA: '0'
+  Test::Differences: '0.61'
+  Test::FailWarnings: '0'
+  Test::More: '0.96'
+  Test::Most: '0.22'
+  Test::TCP: '1.17'
+configure_requires:
+  ExtUtils::MakeMaker: '6.3002'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - redis
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RedisDB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '2.1'
+  IO::Socket::IP: '0'
+  RedisDB::Parser: '2.21'
+  Try::Tiny: '0'
+  URI: '0'
+  URI::redis: '0'
+  perl: '5.008004'
+resources:
+  bugtracker: https://github.com/trinitum/RedisDB/issues
+  homepage: https://github.com/trinitum/RedisDB
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trinitum/RedisDB
+version: '2.53'
+x_contributors:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'Norbert BuchmÃ¼ller <mendel@cpan.org>'
+  - 'Steve Ratcliffe <sr@itinken.com>'
+  - 'Uwe Voelker <uwe.voelker@xing.com>'
+  - "Andrew O'Brien"
+  - 'Troy Ablan'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

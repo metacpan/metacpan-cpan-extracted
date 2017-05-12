@@ -1,0 +1,48 @@
+---
+abstract: 'Reply + O/R Mapper'
+author:
+  - 'papix <mail@papix.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v0.15.2, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Reply-Plugin-ORM
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Reply::Plugin::ORM:
+    file: lib/Reply/Plugin/ORM.pm
+    version: '0.01'
+  Reply::Plugin::ORM::Otogiri:
+    file: lib/Reply/Plugin/ORM/Otogiri.pm
+  Reply::Plugin::ORM::Teng:
+    file: lib/Reply/Plugin/ORM/Teng.pm
+requires:
+  List::Compare: '0'
+  Module::Load: '0'
+  Path::Tiny: '0'
+  Reply: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/papix/Reply-Plugin-ORM/issues
+  homepage: https://github.com/papix/Reply-Plugin-ORM
+  repository: git://github.com/papix/Reply-Plugin-ORM.git
+version: '0.01'
+x_contributors:
+  - 'Takuya Tsuchida <takuya.tsuchida@gmail.com>'

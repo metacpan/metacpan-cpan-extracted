@@ -1,0 +1,14 @@
+RT-Extension-MenubarUserTickets 1.1 -- 28/09/2009
+
+	Updated button style for RT 3.6
+	Added more pod
+	Simple unit test added
+	
+RT-Extension-MenubarUserTickets 1.0 -- 18/06/2009
+
+	Added more pod
+	Packaged for CPAN
+
+RT-Extension-MenubarUserTickets 0.01 13/12/2007
+
+	Initial release

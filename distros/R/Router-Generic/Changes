@@ -1,0 +1,104 @@
+
+Change log for Perl module Router::Generic:
+
+2012-05-07    v0.021
+  - DEPRECATED do not use for new code.
+
+2012-03-23    v0.020
+  - In route_for($uri [, $method ]) if we get no $uri then we just bail out.
+  - This removes annoying "uninitialized value" warnings without introducing
+    odd behavior.
+
+2011-12-02    v0.019
+  - Added some tests to validate the behavior of splat captures in routes.
+  - Splat captures are like "/{*display}".
+
+2011-11-29    v0.018
+  - Removed some errant POD.
+
+2011-11-28    v0.017
+  - Default values (from the 'defaults' param) will always be added to the 'match' output
+    unless they exist in the querystring input.
+
+2010-11-23    v0.016
+  - Fixes the following warning:
+    "Use of uninitialized value in anonymous hash ({}) at /usr/local/share/perl/5.10.0/Router/Generic.pm line 254"
+
+2010-11-13    v0.015
+  - Routes with paths like /foo/bar.asp will now no longer auto-map to /foo/bar.asp/
+    (no trailing "/" will be appended).
+
+2010-08-05    v0.014
+  - Calling $router->uri_for(...) with extra parameters not declared in the target
+    will return a url with the extra parameters in the querystring - eg: /path/?foo=bar
+
+2010-05-20    v0.013
+  - Added `replace_route(%args)` - let's see how we like this.  It's not documented
+    in case it gets removed in a subsequent release.
+
+2010-03-27    v0.012
+  - Routes with a path like "/foo/:city" and a target like "/bar-[:city:].asp"
+    will now (correctly) produce a uri like "/bar-Dallas.asp?city=Dallas".
+    Before this change, they would be resolved as "/bar-Dallas.asp" (which is sub-optimal).
+  - Updated POD.
+  - Shed a little more light on the route_for($uri [, $method ]) ...er...method.
+
+2010-03-27    v0.011
+  - Fixed some bugs related to form variables passed in.
+  - Added 'route_for('/path/') method.
+
+2010-03-27    v0.010
+  - Routes like /trucks/:page with no default :page or with a default :page of undef or ""
+    produced URIs like /trucks/[:page:] or /trucks// - which nobody wants.
+  - New behavior is to produce a URI like /trucks/ instead of /trucks// or /trucks/[:page:].
+
+2010-03-27    v0.009
+  - Now paths like /:lang-:locale/{*Page} will parse the :lang and :locale properly.
+  - Updated POD to reflect this improvement.
+  - Added tests to verify this feature.
+
+2010-03-26    v0.008
+  - Calling $router->match(...) in list context would sometimes result in an undef
+    return value - which is bad in list context, because of this kind of bug:
+    if( my @matches = $router->match(...) ) {
+      # You always get here even when no match was found:
+    }# end if()
+
+2010-03-26    v0.007
+  - When $router->match(...) has multiple matches, it will return a list or arrayref
+    depending on the context in which it is called.
+  - Updated POD.
+  - Updated tests.
+  - Removed the "non-MVC" bit because it could be used for MVC-ish stuff actually.
+
+2010-03-24    v0.006
+  - If passed an arrayref of targets, match(...) will return an arrayref of targets.
+    (This is useful when you want one as the default, and the other as the fallback.)
+
+2010-03-23    v0.005
+  - Route-matching when the route is declared with method '*' and matched with
+    'GET' or 'POST' explicitly would fail.  This is now fixed.
+
+2010-03-23    v0.004
+  - Added 'method' parameter to add_route() and match() methods.
+  - 'method' defaults to '*' - so you can safely ignore it if you would rather.
+  - Added more tests to account for the extra features.
+  - Added basic CRUD example in POD.
+
+2010-03-22    v0.003
+  - Forgot to update Changes file.
+
+2010-03-22    v0.002
+  - Renamed from Router::Lite to Router::Generic.
+  - Added uri_for(...) method.
+  - Added many tests.  Code-coverage is fairly high.
+  - Route path grammar is 99.99% final.  Any future changes will be backwards-compatible.
+  - Speed is acceptable, even with large routing tables.
+
+2010-03-20    v0.001_01
+  - Alpha level - Still under development.
+  - Handles some path declarations and allows specification of default values.
+  - Returns 'match()' results as a parameterized string.
+  - Supports simple route caching.
+
+

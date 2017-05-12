@@ -1,0 +1,13 @@
+<%init>
+my $q = $$args{Argument};
+if( $q =~ /^(\s*from:\S+)+/ ){
+  my @q = $q =~ m/from:(\S+)/g;
+  RT::Interface::Web::Redirect(RT->Config->Get('WebURL').
+			       'Admin/Users/From.html?UserString='.
+			       join('&UserString=', @q) );
+}
+</%init>
+
+<%args>
+$args => undef
+</%args>

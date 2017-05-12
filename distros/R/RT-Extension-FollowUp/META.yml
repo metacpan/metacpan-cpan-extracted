@@ -1,0 +1,25 @@
+---
+abstract: 'Allow RT users to quickly add themself as Cc/AdminCc in the ticket action menu'
+author:
+  - 'Emmanuel Lacour, C<< <elacour at home-dn.net> >>'
+  - 'Emmanuel Lacour <elacour@home-dn.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-FollowUp
+no_index:
+  directory:
+    - html
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.home-dn.net/manu/RT-Extension-FollowUp.git
+version: 0.01

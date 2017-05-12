@@ -1,0 +1,143 @@
+0.31      2017-05-02 11:43:09+02:00 Europe/Madrid
+
+    - Refactored job payload attributes inflate/deflate to allow extension (meru-akimbo)
+
+0.30      2017-04-27 06:52:03+02:00 Europe/Madrid
+
+    - Improve docs with usage examples (joshrabinowitz)
+
+0.29      2017-04-24 00:34:22+02:00 Europe/Madrid
+
+    - Improve docs (joshrabinowitz)
+    - New bin/resque-tool to handle admin tasks (only queues ATM) (joshrabinowitz)
+    - Resque::create_queue() added for resque-tool.
+
+0.28      2017-04-14 12:19:26+02:00 Europe/Madrid
+
+    - Fixed --redis server:port option on resque-worker (#GH23 by joshrabinowitz)
+    - Added some missing deps on 5.24
+
+0.27      2017-02-20 15:20:09+01:00 Europe/Madrid
+
+    - Fixed cant_fork option on resque-worker (#GH21)
+
+0.26      2016-08-19 20:27:43+02:00 Europe/Madrid
+
+    - New Resque::WorkerClass class to ease the creation of Moose based background jobs
+    - Resque::Worker::started() method now parse date string and returns a DateTime object
+
+0.25      2016-08-16 13:38:13+02:00 Europe/Madrid
+
+    - Now Resque::worker() builds a fresh worker every time it's called (#GH20)
+
+0.24      2016-07-13 22:03:49+02:00 Europe/Madrid
+
+    - Reverted #GH20 as it breaks workers losing reference to resque (will need a bigger rework)
+
+0.23      2016-07-09 01:23:03+02:00 Europe/Madrid
+
+    - Fixed and reworked mass_remove (#GH19)
+    - Removed circular refs from worker and failures (#GH20)
+
+0.22      2016-04-23 09:42:25+02:00 Europe/Madrid
+
+    - Script to run workers
+    - Failures::mass_remove method for fast and selective delete and requeue on failed jobs
+
+0.21      2015-09-07 11:35:21+02:00 Europe/Madrid
+
+    - Docs fix
+
+0.20      2015-09-07 11:26:35+02:00 Europe/Madrid
+
+    - Default to Redis::Fast when available (issue #17)
+    - Accept any kind of object as a redis client (djstevenson)
+
+0.19      2014-04-28 22:41:44CET+0100 Europe/Madrid
+
+    - Support for win32 when prunning dead workers (codehead)
+    - dzil cleanup
+
+0.18      2014-03-07 22:41:44CET+0100 Europe/Madrid
+
+    - Coerce object exceptions into string (issue #14)
+
+0.17      2013-25-12 19:10:21 Europe/Madrid
+
+    - Stop comparing encoded json as it's broken with hash randomization (issue #13)
+
+0.16      2013-07-12 19:10:21 Europe/Madrid
+
+    - Watch forked jobs exit status (Wolfgang Kinkeldei)
+
+0.15      2013-04-26 16:38:40 Europe/Madrid
+
+    - Docs cleanup
+    - Allow custom job classes (Michal Sedlák)
+
+0.14      2013-04-26 15:04:00 Europe/Madrid
+
+    - Respect worker queues order when reserving jobs (stop iterating!)
+
+0.13      2013-03-07 15:51:47 Europe/Madrid
+
+    - Added support to use libs that use FindBin on worker classes
+
+0.12      2013-02-15 02:50:41 Europe/Madrid
+
+    - Moved to Moose (from Any::Moose)
+    - New plugin system to allow Resque, Resque::Worker and Resque::Job roles (experimental and under documented)
+    - Store properly exceptions backtrace on Failure (Yusuke Watase)
+
+0.11      2012-06-27 13:34:37 Europe/Madrid
+
+    - Fixed Worker::worker_pids() to also filter grep's own pid!
+
+0.10      2012-06-27 13:11:34 Europe/Madrid
+
+    - Fixed Worker::worker_pids() to support solaris
+
+0.09      2012-04-30 11:27:49 Europe/Madrid
+
+    - Fixed and documented requeue method on Resque::Failures
+    - New tests on requeue and remove failures
+    - Updated redis launcher test library (copied from Melo's Redis one)
+
+0.08      2012-04-12 17:05:17 Europe/Madrid
+
+    - Worker interval attribute accept floating seconds (Time::HiRes::sleep).
+    - Worker interval attribute is documented now.
+
+0.07      2012-04-03 00:39:06 Europe/Madrid
+
+    - Back to Redis dependency
+    - Using reconnect facility of Redis module
+    - encoding undef as recommended on Redis docs
+
+0.06      2012-01-04 16:36:08 Europe/Madrid
+
+    - Replaced dependency on Redis for RedisDB
+    - Handle redis re-connection thank's to RedisDB
+    - More tests on workerland
+    - Stop requiring 5.10 on test libs
+
+0.05      2012-01-03 20:30:46 Europe/Madrid
+
+    - Relaxed regex to catch pid's of running workers
+
+0.04      2011-12-30 22:19:55 Europe/Madrid
+
+    - Hope this is the last POD bug. I suck!
+    - Delegate Resque::Job::redis() to resque()
+
+0.03      2011-12-30 18:42:04 Europe/Madrid
+
+    - Renamed Pod::Weaver config file (old name was useless)
+
+0.02      2011-12-30 18:34:32 Europe/Madrid
+
+    - POD reformatting to look fine on CPAN :-)
+
+0.01      2011-12-30 17:50:59 Europe/Madrid
+
+    - Kind of working, need lot if tests and features

@@ -1,0 +1,54 @@
+<%args>
+$Format => undef
+</%args>
+
+<%init>
+my @results;
+my $title = loc('Manage auto-created users');
+unless ($session{'CurrentUser'}->HasRight( Object=> $RT::System, Right => 'SuperUser')) {
+ Abort(loc('This feature is only available to system administrators.'));
+}
+
+my $format_config = RT->Config->Get('AdminSearchResultFormat')->{'Users'};
+$format_config =~ s/__Name__/__EmailAddress__/;
+$format_config =~ s/TITLE\:Name/TITLE\:EmailAddress/;
+$format_config =~ s/__RealName__\,\s+__EmailAddress__//;
+$format_config .= q{,__WatchingTickets__,__Action__,__MergeUser__};
+$Format ||= $format_config;
+
+my $manager = 'RT::Extension::ManageAutoCreatedUsers';
+if ($ARGS{'update-autocreated-users'}) {
+    @results = $manager->process_form(\%ARGS);
+}
+my $users = $manager->get_autocreated_users;
+</%init>
+
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+<&|/Widgets/TitleBox, title => loc('Auto-created Users') &>
+
+% if ( $users->Count ) {
+
+<form name="manage-autocreated-users" action="<%RT->Config->Get('WebPath')%>/Admin/Tools/AutoCreatedUsers.html" method="POST">
+<input name="Page" type="hidden" value="<% $ARGS{'Page'} %>">
+<& /Elements/CollectionList,
+    OrderBy => 'Name',
+    Order => 'ASC',
+    Rows  => RT->Config->Get('RTxAutoUserRows') || 25,
+    %ARGS,
+    Format => $Format,
+    Collection => $users,
+    AllowSorting => 1,
+    PassArguments => [qw(Format Rows Page Order OrderBy)],
+&>
+<input type="submit" class="button" name="update-autocreated-users" value="Update users" />
+</form>
+
+% } else {
+
+<p><i><&|/l&>(No users)</&></i></p>
+
+% }
+
+</&>

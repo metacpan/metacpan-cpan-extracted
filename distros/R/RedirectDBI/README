@@ -1,0 +1,146 @@
+Apache::RedirectDBI - Redirect requests to different directories based on the existence of a user in one or more database tables
+
+SYNOPSIS
+
+PerlModule Apache::DBI Apache::RedirectDBI
+
+<Location /path/to/virtual/directory>
+    SetHandler perl-script
+    PerlHandler Apache::RedirectDBI
+    PerlAuthenHandler Apache::AuthenDBI
+
+    PerlSetVar Auth_DBI_data_source     dbi:Oracle:CERT
+    # :
+    # and other Auth_DBI_* variables
+    # :
+
+    PerlSetVar RedirectDBI_data_source dbi:Oracle:CERT
+    PerlSetVar RedirectDBI_username    nobody
+    PerlSetVar RedirectDBI_password    nobody
+    PerlSetVar RedirectDBI_location    /path/to/virtual/directory
+    PerlSetVar RedirectDBI_default     /path/to/virtual/directory.1
+    PerlSetVar RedirectDBI_table2uri   "t1 /directory.2 t2 /directory.3"
+    PerlSetVar RedirectDBI_field       DB_field_name_containing_username
+    PerlSetVar RedirectDBI_url         DB_field_name_containing_redirect_url
+    PerlSetVar RedirectDBI_external    External_REDIRECT_is_issued
+
+    AuthName "Realm"
+    AuthType Basic
+    Require  valid-user
+</Location>
+
+DESCRIPTION
+
+Apache::RedirectDBI allows you to create a virtual path in your document hierarchy.
+
+All requests for access to this virtual path should require a username and password 
+to access. When the user attempts to access this virtual path their username is 
+looked up in one or more database tables. The table in which the username is found 
+in determines the physical path from which files are served.
+
+For internal redirects the files are served to the user without the URL changing, 
+so they never know that they have been redirected.  For external redirects the
+web browser is sent a redirected to the desired URL.
+
+The user is redirected to a default location if they are not in any of the database 
+tables.
+
+CONFIGURATION
+
+First, define the virtual location that a user will see. You must also create other 
+directories from which files will be served.
+
+For example, specify /dir as the virtual directory, and have $DOCROOT/dir.1,
+$DOCROOT/dir.2 and $DOCROOT/dir.3 as three possible directories that files
+will be served from, depending on the table that lists the user.
+
+    <Location /dir>
+        ...
+    </Location>
+  
+The different configuration directives in httpd.conf have the following
+meanings;
+
+RedirectDBI_data_source
+
+A DBI identifier for the data source that contains the tables that will be
+used to determine which directory to send the user to.
+
+RedirectDBI_username
+
+The username to use when connecting to the data source.
+
+RedirectDBI_password
+
+The password to use when connecting to the data source.
+
+RedirectDBI_location
+
+The same path as used in the <Location ...> section of this configuration.
+
+RedirectDBI_default
+
+Path (relative to the document root) from which files will be served if the
+user does not exist in any of the database files.
+
+PerlSetVar RedirectDBI_field
+
+A sting that provides the field name that contains the login username.
+
+PerlSetVar RedirectDBI_url
+
+A string that provides the field name containing the URL name to use for
+the user logged in.  If this directive is not provided, an URI is obtianed
+from the second subparameter from the RedirectDBI_table2uri directive.
+
+PerlSetVar RedirectDBI_external
+
+If the directive is set to any value, an external REDIRECT is presented
+to the client.  If it is not set, an internal redirect is issued.
+
+RedirectDBI_table2uri
+
+A string containing white space seperated elements. If the RedirectDBI_url
+directive is not set, each element is forms a pair where the first element 
+is the name of the user table and the second element is the redirect location.
+If the RedirectDBI_url is set, the list is just the user tables to scan.
+The URI directory is relative to the document root from which files will 
+be redireted if the user is in this table.
+
+
+CREATING YOUR TABLES
+
+The tables listed in the RedirectDBI_table2uri string must contain one or
+more columns. One of these columns B<must> be contain the  username, 
+which is specified by the RedirectDBI_field directive.
+
+These tables do not necessarily have to be real tables. If the backend
+database supports it then they could be views. This allows for a lot of
+flexibility in specifying the criteria for the inclusion of a user in
+the table.
+
+BUGS AND LIMITATIONS
+
+
+If the same username exists in more than one of the listed tables, the
+location for the first table they are found in is used. Tables are searched
+in the same order as they are listed in the configuration file.
+
+It is assumed that the database connection to read the tables will always
+succeed.
+
+SEE ALSO
+
+perl(1), Apache(3), Apache::DBI(3)
+
+AUTHORS
+
+
+Mike Smith (mjs@iii.co.uk)
+George Sanderson (perler@xorgate.com)
+
+Original Apache module
+
+Nik Clayton (nik@freebsd.org)
+
+Original CGI scripts which this replaces, and this documentation.

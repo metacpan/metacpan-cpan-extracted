@@ -1,0 +1,31 @@
+<&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 1, class_name => 'WorkSchedule' &>
+<p>This filter selects eligible owners by their work schedule. The following user custom field decides which work schedule each user maintains. Administrators may update the <tt>%ServiceBusinessHours</tt> RT config for adding or modifying the available schedules.</p>
+
+% if ($user_cfs->Count) {
+<table>
+<tr>
+<td class="label"><label for="<% $prefix %>_user_cf">Custom Field:</label></td>
+<td class="value">
+<select id="<% $prefix %>_user_cf" name="<% $prefix %>_user_cf">
+<option value="">-</option>
+% while (my $cf = $user_cfs->Next) {
+<option <% ($config->{user_cf}||0) == $cf->Id ? "selected" : "" %> value="<% $cf->Id %>"><% $cf->Name %></option>
+% }
+</select>
+</td>
+</tr>
+</table>
+% } else {
+<p>No user custom fields found.</p>
+% }
+</&>
+<%INIT>
+my $user_cfs = RT::CustomFields->new($session{CurrentUser});
+$user_cfs->LimitToLookupType(RT::User->CustomFieldLookupType);
+$user_cfs->ApplySortOrder;
+</%INIT>
+<%ARGS>
+$prefix
+$config
+$queue
+</%ARGS>

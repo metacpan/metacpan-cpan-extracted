@@ -1,0 +1,40 @@
+# Copyright 2012, 2013, 2014 Kevin Ryde
+
+# This file is part of Regexp-Common-Other.
+#
+# Regexp-Common-Other is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Regexp-Common-Other is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Regexp-Common-Other.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libregexp-common-other-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.6
+Homepage: http://user42.tuxfamily.org/regexp-common-other/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libregexp-common-other-perl
+Architecture: all
+Depends: perl (>= 5.005), libregexp-common-perl, ${perl:Depends}, ${misc:Depends}
+Replaces: libperlio-via-escstatus-perl (<< 11)
+Breaks: libperlio-via-escstatus-perl (<< 11)
+Description: More patterns for Regexp::Common
+ Patterns include
+  * ANSIescape - for Esc [ forms
+  * Emacs - backup filenames etc

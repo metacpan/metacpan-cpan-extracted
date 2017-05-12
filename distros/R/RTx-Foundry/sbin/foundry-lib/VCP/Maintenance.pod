@@ -1,0 +1,299 @@
+=head1 NAME
+
+VCP::Maintenance - VCP code maintenance tips & tricks
+
+=head1 SYNOPSIS
+
+ VCPNODELETE=yes
+
+ bin/hexdump.pl
+
+ vcp revml: --dtd <dtd file name> --save_dtd <how>
+
+=head1 DESCRIPTION
+
+=head2 The distribution hierarchy
+
+As untarred, the distribution hierarchy looks like (some files not
+shown for brevity):
+
+   VCP-x.yy/
+   +--- Makefile.PL     ## Generates the Makefile
+   +--- MANIFEST        ## what files to ship, built with `make manifest`
+   +--- MANIFEST.SKIP   ## what filenames `make manifest` should ignore
+   +--- CHANGES         ## A detailed summary of all edits
+   +--- TODO            ## Things we can't get to quite yet
+   +--- LICENSE
+   +--- README
+   +--- revml.dtd       ## Defines legal RevML
+   +--+ bin/            ## Executable files
+   |  +---- vcp         ## The command line interface
+   |  +---- gentrevml   ## builds RevML files for the test suite
+   |  +---- hexdump.pl  ## dumps files in hex, a debugging aid
+   |
+   +--+ lib/            ## All modules that comprise VCP itself
+   |  +--- VCP.pm       ## Drives the VCP process
+   |  +--- *.pod        ## Supplemental documentation
+   |  +--- Plugin.pm    ## Base class for all sources & destinations
+   |  |
+   |  +--- Source.pm    ## Base class for all sources
+   |  +--+ Source/
+   |  |  +--- foo.pm    ## A backend to read from repo. type "foo"
+   |  |
+   |  +--- Dest.pm      ## Base class for all destinations
+   |  +--+ Dest/
+   |  |  +--- foo.pm    ## A backend to write to repo. type "foo"
+   |  |
+   |  +--+ Utils/
+   |  |  +--- foo.pm    ## Routines shared by Source/ and Dest/ foo.pm's
+   |  |
+   |  +--- Rev.pm       ## VCP's concept of a revision
+   |  +--- Revs.pm      ## A collection of VCP::Rev instances
+   |  |
+   |  +--- RevML/       ## Files defining RevML
+   |
+   +--+ t/              ## The test suite
+      +--- *.t          ## Test scripts
+      +--- test-*.revml ## Fodder for test scripts
+
+In addition, the following files are created:
+
+   |
+   +--- vcp_html        ## By running the `vcp html` command
+   +--- pod2htm*        ## Gunk left over from `vcp html`
+   +--- blib/           ## By running `make`
+
+=head2 Useful command line idioms
+
+=over
+
+=item perl -Ilib -cw %
+
+(in your editor's key mapping).
+
+Useful to map an editor key to this.  Use whatever path for -I works
+given your cwd usage habit, and replace the "%" with whatever macro your
+editor replaces with the path to the current file.
+
+=item make test TEST_FILES=t/90foo.t TEST_VERBOSE=1
+
+Runs just the listed test files (space separated list; use quotes) and
+shows STDOUT.
+
+=item perl -Ilib bin/vcp ...
+
+Run C<vcp> manually without setting PERL5LIB or installing it.
+
+=item export PERL5LIB=lib
+
+Allows C<vcp> and C<gentrevml> to be run from command line
+
+=item make test
+
+Runs all tests, generating C<t/test-*.revml> if need be.
+
+=back
+      
+=head2 Environment Variables
+
+Some environment variables that are useful in debugging:
+
+=over
+
+=item VCPNODELETE
+
+Set this to C<yes> to tell C<vcp> I<not> to delete it's working
+directories.  This allows you to take a look at them and see what
+the source and dest command lines saw.
+
+=item IPCRUNDEBUG
+
+Set this to some number from 0..10 to see how C<vcp> (via L<IPC::Run|IPC::Run>)
+is treating it's subprocesses.
+
+=item VCPDEBUG
+
+Set this to a regular expression to control what modules within C<VCP::*>
+emit debugging messages.
+
+See also L<VCP::Debug|VCP::Debug> for more details.
+
+=item VCPP4LICENSE
+
+If this is present and pointing to a readable file when a p4 daemon is
+started via vcp, a symlink will be created in the (possibly newly
+created) p4root directory to point to the p4 license file pointed to
+by VCPP4LICENSE.  The 'make' target test_all_p4_versions will cycle
+through each version of p4 and p4d contained in the 'p4versions'
+directory, in both unlicensed and (if VCPP4LICENSE present) licensed
+mode.
+
+=back
+
+In addition, both CVS and Perforce backends pay attention to the relevant
+environment variables.
+
+=head2 C<hexdump.pl>
+
+C<bin/hexdump.pl> is useful for debugging issues involving line endings,
+embedded control code (esp. ^Z on Win32 and NULL on every platform, since most
+C programs die when encountering NULL in a text file).
+
+=head2 The tests
+
+The t/*.t files in the source distribution contain a large number of
+tests.  The tests begin with a two digit number that orders them so that
+more primitive tests run first, followed by higher level "end-to-end"
+tests in C<t/90*.t>.
+
+The more primitive tests are pretty standard fare for Perl test suites.
+Where things get interesting is the C<t/90*.t> tests.  These tests use the
+command-line C<vcp> interface to move reasonably sized chunks of RevML
+(up to about 65k currently; pretty small in comparison to "real"
+exports) in to, out of, and between various repositories.
+
+The RevML extracted from the repositories is compared to the RevML that
+was fed in to them, after sanitizing both of data that is known to not
+make it through ok.
+
+The module L<VCP::TestUtils|VCP::TestUtils> contains support routines
+for initializing repositories and shutting them down (when a server is
+needed).  Existing repositories are not used in the test suite; they'd
+be useless and in danger if we did.
+
+The file C<bin/gentrevml> is used to generate the RevML files
+(C<t/test*.revml>) from scratch using hand written code instead of
+L<VCP::Dest::revml> in order to reduce the chances of a bug in
+VCP::Dest::revml causing false positives in the test results.
+
+It's highly likely that new back ends will require new test RevML files.
+C<bin/gentrevml> should be hacked up to generate these and new rules
+should be added to the C<Makefile> by editing C<Makefile.PL>.
+
+=head3 The structure of a test script.
+
+The t/*.t scripts generally all follow the same structure.
+
+First, they import all necessary modules and init themselves.
+
+Then they build a
+
+   my @tests = (
+   sub {
+       ...
+   },
+   );
+   
+array that contain the actual tests.  Each
+test is a single anonymous C<sub {...}>, every once in a while a single
+C<sub {...}> will contain two tests; it is preceded by an empty (or nearly
+empty) C<sub {}> in these cases.
+
+At the bottom, some final checks are run to see if all tests should be
+skipped, then
+
+   plan tests => scalar @tests;
+
+emits how many tests are to be run, and
+
+   $_->() for @tests;
+
+runs the tests.
+
+This structure is used for several reasons:
+
+=over
+
+=item 1. No counting tests
+
+Tests are counted automatically for you this way, the C<scalar @tests>
+does this.  Otherwise you end up having to remember to manually fudge
+this every time a test is adding or removed.
+
+=item 2. Clear demarcation
+
+Tests tend to use local variables a lot; this structure keeps them from
+"leaking" from one test to another.  Things that are shared between
+tests are usually declared right above the C<my @tests => line and are
+pretty obvious.
+
+=item 3. Commenting out tests
+
+In situations where you want to focus on one or a few tests, just put a
+line like:
+
+    ); @tests = (
+
+before the first test C<sub> you want to run, and a line like
+
+   sub { last },
+
+after the last one.  This is especially important.
+
+=item 4. Test line numbers
+
+Failing tests, when run with C<TEST_VERBOSE=1> as shown above, will
+report their line numbers.  This is the fastest way to find out what's
+failing.  The list-of-subs approach is used even when C<@tests> could
+actually contain just test vectors and the C<for @tests > loop could
+check the vectors because we want line numbers to tell us where to look.
+If we used test vectors, then the call to C<ok()> would report some line
+number in the C<for @tests> loop, not the line number of the test.
+
+=item 5.
+
+If you want to enable C<vcp> or L<IPC::Run> debugging (see
+L<VCP::Debug>, too), you can put a
+
+   local $ENV{VCPDEBUG} = '.*';
+
+or
+
+   local $ENV{IPCRUNDEBUG} = 1;  ## 1..10
+
+in the appropriate C<sub {...}> and it won't cause all the other tests
+to spew a lot of noise.
+
+=back
+
+=head2 Developing a new backend
+
+In general, backends are created in pairs so that a C<t/90foo.t> can be
+written to import the RevML files in to the backend repository, extract
+new RevML from it, and compare the two.
+
+A backend usually consists of 3 Perl classes: VCP::Source::foo,
+VCP::Dest::foo, and VCP::Utils::foo.  The reason for the lowercase
+final name is so that the C<vcp> command can translate from the scheme
+name (C<cvs:>) to a source or destination module name trivially.
+
+The VCP::Source::foo generally contains a parser to extract metadata
+from repository log reports and a routine to drive the copying process.
+The L<VCP|VCP> module (C</lib/VCP.pm>)
+
+=head2 Updating the RevML DTD
+
+Run the command C<compile_dtd>, which by default will look for the
+file 'revml.dtd'.  This should be done each time the dtd changes.
+Optionally you may pass in a dtd file name as the argument to C<compile_dtd>.
+
+The generated file is placed in C<./lib/RevML/Doctype/> or C<./RevML/Doctype/>
+or C<./>, whichever is found first.  No directories will be created.
+
+This does not update the L<VCP::Source::revml|VCP::Source::revml> or
+L<VCP::Dest::revml|VCP::Dest::revml> drivers to match the DTD, nor does
+it affect C<bin/gentrevml>, which is used by the test suite to build the
+RevML files used for testing.
+
+=head1 AUTHOR
+
+Barrie Slaymaker <barries@slaysys.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000, 2001, Perforce Software, Inc.
+All rights reserved.
+
+See L<VCP::License|VCP::License> (C<vcp help license>) for the terms of use.
+
+=cut

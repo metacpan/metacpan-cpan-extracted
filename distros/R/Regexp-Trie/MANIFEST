@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Regexp/Trie.pm
+t/00-load.t
+t/01-dict.t
+t/dict2rx.pl
+META.yml                                 Module meta-data (added by MakeMaker)

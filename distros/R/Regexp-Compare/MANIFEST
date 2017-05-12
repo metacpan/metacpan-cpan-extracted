@@ -1,0 +1,21 @@
+Changes
+Compare.xs
+engine.c
+engine.h
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XPosixAlnum.20
+XPosixAlnum.22
+XPosixAlnum.24
+XPosixAlpha.20
+XPosixAlpha.24
+XPosixDigit.20
+XPosixDigit.22
+XPosixWord.20
+XPosixWord.22
+t/Regexp-Compare.t
+lib/Regexp/Compare.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

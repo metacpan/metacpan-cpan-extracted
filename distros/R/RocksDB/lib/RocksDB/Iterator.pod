@@ -1,0 +1,103 @@
+=head1 NAME
+
+RocksDB::Iterator - rocksdb::Iterator object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $db = RocksDB->new('/path/to/db');
+  my $iter = $db->new_iterator->seek_to_first;
+  while (my ($key, $value) = $iter->each) {
+      printf "%s: %s\n", $key, $value;
+  }
+  # in reverse order
+  $iter->seek_to_last;
+  while (my ($key, $value) = $iter->reverse_each) {
+      printf "%s: %s\n", $key, $value;
+  }
+
+  # low-level interface
+  for ($iter->seek_to_first; $iter->valid; $iter->next) {
+      printf "%s: %s\n", $iter->key, $iter->value;
+  }
+  for ($iter->seek_to_last; $iter->valid; $iter->prev) {
+      printf "%s: %s\n", $iter->key, $iter->value;
+  }
+  $iter->seek('key');
+
+=head1 DESCRIPTION
+
+B<RocksDB::Iterator> is a rocksdb::Iterator object.
+
+=head1 METHODS
+
+=head2 C<< $iter->valid() :Bool >>
+
+An iterator is either positioned at a key/value pair, or
+not valid.  This method returns true iff the iterator is valid.
+
+=head2 C<< $iter->seek_to_first() :LevelDB::Iterator >>
+
+Position at the first key in the source.  The iterator is valid()
+after this call iff the source is not empty.
+Return $self. It's useful for method chain as below.
+
+  my $iter = $db->new_iterator->seek_to_first;
+
+=head2 C<< $iter->seek_to_last() :LevelDB::Iterator >>
+
+Position at the last key in the source.  The iterator is
+valid() after this call iff the source is not empty.
+
+=head2 C<< $iter->seek($key :Str) :RocksDB::Iterator >>
+
+Position at the first key in the source that at or past target
+The iterator is valid() after this call iff the source contains
+an entry that comes at or past target.
+
+=head2 C<< $iter->next() :Undef >>
+
+Moves to the next entry in the source.  After this call, valid() is
+true iff the iterator was not positioned at the last entry in the source.
+Raise error if the iterator is not valid().
+
+=head2 C<< $iter->prev() :Undef >>
+
+Moves to the previous entry in the source.  After this call, Valid() is
+true iff the iterator was not positioned at the first entry in source.
+Raise error if the iterator is not valid().
+
+=head2 C<< $iter->key() :Str >>
+
+Return the key for the current entry.  The underlying storage for
+the returned slice is valid only until the next modification of
+the iterator.
+Return undef if the iterator is not valid().
+
+=head2 C<< $iter->value() :Str >>
+
+Return the value for the current entry.  The underlying storage for
+the returned slice is valid only until the next modification of
+the iterator.
+Return undef if the iterator is not valid().
+
+=head2 C<< $iter->each() :(Str, Str) >>
+
+If the iterator is valid(), return key-value pair and call next().
+Otherwise return empty list.
+
+=head2 C<< $iter->reverse_each() :(Str, Str) >>
+
+If the iterator is valid(), return key-value pair and call prev().
+Otherwise return empty list.
+
+=head1 SEE ALSO
+
+L<RocksDB>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

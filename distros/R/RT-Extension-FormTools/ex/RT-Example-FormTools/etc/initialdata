@@ -1,0 +1,19 @@
+push @CustomFields, (
+    {
+        Name        => 'Systems',
+        Type        => 'SelectSingle',
+        Queue       => 0,
+        Disabled    => 0,
+        Pattern     => q'(?#Mandatory).',
+        Values      => [
+            { Name      => "web", SortOrder => 1 },
+            { Name      => "mail",  SortOrder => 2 },
+        ],
+    },
+    {
+        Name        => 'Username',
+        Type        => 'FreeformSingle',
+        Queue       => 0,
+        Disabled    => 0,
+    },
+);

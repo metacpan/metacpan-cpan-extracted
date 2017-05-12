@@ -1,0 +1,11 @@
+Revision history for RT-Extension-LDAPImport-MultiEmail
+
+0.04 2014-08-19
+ - Create secondary merged accounts even when $LDAPUpdateOnly is set
+
+0.03 2014-07-16
+ - Support more than one secondary email address attribute
+ - Packaging updates
+
+0.02 2014-01-27
+ - Initial release

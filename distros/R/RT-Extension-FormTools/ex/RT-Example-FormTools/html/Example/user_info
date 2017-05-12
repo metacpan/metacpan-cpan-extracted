@@ -1,0 +1,14 @@
+<&|/FormTools/Form, next => 'confirm', validation => 1 &>
+ 
+<h1>Account Request</h1>
+
+<& /FormTools/Field, name => 'Requestors', label => 'Requested By', default => $session{'CurrentUser'}->EmailAddress  &> 
+
+<& /FormTools/Field, name => 'Systems', render_as => 'radio', default => 'web' &>
+
+<& /FormTools/Next &>
+</&>
+
+<%INIT>
+#Do some username validation
+</%INIT>

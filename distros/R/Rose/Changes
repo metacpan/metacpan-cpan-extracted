@@ -1,0 +1,35 @@
+0.10 (02.25.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Updated project web site URL.
+
+0.05 (11.17.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Updated documentation and component version numbers.
+
+0.03 (08.05.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Updated component version numbers.
+
+0.02 (03.05.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Updated for release of Rose::DB and Rose::DB::Object.
+
+0.014 (11.16.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Updated for release of Rose::Conf.
+
+0.013 (11.15.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Updated versioning policy.
+
+0.012 (11.14.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Added copyright info.  Versions 0.01 and 0.011 removed.
+
+0.011 (11.14.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Bumped version due to missing prerequisite in Rose::HTML::Objects.
+
+0.01 (11.13.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Initial release.

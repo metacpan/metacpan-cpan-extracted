@@ -1,0 +1,25 @@
+---
+abstract: 'adds actions to Regexp::Common'
+author:
+  - Ruslan.Zakirov@gmail.com
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Regexp::Common::WithActions
+name: Regexp-Common-WithActions
+no_index:
+  directory:
+    - inc
+requires:
+  Regexp::Common: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

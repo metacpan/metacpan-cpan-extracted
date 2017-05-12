@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+
+use 5.008003;
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+=head1 NAME
+
+rt-create-admin-user - create a user wiht SuperUser right granted
+
+=head1 SYNOPSIS
+
+    rt-create-admin-user new-admin password
+
+=head1 DESCRIPTION
+
+Takes a name, creates a new user record and grants him super user right. Useful
+when performing a test upgrade and want to peek around in the UI. When disabled
+root account. When revoked SuperUser right.
+
+=cut
+
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+my $name = shift || do {
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ verbose => 2 });
+    exit;
+};
+my $password = shift;
+
+my $user;
+
+{
+    $user = RT::User->new( $RT::SystemUser );
+    my ($status, $msg) = $user->Create(
+        Name => $name,
+        Password => $password,
+        Privileged => 1,
+        Disabled => 0,
+    );
+    unless ( $status ) {
+        $RT::Logger->error("Couldn't create user '$name': $msg");
+        exit 1;
+    }
+    $RT::Logger->info("Created privileged user '$name'");
+}
+{
+    my ($status, $msg) = $user->PrincipalObj->GrantRight(
+        Right => 'SuperUser', Object => $RT::System
+    );
+    unless ( $status ) {
+        $RT::Logger->error("Couldn't grant SuperUser right to user '$name': $msg");
+        exit 1;
+    }
+    $RT::Logger->info("Granted SuperUser right to user '$name'");
+}
+exit 0;

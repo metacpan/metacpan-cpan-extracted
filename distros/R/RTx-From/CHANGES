@@ -1,0 +1,14 @@
+0.04	2009-08-09
+	Renamed Admin/Users/from.html to Admin/Users/From.html
+	If you leave the existing from.html in place, anyone still looking
+	there can find the previous version you installed.
+
+	Altered Simple Search display text.
+
+	Add RTx::BecomeUser integration, list a link in results if SuperUser.
+
+0.03	2009-05-30
+	Documentation update
+
+0.02	2009-04-15
+	Initial public release.

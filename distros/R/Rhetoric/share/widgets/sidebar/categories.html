@@ -1,0 +1,6 @@
+<h2>Categories</h2>
+<ul>
+  [% FOREACH c IN categories %]
+  <li><a href="[% R('Category', c) %]">[% c %]</a></li>
+  [% END %]
+</ul>

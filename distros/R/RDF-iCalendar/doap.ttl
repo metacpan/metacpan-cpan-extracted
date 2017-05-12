@@ -1,0 +1,155 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/project>
+	a                    doap:Project;
+	cpan-uri:x_IRC       <irc://irc.perl.org/#perlrdf>;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "DateTime"^^doap-deps:CpanId ], [ doap-deps:on "RDF::vCard 0.010"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-iCalendar>;
+	doap:category        [ rdfs:label "RDF"@en ], [ rdfs:label "hCalendar"@en ], [ rdfs:label "hCal"@en ], [ rdfs:label "Semantic Web"@en ], [ rdfs:label "SemWeb"@en ], [ rdfs:label "vCalendar"@en ], [ rdfs:label "iCalendar"@en ], [ rdfs:label "iCal"@en ], [ rdfs:label "Directory"@en ], [ rdfs:label "Event"@en ], [ rdfs:label "Todo"@en ];
+	doap:created         "2011-01-21"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:documenter      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/RDF-iCalendar>;
+	doap:homepage        <https://metacpan.org/release/RDF-iCalendar>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "RDF-iCalendar";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-rdf-icalendar>;
+	];
+	doap:shortdesc       "convert from RDF to iCalendar"@en;
+	doap:tester          <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "First release"@en;
+	dc:issued            "2011-01-23"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-iCalendar-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2011-02-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Minor bugfixes and cleanups.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support for VALARM.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support for VJOURNAL.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support for VFREEBUSY.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-iCalendar-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2011-02-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Drop some dependencies." ], [ rdfs:label "Various minor cleanups." ], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-iCalendar-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2013-05-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Stop claiming to be able to convert between RDF and iCalendar; right now it's only one-way.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/85190>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/jonass>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Explicitly require RDF::vCard.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/85188>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/jonass>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Remove references to paths on TOBYINK's local computer from example script.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/78050>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/jonass>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add a vaguely decent test case.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-iCalendar-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-iCalendar/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "RDF-iCalendar-0.005"^^xsd:string;
+	dc:issued            "2014-09-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add IRC link.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "use warnings";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-iCalendar-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/jonass>
+	a                    foaf:Person;
+	foaf:nick            "JONASS";
+	foaf:page            <https://metacpan.org/author/JONASS>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/78050>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "78050"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=78050>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/85188>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "85188"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=85188>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/85190>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "85190"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=85190>.
+

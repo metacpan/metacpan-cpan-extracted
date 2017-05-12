@@ -1,0 +1,20 @@
+Revision history for RPi-DigiPot-MCP4XXXX
+
+2.3603  2017-03-13
+        - changed version scheme from 2.36.x to 2.360x
+
+2.36.2  2017-02-22
+        - fix missed method name in SYNOPSIS
+        - added link to the datasheet in POD
+        - bumped prereq of EUMM to 6.72 to ensure multi-digit prereq versions
+          are adhered to
+        - bypass t/init.t if PI_BOARD env var isn't true (closes #22)
+
+2.36.1  2017-01-22
+        - WiringPi::API 2.36.3 and RPi::WiringPi::Constant 0.02 are prereqs
+        - added technical specifications
+        - MocK::Sub now a TEST_REQUIRES
+        - added _bytes(), returns aref of bytes to send to SPI
+        - added set(), sets the output of the potentiometer(s)
+        - added shutdown(), shuts down the potentiometer(s) per the datasheet
+        - added tests for the base functionality, and bit manipulation

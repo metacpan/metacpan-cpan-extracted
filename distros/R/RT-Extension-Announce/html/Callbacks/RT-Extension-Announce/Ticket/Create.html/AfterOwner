@@ -1,0 +1,38 @@
+<%init>
+my $queue = RT::Queue->new($session{CurrentUser});
+$queue->Load($ARGSRef->{Queue});
+return unless $queue->id && $queue->Name eq 'RTAnnounce';
+
+my $cf = RT::CustomField->new($session{CurrentUser});
+$cf->Load('Announcement Groups');
+return unless $cf->id;
+
+my @groups = map {
+    my $group = RT::Group->new( $session{CurrentUser} );
+    my ( $status, $msg ) = $group->LoadUserDefinedGroup($_);
+    if ( $group->id ) {
+        $group->Name;
+    }
+    else {
+        RT->Logger->warning("Failed to load group $group: $msg");
+        ();
+    }
+} grep { defined } RT->Config->Get('AnnounceDefaultGroups');
+return unless @groups;
+
+if ( @groups > 1 ) {
+    if ( $cf->Type eq 'Select' ) {
+        $ARGSRef->{ 'CustomField-' . $cf->id } = \@groups;
+    }
+    else {
+        $ARGSRef->{ 'CustomField-' . $cf->id } = join "\n", @groups;
+    }
+}
+else {
+    $ARGSRef->{ 'CustomField-' . $cf->id } = $groups[0];
+}
+</%init>
+
+<%args>
+$ARGSRef
+</%args>

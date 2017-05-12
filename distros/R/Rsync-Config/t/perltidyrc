@@ -1,0 +1,14 @@
+--standard-output               # -st : output to STDOUT
+--standard-error-output         # -se : errors to STDERR
+--maximum-line-length=78        # -l=78 : line width
+--indent-columns=4              # -i=4 : ident level
+--continuation-indentation=4    # -ci=4 : continuation ident (columns)
+--vertical-tightness=2          # -vt=2 : maximal vertical tightness
+--closing-token-indentation=0   # -cti=0 : no extra identation for closing brackets
+--paren-tightness=1             # -pt=1 : medium parenthesis tightness
+--brace-tightness=1             # -bt=1 : medium brace tightness
+--square-bracket-tightness=1    # -sbt=1 : medium square bracket tightness
+--nospace-for-semicolon         # -nsfs : no space before semicolons
+--nooutdent-long-lines          # -nolq : don't outdent long quoted strings
+                                # -wbb : break before all operators:
+--want-break-before="% + - * / x . = != == <= >= =~ !~ < > | & || && %= += -= *= /= **= <<= >>= ^= &= |= &&= ||= .= x="

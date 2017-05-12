@@ -1,0 +1,17 @@
+CONTRIBUTING
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+bin/rt-grabbugs
+dist.ini
+doap.ttl
+lib/RT/ClientX/GrabBugs.pm
+t/01basic.t

@@ -1,0 +1,35 @@
+---
+abstract: 'Perl programming, the rubyish way.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>, shelling C<shelling@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.86'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Rubyish
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Class::Inspector: 1.23
+  Clone: 0.31
+  Data::Dumper: 2.121
+  Devel::Declare: 0.003004
+  Rubyish::Attribute: 1.0
+  Sub::Exporter: 0.982
+  UNIVERSAL::isa: 1.01
+  YAML: 0.68
+  autobox: 2.55
+  perl: 5.10.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: git://github.com/gugod/rubyish-perl.git
+version: 0.32

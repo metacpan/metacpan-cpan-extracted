@@ -1,0 +1,33 @@
+NAME
+    Regexp::Common::net::CIDR -- provide patterns for CDIR blocks.
+
+SYNOPSIS
+        use Regexp::Common ();
+        use Regexp::Common::net::CIDR ();
+
+        while (<>) {
+            /$RE{net}{CIDR}{IPv4}/ and print "Contains a CIDR.\n";
+        }
+
+DESCRIPTION
+    Patterns for CIDR blocks. Now only next IPv4 formats are supported:
+
+      xxx.xxx/xx
+      xxx.xxx.xxx/xx
+      xxx.xxx.xxx.xxx/xx
+
+    With {-keep} stores address in $1 and number of bits in $2.
+
+INSTALLATION
+      perl Makefile.PL
+      make
+      make install
+
+CAVEATS
+    As Regexp::Common doesn't work well with extensions named
+    "Regexp::Common::xxx::yyy" you have to load this extension yourself with
+    "use" or "require".
+
+AUTHOR
+    Ruslan U. Zakirov <ruz@bestpractical.com>
+

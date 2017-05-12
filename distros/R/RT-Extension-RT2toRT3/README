@@ -1,0 +1,109 @@
+Migrating from RT 2.0 to RT 3.x 
+
+You can use make install to install the two scripts in this package.
+It may be easier to work from withing the distribution instead, in case you 
+need to modify anything in the scripts.
+
+This tool migrates your RT2 instance to an RT 3.x instance. It transfers:
+
+	Users
+	Groups
+	Queues
+	Rights
+	Tickets
+	Custom Fields (Formerly Keywords)
+	ACLs
+	BASIC Scrips
+
+It does NOT automatically migrate:
+
+	Custom templates, 
+	Custom Scrips, 
+	Custom ScripActions, 
+	Custom ScripConditions
+
+
+
+Create a directory to hold your RT2 database dump. Here we'll refer to it as
+DIRNAME. Anywhere you see the string  "DIRNAME", replace it with the path to
+your directory.
+
+Tell rt-2.0-to-dumpfile where your RT libraries live. (Edit the 'use lib' lines)
+
+Execute:
+rt-2.0-to-dumpfile  DIRNAME
+
+DIRNAME will now contain one file called "metadata" and several subdirectories
+which contain about 1000 files, 1 file per ticket.
+
+
+Install rt3. Let it set up your rt3 database.
+
+Tell dumpfile-to-rt-3.0 where your RT libraries live. (Edit the 'use lib' lines)
+
+If your RT instance contains tickets encoded in a characterset other than
+"IS0-8859-1", you'll want to edit the value of $ENCODING in dumpfile-to-rt-3.0.
+
+
+Execute:
+dumpfile-to-rt-3.0 DIRNAME
+
+Watch it spin.  If it crashes, please send a crashdump to rt-devel@lists.fsck.com
+Importing is a heavy-weight process and for large databases can run for a very
+long time. (Huge imports can take over 24 hours to run.) The import toolset now
+ships with an "incremental" mode. The incremental mode will take care of any
+users or tickets which have changed since the specified date. Once your initial
+export has run, perform a secondary export:
+
+rt-2.0-to-dumpfile NEWDIRNAME since 2003-01-01 
+
+         (replace that date with the date before the initial export)
+
+Then execute:
+
+dumpfile-to-rt-3.0 NEWDIRNAME
+
+It's important to note that this incremental importer _mandates_ that queues,
+keyword selects, links and queue watchers not be changed on either RT instance
+during the export/import period.
+
+If you're using a database such as Postgres or Oracle that has
+explicit sequence support, you may need to set the value of each
+table's sequence to the MAX(id) for that table
+
+MERGING
+
+This release of rt2-to-rt3 supports merging your RT2 instance into an existing
+RT3 instance.  You should create your RT2 dump as above:
+
+rt-2.0-to-dumpfile DIRNAME
+
+You will need to set $merge_on_import in dumpfile-to-rt-3.0 to a true value
+Then you can run 
+
+dumpfile-to-rt-3.0 DIRNAME
+
+The importer will do extra work to handle renumbering your tickets and looking
+for queues that might already exist in your new RT instance
+
+CUSTOM CODE ON IMPORT
+
+If you want to do custom changes to your data during the import, there are some
+new hooks for this.  Create a file that defines any of the following subroutines
+
+sub client_setup
+sub client_import_queue
+sub client_import_user
+sub client_import_ticket
+sub client_import_ticket_extra
+
+tell the importer about this file by passing it as the second argument
+
+dumpfile-to-rt-3.0 DIRNAME PATH/TO/FIlE/WITH/CUSTOMCODE
+
+These can be used to create new groups, assign all users to a group,
+assign all tickets a new CustomField.
+
+You can find some example code using these hooks in the examples directory
+
+Bug reports and problems should be sent to rt-devel@lists.bestpractical.com

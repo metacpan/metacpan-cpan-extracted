@@ -1,0 +1,15 @@
+.*.bak
+.*.swp
+.*~
+.carton/
+.git/
+.gitignore
+.rock.yml
+MYMETA.json
+MYMETA.yml
+Makefile$
+Makefile.old
+blib/
+carton.lock
+local/
+pm_to_blib

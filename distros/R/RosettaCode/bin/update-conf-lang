@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict; use warnings;
+use IO::All;
+use YAML::XS;
+use XXX;
+
+my @all = io('Cache/langs.txt')->chomp->slurp;
+my %all = map {$_=>1} @all;
+my $lang = YAML::XS::LoadFile 'Conf/lang.yaml';
+
+for my $l (@all) {
+  # next unless $l =~ /^\w/;
+  next unless $l =~ /^\w[\w\+\-\.\/\ ]*$/;
+  $lang->{$l} = undef unless exists $lang->{$l};
+}
+
+my $new = Dump $lang;
+$new =~ s/ ~$//gm;
+
+io('Conf/lang.yaml')->print($new);

@@ -1,0 +1,250 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Ruby - Perl interface to Ruby interpreter
+
+=head1 SYNOPSIS
+
+	use Ruby
+		':DEFAULT',
+
+		-require  => 'complex',     # load Ruby's library
+			     'digest/md5',  # load Ruby's extention
+
+		-function => 'Rational',    # import Ruby's function
+
+		-class    => qw(GC Object), # import Ruby's classes
+		-module   => qw(Kernel),    # synonym for -class
+
+		-variable => ['$!' => '$rb_errinfo'],    # $! as $rb_errinfo
+		-function => ['String' => 's'],          # String() as &s()
+		-class    => ['Config' => 'RubyConfig'], # Config as RubyConfig
+
+		-literal  => 'all',   # literals are overloaded
+		-no_literal => 'all',
+
+		-autobox,             # literals are autoboxed
+		-no_autobox,
+
+		-eval => <<'EOR', # eval and import 'add()', 'MyObject'
+			def add(x,y)
+				x.to_f + x.to_f
+			end
+
+			class MyObject
+				def my_method
+					"OK"
+				end
+			end
+	EOR
+	;
+	use Ruby -all; # -function => ':DEFAULT' && -class => ':ALL' && -literal
+
+	p($Ruby::Version); # => "1.8.6", for example
+
+	p(add(1, 2));           # => 3.0
+	p(MyObject->my_method); # => "OK"
+
+	rb_eval(<<'EOS', __PACKAGE__);
+
+		p __PACKAGE__; # => "main"
+
+		Perl::eval("use LWP::Simple");
+
+		# should be Perl's string
+		uri = Perl.String("http://www.ruby-lang.org/");
+		getprint(uri); # call # &main::getprint
+	EOS
+
+	use Ruby -literal;
+	# String/Integer/Float are overloaded
+
+	p "foo"->class; # String
+
+	p ref("foo"); # "Ruby::Object"
+
+	10->times(sub{ p @_ });
+
+	p "foo"->upcase;
+
+	use Ruby -autobox;
+
+	[qw(foo bar baz)]->each(sub{ p @_ });
+
+
+=head1 DESCRIPTION
+
+This module provides an interface to a ruby interpreter that is installed in
+your machine.
+
+=head1 IMPORT COMMAND
+
+=over 4
+
+=item -function => functions
+=item -variable => global_variables
+
+Imports I<functions> and/or I<global_variables>.
+
+C<-variable> is a synonym for C<-funcion>.
+
+=item -class => classes
+=item -module => modules
+
+Installs I<classes> and/or I<modules> of Ruby.
+
+C<-module> is a synonym for C<class>.
+
+=item -all
+
+Does C<< -function => ':DEFAULT', -class => ':ALL', -literal >>.
+
+=item -require => libraries
+
+Loads I<libraries> at the compile time.
+
+=item -eval => source_code
+
+Evals I<source_code>, and imports the classes and functions that are defined
+in I<source_code>.
+
+=item -base => base_class
+
+Sets up the is-a relationship with I<base_class>, like C<base.pm>.
+
+=item -literal => [ 'all' | 'string' | 'numeric' | 'integer' | 'float' ]
+=item -no_literal
+
+Enables/Disables literal overloading.
+
+=item -autobox
+=item -no_autobox
+
+Enables/Disables literal autoboxing.
+
+=back
+
+
+=head1 INTERPRETER FEATURE
+
+=head2 Constants
+
+These are imported by default.
+
+=over 4
+
+=item true
+
+=item false
+
+=item nil
+
+=back
+
+=head2 Functions
+
+These are imported by default.
+
+=over 4
+
+=item rb_eval(source [, package [, file [, line]]])
+
+Evals I<source> as Ruby code.
+
+If I<package> is supplied, those classes and functions that are defined in
+I<source> are exported to I<package> automatically.
+
+=item rb_require(library)
+
+Loads I<library> at the run time.
+
+=item p(...), puts(...)
+
+Equivalent to ruby's C<p()> and C<puts()>.
+
+=item rubyify(perldata)
+
+Rubyifies I<perldata> to use some ruby-like methods.
+
+For example:
+
+	rubyify(\%ENV)->each(sub{
+		my($key, $value) = @_;
+		puts "$key=$value";
+	});
+
+This method doesn't convert I<perldata> to Ruby data.
+It wraps I<perldata> with Ruby object.
+
+=back
+
+These functions are importable:
+
+=over 4
+
+=item rb_c(class)
+
+=item rb_m(module)
+
+=item rb_e(exception)
+
+Obtains the defined I<class>, I<module> or I<exception> object.
+
+=item rb_const(constant)
+
+Obtains the I<constant>.
+
+For example:
+
+	p rb_const(RUBY_VERSION);
+	p rb_const(File::Constant);# == rb_c(File::Constant)
+
+=back
+
+=head1 RUBY FUNCTIONS
+
+Those functions defined in Ruby interpreter are importable.
+
+For example:
+
+	use Ruby qw(lambda(&));
+
+	my $lambda = lambda { ... };
+	$lambda->(...);
+
+
+=head1 NOTE
+
+=head2 Continuation, catch/throw
+
+Ruby's C<callcc> and C<catch/throw> functions throw C<LocalJumpError>.
+
+=head2 Ruby thread
+
+Ruby threads may cause core dumps.
+
+=head2 Perl thread
+
+Perl threads will cause core dumps.
+
+=head1 BUGS
+
+This module is very experimental. There are a lot of bugs.
+
+=head1 SEE ALSO
+
+L<http://www.ruby-lang.org/>.
+
+=head1 AUTHOR
+
+Goro Fuji (藤 吾郎) E<lt>gfuji(at)cpan.orgE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008, Goro Fuji. Some rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,54 @@
+% layout 'dashboard';
+% title 'Welcome to Rex::JobControl';
+<h2><%= $project_count %> Projects</h2>
+
+% if($project_count == 0) {
+<p>Currently there is no project configured.</p>
+% } else {
+
+% for my $pro (@{ $projects }) {
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title"><a href="/project/<%= $pro->directory %>"><%= $pro->name %></a></h3>
+  </div>
+  <div class="panel-body">
+
+    <div>
+      <div class="col-xs-2">
+        Jobs
+      </div>
+      <div class="col-xs-10">
+        % if ($pro->job_count > 0) {
+        <%= join(", ", map { $_ = $_->name } @{ $pro->jobs }); %>
+        % } else {
+        No jobs
+        % }
+      </div>
+    </div>
+
+    <div>
+      <div class="col-xs-2">
+        Last executed job
+      </div>
+      <div class="col-xs-10">
+        % my $last_job = $pro->get_last_job_execution;
+        % if($last_job) {
+        % my $rexfile_name = $last_job->{status}->[-1]->{rexfile};
+        % my $task_name = $last_job->{status}->[-1]->{task};
+        % my $server_name = $last_job->{status}->[-1]->{server};
+        % my $status = $last_job->{status}->[-1]->{status};
+        <%= $rexfile_name %>/<%= $task_name %> on <%= $server_name %> with status <%= $status %>
+        % } else {
+        Nothing executed yet.
+        % }
+      </div>
+    </div>
+
+  </div>
+</div>
+% }
+
+% }
+
+<a href="/project/new" class="btn btn-info">New Project</a>
+

@@ -1,0 +1,44 @@
+0.0.15 Sun Feb 12 14:12:06 PST 2017
+ - Release after pause-cleanup removed wrong dists
+
+0.0.14 Sat Aug 16 15:05:02 PDT 2014
+ - Remove .gitignore
+
+0.0.13 Sat Aug 16 12:17:44 PDT 2014
+ - Meta 0.0.2
+
+0.0.12 Fri Aug 15 21:27:54 PDT 2014
+ - Remove t/use_ok.t
+
+0.0.11 Fri Aug 15 20:37:18 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.0.10 Fri Aug  8 12:56:13 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.0.9 Mon Aug  4 00:29:16 PDT 2014
+ - Remove (c) from Copyright
+
+0.0.8 Wed Jul 30 16:13:54 PDT 2014
+ - Switch IRC to '#pkg'
+
+0.0.7 Sat Jul 26 20:01:32 PDT 2014
+ - Add dep for Mo::xxx
+
+0.0.6 Sat Jul 26 11:58:04 PDT 2014
+ - Switch to Zilla::Dist
+
+0.0.5 Fri Apr 12 14:21:33 PDT 2013
+ - Change RosettaCode.git to RosettaCodeData.git
+
+0.0.4 Fri Apr 12 12:16:56 PDT 2013
+ - Fix dzil dist.ini so that installation works properly.
+
+0.0.3 Thu Apr 11 13:22:54 PDT 2013
+ - Get bin/rosettacode into the dist.
+
+0.0.2 Thu Apr 11 12:27:55 PDT 2013
+ - Initial release
+
+0.0.1 Thu Apr 11 11:16:25 PDT 2013
+ - Initial release

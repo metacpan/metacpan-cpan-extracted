@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tableQueryResult>
+	<header>
+		<columnName>bed_day</columnName>
+		<columnName>bd_date</columnName>
+		<columnName>actual</columnName>
+	</header>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/Ov89akIfSFEzzmnIp0Yz8w</uri>
+		<literal>2006-01-20</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/ZyTxPXEFGNm-j2q1gXaOxg</uri>
+		<literal>2006-01-27</literal>
+
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/UPFq72T3-KpkOApwXXR_wA</uri>
+		<literal>2006-01-01</literal>
+		<literal>true</literal>
+	</tuple>
+
+	<tuple>
+		<uri>http://scswks91/census/uniq/ZbZ54ZoP4S0BVrRhNp6gkw</uri>
+		<literal>2006-01-02</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/ONO27O15B5-eUVz8DmHhrg</uri>
+
+		<literal>2006-01-03</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/224EcrVhrf2kXBOvlDzIyg</uri>
+		<literal>2006-01-04</literal>
+		<literal>true</literal>
+
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/pcwHQOk4epQdA6Gr8p6FzA</uri>
+		<literal>2006-01-05</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/2Dj3a35VYyR2Fwp5oyIY7A</uri>
+		<literal>2006-01-06</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/Xbm5JzWFTYuopkm1UT8I5w</uri>
+		<literal>2006-01-07</literal>
+
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/JZYlzcReF2le1trkNVeQTw</uri>
+		<literal>2006-01-08</literal>
+		<literal>true</literal>
+	</tuple>
+
+	<tuple>
+		<uri>http://scswks91/census/uniq/bx9sEPZjkbFChER-DFsvSw</uri>
+		<literal>2006-01-09</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/4X8gplg16pt8ZXCUbnqytg</uri>
+
+		<literal>2006-01-10</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/1V0mkmxHUj4WtoSHcIWhmA</uri>
+		<literal>2006-01-11</literal>
+		<literal>true</literal>
+
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/CjJrTxbGpjrxTAPs3oYu6Q</uri>
+		<literal>2006-01-21</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/WCQeDj0cm01wPaUNFBFyRg</uri>
+		<literal>2006-01-22</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/0GhTrZN8v_pk4REltan7nw</uri>
+		<literal>2006-01-23</literal>
+
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/lHEJ52LXh0vwIw-90jW4mA</uri>
+		<literal>2006-01-24</literal>
+		<literal>true</literal>
+	</tuple>
+
+	<tuple>
+		<uri>http://scswks91/census/uniq/_ujAvnfeH_VxyvcSVDhJXA</uri>
+		<literal>2006-01-25</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/oBvteiNQ6gMbCp8a3VBgBQ</uri>
+
+		<literal>2006-01-26</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/_y94JIB7qtaRmAA-eIgJyw</uri>
+		<literal>2006-01-28</literal>
+		<literal>true</literal>
+
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/51rVdXt40OOm2TRkFsVcfA</uri>
+		<literal>2006-01-29</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/ofmwQUnBWrfYgNJpK3JNrg</uri>
+		<literal>2006-01-30</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/idU4GnWHrjWwM_9hF9Y_AQ</uri>
+		<literal>2006-01-12</literal>
+
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/MZ9u3OTdHZAVlM2uxBZejg</uri>
+		<literal>2006-01-13</literal>
+		<literal>true</literal>
+	</tuple>
+
+	<tuple>
+		<uri>http://scswks91/census/uniq/gZR3yW-32KN_Xj4Msbhtaw</uri>
+		<literal>2006-01-14</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/-QSjEAyZKZqSZ1iDoALm3g</uri>
+
+		<literal>2006-01-15</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/dIEL18YCKSS1Bwrl_KWuww</uri>
+		<literal>2006-01-16</literal>
+		<literal>true</literal>
+
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/JEx55oSb8sDjkd9junEKPw</uri>
+		<literal>2006-01-17</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+
+		<uri>http://scswks91/census/uniq/MyfgdV5bLBNc4NeiexOhlA</uri>
+		<literal>2006-01-18</literal>
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/nGvyUcfb67hKSk85wmhrWg</uri>
+		<literal>2006-01-19</literal>
+
+		<literal>true</literal>
+	</tuple>
+	<tuple>
+		<uri>http://scswks91/census/uniq/kd_7pWHukbfaZStd4cc_3Q</uri>
+		<literal>2006-01-31</literal>
+		<literal>true</literal>
+	</tuple>
+
+</tableQueryResult>

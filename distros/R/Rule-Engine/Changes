@@ -1,0 +1,21 @@
+Revision history for Rule-Engine
+
+0.06    2011-02-26
+        Fix Filter's condition not getting the correct arguments.
+
+0.05    2011-02-25
+        Pass session to filter condition (does what the docs say now)
+
+0.04    2011-02-25
+        POD improvements
+
+0.03    2010-12-10
+        Use execute_method with code attrs so that self can be used
+        POD improvements
+
+0.02	2010-11-17
+		Fix busted tests
+
+0.01    2010-11-11
+        First version, released on an unsuspecting world.
+

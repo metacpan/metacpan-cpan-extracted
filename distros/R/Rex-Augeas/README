@@ -1,0 +1,46 @@
+Rex-Augeas - An augeas module for Rex
+=====================================
+
+This is a simple module to manipulate configuration files with the help of augeas.
+
+INSTALLATION
+
+To install Rex-Augeas type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules, libraries and programs:
+
+   Rex >= 0.7.0
+   Config::Augeas
+
+BUGS/FEATURE REQUESTS
+
+Please report bugs and request features on the CPAN bug tracking site,
+rt.cpan.org.  If you are able and willing to provide a fix, attach a patch
+and please provide your name to be credited in the changelog and an email
+address for verification/discussion.
+
+HACKING
+
+The module is kept in a GitHub (https://github.com/krimdomu/Rex-Augeas/)
+repository.
+
+If you are interested in making a change/fix, just do a pull request.
+
+TODO
+
+More examples and guides would be nice.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Jan Gehring; all rights reserved.
+
+Rex is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+

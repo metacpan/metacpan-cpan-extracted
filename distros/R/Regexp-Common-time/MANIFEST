@@ -1,0 +1,20 @@
+Changes
+lib/Regexp/Common/time.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/1-load.t
+t/american.t
+t/dmy.t
+t/doc.t
+t/hms.t
+t/mail-strict.t
+t/mail.t
+t/mdy.t
+t/strftime.t
+t/tf.t
+t/ymd.t
+t/zone.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

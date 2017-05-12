@@ -1,0 +1,35 @@
+---
+abstract: 'Perl extension for RT+IR integration with CIF'
+author:
+  - 'Wes Young, <wes@barely3am.com>'
+  - 'Barely3am Solutions <wes@barely3am.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-CIFMinimal
+no_index:
+  directory:
+    - etc
+    - examples
+    - html
+    - inc
+requires:
+  CIF::Client: 0.01
+  HTML::Table: 2.08
+  JSON: 2.07
+  Net::Abuse::Utils: 0.10
+  Net::CIDR: 0.11
+  Regexp::Common: 2.122
+  Regexp::Common::net::CIDR: 0.02
+  XML::IODEF::Simple: 0.00
+  perl: 5.8.8
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.01

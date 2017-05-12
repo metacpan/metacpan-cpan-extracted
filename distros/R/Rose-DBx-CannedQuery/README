@@ -1,0 +1,365 @@
+NAME
+    Rose::DBx::CannedQuery - Conveniently manage a specific SQL query
+
+SYNOPSIS
+      use Rose::DBx::CannedQuery;
+      my $qry = Rose::DBx::CannedQuery->new(rdb_class => 'My::DB',
+                  rdb_params => { type => 'real', domain => 'some' },
+                  sql => 'SELECT * FROM table WHERE attr = ?');
+      foreach my $row ( $qry->results($bind_val) ) {
+        do_something($row);
+      }
+
+      sub do_something_repeatedly {
+        ...
+        my $qry = Rose::DBx::CannedQuery->new_or_cached(rdb_class => 'My::DB',
+                  rdb_params => { type => 'real', domain => 'some' },
+                  sql => 'SELECT my, items FROM table WHERE attr = ?');
+        # Exdcute query and manage results
+        ...
+      }
+
+DESCRIPTION
+    This class provides a convenient means to execute specific queries
+    against a database fronted by Rose::DB subclasses, in a manner similar
+    to (and I hope a bit more flexible than) the DBI's "selectall_arrayref"
+    in DBI method. You can set up the query once, then execute it whenever
+    you need to, without worrying about the mechanics of the database
+    connection.
+
+    The database connection is not actually made and the query is not
+    actually executed until you retrieve results or the active statement
+    handle.
+
+  ATTRIBUTES
+    The specifics of the query are passed as attributes at object
+    construction. You may specify the database connection in either of two
+    ways:
+
+    rdb_class
+    rdb_params
+        These describe, respectively, the Rose::DB-derived class and the
+        parameters to be passed to that class' "new" in Rose::DB method to
+        create the Rose::DB object. The "rdb_params" attribute must be a
+        hash reference, the single-argument shortcut allowed by Rose::DB to
+        specify just a data source "type" is not supported.
+
+        When the Rose::DB>-derived object is created, the information in
+        rdb_params will be merged with the class' default attributes, with
+        attributes in rdb_params taking precedence. You may omit
+        "rdb_params" if "rdb_class" has default domain and type values that
+        point to a specific datasource; if this isn't the case, Rose::DB
+        will die noisily.
+
+        Rose::DBx::CannedQuery provides a small set of defaults:
+
+          { connect_options =>
+             { RaiseError => 1,
+               PrintError => 0,
+               AutoCommit => 1 
+             }
+          }
+
+        Subclasses may change or extend these defaults (see below). The
+        merged parameters are then passed to the "rdb_class"' new_or_cached
+        constructor.
+
+        If a Rose::DBx::CannedQuery object was created by passing in a
+        Rose::DB database handle directly, the rdb_params attribute will
+        return "type" and "domain" information only; if you want more
+        information about the handle, you can call Rose::DB accessor methods
+        on it directly.
+
+    rdb This is the Rose::DB-derived object ("handle") managing the database
+        connection. It may be supplied at connection time instead of the
+        rdb_class and rdb_params parameters, if you want to make use of an
+        already-constructed database handle.
+
+    One or the other of these attribute sets must be provided when creating
+    a Rose::DBx::CannedQuery object.
+
+    Other attributes are:
+
+    sql The SQL query that this object mediates is supplied as a string.
+        This attribute is required.
+
+    sth The DBI statement handle mediating the canned query. This is a
+        read-only accessor; a statement handle cannot be specified at object
+        construction.
+
+  CLASS METHODS
+    new(*%args*)
+        Create a new Rose::DBx::CannedQuery, taking values for its
+        attributes from *%args*. In the style of Moose, *%args* may be
+        either a list of key-value pairs or a single hash reference.
+
+        The "sql" attribute is required, as is either "rdb" or enough of
+        "rdb_class" and "rdb_params" to construct a database handle. If
+        "rdb" is provided, it will be used regardless of the values in
+        "rdb_class" and "rdb_params". Otherwise, "rdb_class"'
+        "new_or_cached" in Rose::DB will be called with the contents of
+        "rdb_params" as parameters to obtain a new Rose::DB-derived database
+        object.
+
+    new_or_cached(*%args*)
+        Attempt to retrieve a cached Rose::DBx::CannedQuery matching
+        *%args*. If successful, return the existing query object. If not,
+        create a query via "new" and add it to the cache. See "CACHING
+        QUERIES" for a description of the query cache
+
+  OBJECT METHODS
+    dbh Convenience method that returns the DBI database handle associated
+        with this object. It is equivalent to "$obj->rdb->dbh".
+
+    setup_dbh_for_query
+        Establishes the DBI database connection. It also sets the
+        "FetchHashKeyName" in DBI attribute on the handle to "NAME_lc", so
+        the methods below will by default return hash references with
+        lowercase keys.
+
+        Returns the DBI database handle.
+
+    execute([*@bind_args*])
+        Executes the query, binding the elements of *@bind_args*, if any, to
+        placeholders in the SQL. Returns a DBI statement handle on success,
+        and raises an exception on failure.
+
+        You should use this method when you want to access the statement
+        handle directly for detailed control over how the results are
+        retrieved.
+
+    results([*@bind_args*])
+        Calls "execute", passing *@bind_args*, if any, and then fetches the
+        results. In scalar context, returns the number of rows fetched. In
+        array context, returns a list of hash references corresponding to
+        rows fetched. The keys in each hash are the lower-case column names
+        (cf. "setup_dbh_for_query"), and the values are the results for that
+        row, as described for "fetchrow_hashref" in DBI.
+
+    resultref([*$bind_args*, *$query_opts*])
+        This method provides more flexibility than "results", at the cost of
+        a slightly more complex calling sequence.
+
+        Calls "execute", passing the contents of the array referenced by
+        *$bind_args*, if any, and then fetches the results. If present,
+        *$query_opts* must be an array reference, whose contents are passed
+        to "fetchall_arrayref" in DBI. If *$query_opts* is omitted, an empty
+        hash reference is passed, causing each row of the resultset to be
+        returned as a hash reference.
+
+        Returns the array reference resulting from the call to
+        "fetchall_arrayref" in DBI.
+
+  INTERNAL METHODS
+    These methods are exposed to facilitate subclassing, and should not
+    otherwise be used to interact with a Rose::DBx::CannedQuery object.
+
+    _default_rdb_params
+        This method returns a hash reference that supplies default
+        parameters to be passed to the Rose::DB-derived constructor.
+        Specific parameters will be overridden by equivalent keys in the
+        "rdb_params" attribute.
+
+    _retcon_rdb_class
+        This method is used to generate the value of the "rdb_class"
+        attribute iff the object was constructed using an existing
+        Rose::DB-derived object rather than connection parameters.
+
+    _retcon_rdb_params
+        This method is used to generate the value of the "rdb_params"
+        attribute iff the object was constructed using an existing
+        Rose::DB-derived object rather than connection parameters. As noted
+        above, it is perhaps useful for reference, but is under no
+        obligation to accurately reproduce all of the parameters necessary
+        to construct a Rose::DB handle just like the one owned by this
+        object.
+
+    _init_rdb
+        Given the connection information in "rdb_class" and "rdb_params",
+        construct a Rose::DB-derived handle for the "rdb" attribute. If
+        necessary, you should arrange for "rdb_class" to be loaded. An
+        exception should be raised on failure; the Rose::DB constructor
+        usually does this for you.
+
+    _init_sth
+        Given a validly constructed and connected Rose::DBx::CannedQuery,
+        create a prepared DBI statement handle for the query in "sql". On
+        success, you should return the statement handle. On failure, you
+        should raise an exception.
+
+    BUILDARGS
+        The Rose::DBx::CannedQuery BUILDARGS simply checks that either a
+        Rose::DB-derived handle or the necessary connection class and
+        parameters are provided.
+
+    _query_cache([*$query_cache_object*)
+        If called without any parameters, returns the query cache currently
+        in use. In this form, may be called as a class or object method, but
+        remember that the cache is class-wide, no matter how you retrieve
+        it.
+
+        If called with *$query_cache_object*, the current query cache (if
+        any) is cleared, and the query cache is set to
+        *$query_cache_object*, which must conform to the API implemented by
+        Rose::DBx::CannedQuery::SimpleQueryCache. For simple variations on
+        the default behavior, you may be better served by supplying an
+        appropriately reconfigured Rose::DBx::CannedQuery::SimpleQueryCache
+        instance than by writing a new cache class.
+
+        If you have not set the query cache explicitly (or if you set it to
+        "undef"), an instance of Rose::DBx::CannedQuery::SimpleQueryCache
+        will be lazily constructed using its default behaviors when a cache
+        is needed.
+
+CACHING QUERIES
+    Since one of the common uses for canned queries is execution of a
+    prepared SQL statement whenever a function is called,
+    Rose::DBx::CannedQuery provides a (very!) simplistic cache to keep
+    queries around without requiring each place that might need the query to
+    maintain state. You can use "new_or_cached" as an alternative to the
+    regular "new" constructor, and it will return to you the cached version
+    of a query, if any, in preference to creating a new one.
+
+    There are a few important limitations of this caching mechanism to keep
+    in mind:
+
+    *   there is a single class-level query cache, so there will be at most
+        one query object compatible with any given set of parameters passed
+        to "new_or_cached" at a time. This cached object is returned in
+        whatever state the last user left it, so it may have already
+        "execute"d using a particular set of bind values, or be in the midst
+        of fetching a resultset.
+
+        This may be construed as a feature, if you want to be able to pick
+        up where you left off in collecting results, but be careful if you
+        plan to retrieve the same query from multiple places.
+
+    *   the key used to determine whether a query is in the cache is up to
+        the cache class, which is passed the arguments that were given to
+        "new_or_cached". The default key generating function for
+        Rose::DBx::CannedQuery::SimpleQueryCache simply serializes the
+        arguments as a string. This means that two calls that refer to the
+        same conceptual database operation in different ways (e.g. one which
+        says "SELECT a FROM mytable ..." and another which says "SELECT a
+        FROM mytable tab ...") will result in creation and caching of two
+        queries. Other cache classes may be smarter.
+
+        It also means the cache is not aware of any bind parameter values,
+        so it's not possible to simultaneously cache the same query being
+        executed with different bind parameters.
+
+    *   Rose::DBx::CannedQuery::SimpleQueryCache (q.v.) makes an attempt to
+        insure that a cached query hasn't been disconnected since it was
+        last used. However, the checks err on the side of low overhead
+        rather than comprehensiveness, and aren't foolproof. If you plan to
+        leave queries untouched in the cache for a long time, you need to
+        account for the possibility that you'll get a stale query back (or
+        you might want to avoid the cache altogether, since the benefit is
+        likely smaller).
+
+        If your application typically handles bursts of work with intervals
+        of rest in between (e.g. in responding to incoming requests), you
+        may benefit from caching queries while working, then explicitly
+        clearing the cache (e.g. by calling
+        "Rose::DBx::Cannedquery->_query_cache->clear") at the end of each
+        cycle.
+
+EXPORT
+    None.
+
+DIAGNOSTICS
+    Any message produced by an included package, as well as
+
+    Need either Rose::DB object or information to constuct one (F)
+        The constructor was called without either a "rdb" attribute or
+        necessary "rdb_class" and "rdb_params" attributes.
+
+    Failed to load class (F)
+        The Rose::DB-derived class specified by "rdb_class" either couldn't
+        be found or didn't load successfully.
+
+    Error preparing query (F)
+        Something went wrong when trying to "prepare" in DBI the DBI
+        statement handle using "sql".
+
+    Error executing query (F)
+        A problem was encountered trying to "execute" in DBI the prepared
+        query. This could be a sign of a database problem, or it may reflect
+        pilot error, such as passing the wrong number of bind parameters.
+
+    Can't recover Rose::DB class information (F)
+    Can't recover Rose::DB datasource information (F)
+        Somehow we managed to get an object with neither "rdb_class" or a
+        "rdb" handle. This shouldn't happen; it probably means a subclass
+        overrode BUILDARGS and forgot to call the superclass method.
+
+BUGS AND CAVEATS
+    All query results are prefetched by the "results" and "resultref"
+    methods; if you want to iterate over a potentially large resultset,
+    you'll need to call appropriate DBI methods on the statement handle
+    returned by "execute".
+
+    The default connection parameters include "RaiseError", and the
+    exceptions thrown when "_init_sth" or "execute" fails also include the
+    error information, so you may see it twice. Better that than not at all,
+    if you happen to have changed the connection options in "rdb_params".
+
+BUT *WHY?*
+    You might think, "What's the point? How hard can it be to write a little
+    wrapper around straight DBI calls? Anybody who uses a database has done
+    that already. Why should I bloat my dependency chain with Rose::DB and
+    some object system?" or "Why is this different from any of the other ORM
+    or SQL-simplifier packages out there?" And you may well be right, if
+    you're dealing with a single database connection, or are already up to
+    your elbows in DBI calls.
+
+    However, I find that this lands in a "sweet spot" for my coding style. I
+    find myself dealing with several databases on a recurring basis, and
+    Rose::DB is a handy way to wrap up connection information and
+    credentials so they're easy to use elsewhere. But when I just want to
+    pull some data, I don't necessarily need the weight of an ORM.
+    Rose::DBx::CannedQuery cuts down on the boilerplate I need to make these
+    queries, and lets me keep the credentials separate from the code
+    (particularly when using Rose::DBx::MoreConfig), without adding the
+    overhead of converting the results into objects.
+
+    Then there's the question, "What's with the Moo stuff?" Sure,
+    Rose::DBx::CannedQuery could be written using only "core" Perl
+    constructs. But again, I find the Mooy sugar makes the code cleaner for
+    me, and easier for someone else to subclass if they want to.
+
+    In the end, I hope Rose::DBx::CannedQuery makes your life sufficiently
+    easier that you find it worth using. If it's close, but you think it's
+    not quite there, suggestions (better still, patches!) are happily
+    received.
+
+SEE ALSO
+    Rose::DB and DBI for more detailed information on options for managing a
+    canned query object.
+
+    Rose::DBx::MoreConfig for an alternative to vanilla Rose::DB that lets
+    you manage configuration data (such as server names and credentials) in
+    a manner that plays nicely with many CI and packaging sytems.
+
+    If you're using Rose::DB::Object as an ORM, see
+    "make_manager_method_from_sql" in Rose::DB::Object::Manager for a
+    similar apprach that produces objects rather than raw results.
+
+    Moo (or Moose), if you're interested in subclassing
+
+    Rose::DBx::CannedQuery::SimpleQueryCache for the default query cache
+
+    Rose::DBx::CannedQuery::Glycosylated for slightly more sugary variant
+
+VERSION
+    version 1.00
+
+AUTHOR
+    Charles Bailey <cbail@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2015 by Charles Bailey
+
+    This software may be used under the terms of the Artistic License or the
+    GNU General Public License, as the user prefers.
+

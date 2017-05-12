@@ -1,0 +1,32 @@
+.travis.yml.bad
+ADS.xs
+Changes
+examples/bit_manipulation.pl
+examples/input.pl
+lib/RPi/ADC/ADS.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/00-load.t
+t/01-new.t
+t/05-_register_data.t
+t/10-addr.t
+t/15-channel.t
+t/20-device.t
+t/25-model.t
+t/30-resolution.t
+t/40-volts.t
+t/45-percent.t
+t/50-raw.t
+t/900-bitwise_queue.t
+t/910-bitwise_polarity.t
+t/915-bitwise_rate.t
+t/920-bitwise_mode.t
+t/925-bitwise_gain.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

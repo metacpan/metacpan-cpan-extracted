@@ -1,0 +1,95 @@
+% layout 'formular';
+% title 'Edit Formular';
+<h2>Edit Formular</h2>
+
+
+<form action="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/edit" method="post" enctype="multipart/form-data">
+  <div class="panel panel-default">
+
+    <div class="panel-heading">Basic Settings</div>
+    <div class="panel-body">
+
+      <div class="form-group">
+        <label for="formular_name">Formular Name</label>
+        <input type="text" class="form-control" id="formular_name" name="formular_name" placeholder="" value="<%= $formular->name %>" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="formular_description">Formular Description</label>
+        <textarea class="form-control" id="formular_description" name="formular_description"><%= $formular->description %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="formular_job">Job</label>
+         <select name="formular_job" size="1" class="form-control">
+           % for my $job (@{ $project->jobs }) {
+           <option value="<%= $job->directory %>"><%= $job->name %></option>
+           % }
+         </select>
+      </div>
+
+      <div class="form-group">
+        <label for="formular_public">Public Formular</label>
+        <div class="checkbox" style="display: inline;">
+          <label>
+            <input type="radio" name="formular_public" value="true" <% if($formular->public eq "yes") { %>checked="checked" <% } %>> Formular is public
+          </label>
+        </div>
+        <div class="checkbox" style="display: inline;">
+          <label>
+            <input type="radio" name="formular_public" value="false" <% if($formular->public eq "no") { %>checked="checked" <% } %>> Formular is private
+          </label>
+        </div>
+
+      </div>
+
+      <div class="form-group">
+        <label for="formular_file">Steps File</label>
+      %= file_field 'formular_file'
+    </div>
+
+
+      <div class="form-group">
+        <label for="server">Choose the servers</label>
+      <table id="server" class="display" cellspacing="0" width="100%">
+        <thead>
+          <tr>
+            <th style="width: 20px;"></th>
+            <th>Name</th>
+            <th>Group</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Group</th>
+          </tr>
+        </tfoot>
+        <tbody>
+      % for my $srv (@{ $project->all_server }) {
+          <tr>
+            <td><input type="checkbox" name="sel_server" value="<%= $srv->{name} %>" /></td>
+            <td><%= $srv->{name} %></td>
+            <td><%= $srv->{group} %></td>
+          </tr>
+      % }
+        </tbody>
+      </table>
+    </div>
+
+
+
+    </div>
+
+  </div>
+
+  <button type="submit" class="btn btn-primary">Update Formular</button>
+</form>
+
+<script>
+$(document).ready(function() {
+    $('#server').dataTable();
+} );
+</script>
+

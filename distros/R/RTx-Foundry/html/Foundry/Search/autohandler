@@ -1,0 +1,23 @@
+%# Money is the root of all evil, and man needs roots
+<& /Foundry/Elements/Header, Title => 'Search' &>
+
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td>
+      <table border="0" cellspacing="0" cellpadding="0" class="poptable" width="100%"><tr><td>
+% $m->print($rv);
+      </td></tr></table>
+    </td>
+  </tr>
+</table>
+<br>
+
+<& /Foundry/Elements/Footer &>
+<%INIT>
+my $rv = $m->scomp('index.html' => %ARGS);
+if ($rv =~ /^<!DOCTYPE/) {
+    $m->print($rv);
+    $m->abort;
+}
+</%INIT>

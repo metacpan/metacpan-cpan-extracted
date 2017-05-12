@@ -1,0 +1,15 @@
+Revision history for Perl extension Randomize.
+
+1.7   Sun Jan 21 00:38:25 2001
+	- First public release
+
+1.8   Tue Apr 24 14:02:42 2001
+        - Added permutations() method
+        - Fixed a bug that would cause problems if you used both
+          varieties of Retry_If at the same time
+
+1.9   Tue Apr 24 21:59:35 2001
+        - Documentation updates
+
+1.10  Mon Apr 30 13:09:40 2001
+        - Added generate_all() method

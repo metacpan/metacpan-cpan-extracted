@@ -1,0 +1,27 @@
+Revision history for RT::Extension::HistoryFilter
+
+2.01 2016-05-30
+ - update Module::Install::ReadmeFromPod
+ - support SelfService again
+
+2.00 2016-02-25
+ - use the same callback for all supported RT version
+ - RT 4.4 compatibility
+
+1.01 2014-08-26
+ - update select widget
+ - get transaction types from BriefDescriptions hash instead of a static list
+
+1.00 2013-10-22
+ - update select widget
+ - RT 4.2 compatibility
+
+0.03 2011-05-20
+ - RT 4.0 compatibility
+
+0.02 2010-06-13
+ - First version released to CPAN
+ - update MANIFEST and MANIFEST.SKIP
+
+0.01 2010-05-31
+ - initial release

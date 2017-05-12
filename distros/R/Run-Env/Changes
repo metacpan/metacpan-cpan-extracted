@@ -1,0 +1,28 @@
+Revision history for Run-Env
+
+0.08	Thu, 25 Nov 2010 14:28:45 +0100
+    * replaced FindBin with FindBin::Real to allow usage under mod_perl
+      (recommended in http://perl.apache.org/docs/general/perl_reference/perl_reference.html)
+
+0.07    2010-07-22
+    * #59270 fixed test failing when env file is present
+    * has_humanreadable_license
+
+0.05    2010-06-28
+    * added uat environment
+    * added SEE ALSO
+
+0.04    2010-06-25
+    * moved Pod to __END__ so that the code is readable
+
+0.03    2008-06-30
+    * short names (prod, stg, dev) added
+
+0.02    2008-03-10
+	* Removed the '-' in %ENV variables. Doesn't work good with shell.
+	* dependencies fixed
+	* debug mode if @ARGV nas --debug
+
+0.01    2008-03-09
+        First version, released on an unsuspecting world.
+

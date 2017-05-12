@@ -1,0 +1,249 @@
+#!/usr/bin/perl
+
+use strict;
+use Games::Roguelike::Utils qw(:all);
+use Games::Roguelike::World::Daemon;
+use Games::Roguelike::Console;
+
+use Time::HiRes qw( usleep );
+
+use Getopt::Long;
+
+my $r = mydaemon->new(
+       	w=>50,
+       	port=>9191,
+        h=>20,
+       	dispw=>50,
+        disph=>20,
+	tick=>.25,
+	pov=>8,
+);
+
+new Games::Roguelike::Area(name=>'2', world=>$r);
+new Games::Roguelike::Area(name=>'1', world=>$r);
+
+$r->area(1)->generate('cavelike', with=>['>']);
+$r->area(2)->generate('cavelike', with=>['<']);
+
+while (1) {
+	$r->proc();
+}
+
+package mychar;
+use Games::Roguelike::Utils qw(:all);
+use base 'Games::Roguelike::Mob';
+
+sub aftermove {
+          my $char = shift;
+          if ((++$char->{healcount} > 5) && ($char->{hp} > 0)) {
+                $char->{hp} = min($char->{maxhp}, $char->{hp}+1);
+                $char->{healcount} = 0;
+          }
+}
+
+sub checkmove {
+	my ($char, $x, $y, $mob, $testonly) = @_;
+	my $mapsym = $char->{area}->{map}->[$x][$y];
+	return 0 if $mapsym eq '';
+	return 0 if $mapsym eq '#';
+	return 0 if $char->{hp} <= 0;
+	return 1 if $char eq $mob;
+	return 1 if $testonly;
+
+	if ($mapsym eq '+') {
+		# door locked? return 0
+		$char->{area}->setmap($x,$y,'/','yellow');
+	}
+
+	if ($mob && $mob->{hp} >= 0) {
+		if ($char->{at} >= randi(6)) {
+			$mob->{hp}-= 1;
+			if ($mob->{hp} <= 0) {
+				$r->showmsg($mob->{name} . " died.", "bold, red");
+				# instead of removing, turn red, so player can watch aftermath
+				$mob->{color} = 'red';
+				$char->{xp}+=1;
+				return 1;
+			} else {
+				$r->showmsg("You hit " . $mob->{name} . "!", "bold");
+				$r->charmsg($mob, $char->{name} . " hit you!", "bold red");
+			}
+		} else {
+			$r->showmsg("You missed.", "bold");
+			$char->{skillp}+=1;
+		}
+		return -1;
+	}
+	return 1;
+}
+
+package mymob;
+use Games::Roguelike::Utils qw(:all);
+use base 'Games::Roguelike::Mob';
+
+sub checkmove {
+        my ($mob, $x, $y, $other, $testonly) = @_;
+	my $mapsym = $mob->{area}->{map}->[$x][$y];
+        return 0 if $mapsym eq '';
+        return 0 if $mapsym eq '#';
+	return 1 if $mob eq $other;
+
+	if ($other) {
+      		return 0 unless $other->{type} eq 'char';
+      		return 0 if $other->{hp} <= 0;
+		return 1 if $testonly;
+
+                if ($mob->{at} >= randi(6)) {
+                        $other->{hp}-= 1;
+                        if ($other->{hp} <= 0) {
+                                $r->showmsg("You died.", "bold, red");
+				$other->{color} = 'red';
+				return -1;
+                        } else {
+                                $r->showmsg("It hit you! ($other->{hp})", "bold");
+                        }
+                } else {
+                        $r->showmsg("It missed you.", "bold");
+                        $mob->{skillp}+=1;
+                }
+                return -1;
+	}
+        return 1;
+}
+
+package mydaemon;
+use Games::Roguelike::Utils qw(:all);
+use base 'Games::Roguelike::World::Daemon';
+
+sub readinput {
+        my $self = shift;
+        my $sock = shift;
+        my $char = $self->{vp};
+        my $state = $self->{state};
+
+        if ($state eq 'WAITNAME') {
+                $self->log("waitname");
+                if (my $str = $self->getstr()) {
+                        $char = *$sock{HASH}->{char} = mychar->new($self->area(1),
+                                sym=>'@',
+                                color=>'green',
+			        hp=>10,
+			        maxhp=>10,
+			        at=>4,
+				pov=>7,
+				move=>'',
+			        con=>$self->{con},
+                        );
+                        $char->{name} = substr($str,0,10);
+			$char->{name} =~ s/[^A-Za-z 0-9_.-]//g;
+			$char->{name} =~ s/(.)/\U$1/;
+                        $char->{sock} = $sock;
+                        $state = 'MOVE';
+                        $self->{con}->clear();
+                        $self->{vp} = $char;    # record char as viewpoint
+                }
+        } elsif ($state eq 'MOVE') {
+                if (my $c = $self->getch()) {
+			die unless $char->isa('Games::Roguelike::Mob');
+			if ($char->{move} eq 'auto') {
+				# auto is interrupted by any key
+				$char->{move} = '';
+			}
+                        if ($c eq 'q') {
+                                $self->showmsg("Are you sure?");
+				$self->{con}->refresh();
+                                $state = 'QUITYN';
+                        } elsif ($c eq 'o') {
+				$self->queuemove($char, 'auto', "Press any key to stop.");
+                        } elsif ($c eq 'R') {
+                                $self->showmsg("Refresh");
+                                $self->{con}->redraw();
+                        } elsif ($c eq '>' && ($char->{area}->{name} == 1) && $char->on eq '>') {
+				$self->queuemove($char, $c, "Level 2");
+                        } elsif ($c eq '<' && ($char->{area}->{name} == 2) && $char->on eq '<') {
+				$self->queuemove($char, $c, "Level 1");
+                        } else {
+                                my $r = $char->kbdmove($c, 1);
+                                $self->log("res $r from test move" . ord($c) . "($c)");
+                                if ($r) {
+					$self->queuemove($char, $c, "Move $c");
+				}
+                        }
+                }
+        } elsif ($state eq 'QUITYN') {
+                if (my $c = $self->getch()) {
+                        if ($c =~ /y/i) {
+                                $state = 'QUIT';
+                                $self->showmsg("Quitting.");
+                        } else {
+                                $state = 'MOVE';
+                                $self->showmsg("Nevermind.");
+                        }
+                }
+	}
+	$self->{state} = $state;
+}
+
+# override this for intro screen, etc.
+sub newconn {
+        my $self = shift;
+        $self->{con}->addstr("Please enter your name: ");
+        $self->{state} = 'WAITNAME';
+        $self->{con}->refresh();
+}
+
+sub tick {
+    my $self = shift;
+    my @auto;
+    foreach my $char (randsort(@{$self->{qmove}})) {
+	if ($char->{move} eq 'auto') {
+		$char->autoex();
+                push @auto, $char;
+	} elsif ($char->{move} eq '>') {
+		$char->area($self->area(2));
+		$char->movetofeature('<');
+		$char->{move} = '';
+	} elsif ($char->{move} eq '<') {
+		$char->area($self->area(1));
+		$char->movetofeature('>');
+		$char->{move} = '';
+	} else {
+        	$char->kbdmove($char->{move});
+		$char->{move} = '';
+	}
+    }
+    $self->{qmove} = \@auto;
+    ++$self->{tickc};
+
+    for ($self->areas) {
+	for (@{$_->mobs}) {
+    	$_->{con}->addstr(0, 64, $_->{name});
+    	$_->{con}->addstr(1, 64, " -------");
+    	$_->{con}->addstr(2, 64, " HP: $_->{hp}    ");
+    	$_->{con}->addstr(3, 64, " AT: $_->{at}    ");
+    	$_->{con}->addstr(4, 64, " -------");
+	}
+    }
+}
+
+# change the symbol/color of the character when it's "in focus"
+sub setfocuscolor {
+        my $self = shift;
+	if ($self->{vp}->{hp} > 0) {
+        	$self->{vp}->{color} = 'bold yellow';
+	}
+}
+
+sub queuemove {
+	my $self = shift;
+	my ($char, $move, $msg) = @_;
+	if ($char->{move}) {
+        	$self->showmsg("Already moving $char->{move}");
+        	$self->{con}->refresh();
+	} else {
+        	$self->showmsg($msg) if $msg;
+        	$self->{con}->refresh();
+        	$char->{move} = $move;
+        	push @{$self->{qmove}}, $char;
+	}
+}

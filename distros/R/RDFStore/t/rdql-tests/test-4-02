@@ -1,0 +1,7 @@
+/*
+ * Test 4-02 : Paths : Find a named path
+ */
+
+SELECT *
+SOURCE <model2.nt>
+WHERE  (?a,  <http://rdf.org/p>, ?z), (?z,  <http://rdf.org/p>, ?d)

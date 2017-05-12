@@ -1,0 +1,20 @@
+0.06 Thu Dec  3 11:08:41 EST 2009
+
+    Style improvements for RT 3.8 ; IE compatiblity fixes
+
+0.05 Fri Jul 21 19:25:56 PDT 2006
+
+    Added a class=button to the go button, to improve its looks on RT 3.6
+    Requested by: Gavin Henry
+
+0.04 Tue Mar 14 17:14:11 PST 2006
+
+    Added a "Go" button for non-js browsers
+
+0.03 Tue Mar 14 14:44:35 PST 2006
+
+* useful when I close the form
+
+0.02 Tue Mar 14 13:14:13 PST 2006
+
+* made the menu jump only on clicking a valid option

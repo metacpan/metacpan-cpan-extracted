@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ $# -lt 3 ]; then
+	echo "usage: $0 dsn user password" >&2
+	exit 1
+fi
+
+dbicdump \
+	-o dump_directory=./lib \
+	-o moniker_map='sub { $_[0] }' \
+	-o use_moose=1 \
+	RackTables::Schema  "$@"

@@ -1,0 +1,70 @@
+Revision history for perl module Routes::Tiny
+
+0.19 2017-01-27T18:28:27Z
+
+ - default_method parameter (dshadow)
+
+0.18 2016-12-26T20:34:29Z
+
+ - merge arguments in subroutes by pushing (+arguments)
+
+0.17 2016-12-26T18:28:28Z
+
+ - merge arguments in subroutes
+
+0.16 2016-08-19T08:10:24Z
+
+ - Fix captures when using array constraints (Alexander Batyrshin)
+
+0.15 2016-01-03T20:19:43Z
+
+ - captures now return all captures from all children (Jonathan R. Warden)
+ - fix bug: correct parent of match on sub-subroute (Jonathan R. Warden)
+ - PSGI example
+
+0.14 2014-01-07T08:09:27Z
+
+ - Just meta files update
+
+0.13 2013-10-16T18:51:38Z
+
+ - Fix optional param at route beginning (ziontab)
+
+0.12 2013-10-10T17:27:16Z
+
+ - Pass params when matching to subroutes too (ziontab)
+
+0.11 2013-06-28T06:56:10Z
+
+ - Added subroutes (mialinx)
+
+0.10 2013-06-20
+
+ - Added arguments (proposed by jemhad)
+
+0.009014 2011-09-02
+
+ - Greatly accelerated routes matching (und3f)
+
+0.009013 2011-07-02
+
+ - Made method matching more robust
+ - Fixed globbing default value bug
+
+0.009012 2011-05-07
+
+ - When building a path use default values too
+
+0.009011 2011-04-01
+
+ - Pass 'name' instead of 'pattern' to the match object
+
+0.009010 2011-02-27
+
+ - Forward / is added when building a path
+ - Fixed path building when using grouping
+ - Fixed path building with trailing slash
+
+0.009009 2011-02-26
+
+ - Initial release

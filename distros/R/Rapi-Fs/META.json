@@ -1,0 +1,78 @@
+{
+   "abstract" : "Plack-compatible, instant ExtJS file browser",
+   "author" : [
+      "Henry Van Styn <vanstyn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Rapi-Fs",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Encode::Guess" : "0",
+            "File::MimeInfo::Magic" : "0",
+            "File::ShareDir" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Entities" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Number::Bytes::Human" : "0",
+            "Path::Class" : "0",
+            "Plack::Runner" : "0",
+            "Pod::Usage" : "0",
+            "RapidApp" : "1.04",
+            "RapidApp::Builder" : "0",
+            "RapidApp::Module::NavTree" : "0",
+            "RapidApp::Util" : "0",
+            "Scalar::Util" : "0",
+            "Types::Standard" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "experimental" : "0",
+            "if" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "RapidApp::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vanstyn/Rapi-Fs/issues"
+      },
+      "homepage" : "http://rapi.io/fs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vanstyn/Rapi-Fs.git",
+         "web" : "https://github.com/vanstyn/Rapi-Fs"
+      },
+      "x_IRC" : "irc://irc.perl.org/#rapidapp"
+   },
+   "version" : "1.104"
+}
+

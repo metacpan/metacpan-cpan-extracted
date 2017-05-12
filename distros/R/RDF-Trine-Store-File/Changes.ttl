@@ -1,0 +1,57 @@
+@prefix :     <http://usefulinc.com/ns/doap#> .
+@prefix dc:   <http://purl.org/dc/terms/> .
+@prefix my:   <http://purl.org/NET/cpan-uri/dist/RDF-Trine-Store-File/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dcs:  <http://ontologi.es/doap-changeset#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+
+<>
+    dc:title     "DOAP for RDF-Trine-Store-File"@en ;
+    dc:subject   my:project ;
+    dc:creator   <http://www.kjetil.kjernsmo.net/foaf#me> .
+
+my:project	 
+    a           :Project ;
+    :name       "RDF-Trine-Store-File" ;
+    :shortdesc  "Using a file with canonical N-Triples as triplestore"@en ;
+    :created    "2011-07-21"^^xsd:date ;
+    :programming-language "Perl" ;
+    :homepage <http://search.cpan.org/dist/RDF-Trine-Store-File/> ;
+    :maintainer <http://www.kjetil.kjernsmo.net/foaf#me> ;
+    :bug-database <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=RDF-Trine-Store-File> ;
+    :release    my:v_0_1, my:v_0_02 .
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+    a           foaf:Person ;
+    owl:sameAs  <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+    foaf:name   "Kjetil Kjernsmo" ;
+    foaf:mbox   <mailto:kjetilk@cpan.org> .
+
+my:v_0_02
+    a           :Version ;
+    dc:issued   "2011-11-29"^^xsd:date ;
+    :revision   "0.02"^^xsd:string ;
+    rdfs:label  "First beta release"@en .
+
+my:v_0_1
+    a           :Version ;
+    dc:issued   "2011-12-22"^^xsd:date ;
+    :revision   "0.1"^^xsd:string ;
+    rdfs:label  "Trine store test suite passes."@en ;
+    dcs:changeset [
+      dcs:item
+	[ rdfs:label "Escape hats in regexps."@en ; a dcs:Bugfix ] ,
+      	[ rdfs:label "Discard context."@en ; a dcs:Bugfix ] ,
+      	[ rdfs:label "Nuke should return self."@en ; a dcs:Bugfix ] ,
+       	[ rdfs:label "Escape unicode escape sequences in NTriples."@en ; a dcs:Bugfix ] ,
+        [ rdfs:label "Now passing the new Test::RDF::Trine::Store test suite."@en ; a dcs:Addition ]         
+	[ rdfs:label "Add a build_requires on URI::Escape."@en ; a dcs:Addition ] 
+	[ rdfs:label "Support variables in statements."@en ; a dcs:Addition ] 
+	[ rdfs:label "Add more constructors and tests for them."@en ; a dcs:Addition ] 
+  	[ rdfs:label "Note that duplicate triples aren't prevented."@en ; a dcs:Addition ] 
+        [ rdfs:label "Many minor documentation fixes"@en ; a dcs:Update ] ,
+    ] .
+

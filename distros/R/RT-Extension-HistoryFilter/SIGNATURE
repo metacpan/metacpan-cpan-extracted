@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 4aac2cc39ff8892e1cf15ca684adb9e7b137e831 Changes
+SHA1 85e57dc100648ae16e1ca5e4d932256ffdeba190 MANIFEST
+SHA1 35308858703df5157c0744e1fefc9fadb2ffbeed META.yml
+SHA1 53d11986dfc07a7c7f8ce39bad5d0f6e2f6cf871 Makefile.PL
+SHA1 15d9ef2b38bf83dd2d68afd08c43980e1dd10f63 README
+SHA1 dcab2b9a74a451da091a4e7a6e36a3b21bc2dce7 etc/HistoryFilter_Config.pm
+SHA1 8706248cda9eb606e44db34782bd3602d9b36c5d html/Callbacks/HistoryFilter/Elements/ShowHistory/SkipTransaction
+SHA1 0574a49ccdd2876144f3a200d8c4a47f7112e541 html/Callbacks/HistoryFilter/Elements/ShowHistoryPage/SkipTransaction
+SHA1 7ba5f95c270a1ed6a1779e7960fe5a199e77a4f8 html/Callbacks/HistoryFilter/Ticket/Elements/ShowHistory/SkipTransaction
+SHA1 edf0bc260a20aa4b81048f2f1a5725d8cf3d2b33 html/Widgets/Form/Select
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 4d209d2372e4e21fdf267ee0efc6d1bbac933bc4 lib/RT/Extension/HistoryFilter.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJXTBABAAoJEKq6dEXbZ7ZrHNcP/1eZo9nqEwV0hdEBsQawgU2r
+kKUFyOvEsoa4jaAvGbF4VBTPTiVtO2gHbuVIi+Nzk6CUnPNyDABgltouclYpg6pY
++IM13d8Keb/OkLgYU5ZZy3o9kssUL9rnKMLr0IGjFlL/0sGwMDOUqmhTkgDAgTZg
+fpBDz2tK2+WZVUN5Jt0uwCcJbpd5LNACw7iU+fG9wjuo3sX2jfAbKqk7LiH8rY6Z
+1vVdaeehn9QtX2JQADPgEsc4/XVvqOXwQre69KB0MV3sXcFOjS1XGy/+xzwsSQPO
+h6iPmeuLomMC/FaXj2Q9C/1IAj0flfs5ZVAhoQnBpB/Eb0lNsEEBxcbj1eTssqzr
+zgW6d05vAhxf+blF1LbeOT71kB2DfIW20g589BxUFvNcikg5hq1iqANLGHeLxPex
+mlBKDlkXRQ56Li2zQAo9nFmKhwovEoiO5tQgqjj6TVy8TbZiKW4qnUzGDSwHd9Ce
+OEp9fMCh1cRNrW7yCY4kY9TeEEABvzS/trG89mdLhYHijxz7rjegrLoNmSQCNxgo
+ROWLn/c9PPrrvRnwTshQnV5XpQP3N9ojDqGYqrU+zs9XcxIqoq1SQ5YSUNIud5Cp
+prg3mPimJsvdZETrlXoa9TulEthjYkRVNi6BdVG5yThFMSbsH9Q4i8O8TAJAaVq/
+mfyRVLwH0IM5mN7ucK5e
+=h2Zf
+-----END PGP SIGNATURE-----

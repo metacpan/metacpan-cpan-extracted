@@ -1,0 +1,20 @@
+=head1 NAME
+
+RocksDB::SliceTransform - rocksdb::SliceTransform object
+
+=head1 DESCRIPTION
+
+B<RocksDB::SliceTransform> is a rocksdb::SliceTransform object.
+
+Do not use this class directly. Use the subclass of this class.
+(L<RocksDB::FixedPrefixTransform> is only subclass for now.)
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::FixedPrefixTransform>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

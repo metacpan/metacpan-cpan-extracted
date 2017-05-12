@@ -1,0 +1,15 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Load draft"
+msgstr "Récupérer le brouillon"
+
+msgid "Save draft"
+msgstr "Sauver le brouillon"
+
+msgid "Update draft"
+msgstr "Mettre à jour le brouillon"
+

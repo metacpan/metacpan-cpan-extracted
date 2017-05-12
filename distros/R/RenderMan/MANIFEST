@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+RenderMan.pm
+RenderMan.xs
+examples/Iff.pm
+examples/Makefile
+examples/cow.lwo
+examples/lwo2pl.c
+examples/lwo2rib.c
+examples/show_cow.pl
+test.pl
+typemap

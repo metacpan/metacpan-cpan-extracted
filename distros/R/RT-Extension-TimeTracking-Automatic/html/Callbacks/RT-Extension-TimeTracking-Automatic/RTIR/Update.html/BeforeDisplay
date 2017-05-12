@@ -1,0 +1,9 @@
+<%args>
+$Ticket
+$ARGSRef
+</%args>
+<%init>
+my $adjustment = RT->Config->Get("TimeTrackingAdjustment") || 0;
+my $worked = POSIX::ceil((time - $$ARGSRef{TimeTrackingAutomatic})/60) + $adjustment;	# at least 1 minute
+$Ticket->SetTimeWorked( $worked + $Ticket->TimeWorked );
+</%init>

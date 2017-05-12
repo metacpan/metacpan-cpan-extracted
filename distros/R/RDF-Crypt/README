@@ -1,0 +1,38 @@
+NAME
+    RDF::Crypt - semantic cryptography
+
+DESCRIPTION
+    RDF-Crypt provides a variety of objects and methods for
+    cryptographically manipulating (encrypting, decrypting, signing and
+    verifying) RDF graphs using RSA and WebID.
+
+    RDF-Crypt uses a role-based architecture. Classes like
+    RDF::Crypt::Encrypter are in fact very slim wrappers around collections
+    of roles. Most of the interesting behaviour is documented in the role
+    modules.
+
+SEE ALSO
+    RDF::Crypt::Encrypter, RDF::Crypt::Decrypter, RDF::Crypt::Signer,
+    RDF::Crypt::Verifier.
+
+    Web::ID, RDF::ACL.
+
+    <http://www.perlrdf.org/>.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2010, 2012 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

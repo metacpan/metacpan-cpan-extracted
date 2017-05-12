@@ -1,0 +1,12 @@
+<%ARGS>
+$MergeFrom
+$MergeTo
+</%ARGS>
+
+<%INIT>
+if(my $lock = $MergeFrom->Locked()) {
+    my $lockType = $lock->Content->{'Type'};
+    $MergeTo->Lock($lockType) unless $lockType eq 'Auto';
+    $MergeFrom->Unlock('Hard');    #We don't need any locks on the merged-from ticket, since it's now the merge-to ticket
+}
+</%INIT>

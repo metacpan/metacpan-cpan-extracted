@@ -1,0 +1,9 @@
+@ScripActions = (
+    {
+      Name        => 'Assign unowned tickets to actor',
+      Description => 'Assigns unowned tickets to the creator of the transaction unless they are the requestor',
+      ExecModule  => 'AssignUnownedToActor',
+    },
+);
+
+1;

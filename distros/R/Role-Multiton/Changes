@@ -1,0 +1,8 @@
+Revision history for Role-Multiton
+
+0.2  2013-10-07 22:31:01
+    - change *::New to an explicit post-new-object-call method (See rt 89239 to see why)
+    - more RELEASE_TESTING tests
+
+0.1  2013-06-11 20:45:07
+       Initial release.

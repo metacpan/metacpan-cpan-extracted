@@ -1,0 +1,109 @@
+=head1 NAME
+
+RDF::Trine::Serializer::SparqlUpdate - SPARQL/U serialization of triples
+
+=head1 SYNOPSIS
+
+    my $sparqlu = RDF::Trine::Serializer::SparqlUpdate->new;
+    $query = $sparqlu->serialize_to_string( $stmt, delete => $model );
+    $query = $sparqlu->serialize_to_string( undef, delete => $iter );
+
+    my $sparqlu_quad = RDF::Trine::Serializer->new('sparqlu', quad_semantics => 1 );
+    $query = $sparqlu_quad->insert( $model );
+
+=head1 DESCRIPTION
+
+TODO
+
+=head1 METHODS
+
+Beyond the methods documented below, this class inherits methods from the
+L<RDF::Trine::Serializer> class.
+
+
+=head2 C<< new( [quad_semantics => (0|1)] ) >>
+
+Returns a new SPARQL/Update serializer object.
+
+If C< quad_semantics > is set, contexts/graphs will be considered for INSERT
+and DELETE clauses. Otherwise, the serializer works on the union graph of the
+model.
+
+=head2 C<< serialize_to_string ( $data, %opts ) >>
+
+Coerces both $data and $opts{delete} to a model and calls C<<
+serialize_model_to_string >> with those.
+
+=head2 C<< serialize_to_string ( $fh, $data, %opts ) >>
+
+Coerces both $data and $opts{delete} to a model and calls C<<
+serialize_model_to_string >> with those and writes the resulting
+string to filehandle $fh.
+
+=head2 C<< serialize_model_to_string ( $model ) >>
+
+Serializes the C<$model> to SPARQL/Update, returning the result as a string.
+
+=head2 C<< serialize_model_to_file ( $fh, $model ) >>
+
+Serializes the C<$model> to SPARQL/Update, printing the results to the supplied
+filehandle C<<$fh>>.
+
+Alias for L</serialize_to_file>.
+
+=head2 C<< serialize_iterator_to_file ( $file, $iter ) >>
+
+Serializes the iterator to SPARQL/Update, printing the results to the supplied
+filehandle C<<$fh>>.
+
+Alias for L</serialize_to_file>.
+
+=head2 C<< serialize_iterator_to_string ( $iter ) >>
+
+Serializes the iterator to SPARQL/Update, returning the result as a string.
+
+Alias for L</serialize_to_string>.
+
+=head2 C<< statement_as_string ( $st ) >>
+
+Serializes a statement to a SPARQL/Update INSERT DATA clause.
+
+Alias for L</serialize_to_string>.
+
+=head2 C<< _serialize_data( $data ) >>
+
+Turns $data into a string of N-Triples.
+
+=head2 C<< _to_model( $data ) >>
+
+Turns $data into a L<RDF::Trine::Model>.
+
+=head2 C<< _create_clause( $type, $data, [$graph] ) >>
+
+Creates a SPARQL/U 'INSERT' or 'DELETE' clause, depending on L<$type>. 
+
+C<$data> can be anything that L</_serialize_data> can coerce to N-Triples.
+
+If C<$graph> is given, clauses take the form
+    
+    INSERT DATA { GRAPH <$graph> { ... } };
+
+otherwise they act on the default graph, like so:
+
+    INSERT DATA { ... };
+
+=head1 SEE ALSO
+
+L<http://www.w3.org/TR/rdf-testcases/#ntriples>
+
+L<http://www.w3.org/TR/sparql11-update/#deleteInsert>
+
+=head1 AUTHOR
+
+Konstantin Baierer <kba@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2011 Konstantin Baierer. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+

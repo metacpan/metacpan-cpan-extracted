@@ -1,0 +1,39 @@
+-- .......................................................................... --
+-- File catalog  ............................................................ --
+
+--  XHTML Catalog Data File
+
+    Revision:  $Id: xhtml-rdfa.cat,v 1.1 2007/08/11 19:07:00 jigsaw Exp $ SMI
+
+    This is the catalog data file for various versions of the XHTML DTD.
+    You do not need to use the file names listed here, and do not need 
+    to use the filename method of identifying storage objects at all.
+
+    See "Entity Management", SGML Open Technical Resolution 9401 for detailed
+    information on supplying and using catalog data. This document is available
+    from OASIS at URL:
+
+        <http://www.oasis-open.org/cover/tr9401.html>
+--
+
+-- .......................................................................... --
+-- SGML declaration associated with XHTML  .................................. --
+
+OVERRIDE YES
+
+-- for use with non-Unicode compatible parsers: --
+-- SGMLDECL "xml1n.dcl"
+
+-- uncomment for XML compatibility: --
+SGMLDECL "xml1.dcl" --
+
+-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --
+
+-- XHTML framework modules .................................................. --
+
+PUBLIC "-//W3C//ENTITIES XHTML HyperAttributes 1.0//EN"        "xhtml-hyperAttributes-1.mod"
+PUBLIC "-//W3C//ENTITIES XHTML MetaAttributes 1.0//EN"         "xhtml-metaAttributes-1.mod"
+PUBLIC "-//W3C//ELEMENTS XHTML Metainformation 2.0//EN"        "xhtml-meta-2.mod"
+
+-- End of catalog data  ..................................................... --
+-- .......................................................................... --

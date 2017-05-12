@@ -1,0 +1,19 @@
+0.61 2015-02-25
+ - Documentation additions; note that content is de-duplicated, and that
+   shredder will not reclaim space
+
+0.60 2015-01-20
+ - Never store 0-length attachments of OCFVs externally
+
+0.55 2015-01-05
+ - Update copyright year
+ - Add explicit "return 0"s for non-external attachment storage
+ - Store large (>10M) CFs of type Image externally, as well
+
+0.51 2014-12-18
+ - Export old file upload CFs, as well as current values
+ - Add no_index for core RT packages
+
+0.50 2014-12-10
+ - Initial release
+

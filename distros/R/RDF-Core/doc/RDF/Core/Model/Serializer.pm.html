@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RDF::Core::Model::Serializer - interface between model and RDF::Core::Serializer</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#interface">Interface</a></li>
+	</ul>
+
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<pre>
+  RDF::Core::Model::Serializer - interface between model and RDF::Core::Serializer</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  require RDF::Core::Model::Serializer;</pre>
+<pre>
+  my $xml = '';
+  my $serializer = new RDF::Core::Model::Serializer(Model=&gt;$model,
+                                                    Output=&gt;\$xml,
+                                                    BaseURI =&gt; 'URI://BASE/',
+                                                   );
+  $serializer-&gt;serialize;
+  print &quot;$xml\n&quot;;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>A Model::Serializer object sets handlers for serializer, connecting the serializer with a specific model.</p>
+<p>
+</p>
+<h2><a name="interface">Interface</a></h2>
+<ul>
+<li><strong><a name="item_new"><code>new(%options)</code></a></strong><br />
+</li>
+Available options are:
+<ul>
+<li><strong><a name="item_model">Model</a></strong><br />
+</li>
+A reference to RDF::Core::Model object - the RDF model I want to serialize.
+<p></p>
+<li><strong><a name="item_output_2c_baseuri">Output, BaseURI</a></strong><br />
+</li>
+See RDF::Core::Serializer options
+<p></p>
+<li><strong><a name="item_getsubjects_2c_getnamespaces_2c_getstatements_2c_c">getSubjects, getNamespaces, getStatements, countStatements, existsStatement</a></strong><br />
+</li>
+While the module provides defaults for each handler, you can override any of them. See RDF::Core::Serializer for details.
+<p></p></ul>
+<li><strong><a name="item_getoptions">getOptions</a></strong><br />
+</li>
+<li><strong><a name="item_setoptions"><code>setOptions(\%options)</code></a></strong><br />
+</li>
+<li><strong><a name="item_serialize">serialize</a></strong><br />
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is subject to the MPL (or the GPL alternatively).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ginger Alliance, <a href="mailto:rdf@gingerall.cz">rdf@gingerall.cz</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>RDF::Core::Serializer, RDF::Core::Model</p>
+
+</body>
+
+</html>

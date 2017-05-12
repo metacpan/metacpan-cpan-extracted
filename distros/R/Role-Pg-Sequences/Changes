@@ -1,0 +1,9 @@
+Revision history for Role-Pg-Sequences
+
+0.002   2015-04-27 13:49:36 Europe/Copenhagen
+  - Added sequence_exists to test for existance of a sequence
+  - Added database schema to allow for creating sequences in other schemas
+
+0.001   2015-04-27 11:56:06 Europe/Copenhagen
+  - first version
+

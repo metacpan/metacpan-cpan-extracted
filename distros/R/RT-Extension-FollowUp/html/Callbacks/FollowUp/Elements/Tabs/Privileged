@@ -1,0 +1,35 @@
+<%INIT>
+my $request_path = $HTML::Mason::Commands::r->path_info;
+
+my $query_string = sub {
+    my %args = @_;
+    my $u    = URI->new();
+    $u->query_form(%args);
+    return $u->query;
+};
+
+
+# Static menu entries
+if ( $request_path =~ qr{^/Ticket/.*\.html} && $m->request_args->{'id'} &&  $m->request_args->{'id'} =~ /^\d+$/ ) {
+    my $Ticket = RT::Ticket->new( $session{'CurrentUser'} );
+    $Ticket->Load( $m->request_args->{'id'} );
+    my $CcRight = $session{'CurrentUser'}->HasRight( Right => 'Watch', Object => $Ticket )
+                  || $session{'CurrentUser'}->HasRight( Right => 'ModifyTicket', Object => $Ticket );
+    my $AdminCcRight = $session{'CurrentUser'}->HasRight( Right => 'WatchAsAdminCc', Object => $Ticket )
+                       || $session{'CurrentUser'}->HasRight( Right => 'ModifyTicket', Object => $Ticket );
+    my $tabs = PageMenu;
+    my $actions = $tabs->child( 'actions' );
+    if ( $CcRight  && ! $Ticket->IsWatcher( Type => 'Cc', PrincipalId => $session{'CurrentUser'}->id ) ) {
+        $actions->child(
+            'followupcc' => title => loc('Follow Up as Cc'), path => '/Ticket/Display.html?id='.$Ticket->Id.'&Ticket-AddWatcher-Principal-'.$session{'CurrentUser'}->Id.'=Cc'
+        );
+    }
+    if ( $AdminCcRight && ! $Ticket->IsWatcher( Type => 'AdminCc', PrincipalId => $session{'CurrentUser'}->id ) ) {
+        $actions->child(
+            'followupadmincc' => title => loc('Follow Up as AdminCc'), path => '/Ticket/Display.html?id='.$Ticket->Id.'&Ticket-AddWatcher-Principal-'.$session{'CurrentUser'}->Id.'=AdminCc'
+        );
+    }
+}
+
+
+</%INIT>

@@ -1,0 +1,20 @@
+{
+   "requirepass" : "",
+   "dbfilename" : "dump.rdb",
+   "slave-serve-stale-data" : "yes",
+   "dir" : "/Users/thiago",
+   "list-max-ziplist-entries" : "512",
+   "save" : "3600 1 300 100 60 10000",
+   "hash-max-zipmap-value" : "64",
+   "timeout" : "300",
+   "maxmemory-samples" : "3",
+   "set-max-intset-entries" : "512",
+   "list-max-ziplist-value" : "64",
+   "no-appendfsync-on-rewrite" : "no",
+   "appendfsync" : "everysec",
+   "maxmemory-policy" : "volatile-lru",
+   "maxmemory" : "",
+   "appendonly" : "no",
+   "masterauth" : "",
+   "hash-max-zipmap-entries" : "512"
+}

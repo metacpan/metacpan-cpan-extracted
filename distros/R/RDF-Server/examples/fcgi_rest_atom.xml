@@ -1,0 +1,21 @@
+<config
+  protocol="FCGI"
+  interface="REST"
+  semantic="Atom"
+  socket="/tmp/example_fcgi_rest_atom.socket"
+  pidfile="/tmp/rdf-server.pid"
+  default_renderer="Atom"
+  foreground="1"
+>
+  <renderers json="JSON" rdf="RDF" xml="Atom" />
+  <handler type="workspace" path_prefix="/" title="Workspace">
+    <collection path_prefix="foo/" title="Foo">
+      <category scheme="2" term="1" />
+      <category scheme="b" term="a" />
+      <model class="RDFCore" namespace="http://www.example.com/ns/" />
+    </collection>
+    <collection path_prefix="bar/" title="Bar">
+      <model class="RDFCore" namespace="http://www.example.com/bar/" />
+    </collection>
+  </handler>
+</config>

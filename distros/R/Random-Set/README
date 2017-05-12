@@ -1,0 +1,82 @@
+NAME
+    Random::Set - Class for random set generation.
+
+SYNOPSIS
+     use Random::Set;
+     my $obj = Random::Set->new(%params);
+     my $random = $obj->get;
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+            *       "precision"
+
+                     Precision.
+                     Default value is 100.
+
+            *       "set"
+
+                     Set definition.
+                     Set is array of arrays with pairs of probability and value.
+                     Default value is [].
+                     It is required.
+                     Sumary of probabilities must be 1.
+
+    "get()"
+             Get random value from set.
+             Returns value from set.
+
+ERRORS
+     new():
+             Bad set sum. Must be 1.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Random::Set;
+
+     # Object.
+     my $obj = Random::Set->new(
+             'set' => [
+                     [0.5, 'foo'],
+                     [0.5, 'bar'],
+             ],
+     );
+
+     # Get random data.
+     my $random = $obj->get;
+
+     # Print out.
+     print $random."\n";
+
+     # Output like:
+     # foo|bar
+
+DEPENDENCIES
+    Class::Utils, Error::Pure.
+
+SEE ALSO
+    Random::Day
+        Class for random day generation.
+
+REPOSITORY
+    <https://github.com/tupinek/Random-Set>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2013-2015
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

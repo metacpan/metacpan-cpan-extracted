@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Prefixes</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Rasqal RDF Query Library Manual">
+<link rel="up" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="prev" href="rasqal-section-literal.html" title="Literal">
+<link rel="next" href="rasqal-section-query.html" title="Query">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="rasqal.html" title="Rasqal Overview">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Reference Manual">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="rasqal-section-literal.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt01.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Rasqal RDF Query Library Manual</th>
+<td><a accesskey="n" href="rasqal-section-query.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2569090" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2565814" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="rasqal-section-prefix"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2569090"></a><span class="refentrytitle">Prefixes</span>
+</h2>
+<p>Prefixes &#8212; XML QName-style prefixes made from a URI and a short text prefix.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+            <a href="rasqal-section-prefix.html#rasqal-prefix">rasqal_prefix</a>;
+<a href="rasqal-section-prefix.html#rasqal-prefix">rasqal_prefix</a>* <a href="rasqal-section-prefix.html#rasqal-new-prefix">rasqal_new_prefix</a>            (unsigned char *prefix,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *uri);
+void        <a href="rasqal-section-prefix.html#rasqal-free-prefix">rasqal_free_prefix</a>              (<a href="rasqal-section-prefix.html#rasqal-prefix">rasqal_prefix</a> *p);
+void        <a href="rasqal-section-prefix.html#rasqal-prefix-print">rasqal_prefix_print</a>             (<a href="rasqal-section-prefix.html#rasqal-prefix">rasqal_prefix</a> *p,
+                                             FILE *fh);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2565814"></a><h2>Description</h2>
+<p>
+Used inside a <a href="rasqal-section-query.html#rasqal-query"><span class="type">rasqal_query</span></a> to declare syntax prefix abbreviations
+for URIs.  Once a <a href="rasqal-section-query.html#rasqal-query"><span class="type">rasqal_query</span></a> is constructed, these are for information
+only.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2565846"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2565857"></a><h3>
+<a name="rasqal-prefix"></a>rasqal_prefix</h3>
+<a class="indexterm" name="id2565870"></a><pre class="programlisting">typedef struct {
+  const unsigned char *prefix;
+  raptor_uri* uri;
+  int declared;
+  int depth;
+} rasqal_prefix;
+</pre>
+<p>
+Namespace (prefix, uri) pair.
+</p>
+<p>
+Includes internal flags used for marking when prefixes are
+declared and at what XML element depth when used in XML formats.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term">const&#160;unsigned&#160;char&#160;*<em class="structfield"><code>prefix</code></em>;</span></td>
+<td> short prefix string
+</td>
+</tr>
+<tr>
+<td><span class="term"><a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a>&#160;*<em class="structfield"><code>uri</code></em>;</span></td>
+<td> URI associated with the prefix.
+</td>
+</tr>
+<tr>
+<td><span class="term">int&#160;<em class="structfield"><code>declared</code></em>;</span></td>
+<td> Internal flag.
+</td>
+</tr>
+<tr>
+<td><span class="term">int&#160;<em class="structfield"><code>depth</code></em>;</span></td>
+<td> Internal flag.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2574060"></a><h3>
+<a name="rasqal-new-prefix"></a>rasqal_new_prefix ()</h3>
+<a class="indexterm" name="id2574072"></a><pre class="programlisting"><a href="rasqal-section-prefix.html#rasqal-prefix">rasqal_prefix</a>* rasqal_new_prefix            (unsigned char *prefix,
+                                             <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+>raptor_uri</a> *uri);</pre>
+<p>
+Constructor - create a new <a href="rasqal-section-prefix.html#rasqal-prefix"><span class="type">rasqal_prefix</span></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>prefix</code></em>&#160;:</span></td>
+<td> Short prefix string to stand for URI or NULL.
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> Name <a
+href="/usr/share/gtk-doc/html/raptor/raptor-section-uri.html#raptor-uri"
+><span class="type">raptor_uri</span></a>.
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="rasqal-section-prefix.html#rasqal-prefix"><span class="type">rasqal_prefix</span></a> or NULL on failure.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2613570"></a><h3>
+<a name="rasqal-free-prefix"></a>rasqal_free_prefix ()</h3>
+<a class="indexterm" name="id2613582"></a><pre class="programlisting">void        rasqal_free_prefix              (<a href="rasqal-section-prefix.html#rasqal-prefix">rasqal_prefix</a> *p);</pre>
+<p>
+Destructor - destroy a <a href="rasqal-section-prefix.html#rasqal-prefix"><span class="type">rasqal_prefix</span></a> object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>p</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-prefix.html#rasqal-prefix"><span class="type">rasqal_prefix</span></a> object.
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2613645"></a><h3>
+<a name="rasqal-prefix-print"></a>rasqal_prefix_print ()</h3>
+<a class="indexterm" name="id2613657"></a><pre class="programlisting">void        rasqal_prefix_print             (<a href="rasqal-section-prefix.html#rasqal-prefix">rasqal_prefix</a> *p,
+                                             FILE *fh);</pre>
+<p>
+Print a Rasqal prefix in a debug format.
+</p>
+<p>
+The print debug format may change in any release.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>p</code></em>&#160;:</span></td>
+<td> <a href="rasqal-section-prefix.html#rasqal-prefix"><span class="type">rasqal_prefix</span></a> object.
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fh</code></em>&#160;:</span></td>
+<td> The <span class="type">FILE</span>* handle to print to.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

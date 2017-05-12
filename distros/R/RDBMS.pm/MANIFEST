@@ -1,0 +1,11 @@
+Makefile.PL
+RCS/RDBMS.pm,v
+RCS/sqldef.pl,v
+RDBMS.pm
+README
+bin/sqldef.pl
+examples/README
+examples/example.cgi
+examples/example.schema
+examples/example.sql
+MANIFEST

@@ -1,0 +1,84 @@
+%# RT::Extension::ReferenceIDoitObjects
+%#
+%# Copyright (C) 2011-17 synetics GmbH, <https://i-doit.com/>
+%#
+%# This program is free software: you can redistribute it and/or modify
+%# it under the terms of the GNU Affero General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# This program is distributed in the hope that it will be useful,
+%# but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%# GNU Affero General Public License for more details.
+%#
+%# You should have received a copy of the GNU Affero General Public License
+%# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%#
+%# Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+<& /Elements/Header, Title => loc('Modify referenced i-doit objects for ticket #[_1]', $TicketObj->Id) &>
+<& /Elements/Tabs &>
+
+% $m->callback(CallbackName => 'BeforeActionList', Actions => \@results, ARGSRef => \%ARGS, Ticket => $TicketObj);
+
+<& /Elements/ListActions, actions => \@results &>
+
+<form name="ModifyReferencedIDoitObjects" method="post" action="ModifyIDoitObjects.html">
+    <input type="hidden" class="hidden" name="id" value="<% $TicketObj->Id %>" />
+    <input type="hidden" id="Requestors" name="Requestory" value="<% $TicketObj->RequestorAddresses %>" />
+    <input type="hidden" id="Subject" name="Subject" value="<% $TicketObj->Subject %>" />
+
+    <div style="display: none;">
+    <&| /Widgets/TitleBox, title => loc('These fields are needed to modify referenced i-doit objects.'), class => 'ticket-info-basics' &>
+        <& /Elements/EditCustomFields, Object => $TicketObj &>
+    </&>
+    </div>
+
+    <br />
+
+    <&| /Widgets/TitleBox,title => loc('Modify referenced i-doit objects for ticket #[_1]', $TicketObj->Id), class=> 'ticket-info-basic' &>
+        <& Elements/EditIDoitObjects, TicketObj => $TicketObj &>
+    </&>
+    <& /Elements/Submit, Name => 'SubmitTicket', Label => loc('Save Changes') &>
+</form>
+
+<%INIT>
+my @results;
+my $TicketObj = LoadTicket($id);
+$m->callback( TicketObj => $TicketObj, ARGSRef => \%ARGS );
+push @results, ProcessObjectCustomFieldUpdates(Object => $TicketObj, ARGSRef => \%ARGS);
+$TicketObj->ApplyTransactionBatch;
+
+## Set default tenant if necessary:
+my $cfTenant = 'i-doit tenant';
+my $IDoitTenant = $TicketObj->FirstCustomFieldValue($cfTenant);
+unless ($IDoitTenant) {
+    $IDoitTenant = RT->Config->Get('IDoitDefaultTenant');
+
+    unless ($IDoitTenant) {
+        my $msg = loc('Default tenant is not configured.');
+        RT::Logger->error($msg);
+        $$skip_create = 1;
+        push @{$results}, $msg;
+    }
+
+    my $cf = RT::CustomField->new($RT::SystemUser);
+    $cf->LoadByNameAndQueue(Name => $cfTenant, Queue => $TicketObj->Queue);
+    unless ($cf->id) {
+        $cf->LoadByNameAndQueue(Name => $cfTenant, Queue => 0);
+    }
+
+    my ($val, $msg) = $TicketObj->AddCustomFieldValue(Field => $cf, Value => $IDoitTenant);
+    unless ($val) {
+        $RT::Logger->error('Could not set default tenant: ' . $msg);
+        return 0;
+    }
+}
+</%INIT>
+
+<%ARGS>
+$id => undef
+$skip_create => undef
+$results => undef
+</%ARGS>

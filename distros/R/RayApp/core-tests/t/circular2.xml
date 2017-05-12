@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<ppp id='circular2' type="hash">
+	<x typeref="circular1.xml#circular1"/>
+</ppp>
+

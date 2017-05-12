@@ -1,0 +1,212 @@
+#!perl
+
+use strict;
+use warnings;
+
+our $VERSION = '1.2.1'; # VERSION
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Rex::Repositorio;
+
+use common::sense;
+use Carp;
+use Config::General;
+use Log::Dispatch;
+use Data::Dumper;
+use Getopt::Long;
+
+use lib '/usr/lib/rex/perl/share/perl5/vendor_perl';
+
+my %cli;
+GetOptions(
+  \%cli,       "mirror",          "tag=s",         "repo=s",
+  "help",      "update-metadata", "update-files",  "no-update-files",
+  "force-download",
+  "list",      "add-file=s",      "remove-file=s", "init",
+  "server",    "errata",          "update-errata", "package=s",
+  "version=s", "arch=s",          "clonetag=s",    "force",
+  "checksums", "loglevel=s",
+);
+
+my @config_file_locations = (
+  "./repositorio.conf", "/etc/rex/repositorio.conf",
+  "/usr/local/etc/rex/repositorio.conf",
+);
+
+my ($config_file) = grep { -f $_ } @config_file_locations;
+
+if ( !$config_file ) {
+  confess "No configuration file found.\nLocations: "
+    . join( ", ", @config_file_locations );
+}
+
+my $conf_o = Config::General->new(
+    -ConfigFile         => $config_file,
+    -UseApacheInclude   => 1,
+    -IncludeDirectories => 1,
+    -IncludeGlob        => 1,
+    -IncludeRelative    => 1,
+    -IncludeAgain       => 1,
+    -AllowMultiOptions  => 0,
+);
+
+my %conf   = $conf_o->getall;
+
+my $log_file       = $conf{LogFile} || undef;
+my $log_file_level = $conf{LogFileLevel}    || 'info';
+my $screen_level   = $conf{ScreenLevel} || 'info';
+$screen_level      = $cli{'loglevel'} if $cli{'loglevel'};
+
+my $log_outputs = [[ 'Screen', 'min_level' => $screen_level, stderr => 0, newline => 1, ]];
+push @{$log_outputs}, [ 'File', 'min_level' => $log_file_level, filename => $log_file, newline => 1, mode => '>>'] if $log_file;
+my $logger = Log::Dispatch->new(outputs => $log_outputs);
+
+$logger->info("repositorio started.");
+$logger->debug("Logger initialized.");
+$logger->debug("Configuration Dump:");
+$logger->debug( Dumper( \%conf ) );
+
+my $app = Rex::Repositorio->new( config => \%conf, logger => $logger );
+$app->run(%cli);
+
+__END__
+
+=pod
+
+=head1 repositor.io - Linux Repository Management
+
+repositor.io is a tool to create and manage linux repositories.
+You can mirror online repositories so that you don't need to download the
+package every time you set up a new server. You can also secure your servers
+behind a firewall and disable outgoing http traffic.
+
+With repositor.io it is easy to create custom repositories for your own
+packages. With the integration of a configuration management tool you can
+create consistant installations of your server.
+
+=head2 GETTING HELP
+
+=over 4
+
+=item * Web Site: L<http://repositor.io/>
+
+=item * IRC: irc.freenode.net #rex (RexOps IRC Channel)
+
+=item * Bug Tracker: L<https://github.com/RexOps/repositorio/issues>
+
+=item * Twitter: L<http://twitter.com/RexOps>
+
+=back
+
+=head2 COMMAND LINE
+
+=over 4
+
+=item --mirror            mirror a configured repository (needs --repo, use "all" for all repos)
+
+=item --tag=tagname       tag a repository (needs --repo)
+
+=item --clonetag=tagname  clones a tag in a repository (needs --repo and new  --tag)
+
+=item --repo=reponame     the name of the repository to use
+
+=item --update-metadata   update the metadata of a repository
+
+=item --update-files      download files even if they are already downloaded
+
+=item --init              initialize an empty repository
+
+=item --add-file=file     add a file to a repository (needs --repo)
+
+=item --remove-file=file  remove a file from a repository (needs --repo)
+
+=item --list              list known repositories
+
+=item --server            start a server for file delivery. (not available for all repository types)
+
+=item --update-errata     updates the errata database for a repo (needs --repo)",
+
+=item --errata            query errata for a package (needs --repo, --package, --version, --arch)",
+
+=item --package=pkg       for which package the errata should be queries",
+
+=item --version=ver       for which version of a package the errata should be queries",
+
+=item --arch=arch         for which architecture of a package the errata should be queries",
+
+=item --help              display this help message
+
+=back
+
+=head2 CONFIGURATION
+
+To configure repositor.io create a configuration file
+I</etc/rex/repositorio.conf>.
+ RepositoryRoot = /srv/html/repo/
+
+ # log4perl configuration file
+ <Log4perl>
+   config = /etc/rex/io/log4perl.conf
+ </Log4perl>
+
+ # create a mirror of the nightly rex repository
+ # the files will be stored in
+ # /srv/html/repo/head/rex-centos-6-x86-64/CentOS/6/rex/x86_64/
+ <Repository rex-centos-6-x86-64>
+   url   = http://nightly.rex.linux-files.org/CentOS/6/rex/x86_64/
+   local = rex-centos-6-x86-64/CentOS/6/rex/x86_64/
+   type  = Yum
+ </Repository>
+
+ # create a mirror of centos 6
+ # and download the pxe boot files, too.
+ <Repository centos-6-x86-64>
+   url    = http://ftp.hosteurope.de/mirror/centos.org/6/os/x86_64/
+   local  = centos-6-x86-64/CentOS/6/os/x86_64/
+   type   = Yum
+   images = true
+ </Repository>
+
+ # create a custom repository
+ <Repository centos-6-x86-64-mixed>
+   local = centos-6-x86-64-mixed/mixed/6/x86_64/
+   type  = Yum
+ </Repository>
+
+If you want to sign your custom repositories you have to configure the gpg key to use.
+repositorio automatically exports the public key into the root of the repository, so it can be imported from the clients.
+If you don't specify the gpg password repositorio will ask you for the password.
+
+An example for YUM repositories:
+
+ <Repository centos-6-x86-64-mixed>
+   local = centos-6-x86-64-mixed/mixed/6/x86_64/
+   type  = Yum
+   <gpg>
+     key      = DA95F273
+     password = test
+   </gpg>
+ </Repository>
+
+An example for APT repositories:
+
+ <Repository debian-7-x86-64-mixed>
+   local     = debian-7-x86-64-mixed/debian
+   type      = Apt
+   arch      = amd64
+   dist      = wheezy
+   component = mixed
+   <gpg>
+     key      = DA95F273
+     password = test
+   </gpg>
+ </Repository>
+
+An example log4perl.conf file:
+
+ log4perl.rootLogger                    = DEBUG, FileAppndr1
+
+ log4perl.appender.FileAppndr1          = Log::Log4perl::Appender::File
+ log4perl.appender.FileAppndr1.filename = /var/log/repositorio.log
+ log4perl.appender.FileAppndr1.layout   = Log::Log4perl::Layout::SimpleLayout

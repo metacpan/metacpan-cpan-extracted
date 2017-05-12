@@ -1,0 +1,35 @@
+RSH-Logging version 0.3.1
+
+RSH::Logging is kind of like poor‐man’s profiling or dtrace.  It is
+designed on the same concepts behind logging packages like
+Log::Log4perl, that when event tracking is off, there be little to no
+overhead incurred by leaving the code in place.  This allows you to
+instrument all your code and frameworks and then dynamically turn on
+this kind of profiling information when you need it.
+
+Execute perldoc lib/RSH/Logging.pm to see the more detailed documentation
+for this module.
+
+RSH::Logging makes use of Module::Install for building, installation,
+and packaging.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+The dependencies should be satisfied via Module::Install.  See the
+Makefile.PL for a list of specific module dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Matt Luker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

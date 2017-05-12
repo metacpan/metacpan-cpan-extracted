@@ -1,0 +1,430 @@
+Revision history for Regexp-Grammars
+
+1.001_003 Tue Apr  7 08:42:33 2009
+       Initial public release.
+
+
+1.001_004  Sun Aug  2 23:08:52 2009
+
+    * Fixed mishandling of (??{....}) blocks
+
+    * Attempted to patch around three-way bug with lexicals in regexes
+      (further testing may be required to ensure patch is effective
+       across various perl configs)
+
+
+1.001_005  Sun Aug  2 23:08:52 2009
+
+    * Rerelease to sync numbering with CPAN
+
+
+
+1.002  Tue Dec  8 21:30:11 2009
+
+    * Various doc tweaks
+
+    * Removed intermittent "uninitialized" warnings
+
+    * Added warning when no main regex specified
+
+    * Refined error message status indicators (now only errors get an
+      indicator for every separate message; info is consolidated)
+
+    * Fixed exponentiation associativity for demo_calc (thanks Schwern!)
+
+    * Fixed bug in charset parsing (thanks Dave!)
+
+    * Removed false error messages regarding explicitly use of built-in
+      <ws> and <hk> rules
+
+    * Fixed bug with negative lookaheads that incorporate subrule calls
+
+    * Localized $/ during debugger interactions
+
+    * Added <objrule: Class::Name=rulename> variation to allow distinct
+      "internal" and "external" names for objrules and objtokens
+      (thanks Casiano)
+    
+    * Fixed handling of (?#...) comments (thanks Casiano)
+
+    * Added pure grammar definitions: <grammar: NAME>
+
+    * Added inheritance from grammar definitions: <extends: NAME>
+
+    * Added fully qualified subrule calls to allow derived rules to call
+      base rules: <Base::Class::rulename>
+
+
+
+1.005  Tue Jun 22 05:41:35 2010
+
+    * Tweaked internals to allow matches against stringifying objects,
+      without nasty warnings
+
+    * Extended demo/calc* to allow negatives outside parens (thanks Steven)
+
+    * Pod tweaks (thanks Carl)
+
+    * Added autoaction callbacks
+
+    * Made @! contents unique (no more duplicates due to backtracking retries)
+
+    * Made <MATCH=...> work in the top-level pattern of a grammar
+
+    * Added set_context_width() to allow width of context string column 
+      to be adjusted either permanently or within a scope. (Thanks Daniel)
+
+    * Added l10n feature for <error:...> and <warning:...> directives
+      (thanks Aki!)
+
+    * Added <minimize:> directive
+
+    * Fixed debugging directives in grammars
+
+    * Added per-hash key patterns to <%HASH>  (Thanks Aki)
+
+    * Added <\IDENT> backrefs
+
+    * Added </IDENT> inverserefs
+
+
+1.008  Fri Sep 17 20:53:31 2010
+
+    * Pod nits denitted (thanks Christopher)
+
+    * Added builtin <matchpos> and <matchline> subrules
+
+    * Added <subrule(arg=>list)> and %ARG
+
+    * Added <:argname>
+
+    * Added <\:argname> and </:argname>
+
+    * Added Lucene example to demos (thanks Christian)
+
+    * Added <ws:...> directive
+
+    * Updated diagnostics list
+
+    * Improved behaviour (and documentation) of non-bracketed
+      separators in **
+
+
+
+1.009  Sun Sep 19 09:11:06 2010
+
+    * Rerelease to remove spurious dependencies on Data::Show
+      (thanks Salvatore!)
+
+
+
+1.010  Tue Sep 28 08:03:42 2010
+
+    * Added documentation warning about non-reentrancy of Perl 5 regex engine
+      (thanks Andrew).
+
+    * Fixed behaviour of ** repetitions wrt whitespace (thanks Andrew)
+
+    * Documented more explicitly that start-pattern is supposed to act
+      like a regular regex (or a token) wrt to whitespace
+
+
+
+1.011  Sun Oct 10 18:57:10 2010
+
+    * Added <!RULENAME> as alias for: (?! <.RULENAME> )
+
+    * Added <?RULENAME> as alias for: (?= <.RULENAME> ) 
+      (and made it work around normal lookahead/capture problem)
+
+    * Fixed major bugs in <:arg> handling
+
+
+1.012  Wed Nov  3 20:24:36 2010
+
+    * Added RFC5322 example (thanks Tom and Abigail!)
+
+    * Added <:nocontext> and <:context> directives to optimize
+      away unwanted context substrings.
+
+    * Solved transitive inheritance problem
+      (grammars now fully polymorphic)
+
+    * Added NEXT:: namespace for generic polymorphism
+
+
+1.013  Wed Jun 29 14:39:40 2011
+
+    * Improved in-doc calculator example (thanks Jake!)
+
+    * Improved RFC5322 example (thanks Tom and Abigail)
+
+    * Added <timeout:...> directive (thanks Dan)
+
+    * Added <fatal:...> directive
+
+    * Added better compile-time debugging of standard Perl subpatterns
+
+    * Added documentation of problems when using objrules
+      whose ctors re-invoke the regex engine (thanks Nathan)
+
+    * Added new tests for objrules whose classes are based
+      on Moose or autoloading (thanks Nathan!)
+
+
+1.014  Wed Nov  2 13:57:09 2011
+
+    * Improved description of <error:...> directive to make it clearer 
+      that errors manifest in @! variable (thanks Leigh)
+
+    * Added t/error_non_backtracking.t and
+      demo/demo_error_nonbacktracking.pl to demonstrate use of (*COMMIT)
+      to optimize error messages (thanks Nicolas)
+
+    * Removed undocumented dependency of test suite on Class::Accessor
+      (thanks Duff)
+
+    * Tweaked caveats section to reflect improvements both in module
+      (grammar inheritance now fully polymorphic) and in Perl 5.14
+      regexes (regexes now reentrant)
+
+    * Fixed problem with \N{NAMED CHARS} under 5.12 and later (thanks Tom!)
+
+    * Added *% +% and {n,m}% separated repetitions to track the
+      Perl 6 feature
+
+
+
+1.015  Wed Feb 29 12:37:25 2012
+
+    * Enabled limited support for tracking raw regex components when
+      debugging a grammar (mainly literals and backslashed
+      metacharacters)
+
+    * Fixed bug that prevented named subpattern captures from including 
+      lookbehinds (e.g. <name=( (?<!foo) bar )> didn't work)
+
+
+1.016  Sat Mar 10 07:01:30 2012
+
+    * Fixed omissions in charset recognition within metagrammar
+      (now handles \] and otehr escapes correctly)
+
+
+1.020  Thu Aug 16 14:13:03 2012
+
+    * Fixed licence generation in Makefile.PL
+
+    * Fixed issues with the stupid behaviour
+      of Perl 5.17+ wrt (un)backslashed {'s
+
+    * Fixed bad code in SYNOPSIS example
+      (Thanks Paul!)
+
+    * Fixed bad code in demo/demo_pos.pl
+      (Thanks Peng)
+
+    * Corrected docs for <debug: on>
+      (Thanks Peng)
+
+    * BACKWARDS INCOMPATIBLE CHANGE!!!!
+      Due to limitations in Perl's qr overload
+      The <\IDENT> backreference syntax has had to be changed
+      to <\_IDENT>
+
+
+1.021  Mon Aug 20 13:55:34 2012
+
+    * Made Latin-1 encoding of docs explicit
+
+
+1.022  Tue Jan 22 18:39:16 2013
+
+    * Fixed minimization (by handling nocontext marker correctly)
+      (thanks Thomas!)
+
+
+1.025  Wed Jan 30 09:39:52 2013
+
+    * Reuploaded with no substantive modifications
+
+
+1.026  Thu Jan 31 08:20:14 2013
+
+    * Re-fixed minimization (by handling nocontext marker correctly)
+      (thanks again Thomas!)
+
+
+
+1.027  Fri May 10 07:43:52 2013
+
+    * Fixed nasty bug where 0 used as an atom
+      (many thanks Arseny!)
+
+
+1.028  Sat May 11 06:00:00 2013
+
+    * Fixed very nasty caching bug within interpolation support
+      (many more thanks Arseny!)
+
+
+
+
+1.029  Tue Jun 25 15:44:35 2013
+
+    * Doc patch (thanks Steven)
+
+    * Added workarounds for some unfortunate changes in 5.18 behaviour
+      (thanks Steven)
+
+    * CRITICAL: Added warning regarding fundamental and intractable
+      incompatibilities with Perl 5.18, and announcing that
+      Regexp::Grammars is not supported under that version of Perl. :-(
+
+
+1.030  Wed Jun 26 07:17:41 2013
+
+    * Added essential-but-missing Skip_if_Perl_518 to the MANIFEST
+
+
+
+1.031  Mon Aug 19 09:55:37 2013
+
+    * Updated warning re 5.18 incompatibilities. Some progress has been
+      made, but a complete solution is still at least a month away,
+      possibly longer.
+
+    * Added dependency on Lexical::Var under Perl 5.18 to overcome
+      problem with magic pseudo-variables
+
+
+1.032  Thu Aug 29 10:44:21 2013
+
+    * Culled stray DB::single = 1 (thanks Robert!)
+
+
+1.033  Sat Aug 31 13:10:57 2013
+
+    * Listed dependency on Lexical::Var under Perl 5.18 to overcome
+      problem with magic pseudo-variables (thanks Andreas!)
+
+
+
+1.034  Wed Jun 11 06:50:04 2014
+
+    * Reverted actual encoding to match nominated encoding (i.e. Latin-1)
+      (thanks Olivier)
+
+    * Fixed last bug preventing module from passing
+      its own test suite under 5.20.
+
+    * Gave up (for the present) on Perl 5.18 compatibility.
+
+    * Noted limitations of passing %MATCH values as subrule args
+      under 5.18+
+
+
+1.035  Sat Jun 28 19:03:54 2014
+
+    (All of the following with deepest thanks to Hugo...)
+
+    * Removed no-longer-necessar Skip_if_Perl_518.pm from MANIFEST
+
+    * Allowed rule declarations to be made anywhere
+      (not just at the start of a line)
+
+    * Fixed buggy edge-case for in-rule whitespace auto-matching
+      at start of rule body (now works even if there is only a single
+      whitespace between <rule: NAME> and first element of rule body)
+
+    * Made R::G auto-/x any regex used under its suasion
+      (solves formerly intractable problem of detecting a missing /x)
+
+    * R::G now short-circuits any regex in its scope that does not
+      contain any R::G constructs (and does not auto-/x them either)
+
+    * Added line numbers to all warnings generated by the module
+
+    * Added detection of "stray" quantifiers: unquoted quantifiers that
+      don't actually quantify anything.
+
+    * Added line-number annotations to the transformed regex as a
+      last-gasp kind of assistance when confronted with the dreaded
+      post-transformation "error marked with <-- HERE" message
+
+
+
+1.036  Mon Sep 15 12:58:47 2014
+
+    * Minor doc improvements
+
+    * Fixed odd behaviour of <debug: off> 
+      (Thanks, Chris!)
+
+
+
+1.038  Thu Dec 11 14:52:05 2014
+
+    * Fixed bug where actions persisted after a failed ->with_actions() match
+      (Thanks Hao Wu!)
+
+
+
+
+1.039  Sat Feb  7 08:39:58 2015
+
+    * Module works correctly under 5.18.4.
+      Updated warnings to reflect this.
+      (Thanks p5p!)
+
+
+1.040  Thu Mar 26 07:44:41 2015
+
+    * Tweaked Makefile.PL and BUILD.PL to (maybe)
+      work more happily with the CPANTesters toolchain
+
+
+
+1.041  Sun May  3 12:57:37 2015
+
+    * Documented edge case where new 5.18 regex compilation semantics
+      breaks the <%hash> construct, listing two work-arounds
+      (thanks David and Gianni!)
+
+    * Fixed subtle problem with implicit whitespace-matching invalidating
+      subrule argument lists
+      (thanks Alex!)
+
+
+1.042  Wed Sep 16 16:32:23 2015
+
+    * Prelimary attempt to support raw named captures as well as R::G syntax
+      (may induce bugs, though none found in the test suite)
+
+    * Fixed bug deep inside demo/demo_rfc5322.pl
+      (Thanks, Dale!)
+
+    * Replaced Lexical::Vars with B::Hooks::Parser for 5.22+ compatibility
+      (Thanks Alex!)
+
+
+1.043  Mon Dec 14 13:14:25 2015
+
+    * Eliminated redundant calls to setup() and teardown() for B::Hooks::Parser
+
+    * Removed timeout test, as it cannot be reliably run across platforms
+      much faster or slower than the author's development platform.
+      (Thanls Slavin)
+
+
+1.044  Wed Dec 16 08:22:01 2015
+
+    * Yet another attempt to code around the changes in vars-inside-regexes
+      to preserve post-5.18 compatibility (Thanks, Kent!)
+
+
+
+1.045  Tue Jan 12 15:55:21 2016
+
+    * Fixed bug causing premature clearing of action handlers
+      (thanks Keith!)

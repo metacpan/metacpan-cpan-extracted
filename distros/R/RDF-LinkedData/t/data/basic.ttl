@@ -1,0 +1,7 @@
+@base <http://localhost/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+
+</foo> rdfs:label "This is a test"@en ;
+       <http://xmlns.com/foaf/0.1/page> <http://en.wikipedia.org/wiki/Foo> .
+</bar/baz/bing> rdfs:label "Testing with longer URI."@en .

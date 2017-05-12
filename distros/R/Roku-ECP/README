@@ -1,0 +1,39 @@
+Roku-ECP version 0.01
+=====================
+
+This module provides an interface to the External Control Protocol for
+Roku settop boxes. Briefly, it allows you to control the Roku remotely.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- Encode
+- URI
+- URI::Escape
+- LWP::UserAgent
+- FindBin
+
+FURTHER READING
+Roku External Control Guide:
+http://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
+
+DIAL - Second Screen Protocol:
+http://www.dial-multiscreen.org/dial-protocol-specification
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Andrew Arensburger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

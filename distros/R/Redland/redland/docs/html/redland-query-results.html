@@ -1,0 +1,750 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Query results</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Redland RDF Application Framework Manual">
+<link rel="up" href="pt02.html" title="Part&#160;II.&#160;Reference Manual">
+<link rel="prev" href="redland-query.html" title="Querying">
+<link rel="next" href="redland-serializer.html" title="Serializers">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="redland.html" title="Redland Overview">
+<link rel="chapter" href="introduction.html" title="Introduction">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Tutorial">
+<link rel="part" href="pt02.html" title="Part&#160;II.&#160;Reference Manual">
+<link rel="chapter" href="objects.html" title="Objects in C">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="redland-query.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt02.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Redland RDF Application Framework Manual</th>
+<td><a accesskey="n" href="redland-serializer.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2579722" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2618894" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="redland-query-results"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2579722"></a><span class="refentrytitle">Query results</span>
+</h2>
+<p>Query results &#8212; RDF query results.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="redland-query-results.html#librdf-query-results">librdf_query_results</a>;
+<a href="redland-stream.html#librdf-stream">librdf_stream</a>* <a href="redland-query-results.html#librdf-query-results-as-stream">librdf_query_results_as_stream</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+int         <a href="redland-query-results.html#librdf-query-results-get-count">librdf_query_results_get_count</a>  (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+int         <a href="redland-query-results.html#librdf-query-results-next">librdf_query_results_next</a>       (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+int         <a href="redland-query-results.html#librdf-query-results-finished">librdf_query_results_finished</a>   (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+int         <a href="redland-query-results.html#librdf-query-results-get-bindings">librdf_query_results_get_bindings</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             const char ***names,
+                                             <a href="redland-node.html#librdf-node">librdf_node</a> **values);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-query-results.html#librdf-query-results-get-binding-value">librdf_query_results_get_binding_value</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             int offset);
+const char* <a href="redland-query-results.html#librdf-query-results-get-binding-name">librdf_query_results_get_binding_name</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             int offset);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-query-results.html#librdf-query-results-get-binding-value-by-name">librdf_query_results_get_binding_value_by_name</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             const char *name);
+int         <a href="redland-query-results.html#librdf-query-results-get-bindings-count">librdf_query_results_get_bindings_count</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+unsigned char* <a href="redland-query-results.html#librdf-query-results-to-counted-string">librdf_query_results_to_counted_string</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *format_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri,
+                                             size_t *length_p);
+unsigned char* <a href="redland-query-results.html#librdf-query-results-to-string">librdf_query_results_to_string</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *format_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri);
+int         <a href="redland-query-results.html#librdf-query-results-to-file-handle">librdf_query_results_to_file_handle</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             FILE *handle,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *format_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri);
+int         <a href="redland-query-results.html#librdf-query-results-to-file">librdf_query_results_to_file</a>    (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             const char *name,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *format_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri);
+void        <a href="redland-query-results.html#librdf-free-query-results">librdf_free_query_results</a>       (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+int         <a href="redland-query-results.html#librdf-query-results-is-bindings">librdf_query_results_is_bindings</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+int         <a href="redland-query-results.html#librdf-query-results-is-boolean">librdf_query_results_is_boolean</a> (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+int         <a href="redland-query-results.html#librdf-query-results-is-graph">librdf_query_results_is_graph</a>   (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+int         <a href="redland-query-results.html#librdf-query-results-get-boolean">librdf_query_results_get_boolean</a>
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2618894"></a><h2>Description</h2>
+<p>
+The results of an <a href="redland-query.html#librdf-query"><span class="type">librdf_query</span></a> execution as a sequence of individual
+results, an RDF graph as a sequence of triples or a boolean.  For
+variable binding results, the binding names and values can be read in
+multiple forms and the number of results returned as well as the
+current result moved to the next.  For an RDF graph result, the
+stream of triples can be returned. For a boolean result, the value
+can be returned.  All results can be turned into a string XML format
+based on the SPARQL XML results format which can also be written to a file.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2568621"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2616828"></a><h3>
+<a name="librdf-query-results"></a>librdf_query_results</h3>
+<a class="indexterm" name="id2625335"></a><pre class="programlisting">typedef struct librdf_query_results_s librdf_query_results;
+</pre>
+<p>
+Redland query results class.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2585275"></a><h3>
+<a name="librdf-query-results-as-stream"></a>librdf_query_results_as_stream ()</h3>
+<a class="indexterm" name="id2618931"></a><pre class="programlisting"><a href="redland-stream.html#librdf-stream">librdf_stream</a>* librdf_query_results_as_stream
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+The return value is only meaningful if this is an RDF graph
+query result - see <a href="redland-query-results.html#librdf-query-results-is-graph"><span class="type">librdf_query_results_is_graph</span></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> RDF graph query result or NULL on error
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619008"></a><h3>
+<a name="librdf-query-results-get-count"></a>librdf_query_results_get_count ()</h3>
+<a class="indexterm" name="id2619021"></a><pre class="programlisting">int         librdf_query_results_get_count  (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Get number of bindings so far.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> number of bindings found so far
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619088"></a><h3>
+<a name="librdf-query-results-next"></a>librdf_query_results_next ()</h3>
+<a class="indexterm" name="id2619100"></a><pre class="programlisting">int         librdf_query_results_next       (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Move to the next result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if failed or results exhausted
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619167"></a><h3>
+<a name="librdf-query-results-finished"></a>librdf_query_results_finished ()</h3>
+<a class="indexterm" name="id2619180"></a><pre class="programlisting">int         librdf_query_results_finished   (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Find out if binding results are exhausted.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if results are finished or query failed
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623560"></a><h3>
+<a name="librdf-query-results-get-bindings"></a>librdf_query_results_get_bindings ()</h3>
+<a class="indexterm" name="id2623574"></a><pre class="programlisting">int         librdf_query_results_get_bindings
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             const char ***names,
+                                             <a href="redland-node.html#librdf-node">librdf_node</a> **values);</pre>
+<p>
+Get all binding names, values for current result.
+</p>
+<p>
+If names is not NULL, it is set to the address of a shared array
+of names of the bindings (an output parameter).  These names
+are shared and must not be freed by the caller
+</p>
+<p>
+If values is not NULL, it is used as an array to store pointers
+to the librdf_node* of the results.  These nodes must be freed
+by the caller.  The size of the array is determined by the
+number of names of bindings, returned by
+librdf_query_get_bindings_count dynamically or
+will be known in advanced if hard-coded into the query string.
+</p>
+<p>
+Example
+</p>
+<p>
+const char **names=NULL;
+librdf_node* values[10];
+</p>
+<p>
+if(librdf_query_results_get_bindings(results, &amp;names, values))
+  ...</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query results
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>names</code></em>&#160;:</span></td>
+<td> pointer to an array of binding names (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>values</code></em>&#160;:</span></td>
+<td> pointer to an array of binding value <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if the assignment failed
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623721"></a><h3>
+<a name="librdf-query-results-get-binding-value"></a>librdf_query_results_get_binding_value ()</h3>
+<a class="indexterm" name="id2623735"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_query_results_get_binding_value
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             int offset);</pre>
+<p>
+Get one binding value for the current result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query results
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>offset</code></em>&#160;:</span></td>
+<td> offset of binding name into array of known names
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> binding value or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623832"></a><h3>
+<a name="librdf-query-results-get-binding-name"></a>librdf_query_results_get_binding_name ()</h3>
+<a class="indexterm" name="id2623846"></a><pre class="programlisting">const char* librdf_query_results_get_binding_name
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             int offset);</pre>
+<p>
+Get binding name for the current result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query results
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>offset</code></em>&#160;:</span></td>
+<td> offset of binding name into array of known names
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a pointer to a shared copy of the binding name or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2623938"></a><h3>
+<a name="librdf-query-results-get-binding-value-by-name"></a>librdf_query_results_get_binding_value_by_name ()</h3>
+<a class="indexterm" name="id2623952"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_query_results_get_binding_value_by_name
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             const char *name);</pre>
+<p>
+Get one binding value for a given name in the current result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query results
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> variable name
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> binding value or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2637192"></a><h3>
+<a name="librdf-query-results-get-bindings-count"></a>librdf_query_results_get_bindings_count ()</h3>
+<a class="indexterm" name="id2637205"></a><pre class="programlisting">int         librdf_query_results_get_bindings_count
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Get the number of bound variables in the result.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> &lt;0 if failed or results exhausted
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2637268"></a><h3>
+<a name="librdf-query-results-to-counted-string"></a>librdf_query_results_to_counted_string ()</h3>
+<a class="indexterm" name="id2637281"></a><pre class="programlisting">unsigned char* librdf_query_results_to_counted_string
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *format_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri,
+                                             size_t *length_p);</pre>
+<p>
+Turn a query results into a string.
+</p>
+<p>
+Values of format_uri currently supported (via Rasqal) are:
+ http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/
+</p>
+<p>
+The base URI may be used for the generated syntax, depending
+on the format.
+</p>
+<p>
+The returned string must be freed by the caller</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>format_uri</code></em>&#160;:</span></td>
+<td> URI of syntax to format to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> Base URI of output formatted syntax  or NULL
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>length_p</code></em>&#160;:</span></td>
+<td> Pointer to where to store length of string or NULL
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new string value or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2637418"></a><h3>
+<a name="librdf-query-results-to-string"></a>librdf_query_results_to_string ()</h3>
+<a class="indexterm" name="id2637431"></a><pre class="programlisting">unsigned char* librdf_query_results_to_string
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *format_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri);</pre>
+<p>
+Turn a query results into a string.
+</p>
+<p>
+See librdf_query_results_to_counted_string for information on the
+format_uri and base_uri parameters.
+</p>
+<p>
+The returned string must be freed by the caller</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>format_uri</code></em>&#160;:</span></td>
+<td> URI of syntax to format to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> Base URI of output formatted syntax 
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new string value or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2637543"></a><h3>
+<a name="librdf-query-results-to-file-handle"></a>librdf_query_results_to_file_handle ()</h3>
+<a class="indexterm" name="id2637556"></a><pre class="programlisting">int         librdf_query_results_to_file_handle
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             FILE *handle,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *format_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri);</pre>
+<p>
+Write a query results to a FILE*.
+</p>
+<p>
+See librdf_query_results_to_counted_string for information on the
+format_uri and base_uri parameters.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>handle</code></em>&#160;:</span></td>
+<td> file handle to write to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>format_uri</code></em>&#160;:</span></td>
+<td> URI of syntax to format to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> Base URI of output formatted syntax 
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2637681"></a><h3>
+<a name="librdf-query-results-to-file"></a>librdf_query_results_to_file ()</h3>
+<a class="indexterm" name="id2637693"></a><pre class="programlisting">int         librdf_query_results_to_file    (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results,
+                                             const char *name,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *format_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri);</pre>
+<p>
+Write a query results to a file.
+</p>
+<p>
+See librdf_query_results_to_counted_string for information on the
+format_uri and base_uri parameters.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> filename to write to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>format_uri</code></em>&#160;:</span></td>
+<td> URI of syntax to format to
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> Base URI of output formatted syntax 
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2637818"></a><h3>
+<a name="librdf-free-query-results"></a>librdf_free_query_results ()</h3>
+<a class="indexterm" name="id2637829"></a><pre class="programlisting">void        librdf_free_query_results       (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Destructor - destroy a <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2637885"></a><h3>
+<a name="librdf-query-results-is-bindings"></a>librdf_query_results_is_bindings ()</h3>
+<a class="indexterm" name="id2637897"></a><pre class="programlisting">int         librdf_query_results_is_bindings
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Test if librdf_query_results is variable bindings format.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if true
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2637960"></a><h3>
+<a name="librdf-query-results-is-boolean"></a>librdf_query_results_is_boolean ()</h3>
+<a class="indexterm" name="id2637972"></a><pre class="programlisting">int         librdf_query_results_is_boolean (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Test if librdf_query_results is boolean format.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if true
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2638033"></a><h3>
+<a name="librdf-query-results-is-graph"></a>librdf_query_results_is_graph ()</h3>
+<a class="indexterm" name="id2638046"></a><pre class="programlisting">int         librdf_query_results_is_graph   (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Test if librdf_query_results is RDF graph format.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-0 if true
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2638107"></a><h3>
+<a name="librdf-query-results-get-boolean"></a>librdf_query_results_get_boolean ()</h3>
+<a class="indexterm" name="id2638119"></a><pre class="programlisting">int         librdf_query_results_get_boolean
+                                            (<a href="redland-query-results.html#librdf-query-results">librdf_query_results</a> *query_results);</pre>
+<p>
+Get boolean query result.
+</p>
+<p>
+The return value is only meaningful if this is a boolean
+query result - see <a href="redland-query-results.html#librdf-query-results-is-boolean"><span class="type">librdf_query_results_is_boolean</span></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>query_results</code></em>&#160;:</span></td>
+<td> <a href="redland-query-results.html#librdf-query-results"><span class="type">librdf_query_results</span></a> query_results
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> boolean query result - &gt;0 is true, 0 is false, &lt;0 on error or finished
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

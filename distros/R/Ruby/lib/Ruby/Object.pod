@@ -1,0 +1,67 @@
+=head1 NAME
+
+Ruby::Object - Ruby object in Perl
+
+=head1 SYNOPSIS
+
+	use Ruby qw(:DEFAULT String Integer rubyify), -class => qw(Hash Array);
+
+	$perlstr = String('foo')->stringify;
+	$perlnum = Integer(1000)->numify;	$perlbol = nil->boolify;
+
+	$obj->kind_of('Object');    # instead of kind_of?()
+	$obj->respond_to('method'); # instead of respond_to?()
+
+	# containter
+
+	$perl_array_ref = Array->new->to_perl;
+	$perl_hash_ref  = Hash->new->to_perl;
+
+	$ruby_array = rubyify($perl_array_ref)->to_ary;
+	$ruby_hash  = rubyify($perl_hash_ref)->to_hash;
+
+	# make aliases
+	rb_c(Array)->alias(aref => '[]');
+	rb_c(Array)->alias(aset => '[]=');
+
+	# Exception handling
+	eval{
+		$obj->undefined_method();
+	};
+
+	if($rb_errinfo->kind_of('NoMethodError')){
+		warn($rb_errinfo); # => <#NoMethodError: ...>
+	}
+
+	# use HASH as Perl::Hash
+
+	rubyify(\%ENV)->each(sub{
+		my($key, $value) = @_;
+		# ...
+	});
+
+	# use ARRAY as Perl::Array
+	rubyify(\@structures)->sort_by(sub{ $_[0]->{aField} });
+
+	$aryref = rubyify(\*STDIN)
+		->binmode(':encoding(Shift_JIS)')
+		->map(sub{ $_[0]->chomp->upcase->stringify })
+		->sort
+		->to_perl;
+
+	# inheritance
+	package MyObject;
+	use Ruby -base => 'Object';
+
+	sub method { ... }
+
+	my $myobj = MyObject->new;
+
+	$myobj->method();    # OK
+	$myobj->object_id(); # OK
+
+=head1 SEE ALSO
+
+L<Ruby>.
+
+=cut

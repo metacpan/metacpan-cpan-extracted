@@ -1,0 +1,83 @@
+Revision history for RSSycklr
+0.15    20110802
+        - Double derp. Missed Moose in the subpackages.
+
+0.14    20110730
+        - Derp. capture blocked return value.
+
+0.13    20110728 (this release is broken, lucky 13)
+        - Silencing a long standing issue with noisy XML::LibXML.
+        - Going back to Mouse.
+        - General lack of review and checking what I may or may not
+          have changed in a long time.
+        - Get .git out of MANIFEST. Jeeze.
+
+0.12    20100917
+        - Added time to datetime timestamps.
+        - Moved to github: http://github.com/pangyre/p5-rssycklr
+        - Bunch of code layout tweaks.
+        - ->meta->make_immutable.
+
+0.11    20090510
+        - Fixed broken README.
+        - Put URI in timeout message.
+        - Added datetime in default template.
+
+0.10    20090509
+        - Biggish change: s/(?<=Mo)u(?=se)/o/;
+        - Updated error on feed parse failure to include URI.
+        - Titles are now double decoded because I'm still seeing feeds
+          here and there popping up with &#39; &c in the titles.
+        - Added title_override to feeds.
+
+0.09    20090224
+        - Arrrrrrg. Mac case insensitivity got me again. Makefile now
+          lists Getopt::Long, not GetOpt::Long as a requirment.
+        - Couple spelling errors in Pod fixed and that's it.
+
+0.08    20081114
+        - Put a default of "" into lede to prevent errors when it's
+          not correctly formed.
+        - Redid alarm handling a little to account for latent failures
+          in XML parsing.
+
+0.07    20080809
+        - Qualified namespace with YAML::Dump call.
+        - Put in a BUILD so things like Catalyst::Model::Adaptor can
+          put configs into new() calls.
+
+0.06    20080808
+        - Fixed CSS typo in Pod.
+        - Put in Hash::Merge::Simple for config. Made the ellipsis and
+          read_more options work. Docs showed them working but they
+          did not befeore.
+        - Put a little Encode stuff in though frankly I'm not sure
+          it's in the right place.
+
+0.05    20080805
+        - Strip leading and trailing <br/>s when they are in the keep_tags.
+
+0.04    20080805
+        - Fixed README. Der...
+        - Added as_string and process.t.
+        - Fixed broken command line snippet to see keep_tags.
+        - Happy 4 to the VI.
+
+0.03    20080804
+        - Updated half-done 0.02 entry date below. Sigh.
+        - Fixed synopsis.t output a little.
+        - Put timeout on XML::Feed->parse() requests.
+        - Updated docs a bit and though load_config will still handle
+          a Perl structure, it's not in the doc now and won't do it
+          much longer.
+        - Considering name change to App::RSSycklr... Not sure.
+
+0.02    20080803
+        - Improved Pod for 'rssycklr.' Didn't mean to ship it with
+          such bad docs.
+
+0.01    20080803
+        - Holy cats is Mouse/Moose hot. This is an adaptation of a
+          script I've been using. It's the kind of thing that normally
+          seems wrong for a module but Mouse made it natural. Really
+          nice. See the docs for todo and such.

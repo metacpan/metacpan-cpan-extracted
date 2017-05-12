@@ -1,0 +1,12 @@
+% my $Title = loc("Asset Rights for [_1]: [_2]", $principal->IsUser ? loc('User') : loc('Group'), $principal->Object->Name ? $principal->Object->Name : $principal->Object->Type);
+<& /Elements/Header, Title=>$Title &>
+<& /Admin/Tools/RightsMatrix/Elements/UserRightsTabs,
+    current_tab => 'User/Prefs.html',
+    current_subtab => 'Admin/Tools/RightsMatrix/User/TypeRightsMatrix.html',
+    Title=>$Title &>
+
+<& /Admin/Tools/RightsMatrix/Elements/AssetRightsMatrix, %ARGS  &>
+<%INIT>
+use RTx::RightsMatrix::Util;
+my ($principal) = RTx::RightsMatrix::Util::get_principal( Principal => $ARGS{Principal} || $ARGS{PrincipalId}, User => $ARGS{User}, CurrentUser => $session{CurrentUser} );
+</%INIT>

@@ -1,0 +1,47 @@
+RDF-ACL
+=======
+
+Created:      2010-01-20
+Home page:    <https://metacpan.org/release/RDF-ACL>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-ACL>
+Maintainer:   Toby Inkster
+
+0.104	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.103	2013-07-16
+
+ [ Documentation ]
+ - Copyright 2013.
+
+ [ Packaging ]
+ - Stop bundling early paleolithic version of Scalar::Util.
+
+0.102	2012-05-30	Still alive!
+
+ [ Documentation ]
+ - Copyright 2012.
+
+ [ Packaging ]
+ - Module::Package::RDF.
+
+ [ Other ]
+ - Cleanups.
+ - Drop RDF::TrineShortcuts dependency; use RDF::TrineX::Functions.
+
+0.101	2011-02-09	We're not dead yet!
+
+ [ Documentation ]
+ - Copyright 2011.
+
+ [ Other ]
+ - Minor cleanups.
+
+0.100	2010-06-20
+
+ - Updated: Support recent addition to ACL vocabulary - acl:Append.
+ - use Scalar::Util.
+
+0.01	2010-01-20

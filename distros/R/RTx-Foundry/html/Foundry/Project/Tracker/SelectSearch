@@ -1,0 +1,63 @@
+%# Excellent day to have a rotten day.
+
+<table border="0" cellspacing="4" cellpadding="0" align="center">
+  <tr>
+    <td align="right">
+% if ($Type) {
+    <&|/l, loc($Type)&>Submit new [_1]</&>
+    </td>
+    <td align="right">
+	<input type="hidden" name="Type" value="<% $Type %>">
+	<& /Work/Elements/Button, Name => 'Action-New', Image => 'funcAdd', Text => loc('Create') &>
+	</form><form action="index.html">
+% }
+    </td>
+    <td width="14">
+    <img src="/img/3Dtoolbar.png" width="2" height="60">
+    </td>
+    <td><&|/l&>Search</&></td>
+    <td width="20">&nbsp;</td>
+    <td><table cellpadding=2 cellspacing=0 border=0><tr>
+    <td><nobr><&|/l&>Owner</&></nobr></td><td>
+	    <& SelectOwner, QueueObj => $QueueObj, Default => $Owner, Name => 'Owner' &>
+    </td>
+    <td width="20">&nbsp;</td>
+    <td>
+            <select name="SearchOp">
+% foreach my $option (qw(Subject Requestor Content Id)) {
+		<option value="<% $option %>"
+		    <% ($SearchOp eq $option) && 'selected' %>
+		><% loc($option) %></option>
+% }
+	    </select>
+    </td><td>
+            <input type="text" name="SearchFor" style="width:150px" value="<% $SearchFor %>">
+    </td>
+    </tr><tr>
+    <td><nobr><&|/l&>Process Status</&></nobr></td><td>
+<& FilterStatus, Status => $Status &>
+	</td>
+    <td width="20">&nbsp;</td>
+    <td>
+      <input type="hidden" name="Type" value="<% $Type %>">
+    </td>
+    </tr></table></td>
+    <td>
+      <input type="image" border="0" name="Action-Search" src="/img/Go.png" width="23" height="19" align="middle">
+    </td>
+  </tr>
+</table>
+<%ARGS>
+$QueueObj
+$Status		=> 'all'
+$Category	=> ''
+$CreatedBefore	=> ''
+$CreatedAfter	=> ''
+$Requestor	=> ''
+$Owner		=> ''
+$ShowRequestor	=> 1
+$Type		=> ''
+$Subject	=> ''
+$SearchOp	=> 'Subject'
+$SearchFor	=> ''
+</%ARGS>

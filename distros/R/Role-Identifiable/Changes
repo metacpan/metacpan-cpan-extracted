@@ -1,0 +1,11 @@
+Revision history for Role-Identifiable
+
+0.007     2013-10-15 22:18:31 America/New_York
+          update bugtracker and repo metadata
+
+0.006     2013-08-30 15:41:27 America/New_York
+          [NOT QUITE BACKWARD COMPATIBLE]
+          idents now have to be non-empty and can't start or end with spaces
+
+0.005     2010-10-28 15:25:50 America/New_York
+          first release, spun off of Throwable-X 0.004

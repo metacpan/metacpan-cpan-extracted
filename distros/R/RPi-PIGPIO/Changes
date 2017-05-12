@@ -1,0 +1,12 @@
+Revision history for WWW-Session
+
+0.014  2017-04-03
+      Improved calculations for DSM501 dust sensor
+      POD improvements
+0.013  2017-03-24
+      Added suport for BCM180 presure/temperature sensor
+0.012  2017-03-24
+      Implemented I2C support
+0.011  2017-03-22
+      First version
+      

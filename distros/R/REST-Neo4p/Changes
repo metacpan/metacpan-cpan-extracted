@@ -1,0 +1,213 @@
+Revision history for Perl module REST::Neo4p
+0.3012 2015-11-06
+    - Add build req (Mojo::Exception) to Build.PL
+0.3011 2015-11-01
+    - Fix issue with exceptions that can't(rethrow)
+      (thanks @Htbaa)
+0.3010 2015-04-20
+    - Fix git repos link
+    - Enabled basic auth for all backends, so that...
+    - All tests pass on Neo4j server version 2.2
+
+0.3004 2014-08-05
+    - Added git repos to distro metadata
+
+0.3000 2014-07-12
+    - Major update: streamed query, transaction and batch responses now
+      processed incrementally on the fly; should result in significant
+      performance improvements in those features
+    
+0.2253 2014-06-30
+    - fixed Query memory leak and added Chisel's test (thx Chisel)
+    - direct creation of a REST::Neo4p::Agent has a default backend agent
+      (thx Steve)
+
+0.2252 2014-05-16
+    - softpedal the smartmatch backpedal with experimental (thx Chisel)
+    - require 5.10.1+
+
+0.2250 2014-05-10
+    - refactored Agent to support multiple backend user agent pkgs
+      (thanks DBI guys)
+    - minor API change for Agent: server() is now server_url()
+    - added raw_response() to Agent to return the last HTTP::Response
+    - corrected decoded_response() to decoded_content() in Agent pod
+
+0.2241 2014-02-17
+    - added exception handling for empty json query response bodies
+    - fixed json row parser for transaction json return format
+
+0.2240 2014-02-13
+    - added Schema.pm which provides access to new Neo4j index creation 
+      and uniqueness constraints (v2.0.1 server and greater) (thanks Andrii)
+    - fixed an object destruction bug that was causing segfaults in certain
+      circumstances (thanks Alexey)
+
+0.2233 2014-01-02
+    - adjusted breaking test
+
+0.2232 2013-12-31
+    - added 'code' to auto fields of REST::Neo4p::LocalException
+      (thanks Andrii)
+
+0.2231 2013-12-31
+    - added env vars to build script to allow non-interactive builds
+      (see Build.PL - thanks Gavin)
+    - fixed guard code that prevented legitimate 0 value in index 
+      creation (thanks Kevin)
+
+0.2230 2013-12-26
+    - fixed UTF-8 encoding issue (thanks Andrii)
+    - documented remove_property method in Node and Relationship
+
+0.2222 2013-12-03
+    - describe class methods _tx_results() and _tx_errors()
+
+0.2221 2013-12-01
+    - pod fixes
+
+0.2220 2013-11-29
+    - added as_simple methods to entities
+    - modified REST::Neo4p::Query to return simplified row structures
+      in transaction mode (to handle the limited content returned by 
+      Neo4j (as of 2.0.0-RC1) in this mode
+    - when a row contains multiple elements, at least one of which is
+      an array, fetch will return the array(s) as array refs. Rows with
+      containing a single array are still flattened (the array itself 
+      is returned)
+
+0.2201 2013-11-21
+    - Added get_all_labels as advertised
+
+0.2200 2013-11-21
+    - perl v5.10 required
+    - Added initial support for transactions under neo4j server v2.0.0
+    - Refactored to support multiple distinct REST::Neo4p connections
+    - Added user/pass to connect method and build script
+    - Added finish() method to REST::Neo4p::Query
+
+0.2120 2013-11-09
+    - Added as_simple to entities; represent entities as simple perl data structs
+    - REST::Neo4p::Query attribute to select whether objects or simple 
+      structs are returned in responses
+
+0.2113 2013-11-09
+    - Can add user, pass to REST::Neo4p->connect() args
+    - user, pass options added to Build.PL and propagated to all tests
+
+0.2112 2013-11-05
+    - Changes file conforms to CPAN::Changes::Spec (thanks NEILB)
+
+0.2111 2013-11-05
+    - pod typo fixes
+
+0.2110 2013-10-16
+    - Query.pm and Agent.pm use pure File::Temp objects for
+      autocleanup that seems to just work (thanks symondsjo)
+
+0.2101 2013-07-29
+    - REST::Neo4p::agent() allows access to the LWP::UserAgent to change
+      parameters, add credentials, etc. before/after connection
+
+0.2100 2013-04-16
+    - experimental support for Neo4j-2.0
+    - set_property, remove_property returns the object itself on 
+      success (for chaining calls)
+    - added create_unique functionality to node and relationship indexes
+
+0.2013 2013-02-10
+    - fixed bad Perl in Index synopsis
+
+0.2012 2012-12-03
+    - modified _fix_constraints regexp to accommodate 5.10 and less
+
+0.2010 2012-11-24
+    - REST::Neo4p::Query::fetch() now supports array responses
+      (thanks Joseph)
+    - fetch() now throws a reasonable exception if the query has not
+      been execute()d    
+
+0.20 2012-11-20
+    - Added support for application-level constraints (REST::Neo4p::Constrain
+      and REST::Neo4p::Constraint)
+    - refactored tests to better cleanup test entities on failed suites
+    - Module version numbers reflect last version in which the module was
+      modified
+    - fixed problem with escaped spaces in queries
+
+0.1285 2012-11-18
+    - get_<entity> methods in REST::Neo4p now quietly return undef if item
+      not found (thanks Sergei)
+
+0.1284 2012-11-14
+    - fixed incorrect handling of comm errors in REST::Neo4p::Agent
+    - added request retry capability (see REST::Neo4p::Agent pod)
+      (thanks Joseph)
+    - REST::Neo4p::Index::add_entry allows multiple key-value pairs
+      (thanks Joseph)
+
+0.1283 2012-10-23
+    - fixed rt80343 (thanks Joseph)
+    - get_property on a property that doesn't exist now just returns 
+      undef (rather than throwing an exception)
+    - remove() checks for a NotFoundException and simply destroys the 
+      Perl object (rather than throwing an exception)
+
+0.1282 2012-10-15
+    - fixed rt80196 (thanks Sergei)
+    - added newlines to all exception messages
+    - updated $VERSION for all modules
+
+0.128 2012-10-13
+    - fixed rt80150 (thanks Joseph)
+
+0.127 2012-10-04
+    - Added start_node(), end_node() to Relationship object (thanks Joseph)
+
+0.1262 2012-09-24
+    - Added REST::Neo4p::Exceptions pod
+
+0.1261 2012-09-22
+    - Pod fixes
+
+0.126 2012-09-22
+    - LWP::UserAgent v6.04 or greater required
+    - Batch feature implemented, new tests (008, 009)
+
+0.1251 2012-09-18
+    - Pod fixes (thanks Mat)
+
+0.125 2012-09-11
+    - Query responses are now sent to disk and rows are streamed from
+      there by the fetch() iterator
+
+0.124 2012-09-10
+    - try/catch (with eval {}) all REST::Neo4p::Agent calls; rethrow
+    - REST::Neo4p::Agent - 'X-Stream: true' added as a default header
+      (use $agent->no_stream to remove)
+
+0.123 2012-09-08
+    - fixed a bug in index constructor
+
+0.122 2012-09-08
+    - auto creation of accessors now works on properties
+      created in the constructor
+    - added tests for above in 007_accessors.t
+    - fixed the set_property pod (needs a hashref arg, not an array)
+
+0.121 2012-09-04
+    - fixed the get_by_id methods in REST::Neo4p; they correctly return
+      all entities (including indexes) present already in database
+    - added tests for above in 005_db.t
+    - pod fixes 
+
+0.12 2012-08-30
+    - added REST::Neo4p::Path to support paths returned by queries
+    - added a few more exception throws
+    - built out pod
+    - added pod tests
+
+0.1 2012-08-29
+    - First release to CPAN
+    - original version created by ExtUtils::ModuleMaker 0.51
+

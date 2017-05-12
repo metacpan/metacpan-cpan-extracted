@@ -1,0 +1,15 @@
+<%INIT>
+    # Replace any spreadsheet links containing a SavedSearchId param to a short string.
+    if (my $feeds = PageMenu()->child('more') ) {
+        if (my $spreadsheet = $feeds->child('spreadsheet')) {
+            my $url = $spreadsheet->path;
+            if ($url =~ m{/Search/Results\.tsv\?.*(SavedSearchId=(.*))[&;]}) {
+                my ($savedsearch, $id) = ($1, $2);
+                # SavedSearchId=RT%3A%3ASystem-1-SavedSearch-8
+                if ($id) {
+                    $spreadsheet->path("/Search/SavedSearchResults.tsv?". $savedsearch);
+                }
+            }
+        }
+    }
+</%INIT>

@@ -1,0 +1,90 @@
+NAME
+    RDF::Query::Functions::Buzzword::Util - plugin for buzzword.org.uk
+    utility functions
+
+SYNOPSIS
+      use RDF::TrineX::Functions -shortcuts;
+  
+      my $data = rdf_parse(<<'TURTLE', type => 'turtle', base => $base_uri);
+      @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+      @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+  
+      <http://tobyinkster.co.uk/#i>
+        foaf:name "Toby Inkster" ;
+        foaf:page [ foaf:name "Toby Inkster" ] ;
+        foaf:junk "Foo <ex xmlns=\"urn:junk\">Bar</ex>"^^rdf:XMLLiteral ;
+        foaf:mbox <mailto:tobyink@cpan.org> .
+      TURTLE
+  
+      my $query = RDF::Query->new(<<'SPARQL');
+      PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+      PREFIX util: <http://buzzword.org.uk/2011/functions/util#>
+      PREFIX junk: <urn:junk> 
+      SELECT
+        ?name
+        (util:uc(?name) AS ?ucname)
+        (util:trim(util:sprintf(" I am %s "@en, ?name)) AS ?intro)
+        (util:skolem(?page, "oid") AS ?skolempage)
+        (util:preg_replace("t", "x", ?name, "ig") AS ?mangled)
+        (util:find_xpath("//junk:ex", ?junk, 0) AS ?found)
+      WHERE
+      {
+        ?person foaf:name ?name ; foaf:page ?page ; foaf:junk ?junk.
+      }
+      SPARQL
+  
+      print $query->execute($data)->as_xml;
+
+DESCRIPTION
+    This is a plugin for RDF::Query providing a number of extension
+    functions.
+
+    *   http://buzzword.org.uk/2011/functions/util#defragment
+
+    *   http://buzzword.org.uk/2011/functions/util#find_xpath
+
+    *   http://buzzword.org.uk/2011/functions/util#lc
+
+    *   http://buzzword.org.uk/2011/functions/util#ltrim
+
+    *   http://buzzword.org.uk/2011/functions/util#oid
+
+    *   http://buzzword.org.uk/2011/functions/util#oid_uri
+
+    *   http://buzzword.org.uk/2011/functions/util#preg_replace
+
+    *   http://buzzword.org.uk/2011/functions/util#rand
+
+    *   http://buzzword.org.uk/2011/functions/util#rtrim
+
+    *   http://buzzword.org.uk/2011/functions/util#skolem
+
+    *   http://buzzword.org.uk/2011/functions/util#sprintf
+
+    *   http://buzzword.org.uk/2011/functions/util#str_replace
+
+    *   http://buzzword.org.uk/2011/functions/util#trim
+
+    *   http://buzzword.org.uk/2011/functions/util#uc
+
+    *   http://buzzword.org.uk/2011/functions/util#uuid
+
+    *   http://buzzword.org.uk/2011/functions/util#uuid_uri
+
+    Some of these are somewhat close to new functions introduced in SPARQL
+    1.1.
+
+SEE ALSO
+    RDF::Query.
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2010-2012 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

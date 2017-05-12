@@ -1,0 +1,14 @@
+Changes
+Build.PL
+lib/Regexp/English.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/basic.t
+t/chars.t
+t/example.t
+t/export.t
+t/groupings.t
+t/quantifiers.t
+t/remember.t

@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name: Rose-DBx-Object-Renderer
+version: 0.77
+author:
+  - Xufeng (Danny) Liang <danny.glue@gmail.com>
+abstract: Web UI Rendering for Rose::DB::Object
+license: perl
+requires:
+  Test::More: 0
+  Lingua::EN::Inflect: 0
+  DateTime: 0
+  Rose::DB::Object::Loader: 0
+  Rose::DB::Object::Helpers: 0
+  CGI: 0
+  CGI::FormBuilder: 3.05
+  Template: 0
+  File::Path: 0
+  File::Copy: 0
+  File::Copy::Recursive: 0
+  File::Spec: 0
+  Digest::MD5: 0
+  Scalar::Util: 0
+  Clone: 0
+  Exporter: 5.57
+

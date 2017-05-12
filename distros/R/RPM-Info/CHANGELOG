@@ -1,0 +1,7 @@
+2003-06-24
+	added testscript test.t
+2003-10-30
+	changed name of package from Info to RPM::Info
+	changed perldoc layout
+2003-12-08
+	added methods "getRpmInfoRaw" and "getRpmDependents"

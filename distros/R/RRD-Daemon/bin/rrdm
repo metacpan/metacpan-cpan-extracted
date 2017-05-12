@@ -1,0 +1,231 @@
+#!/usr/bin/perl
+
+# rrd monitor tool
+
+# pragmata ----------------------------
+
+use feature  qw( :5.10 );
+use strict;
+use warnings;
+
+# utility -----------------------------
+
+use Carp                   qw( croak );
+use File::Spec::Functions  qw( catdir catfile );
+use FindBin                qw( $Bin $Script );
+use Getopt::Long           qw( GetOptions :config no_ignore_case );
+use Log::Log4perl          qw( :levels get_logger );
+use Memoize                qw( memoize );
+
+use lib  "$Bin/perllib";
+
+use Fatal                 qw( mkdir );
+use RRD::Daemon           qw( );
+use RRD::Daemon::RRDB     qw( );
+use RRD::Daemon::Util     qw( debug info trace tdumps
+                              init_log4perl );
+
+# constants ---------------------------
+
+use constant MODE_LIST_PLUGINS => 'mode:list plugins';
+use constant MODE_LIST_KEYS    => 'mode:list keys';
+use constant MODE_WRITE_ONCE   => 'mode:write once';
+use constant MODE_WRITE_OFTEN  => 'mode:write often';
+use constant MODE_DUMP_CSPECS  => 'mode:dump create specs';
+
+# globals -----------------------------
+
+my $Mode = '';
+my $Dir;
+my %Next; # next lookup; time => @plugins
+my @Plugins;
+# pile of values to write to RRDB if delayed writing is on
+# each element is a hash, keys: plugin(shortname), key, value
+my @ValuesToWrite;
+# min number of seconds between writes to RRDB DB (to avoid spinning the disk
+# all the time)
+my $WriteEvery = 0;
+my $LastWrite = 0;
+
+# subrs ----------------------------------------------------------------------
+
+# RRDB object for a given value
+sub rrdb {
+  my ($plugin, $shortname, $vname) = @_;
+
+  my $dir = catdir $Dir, $shortname;
+  if ( ! -e $dir ) {
+    mkdir $dir, 0755;
+  } elsif ( ! -d $dir ) {
+    croak "not a directory: $dir\n";
+  }
+
+  my $fn = catfile $dir, "$vname.rrd";
+
+  return RRD::Daemon::RRDB->new($fn, rrdbspec(@_))
+}
+memoize 'rrdb';
+
+# -------------------------------------
+
+sub rrdbspec {
+  my ($plugin, $shortname, $vname) = @_;
+
+  my $rrdbspec = +{ names    => [ $vname ],
+                    ds_type  => $plugin->ds_type($vname),
+                    min      => $plugin->min($vname),
+                    max      => $plugin->max($vname),
+                    interval => $plugin->interval,
+                  };
+
+  return $rrdbspec;
+}
+
+# -------------------------------------
+
+sub write_values {
+  my ($plugin) = @_;
+
+  trace 'write_values: ' . $plugin;
+  my $s = $plugin->shortname;
+  my $v = $plugin->read_values;
+  my $n = $plugin->interval + time;
+  push @{$Next{$n}}, $plugin;
+
+  tdumps p => $plugin, v => $v;
+
+  for my $_ (sort keys %$v) {
+    info "%-16s\t%-16s\t%s", $s, $_, $v->{$_};
+    push @ValuesToWrite, +{ time   => time,
+                            plugin => $plugin, shortname => $s,
+                            key    => $_,      value     => $v->{$_} };
+  }
+
+  if ( time - $LastWrite > $WriteEvery ){
+    $LastWrite = time;
+    for my $v (@ValuesToWrite) {
+      my ($t, $s, $k, $v, $p) = @{$v}{qw( time shortname key value plugin )};
+      rrdb($p, $s, $k)->update($t, $v)
+        if defined $Dir;
+    }
+    @ValuesToWrite = ();
+  }
+}
+
+# -------------------------------------
+
+sub _plugins {
+  return RRD::Daemon->plugins
+    unless @Plugins;
+
+  # assert @Plugins > 0
+  my %plugins = map +( $_ => 1 ), @Plugins;
+  my @plugins;
+  for my $plugin (RRD->plugins) {
+    my $shortname = $plugin->shortname;
+    push @plugins, $plugin
+      if delete $plugins{$shortname};
+  }
+  die "plugin(s) not found: " . join ',', keys %plugins
+    if keys %plugins;
+  return @plugins;
+}
+
+sub plugins { map $_->new, _plugins }
+memoize 'plugins';
+
+# main -----------------------------------------------------------------------
+
+init_log4perl;
+
+GetOptions('v|verbose+'     =>
+             sub { Log::Log4perl->get_logger('')->more_logging },
+           'q|quiet+'       =>
+             sub { Log::Log4perl->get_logger('')->less_logging },
+           'debug=s'        => \&RRD::Daemon::Util::cmdline_debug,
+           'trace=s'        => \&RRD::Daemon::Util::cmdline_debug,
+           'debug-all'      => \&RRD::Daemon::Util::cmdline_debug,
+           'trace-all'      => \&RRD::Daemon::Util::cmdline_debug,
+           'list-plugins|l' => sub { $Mode = MODE_LIST_PLUGINS },
+           'list-keys|L'    => sub { $Mode = MODE_LIST_KEYS },
+           'write-once|w=s' => sub { $Mode = MODE_WRITE_ONCE;  $Dir = $_[1] },
+           'write|W=s'      => sub { $Mode = MODE_WRITE_OFTEN; $Dir = $_[1] },
+           'no-write'       => sub { $Mode = MODE_WRITE_OFTEN },
+           'dump-cspecs'    => sub { $Mode = MODE_DUMP_CSPECS },
+           'plugins|P=s'    => sub { push @Plugins, split /,/, $_[1] },
+           'write-time|E=i' => \$WriteEvery,
+          )
+  or die "options parsing failed\n";
+die "$Script brooks no argument\n"
+  if @ARGV;
+
+die "no such dir: $Dir\n"
+  if defined $Dir and ! -d $Dir;
+
+given ( $Mode ) {
+  when ( MODE_LIST_PLUGINS )
+    { say "plugin:\t" . ref $_ for plugins }
+
+  # ----
+
+  when ( MODE_LIST_KEYS )
+    { say join "\n  ", "plugin:\t$_", @{$_->keys} for plugins }
+
+  # ----
+
+  when ( [ MODE_WRITE_ONCE, MODE_WRITE_OFTEN ] ) {
+    # pre-cache RRDB instances
+    # do this, and then sleep for a second, because if we try to update within
+    # the same second as creating, then RRD complains of an illegal update
+    # (thinks it's getting two updates in the same second)
+
+    for my $p (plugins) {
+      rrdb($p, $p->shortname, $_)
+        for @{$p->keys};
+    }
+    sleep 1;
+
+    write_values($_)
+      for plugins;
+  }
+
+  # ----
+
+  when ( MODE_DUMP_CSPECS ) {
+    for my $p (plugins) {
+      my $shortname = $p->shortname;
+      my $keys = $p->keys;
+
+      for my $k (sort @$keys) {
+        my $fn = catfile($shortname, "$k.rrd");
+        my $c = RRD::Daemon::RRDB->createspec($fn, rrdbspec($p, $shortname, $k));
+        print join("\n  ", $fn, @$c), "\n";
+      }
+    }
+  }
+
+  # ----
+
+  default {
+    say 'not writing out any values';
+    for my $plugin (plugins) {
+      my $v = $plugin->read_values;
+      say $plugin->name;
+      printf "  %-16s\t%s\n", "$_:", $v->{$_}
+        for sort keys %$v;
+    }
+  }
+}
+
+
+while ( MODE_WRITE_OFTEN eq $Mode and keys %Next ) {
+  trace +{ Next => \%Next };
+  my ($next) = sort { $a <=> $b } keys %Next;
+  my $sleep;
+  while ( ( my $sleep = $next - time ) > 0 ) {
+    sleep $sleep;
+  }
+  write_values($_)
+    for @{$Next{$next}};
+  delete $Next{$next};
+}

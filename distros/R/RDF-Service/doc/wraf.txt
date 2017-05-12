@@ -1,0 +1,65 @@
+$Id: wraf.txt,v 1.5 2000/10/22 10:59:00 aigan Exp $
+
+We have the intention to not differentiate between properties and
+functions.  A property value can be determined using any algorithm.
+
+A function call with parameters should be the same as a query model.
+
+
+Further : All functions should have a unique URI in the same manner
+that the module itself is a resource, as is the resulting interface.
+
+That means that you in the interface could use properties as methods.
+For example: "$person->contact->home->phone->value" or something like
+that.
+
+This would require you to first register shortcuts for the functions
+and properties you would like to use in this way.  That is: tell the
+service how to translate the name to the full uri.  Any nonregistred
+functions can still be called with something like $person->get(
+"http://.../" ).
+
+
+One important use of this property/function equality is the
+presentation layer. The presentation of a resource is a property.
+That presentation resource has metadata saying what type of
+presnetation it is - the context.  A resource can have several
+presentations.  The method call for the presentation can send
+arguments to make the selection among the presentations. Like:
+
+  $person -> presentation(
+                 format => 'html',
+                 layout =) $fancy_layout,
+                 trust  => $my_trust,
+                ) -> value;
+
+Or something like that...  And you could be certain that this would be
+true:
+
+  $person -> presentation(
+                 format => 'html',
+                 layout =) $fancy_layout,
+                 trust  => $my_trust,
+                ) -> format -> value  eq 'html';
+
+So the style would also be used for normal propertues:
+
+$person->first_name(according_to=>$this_person)->value;
+
+
+
+But what is the model of those generated statements?  The resulting
+model would be a product of the issuer of the involved function as
+well as all parameters used.
+
+
+The reson I write this now is because I just now want to define the
+calling order of the functions in the jumptable. It should be called
+in order of speciality. The type of the resource is used.  An
+connected model can define that one class is a subClassOf another
+class.  And the RDFS model will programmaticly say that the specific
+class is subClassOf all classes that the super-class is subClassOf.
+
+This subClassOf thing will now serve as the test for this
+property/function implementation.
+

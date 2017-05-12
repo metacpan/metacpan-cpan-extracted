@@ -1,0 +1,76 @@
+Revision history for Regexp-Grammars-Common-String
+
+1.000002 2015-12-15T10:56:25Z fdd40fd
+ [Bugfix]
+ - Avoid complications with Regexp::Grammars 1.043 failing to create match globals ( See RT#110356 ) by explicitly
+   declaring them.
+ - Closes #1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - test: +1 (recommends: ↑1 ↓1)
+
+1.000001 2014-08-15T23:28:10Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - whitespace greatly reduced.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+1.000000 2014-08-07T14:27:54Z
+ [00 Major]
+ - Significant packaging changes that may affect hand-operated downstream.
+
+ [01 Version Scheme]
+ - Versions normalised to x.y{6} instead of x.y{8}
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+ - This is the primary reason for the 1.x on the box
+
+ [02 Toolkit]
+ - Migrate to EUMM
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+ - "latest" Toolkit dependencies softened to recommendations.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000002, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +48 -1 (recommends: -1, suggests: +1 ↑1)
+ - runtime: +1
+ - test: +2 -2 (recommends: +3)
+
+ [Minor]
+ - Moved to kentnl.org
+
+0.01000002 2011-10-22T13:35:39Z
+ - Maintenance Release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000001, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: +1 -1, suggests: +1 -1)
+ - runtime: +2
+ - test: -1
+
+ [Packaging]
+ - ship .perltidyrc
+ - use Git versions
+ - move to @Author::KENTNL
+ - Migrate Changelog format to CPAN::Changes
+ - Update LICENSE ( Year, Indentation, Address )
+ - Move author/release tests to xt/
+ - add x_authority
+ - point Git repo urls to https:// github
+
+ [Tests]
+ - 00-compile.t regenerated.
+
+0.01000001 2010-12-25T01:20:07Z
+ - First version. Merry Christmas.

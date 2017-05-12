@@ -1,0 +1,24 @@
+This is the README file for RTx::DDMU.
+
+RTx::DDMU is the drop down menu user interface for RT, and it works for RT 3.5 or later. You should make sure the version of RT that you installed currently.
+
+Please type "perldoc RTx::DDMU" after installation to see
+the module usage information.
+
+* Installation
+
+RTx::DDMU uses the standard perl module install process:
+
+perl Makefile.PL
+make			# or 'nmake' on Win32
+make test
+make install
+
+* Copyright
+
+Copyright 2005 by Hsin-Chan Chien <hcchien@hcchien.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

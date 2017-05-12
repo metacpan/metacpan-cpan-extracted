@@ -1,0 +1,23 @@
+<&|/l&>No search to operate on.</&>
+<%INIT>
+$Query =~ s/^\s+|\s+$//g;
+if (length($Query) and $SearchType =~ /^(?:Project|User|Ticket)$/) {
+    my $List = $m->comp($SearchType, Query => $Query);
+    if ($List) {
+	return $m->comp('/Foundry/Trove/List', ARGS => \%ARGS, Begin => $Begin, List => $List)
+	    if $SearchType eq 'Project';
+	return $m->comp('/Foundry/Project/Tracker/List', List => $List, Begin => $Begin, URL => '/Foundry/Project/Tracker/Display.html', Hide => '!', ARGS => \%ARGS)
+	    if $SearchType eq 'Ticket';
+	return $m->comp('/Foundry/User/List', ARGS => \%ARGS, Begin => $Begin, List => $List)
+	    if $SearchType eq 'User';
+	return $m->print(loc("Under Construction."));
+    }
+    return if defined $List;
+    return $m->print(loc("Cannot find any matching items."));
+}
+</%INIT>
+<%ARGS>
+$SearchType => 'Project'
+$Query	    => ''
+$Begin	    => 0
+</%ARGS>

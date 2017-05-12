@@ -1,0 +1,9 @@
+Revision history for Perl module Rose::HTMLx::Form::DBIC
+
+0.08 Thu Feb 26 23:41:35 CET 2009
+ - select boxes for relations required if the appriopriate field in DB is not 'is_nullable'
+
+0.01 Sat Apr 12 12:09:36 2008
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

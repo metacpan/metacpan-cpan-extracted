@@ -1,0 +1,142 @@
+#!/usr/bin/perl -w
+
+use 5.010;
+use strict;
+use warnings;
+
+use lib qw(
+    lib
+);
+
+# NAME: Dump Redis::CappedCollection collection data content.
+
+use bytes;
+use Carp;
+use Getopt::Long qw(
+    GetOptions
+);
+use JSON::XS ();
+use Try::Tiny;
+
+use Redis::CappedCollection qw(
+    $DEFAULT_SERVER
+    $DEFAULT_PORT
+);
+
+my ( $collection, $dump_fh, $json ) = setup();
+
+my $queue_key = $collection->_queue_key;
+
+foreach my $list_id ( $collection->lists ) {
+    my $data_key        = $collection->_data_list_key( $list_id );
+    my %list_data       = $collection->_call_redis( 'HGETALL', $data_key );
+    my @data_ids        = sort keys %list_data;
+    my $only_one_item   = scalar( @data_ids ) == 1;
+    my $time_key        = $collection->_time_list_key( $list_id );
+
+    foreach my $data_id ( @data_ids ) {
+        my $data_time = $collection->_call_redis( 'ZSCORE', $only_one_item ? ( $queue_key, $list_id ) : ( $time_key, $data_id ) );
+
+        my $encoded = $json->encode( {
+                list_id     => $list_id,
+                data_id     => $data_id,
+                data        => $list_data{ $data_id },
+                data_time   => $data_time,
+            }
+        );
+
+        say $dump_fh $encoded;
+    }
+}
+
+close $dump_fh;
+
+exit 0;
+
+sub setup {
+    my ( $help, $host, $port, $collection_name, $dump_file );
+
+    $host = $DEFAULT_SERVER;
+    $port = $DEFAULT_PORT;
+
+    my $ret = GetOptions(
+        'host=s'        => \$host,
+        'port=i'        => \$port,
+        'collection=s'  => \$collection_name,
+        'dump-file=s'   => \$dump_file,
+        "help|?"        => \$help,
+    );
+
+    if ( !$ret || $help )
+    {
+        say <<"HELP";
+Usage: $0 [--host="..."] [--port=...] --collection="..." [--dump-file="..."] [--help]
+
+Open existing Redis::CappedCollection collection, dump collection data content.
+
+Options:
+    --help
+        Display this help and exit.
+
+    --host="..."
+        The server should contain an IP address of Redis server.
+        If the server is not provided, '${DEFAULT_SERVER}' is used as the default for the Redis server.
+    --port=N
+        The server port.
+        Default ${DEFAULT_PORT} (the default for the Redis server).
+    --collection="..."
+        The collection name.
+    --dump-file="..."
+        Path to created dump file.
+        If not specified, the output to the screen.
+HELP
+        exit 1;
+    }
+
+    die "Error: Redis::CappedCollection collection name required, use --collection to specify\n"
+        unless $collection_name;
+
+    my $redis_server = "$host:$port";
+
+#NOTE: Only for test
+#-------------------------------------------------------------------------------
+#use Time::HiRes ();
+#my @_collection_data = (
+#    redis   => $redis_server,
+#    name    => $collection_name,
+#);
+#if ( !Redis::CappedCollection->collection_exists( @_collection_data ) ) {
+#    my $_collection = Redis::CappedCollection->create( @_collection_data );
+#    my $_items = 3;
+#    foreach my $_list_idx ( 1..$_items ) {
+#        my $_list_id = "List id $_list_idx";
+#        foreach my $_data_idx ( 1..$_list_idx ) {
+#            my $_data_id    = "Data id $_data_idx";
+#            my $_data       = "Stuff: list_id '$_list_id', data_id '$_data_id'";
+#            my $_data_time  = Time::HiRes::time;
+#            $_collection->insert( $_list_id, $_data_id, $_data, $_data_time );
+#        }
+#    }
+#}
+#-------------------------------------------------------------------------------
+    my $collection = try {
+        Redis::CappedCollection->open(
+            redis   => $redis_server,
+            name    => $collection_name,
+        );
+    } catch {
+        die "Error: Redis::CappedCollection collection '$collection_name' does not available on '$redis_server'.\n";
+    };
+
+    my $dump_fh;
+    if ( $dump_file ) {
+        open( $dump_fh, '>', $dump_file ) or die "cannot open > $dump_file: $!";
+    } else {
+        $dump_fh = *STDOUT;
+    }
+
+    # resulting JSON text is guaranteed not to contain any newlines
+    my $json = JSON::XS->new->indent( 0 );
+
+    return( $collection, $dump_fh, $json );
+}

@@ -1,0 +1,9 @@
+<%args>
+$ReportType  => ''
+$Start => undef
+$End   => undef
+$Query => ''
+</%args>
+<%init>
+$m->redirect($RT::WebPath . '/Reports/Activity/index.html?' . $m->comp('/Elements/QueryString', Query => $Query, Start => $Start, End => $End, ReportType => $ReportType));
+</%init>

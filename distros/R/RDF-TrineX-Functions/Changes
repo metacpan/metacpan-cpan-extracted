@@ -1,0 +1,28 @@
+RDF-TrineX-Functions
+====================
+
+Created:      2012-05-30
+Home page:    <https://metacpan.org/release/RDF-TrineX-Functions>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-TrineX-Functions>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.004	2012-07-11
+
+ - Added: The parse function now accepts a 'graph' option.
+
+0.003	2012-07-10
+
+ - Added: The parse function now accepts unblessed 'data:' URIs.
+ - Updated: Use IO::Detect to simplify the parse function.
+
+0.002	2012-05-30
+
+ [ Bug Fixes ]
+ - Media types passed to 'parse' function were not being handled correctly.
+
+0.001	2012-05-30	Initial release

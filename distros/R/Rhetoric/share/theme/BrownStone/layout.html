@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Name       : Brown Stone  
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20100928
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="keywords" content="[% keywords %]" />
+<meta name="description" content="[% description %]" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>[% title %][% IF post; " - " _ post.title; END %]</title>
+<link href="[% R('Feed') %]" rel="alternate" type="application/atom+xml" title="[% title %] Feed" />
+<link href="[% relocated %]/theme/BrownStone/style.css" rel="stylesheet" type="text/css" media="screen" />
+</head>
+<body>
+<div id="wrapper">
+  <div id="page">
+    <div id="page-bgtop">
+      <div id="page-bgbtm">
+
+        <div id="content">
+          [% content %]
+          <div style="clear: both;">&nbsp;</div>
+        </div>
+
+        <div id="sidebar">
+          <div id="logo">
+            <h1><a href="[% R('Home') %]">[% title %]</a></h1>
+            <p><a href="[% R('Home') %]">[% subtitle %]</a></p>
+          </div>
+          <div id="menu">
+            <ul>
+            [% FOREACH item IN menu %]
+              <li[% IF request_path == item.url %] class="current_page_item"[% END %]><a href="[% item.url %]">[% item.name %]</a></li>
+            [% END %]
+            <!--
+              <li class="current_page_item"><a href="#">Home</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Photos</a></li>
+              <li><a href="#">About</a></li>
+              <li><a href="#">Links</a></li>
+              <li><a href="#">Contact</a></li>
+            -->
+            </ul>
+          </div>
+          <ul id="sidebar">
+          [% FOREACH widget IN widgets.sidebar %]
+            <li>
+            [% widget %]
+            </li>
+          [% END %]
+          </ul>
+        </div>
+        <!-- end #sidebar -->
+        <div style="clear: both;">&nbsp;</div>
+      </div>
+    </div>
+  </div>
+  <!-- end #page -->
+</div>
+<div id="footer">
+  <p>[% copy %] - Design by <a href="http://www.freecsstemplates.org/">CSS Templates</a>.</p>
+</div>
+<!-- end #footer -->
+</body>
+</html>

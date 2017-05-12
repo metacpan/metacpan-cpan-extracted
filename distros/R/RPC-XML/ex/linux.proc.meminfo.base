@@ -1,0 +1,7 @@
+Name:		linux.proc.meminfo
+Type:		procedure
+Version:	1.0
+Hidden:		no
+Signature:	struct
+Helpfile:	linux.proc.meminfo.help
+Codefile:	linux.proc.meminfo.code

@@ -1,0 +1,1454 @@
+0.815 (03.17.2015) - John Siracusa <siracusa@gmail.com>
+
+    * Updated more project URLs.
+    
+0.814 (03.17.2015) - John Siracusa <siracusa@gmail.com>
+
+    * Updated project URLs.
+
+0.813 (11.07.2014) - John Siracusa <siracusa@gmail.com>
+
+    * Added prepare_options parameter to get_objects_iterator_from_sql() and
+      get_objects_from_sql() Manager methods (RT 98014)
+
+0.812 (11.07.2014) - John Siracusa <siracusa@gmail.com>
+
+    * Second attempt to address precision and scale mix-ups in auto-loaded
+      numeric column metadata.
+    * Fixed get_objects_count() with custom select lists and distinct
+      (Reported by Alexander Karelas)
+    * Fixed precision and scale references in the tutorial (RT 96079)
+    * Fixed an incorrect method name in the Rose::DB::Object::Helpers
+      documentation (RT 97602)
+    * Fixed a bug where save() parameters were not passed to map record
+      save() calls (RT 98730)
+    * Corrected a typo in the documentation (RT 94100)
+    * Updated tests to work with DBD::Pg versions greater than 2.x.x.
+
+0.811 (03.21.2014) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that prevented many-to-many map records from being saved
+      to the database (RT 93531)
+
+0.810 (01.18.2014) - John Siracusa <siracusa@gmail.com>
+
+    * Improved automated installation detection (RT 92255)
+
+0.809 (12.04.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected precision and scale for auto-loaded numeric column metadata.
+      (Reported by Justin Hawkins)
+
+0.808 (11.03.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed typos.
+
+0.807 (08.28.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed inheritance of Rose::DB::Object::Cached's cached_objects_expire_in
+      attribute.  (Patch by Frank Wesemann)
+
+0.806 (06.08.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Updated iterator leak test to work on perl 5.17.* and later (RT 86000)
+
+0.805 (03.10.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Changed the recommended Oracle trigger PL/SQL to avoid sequence gaps.
+      (Patch by Tom Adamo.)
+    * Updated several Manager calls in bench.pl, adding the inject_results
+      parameter.
+
+0.804 (02.01.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed some test failures on perl 5.16.2, mysql 5.5.29, and DBD::Pg 2.19.3.
+
+0.803 (01.04.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Make char column's parse_value() method honor a column's overflow
+      attribute when handling column values that are too long.
+    * Correct length value in column overflow error messages.
+
+0.802 (01.03.2013) - John Siracusa <siracusa@gmail.com>
+
+    * Make varchar column's parse_value() method honor a column's overflow
+      attribute when handling column values that are too long.
+
+0.801 (11.24.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed "DBD::Informix::st execute failed: SQL: -255: Not in transaction"
+      errors in the test suite.  (Patch by Sergey Leschenko.)
+
+0.800 (09.09.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Correct tests to account for the Loader's init_db generation fix
+      in 0.799 behavior (RT 79526)
+
+0.799 (08.10.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Added column type mappings for varchar2, nvarchar, and nvarchar2.
+      (Suggested by Chris Campise)
+    * Fixed some typos in the Loader documentation (RT 78860)
+    * Fixed a Loader bug that caused the base class's init_db method to
+      be ignored (RT 78571)
+
+0.798 (04.04.2012) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a typo in the Rose::DB::Object::Manager documentation.
+    * Fixed a bug that caused save() not to throw an exception when
+      a transaction could not be started (Reported by jdv79)
+    * Converted some uses of each() to keys() to avoid iteration
+      state bugs (RT 75773)
+    * Corrected a broken POD link in the one-to-many relationship
+      documentation.  (Reported by Nee)
+
+0.797 (11.21.2011) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that prevented explicitly disabling/enabling column
+      triggers from working (RT 72592)
+
+0.796 (10.18.2011) - John Siracusa <siracusa@gmail.com>
+
+    * Use ENGINE=InnoDB instead of TYPE=InnoDB in MySQL table creation
+      statements to avoid an incompatibility with MySQL 5.5 (RT 71757)
+
+0.795 (07.14.2011) - John Siracusa <siracusa@gmail.com>
+
+    * The Loader now passes the Manager class name as a second argument to
+      module_preamble and module_postamble subroutines to allow Manager
+      classes to be distinguished from object classes.
+    * Corrected a typo in the ConventionManager documentation ("objs_"
+      should be "_objs")
+    * Fixed a bug that caused load-on-demand columns to be loaded by
+      load(with => ...) method calls.  (Reported by Marlon Bailey)
+
+0.794 (12.30.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Handle null default values for foreign key columns in PostgreSQL
+      (RT 64331)
+
+0.793 (12.21.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected skip count in t/db-object.t
+
+0.792 (12.20.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Detect attempts to create methods whose names conflict with
+      methods defined in Rose::DB::Object itself.  (Reported by
+      Dave Howorth)
+
+0.791 (10.23.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused on_save column triggers to fire when loading.
+    * More floating point rounding fixes in the test suite.
+
+0.790 (10.17.2010) - John Siracusa <siracusa@gmail.com>
+
+    * The auto-initialization process no longer sets column default
+      values to undef when there is no default for the column.  Doing
+      this was tripping up the default_exists() method.  (Reported
+      by Timo Karhu)
+    * Documented the behavior of the manager_args relationship attribute
+      when a relationship is used as a with_objects or require_objects
+      argument.
+    * Fixed a bug that caused SET columns to be erroneously marked as 
+      modified when their accessor methods were called.
+    * Fixed a bug in make_manager_methods() that left base_name undefined.
+      (RT 61963, patch by Chris Malarky)
+    * Improved handling of floating point and string/number conversions
+      in the test suite.
+
+0.789 (06.23.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for SELECT FOR UPDATE and other forms of locking
+      (Initial patch by Kostas Chatzikokolakis)
+    * Fixed some POD typos (RT 58405) 
+
+0.788 (05.22.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that prevented function calls like now() from being
+      properly inlined, even when allow_inline_column_values was set
+      to a true value.  (Reported by David Bourget)
+    * The Loader/auto-init system will now automatically set the
+      allow_inline_column_values attribute to a true value when a
+      column has a default value that looks like a function call.
+    * Fixed a non-numeric warning with development releases of Math::BigInt.
+    * Fixed SQL reserved word quoting bug.  (Reported by Taric Mirza)
+    * Avoid stringifying exception objects when setting error().
+      (Suggested by Kostas Chatzikokolakis)
+
+0.787 (04.27.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Added remarks column attribute.  (Patch by Adam Mackler)
+    * Improved error message generated by get_objects_from_sql() when
+      an unknown column is encountered.
+    * Added support for Rose::DB's keyword_function_calls attribute.
+    * Added dedicated timestamp with time zone column type.
+    * Inflate triggers now work correctly with lazy-loaded columns.
+      (Reported by Alex Karelas)
+    * Failure to have any valid registered data sources no longer causes
+      a fatal error when looking up default column sequence names during
+      class setup.
+
+0.786 (01.23.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Improved support for serial columns in Oracle.
+    * Renamed CHECK labels to avoid clashes with the reserved block name.
+    * Added force_lowercase attribute to the Loader and Convention Manager
+      as a means of getting "normal" behavior out of Oracle schemas.
+    * Fixed a bug that caused money columns in PostgreSQL to have
+      column lengths that were too short.
+    * Fixed a POD typo (RT 53272)
+
+0.785 (12.31.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed Rose::DB::Object::Cached to correctly honor alternate column
+      accessor/mutator method names.  (Reported by Kevin McGrath)
+    * Stopped the default auto-init handler from asking the convention
+      manager to name foreign keys that have only partially populated
+      column lists, causing it to burn through the "good" foreign key
+      names.  (Patch by Douglas Wilson)
+    * Corrected some typos in the ManyToMany documentation and the tutorial.
+      (Thanks to Bart Dopheide)
+
+0.784 (10.16.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug introduced by the multi-many Manager bug fix in the
+      0.783 release.  (Reported by Mark Frost)
+    * Added missing exception error explanations to relationship methods.
+    * Updated eval blocks to avoid stomping on $@ from an outer scope.
+
+0.783 (09.14.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Added new range operators: between, gt_lt, gt_le, ge_lt, and ge_le.
+    * The strip() helper method will now throw an exception when there are
+      pending "on-save" actions.  (Reported by Kevin McGrath)
+    * Added strip_on_save_ok parameter to strip() to override the default
+      behavior.
+    * Worked around yet another MySQL empty-string-default "feature."
+      (Reported by Terrence Brannon)
+    * Added missing documentation about the required return value of the
+      "object" handler in the traverse_depth_first() helper method.
+      (Reported by David Christensen)
+    * The traverse_depth_first() helper now preserves the existing context
+      object if a "relationship" handler is not defined.  (Reported by
+      David Christensen)
+    * Fixed a bug that prevented scalar reference filter arguments from working
+      correctly with date columns in Manager queries.  (Reported by Todd Lyons)
+    * Fixed a multi-many Manager bug that caused duplicate sub-objects to be
+      linked to the wrong parent object.  (Reported by Anton Shevchenko)
+
+0.782 (07.09.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Altered tests to confirm the fix for RT 45836.
+    * Detect enum-like columns in PostgreSQL.  (RT 46214)
+    * Added optional warning to the Loader for missing primary keys.
+      (Patch by Ed Loehr)
+    * Fixed a memory leak in the Iterator class.  (RT 47294)
+      (Patch by Thomas Whaples)
+    * Unique indexes that have predicates are now skipped by the auto-
+      initialization process.  Use the include_predicated_unique_indexes
+      Metadata attribute and/or Loader attribute to override the default.
+      This feature is currently only supported in PostgreSQL.
+      (Patch by Ed Loehr)
+    * Improved unknown method error messages.  (Suggested by Brian Miller)
+    * Updated some example code in the documentation.
+
+0.781 (04.19.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Added an explicit SQL_BLOB bind_param() argument for blob columns
+      in SQLite.  (Reported by clausi)
+    * Added manager_iterator_method and support for manager_count_method
+      and manager_delete_method to relevant Relationship classes.
+      (Patch by Peter Karman)
+    * Updated test suite to consider DBD::SQLite 1.19+ non-broken.
+
+0.780 (03.04.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused the delete_relationships() Metadata method
+      to fail in some circumstances.  (Reported by vti)
+    * Fixed a few accessor/mutator mismatches in relationship methods.
+      (Reported by Bharanee)
+
+0.779 (02.26.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Added missing documentation on one-to-many and many-to-many 
+      relationship "iterator" and "find" method type names.
+    * Corrected an error message in Rose::DB::Object::MakeMethods::Generic
+      (RT 43667)
+
+0.778 (02.06.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Added PostgreSQL's "ltree" query extensions to QueryBuilder.  
+      (Patch by Rick Apichairuk)
+    * Improved the efficiency of the check-and-merge function used
+      when related objects are added.  (Reported by Bryan Opfer)
+
+0.777 (12.12.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused foreign key proxy relationships to
+      be clobbered if relationships were set after foreign_keys.
+      (Reported by Peter Karman)
+
+0.776 (12.09.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that was preventing the use of new comparison
+      operators with QueryBuilder.  (Reported by Derek Wueppelmann)
+    * Added a strict_ops parameter and class method to the Manager
+      to allow the policy to b changed per-call or per-class.
+    * Auto-initialization under Oracle should no longer be confused
+      by tables with the same names in different schemas. (Patch by 
+      Benjamin Hitz)
+    * Removed the on-again, off-again restriction on aliasing primary 
+      key columns.  I think it's off for good this time.
+    * Refined column alias policy to keep from appearing to override
+      more granular column method name customization.
+    * Overhauled related object mutator methods to better match the
+      documentation and reduce unnecessary queries.
+    * Fixed a bug that caused the init_with_tree() helper method to
+      overwrite columns involved in relationship mapping in some 
+      circumstances.  (Reported by Todd Lyons)
+
+0.775 (11.02.2008) - John Siracusa <siracusa@gmail.com>
+
+    * The insert_or_update(), load_or_insert(), and load_or_save() helper
+      methods no longer throw an exception when called on an object with 
+      no uniquely identifying column(s).  (Suggested by Richard Jones)
+    * Added detection of minimum JSON version (2.00) to test suite and
+      the Helpers module.
+
+0.774 (10.25.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Setting objects related through a one-to-many relationship
+      now does more work to ensure success.  (Reported by vti and 
+      David Bourget)
+    * Fixed an ON DUPLICATE KEY UPDATE test to work around a MySQL 
+      "strict mode" quirk (or, IMO, "bug") which causes it to complain
+      about a situation that is only a concern if it decided to do an
+      INSERT rather than an UPDATE.  (Reported by Richard Jones)
+    * Fixed a regression in t/spot-check-10.t: adding objects to 
+      one-to-many-related lists failed in some circumstances.
+    * Updated auto-initialization examples in the synopsis.
+
+0.773 (10.02.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for multiple add_on_save calls prior to save(),
+      which is how everyone expected it to behave anyway, and how the
+      documentation always seemed to imply that it did work.  Well,
+      now it does.
+    * Pre-saved objects now get their foreign key columns hooked up
+      correctly when passed as arguments to add_on_save methods.
+      (Reported by George Hartzell)
+    * ...-to-many related object lists will now be re-fetched on
+      demand after an add_on_save and a subsequent save().
+      (Reported by George Hartzell)
+
+0.7722 (09.29.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed compatibility with older versions of ExtUtils::MakeMaker.
+
+0.7721 (09.29.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Updated distribution metadata for ExtUtils::MakeMaker 6.44.
+    * Added a column type mapping for MySQL's MEDIUMINT type.
+      (Reported by Andreas Dewes)
+
+0.772 (09.26.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Altered Rose::DB::Object::Cached to override insert() and
+      update methods.  (Suggested by Kevin McGrath)
+    * The update() method now marks updated objects as being in the
+      database (see is_in_db() in Rose::DB::Object::Util)  (Suggested
+      by Kevin McGrath)
+    * The insert_or_update() and insert_or_update_on_duplicate_key()
+      helper methods now call save() instead of insert() or update()
+      (passing the appropriate flags to cause an insert or update) in
+      order also save child objects.  (Suggested by Kevin McGrath)
+    * The set_column_value_modified() function in Rose::DB::Object::Util
+      now also clears any "db-ready" column value the object may be
+      holding for that column.
+    * Added a dirty_columns() helper method (Suggested by jdv79)
+
+0.7713 (09.16.2008) - John Siracusa <siracusa@gmail.com>
+
+    * More test skipping fixes.
+
+0.7712 (09.15.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Improved detection of broken DBD::SQLite versions.
+
+0.7711 (09.15.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed typos in POD.
+    * Improved test skipping conditions.
+    * Clarified JSON module version requirements.
+
+0.771 (09.12.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Traversal and recursive serialization helper method added.
+    * Non-persistent columns feature added.
+    * Made "where" an alias for the Manager's "query" parameter.
+      (Requested by Ask Bjørn Hansen)
+    * Documented restrictions on the Manager's "select" parameter.
+    * Fixed bug that prevented CURRENT_TIMESTAMP from being properly
+      inlined in queries sent to SQLite.  (RT 37224)
+    * Fixed a memory leak.  (Reported by Christopher Laco)
+    * The "cluck" error mode now correctly calls cluck() rather than 
+      croak().  (Reported by Kevin McGrath)
+    * Added support for Oracle date/time column keywords.
+    * Cascaded delete now properly cascades to one-to-one related objects.
+      (Reported by kittens)
+
+0.770 (05.28.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added "iterator" method type, similar to "find", to OneToMany
+      and ManyToMany.  (Patch by Peter Karman - peknet@gmail.com)
+    * Updated the Loader documentation to describe an important 
+      consideration when regenerating modules with make_modules().
+    * Improved error propagation in relationship methods.  (Suggested
+      by Wiggins d'Anconia)
+    * Skip the interactive part of the test suite when the
+      AUTOMATED_TESTING environment variable is set.
+    * Test suite now accounts for versions of DBD::mysql that predate
+      the mysql_is_auto_increment column attribute.
+
+0.769 (04.01.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Improved the default singular/plural conversion rules in the
+      Convention Manager.  (Suggested by David Brownlee)
+    * Added new join type override syntax for the Manager's with_objects
+      and require_objects parameters.
+    * Added column method naming conventions to the Convention Manager.
+    * Added Manager naming conventions to the Convention Manager and
+      exposed more Manager-related defaults in the Metadata and Manager
+      class.  (Patch by Bradley C Bailey, modified by John Siracusa)
+    * Column method names are now allowed at the end of compound Manager
+      query parameters (e.g., "a.b.method")
+    * Clarified column/method query parameter documentation.
+    * PostgreSQL tests are not skipped when DBD::Pg version 2.1.x or 2.2.0
+      is installed.  (Bus error for me in t/deep-joins.t)
+
+0.768 (02.25.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Changed mailing list and wiki URLs.
+    * Fixed the "warn" overflow mode for character columns to carp
+      instead of croaking.  (Reported by John Ingram)
+    * Refined workaround for http://rt.cpan.org//Ticket/Display.html?id=33193
+      to apply only to versions that exhibited this bug.
+    * Added the forget_related() helper method to the "all" export tag.
+
+0.767 (02.15.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added the forget_related() helper method.
+    * Enhanced and documented the long-dormant "hints" Manager parameter.
+    * Added a work-around for a DBD::Pg 2.0.0 array/bind_col() bug:
+      http://rt.cpan.org//Ticket/Display.html?id=33193
+    * Improved the column method handling for array-reference values
+      that may be fetched from array columns by DBD::Pg 2.0.0.
+    * Fixed a bug in the test suite that caused some PostgreSQL tests
+      to fail if the "chkpass" column type was not installed.
+      (Reported by Randal Schwartz)
+
+0.7665 (02.08.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that prevented the convention manager's auto_table_name()
+      method from honoring the tables_are_singular() attribute value.
+      (Reported by Ben Tilly)
+    * The new, more correct behavior of Rose::DB 0.739's array column
+      value parsing and formatting revealed a bug in QueryBuilder's 
+      handling of "(any|all)_in_array" conditions involving empty list
+      arguments.  This is now fixed.
+
+0.7664 (02.06.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused boolean columns to be incorrectly marked as
+      modified.  (Reported by Grzegorz Nosek)
+    * Added sql_qualify_column_names_on_load() Metadata method to help
+      support PostgreSQL functions that can masquerade as columns if they're
+      prefixed by the table name.  (Suggested by Grzegorz Nosek)
+
+0.7663 (02.04.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused delete_on_save method creation for foreign
+      keys to fail in some circumstances.  (Reported by Justin Ellison)
+    * Fixed a bug that prevented Perl code from being emitted for 
+      non-set columns with check_in attributes.  (Reported by Sam Tregar)
+    * Pushed cache control methods down into Rose::DB::Object::Cached
+      in preparation for more caching subclasses.
+    * The clear_object_cache() method now correctly clears load timestamps
+      as well.  (Patch by Justin Ellison)
+
+0.7662 (01.30.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed copy-and-paste-o in Rose::DB::Object::Cached code.
+
+0.7661 (01.29.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed method clash detection in Rose::DB::Object::Manager.
+    * Streamlined caching implementation in Rose::DB::Object::Cached.
+
+0.766 (12.13.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Added the unique_key_by_name() metadata method.
+    * Added the ability to do unrestricted joins in some circumstances.
+    * Added the remember_all() class method to Rose::DB::Object::Cached.
+    * Added the undef_overrides_default column attribute.
+    * The key_column() method in the ForeignKey class now works correctly.
+      (Patch by Christopher Masto)
+    * Further synced datetime and timestamp method-maker code.
+    * Added a test suite exclusion for DBD::SQLite 1.14, which still suffers 
+      from this bug: http://rt.cpan.org/Public/Bug/Display.html?id=21472
+    * Improved detection of fatal errors during class setup.
+    * Added a "gotchas" section to the Loader documentation.
+    * Fixed propagation of db objects in update and delete Manager methods.
+    * Fixed a bug that caused some cached SQL to persist incorrectly after
+      inheritance.  (Patch by Daniel Koch)
+    * Fiddled with not_found() detection.  (Changes suggested by Philip Dye)
+    * Made one-to-one relationships (attempt to) work even when uniqueness is 
+      not apparent in the metadata.
+    * The Loader no longer chokes on SQLite columns that use the 
+      current_timestamp keyword.  (Reported by George Hartzell)
+    * Setting undef integer attributes to zero is now correctly detected 
+      as a modification.
+
+0.765 (07.21.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Added a value_type attribute to SET columns.
+    * Added a normalize_get_objects_args() utility method to make
+      custom Manager methods less cumbersome to implement.
+    * Setting a BigInt column to undef no longer sets it to zero.
+      (Reported by Jeffrey Horn)
+    * Corrected error propagation in many-to-many "find" methods when bad
+      arguments are passed.  (Reported by Michael Reece)
+    * Added "use strict" the output of perl_manager_class().
+    * Restored default use of table aliases in Manager queries.  The new
+      table_aliases parameter can be used to alter the behavior.
+    * Added support for literal sort_by parameters using scalar references.
+    * Added is/is_not comparison operators to QueryBuilder.  (Suggested by
+      Jonathan Vanasco)
+    * Scalar references appearing in the select => ... list in Manager calls
+      are now passed through unmodified.
+    * Existing map records are now correctly checked for when adding items
+      through a many-to-many relationship.  (Reported by Drew Taylor)
+    * Using a nonexistent column name in a primary or unique key is now a
+      fatal error.  (Reported by Philip Dye)
+    * Multi-columns "select count(distinct ...)" queries now fall back to 
+      count(*) on a subselect in databases that do not support calling count
+      on multi-argument distinct clauses.  (Reported by Derek Watson)
+    * The auto-init system will now skip PostgreSQL functional indexes when 
+      extracting unique keys.  (Reported by Jonathan Vanasco)
+    * Fixed a bug that caused inner joins to be used inappropriately in 
+      certain cases with many-to-many relationships or when nested joins 
+      are disabled.
+    * Fixed a bug that caused the auto-init system to fold multiple foreign
+      keys that reference the same remote key into a single multi-column
+      foreign key.  (Reported by Marlon Bailey)
+    * Fixed a Manager bug that caused count queries to use incorrect
+      table aliases when passed empty with_objects or require_objects
+      array reference values.  (Reported by Denis Moskowitz)
+    * Fixed a bug that prevented relationship and foreign key names from 
+      being resolved when used in nested query parameters.
+    * Relationship count methods no longer die when the count is zero.
+      (Reported by Derek Watson)
+    * Setting enum fields to undef now works correctly.  (Reported by Ovid)
+    * Columns with custom DBI bind attributes are now updated correctly.
+      (Reported by Derek Watson)
+    * Epoch columns with zero (0) default values now work correctly.
+      (Reported by Peter Karman)
+    * Setting boolean columns to null (undef) now works correctly.
+      (Reported by Derek Watson)
+    * Fixed a bug that caused literal query parameters with bind arguments
+      to become corrupted after their first use.
+    * Changed the way classes are registered in order to fix a Loader bug
+      that caused cross-database foreign keys to be erroneously created
+      when tables with the same names exists in two different databases.
+      (Reported by Adrian Howard)
+    * Deleting one-to-one related objects on save now works correctly.
+      (Reported by Ovid)
+    * The "find" method for many-to-many relationships now propagates custom
+      Manager arguments correctly.  (Patch by Michael Reece)
+    * The use_key parameter to load() now dies if an invalid key is passed.
+      (Reported by Jonathan Vanasco)
+
+0.764 (05.04.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Added the strip() helper method.
+    * Added a "find" method type to many-to-many relationships.
+    * Added a "count" method type to ...-to-many relationships.
+    * Added support for nested joins.
+    * The setup() method now supports a "helpers" shortcut for importing
+      methods from Rose::DB::Object::Helpers.
+    * Added the dubious require_primary_key parameter and object attribute
+      to the Loader.  (Requested by Teodor Zlatanov)
+    * Added two syntaxes for literal SQL to QueryBuilder.
+    * Added the with_column_triggers attribute to foreign keys and singular
+      relationships in order to keep columns and related objects in sync.
+    * Fixed a bug that caused some optional related objects to be improperly
+      transformed into required objects.  (Reported by Ethan Rowe)
+    * Improved detection of errors when auto-loading related classes.
+    * Duplicate auto-created map record method names are now detected and 
+      reported as a fatal error.
+    * Added and documented a return value for add_columns().
+    * Added module_preamble and module_postamble features to the Loader's
+      make_modules() method.  (Patch by David Christensen)
+    * Made changes_only, cascade, and prepare_cached arguments to save()
+      also apply to *_on_save collections.
+    * Added test and prerequisite version for a Rose::DB bug that
+      prevented certain reserved words from being detected as primary
+      key columns in PostgreSQL.  (Reported by Fred Cox)
+    * Baseline Oracle support added to the Loader.  (Patch by Teodor Zlatanov)
+    * The clone() and clone_and_reset() methods now handle missing or
+      differently named accessor/mutator methods.
+    * QueryBuilder now supports eq/ne undef for is/is not null comparisons.
+    * Foreign key columns that are also primary key columns are no longer set 
+      to undef when a foreign object is set to undef.  (Reported by Ovid)
+    * Fixed a bug that caused values not to be checked against the list
+      of valid values in SET columns.  (Reported by Adrian Howard)
+    * Fixed a bug that caused column (get/)set methods not to return the
+      correct value when an on_set trigger was applied to the column.
+      (Reported by Cory Bennett)
+    * Fixed a bug that caused enum columns to be incorrectly marked as
+      modified in some circumstances.  (Reported by Cory Bennett)
+    * Fixed a bug that caused inflate/deflate triggers to fail under some
+      circumstances.  (Patch by Cory Bennett)
+
+0.763 (02.24.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Re-enabled the DBD::SQLite 1.13 work-around in the test suite, which
+      I temporarily disabled to test a 1.14 candidate and then forgot to
+      re-enable before the 0.762 release.
+
+0.762 (02.24.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed an unparseable version number in MakeMethods::BigNum
+      that was causing CPAN and associated tools to choke.
+
+0.761 (02.23.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Added the ability to specify a unique key by name in calls to load().
+    * Added support for query_args and other Manager parameters to
+      one-to-one and one-to-many relationships.
+    * Added a "find" method type to one-to-many relationships for 
+      ad-hoc queries.
+    * Added support for Informix's "datetime year to month" column type.
+    * Updated the dbh() method to be a more conventional proxy for ->db->dbh().
+    * The get_objects() and delete_objects() Manager methods now accept a lone
+      arrayref or hashref argument as a short way to specify the value of the
+      "query" parameter.
+    * Eliminated warning in the BigNum column type when the GMP math library
+      is not installed.
+    * Added a double precision column type and class for PostgreSQL.
+    * Fixed a bug that caused cascaded save() to fail to cascade beyond
+      a set-on-save related object.
+    * Improved reporting of errors in auto-loaded related modules.
+    * Fixed a bug that caused numeric columns to have invalid length
+      restrictions.  (Reported by Fred Cox)
+    * Fixed many incorrect skip counts in the test suite when running against
+      PostgreSQL without CHKPASS support.
+
+0.760 (01.16.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a mistake in the test suite that caused spurious failures
+      when testing against Pg without the CHKPASS column type installed.
+      (Reported by Randal Schwartz)
+
+0.759 (01.15.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Oracle support improved significantly.
+    * Added a "state" export tag to Rose::DB::Object::Util.
+    * Fixed a bug that caused the Manager to unconditionally alias selected
+      columns in some situations.
+    * Added the (dubious) ability to set a list of filtered one-to-many items.
+    * Fixed a database handle leak in the iterator class.
+      (Reported by Peter Karman)
+
+0.758 (11.29.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added the get_objects_iterator_from_sql() Manager method and an
+      iterator option for the make_manager_method_from_sql() method.
+      (Suggested by George Hartzell)
+    * Turned off unique column aliases by default and added the
+      unique_aliases Manager parameter to turn them back on.
+    * Fixed some circular references that could have caused database
+      connections to leak.  (Reported by Bruno Czekay)
+
+0.757 (11.22.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added load_or_save() helper method.
+    * Added support for MySQL's SET data type.
+    * Fixed some SET and ARRAY bugs in QueryBuilder.
+    * Fixed a bug that caused QueryBuilder to choke on inflated
+      BigInt columns.  (Reported by Jud)
+    * Modified the rules that govern metadata inheritance in order to
+      allow multiple layers of abstract base classes.
+    * The Loader will now pick up custom convention manager classes
+      from the specified base class.
+
+0.756 (10.29.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Changed the interaction and behavior of the metadata object's 
+      foreign_key_name_generator() method and the convention manager's
+      auto_foreign_key_name() method to avoid some name conflict bugs
+      and create a more sensible flow for foreign key naming.
+      (Suggested by Graham Barr)
+    * Added has_modified_children() has_loaded_related() methods to
+      Rose::DB::Object::Util.
+    * Added an init_with_column_value_pairs() helper method.  (Requested
+      by Jonathan Vanasco)
+    * Modified child objects are now correctly detected and handled by 
+      cascading save().  (Reported by Lucian Dragus)
+    * Fixed a bug that caused save(changes_only => 1, cascade => 1) to
+      fail in cases where a child object set a key column in the parent
+      object.  (Reported by Lucian Dragus)
+    * Fixed a bug in the Manager that caused the with_objects parameter 
+      to be ignored when the count_only parameter was set.  (Reported
+      by Uwe Voelker)
+    * The column_values_as_*() helper methods no longer require the 
+      column_value_pairs() helper to also be imported.  (Reported
+      by Jonathan Vanasco)
+    * Fixed a bug caused by blank lines in JSON and YAML output. 
+      (Patch by Jonathan Vanasco)
+    * Setting a fixed-length character column to undef now works
+      correctly.
+    * Fixed a bug that caused the benchmark suite to fail under SQLite 
+      due to a mishandling of the query_is_sql Manager parameter.
+    * Corrected some typos in the documentation.
+
+0.755 (10.20.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that could cause ...-to-many accessors with
+      custom sort orders to fail in some situations.
+    * Removed some imported functions to correctly reflect the 
+      documented list of reserved method names.  (Reported by
+      Uwe Voelker)
+    * Added the allow_empty_lists parameter to the Manager's 
+      get_objects() method.  (Suggested by Ask Bjørn Hansen)
+    * Fixed bugs in the query hints implementation.
+
+0.754 (10.06.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added an optional db argument to the prime_all_caches() and
+      prime_caches() metadata methods.  (Suggested by Jonathan Vanasco)
+    * Improved and documented the way that unique keys are selected by
+      the load() method.  (Patch by Graham Barr)
+    * Fixed a bug that caused foreign key column lookups to fail in
+      PostgreSQL when using the unicode database encoding.
+    * Invalid dates are now detected in the query portion of Manager calls.
+    * The test suite now refuses to run SQLite tests if the buggy 
+      DBD::SQLite version 1.13 is installed.
+    * Fixed some typos in the documentation.
+
+0.753 (09.17.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Improved the convention manager's plural_to_singular() method.
+    * Added "match", "imatch", and "similar" operators to QueryBuilder.
+      (Patch by Lucian Dragus)
+    * The Loader will now check if a db_class "isa" Rose::DB already
+      before attempting to load it.  (Reported by Randal Schwartz)
+    * The auto-initialization system will now correctly connect one-to-one
+      relationships with foreign keys when appropriate.
+    * Fixed a bug that caused the update_objects() and delete_objects()
+      Manager methods to fail to extract the object_class value from the
+      object_class() method.  (Patch by Graham Barr)
+    * Fixed a bug that caused "like" and other match operators to be
+      provided with incorrectly formatted arguments when used with
+      fixed-length CHAR columns.  (Reported by Ask Bjørn Hansen)
+
+0.752 (09.06.2006) - John Siracusa <siracusa@gmail.com>
+
+    * The select parameter to the Manager's get_objects() method now 
+      accepts tN.* column specifiers.  (Suggested by Jonathan Vanasco)
+    * Added auto_relationship_name_*() methods to the convention manager.
+    * Added rudimentary name conflict resolution abilities to the 
+      convention manager's auto_*_name() methods.
+    * Altered the meaning of the time column's precision() attribute
+      and added a scale() attribute to take over the previous meaning.
+    * Renamed the interval column's precision() attribute to scale().
+    * Aliased columns now work correctly with the select parameter to 
+      Manager's get_objects() method.
+    * Fixed a bug that caused the get_objects() Manager method to fail
+      to extract the object_class value from the object_class() method.
+    * Fixed a bug that caused Informix datetime column values to have
+      incorrect "largest qualifier" values for values other than "year."
+    * Eliminated an "uninitialized value" warning when running under 
+      mod_perl (Patch by Graham Barr)
+
+0.751 (08.29.2006) - John Siracusa <siracusa@gmail.com>
+
+    * The Loader is now much, much faster when loading many tables.
+    * Added a tables_are_singular() method to the default ConventionManager.
+    * Improved detection of ambiguous columns in QueryBuilder.
+    * Removed a potentially dubious optimization of the with_objects
+      argument to the get_objects() and get_objects_count() methods.
+    * Added support for auto-initialization in setup() calls.
+    * Added prime_caches(), auto_prime_caches(), and prime_all_caches() 
+      Metadata methods to help increase shared memory when running under
+      mod_perl and other similar environments.
+    * The Loader's include_tables and exclude_tables attributes now accept
+      references to arrays of table names as well as regular expressions.
+    * The Loader's include_tables and exclude_tables attributes are now
+      case-insensitive by default.
+    * Fixed a bug that caused save() with sub-objects to fail in some cases.
+      (Reported by Wiggins d'Anconia)
+    * Added examples of the add_on_save relationship methods to the tutorial.
+
+0.75 (08.10.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added a cascade option to save().
+    * Added auto-detection of one-to-one relationships to the Loader.
+    * The object_class parameter to Manager methods now defaults to the 
+      return value of the object_class() class method.
+    * The soft() and referential_integrity() methods of the ManyToOne and
+      OneToOne relationship classes have been renamed to optional() and
+      required(), respectively.  The old method names still work, but may
+      be removed at some later date.  Also, the default values are now 
+      determined by a new set of rules, rather than a constant.
+    * Passing invalid query parameters to Manager methods will now 
+      cause a fatal error.
+    * Scalar references now work correctly when used in IN(...) queries 
+      built by QueryBuilder.  (Patch by Perrin Harkins)
+    * Fixed a bug that caused get_set_on_save methods to fail for certain
+      kinds of ...-to-one relationships.
+    * Ignore empty "and" and "or" query parameters in QueryBuilder.
+      (Suggested by Jonathan Vanasco)
+    * Fixed a bug that caused update() to fail for tables where all columns
+      are part of the primary key.  (Reported by Danial Pearce)
+    * Minor tweaks to the subselect-based limit/offset code.
+
+0.742 (07.21.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for a more efficient subselect-based limit/offset 
+      implementation for queries that would otherwise have to be
+      scanned through manually.
+    * Added a column class for PostgreSQL's BYTEA column type.
+    * Added support for DBI bind_param() attributes for all column types.
+    * Fixed a bug in the test suite that could cause the TIME(9)
+      column type test to fail in PostgreSQL.
+    * Fixed some POD formatting errors.
+
+0.741 (07.14.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added end_of_month_mode parameter to the interval column class.
+    * Prevented perl_* code generation methods from attempting to 
+      auto-initialize missing metadata.
+    * Added name/value pair, JSON, and YAML helper methods.
+    * Tweaked the JOIN syntax for MySQL in order to better accommodate
+      MySQL version 5.0.12+.  (Reported by Glenn Gallien)
+    * Some small POD corrections.
+
+0.74 (06.30.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added the Time column type.
+    * Added support for the changes_only parameter to the insert() method.
+    * Documented the manager_base_class(es) Loader methods.
+    * Fixed a bug that caused the Loader to refuse to use empty or 
+      undefined class_prefix values.
+    * Fixed a bug that prevented auto_* methods names from working in
+      calls to the setup() method.
+    * Removed redundant @ISA declaration from generated Manager classes.
+
+0.731 (06.12.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a database handle leak in the get_objects_iterator() method.
+      (Reported by Martin Rubli)
+    * Documented the changes_only parameter to the save() and update()
+      methods.  (This feature was actually implemented in version 0.73, but 
+      I forgot to document it.)
+    * The class_for() metadata method may now be called as a class method,
+      with some caveats.
+
+0.73 (06.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * The new setup() method is now the officially recommended way to set up
+      class metadata.
+    * Updated the documentation and the generated Perl code to use the
+      new setup() method.
+    * Related classes are now loaded automatically by default.  Added the
+      auto_load_related_classes metadata attribute to control this behavior.
+    * Added the pk_columns() alias for the primary_key_columns() method.
+    * Added insert_or_update() and insert_or_update_on_duplicate_key()
+      helper methods.  (Suggested by Guillermo Roditi)
+    * The Loader now automatically skips tables without primary keys.
+    * Moved some database introspection code to a new version of Rose::DB, 
+      which this version of Rose::DB::Object now requires.
+    * Non-null character columns are now detected correctly in Informix.
+    * Fixed many bugs related to explicit and auto-detected column defaults.
+    * Corrected the return value of Rose::DB::Object::Cached's load() method
+      to match that of the standard load(). (Reported by Randal Schwartz)
+    * Fixed a bug that caused chkpass columns to be erased after some save()s.
+      (Reported by Cees Hek)
+    * Added an option to use InnoDB with MySQL in the benchmark suite.
+
+0.727 (05.24.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused custom primary key sequences to be improperly 
+      configured in the code generated by the perl_class_defintion() method.
+      (Reported by Ethan Rowe)
+    * Fixed a bug that caused false boolean values to be ignored when an
+      object was loaded, modified, and then saved.  (Patch by Cees Hek)
+
+0.726 (05.17.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed incorrect skip count in t/spot-check-07.t
+
+0.725 (05.17.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused self-referential many-to-many relationships to
+      fail during cascaded save() operations.  (Reported by Michael Drozdov)
+    * The test suite now requires DBD::SQLite version 1.11 or later.
+    * Modified auto-init system to account for custom FetchHashKeyName
+      DBI settings.
+
+0.724 (05.11.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added the replace_column() Metadata method.
+    * The add_now and add_on_save relationship methods now return
+      the number of items added when called in scalar context and 
+      the list of items added when called in list context.
+      (Suggested by Jesse Brown)
+
+0.723 (05.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused Rose::DB::Object::Cached objects
+      to stay in the cache after being delete()d.
+    * Added clone() and clone_and_reset() Helper methods.
+    * The tutorial now recommends "use base ..." over direct modification
+      of @ISA in order to work better with circular relationships.
+    * Generated Perl code now uses "use base ..." for the same reason.
+    * Simplified object destruction, delegating all database object
+      clean-up to Rose::DB.
+
+0.722 (04.27.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Really remove Clone::PP this time...
+
+0.721 (04.27.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Improved and documented metadata inheritance behavior.
+
+0.72 (04.19.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Many reference-count bugs fixed, including several that could cause 
+      database handles to leak.
+    * Fixed a bug that could cause "empty" sub-objects to be created when
+      processing certain with_objects parameters.
+    * Improved the accessor/mutator methods for these column types: set, 
+      array, and boolean.
+    * Changed the BigInt and BigSerial column classes to use normal Perl
+      scalars instead of Math::BigInt objects when perl has been compiled 
+      to use native 64-bit integers.  (Suggested by Jesse Brown)
+    * Added the inject_results Manager parameter to bypass the standard
+      object creation mechanism in cases where it's the dominant factor
+      in overall performance.
+
+0.71 (04.14.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Correctly clear the "in the database" state flag when a 
+      speculative load fails because the object was not found.
+      (Reported indirectly by Svilen Ivanov)
+    * Changed how multi-table queries are formulated for SQLite in 
+      order to make the new DBD::SQLite version (1.12) happy.
+    * Fixed errors in the epoch column documentation.
+    * Fixed some internal method-maker bugs.
+
+0.701 (04.05.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Removed stray "._*" files from module distribution.
+
+0.70 (04.04.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for the interval data type.
+    * Added support for big integer and serial columns via Math::BigInt.
+    * Added explicit support for columns that store a number of seconds
+      since the Unix epoch (both integer and fractional).
+    * Silenced warning when querying datetime columns with undef values.
+    * Fixed a bug in the loader that prevented auto-generated base class
+      names from being correctly nested under class_prefix.
+    * Fixed a bug that caused duplicate WHERE clauses when a relationship
+      name was the same as the foreign table name.
+
+0.691 (03.16.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that prevented the Manager from correctly handling
+      many-to-one relationships in some situations.  (Reported by 
+      Michael Lackhoff)
+
+0.69 (03.12.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added Rose::DB::Object::MixIn and Rose::DB::Object::Helpers.
+    * Made insert() and update() part of Rose::DB::Object's public API.
+    * Fixed typos in some auto-initialization error messages.
+    * Improved checks for MySQL transaction support in the test suite.
+
+0.681 (02.16.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Removed debugging trigger accidentally left in the 0.68 release.
+
+0.68 (02.16.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for literal query values using scalar references.
+    * Added translation of undef to the inline keyword NULL in 
+      multi-value query operations.  (Reported by Teodor Zlatanov)
+    * Added the default_load_speculative() metadata attribute.  
+      (Suggested by Teodor Zlatanov)
+    * Added a referential_integrity() attribute to foreign keys and 
+      ?-to-one relationships.  (Suggested by Teodor Zlatanov)
+    * Corrected some errors in the documentation and added more details
+      on the auto-initialization of relationships.
+
+0.67 (02.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added the ability to directly set attributes in map records
+      when saving the parent object.  (Suggested by Bruno Czekay)
+    * Slightly rearranged and added to the tutorial.
+
+0.66 (02.02.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Disabled implicit primary table sort clause in the Manager when 
+      only fetching rows from a single table.
+    * Allow multiple pre_init_hook()s in the loader and metadata object.
+    * Improved auto-initialization of many-to-many relationships.
+    * Added with_relationships, with_foreign_keys, with_unique_keys, db,
+      and db_class parameters to make_classes() and the loader object.
+    * Renamed some obscure convention manager methods and altered the
+      default behavior of the is_map_class() method slightly.
+
+0.65 (01.27.2006) - John Siracusa <siracusa@gmail.com>
+
+    * More MySQL 5 bitfield fixes.  (Reported by Svilen Ivanov)
+      Important note: if you are using MySQL 5.0.3 or later and you
+      have one or more BIT columns in a given table, you MUST call
+      meta->allow_inline_column_values(1) when setting up the 
+      Rose::DB::Object-derived class that fronts the table.
+    * Added missing "use ..." statements to the code generated by
+      perl_class_definition().
+    * Fixed a bug that prevented certain kinds of self-referential
+      relationships from being initialized properly.  (Reported by
+      Bruno Czekay)
+
+0.64 (01.19.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Worked around yet more SQLite ORDER BY bugs.
+    * Improved the column trigger implementation.
+    * Added support for MySQL 5's brain-dead new BIT column type.  Classes
+      must allow_inline_column_values(1) to use it due to the inability of
+      DBD::mysql to bind BIT values correctly without explicit calls to
+      DBI's bind_param() method.
+    * Use alternate strategies for extracting foreign key information from
+      MySQL 5 because the old way no longer works reliably.
+
+0.63 (01.15.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Made the with_map_records Manager argument work in the
+      manager_args list for relationships.
+    * Added the generate_manager_class_name() method to the loader.
+    * Added the auto_manager_class_name() method to convention manager, 
+      and made the loader delegate to it.
+
+0.62 (01.06.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a make_modules() bug that caused incorrect init_db() methods
+      to be created in some cases.  (Reported by Sean Davis)
+
+0.61 (01.05.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Added "select" parameter to the Manager which accetps an explicit
+      list of columns to be selected.
+    * It's now possible to filter based on columns that are not selected
+      as part of a Manager query.
+    * Extra parameters can now be passed to the method created by
+      make_manager_method_from_sql()
+    * Fixed several bitfield column accessor method bugs.  (Reported by 
+      Svilen Ivanov)
+    * The loader's make_modules() method now correctly creates *.pm files
+      for auto-generated base classes.  (Reported by Sean Davis)
+
+0.601 (01.01.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed some incorrect deep join tests.
+    * Reduced the number of PostgreSQL database connections used in the test
+      suite in order to avoid hitting PostgreSQL's default connection limit.
+    * Fixed the DBI benchmark tests broken by the last release.
+    * Uncommented some sections of the benchmark script that were
+      accidentally left commented-out in the last release.
+
+0.60 (12.31.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added arbitrary-depth auto-joins to the Manager using a "dot-chained"
+      syntax (e.g., vendor.regions.code)
+    * Added make_modules() method to the loader.
+    * Added pre_init_hook() method to metadata objects and the loader.
+    * Added overflow attribute to control the behavior when a scalar, 
+      character, or varchar column value is too long.  Possible values
+      are "fatal" (the default), "truncate", and "warn".
+    * Serial columns are now detected correctly even when DBI returns a 
+      column type of integer or bigint.  (Reported by Cees Hek)
+    * Added support for bigserial columns.
+    * Enum columns now have their list of valid values printed correctly
+      by the perl_hash_definition() method.  (Reported by Juan Camacho)      
+    * Fixed a bug that caused the loader to trip over mixed-case unique 
+      keys in MySQL databases. (Reported by Juan Camacho)
+    * Force MDY dates in PostgreSQL in the test suite, just in case the user
+      has European dates configured.  (Reported by Cees Hek)
+    * Fixed numerous PostgreSQL 7.x bugs.  (Reported by Cees Hek)
+    * Modified the benchmark suite to further confine each module to its
+      own private set of database rows in order to eliminate the influence
+      of run order during the tests.
+    * Worked around SQLite ORDER BY bugs in order to make the test suite
+      function correctly.
+
+0.59 (12.19.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added in_array, any_in_array, and all_in_array query operators
+      for filtering on PostgreSQL array columns.
+    * Fixed a bug that caused certain method overrides to fail when
+      using a custom metadata class with the auto-initialize feature.
+      (Reported by Svilen Ivanov)
+
+0.58 (12.16.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added auto-detection of multiple sequence-based primary 
+      key columns and primary keys with one or more non-sequence-
+      based columns.
+    * Added support for schema and catalog overrides.
+    * Added tests for db migration with forced and default schemas,
+      multiple sequence-based primary key columns, and primary keys
+      with one or more non-sequence-based columns, migrating to and
+      from databases with and without sequence support.  (Whew!)
+    * Added a summary of the default conventions to the 
+      Rose::DB::Object::ConventionManager documentation.
+
+0.57 (12.04.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed broken custom convention manager support in the loader.
+
+0.56 (12.03.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Updated required Rose::DB version.  The 0.55 release was incorrect.
+
+0.55 (12.03.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added get_objects_from_sql() and make_manager_method_from_sql()
+      Manager methods.
+    * Made the use of prepare_cached() optional everywhere.  It's on
+      by default in Rose::DB::Object, but off by default in Manager.
+      Class data determines the defaults.
+    * Added enum column type.
+
+0.54 (11.30.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added SQLite support.
+    * Improved auto-detection of primary key sequence names.
+    * Made primary key sequence names configurable.
+    * Added the "with_map_records" Manager parameter used to fetch map
+      records when auto-joining through a "many to many" relationship.
+    * Fixed a bug in the MySQL foreign key auto-init system.
+      (Reported by Bernhard Graf)
+    * Fixed a bug in the column type class customization system that
+      caused it to fail when combined with auto-initialization.
+      (Reported by Bernhard Graf)
+    * DBI 1.40 or later is now required.
+
+0.53 (11.22.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Improved handling of table and column names that use 
+      reserved words.
+
+0.52 (11.21.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed bugs in loader when using a DSN instead of a db.
+
+0.51 (11.20.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added auto-initialization of relationships.
+    * Added loader.
+
+0.50 (11.17.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added optional lazy-loading of column values.
+    * Long-overdue version number bump.
+
+0.081 (11.15.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Tutorial added.
+
+0.080 (11.14.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added column triggers for get, set, load, save, inflate, and deflate.
+    * Added support for new argument types to relationship methods.
+    * Added a named, configurable map for convention manager classes.
+    * Added perl_manager_class() and make_manager_class() meta methods.
+    * Many bug fixes to datetime column methods, cross-database migration,
+      and the auto-init system.
+
+0.079 (10.25.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed bugs that caused auto-inited many-to-many relationships
+      to be inadequately fleshed-out under some circumstances.
+
+0.078 (10.24.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added page and per_page manager parameters for the truly lazy.
+    * Fixed a bug caused by a conflict between the convention manager
+      and the legacy foreign key name generator.
+
+0.077 (10.20.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added convention manager.
+    * Added "distinct" and "fetch_only" manager parameters.
+    * Added support for foreign key and relationship names as
+      column prefixes in manager query parameters and sort_by
+      arguments.
+    * Changed manager and query builder to default unprefixed
+      ambiguous columns to belong to the primary table ("t1").
+    * Fixed a bug that caused make_methods() to fail for "... to one"
+      relationships that have no corresponding foreign key.
+    * Fixed a bug in QueryBuilder that prevented the ability to check
+      for null columns.
+    * Added the ability to query columns that are not SELECTed.
+
+0.076 (10.05.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused incorrect counts in get_objects_count()
+      when using the require_object parameter with "... to many" 
+      relationships.
+    * Added bulk update and delete methods to Manager.
+    * Added cascaded delete, plus a plea in the documentation for users
+      to do this in the database instead.
+    * Added "many to one" relationship and made it the new default
+      relationship type for foreign keys.
+    * Added *_now and *_on_save method types for foreign keys and
+      "... to one" relationships.
+    * Made get_set_on_save and delete_on_save the default auto method 
+      types for foreign keys and "... to one" relationships.
+    * load() now returns the object itself on success, which allows
+      for the convenient $obj = MyObject->new(id => 123)->load;
+    * save() now returns the object itself on success, which allows
+      for the convenient $obj = MyObject->new(id => 123)->save;
+
+0.075 (09.19.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for "many to many" relationships to Manager's
+      "with_objects" and "require_objects" parameters.
+    * Corrected a bug that could cause missing sub-objects when
+      using the Manager's "with_objects" and "require_objects" 
+      parameters.
+    * Added warning for doing multiple LEFT OUTER JOINs that could
+      cause a geometric explosion of redundant rows.
+    * Added the "multi_many_ok" parameter to Manager to suppress 
+      the warning described above.
+    * Forced inner joins when fetching foreign keys that have
+      key columns that are all NOT NULL.
+    * Added a few more sanity checks to class setup which, in turn,
+      helped me to find and fix a few bugs in the test suite.
+
+0.074 (09.15.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Repurposed the "with_objects" Manager parameter to do explicit
+      LEFT OUTER JOINs instead of implicit inner joins.
+    * Added "require_objects" Manager parameter to fill the old role of
+      the "with_objects" parameter.
+    * Documented new restrictions associated with the more sensible
+      "with_objects" and "require_objects" parameters.
+    * Added *_sql comparison operators to QueryBuilder, allowing inline
+      SQL.  (Requested by Uwe Voelker.)
+    * Removed restriction on aliasing primary key columns.
+    * Fixed bug in Manager that caused fetched objects to be inserted 
+      instead of updated on save().  (Reported by Uwe Voelker.)
+    * Corrected a misspelled method name in Rose::DB::Object::Cached.
+      (Reported by David Glass)
+    * Updated benchmark suite to include "one to many" search tests.
+
+0.073 (09.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added deferred method creation for relationships and foreign
+      keys in order to make "many to many" relationship setup more
+      developer-friendly.
+    * Renamed default auto-method type for foreign keys and relationships
+      from "get" to "get_set", since technically these foreign objects
+      can be set.  They just don't go into the database at that point.
+      I'll probably use a different term for that process (e.g., "add")
+    * Some POD and test fixes.
+
+0.0721 (09.08.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed incorrect method names in Numeric column type.
+    * Added tests to prevent the above error in the future.
+
+0.072 (08.31.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added "get" and "set" interfaces to all default column method makers.
+    * More POD fixes.
+
+0.071 (08.30.2005) - John Siracusa <siracusa@gmail.com>
+
+    * POD fixes.
+
+0.07 (08.30.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added rudimentary "many to many" relationship support.
+    * Restructured method-making system to support extensible method
+      types for each kind of thing that makes methods.
+    * Added "get" and "set" interfaces to the scalar method maker.
+
+0.0692 (08.20.2005) - John Siracusa <siracusa@gmail.com>
+
+    * POD fixes.
+
+0.069 (08.20.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Whoops, fixed manifest to repair a botched 0.068 release.
+
+0.068 (08.19.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Enabled multiple joins with the same table in the manager,
+      provided that each occurrence of multi-joined table has the
+      same Rose::DB::Object class fronting it.
+    * Added support for the "alias" parameter to hash-style column
+      definitions.
+    * Added "relationship" objects.
+    * Fixed a bug that caused nearly everything to fail if a 
+      column_name_to_method_name_mapper was used.
+    * Moved some class methods out of the object methods section of the
+      documentation, where they shouldn't have been in the first place.
+
+0.0671 (08.15.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed more MySQL case sensitivity bugs.  (Thanks Uwe!)
+    * Changed objects_by_key query_args parameter to be an array ref
+      instead of a hash ref to match the manager change from long ago.
+    * Updated makemethods.t to use MySQL if PostgreSQL is not available.
+
+0.067 (08.14.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed more MySQL bugs related to foreign keys, timestamps,
+      and boolean support in MySQL 4.0.x.
+
+0.066 (08.12.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed MySQL case-sensitivity bug.
+    * Added case-sensitivity tests for PostgreSQL and MySQL.
+    * Added accessor, delete, and search with limit and offset benchmarks.
+
+0.0651 (08.11.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Moved benchmarks into test directory in an attempt to
+      get search.cpan.org to ignore them.
+
+0.065 (08.11.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Improved the efficiency of manager classes.
+    * Added benchmark suite.
+    * More POD fixes.
+
+0.064 (08.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Duh, forgot the table name and initialize() call in 
+      perl_class_definition().
+
+0.063 (08.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added foreign key auto-initialization for Informix.
+
+0.062 (08.08.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Changed default error mode to "fatal" for manager class too.
+
+0.061 (08.07.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added foreign key auto-initialization for MySQL.
+
+0.06 (08.05.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added auto-initialization (finally).
+    * Plumped-up unique and primary keys into objects.
+    * Changed default error mode to "fatal"
+    * Made substantial additions to the documentation.
+
+0.052 (07.22.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added make_manager_methods() to Rose::DB::Object::Manager.
+    * Corrected Rose::DB::Object::Manager POD.
+
+0.052 (07.22.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added make_manager_methods() to Rose::DB::Object::Manager.
+    * Corrected Rose::DB::Object::Manager POD.
+
+0.051 (06.22.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added abstracted offset parameter to object manager.
+
+0.05 (06.16.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Moved object cache management further into the metadata object.
+    * Enabled auto-generated primary key values for Rose::DB::Object
+      objects used with the PostgreSQL database.
+
+0.043 (06.16.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added time-based expiration to Rose::DB::Object::Cached.
+    * Added catalog attribute to metadata objects.
+
+0.042 (05.04.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added not_null attribute to column metadata objects.
+    * Removed use of prepare_cached() because it apparently(?)
+      can't be used across transactions in Informix.
+
+0.041 (04.22.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected typo in DatetimeYearToSecond column class.
+      (Still need to add tests for those column types...)
+    * Added skip_first parameter to get_object_iterator().
+    * Added fix to avoid trying to format or truncate undefined 
+      dates in datetime columns.
+
+0.04 (04.01.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Refactored column value parsing.  No, really.
+
+0.031 (03.27.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected typos and errors in the documentation.
+
+0.03 (03.27.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added error_mode methods.
+0.023 (03.25.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added prepare_*_options (undocumented for now).
+
+0.022 (03.18.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed POD error that was throwing off search.cpan.org.
+
+0.021 (03.17.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added documentation for the "pretty" parameter to build_select()
+    * Added support for column value inlining in build_select()
+
+0.02 (03.17.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for nested boolean logic in queries.
+
+0.013 (03.11.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed bug in Rose::DB::Object::Std::Metadata that caused the
+      number of primary key columns to appear to be zero.
+
+0.012 (03.10.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Add tests for aliased unique key fix and primary key aliasing.
+      Documented constraints on column aliasing.  Fixed version
+      numbers in this file.  Deleted version 0.011.
+
+0.011 (03.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Well that was quick.  Fixed copy and paste error that caused
+      a failure to load using an aliased unique key column.  Deleted
+      version 0.01.
+
+0.01 (03.09.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Initial release.

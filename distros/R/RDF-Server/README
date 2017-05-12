@@ -1,0 +1,118 @@
+                                 RDF::Server 0.08
+
+                          toolkit for building RDF servers
+
+INSTALLATION
+    Installation follows standard Perl CPAN module installation steps:
+
+     cpan> install RDF::Server
+
+    or, if not using the CPAN tool, then from within the unpacked
+    distribution:
+
+     % perl Makefile.PL
+     % make
+     % make test
+     % make install
+
+DESCRIPTION
+    RDF::Server provides a flexible framework with which you can design your
+    own RDF service. By dividing itself into several areas of
+    responsibility, the framework allows you to mix and match any
+    capabilities you need to create the service that fits your RDF data and
+    how you need to access it.
+
+    The `rdf-server' script is installed as an easy-to-use way of building
+    and running an RDF::Server service. Some sample configuration files are
+    in the `examples' directory of the RDF::Server distribution.
+
+    The framework identifies four areas of responsibility:
+
+  Protocol
+
+    The protocol modules manage the outward facing part of the framework and
+    translating the requested operation into an HTTP::Request object that is
+    understood by any of the interface modules. Conversely, it translates
+    the resulting HTTP::Response object into the form required by the
+    environment in which the server is operating.
+
+    For example, the Embedded protocol provides a Perl API that can be used
+    by other modules without having to frame operations in terms of HTTP
+    requests and responses.
+
+    The methods expected of protocol modules are defined in
+    RDF::Server::Protocol. The outward-facing API is dependent on the
+    environment the server is expected to operate within.
+
+    Available protocols in the standard distribution:
+    RDF::Server::Protocol::Embedded, RDF::Server::Protocol::HTTP.
+
+  Interface
+
+    The interface modules define how the HTTP requests are translated into
+    operations on various handlers that manage different aspects of the RDF
+    triple store.
+
+  Semantic
+
+    The semantic modules define the meaning attached to and information
+    contained in the various documents and the heirarchy of resources
+    available through the interface modules. Most of the content handlers
+    are attached to a particular semantic.
+
+    The available semantics are: RDF::Server::Semantic::Atom,
+    RDF::Server::Semantic::RDF.
+
+  Formatters
+
+    The same information can be rendered in several different formats. The
+    format modules manage this rendering.
+
+    The available formatters are: RDF::Server::Formatter::Atom,
+    RDF::Server::Formatter::JSON, RDF::Server::Formatter::RDF.
+
+NAMESPACE DESIGN
+    The RDF::Server namespace is divided into these broad areas:
+
+    Protocol
+        Modules in RDF::Server::Protocol provide the interface with the
+        world. Examples include HTTP, Apache/mod_perl, and FastCGI.
+
+    Interface
+        RDF::Server::Interface modules determine the type of URI and HTTP
+        method management that is used. RDF::Server comes with a REST
+        interface.
+
+    Semantic
+        RDF::Server::Semantic modules manage the configuration and
+        interpretation of URIs once the Interface module has passed the
+        request on. RDF::Server comes with an Atom semantic of URI
+        heirarchies and configuration.
+
+    Formatter
+        RDF::Server::Formatter modules translate the internal data
+        structures to particular document types. The formatter for a request
+        is selected by the Interface module.
+
+    Model
+        RDF::Server::Model modules interface between the Semantic and
+        Formatter modules and the backend triple store.
+
+    Resource
+        RDF::Server::Resource modules represent particular resources and
+        associated data within a triple store.
+
+BUGS
+    There are bugs. The test suite only covers a little over 90% of the
+    code. Bugs may be reported on rt.cpan.org or by e-mailing bug-RDF-Server
+    at rt.cpan.org.
+
+AUTHOR
+    James Smith, `<jsmith@cpan.org>'
+
+LICENSE
+    Copyright (c) 2008 Texas A&M University.
+
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

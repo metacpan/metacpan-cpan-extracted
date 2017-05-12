@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 49046698d1dbe75c73e67968a85b108abde34e0d ChangeLog
+SHA1 9edf39480c13016509b3a6d585d7b64777a5a837 MANIFEST
+SHA1 42969a7ea048799c6fdb9a89dc557f62d950432d META.yml
+SHA1 17263bf7448ec8c26075463661512f3a864371fd Makefile.PL
+SHA1 4cb1eb39379867b9c4402ac6f9e704f761677749 README
+SHA1 c3e6699fe836bece3f6ab157731ea95419de1344 html/Callbacks/RT-OnlineDocs/Elements/Tabs/Privileged
+SHA1 c6cc0a806a0bfe04eacb906ca405b3a788e05019 html/Developer/Perldoc/Elements/Body
+SHA1 3cea021d0a31da90892e320eb9bc8b84de452448 html/Developer/Perldoc/Elements/TOC
+SHA1 17abf23b6eaef0d92dc0086ee3d30dcffa8c51b0 html/Developer/Perldoc/autohandler
+SHA1 9ef191cebf2bd36e3635d002c9641ed39c737839 html/Developer/Perldoc/index.html
+SHA1 10f1ba97180b54e94ab30d9efe4aaa0a70aa1e26 inc/Module/AutoInstall.pm
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 b084961275ae4b66a9a0766372b0a08803aa63d1 inc/Module/Install/AutoInstall.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 acbf148a1e6067cc677c89da2bfe1ae4b0b1e01b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
+SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
+SHA1 05496b0f61332f78b2b225568c317477bd9687af lib/RT/OnlineDocs.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSm1fwACgkQMflWJZZAbqA1QgCfTqmC5bnLowPHjMGrOEOVunec
+yWIAnjOBGnCnQSusP2fQ98gMU5zBQomB
+=mSMY
+-----END PGP SIGNATURE-----

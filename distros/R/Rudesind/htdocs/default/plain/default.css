@@ -1,0 +1,85 @@
+/*
+ *
+ * This stylesheet template was adapted from faceplant 1.1, written by
+ * Casey West
+ *
+ */
+
+h1.Rudesind-title {
+
+}
+
+h2.Rudesind-breadcrumb {
+
+}
+
+p.Rudesind-error-message {
+    color: red;
+}
+
+p.Rudesind-message {
+    color: blue;
+}
+
+div.Rudesind-gallery-nav {
+    float: left;
+    width: 25%;
+}
+
+
+h3.Rudesind-section-title {
+
+}
+
+ul.Rudesind-sub-gallery-list {
+
+}
+
+ul.Rudesind-sub-gallery-list li a {
+
+}
+
+div.Rudesind-caption {
+    background: #eee;
+    padding: 3px;
+}
+
+div.Rudesind-thumbnail-div {
+    float: right;
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.Rudesind-thumbnail-div table {
+
+}
+
+div.Rudesind-thumbnail-div table tr td {
+    background: #eee;
+    padding: 10px;
+}
+
+div.Rudesind-thumbnail-div table tr td div.Rudesind-caption {
+    font-size: 80%;
+}
+
+div.Rudesind-thumbnail-div table tr td.Rudesind-thumbnail-table-empty-cell {
+    background: #fff;
+}
+
+div..Rudesind-thumbnail-div table tr td a {
+
+}
+
+img.Rudesind-thumbnail {
+    vertical-align: top;
+}
+
+img.Rudesind-image {
+
+}
+
+div.Rudesind-footer {
+    float: left;
+}

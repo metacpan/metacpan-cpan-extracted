@@ -1,0 +1,118 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Role-Commons/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 1.000000"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moo::Role"^^doap-deps:CpanId ], [ doap-deps:on "Object::ID"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "match::simple"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Role-Commons>;
+	doap:created         "2012-10-12"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Role-Commons>;
+	doap:homepage        <https://metacpan.org/release/Role-Commons>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Role-Commons";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-100>, <http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-101>, <http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-102>, <http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-103>, <http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-104>;
+	doap:shortdesc       "roles that can be commonly used, for the mutual benefit of all".
+
+<http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-100>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Role-Commons-0.100"^^xsd:string;
+	dc:issued            "2012-10-26"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Commons-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-101>
+	a                    doap:Version;
+	dc:identifier        "Role-Commons-0.101"^^xsd:string;
+	dc:issued            "2012-10-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Provide &Object::AUTHORITY::AUTHORITY function. It seems Web::Magic was relying on it.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Commons-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-102>
+	a                    doap:Version;
+	dc:identifier        "Role-Commons-0.102"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Commons-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-103>
+	a                    doap:Version;
+	dc:identifier        "Role-Commons-0.103"^^xsd:string;
+	dc:issued            "2014-10-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Stop using Scalar::Does.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "use match::simple.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Recommend Object::Tap/Object::Util over Role::Commons::Tap.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "The obsolete authority::shared module is now gone.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "The obsolete Object::Tap module is now gone (though the namespace has been recycled by MSTROUT).";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix dependency information.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Commons-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Commons/v_0-104>
+	a                    doap:Version;
+	rdfs:label           "Happy Birthday, Elliott!";
+	dc:identifier        "Role-Commons-0.104"^^xsd:string;
+	dc:issued            "2014-10-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add dependency on Test::Exception.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Commons-0.104.tar.gz>;
+	doap:revision        "0.104"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

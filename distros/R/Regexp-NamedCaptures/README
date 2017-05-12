@@ -1,0 +1,118 @@
+NAME
+    Regexp::NamedCaptures - Saves capture results to your own variables
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+     use Regexp::NamedCaptures;
+     my ( $name, $title, $first, $last );
+     /(?<\$name>(?<\$title>Mr\.|Ms\.) (?<\$first>\w+) (?<\$last>\w+))/;
+     
+ # is the same as
+     
+ my ( $name, $title, $first, $last )
+         = /((Mr\.|Ms\.) (\w+) (\w+))/;
+
+     # use re 'eval' when interpolating
+     use Regexp::NamedCaptures;
+     use re 'eval';
+     /(?<\$something>$pattern)/
+
+DESCRIPTION
+    This highly experimental module implements named captures. When your
+    regular expression captures something, you can have it automatically
+    copied out to the right location. This is an improvement over normal
+    perl because now you don't have to deal with positional captures. When
+    your expression is complex and there are multiple or nested captures it
+    really helps to not have to track what number you're supposed to find
+    your data in.
+
+NAMED CAPTURE SYNTAX
+    I have borrowed the syntax from .Net. I'm told that each of the
+    following forms are equivalent so I've treated them identically.
+
+     (?< name >pattern)
+     (?' name 'pattern)
+
+    "name" should be a a piece of valid perl code. In a normal,
+    interpolating regular expression, you would write "(?<\$something"...)
+    if you wanted to have the result copied to the $something variable. That
+    is, perl will interpolate your variables just like it always does.
+
+    The value of name may be arbitrary perl code. It must be a valid lvalue.
+
+    "pattern" is a normal pattern.
+
+    The entire expression is rewritten as:
+
+     (pattern)(?{ name = $^N })
+
+FUNCTIONS
+  $rewritten_regexp = convert( $original_regexp )
+    This function does all the work of converting a regular expression
+    containing named capture expressions into an expression that can be used
+    by perl. You only need this if you're going to be creating regular
+    expressions at runtime.
+
+     use re 'eval';
+     $re = Regexp::NamedCapture::convert '(?<$var>...)'
+     $re = qr/$re/
+
+     use re 'eval';
+     $re = Regexp::NamedCapture::convert "(?'\$var'...)";
+
+"use re 'eval'" AND SECURITY
+    This module functions by inserting (?{ code }) blocks into your
+    expression. As a security feature, perl does not allow new (?{ ... })
+    blocks to be compiled once BEGIN-time has passed unless the programmer
+    specifically lifts that restriction by including the "use re 'eval'"
+    pragma.
+
+    If you trust all of the expressions that you're interpolating, you can
+    use this safely. If you are accepting regular expressions from sources
+    you might not trust, you should not use "use re 'eval'".
+
+    If you still want to use this module, see if you can push your regular
+    expression compilation earlier.
+
+    Consider these two examples:
+
+     use re 'eval';
+     $rx = qr/(?<\$name>$expr)/;
+
+     BEGIN {
+         $rx = qr/(?<\$name>$expr)/;
+     }
+
+    The first one requires the "use re 'eval'" pragma because the
+    interpolation and compilation occurs at runtime. The second does not
+    because it interpolated and compiled the pattern at BEGIN-time. It
+    suffers the obvious drawback that you must have the value for $expr at
+    BEGIN-time instead of runtime.
+
+AUTHOR
+    "Joshua ben Jore" <jjore@cpan.org>
+
+BUGS
+    \Q escapes are completed ignored. If you try to use one to prevent
+    something that looks like a named capture from being parsed as one, it
+    won't work.
+
+    Please report any bugs or feature requests to
+    "bug-regexp-namedcaptures@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Regexp-NamedCaptures>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    Jeffrey Friedl's book Mastering Regular Expressions for the original
+    inspiration. perlre for making it possible. Minneapolis.pm for giving me
+    a reason to create this. Tanktalus, Ctrl-z, and others of perlmonks.org
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Joshua ben Jore, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

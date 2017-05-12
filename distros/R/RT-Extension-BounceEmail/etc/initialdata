@@ -1,0 +1,36 @@
+@Templates = (
+    { Queue       => '0',
+      Name        => 'Bounce',                                             # loc
+      Description => 'Bounce Transaction',                                  # loc
+      Content     => 'Content-Type: text/plain
+RT-Attach-Message: yes
+
+{$Transaction->Content( 
+  Type => "text/plain", 
+  Quote => 1,
+)}', },
+);
+
+@ScripActions = (
+    {
+      Name        => 'Send Bounce',
+      Description => 'Add the ability to Bounce messages',
+      ExecModule  => 'SendBounce',
+    },
+);
+
+@ScripConditions = (
+    { Name                 => 'On Bounce',
+      Description          => 'When a Transaction or Ticket is bounced',
+      ApplicableTransTypes => 'Bounce Transaction',
+      ExecModule           => 'AnyTransaction', },
+);
+
+@Scrips = (
+    {  Description    => 'Bounce Transaction',
+       ScripCondition => 'On Bounce',
+       ScripAction    => 'Send Bounce',
+       Template       => 'Bounce' },
+);
+
+1;

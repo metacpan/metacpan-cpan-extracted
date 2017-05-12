@@ -1,0 +1,15 @@
+@CustomFields = (
+    {
+        Name => 'ExistingCondition',
+        Type => 'SelectSingle',
+        RenderType => 'Dropdown',
+        Queue => [ 'General' ],
+        LookupType => 'RT::Queue-RT::Ticket',
+        Values => [
+            { Name => 'Passed', SortOrder => 0 },
+            { Name => 'Failed', SortOrder => 1 },
+        ],
+        Pattern => '(?#Mandatory).',
+        DefaultValues => [ 'Failed' ],
+    },
+);

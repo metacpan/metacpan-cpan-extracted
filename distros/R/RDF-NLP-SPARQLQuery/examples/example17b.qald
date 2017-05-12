@@ -1,0 +1,31 @@
+DOC: qald-4_biomedical_train-17
+language: EN
+
+sentence: 
+# sentence form (ended by _END_SENT_)
+Which are possible drugs against rickets?
+_END_SENT_
+
+word information:
+# Inflected form<tab>POSTAG<tab>Lemma<tab>offset (ended by _END_POSTAG_)
+Which	WDT	which	10	
+are	VBP	be	16	
+possible	JJ	possible	20	
+drugs	NNS	drug	29	
+against	IN	against	35	
+rickets	NN	rickets	43	
+?	SENT	?	50	
+
+_END_POSTAG_
+
+semantic units:
+# term form<tab>term canonical form<tab>semantic features<tab>offset start<tab>offset end (ended by _END_SEM_UNIT_)
+drugs	drug	drug:drug	29	33
+rickets	Rickets	disease/diseasome/name/1004:disease/diseasome/name/1004:sideeffect/sider/ae/C0035579:sideeffect/sider/ae/C0035579	43	49
+possible drugs	possible drug	possibleDrug	20	33
+rickets	Rickets	disease/diseasome/name/1004:disease/diseasome/name/1004:sideeffect/sider/ae/C0035579:sideeffect/sider/ae/C0035579	43	49
+drugs	drug	drug:drug	29	33
+_END_SEM_UNIT_
+
+_END_DOC_
+

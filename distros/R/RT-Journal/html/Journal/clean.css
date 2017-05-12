@@ -1,0 +1,268 @@
+<%flags>
+inherit => 0
+</%flags>
+
+	body {
+		margin:0px 0px 10px 0px;
+		background:#FFFFFF;		
+		}
+	A 			{ color: #999966; text-decoration: none; font-weight:bold; } 
+	A:link		{ color: #999966; text-decoration: none; } 
+	A:visited	{ color: #999966; text-decoration: none; } 
+	A:active	{ color: #99CC66;  } 
+	A:hover		{ color: #99CC66;  }
+	
+	h1, h2, h3 {
+		margin: 0px;
+		padding: 0px;
+	}
+
+	#banner {
+		font-family:verdana, arial, sans-serif;
+		color:#FFF;
+		font-size:x-large;
+		font-weight:normal;
+		border-bottom:1px dotted #FFF;
+		border-top:3px solid #99CCFF;
+  		background:#336699;
+  		padding:15px; 
+  		text-transform:uppercase;
+		letter-spacing: .2em; 		
+		}
+	
+	#banner a,
+        #banner a:link,
+        #banner a:visited,
+        #banner a:active,
+        #banner a:hover {
+		font-family:verdana, arial, sans-serif;
+		font-size: x-large;
+		color: #FFF;
+		text-decoration: none;
+		}
+
+	.description {
+		font-family:verdana, arial, sans-serif;
+		color:#99CCFF;
+		font-size:x-small;
+		font-weight:bold;
+  		background:#336699;	
+  		text-transform:none;	
+		letter-spacing: none; 		
+		}	
+				
+	#content {
+		float:left;
+		width:65%;
+		background:#fff;
+		border-right:1px dotted #999;
+		margin-right:15px;
+		padding-bottom:20px;
+		}
+
+	#links {
+		background:#fff;
+		padding-right:15px;				
+		}
+		
+	.blog {
+  		padding-left:15px;
+  		padding-top:15px;
+  		padding-right:15px;			
+		}	
+	
+	.blogbody {
+		font-family:georgia, verdana, arial, sans-serif;
+		color:#333;
+		font-size:small;
+		font-weight:normal;
+  		background:#FFF;
+  		line-height:140%;
+  		padding-left:10px;	
+  		padding-right:10px;
+  		padding-top:10px;			
+		}
+
+
+	.blogbody a,
+	.blogbody a:link,
+	.blogbody a:visited,
+	.blogbody a:active,
+	.blogbody a:hover {
+		font-weight: normal;
+		text-decoration: underline;
+	}
+	
+	.title	{ 
+		font-family: verdana, arial; 
+		font-size: small; 
+		color: #003366; 
+		text-transform: uppercase;
+		font-weight:bold;	
+		}			
+		
+	#menu {
+  		margin-bottom:15px;
+		background:#FFF;  							
+		}	
+		
+	.date	{ 
+		font-family:georgia, verdana, arial, sans-serif; 
+		font-size: small; 
+		color: #666; 
+		border:1px solid #999;
+		padding:5px;
+		margin-bottom:10px;
+		font-weight:normal;
+		}			
+		
+	.posted	{ 
+		font-family:verdana, arial, sans-serif; 
+		font-size: x-small; 
+		color: #003366;
+		margin-bottom:15px; 
+		}
+		
+		
+	.calendar {
+		font-family:verdana, arial, sans-serif;
+		color:#666;
+		font-size:x-small;
+		font-weight:normal;
+  		background:#FFF;
+  		line-height:140%;
+  		padding:2px;
+  		text-align:center;	
+		}
+	
+	.calendarhead {	
+		font-family:verdana, arial, sans-serif;
+		color:#003366;
+		font-size:x-small;
+		font-weight:bold;
+  		background:#FFF;
+  		line-height:140%;
+  		padding:2px;				
+		}	
+	
+	.side {
+		font-family:verdana, arial, sans-serif;
+		color:#333;
+		font-size:x-small;
+		font-weight:normal;
+  		background:#FFF;
+  		line-height:140%;
+  		padding:2px;				
+		}	
+		
+	.sidetitle {
+		font-family:verdana, arial, sans-serif;
+		color:#666;
+		font-size:x-small;
+		font-weight:bold;
+  		background:#EEE;
+  		line-height:140%;
+  		padding:2px;
+  		margin-top:10px;
+  		text-align:center;
+  		text-transform:uppercase;
+		letter-spacing: .2em;  					
+		}		
+	
+	.syndicate {
+		font-family:verdana, arial, sans-serif;
+		font-size:xx-small;
+		font-weight:bold;		
+  		line-height:140%;
+  		padding:2px;
+  		margin-top:10px;
+  		text-align:center;
+  		background:#EEE;  		
+ 		}	
+		
+	.powered {
+		font-family:verdana, arial, sans-serif;
+		color:#003366;
+		font-size:xx-small;
+		font-weight:bold;
+		border-top:1px solid #CCC;
+		border-bottom:1px solid #CCC;		
+		line-height:140%;
+		text-transform:uppercase; 
+		padding:2px;
+		margin-top:10px;
+		text-align:center;
+		letter-spacing: .2em  					
+		}	
+		
+	
+	.comments-body {
+		font-family:verdana, arial, sans-serif;
+		color:#666;
+		font-size:small;
+		font-weight:normal;
+  		background:#FFF;
+  		line-height:140%;
+  		padding:10px;			
+		}		
+
+	.comments-post {
+		font-family:verdana, arial, sans-serif;
+		color:#666;
+		font-size:x-small;
+		font-weight:normal;
+  		background:#FFF;			
+		}	
+
+	.trackback-body {
+		font-family:verdana, arial, sans-serif;
+		color:#666;
+		font-size:small;
+		font-weight:normal;
+  		background:#FFF;
+  		line-height:140%;
+  		padding:10px;			
+		}		
+
+	.trackback-url {
+		font-family:verdana, arial, sans-serif;
+		color:#666;
+		font-size:small;
+		font-weight:normal;
+  		background:#FFF;
+  		line-height:140%;
+  		padding:10px;
+  		border:1px dashed #CCC;			
+		}
+
+	.trackback-post {
+		font-family:verdana, arial, sans-serif;
+		color:#666;
+		font-size:x-small;
+		font-weight:normal;
+  		background:#FFF;			
+		}
+
+		
+	.comments-head	{ 
+		font-family: georgia, verdana, arial, sans-serif; 
+		font-size: small; 
+		color: #666; 
+		border:1px solid #999;
+		padding:5px;
+		font-weight:normal;
+		margin-top:10px;		
+		}		
+
+	#banner-commentspop {
+		font-family:georgia, verdana, arial, sans-serif;
+		color:#FFF;
+		font-size:large;
+		font-weight:bold;
+		border-bottom:1px dotted #FFF;
+		border-top:3px solid #99CCFF;
+  		background:#336699;
+  		padding:15px; 
+		}
+
+

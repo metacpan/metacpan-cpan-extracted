@@ -1,0 +1,87 @@
+=pod
+
+=head1 NAME
+
+RPC::ExtDirect::Event - Asynchronous server-to-client events
+
+=head1 SYNOPSIS
+ 
+  use RPC::ExtDirect;
+  use RPC::ExtDirect::Event;
+ 
+  sub foo : ExtDirect(pollHandler) {
+     my ($class) = @_;
+ 
+     # Do something good, collect results in $good_data
+     my $good_data = { ... };
+ 
+     # Do something bad, collect results in $bad_data
+     my $bad_data = [ ... ];
+ 
+     # Return the data as a list (not arrayref!)
+     return (
+                 RPC::ExtDirect::Event->new('good', $good_data),
+                 RPC::ExtDirect::Event->new(
+                    name => 'bad',
+                    data => $bad_data,
+                ),
+            );
+ }
+
+=head1 DESCRIPTION
+
+This module implements L<Event|RPC::ExtDirect::Intro/Event> object that
+is used to send asynchronous events from server to client via periodic
+polling.
+
+Data can be anything that is serializable to JSON. No checks are made
+and it is assumed that client side can understand the data format used
+with Events.
+
+Note that by default L<JSON> will blow up if you try to feed it a blessed
+object as data payload, and for very good reason: it is not obvious how
+to serialize a self-contained object. To avoid this, set a global Config
+option L<json_options|RPC::ExtDirect::Config/json_options> to include
+C<allow_blessed> flag:
+
+    my $config = RPC::ExtDirect->get_api->config;
+    $config->json_options({
+        allow_blessed => 1,
+    });
+
+=head1 METHODS
+
+=over 4
+
+=item C<new>
+
+Constructor. Creates a new Event object with event name and some data.
+Accepts arguments by position as C<new($name, $data)>, as well as by name
+in a hash or hashref:
+
+    my $event1 = RPC::ExtDirect::Event->new( 'foo', 'bar' );
+    my $event2 = RPC::ExtDirect::Event->new({
+        name => 'foo',
+        data => 'bar',
+    });
+    my $event3 = RPC::ExtDirect::Event->new(
+        name => 'foo',
+        data => 'bar'
+    );
+
+This makes it easier to extend Event objects in a Moose(ish) environment,
+etc.
+
+=item C<run>
+
+Instance method. Not intended to be called directly, provided for duck
+typing compatibility with Exception and Request objects.
+
+=item C<result>
+
+Instance method. Returns an Event hashref in format required by
+Ext.Direct client stack. Not intended to be called directly.
+
+=back
+
+=cut

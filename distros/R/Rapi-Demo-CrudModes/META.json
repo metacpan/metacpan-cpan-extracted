@@ -1,0 +1,67 @@
+{
+   "abstract" : "RapidApp demo application",
+   "author" : [
+      "Henry Van Styn <vanstyn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Rapi-Demo-CrudModes",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Model::DBIC::Schema" : "0",
+            "Cwd" : "0",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Data::Dumper::Concise" : "0",
+            "File::ShareDir" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::MarkAsMethods" : "0",
+            "MooseX::NonMoose" : "0",
+            "Path::Class" : "0",
+            "RapidApp" : "1.0600",
+            "RapidApp::Builder" : "0",
+            "RapidApp::Module::DbicDV" : "0",
+            "RapidApp::Module::DbicGrid" : "0",
+            "RapidApp::Util" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/RapidApp/Rapi-Demo-CrudModes/issues"
+      },
+      "homepage" : "http://www.rapidapp.info",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/RapidApp/Rapi-Demo-CrudModes.git",
+         "web" : "https://github.com/RapidApp/Rapi-Demo-CrudModes"
+      },
+      "x_IRC" : "irc://irc.perl.org/#rapidapp"
+   },
+   "version" : "1.01"
+}
+

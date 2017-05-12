@@ -1,0 +1,193 @@
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix dist: <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Parser/> .
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rrp: <tag:buzzword.org.uk,2012:RDF-RDFa-Parser:> .
+@prefix test: <http://rdfa.info/vocabs/rdfa-test#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[] dc:date "2012-06-05T23:28:51Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9001.atom> .
+[] dc:date "2012-06-05T23:28:51Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9002.atom> .
+[] dc:date "2012-06-05T23:28:51Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9003.atom> .
+[] dc:date "2012-06-05T23:28:51Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9004.atom> .
+[] dc:date "2012-06-05T23:28:51Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9005.atom> .
+[] dc:date "2012-06-05T23:28:51Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9006.atom> .
+[] dc:date "2012-06-05T23:28:52Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9007.atom> .
+[] dc:date "2012-06-05T23:28:52Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9008.atom> .
+[] dc:date "2012-06-05T23:28:54Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9009.atom> .
+[] dc:date "2012-06-05T23:28:54Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		a earl:TestResult ;
+		earl:outcome earl:passed
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9010.atom> .
+[] dc:date "2012-06-05T23:28:55Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9011.atom> .
+[] dc:date "2012-06-05T23:28:56Z"^^xsd:dateTime ;
+	a earl:Assertion ;
+	earl:assertedBy rrp:xt ;
+	earl:mode earl:automatic ;
+	earl:result [
+		earl:outcome earl:passed ;
+		a earl:TestResult
+	] ;
+	earl:subject dist:v_1-097 ;
+	earl:test <http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9012.atom> .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9001.atom> dc:identifier "9001" ;
+	dc:title "Simple triple" ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9002.atom> dc:identifier "9002" ;
+	dc:title "Simple triple, RDFa 1.1 only" ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9003.atom> dc:identifier "9003" ;
+	dc:title "Default subject for root element." ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9004.atom> dc:identifier "9004" ;
+	dc:title "Default subject for entry elements." ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9005.atom> dc:identifier "9005" ;
+	dc:title "Default subjects." ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9006.atom> dc:identifier "9006" ;
+	dc:title "Default subject for entry elements." ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9007.atom> dc:identifier "9007" ;
+	dc:title "xml:base" ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9008.atom> dc:identifier "9008" ;
+	dc:title "xml:lang" ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9009.atom> dc:identifier "9009" ;
+	dc:title "IETF rel registry" ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9010.atom> dc:identifier "9010" ;
+	dc:title "Unknown terms" ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9011.atom> dc:identifier "9011" ;
+	dc:title "Vocab primacy over terms" ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+<http://buzzword.org.uk/2011/Atom_plus_RDFa/test-suite/tests/9012.atom> dc:identifier "9012" ;
+	dc:title "RDFa 1.1 Prefixes" ;
+	test:hostLanguage "atom" ;
+	test:rdfaVersion "1.1" ;
+	a earl:TestCase .
+rrp:xt a earl:Software ;
+	foaf:name "RDF-RDFa-Parser Author Tests" ;
+	foaf:page <https://bitbucket.org/tobyink/p5-rdf-rdfa-parser/src/tip/xt> .

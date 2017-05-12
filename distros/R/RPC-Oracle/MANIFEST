@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/RPC-Oracle.t
+lib/RPC/Oracle.pm
+META.yml                                 Module meta-data (added by MakeMaker)

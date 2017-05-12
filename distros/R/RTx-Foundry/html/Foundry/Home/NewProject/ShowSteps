@@ -1,0 +1,20 @@
+%# The study of non-linear physics is like the study of non-elephant biology.
+
+<p>
+<%INIT>
+my @Steps = (
+    'Term of Use Agreement',			# loc
+    'Registration Info',			# loc
+    'Completing first-time registration',	# loc
+);
+
+foreach my $idx (0 .. $#Steps) {
+    $m->print(' &gt;&gt; ') if $idx;
+    $m->print('<strong>') if $idx eq $Step;
+    $m->print('<nobr>' . loc($Steps[$idx]) . '</nobr>');
+    $m->print('</strong>') if $idx eq $Step;
+}
+</%INIT>
+<%ARGS>
+$Step	=> 0
+</%ARGS>

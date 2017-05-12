@@ -1,0 +1,12 @@
+<link rel="stylesheet" href="<%RT->Config->Get('WebPath')%>/NoAuth/css/announce.css" type="text/css" />
+<%init>
+my @tickets = RT::Extension::Announce::GetAnnouncements($session{CurrentUser});
+return unless @tickets;
+unshift @{ $ARGS{Menu} },
+  {     html => q{<a class="announce" href="}
+      . RT->Config->Get('WebPath')
+      . q{/m/announcements">}
+      . loc("Announcements")
+      . '</a>' };
+</%init>
+

@@ -1,0 +1,89 @@
+See `perldoc lib/RTx/Shredder.pm' for more info about this distribution.
+
+INSTALLATION
+
+1) System rights
+
+You should be logged in under user who has read rights on the RT config files and
+write rights on the RT local dirs. This is limitation, but module must load
+RT config files to proceed successfully.
+
+2) Tarball or CPAN shell.
+
+You can install from tarball or via CPAN shell, ofcouse if you install via
+CPAN shell then most probably you havn't read this, but anyway I hope you'll
+find this text when you hit problems. Installation from tarball as easy as
+installation from CPAN shell except of dependencies. See below.
+
+NOTE: CPAN shell doesn't install development releases unless you define exactly
+version you want.
+
+NOTE: Users of the CPAN shell, please, read this doc to the end because
+if your RT is not in usual '/opt/rt3' location then you must know how
+to set correct location.
+
+3) Source
+
+Get source from
+
+  http://search.cpan.org/dist/RTx-Shredder
+
+Brave guys could get sources from SVN
+
+  https://opensvn.csie.org/rtx_shredder
+
+4) Patch RT 3.4.0 and 3.4.1
+
+RT doesn't allow searches on deleted tickets. I wrote patch that should be applied to RT.
+Patch is shipped with distro under patches/ directory. You can apply it with next commands:
+
+	cd /path/to/rt/dir
+	cat /path/to/patch/file | patch -p0
+
+NOTE: RT 3.4.2 and greater has this patch applied, you don't need to do anything.
+
+5) Path to RT
+
+Installer finds RT easy when your RT installation is in /opt/rt3, but
+if you use own dirs layout (almost all distributions that has RT package
+use own layouts) then you must define it.
+
+You can use RTHOME environment variable to specify directory that
+contains RT.pm or lib/RT.pm
+
+6) `perl Makefile.PL`
+
+If RT.pm couldn't be found you would be asked about path to RT.pm, see
+above about RTHOME, you can use next command:
+
+  `RTHOME=... perl Makefile.PL`
+
+Check output, you should see something like this:
+  Using RT configurations from /opt/rt3/lib/RT.pm:
+  ./html  => /opt/rt3/share/html
+  ./lib   => /opt/rt3/local/lib
+  ./sbin  => /opt/rt3/local/sbin
+
+If you see
+
+  Warning: prerequisite <module> <version or zero> not found
+
+Then you MUST install <module>, you really need this perl modules
+to use and/or test shredder distribution.
+
+7) `make`
+
+8) `make test`
+
+Please, don't skip this step, because you're going to install shredder and
+when something wrong with tests you can lost real valuable data in production
+database.
+
+If something wrong with tests then report errors.
+See `perldoc lib/RTx/Shredder.pm` for more info about reporting.
+
+9) `make install`
+
+10) `perldoc lib/RTx/Shredder.pm`
+
+				Best regards. Ruslan.

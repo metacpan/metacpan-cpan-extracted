@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+META.yml
+README
+lib/Rose/DBx/Object/Builder.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

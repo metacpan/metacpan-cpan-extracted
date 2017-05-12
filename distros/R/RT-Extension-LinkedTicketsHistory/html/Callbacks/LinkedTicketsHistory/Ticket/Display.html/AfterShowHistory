@@ -1,0 +1,23 @@
+% for my $Ticket ( @tickets ) {
+<& /Ticket/Elements/LinkedTicketsHistory,
+    Ticket => $Ticket,
+    LinkedTicketsHistory => 1,
+&>
+% }
+
+<%INIT>
+my @tickets;
+my @link_types = grep { defined } RT->Config->Get('LinkedTicketsHistoryTypes');
+@link_types = qw/MemberOf Members RefersTo ReferredToBy DependsOn DependedOnBy/ unless @link_types;
+for my $type ( @link_types ) {
+    my $links = $Ticket->$type;
+    while ( my $link = $links->Next ) {
+        my $ticket = $type =~ /MemberOf|RefersTo|DependsOn/ ? $link->TargetObj : $link->BaseObj;
+        next unless $ticket->isa('RT::Ticket'); # link could be an article
+        push @tickets, $ticket if $ticket->CurrentUserHasRight('ShowTicket');
+    }
+}
+</%INIT>
+<%ARGS>
+$Ticket
+</%ARGS>

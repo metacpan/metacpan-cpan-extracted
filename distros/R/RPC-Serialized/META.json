@@ -1,0 +1,71 @@
+{
+   "abstract" : "Subroutine calls over the network using common serialization",
+   "author" : [
+      "Oliver Gorwits <oliver@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RPC-Serialized",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Accessor::Fast::Contained" : 0,
+            "Data::Serializer" : 0,
+            "Exception::Class" : 0,
+            "IO::File" : 0,
+            "IO::Handle" : 0,
+            "IO::Socket::INET" : 0,
+            "IO::Socket::SSL" : 0,
+            "IO::Socket::UNIX" : 0,
+            "Log::Dispatch::Syslog" : 0,
+            "Module::MultiConf" : 0,
+            "Net::Server::PreFork" : 0,
+            "Net::Server::Single" : 0,
+            "Readonly" : 0,
+            "Symbol" : 0,
+            "UNIVERSAL" : 0,
+            "URI" : 0,
+            "base" : 0,
+            "constant" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : 0,
+            "IO::Pipe" : 0,
+            "IO::String" : 0,
+            "Test::More" : 0,
+            "URI::file" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=RPC-Serialized"
+      },
+      "homepage" : "https://github.com/ollyg/RPC-Serialized/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ollyg/RPC-Serialized.git",
+         "web" : "https://github.com/ollyg/RPC-Serialized"
+      }
+   },
+   "version" : "1.123630"
+}
+

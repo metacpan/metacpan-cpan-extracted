@@ -1,0 +1,30 @@
+#
+#              typemap file 
+#         for RenderMan perl module
+#
+###################################
+
+RtBoolean	T_SHORT
+RtInt		T_LONG
+RtInt*		T_PACKED
+RtFloat		T_FLOAT
+RtFloat*	T_PV
+RtToken         T_PV
+RtPointer       T_PV
+RtToken*        T_PACKED
+RtPointer*      T_PACKED
+RtString        T_PV
+RtObjectHandle  T_PV
+RtLightHandle   T_PV
+
+RtColor		T_PV
+RtPoint		T_PV
+RtPoint*	T_PACKED
+RtMatrix	T_PV
+RtBasis		T_PV
+RtBound		T_PV
+
+RtFilterFunc    T_PV
+RtErrorHandler  T_PV
+RtFunc          T_PV
+

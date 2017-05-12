@@ -1,0 +1,66 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use RFID::EPC::Tag;
+
+our $count = defined($ARGV[0])?$ARGV[0]:1;
+
+our @tt = keys(%RFID::EPC::Tag::TAGTYPES);
+
+foreach my $i (1..$count)
+{
+    my %tag;
+    my %calc_fieldsize;
+    my $rtt = $tt[rand @tt];
+    my $spec = $RFID::EPC::Tag::TAGTYPES{$rtt}
+      or die "Invalid tag type '$rtt'";
+    $tag{epc_type} = $rtt;
+    my @fields = @{$spec->{fields}};
+    while (@fields)
+    {
+	my $field = shift(@fields);
+	my $fieldsize = shift(@fields);
+	next if ($field eq 'epc_header');
+
+	my $fieldval;
+
+	if ($field eq 'epc_partition')
+	{
+	    my $part = rand(@{$spec->{partitions}});
+	    my $partlist = $spec->{partitions}[$part]
+		or die "Invalid EPC partition size\n";
+	    foreach my $i (0..$#{$partlist})
+	    {
+		$calc_fieldsize{$spec->{partition_fields}[$i]} = $partlist->[$i];
+	    }
+	    $fieldval = sprintf("%x",$part);
+	}
+	else
+	{
+	    if ($fieldsize eq '?')
+	    {
+		$fieldsize = $calc_fieldsize{$field}
+  		  or die "Couldn't figure out field size for '$field'";
+	    }
+	    $fieldval = randhex($fieldsize);
+	}
+	$tag{$field} = $fieldval;
+    }
+    my $tag = RFID::EPC::Tag->new(%tag);
+    print $tag->id,"\n";
+}
+
+sub randhex
+{
+    my($bits)=shift;
+    my $r = "";
+
+    while ($bits > 32)
+    {
+	$r .= sprintf("%x",rand(2**32));
+	$bits -= 32;
+    }
+    $r .= sprintf("%x",rand(2**$bits));
+    $r;
+}

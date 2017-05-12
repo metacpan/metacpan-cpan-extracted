@@ -1,0 +1,5 @@
+<%args>
+$QueryString => undef
+</%args>
+<a href="<%$RT::WebPath%>/ConciseSpreadsheet/Results.tsv<%$QueryString%>"><&|/l&>spreadsheet (Concise)</&></a>
+

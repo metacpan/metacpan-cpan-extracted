@@ -1,0 +1,13 @@
+=extends NEXT
+
+=for layout label_box
+
+<span class="field_collection_label_box"><strong> [% label %]: </strong></span>
+
+=for layout list
+
+<div class="collection_list">
+  [% call_next %]
+</div>
+
+=cut

@@ -1,0 +1,305 @@
+use Test::More tests => 15;
+use Regexp::Log::BlueCoat;
+
+# change the default UFS categories
+Regexp::Log::BlueCoat->ufs_category(
+    'smartfilter',
+    an => 'Anonymizer/Translator',
+    ac => 'Art/Culture',
+    ch => 'Chat',
+    cs => 'Criminal_Skills',
+    oc => 'Cults/Occult',
+    mm => 'Dating',
+    dr => 'Drugs',
+    et => 'Entertainment',
+    ex => 'Obscene/Extreme',
+    gb => 'Gambling',
+    gm => 'Games',
+    nw => 'General_News',
+    hs => 'Hate_Speech',
+    hm => 'Humor',
+    in => 'Investing',
+    js => 'Job_Search',
+    ls => 'Lifestyle',
+    mt => 'Mature',
+    mp => 'MP3_Sites',
+    nd => 'Nudity',
+    os => 'Online_Sales',
+    pp => 'Personal',
+    po => 'Politics/Religion',
+    ps => 'Portal_Sites',
+    sh => 'Self_Help/Health',
+    sx => "Sex",
+    sp => 'Sports',
+    tr => 'Travel',
+    na => 'Usenet_News',
+    wm => 'Webmail',
+);
+
+my $log = Regexp::Log::BlueCoat->new(
+    format  => '%g %e %a %w/%s %b %m %i %u %H/%d %c %f %A',
+    ufs     => 'smartfilter',
+    login   => 'ldap',
+    capture => [':all'],
+);
+
+# test the regex on real log lines
+@ARGV = ('t/bc1.log');
+my @fields = $log->capture;
+my $regexp = $log->regexp;
+
+# a big data set
+my %data;
+my @data = (
+    {
+        'c-ip'        => '10.0.203.16',
+        'user-agent'  => 'Mozilla/4.76 [en] (X11; U; Linux 2.4.2-22mdk i686)',
+        'time-taken'  => '1950',
+        'cs-uri'      => 'http://www.microsoft.com:80/',
+        's-hierarchy' => 'DIRECT',
+        'cs-username' => 'CN=Agent Smith,OU=fr,O=company',
+        'cs-supplier-name'   => 'www.microsoft.com',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'uncategorized',
+        'cs-content-type'    => 'text/html',
+        'cs-method'          => 'GET',
+        'cs-bytes'           => '31977',
+        'sc-status'          => '200',
+        'timestamp'          => '1038956400.024'
+    },
+    {
+        'c-ip'        => '10.0.203.16',
+        'user-agent'  => 'Mozilla/4.76 [en] (X11; U; Linux 2.4.2-22mdk i686)',
+        'time-taken'  => '182',
+        'cs-uri'      => 'http://www.fnac.com:80/',
+        's-hierarchy' => 'DIRECT',
+        'cs-username' => 'CN=Agent Smith,OU=fr,O=company',
+        'cs-supplier-name'   => 'www.fnac.com',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'Online_Sales',
+        'cs-content-type'    => 'text/html',
+        'cs-method'          => 'GET',
+        'cs-bytes'           => '50537',
+        'sc-status'          => '200',
+        'timestamp'          => '1038956401.460'
+    },
+    {
+        'c-ip'        => '10.0.203.16',
+        'user-agent'  => 'Mozilla/4.76 [en] (X11; U; Linux 2.4.2-22mdk i686)',
+        'time-taken'  => '18',
+        'cs-uri'      => 'http://voyages-sncf.com:80/',
+        's-hierarchy' => 'DIRECT',
+        'cs-username' => '-',
+        'cs-supplier-name'   => '-',
+        's-action'           => 'TCP_DENIED',
+        'sc-filter-category' => 'uncategorized',
+        'cs-content-type'    => '-',
+        'cs-method'          => 'GET',
+        'cs-bytes'           => '3309',
+        'sc-status'          => '407',
+        'timestamp'          => '1038956401.633'
+    },
+    {
+        'c-ip'       => '10.0.203.16',
+        'user-agent' => 'MSMSGS',
+        'time-taken' => '298',
+        'cs-uri'     =>
+'http://207.46.110.3/gateway/gateway.dll?Action=poll&SessionID=268004698.8918',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => 'CN=Tux PENGUIN,OU=ress,OU=fr,O=company',
+        'cs-supplier-name'   => '207.46.110.3',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'Webmail',
+        'cs-content-type'    => 'application/x-msn-messenger',
+        'cs-method'          => 'POST',
+        'cs-bytes'           => '228',
+        'sc-status'          => '200',
+        'timestamp'          => '1038956401.013'
+    },
+    {
+        'c-ip'               => '10.0.203.16',
+        'user-agent'         => 'Mozilla/4.01 [en] (Win95; I)',
+        'time-taken'         => '2877',
+        'cs-uri'             => 'http://shttp.msg.yahoo.com/notify/',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => 'CN=Mr MESSENGER,OU=fr,O=company',
+        'cs-supplier-name'   => 'shttp.msg.yahoo.com',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'Portal_Sites',
+        'cs-content-type'    => 'text/plain',
+        'cs-method'          => 'POST',
+        'cs-bytes'           => '2311',
+        'sc-status'          => '200',
+        'timestamp'          => '1038956412.372'
+    },
+    {
+        'c-ip'               => '10.0.203.16',
+        'user-agent'         => 'SetiQueue',
+        'time-taken'         => '2613',
+        'cs-uri'             => 'http://shserver2.ssl.berkeley.edu/',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => 'CN=Frodo BAGGINS,OU=lord-otr,OU=fr,O=company',
+        'cs-supplier-name'   => 'shserver2.ssl.berkeley.edu',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'uncategorized',
+        'cs-content-type'    => 'text/plain',
+        'cs-method'          => 'POST',
+        'cs-bytes'           => '568',
+        'sc-status'          => '200',
+        'timestamp'          => '1039302000.538'
+    },
+    {
+        'c-ip'        => '10.0.203.16',
+        'user-agent'  => 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT 4.0)',
+        'time-taken'  => '91',
+        'cs-uri'      => 'http://www.idealforex.sg-ib.com/Pac_Angl/pool.asp',
+        's-hierarchy' => 'DIRECT',
+        'cs-username' => 'CN=John DOE,OU=decc,OU=fr,O=company',
+        'cs-supplier-name'   => 'www.idealforex.sg-ib.com',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'uncategorized',
+        'cs-content-type'    => 'text/html',
+        'cs-method'          => 'GET',
+        'cs-bytes'           => '8753',
+        'sc-status'          => '200',
+        'timestamp'          => '1039302001.724'
+    },
+    {
+        'c-ip'       => '10.0.203.16',
+        'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT 4.0)',
+        'time-taken' => '125',
+        'cs-uri'     =>
+          'http://www.idealforex.sg-ib.com/Pac_Angl/Include/sg_domain.js',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => 'CN=Pamela ANDERSON,OU=decc,OU=fr,O=company',
+        'cs-supplier-name'   => 'www.idealforex.sg-ib.com',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'uncategorized',
+        'cs-content-type'    => '-',
+        'cs-method'          => 'GET',
+        'cs-bytes'           => '170',
+        'sc-status'          => '304',
+        'timestamp'          => '1039302002.949'
+    },
+    {
+        'c-ip'               => '10.0.203.16',
+        'user-agent'         => 'SetiQueue',
+        'time-taken'         => '2186',
+        'cs-uri'             => 'http://shserver2.ssl.berkeley.edu/',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => 'CN=Frodo BAGGINS,OU=marc-otc,OU=fr,O=company',
+        'cs-supplier-name'   => 'shserver2.ssl.berkeley.edu',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'uncategorized',
+        'cs-content-type'    => 'text/plain',
+        'cs-method'          => 'POST',
+        'cs-bytes'           => '356591',
+        'sc-status'          => '200',
+        'timestamp'          => '1039302002.754'
+    },
+    {
+        'c-ip'               => '10.0.203.16',
+        'user-agent'         => '-',
+        'time-taken'         => '204',
+        'cs-uri'             => 'https://193.116.122.3:443/',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => 'CN=Larry WALL,OU=decc,OU=fr,O=company',
+        'cs-supplier-name'   => '193.116.122.3',
+        's-action'           => 'TCP_TUNNELED',
+        'sc-filter-category' => 'uncategorized',
+        'cs-content-type'    => '-',
+        'cs-method'          => 'CONNECT',
+        'cs-bytes'           => '432',
+        'sc-status'          => '200',
+        'timestamp'          => '1039302011.734'
+    },
+    {
+        'c-ip'               => '10.0.203.16',
+        'user-agent'         => 'Mozilla/4.01 [en] (Win95; I)',
+        'time-taken'         => '336',
+        'cs-uri'             => 'http://shttp.msg.yahoo.com/notify/',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => 'CN=Peter PAN,OU=fr,O=company',
+        'cs-supplier-name'   => 'shttp.msg.yahoo.com',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'Portal_Sites',
+        'cs-content-type'    => 'text/plain',
+        'cs-method'          => 'POST',
+        'cs-bytes'           => '316',
+        'sc-status'          => '200',
+        'timestamp'          => '1039302013.190'
+    },
+    {
+        'c-ip'               => '192.168.71.137',
+        'user-agent'         => '-',
+        'time-taken'         => '2',
+        'cs-uri'             => 'https://econf.qsdf.com/',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => '-',
+        'cs-supplier-name'   => '-',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'content_filter_not_applied',
+        'cs-content-type'    => '-',
+        'cs-method'          => 'GET',
+        'cs-bytes'           => '116',
+        'sc-status'          => '200',
+        'timestamp'          => '1039302017.034'
+    },
+    {
+        'c-ip'       => '10.0.203.16',
+        'user-agent' => 'Totem',
+        'time-taken' => '2',
+        'cs-uri'     =>
+'http://adverts.mp3dancer.com/phps_application/advertisingupdate_7.php3?domain=FavoriteLinksMP3Dancer&localdate=1039301994',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => '-',
+        'cs-supplier-name'   => '-',
+        's-action'           => 'TCP_DENIED',
+        'sc-filter-category' => 'Mature',
+        'cs-content-type'    => '-',
+        'cs-method'          => 'GET',
+        'cs-bytes'           => '3309',
+        'sc-status'          => '407',
+        'timestamp'          => '1039302020.911'
+    },
+    {
+        'c-ip'               => '10.0.203.16',
+        'user-agent'         => 'Mozilla/4.01 [en] (Win95; I)',
+        'time-taken'         => '334',
+        'cs-uri'             => 'http://shttp.msg.yahoo.com/notify/',
+        's-hierarchy'        => 'DIRECT',
+        'cs-username'        => 'CN=Nicolas BOURBAKI,OU=fr,O=company',
+        'cs-supplier-name'   => 'shttp.msg.yahoo.com',
+        's-action'           => 'TCP_NC_MISS',
+        'sc-filter-category' => 'Portal_Sites',
+        'cs-content-type'    => 'text/plain',
+        'cs-method'          => 'POST',
+        'cs-bytes'           => '316',
+        'sc-status'          => '200',
+        'timestamp'          => '1039302022.732'
+    },
+    {
+        'timestamp'   => '1039424947.214',
+        'time-taken'  => '19',
+        'c-ip'        => '192.186.203.16',
+        's-action'    => 'TCP_ERR_MISS',
+        'sc-status'   => '503',
+        'cs-bytes'    => '3100',
+        'cs-method'   => 'GET',
+        'cs-uri'      => 'http:// bug0bus0.free.fr/es_fichiers/tn_ak_01.jpg',
+        'cs-username' => 'CN=Tom BOMBADIL,OU=fr,O=tolkien',
+        's-hierarchy' => 'DIRECT',
+        'cs-supplier-name'   => '-',
+        'cs-content-type'    => '-',
+        'sc-filter-category' => 'Portal_Sites',
+        'user-agent'         =>
+          'Mozilla/5.0 (Windows; U; WinNT4.0; en-US; rv:1.2.1) Gecko/20021130',
+    }
+);
+
+$i = 0;
+while (<>) {
+    @data{@fields} = /$regexp/;
+    is_deeply( \%data, $data[ $i++ ], "bc1.log line " . ( $i + 1 ) );
+}
+

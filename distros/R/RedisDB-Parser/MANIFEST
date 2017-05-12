@@ -1,0 +1,24 @@
+Changes
+lib/RedisDB/Parser.pm
+lib/RedisDB/Parser/Error.pm
+lib/RedisDB/Parser/PP.pm
+lib/RedisDB/Parser/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+rdb_parser.c
+rdb_parser.h
+Parser.xs
+ppport.h
+README
+README.pod
+t/00-load.t
+t/no-leak.t
+t/parser.t
+t/utf8.t
+typemap
+util/parser_benchmark.pl
+xt/manifest.t
+xt/pod-spell.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

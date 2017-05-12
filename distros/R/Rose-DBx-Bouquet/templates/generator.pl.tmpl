@@ -1,0 +1,253 @@
+#!/usr/bin/perl
+#
+# Name:
+#	generator.pl.tmpl.
+#
+# Purpose:
+#	To serve as a template for an auto-generated script.
+#	This template is input to Rose::DBx::Bouquet via rose.app.gen.pl.
+#	The output of rose.app.gen.pl is redirected to generator.pl,
+#	which, when run, generates a set of module files.
+
+use strict;
+use warnings;
+
+# -------------------------------------------------
+
+<tmpl_loop name=package_loop>package <tmpl_var name=prefix>::Rose::<tmpl_var name=module>;
+
+use base '<tmpl_var name=prefix>::Base::Object';
+
+__PACKAGE__ -> meta() -> table('<tmpl_var name=table>');
+__PACKAGE__ -> meta() -> auto_initialize();
+
+</tmpl_loop>package main;
+
+use base 'Rose::DB::Object::Loader';
+use strict;
+use warnings;
+
+use Carp;
+use File::Path;
+use File::Spec;
+use HTML::Template;
+
+# -------------------------------------------------
+
+sub column_to_field
+{
+	my($attribute_map, $type_map, $column, $tabindex) = @_;
+
+	my(%attribute);
+
+	$attribute{'id'}        = $column -> name();
+	$attribute{'class'}     = $column -> type();
+	$attribute{'label'}     = ucfirst join(' ', split(/_/, $attribute{'id'}) );
+	$attribute{'maxlength'} = 64;
+	$attribute{'rank'}      = $tabindex;
+	$attribute{'size'}      = $column -> can('length') ? $column -> length() : 0;
+	$attribute{'size'}      = 24 if (! defined $attribute{'size'});
+	$attribute{'size'}      = $attribute{'maxlength'} if ($attribute{'size'} > $attribute{'maxlength'});
+	$attribute{'tabindex'}  = $tabindex;
+	$attribute{'type'}      = $$type_map{$attribute{'class'} };
+	my($attribute_set)      = $$attribute_map{$attribute{'type'} } || $$attribute_map{'default'};
+
+	my($attribute);
+	my($filler);
+	my(@definition);
+
+	for $attribute (@$attribute_set)
+	{
+		$filler = ' ' x (10 - length $attribute);
+
+		push @definition, qq|\t$attribute$filler=> '$attribute{$attribute}'|;
+	}
+
+	return join(",\n\t", @definition) . ',';
+
+} # End of column_to_field.
+
+# -------------------------------------------------
+
+my($output_dir_name) = '<tmpl_var name=dir_name>';
+
+my(@pm_file_name);
+
+<tmpl_loop name=module_loop>push @pm_file_name, '<tmpl_var name=module>';
+</tmpl_loop>
+# Generate *.pm modules, one per table.
+
+if (<tmpl_var name=verbose>) # if (verbose).
+{
+	print STDERR "Processing Rose::DB-based modules:\n";
+}
+
+my($name);
+my($output_file_name, @output_file_name);
+my($module);
+
+for $module (@pm_file_name)
+{
+	$name             = "<tmpl_var name=prefix>::Rose::$module";
+	$output_file_name = File::Spec -> catfile($output_dir_name, "$module.pm");
+
+	if (<tmpl_var name=remove>) # if (remove).
+	{
+		push @output_file_name, $output_file_name;
+	}
+	else
+	{
+		open(OUT, "> $output_file_name") || die "Can't open(> $output_file_name): \$!";
+		print OUT $name -> meta() -> perl_class_definition(braces => 'bsd');
+		close OUT;
+
+		if (<tmpl_var name=verbose>) # if (verbose).
+		{
+			print STDERR "Generated $output_file_name\n";
+		}
+	}
+}
+
+# Generate */Manager.pm modules, one per table.
+
+if (<tmpl_var name=verbose>) # if (verbose).
+{
+	print STDERR "Processing */Manager.pm modules:\n";
+}
+
+my($lc_module);
+my($template);
+
+for $module (@pm_file_name)
+{
+	mkpath([File::Spec -> catfile($output_dir_name, $module)], 0, 0744);
+
+	$lc_module        = lc $module;
+	$output_file_name = File::Spec -> catfile($output_dir_name, $module, 'Manager.pm');
+
+	if (<tmpl_var name=remove>) # if (remove).
+	{
+		push @output_file_name, $output_file_name;
+	}
+	else
+	{
+		$template = HTML::Template -> new(filename => File::Spec -> catfile('<tmpl_var name=tmpl_path>', 'manager.pm.tmpl') );
+
+		$template -> param(module => $module);
+		$template -> param(prefix => '<tmpl_var name=prefix>');
+		$template -> param(table  => $lc_module);
+
+		open(OUT, "> $output_file_name") || die "Can't open(> $output_file_name): $!";
+		print OUT $template -> output();
+		close OUT;
+
+		if (<tmpl_var name=verbose>) # if (verbose).
+		{
+			print STDERR "Generated $output_file_name\n";
+		}
+	}
+}
+
+# Generate */Form.pm modules, one per table.
+
+if (<tmpl_var name=verbose>) # if (verbose).
+{
+	print STDERR "Processing */Form.pm modules:\n";
+}
+
+my(%attribute_map) =
+(
+ boolean  => [qw/id class label           rank      tabindex type/],
+ default  => [qw/id class label maxlength rank size tabindex type/],
+ hidden   => [qw/id class label           rank      type/],
+ numeric  => [qw/id class label maxlength rank size tabindex type/],
+ text     => [qw/id class label maxlength rank size tabindex type/],
+ textarea => [qw/id class label           rank size tabindex type/],
+);
+my(%type_map) =
+(
+ 'boolean'          => 'boolean',
+ 'character'        => 'text',
+ 'date'             => 'date',
+ 'datetime'         => 'datetime',
+ 'decimal'          => 'numeric',
+ 'double precision' => 'numeric',
+ 'epoch'            => 'datetime',
+ 'float'            => 'numeric',
+ 'integer'          => 'integer',
+ 'numeric'          => 'numeric',
+ 'serial'           => 'hidden',
+ 'text'             => 'textarea',
+ 'time'             => 'time',
+ 'timestamp'        => 'datetime',
+ 'varchar'          => 'text',
+);
+
+my(@column, $column);
+my(@definition);
+my($tabindex);
+
+for $module (@pm_file_name)
+{
+	if (<tmpl_var name=remove>) # if (remove).
+	{
+		push @output_file_name, $output_file_name;
+
+		next;
+	}
+
+	$name = "<tmpl_var name=prefix>::Rose::$module";
+
+	eval "require $name";
+	croak $@ if $@;
+
+	@column     = sort $name -> meta() -> columns();
+	@definition = ();
+	$tabindex   = 1;
+
+	for $column (@column)
+	{
+		push @definition, column_to_field(\%attribute_map, \%type_map, $column, $tabindex++);
+	}
+
+	if (<tmpl_var name=verbose>) # if (verbose).
+	{
+		print STDERR "Module: $module. Columns: ", join(', ', @column), "\n";
+	}
+
+	$lc_module        = lc $module;
+	$output_file_name = File::Spec -> catfile($output_dir_name, $module, 'Form.pm');
+	$template         = HTML::Template -> new(filename => File::Spec -> catfile('<tmpl_var name=tmpl_path>', 'form.pm.tmpl') );
+
+	$template -> param(column_loop => [map{ {column => $column[$_], definition => $definition[$_]} } 0 .. $#column]);
+	$template -> param(module      => $module);
+	$template -> param(prefix      => '<tmpl_var name=prefix>');
+	$template -> param(table       => $lc_module);
+
+	open(OUT, "> $output_file_name") || die "Can't open(> $output_file_name): $!";
+	print OUT $template -> output();
+	close OUT;
+
+	if (<tmpl_var name=verbose>) # if (verbose).
+	{
+		print STDERR "Generated $output_file_name\n";
+	}
+}
+
+if (<tmpl_var name=remove>) # if (remove).
+{
+	for $output_file_name (@output_file_name)
+	{
+		unlink $output_file_name;
+
+		if (<tmpl_var name=verbose>) # if (verbose).
+		{
+			print STDERR "Removed $output_file_name\n";
+		}
+	}
+}
+
+if (<tmpl_var name=verbose>) # if (verbose).
+{
+	print STDERR "Success\n";
+}

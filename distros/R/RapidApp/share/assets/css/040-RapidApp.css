@@ -1,0 +1,1464 @@
+/* http://www.sohtanaka.com/web-design/styling-pre-tags-with-css-code-block/ */
+pre {
+	overflow-x: auto; /* Use horizontal scroller if needed; for Firefox 2, not needed in Firefox 3 */
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */ /*
+	width: 99%; */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
+/* TODO: the above gloabl 'pre' rule does not seem to apply anymore. 
+   Not sure why, but this class name does the same thing */
+.ra-pre-wrap {
+	overflow-x: auto; /* Use horizontal scroller if needed; for Firefox 2, not needed in Firefox 3 */
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */ /*
+	width: 99%; */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
+.loading-background {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-color: white;
+	background-image: url(../../../assets/rapidapp/misc/static/images/indicator.gif) !important;
+}
+
+.rapp-margin-bottom-0 {
+	margin-bottom: 0px;
+}
+
+
+.field-empty-text {
+  color: darkgrey !important;
+  font-family: Arial !important;
+  font-size:.9em !important;
+}
+
+
+.blue-text {
+  color: #083772;
+}
+
+.blue-text-code {
+  color: #083772;
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+.blue-text-code-bold {
+  color: #083772;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+
+
+.with-icon {
+	height: 16px;
+	padding-left: 19px;
+	background-repeat: no-repeat !important;
+	background-position: 1px center;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.with-inline-icon {
+	padding-left: 18px;
+	line-height: 16px;
+	display: inline-block;
+	background-repeat: no-repeat !important;
+}
+
+.ra-icon-centered-16x16 {
+  height: 16px;
+  width: 16px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+
+.grid-cell-with-icon {
+	height: 16px;
+	text-indent: 16px;
+	background-repeat: no-repeat;
+	padding-top: 1px;
+	background-position: 2px 2px;
+}
+
+.ra-icon-16x16 {
+  height: 16px;
+  width: 16px;
+  background-size:16px 16px;
+  background-repeat: no-repeat;
+}
+
+.ra-icon-14x14 {
+  height: 14px;
+  width: 14px;
+  background-size:14px 14px;
+  background-repeat: no-repeat;
+}
+
+.ra-icon-12x12 {
+  height: 12px;
+  width: 12px;
+  background-size:12px 12px;
+  background-repeat: no-repeat;
+}
+
+.ra-icon-11x11 {
+  height: 11px;
+  width: 11px;
+  background-size:11px 11px;
+  background-repeat: no-repeat;
+}
+
+.ra-icon-10x10 {
+  height: 10px;
+  width: 10px;
+  background-size:10px 10px;
+  background-repeat: no-repeat;
+}
+
+.with-background-right-image {
+	background-repeat: no-repeat;
+	background-position: right center;
+}
+
+/* http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting */
+.no-text-select {
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+/*
+  This class can be used to override and re-enable text highlighting that was previously
+  disabled by 'no-text-select' above, or other class that does the same CSS-based text
+  highlight disabling, such as ExtJS'es 'x-unselectable'. Note that this is not a fullproof
+  solution, as text highlighting can also be disabled via swallowing of JS events (See
+  Ext.Element.unselectable() as well as the 'unselectable' HTML tag *attribute*)
+*/
+.yes-text-select, .yes-text-select *  {
+  -webkit-user-select : text !important;
+  -khtml-user-select  : text !important;
+  -moz-user-select    : text !important;
+  -ms-user-select     : test !important;
+  -o-user-select      : text !important;
+  user-select         : text !important;
+}
+
+.x-logical-checkbox {
+	width: 16px;
+	height: 16px;
+	cursor:pointer;
+	float: left;
+}
+
+.ra-icon-bullet_key {
+	background-image: url(../../../assets/rapidapp/misc/static/images/bullet_key.png) !important;
+	background-repeat:no-repeat;
+	padding-right: 18px;
+	padding-top: 9px;
+	padding-bottom: 3px;
+}
+
+
+
+
+
+.tbar-title-medium {
+	font-size:175% !important;
+	padding:6px !important;
+	font-weight: bolder !important;
+}
+.tbar-button-medium {
+	font-size:140% !important;
+	padding-left: 5px !important;
+	font-weight: bolder !important;
+}
+
+.tbar-title-small {
+	padding:3px !important;
+	font-weight: bolder !important;
+}
+.tbar-button-small {
+	padding-left: 2px !important;
+	font-weight: bolder !important;
+}
+
+
+/* Update: renamed from 'magnify-link-tiny' - merged with auto generated icon class 
+   2013-06-22 by HV
+*/
+a.ra-icon-magnify-tiny {
+  /* -- for IE, magic!! Without this, the "filter/opacity" is ignored and other misc problems,
+   this magically makes the element have a "Layout"
+   see: http://www.satzansatz.de/cssd/onhavinglayout.html,
+    http://www.bennadel.com/blog/1354-The-Power-Of-ZOOM-Fixing-CSS-Issues-In-Internet-Explorer.htm   */
+  zoom: 1; 
+  /* -- */
+  
+  background-repeat:no-repeat !important;
+  background-position: 0% 90%;
+  padding-left: 10px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  font-size: 9px;
+  vertical-align: bottom;
+  font-family: "Helvetica Narrow","Arial Narrow",Tahoma,Arial,Helvetica,sans-serif;
+  text-decoration: none;
+  border-bottom: 0px transparent;
+  color: transparent;
+  opacity:0.4;
+  filter:alpha(opacity=40); /* For IE8 and earlier */
+}
+a.ra-icon-magnify-tiny:hover {
+  margin-bottom: 1px;
+  border-bottom: 1px dotted;
+  color: blue;
+  opacity:1.0;
+  filter:alpha(opacity=100); /* For IE8 and earlier */
+}
+a.ra-icon-magnify-tiny span {
+	visibility: hidden;
+}
+a.ra-icon-magnify-tiny:hover span {
+	visibility: visible;
+}
+
+
+a.ra-icon-refresh-tiny {
+  /* -- for IE, magic!! Without this, the "filter/opacity" is ignored and other misc problems,
+   this magically makes the element have a "Layout"
+   see: http://www.satzansatz.de/cssd/onhavinglayout.html,
+    http://www.bennadel.com/blog/1354-The-Power-Of-ZOOM-Fixing-CSS-Issues-In-Internet-Explorer.htm   */
+  zoom: 1; 
+  /* -- */
+  
+  background-repeat:no-repeat !important;
+  background-position: 0% 90%;
+  padding-left: 10px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  font-size: 9px;
+  vertical-align: bottom;
+  font-family: "Helvetica Narrow","Arial Narrow",Tahoma,Arial,Helvetica,sans-serif;
+  text-decoration: none;
+  border-bottom: 0px transparent;
+  color: transparent;
+  opacity:0.4;
+  filter:alpha(opacity=40); /* For IE8 and earlier */
+}
+a.ra-icon-refresh-tiny:hover {
+  margin-bottom: 1px;
+  border-bottom: 1px dotted;
+  color: blue;
+  opacity:1.0;
+  filter:alpha(opacity=100); /* For IE8 and earlier */
+}
+.ra-ap-body a.ra-icon-refresh-tiny span, a.ra-icon-refresh-tiny span {
+  visibility: hidden;
+}
+a.ra-icon-refresh-tiny:hover span {
+  visibility: visible;
+}
+
+
+/* ra-icon-paperclip-tiny: duplicated styles from ra-icon-magnify-tiny */
+a.ra-icon-paperclip-tiny {
+  /* -- for IE, magic!! Without this, the "filter/opacity" is ignored and other misc problems,
+   this magically makes the element have a "Layout"
+   see: http://www.satzansatz.de/cssd/onhavinglayout.html,
+    http://www.bennadel.com/blog/1354-The-Power-Of-ZOOM-Fixing-CSS-Issues-In-Internet-Explorer.htm   */
+  zoom: 1; 
+  /* -- */
+  
+  background-repeat:no-repeat !important;
+  background-position: 0% 90%;
+  padding-left: 10px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  font-size: 9px;
+  vertical-align: bottom;
+  font-family: "Helvetica Narrow","Arial Narrow",Tahoma,Arial,Helvetica,sans-serif;
+  text-decoration: none;
+  border-bottom: 0px transparent;
+  color: transparent;
+  opacity:0.4;
+  filter:alpha(opacity=40); /* For IE8 and earlier */
+}
+a.ra-icon-paperclip-tiny:hover {
+  margin-bottom: 1px;
+  border-bottom: 1px dotted;
+  color: blue;
+  opacity:1.0;
+  filter:alpha(opacity=100); /* For IE8 and earlier */
+}
+a.ra-icon-paperclip-tiny span {
+  visibility: hidden;
+}
+a.ra-icon-paperclip-tiny:hover span {
+  visibility: visible;
+}
+
+
+.superscript-navy {
+  color: navy;
+  font-weight: lighter; 
+  position: relative;
+  top: -4px;
+}
+.superscript-green {
+  color: green;
+  font-weight: lighter; 
+  position: relative;
+  top: -4px;
+}
+
+.x-multifilter-not {
+	font-weight: bolder !important;
+	font-size:145% !important;
+	padding-left: 1px !important;
+	padding-right: 1px !important;
+	font-family: Lucida Console !important;
+	color: lightgray  !important;
+}
+
+.x-multifilter-not-on {
+
+	color: red !important;
+	
+}
+
+.x-multifilter-not-off {
+
+	color: lightgray   !important;
+	
+}
+
+/* ----------------------------------- */
+
+/* http://www.sencha.com/forum/showthread.php?45873-tbar-appears-ugly */
+.tbarBottomBorderFix {
+	border-bottom-style: solid !important;
+	border-bottom-color: #D0D0D0 !important;
+	border-bottom-width: 1px !important;
+}
+
+
+.panel-borders {
+	border-style: solid !important;
+	border-color: #D0D0D0 !important;
+	border-width: 1px !important;
+}
+
+
+.item-disabled {
+  opacity: 0.5 !important;
+  filter: alpha(opacity=50) !important;
+  background-color: #f2f2f2 !important; /* this is needed to fix stupid IE opacity bug */
+}
+
+
+
+
+/* This is needed only with gray theme: */
+/*
+.x-toolbar .xtb-sep { background-image: url(/static/ext/resources/images/default/grid/grid-split.gif) !important }
+*/
+
+.x-tab-panel-header { border-bottom: 0px; }
+
+.offline .x-grid3-cell {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
+
+/*
+.offline .x-grid3-cell .x-grid3-cell-first {
+  opacity: 1.0 !important;
+  filter: alpha(opacity=100);
+}
+*/
+
+.x-grid3-cell-first {
+	opacity: 2.0;
+	filter: alpha(opacity=200);
+}
+
+
+.x-grid3-col-memberpc  {
+	cursor:pointer;
+}
+
+.x-tab-panel-body {
+//	border: 0 none !important;
+}
+
+.x-tab-panel-header-plain .x-tab-strip-spacer, .x-tab-panel-footer-plain .x-tab-strip-spacer {
+	border-bottom: 0 none !important;
+}
+
+
+.x-grid3-row-expander {
+	background-image: url(../../../assets/rapidapp/misc/static/images/row-expand-sprite-arrow.gif) !important;
+}
+
+.x-grid3-row-selected {
+	background: #EEF3E2 !important;
+	border:1px dotted gray;
+}
+
+
+/*
+.x-grid3-row-collapsed .x-grid3-row-expander {
+	background-image: url(../../../assets/rapidapp/misc/static/images/bullet_arrow_up_sm.png) !important;
+	display: inline;
+}
+.x-grid3-row-expanded  .x-grid3-row-expander {
+	background-image: url(../../../assets/rapidapp/misc/static/images/bullet_arrow_down_sm.png) !important;
+	display: inline;
+}
+
+
+html {
+    overflow: -moz-scrollbars-vertical;
+    position: relative;
+}
+
+body {
+    margin: 0 auto;
+    padding: 0;
+    font-family: Tahoma, Geneva, Verdana, Helvetica, sans-serif;
+    font-size: 12px;
+    background-color: #fff; color: #333;
+    letter-spacing: 0.1px;
+    position: relative;
+}
+
+*/
+
+/*
+td {
+  font-family: Tahoma, Geneva, Verdana, Helvetica, sans-serif;
+  letter-spacing: 0.1px;
+  vertical-align: middle;
+}
+*/
+
+img {
+  vertical-align: middle;
+}
+
+/*
+.x-panel-body {
+  border:1px solid gray;
+  border-top:0 none;
+}
+*/
+
+.link-underline {
+	cursor:pointer;
+	text-decoration:underline;
+}
+
+
+/*
+.x-tree-selected { font-weight: bold; }
+*/
+
+//.x-grid3-hd-row .x-grid3-td-PRI_KEY { padding: 0px 0px 0px 0px; }
+//.x-grid3-hd-inner .x-grid3-hd-PRI_KEY { padding: 0px 0px 0px 0px; }
+//.x-grid3-hd-PRI_KEY { padding: 0px 0px 0px 0px; }
+
+.x-grid3-td-editIcon .x-grid3-cell-inner {
+	background-image: url(../../../assets/rapidapp/misc/static/images/table_edit.png) !important;
+	background-position:center center;
+	background-repeat:no-repeat;
+	padding-left: 2px;
+	padding-right: 2px;
+	cursor: pointer;
+}
+
+
+.pos-top-right {
+	text-align: right;
+	position:absolute;
+	top:0;
+	right:5%;
+	width:200px;
+	background-color:yellow;
+}
+
+
+.sbl-panel-body-noborder {
+    border-width: 0 0 0 0 !important;
+    padding: 0 !important;
+    background-color: white !important;
+}
+.res-block {
+	-moz-background-clip:border;
+	-moz-background-inline-policy:continuous;
+	-moz-background-origin:padding;
+	background:transparent url(../img/theme/block-top.gif) no-repeat scroll 0 0;
+	margin-bottom:15px;
+	padding-top:5px;
+	width:210px;
+}
+
+
+/*
+.sbl-panel-body-noborder, .sbl-panel-body-noborder .x-border-panel .x-border-layout-ct, .sbl-panel-body-noborder .x-panel .x-border-panel, .sbl-panel-body-noborder .x-panel-body .x-panel-body-noheader {
+    border-width: 0 0 0 0 !important;
+    padding: 0 !important;
+}
+
+
+*/
+
+/*
+html, body { height:100%; }
+*/
+
+
+
+.bold-italics { font-weight: bold !important; font-style: italic !important; }
+
+
+
+
+
+/* Taken from: http://www.extjs.com/blog/2008/05/14/form-group/  */
+
+/* add some padding so it spaces nice and relative elements dn't get clipped */
+.form-group {
+	padding-top:15px;
+	padding-bottom:10px;
+	overflow:hidden;
+}
+
+/* Simple blue border */
+.form-group .form-group-header {
+	padding:0;
+	border-bottom:1px solid #c3daf9;
+}
+
+/* Position the text element so it appears over the border added above */
+.form-group .form-group-header-text {
+	font-size:11px;
+	font-family:tahoma,arial,sans-serif;
+	line-height:13px;
+	text-transform:uppercase;
+	position:relative;
+	left:5px;
+	top:5px;
+	padding:1px 5px 1px 20px;
+	color:#4e79b2;
+	border:1px solid #c3daf9;
+	background:#fff url(../../../assets/rapidapp/misc/static/images/form-collapse-icon.gif) no-repeat 2px 0;
+}
+
+/* Copied from x-plain (for IE + layouts to work) */
+.form-group-body {
+    overflow:hidden;
+}
+
+/* Copied from x-plain (for IE + layouts to work) */
+.form-group-bwrap {
+    overflow:hidden;
+    zoom:1;
+}
+
+/* Change the toggle icon when collapsed */
+.x-panel-collapsed .form-group-header-text {
+	background-position: 2px -15px;
+}
+
+
+
+
+
+.x-form-display-field, .ext-gecko .x-form-display-field, .ext-strict .ext-ie7 .x-form-display-field {
+    display: block;
+    padding: 3px 0px 0px 0px;
+    padding-left: 0px;
+    position: relative;
+    z-index: 2;
+}
+
+
+.floating-form .x-form-item
+{
+    display: inline;
+    float:left;
+    padding-right: 5px;
+}
+.floating-form label.x-form-item-label
+{
+    padding-right:0;
+}
+.ext-ie .floating-form .x-form-clear-left
+{
+    clear: none;
+    display:none;
+}
+
+
+
+.GreenSheetWrap1 {
+border: 1px #999999 solid !important;
+margin : 3px !important;
+-moz-border-radius: 12px !important;
+-webkit-border-radius: 12px !important;
+border-radius: 12px !important;
+background-color: #ffffcc !important;
+padding-bottom: 3px !important;
+padding-top: 3px !important;
+}
+
+.GreenSheetPN { /* 4 */
+font-weight: bold !important;
+margin : 3px !important;
+margin-left: 5px !important;
+font-size: 24px !important;
+/*text-decoration: underline !important;  */
+color: #333333 !important;
+}
+.GStitle {
+margin-left: 5px !important;
+margin-top: 5px !important;
+margin-bottom: 5px !important;
+font-weight: bold !important;
+font-size: 14px !important;
+padding-top: 3px !important;
+}
+
+.GSrtitle {
+margin-left: 5px !important;
+margin-top: 5px !important;
+margin-bottom: 5px !important;
+font-weight: bold !important;
+font-size: 12px !important;
+padding-top: 3px !important;
+}
+
+
+.GSdesc {
+font-size: 9px !important;
+overflow: hidden !important;
+width: 40% !important;
+border: 1px;
+padding: 2px !important;
+border-style: dotted !important;
+vertical-align: bottom !important;
+font-family: sans-serif !important;
+font-style: italic !important;
+color: grey !important;
+}
+
+
+.GSfloatRight {
+float: right !important;
+margin-right: 20px !important;
+padding-top: 3px !important;
+}
+
+
+table.GSprop {
+font: "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", sans-serif!important;
+padding: 0!important;
+margin: 0!important;
+border-collapse: collapse!important;
+color: #333!important;
+background: #F3F5F7!important;
+}
+
+table.GSprop a.GSprop {
+color: #3A4856!important;
+text-decoration: none!important;
+border-bottom: 1px solid #C6C8CB!important;
+}
+
+table.GSprop thead.GSprop th.GSprop {
+background: #3A4856!important; padding: 15px 10px!important; color: #fff!important; text-align: right!important; font-weight: bolder!important;
+}
+
+table.GSprop tbody.GSprop, table.GSprop thead.GSprop {border-left: 1px solid #EAECEE!important; border-right: 1px solid #EAECEE!important;}
+
+table.GSprop tbody.GSprop {border-bottom: 1px solid #EAECEE!important;}
+
+table.GSprop tbody.GSprop td.GSprop, table.GSprop tbody.GSprop {
+padding: 5px!important; background: url("../../../assets/rapidapp/misc/static/images/td_back.gif") repeat-x!important; text-align: left!important;
+}
+
+th.GSprop, table.GSprop tbody.GSprop {
+padding: 5px!important; background: url("../../../assets/rapidapp/misc/static/images/td_back.gif") repeat-x!important;
+}
+
+th.GSprop { font-weight: bolder!important; margin: 5px !important; white-space:nowrap !important; padding: 2px!important;}
+th.GSprop.right { text-align: right!important; }
+
+
+
+table.GSprop tbody.GSprop tr.GSprop {background: #F3F5F7!important;}
+
+table.GSprop tbody.GSprop tr.GSprop.odd {background: #F0F2F4!important;}
+
+table.GSprop tbody.GSprop tr.GSprop:hover {background: #EAECEE!important; color: #111!important;}
+
+table.GSprop tfoot.GSprop td.GSprop, table.GSprop tfoot.GSprop th.GSprop, table.GSprop tfoot.GSprop tr.GSprop {
+text-align: left!important; font: 120%  "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", sans-serif!important; text-transform: uppercase!important; background: #fff!important; padding: 10px!important;
+}
+
+/* http://www.sencha.com/forum/showthread.php?77984-Field-help-text-plugin. */
+.x-form-helptext {
+    font-size: 9px;
+    color: #888;
+    white-space: normal;
+    padding-bottom:3px;
+}
+
+
+.x-superboxselect-x-flag, body.ext-ie7 .x-superboxselect-x-flag, body.ext-ie6 .x-superboxselect-x-flag {
+	background-image: url(../../../assets/rapidapp/misc/static/s.gif);
+	background-repeat: no-repeat;
+	background-position:  2px center;
+	padding-left: 21px !important;
+	white-space: normal !important;
+	/*text-indent: 17px !important;*/
+}
+
+
+/*
+.x-superboxselect-item-close {background: url(close.png) no-repeat scroll left 0px; border: none; cursor: default; font-size: 1px; height: 16px;padding:0; position: absolute; right: 0px; top: 2px; width: 13px;display:block;cursor:pointer;}
+*/
+
+
+.x-superboxselect-item-read-only .x-superboxselect-item-close {visibility: hidden; background-image: none; border: none; cursor: default; font-size: 1px; height: 0px;padding:0; position: absolute; right: 0px; top: 2px; width: 0px;display:block;cursor:pointer;}
+
+
+.x-superboxselect-item-read-only 
+{
+	-moz-border-radius:6px 6px 6px 6px !important;
+	background-color:#E7E7E7 !important;
+	border:1px solid #D7D7D7 !important;
+	padding:1px 15px 1px 5px !important;
+	position:relative !important;
+	color: black;
+}
+
+.read-only-formfield {
+	background-color: transparent!important;
+	border-color: transparent!important;
+	background-image:none!important;
+	/*
+	# the normal text field has padding-top: 2px which makes the text sit towards
+	# the bottom of the field. We set top and bot here to move one of the px to the
+	# bottom so the text will be vertically centered but take up the same vertical
+	# size as a normal text field:
+	*/
+	padding-top:1px!important;
+	padding-bottom:1px!important;
+}
+
+.RapidApp-dt s {
+	display: none;
+}
+
+
+table.r-simple-table,
+.r-simple-table table {
+	border: 1px solid #DDDDDD;
+}
+
+table.r-simple-table  td,
+.r-simple-table table td {
+	padding: 2px 8px 2px 3px;
+}
+
+table.r-simple-table  th,
+.r-simple-table table th {
+  padding: 2px 15px 2px 5px;
+	font-weight: bold;
+}
+
+table.r-simple-table  tr,
+.r-simple-table table tr  {
+	background: white;
+}
+
+table.r-simple-table  tr:nth-child(2n+1),
+.r-simple-table table tr:nth-child(2n+1) {
+	background: #F8F8F8;
+}
+
+table.r-simple-table  tr > td:first-child,
+.r-simple-table table tr > td:first-child {
+	font-weight: bold;
+}
+
+
+
+.appsuperbox-create-item {
+	background:url(../../../assets/rapidapp/misc/static/images/add.png) center right no-repeat;
+	padding:0px 18px 0px 1px;
+	width: 30;
+	cursor:	pointer;
+	font-size: 12px;
+	font-family: arial;
+	white-space:nowrap;
+	color: darkgray;
+	font-weight: bold;
+	float:left;
+	clear:both;
+	border-bottom-width: 1px;
+	border-color: transparent;
+	cursor:	pointer;
+}
+
+.appsuperbox-create-item:hover {
+	border-bottom-style: dotted;
+	border-color: blue;
+	color: blue;
+}
+
+
+.bgtask-terminal {
+	font-family: Pragmata, Menlo, 'DejaVu LGC Sans Mono', 'DejaVu Sans Mono', Consolas, 'Everson Mono', 'Lucida Console', 'Andale Mono', 'Nimbus Mono L', 'Liberation Mono', FreeMono, 'Osaka Monospaced', Courier, 'New Courier', monospace;
+	padding: 0.5em;
+}
+.bgtask-terminal * {
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */ /*
+	width: 99%; */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
+
+/* alternative to x-grid3-dirty-cell, not currently in use */
+.border-dirty {
+  border-width:5px 0px 0px 5px;
+  -moz-border-image:url("../../../assets/rapidapp/misc/static/images/dirty.gif") 50% 50% 50% 50% stretch;
+  -webkit-border-image:url("../../../assets/rapidapp/misc/static/images/dirty.gif") 50% 50% 50% 50% stretch;
+  border-image: url("../../../assets/rapidapp/misc/static/images/dirty.gif") 50% 50% 50% 50% stretch;
+}
+
+
+
+
+.menu-field-current-value {
+	font-weight: bold;
+	background-repeat: no-repeat;
+	background-position: right center;
+	background-image: url(../../../assets/rapidapp/misc/static/images/checkbox_yes.png);
+}
+
+
+.ra-batch-edit-heading {
+  font-size: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  padding-bottom:15px;
+}
+
+.ra-batch-edit-heading span.num {
+  color: green;
+  font-size:1.25em;
+  font-weight:900;
+}
+
+.ra-batch-edit-sub-heading {
+  text-align: center;
+  padding-bottom:20px;
+  color:gray;
+}
+
+.ra-batch-edit-sub-heading .warn-line {
+  padding-top:10px;
+}
+
+.ra-batch-edit-sub-heading span.warn {
+  font-weight: bold;
+  color: #DAA520;
+}
+
+
+
+.ra-relative-date {
+  font-size: 11px;
+  font-family: arial,tahoma,verdana,helvetica;
+  color: #333333;
+  background-image: url(../../../assets/rapidapp/misc/static/images/clock_run_24x24.png);
+	background-repeat: no-repeat;
+	background-position: 4px 2px;
+}
+
+.ra-relative-date .title {
+  
+  text-align: center;
+  font-size: 1.6em;
+  padding-left: 18px;
+  padding-top:2px;
+  padding-bottom: 8px;
+  line-height: 24px;
+}
+
+.ra-relative-date .mono {
+  font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+  color: gray !important;
+}
+
+.ra-relative-date .sub {
+  padding-bottom: 6px;
+}
+
+.ra-relative-date .examples {
+  font-weight: bold;
+}
+
+.ra-relative-date table {
+  padding-left:5px;
+}
+
+.ra-relative-date ul {
+  padding-top: 4px;
+  padding-left: 12px;
+  padding-bottom: 6px;
+}
+
+.ra-relative-date li {
+  padding: 1px;
+  white-space: nowrap;
+  font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+  color: gray;
+}
+
+.ra-relative-date-renderval {
+  display: block;
+  padding-top: 5px;
+  font-size: 11px;
+  font-family: arial,tahoma,verdana,helvetica;
+  font-style: italic;
+  text-align: center;
+  vertical-align:middle;
+  width:100%;
+  color: gray;
+}
+
+.ra-relative-date-renderval sup {
+  vertical-align: baseline;
+	font-size: 0.7em;
+	position: relative;
+	top: -0.3em;
+}
+
+.ra-relative-date-renderval span {
+  font-style: normal;
+  font-weight: bold;
+  font-variant: small-caps;
+}
+
+.ra-footer {
+  font-size: 10.5px;
+  font-family: arial,tahoma,verdana,helvetica;
+  background-color: #EAEAEA;
+  color: #666666;
+  vertical-align: middle;
+}
+
+.ra-footer .wrap {
+  height: 17px;
+  border-style: solid;
+  border-color: #D0D0D0;
+  border-top-width: 0px;
+  border-left-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.ra-footer td {
+  vertical-align:middle;
+  padding-right:5px;
+  white-space: nowrap;
+}
+
+.ra-footer td.left {
+  padding-left:5px;
+  text-align:left;
+  background-image: url(../../../assets/rapidapp/misc/static/images/rapidapp_powered_logo_tiny.png);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+.ra-footer td a.left {
+  text-align:left;
+  background-image: url(../../../assets/rapidapp/misc/static/images/rapidapp_powered_logo_tiny.png);
+  background-repeat: no-repeat;
+  background-position: left center;
+  display: block;
+  width:99px;
+  height:14px;
+  float:left;
+}
+
+.ra-footer td a.ra-autopanel-reloader {
+  margin-left:7px;
+  margin-bottom: 5px;
+}
+
+.ra-footer td.center {
+  text-align:center;
+}
+
+.ra-footer td.right {
+  text-align:right;
+}
+
+
+
+.ra-datastore-app-field {
+  display: block;
+  padding-top: 2px;
+  padding-right: 12px;
+  padding-bottom: 1px;
+  padding-left: 20px;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  background-color: #FFFFFF;
+  /*background-image: url("../images/default/form/text-bg.gif");*/
+  border: 1px solid;
+  border-color: #C1C1C1;
+  min-height: 15px;
+  background-image: url(../../../assets/rapidapp/misc/static/images/bullet_arrow_down.png);
+  background-repeat: no-repeat;
+  background-position: 2px center;
+  font: 11px tahoma,arial,helvetica,sans-serif;
+  color: #333333;
+  white-space: nowrap;
+  text-overflow:ellipsis;
+  overflow:hidden;
+}
+
+.ra-wrap-on {
+  white-space: normal !important;
+}
+
+.ra-datastore-app-field-invalid {
+  border-color: #CC3300 !important;
+  background-color: #FFCCCC !important;
+}
+
+.ra-datastore-app-field-updating {
+  background-image: url(../../../assets/rapidapp/misc/static/images/progress_green_blocks.gif) !important;
+  background-position: 4px center;
+  padding-right: 2px !important;
+  padding-left: 30px !important;
+  color: #B3B3B3 !important;
+  font-style:italic !important;
+  font: 10px tahoma,arial,helvetica,sans-serif !important;
+}
+
+.ra-bold-grid-row .x-grid3-cell-inner {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #800080;
+  text-shadow:1px 1px 2px #989898;
+}
+
+
+.ra-combo-select-none {
+  color: darkgray !important;
+  font-style: italic !important;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-bottom: 3px;
+  font-size: 1.1em;
+}
+
+.ra-exception-heading {
+  background-image: url(../../../assets/rapidapp/misc/static/icon-error.gif);
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  padding-left:60px;
+  color: #333333;
+  font: 16px tahoma,arial,helvetica,sans-serif;
+  font-weight: bold;
+  top: 10px;
+  padding-top:15px;
+  padding-bottom:15px;
+}
+
+.ra-exception-heading .ra-icon-refresh {
+  font-weight:normal;
+  vertical-align:baseline;
+  font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+}
+
+.ra-exception-body * {
+  word-wrap: break-word;
+}
+
+.ra-exception-body pre {
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;    
+}
+
+.ra-autopanel-error {
+  font-size: 1.2em;
+  position:absolute;
+  top: 0px;
+  right: 25px;
+  bottom: 0px;
+  left:5px;
+}
+
+.ra-autopanel-error .msg {
+  padding-top: 15px;
+  font-size: 1.2em;
+  font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+  color: gray;
+  position:absolute;
+  top: 45px;
+  right: 0px;
+  bottom: 0px;
+  left:0px;
+  min-height: 200px;
+}
+
+.ra-autopanel-error .retry-foot {
+  position:absolute;
+  right: 0px;
+  bottom: 10px;
+  left:0px;
+}
+
+
+/* general purpose search box styles */
+
+.ra-search-box {
+  position: relative;
+  width: 100%;
+  margin: 0;
+}
+
+.ra-search-form {
+  height: 30px;
+  border: 1px solid #999;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.ra-search-text {
+  font-size: 14px;
+  color: #ddd;
+  border-width: 0;
+  background: transparent;
+}
+
+.ra-search-box input[type="text"] {
+  width: 90%;
+  padding: 9px 0 6px 1em;
+  color: #333;
+  outline: none;
+  color: #083772;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+
+/*
+
+.ra-search-box input::-webkit-input-placeholder {
+  color: #999;
+  font-weight: normal;
+  font-family: Arial,Helvetica,sans-serif;
+  padding: 8px 0 6px 1em;
+}
+.ra-search-box input:-moz-placeholder {
+  color: #999;
+  font-weight: normal;
+  font-family: Arial,Helvetica,sans-serif;
+  padding: 8px 0 6px 1em;
+}
+.ra-search-box input:-ms-input-placeholder {
+  color: #999;
+  font-weight: normal;
+  font-family: Arial,Helvetica,sans-serif;
+  padding: 8px 0 6px 1em;
+}
+
+*/
+
+.ra-search-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 32px;
+  width: 40px;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+  line-height: 32px;
+  border-width: 0;
+  background-color: #999;
+  -webkit-border-radius: 0px 5px 5px 0px;
+  -moz-border-radius: 0px 5px 5px 0px;
+  border-radius: 0px 5px 5px 0px;
+  cursor: pointer;
+}
+
+.ra-search-box-heading {
+  font-size: 14px;
+  font-family: Arial,Helvetica,sans-serif;
+  color: #666666;
+  font-weight: bold;
+  padding-bottom:2px;
+  padding-left:1px;
+}
+
+
+
+/* -----
+Overrides to prevent editors from being chopped when they are larger than the grid,
+happens especially in Property Grid when editing the last field/row when it is a
+multi-line editor, like a textarea or html editor.
+TODO: make sure this doesn't cause problems someplace else 
+ * UPDATE -- it did cause problems someplace else, with broken scrolling in windows
+   rendered in grids. Fixed the problem by changing the below rules to direct child 
+   '>' instead of ' ' in the selector paths & verififed it still does what is needed
+*/
+.x-grid-panel>.x-panel-bwrap,
+.x-grid-panel>.x-panel-bwrap>.x-grid-panel>.x-panel-body,
+.x-grid-panel>.x-panel-bwrap>.x-panel-body,
+.x-grid-panel>.x-panel-bwrap>.x-panel-body>.x-grid3,
+.x-grid-panel>.x-panel-bwrap>.x-panel-body>.x-grid3>.x-grid3-viewport {
+  overflow: visible !important;
+}
+/* ----- */
+
+
+.ra-override-cursor-default, .ra-override-cursor-default * {
+  cursor: default !important;
+}
+
+/* http://blog.kenneth.io/blog/2012/03/04/word-wrapping-hypernation-using-css/ */
+.hyphen-wrap {
+  -ms-word-break: break-all;
+  word-break: break-all;
+  word-break: break-word; 
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
+}
+
+.ra-ra-icon-actioncolumn {
+  height: 16px;
+  width: 16px;
+}
+
+/* Needed to fix new default in Ext 3.4.1 */
+a:hover, a:hover * { cursor: pointer; }
+.x-tab-strip-active a:hover, .x-tab-strip-active a:hover * { cursor: default; }
+
+
+/* 
+  Use this class (with an icon class) in iconCls for the special 
+  case where you want a tab to have an icon only, no text title, and
+  have the icon display nicely centered in the tab. This is hard
+  coded for 16px width icons. Note that you *must* also set the 'title' to
+  &nbsp; for the proper/consistent height. This is used by AppExplorer for
+  the dashboard tab (home icon)
+*/
+.ra-tab-icon-only-16px {
+  background-position: 4px 3px !important;
+  padding-left: 0px !important;
+  width: 20px !important;
+}
+
+/* Added to fix Github Issue #12 - we want to make sure any
+   spans *inside* tab titles are inline instead of block so
+   they don't wrap   */
+.x-tab-strip .x-tab-strip-text span { display: inline; }
+
+/* used for the red asterisk appended to tabs with unsaved changes:
+   #c00000 (shade of red) is the same color as 'dirty.gif'  
+   (dirty cell corner triangle icon) */
+.ra-tab-dirty-flag {
+  font-weight:bold;
+  font-size:1.2em;
+  line-height: 1em;
+  color:#c00000;
+}
+
+.ra-grid-tb-query-time {
+  /* light gray */
+  color:#b3b3b3 !important;
+  font-size:0.85em !important;
+  line-height: 0.93em !important;
+}
+
+/* padding only in the toolbar; not in the overflow menu: */
+.xtb-text.ra-grid-tb-query-time {
+  padding-left:6px !important;
+  padding-bottom:4px !important;
+  min-width: 50px;
+  white-space: normal;
+  word-wrap: break-word;
+  text-align: center;
+}
+
+
+/* Hide autopanel reloaders unless they are within an AutoPanel*/
+.ra-autopanel-reloader             { visibility: hidden; }
+.ra-ap-body .ra-autopanel-reloader  { visibility: visible; }
+
+/* Selector path/rule to apply borders _ONLY_  
+   when rendered directly within an AutoPanel     */
+.ra-ap-body > .ra-ap-borders,
+.ra-ap-body > div > .ra-ap-borders,
+.ra-ap-body > div > div > .ra-ap-borders {
+  border: 1px solid #D0D0D0;
+}
+
+
+.ra-autopanel-reloader {
+	color: navy;
+}
+
+.ra-autopanel-reloader:hover {
+	color: blue;
+	cursor:pointer;
+	text-decoration:underline;
+}
+
+/* Need this for the nested navtrees to horizontally scroll together 
+ TODO: this is a hack, and the mouse-over/highlight of tree nodes
+ is not currently working properly (chopped off)
+*/
+#main-navtrees-container .x-panel-body, 
+#main-navtrees-container .x-panel-bwrap,
+#main-navtrees-container .x-tree {
+  overflow: visible;
+}
+
+/* Hide nav links when there is no nav target*/
+.ra-nav-link                  { visibility: hidden; }
+#main-load-target .ra-nav-link  { visibility: visible; }
+
+.ra-null-val {
+  color:darkgrey;
+}
+.ra-dirty-display-val {
+  opacity: 0.8;
+  font-style: italic;
+  border-bottom: 1px dotted #c00000;
+}
+
+.ra-hex-string {
+  color: #083772;
+  font-family: "Lucida Console", Monaco, monospace !important;
+  font-size: 0.8em !important;
+}
+
+/* lighter version of the standard grey combo trigger */
+.ra-x-form-arrow-trigger-light {
+  background-image: url(../../../assets/rapidapp/misc/static/images/trigger-square-light.gif) !important;
+}
+
+/* http://stackoverflow.com/a/5108367 */
+.ra-wrapword, .ra-wrapword * {
+  white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+  white-space: -webkit-pre-wrap; /*Chrome & Safari */ 
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  white-space: pre-wrap;       /* css-3 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  word-break: break-all;
+  white-space: normal;
+}
+
+/* Added for shorten_tab_titles feature by GETTY */
+
+.ra-short-tab-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wrapword {
+  white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  white-space: pre-wrap;       /* css-3 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+  word-break: break-all;
+  white-space: normal;
+}
+
+
+/* This selector will match the tab strip loaded via /rapidapp/module/navable
+   and put the top border on which is disabled when rendered within the explorer,
+   because it already supplies borders */
+body > #main-load-target > .x-tab-panel-header {
+  border-top-width:1px;
+  border-left-width:1px;
+  border-right-width:1px;
+}
+
+
+/* Fix CSS bug in ExtJS --
+   the "noborder" settings of panels which are nested within grids do not work due to
+   an apparent bug in ExtJS CSS. The 'border' style/rules of the grid end up being
+   more specific (and thus higher priority) than the noborder rule, and so the border
+   style meant for the grid's panel body get applied to child panel body's, even though
+   they have border: false and/or bodyBorder: false. Here we repeat the same rule that
+   is already in place, but prepend x-grid-panel to make it have higher priority.
+   This has been a long standing, annoying bug for a long time (note, this bug fix
+   might break things which relied on the bug) */
+.x-grid-panel .x-panel-noborder .x-panel-body-noborder {
+    border-width:0; 
+}
+
+
+/* This style draws a line between the the form-panel items and the buttons, which
+   is only really important when there are enough items to force to scroll.
+   It is designed to work with the 'frame: true' setting, which is set in StoreCmp.
+   This isn't perfect, but its better than nothing and is safe, since the panel 
+   'frame' setting is a complex beast.   */
+.ra-datastore-add-edit-form>.x-panel-bwrap>.x-panel-bl {
+  border-top: 1px solid #D0D0D0;
+}
+
+.ra-paging-total-count-btn button {
+  font-size:1.1em;
+  color:#083772;
+  padding-left: 0px !important;
+  margin-left: -4px;
+  padding-right: 0px !important;
+}
+
+.ra-paging-total-count-btn button .off {
+  font-size:.9em;
+  color:grey;
+  font-style: italic !important; 
+  margin-left: 4px;
+  /*border-bottom: 1px dotted grey;
+  font-family: "Lucida Console", Monaco, monospace;*/
+}

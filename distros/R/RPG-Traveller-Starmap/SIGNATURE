@@ -1,0 +1,73 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7915c40d412930d5171656ce75e8c3cc810bd29a Build.PL
+SHA1 256833de640fd554c055322ec3d971343b5e53d8 Changes
+SHA1 422159c6db4a35ed61896b76b239007db8532e12 INSTALL
+SHA1 a06528f602225b83744243733b686a769e65e840 LICENSE
+SHA1 f39e9f4d6ce964c700e9d991e96dc34f96d67e89 MANIFEST
+SHA1 bcb321d1c46596bea77abecf5f2f3ae8a21f6233 META.json
+SHA1 ce7844381f9326a7f426a9df75b8994a541536b0 META.yml
+SHA1 83535b0dc43f586fdedcf82f535220777364d478 Makefile.PL
+SHA1 89bdc571e4d61fc0db50746f2b6882f23cb00bd2 README
+SHA1 051d40509d2477211cef88fa7f09918982f0c787 dist.ini
+SHA1 6dcc3904cafee60b5570952a892eb7c1c4a91880 lib/RPG/Traveller/Starmap.pm
+SHA1 f5d6ee3d2a0402d8b874f03b5434798603555042 lib/RPG/Traveller/Starmap/Constants.pm
+SHA1 f0237c8bcd2078894ed6e87997ed1d3ea09135a8 lib/RPG/Traveller/Starmap/Moon.pm
+SHA1 df1a9730066e232d4ca8d28b096d6895c362b3de lib/RPG/Traveller/Starmap/Parsec.pm
+SHA1 70657206805ebb7100202c930d9b6756b904011c lib/RPG/Traveller/Starmap/Planet.pm
+SHA1 800fbd921c520aa635a081d2c9d2643b02b78426 lib/RPG/Traveller/Starmap/Planet/Belt.pm
+SHA1 344cd95482d2df21da9533fd89e9c19ff26c3ae0 lib/RPG/Traveller/Starmap/Planet/GasGiant.pm
+SHA1 409dc52454b51d6896e54ffd176a5232ca9e08a1 lib/RPG/Traveller/Starmap/Planet/Main.pm
+SHA1 955e4b64eb6fe75a674edd8bbf941fbcd52ea171 lib/RPG/Traveller/Starmap/Planet/Orbit.pm
+SHA1 1bb7ce38285a67cf89cfe9a569259c319d245183 lib/RPG/Traveller/Starmap/Planet/OrbitPlane.pm
+SHA1 8cb178d53b51e9f50f27ccd1878886f3adf86c3e lib/RPG/Traveller/Starmap/Sector.pm
+SHA1 e1f7238aeafbb7b8b28c6164d2838b7e30bd4fdc lib/RPG/Traveller/Starmap/Star.pm
+SHA1 2d6482ede89ac367da36b740964f180e2efea567 lib/RPG/Traveller/Starmap/Star/Companion.pm
+SHA1 2ef8b80602375c945ce4ae73703797ad9b9eb5f6 lib/RPG/Traveller/Starmap/Star/Orbit.pm
+SHA1 71c002a2ef47e5c4b6dbd7dc9eec9532a2c6c624 lib/RPG/Traveller/Starmap/Star/OrbitPlane.pm
+SHA1 a265c152ef267c25b127995199d7b3756d913621 lib/RPG/Traveller/Starmap/Star/Primary.pm
+SHA1 01ddf347320bf489e01a1cd19d87c82d81174bd3 lib/RPG/Traveller/Starmap/StarGroup.pm
+SHA1 5ae9e839e527496765bbc462bad3fef6974d8733 lib/RPG/Traveller/Starmap/Subsector.pm
+SHA1 b54157894b1f309e692bb0930342cdf04c88b37f perltidy.LOG
+SHA1 5d469e7f94f242bc455bcfa4ba420e787c49ded8 t/00-Constants--Densities.t
+SHA1 3cca57301d17ab1acf7fceec606767419c850425 t/00-compile.t
+SHA1 1f88c1a8ce7363c91e7a5425f1b21fcf0e615c32 t/000-report-versions.t
+SHA1 30d2c2dae655ea4847cdcbf39696e135239e8903 t/02-Subsector.t
+SHA1 f71d5b5d8c024ffeb0f4c853ab9c0844b0de0bec t/80-OrbitPlane.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 cba08adf093fa46a9151be9212a368485ef13c14 t/release-cpan-changes.t
+SHA1 a95be7f18c2443b36947e6a2888ff14742899350 t/release-no-tabs.t
+SHA1 ecd6305379975ecc5ce20f4c3e76bfcfe462e2d4 t/release-pod-coverage.t
+SHA1 7eb3492f9c47f10f80d4f285e96536e9192026dc t/release-pod-syntax.t
+SHA1 451078f0a380624f2de349bf7b4c72a994427afc t/release-portability.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBAgAGBQJREWlLAAoJEG3q6AJEOjrhyGAQAJ1gXmnS2LCwsDfOQmTYIf5T
+d4Zlj5F1HfElr0mauLYj6n/l6PZ86dADBSKxEo1g38csEqi+IBMuqBRxEnQ2hSCb
+cVrtKD2DQANsw+AkRICX7UC8q3HfAhFaUU34a0zMAH5HdtXmGEH6WKShz0XRWSNd
+/sLF0sZmqE0zSg71U80OaEH7Jhj0C4vCQTwtpo/VAxt6eswJyQA9miLmvLzadUN/
+/qBBadqJcqL0zOzAT8f4uSqk26lldqvi9i01Hwfd59SBxgTEMtpMiGpPVQX1Fobw
+y2O72/TSrbiVOcedn1El/fHB3K5A6TbEl8qRBtsWK4lKxDTEDlJmYltjgVED5VQM
+bgANdACf93+Jsu7MGUzFd3JZ8ZH13kjQL4PpjBWrdKH6pVoCj7EfaTxNRwJ0imq4
+fS4+gft1YZ/mp/d7oqNahtx5kO+yhOKs03n0KdaszAolMYy59OWmBqcf7IPRdF2Y
+xyqyrCFG9AuMAC1c58L7DWXA7zPcKNjVSkiPYtbFdTvc43RY6t/chweRkhD0dUuV
+hFBI3AZK4vBVvrBuTJtaA7JfBlWF3IlCopgRL3fYhqN6n0piz+dpAZftzt/5CJDI
+7SWRdY420pqvvudnoS0uKvN7SnPYMFO3Z3R759TVv/oPpmLsaWmRsQHCGQTB57x2
+QuRsB740z5FrQ7VI0YgV
+=yNFs
+-----END PGP SIGNATURE-----

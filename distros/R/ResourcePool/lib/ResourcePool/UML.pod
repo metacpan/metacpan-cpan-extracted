@@ -1,0 +1,83 @@
+=head1 NAME
+
+ResourcePool::UML - UML diagram for the ResourcePool package
+
+=head1 SYNOPSIS
+
+
+This UML Diagram uses DBI as an example Resource. Other Resources are handled in the same way.
+
+ 
+              +---------------------------------+
+              | ResourcePool::LoadBalancer      |
+              +---------------------------------+
+              +---------------------------------+
+              | +new(key, options)              |
+              | +add_pool(pool, options)        |
+              +---------------------------------+
+                                |
+                                |
+                                V      +---------------+
+              +------------------------+ PlainResource |
+              | ResourcePool           +--------+------+
+              +---------------------------------+
+              | -factory: ResourcePool::Factory +--+
+           +--+ -pool: ResourcePool::Resource   |  |
+           |  +---------------------------------+  |
+           |  | +new(fatory,options)            |  |
+           |  | +get():PlainResource            |  |
+           |  | +free(plainresource)            |  |
+           |  | +fail(plainresource)            |  |
+           |  +---------------------------------+  |
+           |                    |                  |
+           |                   / \                 |
+           |  +---------------------------------+  |
+           |  | ResourcePool::Singleton         |  |
+           |  +---------------------------------+  |
+           |  +---------------------------------+  |
+           |  +---------------------------------+  |
+           V                                       V
+ +-----------------------------+  +-----------------------------+
+ | ResourcePool::Resource::DBI |  | ResourcePool::Factory::DBI  |
+ +-----------------------------+  +-----------------------------+
+ | #dbh                        |  | -ds                         |
+ +-----------------------------+  | -user                       |
+ | +new(ds, user, auth, attr)  |  | -auth                       |
+ | +get_plain_resource()       |  | -attr                       |
+ | +close()                    |  +-----------------------------+
+ | +fail_close()               |  | +new(ds, user, auth, attr)  |
+ | +precheck()                 |  | +create_resource()          |
+ | +postcheck()                |  +-----------------------------+
+ +-----------------------------+                 |
+                |                                |
+               / \                              / \
+ +-----------------------------+  +-----------------------------+
+ | ResourcePool::Resource      |  | ResourcePool::Factory       |
+ +-----------------------------+  +-----------------------------+
+ +-----------------------------+  +-----------------------------+
+ | +new()                      |  | +new(key)                   |
+ | +get_plain_resource()       |  | +create_Resource()          |
+ | +close()                    |  +-----------------------------+
+ | +fail_close()               |                 |
+ | +precheck()                 |                 |
+ | +postcheck()                |                / \
+ +-----------------------------+  +-----------------------------+
+                                  | ResourcePool::Singleton     |
+                                  +-----------------------------+
+                                  +-----------------------------+
+                                  +-----------------------------+
+
+=head1 SEE ALSO
+
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Resource::DBI|ResourcePool::Resource::DBI>,
+L<ResourcePool::Resource::Net::LDAP|ResourcePool::Resource::Net::LDAP>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

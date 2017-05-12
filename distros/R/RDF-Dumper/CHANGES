@@ -1,0 +1,6 @@
+Changelog for RDF-Dumper
+
+0.3 2014-01-15T12:26:31
+ - fixed test (but not the bug?) [Jakob Voss]
+ - enable travis-ci [Jakob Voss]
+

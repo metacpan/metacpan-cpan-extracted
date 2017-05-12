@@ -1,0 +1,15 @@
+Revision history for RT-Extension-HideWidgets
+
+0.03	30/07/2014
+	0.031 - Improvement     : Works also for privileged users/group and selfservice users/group
+	0.03  - Bug Fix 	: https://rt.cpan.org/Public/Bug/Display.html?id=97596
+	This version work for RT 4.2.0 and above
+
+0.02	29/07/2014
+	0.025 - Improvement 	: Works also for privileged users/group and selfservice users/group
+	0.024 - Bug Fix 	: https://rt.cpan.org/Public/Bug/Display.html?id=97596
+	This version work for RT 4.0.0 and above
+
+0.01    07/2014
+        First version, released.
+

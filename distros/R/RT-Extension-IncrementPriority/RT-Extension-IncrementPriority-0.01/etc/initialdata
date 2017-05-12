@@ -1,0 +1,22 @@
+use strict;
+use warnings;
+
+our @ScripActions = (
+    {
+	Name        => 'Increment Priority',
+	Description => 'Ignores ticket due dates and simply increments 
+Priority by one (unless the ticket has already reached or exceeded 
+FinalPriority in which case it does nothing). This is in contrast to 
+RT::Action::LinearEscalate and RT::Action::EscalatePriority which 
+both update priority based on due date.
+
+This is useful when tickets do not have due dates but for which it is 
+nonetheless desirable to periodically increment the priority, especially 
+when updates are based on some search criteria (which can be specified 
+in the call to rt-crontool).' ,
+	ExecModule  => 'IncrementPriority',
+	Argument    => ''
+    },
+);
+
+1;

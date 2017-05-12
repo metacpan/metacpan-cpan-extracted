@@ -1,0 +1,14 @@
+lib/RPC/JSON.pm
+lib/RPC/JSON/Shell.pm
+t/01use.t
+t/02connect.t
+t/03podcoverage.t
+t/runtest
+t/pt
+Makefile.PL
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+COPYING
+README
+META.yml                                 Module meta-data (added by MakeMaker)

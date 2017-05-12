@@ -1,0 +1,2 @@
+<& /Elements/Header, %ARGS, Prefs => '/Minimal/Prefs.html' &>
+<& /Minimal/Elements/Tabs, %ARGS &>

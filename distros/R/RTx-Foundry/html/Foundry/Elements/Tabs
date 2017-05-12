@@ -1,0 +1,38 @@
+%# If you want your spouse to listen and pay strict attention to every
+%# word you say, talk in your sleep.
+
+% unless ($Recurse) {
+<table cellpadding=0 cellspacing=0 border=0>
+<tr><td>
+% }
+<table border=0 cellpadding=0 cellspacing=0 width="100%">
+  <tr> 
+% while (my ($k, $v) = splice(@Tabs, 0, 2)) {
+%   if ($k eq $Text) {
+    <td background="/img/tabLeft.png" width=2></td>
+    <td align="center" background="/img/tabMiddle.png"><div style="padding: 3px; padding-left: 10px; padding-right: 10px;position:relative;top:2px;color:white"><label><a href="<% $v %>" style="color: white"><b><% loc($k) %></b></a></label></div></td>
+    <td background="/img/tabRight.png" width=2></td>
+%   } elsif ($Skips->{$k}) {
+    <td background="/img/tabLeftTop.png" width=2></td>
+    <td align="center" style="cursor: hand" background="/img/tabMiddleTop.png"><div style="padding: 3px; padding-left: 10px; padding-right: 10px;position:relative;top:2px;color:#808080"><% loc($k) %></div>
+    </td>
+    <td background="/img/tabRightTop.png" width=2></td>
+%   } else {
+    <td background="/img/tabLeftTop.png" width=2></td>
+    <td align="center" style="cursor: hand" onclick="javascript:location.href='<% $v %>'" background="/img/tabMiddleTop.png"><div style="padding: 3px; padding-left: 10px; padding-right: 10px;position:relative;top:2px;color:black"><a style="color: black" href="<% $v %>"><% loc($k) %></a></div>
+    </td>
+    <td background="/img/tabRightTop.png" width=2></td>
+%   }
+% }
+  </tr>
+</table>
+% return if $Recurse;
+</td></tr></table>
+<%INIT>
+my @Tabs = @RT::Tabs;
+</%INIT>
+<%ARGS>
+$Text => ''
+$Skips => {}
+$Recurse => 0
+</%ARGS>

@@ -1,0 +1,6 @@
+#!perl
+
+use Test::Harness;
+use lib qw|../lib|;
+
+runtests(qw|01use.t 02connect.t 03podcoverage.t|);

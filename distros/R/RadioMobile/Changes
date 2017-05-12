@@ -1,0 +1,31 @@
+Revision history for Perl extension RadioMobile.
+
+0.11  Tue Oct 30 16:57:53 CET 2012
+	- Now unit elevation is working
+
+0.10  Tue Oct 30 14:35:54 CET 2012
+	- Various changes
+	- Understood the Unknown1 Unit field which is a long string unit description
+	- Now this module writes Radio Mobile .net files from scratch
+
+0.06  Wed Mar  2 11:59:19 CET 2011
+	- Coverage had been parsed but didn't exist in RadioMobile methods tree.
+
+0.05  Thu Feb 17 17:50:00 CET 2011
+	- According to documentation, NetUnit->system return its system object 
+		and not its system index.
+
+0.04  Wed Feb  9 15:18:48 CET 2011
+	- Support for an optional callback function for parse()
+
+0.03  Wed Feb  9 11:29:53 CET 2011
+	- Add support for scalar file data to parse
+	- INCOMPATIBLE CHANGES: now path to file to parse must be set using filepath 
+		meanwhile file must be use to set scalar binary raw data.
+
+0.02  Sun Jan 30 14:55:11 CET 2011
+	- Add version number to all module
+	- Add a missing module requirement
+
+0.01  Fri Jan 28 20:50:28 CET 2011
+	- First public revision

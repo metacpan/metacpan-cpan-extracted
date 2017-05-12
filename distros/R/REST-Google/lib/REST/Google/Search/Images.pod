@@ -1,0 +1,17 @@
+=head1 NAME
+
+REST::Google::Search::Images - search Google Images
+
+=head1 SYNOPSIS
+
+	use REST::Google::Search::Images;
+
+=head1 SEE ALSO
+
+L<REST::Google::Search>, L<REST::Google>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2008, Eugen Sobchenko <ejs@cpan.org> and Sergey Sinkovskiy <glorybox@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

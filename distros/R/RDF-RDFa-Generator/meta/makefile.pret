@@ -1,0 +1,13 @@
+# This file provides instructions for packaging.
+
+`RDF-RDFa-Generator`
+	perl_version_from m`RDF::RDFa::Generator`;
+	version_from      m`RDF::RDFa::Generator`;
+	readme_from       m`RDF::RDFa::Generator`;
+	test_requires     p`Test::More 0.61`;
+	requires          p`Data::Dumper`;
+	requires          p`Icon::FamFamFam::Silk`;
+	requires          p`RDF::Trine 0.112`;
+	requires          p`RDF::Prefixes`;
+	requires          p`XML::LibXML 1.60`;
+.

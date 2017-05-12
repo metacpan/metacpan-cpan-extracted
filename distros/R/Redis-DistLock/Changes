@@ -1,0 +1,32 @@
+Revision history for Perl extension Redis::DistLock.
+
+0.07  Wed Jun 18 14:19:43 CEST 2014
+	- fix broken test
+
+0.06  Wed Jun 18 14:10:11 CEST 2014
+	- add experimental option to extend existing locks
+
+0.05  Sat Jun 14 16:10:50 CEST 2014
+	- add license and bucktracker link
+
+0.04  Sat Jun 14 15:08:56 CEST 2014
+	- add auto_release option to release all locks when the manager object
+	  is destroyed (from Ryan Bastic)
+	- add logger option for a callback to log errors (from Ryan Bastic)
+	- catch errors on connect (from Ryan Bastic)
+	- make sure encoding is disabled for Redis connections
+	- make sure the initial number of connections is high enough
+	- allow release() to be called with unnamed arguments
+
+0.03  Thu Jun 12 23:36:17 CEST 2014
+	- fix for quorum calculation by Ryan Bastic
+	- fix expire time value fallout from switching to seconds
+
+0.02  Thu Jun 12 14:07:10 CEST 2014
+	- switch to seconds instead of milliseconds
+	- check for a valid mutex in the release method
+	- implement redis version check on object creation
+
+0.01  Wed Jun 11 10:05:26 CEST 2014
+	- initial version/release
+

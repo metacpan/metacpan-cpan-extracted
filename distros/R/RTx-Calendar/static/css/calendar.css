@@ -1,0 +1,71 @@
+/* Tooltips */
+table.rtxcalendar .tooltip {
+    position: relative;
+    z-index: 1;
+}
+table.rtxcalendar .tooltip:hover {
+    z-index: 5;
+    color:#000;
+}
+table.rtxcalendar .tooltip span.tip {
+    display: none;
+    text-align: left;
+}
+table.rtxcalendar div.tooltip:hover span.tip{
+    display: block;
+    position: absolute;
+    top:12px; left:24px; width:350px;
+    border: 1px solid #555;
+    background-color: #fff;
+    padding: 4px;
+    font-size: 0.8em;
+    color: #505050;
+}
+
+
+/* For the full calendar */
+table.rtxcalendar {
+    width:100%;
+    border-collapse: collapse;
+    border: 1px solid #d0d0d0;
+    margin-bottom: 6px;
+}
+
+table.rtxcalendar td {
+    border: 1px solid #d7d7d7;
+    background: #fff;
+    vertical-align: top;
+    width: 14%;
+}
+
+table.rtxcalendar th {
+    border: 1px solid #d7d7d7;
+    background: #eef;
+}
+
+table.rtxcalendar td .inside-day {
+    min-height: 5em;
+}
+
+table.rtxcalendar td.offmonth {
+    background: #f8f8f8;
+    color: #aaa;
+}
+
+table.rtxcalendar td.today {
+    background: #ffe;
+    border: 1px solid #fc6;
+}
+
+table.rtxcalendar td.today .calendardate {
+    background-color: #fc6;
+    width:100%;
+}
+
+table.rtxcalendar td.yesterday {
+    border-right: none;
+}
+
+table.rtxcalendar td.aweekago {
+    border-bottom: none;
+}

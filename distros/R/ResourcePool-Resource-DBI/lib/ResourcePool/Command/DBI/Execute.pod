@@ -1,0 +1,176 @@
+=head1 NAME
+
+ResourcePool::Command::DBI::Execute - A DBI command to execute non select statements.
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Command::DBI::Execute;
+ 
+ # simple usage
+ my $cmd = ResourcePool::Command::DBI::Execute->new();
+ my $pool; # ResourcePool setup not shown here
+ eval {
+   $pool->execute($cmd
+     , 'insert into test (id, name, value) values (?, ?, ?)'
+     , 1 , 'xy', '15'
+   );
+ };
+ 
+ # pre configured usage
+ my $cmd2 = ResourcePool::Command::DBI::Execute->new(
+   'insert into test (id, name, value) values (?, ?, ?)'
+   , { 1 => {type => SQL_INTEGER}
+     , 2 => {type => SQL_VARCHAR}
+     , 3 => {type => SQL_VARCHAR}
+   }
+   , prepare_cached => 1
+ );
+ 
+ my $i;
+ for ($i = 0; $i < 1000; $i++) {
+   $pool->execute($cmd2, $i, "name $i", "value $i");
+ }
+ 
+ # using named bind parameters and output parameters
+ my $cmd3 = ResourcePool::Command::DBI::Execute->new(
+     'insert into test (name, value) values (:name, :value)' 
+   . ' returning id into :id'
+   , { ':id' => {max_len => 50}} 
+     # max_len identifies an output parameter
+ );
+ 
+ my $id;
+ $pool->execute($cmd3
+   , { ':name' => 'a name'
+     , ':value' => 'a value'
+     , ':id' => \$id # output parameter passed by ref
+   }
+ );
+
+=head1 DESCRIPTION
+
+
+This command can be used to execute non select statements in a DBI database using the L<ResourcePool|ResourcePool> command execution environment.
+
+In order to understand this Class, and more importantly this document, you need to know a few terms I use in this document, if you are new to this class you should read the L<TERMS|/TERMS> sections first.
+
+If the command was executed successfully (without error being raised) the transaction will be committed.
+
+=head2 S<ResourcePool::Command::DBI::Execute-E<gt>new($SQL, \%bindconf, @attr)>
+
+Instantiates a new Execute object, all parameters are optional, the only restriction is that if you want to specify a bind configuration you have also to specify a SQL.
+
+=over 4
+
+=item $SQL
+
+If you specify a SQL string at construction, you can not change it during lifetime of this object. The most common reason to do so is if you want to execute this command more then once, than you do not need to pass the SQL every time. The second reasons is because the only possible way to pass a bind configuration to the Execute object is at construction, and you are only allowed to specify a bind configuration if you have also specified a SQL.
+
+=item \%bindconf
+
+If you have passed a SQL command to the constructor you can also pass a hash reference to bind configuration.
+
+The hash is expected to use a placeholder name as key and an other hash reference as value. If you use for example '?' (position parameters) than the key for that would be 1 for the first '?' in you SQL, 2 for the second and so on. If you use named parameters the name of this parameter is the key to the bind configuration hash.
+
+For each placeholder you can define a second hash which can hold configuration for this single placeholder:
+
+
+=over 4
+
+=item type
+
+Specifies the type of the placeholder. For example SQL_INTEGER for numeric values.
+
+=item max_len
+
+Specifies the maximum space allocated for output parameters. If you want to use output parameters (for example when calling stored procedures) you MUST specify this attribute with an appropriate value.
+
+By defining this value, the Execute calls changes the way it binds the parameters to bind_param_inout which is required for output parameters. If you use output parameters you MUST pass a reference to a scalar which should be used to store the output parameter as bind parameter when calling execute().
+
+=back
+
+=item @attr
+
+Options which do change the way Execute() works can be specified as last argument. There is currently only one such option:
+
+=back
+
+=head2 S<$pool-E<gt>execute($SQL, @bindparam)>
+
+=over 4
+
+=item $SQL
+
+If you haven't specified a SQL string on construction, you have to specify it as first argument to the execute method.
+
+=item @bindparam
+
+Positional parameters which should be bound before executing the statement. It is also possible to use named parameters as described below.
+
+=back
+
+=head2 S<$pool-E<gt>execute(\%bindparam)>
+
+IF you have specified a SQL statement at construction of this object, you can not specify another when calling the execute() method.
+
+=over 4
+
+=item \%bindparam
+
+Named parameters to be bound before executing the statement. The last example from the synopsis uses this technique. Don't forget to pass the reference to a scalar for output parameters.
+
+=back
+
+=head1 TERMS
+
+
+
+=over 4
+
+=item SQL statement
+
+Thats the most easy and important part of each Execute command (surprise, surprise). There are two ways specifying a SQL command for this class, the first is to pass it to the execute() method of the pool as shown in the 'simple usage' above. The second is to pass it to the constructor of the Execute class, this will enable you to specify more information for this SQL like bind parameter types. If you have passed the SQL to the constructor, you can not pass another SQL to the execute() method.
+
+=item bind parameter
+
+Bind parameters are, like in plain DBI, the values associated to the placeholders in the SQL. placeholders can currently passed to the execute() method as shown in 'pre configured usage' above.
+
+=item bind configuration
+
+There are two things which can currently be configured for bind parameters, those are the type to bind the parameter as and configure a particular parameter to be an in/out parameter by setting a max_len value. This settings can be supplied to the constructor if you have also specified a SQL to the constructor. The 'pre configured usage' above illustrates the configuration of types, the 'using named bind parameters and output parameters' shows how to configure an in/out parameter.
+
+=item attributes
+
+Attributes are configurations which are interpreted by the Execute class itself, those are not passed to the DBI but may influence the way the Execute() class uses the DBI. Attributes can be specified in the name => value syntax as last argument to the constructor. The 'pre configured usage' example above uses the prepare_cached attribute.
+
+=back
+
+=head1 TODO
+
+
+
+=over 4
+
+=item Macros
+
+Currently every executed command is it's own transaction. There is no possibility to join more than one pre-existing command into one transaction. Macros will make this possible, however they are under construction.
+
+=back
+
+=head1 SEE ALSO
+
+L<ResourcePool::Command::DBI::SelectRow|ResourcePool::Command::DBI::SelectRow>,
+L<DBI|DBI>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Factory|ResourcePool::Factory>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2004 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

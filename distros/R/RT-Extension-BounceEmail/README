@@ -1,0 +1,51 @@
+NAME
+    RT-Extension-BounceEmail - Add the ability to Bounce Emails
+
+DESCRIPTION
+    if one does not want to alter the content of an email with a forward
+    "bounce" is the way to go
+
+RT VERSION
+    Works with RT 4.2
+
+INSTALLATION
+    "perl Makefile.PL"
+    "make"
+    "make install"
+        May need root permissions
+
+    "make initdb"
+        Only for first-time installation
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::BounceEmail');
+
+        For RT 4.0, add this line:
+
+            Set(@Plugins, qw(RT::Extension::BounceEmail));
+
+        or add "RT::Extension::BounceEmail" to your existing @Plugins line.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Mark Hofstetter, University of Vienna mark.hofstetter@univie.ac.at Kai
+    Storbeck, Kai@xs4all.nl
+
+BUGS
+    or via the web at
+
+        L<https://github.com/MarkHofstetter/RT-Extension-BounceEmail/issues>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2015 by Mark Hofstetter
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

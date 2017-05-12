@@ -1,0 +1,59 @@
+`RDF-RDFa-Generator 0.01 cpan:TOBYINK`
+	issued   2010-05-09 ;
+	label    "Original version"@en .
+
+`RDF-RDFa-Generator 0.02 cpan:TOBYINK`
+	issued   2010-05-18 ;
+	changeset [
+		item [ label "Using FamFamFam Silk icons."@en ] ;
+		item [ label "HTML::Pretty can now include additional textual notes in the output. This functionality added for RDF::RDFa::Linter."@en ; a dcs:Addition ] ;
+	] .
+
+`RDF-RDFa-Generator 0.03 cpan:TOBYINK`
+	issued   2010-05-19 ;
+	changeset [
+		item [ label "HTML::Pretty Fallback to sorting by object now works."@en ; a dcs:Bugfix ] ;
+		item [ label "HTML::Pretty can now force safe HTML (prevents injection attacks)."@en ; a dcs:Addition ] ;
+	] .
+
+`RDF-RDFa-Generator 0.04 cpan:TOBYINK`
+	issued   2010-05-21 ;
+	changeset [
+		item [ label "HTML::Hidden and HTML::Pretty now use @about instead of @src to set the subject URI."@en ] ;
+		item [ label "HTML::Pretty no longer makes 'javascript:' URLs into links."@en ] ;
+	] .
+
+`RDF-RDFa-Generator 0.05 cpan:TOBYINK`
+	issued   2010-05-27 ;
+	changeset [
+		item [ label "UTF-8 fixes."@en ; a dcs:Bugfix ] ;
+	] .
+
+`RDF-RDFa-Generator 0.100 cpan:TOBYINK`
+	issued   2010-07-25 ;
+	changeset [
+		item [ label "HTML::Pretty now includes cross-links to other resources."@en ; a dcs:Addition ] ;
+	] .
+
+`RDF-RDFa-Generator 0.101 cpan:TOBYINK`
+	issued   2010-09-06 ;
+	changeset [
+		item [ label "use RDF::Prefixes."@en ; a dcs:Addition ] ;
+		item [ label "Support 'namespaces' option for the constructor, for compatibility with other Trine serialisers."@en ; a dcs:Addition ] ;
+		item [ label "Icons for a few extra classes."@en ; a dcs:Addition ] ;
+	] .
+
+`RDF-RDFa-Generator 0.102 cpan:TOBYINK`
+	issued   2011-07-06 ;
+	changeset [
+		item [ label "<meta> element should name @name, not @nane."@en ; a dcs:Bugfix ; dcs:fixes [dbug:reporter cpan:kjetilk] ] ;
+		item [ label "Namespaces in HTML::Head and HTML::Hidden."@en ; a dcs:Bugfix ; dcs:fixes [dbug:reporter cpan:kjetilk] ] ;
+	] .
+
+`RDF-RDFa-Generator 0.103 cpan:TOBYINK`
+	issued   2012-12-12 ;
+	changeset [
+		item [ label "Upgrade distribution build system."@en ; a dcs:Packaging ] ;
+		item [ label "Fix strange buglet that affected RDF::RDFa::Linter."@en ; a dcs:Bugfix ] ;
+		item [ label "Drop common::sense and parent.pm deps."@en ] ;
+	] .

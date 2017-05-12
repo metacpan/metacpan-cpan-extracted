@@ -1,0 +1,31 @@
+Games/Roguelike/Area.pm
+Games/Roguelike/Area/Wilderness.pm
+Games/Roguelike/Console.pm
+Games/Roguelike/Console/ANSI.pm
+Games/Roguelike/Console/Curses.pm
+Games/Roguelike/Console/Dump.pm
+Games/Roguelike/Console/Win32.pm
+Games/Roguelike/Item.pm
+Games/Roguelike/Mob.pm
+Games/Roguelike/Utils.pm
+Games/Roguelike/Utils/Pov_C.pm
+Games/Roguelike/World.pm
+Games/Roguelike/World/Daemon.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/example
+scripts/loadarea
+scripts/netgame
+scripts/synop
+scripts/testpov
+scripts/testtag
+scripts/tictactoe
+t/001_load.t
+t/002_pov.t
+t/003_synop.t
+t/004_testload.t
+t/005_nettest.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+Changes
+lib/RDF/Scutter.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE
+t/RDF-Scutter.t

@@ -1,0 +1,36 @@
+
+#       * means all
+#       - means undef/na
+
+# rrdfile			ds		type		min	max
+^net_traffic_.+			Transmit	DERIVE		0	-
+^net_traffic_.+			Receive		DERIVE		0	-
+
+# 10000000000 = 10 gigabit
+# 1000000000  = 1 gigabit
+# 100000000   = 100 megabit
+# rrdfile			ds		type		min	max
+^switch_traffic$		ifInOctets	COUNTER		0	10000000000
+^switch_traffic$		ifOutOctets	COUNTER		0	10000000000
+^switch_traffic_port\d+$	ifInOctets	COUNTER		0	1000000000
+^switch_traffic_port\d+$	ifOutOctets	COUNTER		0	1000000000
+
+# rrdfile			ds		type		min	max
+^hw_irq_interrupts_cpu\d+$	*		DERIVE		0	-
+
+# rrdfile			ds		type		min	max
+^hdd_io_.+			*		DERIVE		0	-
+
+# rrdfile			ds		type		min	max
+^apache_status$			ReqPerSec	DERIVE		0	-
+^apache_status$			BytesPerSec	DERIVE		0	-
+^apache_logs$			*		DERIVE		0	-
+
+# rrdfile			ds		type		min	max
+^db_mysql_activity$		*		DERIVE		0	-
+^db_mysql_activity_com$		*		DERIVE		0	-
+
+# rrdfile			ds		type		min	max
+^mail_postfix_traffic$		*		ABSOLUTE	0	-
+
+

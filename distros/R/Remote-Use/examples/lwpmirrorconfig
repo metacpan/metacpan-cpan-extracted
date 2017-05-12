@@ -1,0 +1,13 @@
+package lwpmirrorconfig;
+use strict;
+use warnings;
+
+sub getarg {
+  return (
+    command => 'lwp-mirror -t 30s',
+    host => 'http://orion.pcg.ull.es/~casiano/cpan',
+    prefix => '/tmp/perl5lib/',
+    ppmdf => '/tmp/perl5lib/.orion.via.web',
+  );
+}
+1;

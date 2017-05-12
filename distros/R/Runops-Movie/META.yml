@@ -1,0 +1,69 @@
+---
+abstract: 'Make movies of perl guts'
+author: []
+configure_requires:
+  Module::Build: 0.26
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Runops-Movie
+provides:
+  Devel::Movie:
+    file: lib/Devel/Movie.pm
+  Runops::Movie:
+    file: lib/Runops/Movie.pm
+    version: 0.03
+  Runops::Movie::TM:
+    file: lib/Runops/Movie/TM.pm
+    version: 0.02
+  Runops::Movie::TM::Input:
+    file: lib/Runops/Movie/TM/Input.pm
+    version: 0.01
+  Runops::Movie::TM::Input::Dir:
+    file: lib/Runops/Movie/TM/Input/Dir.pm
+    version: 0.01
+  Runops::Movie::TM::Input::Edge:
+    file: lib/Runops/Movie/TM/Input/Edge.pm
+  Runops::Movie::TM::Input::Edge::Tie:
+    file: lib/Runops/Movie/TM/Input/Edge/Tie.pm
+  Runops::Movie::TM::Input::XML:
+    file: lib/Runops/Movie/TM/Input/XML.pm
+    version: 0.01
+  Runops::Movie::TM::Output:
+    file: lib/Runops/Movie/TM/Output.pm
+    version: 0.01
+  Runops::Movie::TM::Output::Imager:
+    file: lib/Runops/Movie/TM/Output/Imager.pm
+    version: 0.01
+  Runops::Movie::TM::Output::PrintedText:
+    file: lib/Runops/Movie/TM/Output/PrintedText.pm
+    version: 0.01
+  Runops::Movie::TM::Simple:
+    file: lib/Runops/Movie/TM/Simple.pm
+    version: 0.01
+  Runops::Movie::TM::Squarified:
+    file: lib/Runops/Movie/TM/Squarified.pm
+    version: 0.02
+  Runops::Movie::TM::Strip:
+    file: lib/Runops/Movie/TM/Strip.pm
+    version: 0.01
+  Runops::Movie::Util:
+    file: lib/Runops/Movie/Util.pm
+requires:
+  Alien::Judy: 0
+  Carp::Always: 0
+  ExtUtils::CBuilder: 0
+  IPC::Run: 0
+  IPC::System::Simple: 0
+  Imager: 0
+  Inline::C: 0
+  Internals::DumpArenas: 0.08
+  Judy: 0.13
+  Runops::Trace: 0
+  autodie: 0
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

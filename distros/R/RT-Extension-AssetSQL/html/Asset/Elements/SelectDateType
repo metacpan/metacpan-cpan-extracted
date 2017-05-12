@@ -1,0 +1,7 @@
+<select name="<%$Name%>">
+<option value="Created"><&|/l&>Created</&></option>
+<option value="LastUpdated"><&|/l&>Last Updated</&></option>
+</select>
+<%ARGS>
+$Name => 'DateType'
+</%ARGS>

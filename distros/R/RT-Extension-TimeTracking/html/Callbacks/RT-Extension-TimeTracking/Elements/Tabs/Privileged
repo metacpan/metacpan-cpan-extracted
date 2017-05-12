@@ -1,0 +1,19 @@
+<%init>
+Menu()->child('tools')->child(
+    'my_week',
+    title       => loc("My Week"),
+    description => loc("Tickets you worked on this week"),
+    path        => '/Tools/MyWeek.html',
+    sort_order  => 2.5,
+);
+
+my $request_path = $HTML::Mason::Commands::r->path_info;
+$request_path =~ s!/{2,}!/!g;
+if ( $request_path =~ m{^/Tools/MyWeek.html} && $DECODED_ARGS->{'User'} && $DECODED_ARGS->{'User'} != $session{CurrentUser}->id ) {
+    PageMenu()->child('my_week',
+        title => loc('Return to My Week'),
+        description => loc('Return to My Week'),
+        path => '/Tools/MyWeek.html',
+    );
+}
+</%init>

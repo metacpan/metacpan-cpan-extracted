@@ -1,0 +1,54 @@
+div.autocomplete {
+  position:absolute;
+  width:250px;
+  border:1px solid #888;
+  margin:0px;
+  padding:0px;
+}
+ul.contacts  {
+  list-style-type: none;
+  background-color: #fff;
+  margin:0px;
+  padding:0px;
+}
+ul.contacts li.selected { background-color: #ffb; }
+li.contact {
+  list-style-type: none;
+  display:block;
+  margin:0;
+  padding:2px;
+  height:32px;
+}
+
+li.ldap {
+  background-color: #eee;
+}
+
+li.contact div.name {
+  font-weight:bold;
+  font-size:12px;
+  line-height:1.2em;
+}
+li.contact div.email {
+ font-weight:bold;
+  font-size:12px;
+  line-height:1.2em;
+}
+#list {
+  margin:0;
+  margin-top:10px;
+  padding:0;
+  list-style-type: none;
+  width:250px;
+}
+#list li {
+  margin:0;
+  margin-bottom:4px;
+  padding:5px;
+  border:1px solid #888;
+  cursor:move;
+}
+
+.emailcompletiondebug { 
+  border: 3px solid #F00;
+}

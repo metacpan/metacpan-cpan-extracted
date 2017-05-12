@@ -1,0 +1,141 @@
+=head1 NAME
+
+RSA::Toolkit - Perl extension for RSA Administration Toolkit
+
+=head1 SYNOPSIS
+
+  use RSA::Toolkit;
+
+  $rsa = RSA::Toolkit->new;
+
+  $user = $object->fetch_users;
+
+  $groups = $object->fetch_groups;
+
+  $token = $user->get_inf('token');
+ 
+  $hash_ref = $user->dump;
+
+=head1 DESCRIPTION
+
+RSA::Toolkit is the Perl extension for RSA Authentication Manager Administration Toolkit. 
+By default, it only supports C or TCL language. To maximum the convenience, I wrap these APIs in this object oriented Perl module.
+Because there are a great number of APIs, I provide a part of them in this initial version. Other methods will be supported in the following versions.
+Please let me know if you need some APIs urgently.
+
+=head1 ENVIRONMENT REQUIREMENT
+
+To install RSA::Toolkit successfully, it is the basic requirement that RSA SecurID Ace Server has been installed on your machine, including the library for the RSA utility tools.
+There is no pre-required module for RSA::Toolkit, but an appropriate C compiler is required.
+
+=head1 INSTALLATION GUIDE
+
+The default library path for the RSA utility tools is /opt/ace/utils/toolkit. If you are using a customized path, config your path in Makefile.PL.
+The current version of this module has not been tested in windows platform and it may not be installed correctly.
+The ONLY tested platform for this module is Solaris 10.
+
+=head1 CONSTRUCTOR
+
+  $rsa = RSA::Toolkit->new;
+
+After calling new() succefully, the program has connected to the local RSA server.
+
+=head1 METHODS
+
+The following methods are provided by the RSA::Toolkit class:
+
+=head2 C<fetch_users>
+
+  while (my $user = $rsa->fetch_users) {
+      $login = $user->get_inf('login');
+      $token = $user->get_inf('token');
+      $gn = $user->get_inf('gn');
+      $sn = $user->get_inf('sn');
+  }
+
+C<fetch_users> is the main method to fetch users' information. 
+By default, without providing any option, the method returns all users in RSA database.
+In the example, each time you call C<fetch_users>, it returns a L<RSA::Toolkit::User> object.
+
+=head3 C<field>, C<type>, and C<value>
+
+  # Return the users with the token expired
+  $rsa->fetch_users(field => 7, type => 4);
+
+  # Return the users with the token will be expired in 10 days
+  $rsa->fetch_users(field => 7, type => 7, value => 10);
+
+  # Return the users with the first name equal 'Peter'
+  $rsa->fetch_users(field => 2, filter => 2, value => 'Peter');
+
+The combination of the 3 options C<field>, C<type>, and C<value> is used for filtering users by fields.
+To filter the users with conditions, you need to issue the correct combination of these 3 options.
+Failure to close the search properly may cause the method failed.
+For detailed information about these options, please read the description for C<Sd_ListUsersByField> on "RSA Administration Toolkit Reference Guide".
+
+=head3 C<group>
+
+  # Return the users belong to a certain group.
+  $rsa->fetch_users(group => 'a group name');
+
+This option is used for listing users by a group name. If you are not sure what the exact group name is,
+call C<fetch_groups> first.
+
+=head2 C<fetch_user>
+
+  $user = $rsa->fetch_user($login);
+
+It is similar to C<fetch_user>, but only one L<RSA::Toolkit::User> object will be returned. This method is used for listing a user's information by login name. A valid login name is required as the option.
+
+=head2 C<get_inf>
+
+  while (my $user = $rsa->fetch_users) {
+      $login = $user->get_inf('login');
+      $token = $user->get_inf('token');
+      $gn = $user->get_inf('gn');
+      $sn = $user->get_inf('sn');
+  }
+
+Get values of each field. If the field names are uncertain, call L<get_inf_fields> first.
+
+=head2 C<get_inf_fields>
+
+  @fields = $user->get_inf_fields;
+
+Before calling C<get_inf>, you may not know the exact name of the available fields that a user has.
+This method is to list the fields belong to a user.
+
+=head2 C<fetch_groups>
+
+  $groups = $object->fetch_groups;
+
+This method returns an array reference to the groups in RSA database. The elements of this array are the names of the groups.
+
+=head2 C<dump>
+
+  $hash_ref = $user->dump;
+
+It is rare to use, but it is useful to know the data structure returned by L<fetch_users>.
+
+=head1 BUGS
+
+I hope you do not find any, but if you do please email me.
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks for the help from Hai Bin Zhang, who is my colleague and friend with expertise on RSA products.
+
+=head1 AUTHOR
+
+Pan Yu, E<lt>xiaocong[AT]vip.163.com E<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 by Pan Yu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

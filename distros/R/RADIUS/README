@@ -1,0 +1,21 @@
+README for RADIUS modules
+
+This is a very quick initial release to get some comments on the
+package and see if it turns out to be useful to anyone else.
+
+Please read the RADIUS::Packet manpage for details, and an example of
+how to open the network socket.  There are several examples included
+(example-<blah>.pl) which demonstrate how to do a few things.. they
+will be cleaned up considerably for a future release.
+
+You can also do accounting.. basically just open the radacct port
+instead of radius, and send back an Accounting-Response (no
+attributes) when you've saved the Accounting-Request.
+
+Please contact me if you have any problems or comments with this release.
+
+Christopher Masto
+chris@netmonger.net
+
+Perl RADIUS home page:
+http://www.netmonger.net/~chris/RADIUS/

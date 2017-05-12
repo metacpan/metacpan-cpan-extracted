@@ -1,0 +1,148 @@
+% layout 'formular';
+% title "Formular";
+<h2>Formular</h2>
+
+<div class="panel panel-default">
+  
+    <div class="panel-heading"><%= $formular_config->{label} %></div>
+    <div class="panel-body">
+
+    <form action="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/execute" method="post" accept-charset="utf-8">
+      <input type="hidden" name="posted" value="1" />
+      <input type="hidden" name="repeat" value="<%= $repeat %>" />
+      <input type="hidden" id="form_changed" name="form_changed" value="0" />
+
+      % for my $item (@{ $formular_config->{fields} }) {
+      <div class="form-group">
+        <label for="<%= $item->{name} %>"><%= $item->{label} %></label>
+        % if ($item->{type} eq "text") {
+        <input type="text" class="form-control" id="<%= $item->{name} %>" name="<%= $item->{name} %>" value="<%= $step_data->{$item->{name}} %>" placeholder="" <%= join(" ", @{ $item->{options} || [] }) %>>
+        % } elsif ($item->{type} eq "password") {
+        <input type="password" class="form-control" id="<%= $item->{name} %>" name="<%= $item->{name} %>" value="<%= $step_data->{$item->{name}} %>" placeholder="" <%= join(" ", @{ $item->{options} || [] }) %>>
+        % } elsif ($item->{type} eq "checkbox") {
+
+          % for my $val ( @{ $item->{values} } ) {
+
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" id="<%= $item->{name} %>" name="<%= $item->{name} %>" value="<%= $val->{value} %>" <%= join(" ", @{ $item->{options} || [] }) %>> <%= $val->{label} %>
+            </label>
+          </div>
+
+          % }
+
+        % } elsif ($item->{type} eq "radio") {
+
+          % for my $val ( @{ $item->{values} } ) {
+          <div class="checkbox">
+            <label>
+              <input type="radio" id="<%= $item->{name} %>" name="<%= $item->{name} %>" value="<%= $val->{value} %>" <%= join(" ", @{ $item->{options} || [] }) %>> <%= $val->{label} %>
+            </label>
+          </div>
+          % }
+
+        % } elsif ($item->{type} eq "select") {
+
+          <select id="<%= $item->{name} %>" name="<%= $item->{name} %>">
+
+          % for my $val ( @{ $item->{values} } ) {
+
+          <option value="<%= $val->{value} %>"><%= $val->{label} %></option>
+
+          % }
+
+          </select>
+
+        % } elsif ($item->{type} eq "textarea") {
+        <textarea class="form-control" style="height: 80px;" name="<%= $item->{name} %>"><%= $step_data->{$item->{name}} %></textarea>
+        % }
+      </div>
+      % }
+
+      <button name="form_step" value="cancel"
+        type="submit" class="btn btn-sm btn-danger">Cancel</button>
+
+      <button name="form_step" value="<%= $form_step-1 %>"
+        type="submit" class="btn btn-sm btn-warning"><%= $formular_config->{buttons}->{last_formular}->{text} %></button>
+
+      % if (exists $formular_config->{repeatable} && $formular_config->{repeatable}) {
+      <button name="form_step" value="repeat-<%= $form_step %>"
+        type="submit" class="btn btn-sm btn-default"><%= $formular_config->{buttons}->{add_formular}->{text} || "Repeat formular" %></button>
+      % }
+
+      <button name="form_step" value="<%= $form_step+1 %>"
+        type="submit" class="btn btn-sm btn-success"><%= $formular_config->{buttons}->{next_formular}->{text} %></button>
+
+    </form>
+    </div>
+  </div>
+% if (exists $formular_config->{repeatable} && $formular_config->{repeatable} && scalar(@{ $all_step_data }) > 0) {
+    <hr>
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Already configured</div>
+  <div class="panel-body">
+
+    <form action="/project/<%= $project->directory %>/formular/<%= $formular->directory %>/execute/delete_data_item" method="post" accept-charset="utf-8">
+      <input type="hidden" name="posted" value="1" />
+      <input type="hidden" name="repeat" value="<%= $repeat %>" />
+      <input type="hidden" name="form_step" value="<%= $form_step %>" />
+
+
+      <table id="data_table" class="display" cellspacing="0" width="100%">
+        <thead>
+          <tr>
+            <th width="10"></td>
+            % for my $field (@{ $step_fields }) {
+            <th><%= $field %></th>
+            % }
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th width="10"></td>
+            % for my $field (@{ $step_fields }) {
+            <th><%= $field %></th>
+            % }
+          </tr>
+        </tfoot>
+        <tbody>
+        % my $i = -1;
+        % for my $row (@{ $all_step_data }) {
+        % $i++;
+        <tr>
+          <td width="10"><input type="checkbox" name="data_item" value="<%= $i %>" /></td>
+          % for my $key (@{ $step_fields }) {
+          <td><%= $row->{$key} %></td>
+          % }
+        </tr>
+        % }
+        </tbody>
+      </table>
+
+      <button name="data_delete_item"
+        type="submit" class="btn btn-xs btn-danger">Delete</button>
+
+
+    </form>
+
+  </div>
+</div>
+
+% }
+
+<script>
+$(document).ready(function() {
+
+  $('#data_table').dataTable();
+
+  $(".form-control").on("change", function() {
+    $("#form_changed").val(1);
+  });
+
+} );
+
+
+</script>
+

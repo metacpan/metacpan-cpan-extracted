@@ -1,0 +1,18 @@
+# Written by Scott Gifford <gifford@umich.edu>
+# Copyright (C) 2004 The Regents of the University of Michigan.
+# See the file LICENSE included with the distribution for license
+# information.
+
+The RFID::EPC package provides an implementation of RFID::EPC::Tag, a
+class for storing EPC tags and extracting information from them.
+
+See perldoc for RFID::EPC::Tag for documentation.
+
+See the rfid-perl Web page for other information, and instructions for
+subscribing to the mailing list:
+
+    http://www.eecs.umich.edu/~wherefid/code/rfid-perl/
+
+See EPCGlobal for more information about the EPC standards:
+
+    http://www.epcglobalinc.com/

@@ -1,0 +1,20 @@
+<%init>
+RT::Interface::Web::Redirect( RT->Config->Get('WebURL') ."Minimal/Search.html");
+</%init>
+
+%#<& /Minimal/Elements/Header, Title => loc('Home') &>
+%#<& /Minimal/Elements/MyRequests,
+%#    %ARGS,
+%#    BaseURL => RT->Config->Get('WebPath') ."/Minimal/?",
+%#    Page    => $Page, 
+%#&>
+
+%#<& /Minimal/Elements/RecentlyReportedData,
+%#    %ARGS,
+%#    BaseURL => RT->Config->Get('WebPath') ."/Minimal/?",
+%#    Page    => $Page,
+%#&>
+
+<%ARGS>
+$Page => 1
+</%ARGS>

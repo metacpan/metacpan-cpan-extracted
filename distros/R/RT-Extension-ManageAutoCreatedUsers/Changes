@@ -1,0 +1,41 @@
+Revision history for RT-Extension-ManageAutoCreatedUsers
+
+0.12     2015-03-05
+ - Packaging fixes
+
+0.11     2015-02-26
+ - Meta changes
+
+0.10     2014-12-19
+ - Doc Changes
+ - RTx() implies both all_from and readme_from
+
+0.09     2014-08-28
+ - Parametrize the number of rows
+ - Fix POSTing for when CSRF token is involved
+
+0.08     2014-07-09
+ - No code changes. Using new requires_rt_plugin helper.
+
+0.07     2014-06-09
+ - No code changes. Fixed dist release.
+
+0.06     2014-06-05
+ - Fix Merge/Replace placeholder promotion
+
+0.05     2014-05-24
+ - No code changes. Fixed dist release.
+
+0.04     2014-05-20
+ - Do not index RT::User
+
+0.03     2014-05-19
+ - Typo (PR #1)
+
+0.02     2014-05-07
+ - Implement shred action
+ - Auto-promote merge-into input placeholder to value
+ - Display messages (error or success) on POST
+
+0.01     2014-03-28
+ - Initial version

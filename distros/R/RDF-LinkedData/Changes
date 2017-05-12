@@ -1,0 +1,320 @@
+RDF-LinkedData
+==============
+
+Created:      2009-04-23
+Home page:    <https://metacpan.org/release/RDF-LinkedData>
+Bug tracker:  <https://github.com/kjetilk/RDF-LinkedData/issues>
+Wiki:         <http://wiki.perlrdf.org/>
+Mailing list: <http://lists.perlrdf.org/listinfo/dev>
+Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
+
+0.78	2017-01-03	Use Config::ZOMG for config.
+
+ [ Bug Fixes ]
+ - Fix packaging bug with Config::ZOMG.
+
+0.76	2017-01-02	Improve Namespace handling and hypermedia controls.
+
+ - Also check the request path for the endpoints.
+   Richard Lewis++
+ - Hypermedia controls for the 'all' fragment.
+ - Updated: Use MooX::Log::Any for logging.
+ - Updated: Use URI::NamespaceMap properly.
+
+0.74	2015-03-04	Fix Triple Pattern Fragments bugfix.
+
+ [ Bug Fixes ]
+ - Fix the template to be Hydra compliant.
+   Patrick Hochstenbach++
+
+ [ Other ]
+ - Move Perl version setting to makefile.
+
+0.72	2015-02-14	Triple Pattern Fragments improvement.
+
+ - Added: Adding support to download the complete datasets as fragments.
+   Patrick Hochstenbach++
+ - Added: Set explicit Perl version.
+
+0.70	2014-10-17	Triple Pattern Fragments support and modernization.
+
+ - Added: Add the use of Expires module.
+ - Added: Improve documentation.
+ - Added: Support the .well-known/void magic URL.
+ - Added: Triple Pattern Fragments support.
+ - Hand-maintain README.
+ - Migrate object system from Moose to Moo.
+ - Use Dist::Inkt to package.
+ - Use Log::Contextual to manage the logging.
+
+0.68	2014-07-22	Documentation updates and small fixes.
+
+ - Document the use of the PERLRDF_STORE environment variable.
+ - Drop the weak ETag checking.
+ - Updated: Many smaller documentation updates.
+ - Use Try::Tiny instead of eval.
+
+0.66	2014-07-11	Fix bug in ETag handling.
+
+ [ Bug Fixes ]
+ - ETags could have the URI prefixed.
+ - RFC2616 says ETags have to be quoted.
+
+ [ Other ]
+ - Make ETags use base64 encoding rather than a hex.
+
+0.64	2014-05-26	Fix bug in vocabulary URIs.
+
+ [ Bug Fixes ]
+ - Fix a bug that caused some vocabularies to show up as
+   URI::Namespace-strings.
+
+ [ Other ]
+ - Added: Add git2prov links to the meta information, so there's a linked
+   data chain from Github.
+
+0.62	2013-10-27	Add Server header.
+
+ - Added: Add a Server header.
+
+0.60	2013-07-23	Install script.
+
+ [ Bug Fixes ]
+ - The PSGI script wasn't installed.
+
+0.58	2013-07-23	Stability and modernization release.
+
+ [ Bug Fixes ]
+ - Add the use of content type to Etag to work around some bugs.
+ - Allow POST requests to the endpoint.
+ - Fix newline bug causing problems.
+ - Simplify setting headers by removing call to HTTP::Headers.
+
+ [ Other ]
+ - Added: Enable optional use of environment for config.
+ - Change packaging to use Module::Package::RDF.
+ - Improved tests.
+ - Removed: Remove write_sqlite script.
+ - Updated: Use URI::NamespaceMap for namespaces.
+
+0.56	2012-07-29	Bugfix release.
+
+ [ Bug Fixes ]
+ - Fix major UTF8 breakage by encoding all strings.
+ - Fix performance problems by stat-ing the external VoID-file to see if
+   needs reloading.
+ - Fix performance problems caused by regeneration of VoID descriptions for
+   every request.
+ - Improve the way different HTML serializations are returned.
+
+ [ Other ]
+ - Added: More tests.
+ - Skip some tests when Redland is installed, causes test-specific bugs.
+ - Some cosmetic fixes.
+
+0.54	2012-06-30	Improve VoID generator use.
+
+ - Add a pagetitle config parameter for RDFa title.
+ - Added: Make it possible to use the Generators property attributes.
+ - Added: Use the Generators new feature to add a model with arbitrary data
+   to load a file.
+ - Some minor fixes.
+
+0.52	2012-06-30	Bugfix release.
+
+ [ Bug Fixes ]
+ - A bad plan caused by superfluous BEGIN block caused test failures.
+
+0.50	2012-06-29	Use VoID Generator.
+
+ - Added: Add descriptions to POD and README.
+ - Added: RDF::LinkedData now can use RDF::Generator::Void, but not all its
+   features.
+ - Removed: Remove SQLite generator script.
+ - Some minor fixes.
+ - The content method is now private.
+ - Use current_etag instead of etag
+
+0.44	2012-06-12	Bugfix release.
+
+ [ Bug Fixes ]
+ - Actually, the TODO test about content type failed for everyone else.
+ - The endpoint path was not correctly sent to the hypermedia.
+
+ [ Other ]
+ - Added: More tests (obviously).
+ - Some minor fixes.
+ - Use empty string as default base_uri
+
+0.42	2012-06-11	Enable very basic VoID for hypermedia.
+
+ - Added: Add hypermedia method which will be on by default to enable
+   hypermedia.
+ - Added: Add namespaces_as_vocabularies method which will be on by default
+   to use declared namespaces as vocabularies.
+ - Added: Add void:endpoint and void:vocabulary to all output if enabled.
+ - Some minor test and code fixes.
+ - TODO test about content type now pass.
+ - Use Test::RDF 0.26.
+ - Use the github issue tracker.
+
+0.40	2012-04-04	Refactoring and code improvements.
+
+ - Added: Add Etag support
+ - Added: Add URI::Escape configure_requires.
+ - Added: Major refactor to create a Plack::App::RDF::LinkedData.
+ - Added: More tests on HTML/RDFa content.
+ - Added: Use Module::Install::RDF to manage the metadata.
+ - Added: Use several Middleware modules in the psgi (For HEAD requests,
+   CORS and Etag).
+ - Major refactor to improve the RDF::LinkedData class.
+ - Many minor test and code fixes.
+ - Removed: Remove the Moose::Role, not clear that we need it.
+ - Restructure the documentation.
+ - Use MooseX::UndefTolerant to allow the endpoint_config to be undef.
+ - Use RDF::RDFa::Generator. This alters the HTML output significantly.
+
+0.30	2011-06-09	Use RDF::Endpoint for the same data.
+
+ [ Bug Fixes ]
+ - Add the subject URI to the HTML output, since this would often break.
+ - Correct test dep to Test::JSON rather than just JSON.
+
+ [ Other ]
+ - Added: Added request method to pass the whole request rather than just
+   headers.
+ - Added: Optionally use RDF::Endpoint to set up a SPARQL endpoint for the
+   data.
+ - Allow namespaces to be skipped from the config.
+ - Many minor documentation fixes.
+ - Many minor test and code fixes.
+ - Remove Test::NoWarnings; too many false positives.
+ - Removed: headers_in method removed.
+
+0.20	2011-02-08	Improved conneg; use Test::RDF; Many small fixes.
+
+ [ Bug Fixes ]
+ - Gives HTML page for default Firefox Accept header.
+
+ [ Other ]
+ - Added: Add tests for more browser Accept headers.
+ - Added: Improve documentation of configuration (thanks to Thomas Kappler
+   for input).
+ - Consistently name the base URI base_uri.
+ - Content negotation much improved.
+ - Many minor documentation fixes.
+ - Many minor test and code fixes.
+ - Now use the RDF::Trine::Store->new method, since it now supports
+   checking the type itself.
+ - Updated: Now requires RDF::Trine 0.133.
+ - Use the new Test::RDF module for testing.
+
+0.18	2010-12-09	Minor JSON syntax documentation bug fix release.
+
+ [ Bug Fixes ]
+ - Found out the hard way that JSON doesn't allow single quotes.
+
+0.16	2010-12-09	Instantiate on startup; Many small fixes.
+
+ [ Bug Fixes ]
+ - Move ld instantiation to outside of the coderef for big performance
+   gain.
+
+ [ Other ]
+ - Added: Add basic support for Access-Control-Allow-Origin.
+ - Added: Add tests for more Accept headers (TODO stuff).
+ - Added: Support setting namespace in config.
+ - Added: Use the base if the source has not set its own.
+ - Many minor documentation fixes.
+ - Many minor test and code fixes.
+ - No main-namespaced variable needed for tests.
+ - Remove logging unless in verbose mode.
+ - Use a memory model for testing that loads the file directly
+
+0.14	2010-08-26	Use URI object.
+
+ - Minor documentation fixes.
+ - Updated: Fix the warning described in
+   http://search.cpan.org/~shlomif/Error-0.17016/lib/Error.pm#COMPATIBILITY
+ - Updated: Using URI objects throughout makes more intensive use of
+   absolute URIs.
+
+0.12	2010-08-24	Support base URI.
+
+ - Added: Support base URI in serializations for RDF::Trine 0.127_02.
+ - Added: Use Module::Install::AuthorTests.
+
+0.10	2010-08-19	Better tested release.
+
+ - Added: Add TODO test to check whether Firefox' default Accept header
+   returns data.
+
+0.09_1	2010-08-18	Refactor helper modules; .
+
+ [ Bug Fixes ]
+ - Remove -T switch from load.t, since it borks on some systems.
+
+ [ Other ]
+ - Added: Add namespaces method to set a hashref with RDF namespaces.
+ - Added: create a helper_properties method to pass the properties.
+ - Move POD-tests to xt.
+ - Updated: Split off RDF::LinkedData::Predicates into distribution of its
+   own.
+
+0.08	2010-08-02	Update to use config hashrefs and various fixes for recent RDF::Trine.
+
+ - Now use a hashref config for new_with_config instead of config string.
+ - Updated: Explicitly ask for text/html in tests since RDF::Trine 0.124
+   needs it.
+ - Updated: No Accept header will return turtle data.
+ - Updated: Require RDF::Trine 0.125.
+
+0.06	2010-06-13	Minor POD syntax documentation bug fix release.
+
+ [ Bug Fixes ]
+ - Fix minor POD bugs.
+
+ [ Other ]
+ - Added: Add number of PSGI tests.
+
+0.05	2010-06-13	Major refactor, use Moose and Plack.
+
+ - Added: A response method contains most of the logic.
+ - Added: Create RDF::LinkedData::ProviderRole, a Moose::Role with a
+   default implementation.
+ - Added: Create a Plack PSGI script to run the server. This also serves as
+   a basic usage example.
+ - Added: Create a RDF::LinkedData::Predicates with a title, description
+   and page methods.
+ - Added: More documentation.
+ - Added: More tests, also unit testing.
+ - Added: Use Config::JFDI for configuration.
+ - Added: Use Plack::Response and HTTP::Headers in the role itself.
+ - Added: use Moose
+ - Many smaller changes.
+ - Removed: Remove Mojolicious::Lite script.
+
+0.03	2010-05-06	Add page method to use foaf:page for redirects.
+
+ [ Bug Fixes ]
+ - Really does require RDF::Trine 0.122.
+
+ [ Other ]
+ - Added: Add a page method that uses foaf:homepage or foaf:page to
+   override the default page for redirect.
+ - Minor cleanups.
+ - Removed: Remove boilerplate tests.
+
+0.02	2010-05-05	Use RDF::Trine's conneg and bounded description code.
+
+ - Added: Add and improve a type method that returns page or data.
+ - Added: Add some log messages.
+ - Added: Use RDF::Trine's bounded description code.
+ - Added: Use RDF::Trine's content negotiation code.
+ - Added: Use a HTTP::Headers object for conneg.
+ - Removed: Remove the negotiate method.
+ - Require RDF::Trine 0.121.
+
+0.01	2010-04-29	Initial release. Kjetil Kjernsmo refactored Gregs code to separate the web server logic from the rest.
+
+0.001_01	2010-04-28	Code on Github by Gregory Todd Williams.

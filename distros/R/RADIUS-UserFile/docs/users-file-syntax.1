@@ -1,0 +1,82 @@
+NAME
+     users - Radius daemon users file
+
+SYNOPSIS
+     Used by builddbm and radiusd
+
+DESCRIPTION
+    The users file contains entries for each user who is to be
+    authenticated by Radius.  The file consists of blank lines, comment
+    lines, and user records.
+
+    Comment lines start with a '#' character at column one and extend to
+    the end of the line.  User records consist of a 'first' line followed
+    by the 'rest-of-record'.  The rest-of-record is either a blank line,
+    or a sequence of zero or more 'subsequent' lines followed by a 'final'
+    line.  A 'first' line has a non-'#', non-space, non-tab character at
+    column one, followed by zero or more non-space, non-tab characters,
+    followed by one or more spaces or tabs, followed by an attribute list
+    (*without* a trailing comma), followed by a newline.  A 'subsequent'
+    line has a space or tab in the first column, followed by zero or more
+    spaces or tabs, followed by an attribute list, followed by a comma,
+    followed by a newline.  A 'final' line is identical to a 'subsequent'
+    line except that there is no trailing comma.
+    
+    New to this version of builddbm (and radiusd) is that comment lines
+    may be embedded in a record at will.  Blank lines may *not* be
+    embedded in records, but may be present anywhere outside of a record.
+
+
+    EBNF Users file grammar:
+
+    <USERS-FILE>	::= {<empty-line> | <comment-line> | <record>}*
+    <empty-line>	::= \n
+    <comment-line>	::= #{.}*
+    <record>		::= <first-line><rest-of-record>
+    <first-line>	::= <user-name><whitespace><attribute-list>
+    <rest-of-record>	::= {<comment-line>}*<empty-line> |
+    				{<comment-line> | <subsequent-line>}*
+				<final-line>
+    <user-name>		::= {[^#, \t\n]}+
+    <whitespace>	::= {[ \t]}+
+    <subsequent-line>	::= <whitespace><attribute-list>,
+    <final-line>	::= <whitespace><attribute-list>
+    <attribute-list>	::= <attribute>{<whitespace><attribute>}*
+    <attribute>		::= <attr-name>{<whitespace>}*
+				={<whitespace>}*<attr-value>
+    <attr-name>		::= <attr-segment>{-<attr-segment>}*
+    <attr-segment>	::= <upper-case>{<upper-case>}*
+				{<lower-case> | <decimal-digit>}*
+    <attr-value>	::= <attr-value-plain> | <attr-value-quoted>
+    <attr-value-plain>	::= <dotted-decimal-IP-address>
+				| <enum-attr-value> | <integer>
+    <attr-value-quoted>	::= "<string>" | "<date>" | "<filter>"
+    <upper-case>	::= [A-Z]
+    <lower-case>	::= [a-z]
+    <decimal-digit>	::= [0-9]
+    <alphanumeric>	::= <upper-case> | <lower-case> | <decimal-digit>
+    <enum-attr-value>	::= <attr-segment>{-<attr-segment>}*
+    <string>		::= {[^"]}*
+    <date>		::= <month><space><day><space><year>
+    <month>		::= Jan | Feb | Mar | Apr | May | Jun
+				| Jul | Aug | Sep | Oct | Nov | Dec
+    <space>		::= [ ]
+    <day>		::= <decimal-digit><decimal-digit>
+    <year>		::= 19<decimal-digit><decimal-digit>
+    <filter>		::= <IP-filter> | <generic-filter>
+
+
+Note 1:	<attr-name> and <enum-attr-value> are enumerations; the EBNF
+	grammar describes their syntax but does not specify which strings
+	belong to the enumeration.  The actual enumerations are specified
+	in the Radius 'dictionary' file.
+
+Note 2: The maximum length of any <attr-name> or <enum-attr-value> is 31
+	characters.
+
+Note 3:	It is probably desirable that <user-name> be limited to the set of
+	<alphanumeric> and '-', but this is not strictly required.
+
+Note 4:	See the Ascend router documents (e.g., MAX T1/PRI) for further
+	information on filter syntax.
+

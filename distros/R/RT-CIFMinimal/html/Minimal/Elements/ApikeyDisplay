@@ -1,0 +1,55 @@
+<table>
+% if(@recs){
+    <tr valign="top">
+        <td></td>
+        <td><b>Key</b></td>
+        <td><b>Description</b></td>
+        <td><b>Created</b></td>
+        <td>
+            <table>
+                <tr>
+                    <td><b>Group ID</b></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+% }
+% foreach my $r (@recs){
+    <tr valign="top">
+        <form method="post">
+        <td><& /Elements/Submit, Name => 'PurgeKey', Label => loc('Purge Key') &></td>
+        <td><input type='hidden' name='uuid' value='<%$r->uuid()%>'><%$r->uuid()%></td>
+        <td><%$r->description() || 'None'%></td>
+        <td><%$r->created()%></td>
+        <td>
+            <table>
+% foreach ($r->groups()){
+% my $g = $group_map{$_->guid()};
+%# $g = ($_->default_guid()) ? $g.' default' : $g;
+% my $isDefault = ($_->default_guid()) ? "default" : '';
+                <tr valign="top">
+% if($_->default_guid()){
+                    <td><b><i><%$g%></b></i></td>
+% } else {
+                    <td><%$g%></td>
+% }
+                </tr>
+% }
+            </table>
+        </td>
+        </form>
+    </tr>
+% }
+</table>
+
+<%init>
+my %group_map;
+foreach (keys %groups){
+    $group_map{CIF::Utils::genSourceUUID($_)} = $_;
+}
+</%init>
+
+<%ARGS>
+@recs => undef
+%groups => undef
+</%ARGS>

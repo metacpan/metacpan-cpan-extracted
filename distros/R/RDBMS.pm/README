@@ -1,0 +1,56 @@
+OVERVIEW
+========
+
+This is Msql::RDBMS, version 0.91, an HTML-based Relational Database
+Management System for the Mini SQL database.
+
+REQUIRED COMPONENTS
+===================
+
+Mini SQL 2.x (see http:://www.Hughes.com.au/)
+
+Perl Modules (see your nearest CPAN mirror)
+
+    CGI-modules-2.75.tar.gz
+    Msql-modules-0.91
+    Date::Format
+    Date::Parse
+
+A Web server
+
+INSTALLATION
+============
+
+  perl Makefile.PL
+  make
+  make install
+
+DOCUMENTATION
+=============
+
+Setting up a database schema:
+
+  man sqldef.pl
+or
+  perldoc sqldef.pl
+
+Using the module:
+
+  man Msql::RDBMS
+or
+  perldoc Msql::RDBMS
+
+THE FUTURE
+==========
+
+Keep an eye on:
+
+http://www.ids.net/~bjepson
+
+for late-breaking information and on-line demos (soon).
+
+Have fun,
+
+The Authors
+(Brian Jepson <bjepson@ids.net>, Paul Sharpe <paul@miraclefish.com>)
+

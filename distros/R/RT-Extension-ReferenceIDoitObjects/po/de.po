@@ -1,0 +1,137 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Referenced i-doit objects"
+msgstr "Referenzierte Objekte aus i-doit"
+
+msgid "Default tenant is not configured."
+msgstr "Standard-Mandant ist nicht konfiguriert."
+
+msgid "Please select an i-doit tenant."
+msgstr "Bitte wählen Sie einen i-doit-Mandanten."
+
+msgid "Object view"
+msgstr "Objektansicht"
+
+msgid "Tree view"
+msgstr "Baumansicht"
+
+msgid "Selected objects"
+msgstr "Ausgewählte Objekte"
+
+msgid "Go to i-doit"
+msgstr "Gehe zu i-doit"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+msgid "URL for i-doit is not configured."
+msgstr "URL zu i-doit ist nicht konfiguriert."
+
+msgid "URL for i-doit's API is not configured."
+msgstr "URL zur API von i-doit ist nicht konfiguriert."
+
+msgid "Key for i-doit's API is not configured."
+msgstr "Key für die API von i-doit ist nicht konfiguriert."
+
+msgid "Custom field %s does not exist."
+msgstr "Benutzerdefiniertes Feld %s existiert nicht."
+
+msgid "Default view for referenced i-doit objects is not configured."
+msgstr "Standardansicht für referenzierte Objekte aus i-doit ist nicht konfiguriert."
+
+msgid "Configuration option to show/hide i-doit related custom fields is not set."
+msgstr "Option zum Anzeigen/Verstecken von auf i-doit bezogene benutzerdefinierte Feldern ist nicht konfiguriert."
+
+msgid "Show _MENU_ objects"
+msgstr "Zeige _MENU_ Objekte"
+
+msgid "No objects has been selected yet."
+msgstr "Es wurden noch keine Objekte ausgewählt."
+
+msgid "_START_ to _END_ of _TOTAL_ objects"
+msgstr "_START_ bis _END_ von _TOTAL_ Objekt(en)"
+
+msgid "0 to 0 of 0 objects"
+msgstr "0 bis 0 von 0 Objekten"
+
+msgid "(filtered from _MAX_ objects)"
+msgstr "(gefiltert von _MAX_ Objekten)"
+
+msgid "Error while loading object types"
+msgstr "Fehler beim Laden der Objekttypen"
+
+msgid "Error while loading objects by object type"
+msgstr "Fehler beim Laden der Objekte zu einem Objekttyp"
+
+msgid "Error while loading objects by email"
+msgstr "Fehler beim Laden von Objekten anhand von E-Mail-Adressen"
+
+msgid "Error while loading pre-selecting objects"
+msgstr "Fehler beim Laden vorselektierter Objekte"
+
+msgid "Error while loading relation objects"
+msgstr "Fehler beim Laden von Beziehungsobjekten"
+
+msgid "Modify referenced i-doit objects for ticket #%1"
+msgstr "Bearbeite referenzierte Objekte aus i-doit für Ticket #%1"
+
+msgid "Given requestor(s) could not be found in i-doit."
+msgstr "In i-doit wurde keiner der angegebenen Klienten gefunden."
+
+msgid "Object type"
+msgstr "Objekttyp"
+
+msgid "These fields are needed to modify referenced i-doit objects."
+msgstr "Diese Felder werden zum Bearbeiten von referenzierten Objekten aus i-doit benötigt."
+
+msgid "Ticket was edited."
+msgstr "Ticket wurde editiert."
+
+msgid "Ticket was created."
+msgstr "Ticket wurde erstellt."
+
+msgid "Error while creating i-doit logbook entry"
+msgstr "Fehler beim Erstellen eines Logbuch-Eintrags in i-doit"
+
+msgid "There is no requestor selected."
+msgstr "Es ist kein Klient ausgewählt."
+
+msgid "Unknown"
+msgstr "Unbekannt"
+
+msgid "Expand menu tree"
+msgstr "Menübaum ausklappen"
+
+msgid "There are no roles defined for given customer(s)."
+msgstr "Für den/die angegebenen Klienten sind keine Rollen definiert."
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Primary"
+msgstr "Primär"
+
+msgid "Installed software"
+msgstr "Installierte Software"
+
+msgid "All objects"
+msgstr "Alle Objekte"
+
+msgid "Workplaces"
+msgstr "Arbeitsplätze"
+
+msgid "Devices"
+msgstr "Geräte"
+
+msgid "Given customer(s) could not be found in i-doit."
+msgstr "In i-doit wurde keiner der angegebenen Klienten gefunden."

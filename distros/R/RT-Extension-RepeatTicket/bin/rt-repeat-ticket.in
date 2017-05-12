@@ -1,0 +1,103 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+package RT::Repeat::Ticket::Run;
+
+BEGIN {
+### after:     use lib qw(@RT_LIB_PATH@);
+use lib '/opt/rt4/local/lib /opt/rt4/lib';
+use RT;
+RT::LoadConfig;
+RT::Init;
+}
+
+use RT::Attributes;
+use RT::Date;
+use RT::Extension::RepeatTicket;
+
+__PACKAGE__->run(@ARGV) unless caller;
+
+sub run{
+    my ($class, @args) = @_;
+
+    my %args = $class->process_args(@args);
+
+    my $attrs = RT::Attributes->new( RT->SystemUser );
+    $attrs->Limit( FIELD => 'Name', VALUE => 'RepeatTicketSettings' );
+    my $cf = RT::CustomField->new(RT->SystemUser);
+    $cf->Load('Original Ticket');
+
+    while ( my $attr = $attrs->Next ) {
+        my $date = $args{date}->clone;
+        next unless $attr->Content->{'repeat-enabled'};
+        next if $args{ticket} && $args{ticket} != $attr->Object->id;
+        next
+          if $args{type} && $args{type} ne $attr->Content->{'repeat-type'};
+        next unless $cf->can('IsAdded') ? ( $cf->IsAdded(0) || $cf->IsAdded($attr->Object->Queue) ) : ( $cf->IsApplied(0) || $cf->IsApplied($attr->Object->Queue));
+
+        $RT::Logger->info( 'Repeating ticket ' . $attr->Object->id );
+        my @ids = RT::Extension::RepeatTicket::Run( $attr, $date );
+        if ( @ids ) {
+            $RT::Logger->info(
+                'Repeated ticket ' . $attr->Object->id . ': ' . join ', ', @ids );
+        }
+    }
+    return;
+}
+
+sub process_args {
+    require Getopt::Long;
+    local @ARGV = @_;
+
+    my %opt;
+    Getopt::Long::GetOptions( \%opt, 'help|h', 'date=s', 'type=s', 'ticket=s' );
+
+    if ( delete $opt{help} ) {
+        require Pod::Usage;
+        Pod::Usage::pod2usage( { verbose => 2 } );
+        exit;
+    }
+
+    if ( $opt{date} ) {
+        my $d = RT::Date->new( RT->SystemUser );
+        $d->Set(
+                Format => 'unknown',
+                Value  => $opt{date},
+               );
+
+        # can't use ->Unix because timezone issue
+        # where $d->Unix could return a small seconds after 1970-01-01 00:00:00 UTC
+        # if date parse fails
+        if ( $d->Date ne '1970-01-01' ) {
+            $opt{date} = DateTime->from_epoch(
+                epoch     => $d->Unix,
+                time_zone => RT->Config->Get('Timezone'),
+            )->truncate(to => 'day');
+        }
+    }
+    $opt{date} ||= DateTime->today( time_zone => RT->Config->Get('Timezone') );
+
+    return %opt;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+rt-repeat-ticket - repeat ticket
+
+=head1 SYNOPSIS
+
+    rt-repeat-ticket  # today
+    rt-repeat-ticket --type daily # repeat tickets of repeat type 'daily'
+    rt-repeat-ticket --date 2012-06-23
+    rt-repeat-ticket --ticket 20 # repeat ticket 20
+
+=head1 DESCRIPTION
+
+This script will repeat ticket according to the recurrence rule.

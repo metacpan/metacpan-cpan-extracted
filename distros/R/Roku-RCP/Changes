@@ -1,0 +1,20 @@
+######################################################################
+Revision history for Perl extension Roku::RCP
+
+0.08  2011/06/18
+    (RJP) Dont skip to next song on queue insert
+
+0.07  2010/02/18
+    (RJP) Added Standby
+
+0.05  2009/01/26
+    (RJP) Better System Port documentation
+
+0.04  2008/10/28
+    (RJP) Minor fixes
+
+0.02  2007/03/31
+    (RJP) Minor fixes
+
+0.01  2007/03/31
+    (RJP) And so it begins

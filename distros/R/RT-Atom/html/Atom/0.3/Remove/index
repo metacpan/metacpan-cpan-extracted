@@ -1,0 +1,19 @@
+%# [DELETE EditURI]
+%# Delete an object.
+%# 200: Successfully deleted.  Body is the success message.
+%# 400: Request failed.  Body is the error message.
+%# 404: There is no object matching the specified URI.
+<%INIT>
+$Resource eq 'Object' or return $m->comp($ShowError, Status => 400);
+my ($ok, $msg) = $Object->Delete;
+
+$r->content_type('text/plain');
+$r->status(400) unless $ok;
+print $msg, "\n";
+
+</%INIT>
+<%ARGS>
+$ShowError
+$Object
+$Resource
+</%ARGS>

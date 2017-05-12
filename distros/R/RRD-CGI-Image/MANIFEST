@@ -1,0 +1,24 @@
+binhtml/css/dateslider.css
+binhtml/graphing_error.png
+binhtml/img/graphing_error.png
+binhtml/img/slidebg.gif
+binhtml/index.html
+binhtml/js/date-en-US.js
+binhtml/js/dateslider.js
+binhtml/js/dragdrop.js
+binhtml/js/effects.js
+binhtml/js/prototype.js
+binhtml/js/scriptaculous.js
+binhtml/README.txt
+binhtml/rrd.png.cgi
+Build.PL
+Changes
+lib/RRD/CGI/Image.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

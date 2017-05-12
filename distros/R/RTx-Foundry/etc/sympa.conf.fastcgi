@@ -1,0 +1,11 @@
+DocumentRoot "/usr/local/sympa"
+AddDefaultCharset UTF-8
+DirectoryIndex wws
+Options +Indexes
+
+<Location /wws>
+    SetHandler fastcgi-script
+</Location>
+
+SuexecUserGroup sympa sympa
+ScriptAlias /wws /usr/local/sympa/bin/wwsympa.fcgi

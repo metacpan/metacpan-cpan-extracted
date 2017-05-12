@@ -1,0 +1,50 @@
+#!perl
+use strict;
+use warnings;
+use feature ':5.10';
+use Getopt::Long qw( GetOptions );
+use Runops::Movie::Util qw( pretty_size );
+use File::Spec::Functions qw( catfile );
+use Carp ();
+
+$SIG{__DIE__} = \&Carp::confess;
+
+GetOptions(
+    help         => sub { die 'pod2usage( -verbose => 2 )' },
+    'less-mem'   => \my($less_memory),
+    'dir=s'      => \my($dir),
+    'fulledge=s' => \my($in_fulledge),
+    'edge=s'     => \my($out_edge),
+)
+  or die 'pod2usage( -verbose => 2 )';
+
+if ( $less_memory ) {
+    require Judy;
+}
+
+# --dir automagic
+#
+if ( $dir ) {
+    $in_fulledge //= catfile( $dir, 'frame.fulledge' );
+    $out_edge //= catfile( $dir, 'frame.edge' );
+}
+
+
+my $in_pro     = "$ARGV[0].pro";
+my $out_vertex = "$ARGV[0].vertex_size";
+
+open my($fh,), '<', $in_pro
+  or die "Can't read $in_pro: $!";
+
+my %vertex_size;
+say STDERR "Read $in_pro (@{[ size( -s $in_pro ) ]})";
+while (defined( my $_ = <$fh>)) {
+    next if !( my ( $vertex, $size ) = /^size\D+(\d+)\D+(\d+)/ );
+
+    $vertex_size{sprintf '%x', $vertex} += $size;
+}
+$vertex_size{'root'} = 0;
+
+store( \ %vertex_size, $out_vertex );
+say STDERR "Wrote $out_vertex (@{[ size( -s $out_vertex ) ]})";
+

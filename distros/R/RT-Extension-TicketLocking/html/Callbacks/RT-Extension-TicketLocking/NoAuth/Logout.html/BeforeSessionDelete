@@ -1,0 +1,11 @@
+<%INIT>
+return unless $session{'CurrentUser'} && $session{'CurrentUser'}->id;
+
+local $@;
+eval {
+    require RT::Extension::TicketLocking;
+    $session{'CurrentUser'}->RemoveLocks;
+};
+$RT::Logger->error( $@ ) if $@;
+return;
+</%INIT>

@@ -1,0 +1,17 @@
+This is an extension for Best Practical's Request Tracker
+http://www.bestpractical.com/rt
+
+This extension permits you to download the attachments associated with a ticket as a zip file.
+
+There are two options:
+
+1) current
+2) all
+
+Current mode downloads just the most recent revision of the attached file
+All mode downloads _all_ the revisions, and prepends the revision id number to the filename.
+
+Enjoy
+
+Richard Harman
+<richard+rtx-attachmentzip@richardharman.com>

@@ -1,0 +1,1236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:cal="http://www.w3.org/2000/09/calendar/alpha1" 
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:foaf="http://xmlns.com/foaf/0.1/"
+ xmlns:html="http://www.w3.org/1999/xhtml"
+ xmlns:ical="http://ilrt.org/discovery/2001/06/schemas/ical-full/hybrid.rdf#"
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+ xmlns:util="http://ilrt.org/discovery/2001/06/schemas/swws/index.rdf#"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+
+<ical:VCALENDAR rdf:about="">
+	<dc:source rdf:resource="http://www.SemanticWeb.org/SWWS/program/" />
+	<dc:description>Semantic Web Working Symposium</dc:description>
+	<dc:contributor>
+		<foaf:Person>
+			<foaf:name>Libby Miller</foaf:name>
+			<foaf:mbox rdf:resource="mailto:libby.miller@bristol.ac.uk" />
+		</foaf:Person>
+	</dc:contributor>
+	<dc:date>2001-07-16</dc:date>
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T080000</rdf:value>
+		<util:hour>08</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T090000</rdf:value>
+		<util:hour>09</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+	SWWS Registration and Breakfast 
+              (at the TCSEQ Center)
+	</ical:DESCRIPTION>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="TCSEQ Center" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/map.html" />
+		</ical:GEO>
+	</ical:LOCATION>
+
+    </ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T090000</rdf:value>
+		<util:hour>09</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T093000</rdf:value>
+		<util:hour>09</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Welcome (Organizers and Jim Hendler) (Room TCSEQ 
+              200)
+	</ical:DESCRIPTION>
+
+
+
+	<ical:LOCATION>
+
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Room TCSEQ 200" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/200.html" />
+		</ical:GEO>
+
+	</ical:LOCATION>
+
+	<ical:ATTENDEE>
+	   <ical:CAL-ADDRESS>
+		<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+		<foaf:name>Stefan Decker</foaf:name>
+		<foaf:mbox rdf:resource="mailto:stefan@db.stanford.edu" />
+		<foaf:workplaceHomepage rdf:resource="http://www.stanford.edu"/>
+	   </ical:CAL-ADDRESS>
+	</ical:ATTENDEE>
+
+	<ical:ATTENDEE>
+	   <ical:CAL-ADDRESS>
+		<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+		<foaf:name>Jim Hendler</foaf:name>
+	   </ical:CAL-ADDRESS>
+	</ical:ATTENDEE>
+
+
+    </ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T093000</rdf:value>
+		<util:hour>09</util:hour>
+		<util:minute>30</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T103000</rdf:value>
+		<util:hour>10</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Invited Talk by Eric Miller (W3C Semantic Web 
+              Activity Leader) (Room TCSEQ 
+              200)
+	</ical:DESCRIPTION>
+
+	<ical:LOCATION>
+
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Room TCSEQ 200" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/200.html" />
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS>
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			   <foaf:name>Eric Miller</foaf:name>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T103000</rdf:value>
+		<util:hour>10</util:hour>
+		<util:minute>30</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T110000</rdf:value>
+		<util:hour>11</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+		Coffee Break (at the TCSEQ Center)
+	</ical:DESCRIPTION>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="The TCSEQ Center" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/map.html" />
+		</ical:GEO>
+	</ical:LOCATION>
+
+
+   </ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+<!--track 1-->
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T110000</rdf:value>
+		<util:hour>11</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T123000</rdf:value>
+		<util:hour>12</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Working Track 1 (Room 
+            CIS-X101)
+Ontology and Ontology Maintenance
+	</ical:DESCRIPTION>
+
+	<dc:subject>Working Track 1: Ontology and Ontology Maintenance
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Room  CIS-X101" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/search_map.html?keyword=integrated"/>
+		</ical:GEO>
+
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T140000</rdf:value>
+		<util:hour>14</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T153000</rdf:value>
+		<util:hour>15</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Working Track 1 (Room 
+            CIS-X101)
+Ontology and Ontology Maintenance
+	</ical:DESCRIPTION>
+
+	<dc:subject>Working Track 1: Ontology and Ontology Maintenance
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Room CIS-X101" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/search_map.html?keyword=integrated"/>
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T16000</rdf:value>
+		<util:hour>16</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T180000</rdf:value>
+		<util:hour>18</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Working Track 1 (Room 
+            CIS-X101)
+Ontology and Ontology Maintenance
+	</ical:DESCRIPTION>
+
+	<dc:subject>Working Track 1: Ontology and Ontology Maintenance
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Room CIS-X101" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/search_map.html?keyword=integrated"/>
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+<!--track 2-->
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T110000</rdf:value>
+		<util:hour>11</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T123000</rdf:value>
+		<util:hour>12</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Working Track 2
+(Packard 
+            101)
+Interoperability, Integration, Composition
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Working Track 2
+Interoperability, Integration, Composition
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+			            <ical:TEXT rdf:value="Packard 101" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/stanford_zoom_map.html?220,205"/>
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T140000</rdf:value>
+		<util:hour>14</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T153000</rdf:value>
+		<util:hour>15</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+
+	<ical:DESCRIPTION>
+Working Track 2
+(Packard 
+            101)
+Interoperability, Integration, Composition
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Working Track 2
+Interoperability, Integration, Composition
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+		            <ical:TEXT rdf:value="Packard 101" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/stanford_zoom_map.html?220,205"/>
+		</ical:GEO>
+	</ical:LOCATION>
+
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T160000</rdf:value>
+		<util:hour>16</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T180000</rdf:value>
+		<util:hour>18</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+	<ical:DESCRIPTION>
+Working Track 2
+(Packard 
+            101)
+Interoperability, Integration, Composition
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Working Track 2
+Interoperability, Integration, Composition
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+		            <ical:TEXT rdf:value="Packard 101" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/stanford_zoom_map.html?220,205"/>
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+
+<!--track 3-->
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T110000</rdf:value>
+		<util:hour>11</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T123000</rdf:value>
+		<util:hour>12</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Working Track 3
+(Bio 
+            T175)
+(Web-) Services and Applications
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Working Track 3
+(Web-) Services and Applications
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Bio T175" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/stanford_zoom_map.html?220,205"/>
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T140000</rdf:value>
+		<util:hour>14</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T153000</rdf:value>
+		<util:hour>15</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+
+
+	<ical:DESCRIPTION>
+Working Track 3
+(Bio 
+            T175)
+(Web-) Services and Applications
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Working Track 3
+(Web-) Services and Applications
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Bio T175" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/stanford_zoom_map.html?220,205"/>
+		</ical:GEO>
+	</ical:LOCATION>
+
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T160000</rdf:value>
+		<util:hour>16</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T180000</rdf:value>
+		<util:hour>18</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+
+
+	<ical:DESCRIPTION>
+Working Track 3
+(Bio 
+            T175)
+(Web-) Services and Applications
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Working Track 3
+(Web-) Services and Applications
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Bio T175" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/stanford_zoom_map.html?220,205"/>
+		</ical:GEO>
+	</ical:LOCATION>
+
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+<!--tutorial track-->
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T110000</rdf:value>
+		<util:hour>11</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T123000</rdf:value>
+		<util:hour>12</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Tutorial Track (Room TCSEQ 
+            200)
+Ontology Engineering
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Tutorial Track 
+Ontology Engineering
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Room TCSEQ  200" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/200.html" />
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T140000</rdf:value>
+		<util:hour>14</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T153000</rdf:value>
+		<util:hour>15</util:hour>
+		<util:minute>30</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+
+	<ical:DESCRIPTION>
+Tutorial Track (Room TCSEQ 
+            200)
+Ontology Engineering
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Tutorial Track 
+Ontology Engineering
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Room TCSEQ  200" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/200.html" />
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T160000</rdf:value>
+		<util:hour>16</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T180000</rdf:value>
+		<util:hour>18</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+	<ical:DESCRIPTION>
+Tutorial Track (Room TCSEQ 
+            200)
+Ontology Engineering
+	</ical:DESCRIPTION>
+
+	<dc:subject>
+Tutorial Track 
+Ontology Engineering
+	</dc:subject>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Room TCSEQ  200" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/200.html" />
+		</ical:GEO>
+	</ical:LOCATION>
+
+	    <util:presentation>
+		<foaf:Document>
+		    <dc:creator>
+			<ical:CAL-ADDRESS> 
+			   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+			</ical:CAL-ADDRESS>
+		    </dc:creator>
+		    <dc:title>
+		    </dc:title>
+		    <dc:description>
+
+		    </dc:description>
+	    	</foaf:Document>
+	    </util:presentation>
+	</ical:VEVENT>
+</ical:VEVENT-PROP>
+
+<!--lunch-->
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T123000</rdf:value>
+		<util:hour>12</util:hour>
+		<util:minute>30</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T140000</rdf:value>
+		<util:hour>14</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+	<ical:DESCRIPTION>
+Lunch at the TCSEQ Center
+	</ical:DESCRIPTION>
+
+	<ical:LOCATION>
+
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="TCSEQ Center" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/map.html" />
+		</ical:GEO>
+	</ical:LOCATION>
+    </ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+<!--demo session -->
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T123000</rdf:value>
+		<util:hour>12</util:hour>
+		<util:minute>30</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T140000</rdf:value>
+		<util:hour>14</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+	<ical:DESCRIPTION>
+Demo Session
+	</ical:DESCRIPTION>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Gates 104" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/home/map/search_map.html?keyword=gates"/>
+		</ical:GEO>
+	</ical:LOCATION>
+    </ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+<!-- coffee break -->
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T153000</rdf:value>
+		<util:hour>15</util:hour>
+		<util:minute>30</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T160000</rdf:value>
+		<util:hour>16</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+	<ical:DESCRIPTION>
+	Coffee Break (at the TCSEQ Center)
+	</ical:DESCRIPTION>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="TCSEQ Center" />
+			</ical:GEO-NAME>			
+			<rdfs:seeAlso rdf:resource="http://www.stanford.edu/dept/registrar/tcseq/map.html" />
+
+		</ical:GEO>
+	</ical:LOCATION>
+
+    </ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+<!--banquet -->
+
+
+
+<ical:VEVENT-PROP>
+   <ical:VEVENT>
+
+	<ical:DTSTART>
+	   <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T190000</rdf:value>
+		<util:hour>19</util:hour>
+		<util:minute>00</util:minute>
+	   </ical:DATE-TIME>
+	</ical:DTSTART>
+
+
+	<ical:DTEND>
+	    <ical:DATE-TIME>
+		<ical:TZID rdf:resource="#PDT"/>
+		<rdf:value>20010730T220000</rdf:value>
+		<util:hour>22</util:hour>
+		<util:minute>00</util:minute>
+	    </ical:DATE-TIME>
+
+	</ical:DTEND>
+
+	<ical:DESCRIPTION>
+Banquet at the Faculty Club
+	</ical:DESCRIPTION>
+
+	<ical:LOCATION>
+		<ical:GEO>
+			<ical:GEO-NAME>
+				<ical:TEXT rdf:value="Faculty Club" />
+			</ical:GEO-NAME>			
+		</ical:GEO>
+	</ical:LOCATION>
+    </ical:VEVENT>
+</ical:VEVENT-PROP>
+
+
+
+
+
+
+<ical:VTIMEZONE-PROP>
+<ical:VTIMEZONE rdf:ID="PT">
+<ical:STANDARD>
+<ical:VTIMEZONE-PART>
+<ical:DTSTART>
+<ical:DATE-TIME>
+<rdf:value>20010281T090000Z</rdf:value>
+</ical:DATE-TIME>
+</ical:DTSTART>
+<ical:TZOFFSETFROM>
+<ical:INTEGER>
+<rdf:value>-0700</rdf:value>
+</ical:INTEGER>
+</ical:TZOFFSETFROM>
+<ical:TZOFFSETTO>
+<ical:INTEGER>
+<rdf:value>-0800</rdf:value>
+</ical:INTEGER>
+</ical:TZOFFSETTO>
+<ical:NAME>
+<ical:TEXT>
+<rdf:value>PST</rdf:value>
+</ical:TEXT>
+</ical:NAME>
+</ical:VTIMEZONE-PART>
+</ical:STANDARD>
+<ical:DAYLIGHT>
+<ical:VTIMEZONE-PART>
+<ical:DTSTART>
+<ical:DATE-TIME>
+<rdf:value>20010401T100000Z</rdf:value>
+</ical:DATE-TIME>
+</ical:DTSTART>
+<ical:TZOFFSETFROM>
+<ical:INTEGER>
+<rdf:value>+0800</rdf:value>
+</ical:INTEGER>
+</ical:TZOFFSETFROM>
+<ical:TZOFFSETTO>
+<ical:INTEGER>
+<rdf:value>+0700</rdf:value>
+</ical:INTEGER>
+</ical:TZOFFSETTO>
+<ical:NAME>
+<ical:TEXT>
+<rdf:value>PDT</rdf:value>
+</ical:TEXT>
+</ical:NAME>
+</ical:VTIMEZONE-PART>
+</ical:DAYLIGHT>
+</ical:VTIMEZONE>
+</ical:VTIMEZONE-PROP>
+
+</ical:VCALENDAR>
+</rdf:RDF>

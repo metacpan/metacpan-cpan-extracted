@@ -1,0 +1,19 @@
+# -*- perl -*-
+
+@ScripActions = (
+ { Name        => 'Extract Subject Tag',
+   Description => 'Extract tags from a Transaction\'s subject and add them to the Ticket\'s subject.',
+   ExecModule  => 'ExtractSubjectTag',
+ },
+);
+
+@Scrips= (
+  { Description         => "On transaction, add any tags in the transaction's subject to the ticket's subject",
+    Queue               => 0,
+    ScripCondition      => 'On Transaction',
+    ScripAction         => 'Extract Subject Tag',
+    Template            => 'Blank',
+  }
+);
+
+1;

@@ -1,0 +1,10 @@
+0.3 - 2009/12/17
+  Add display of internal links
+  Deal with restrictive permissions when making links
+  Correctly pull headers from original linked message
+
+0.2 - 2009/12/16
+  Fixes for mySQL
+
+0.1 - 2009/10/21
+  Initial relase

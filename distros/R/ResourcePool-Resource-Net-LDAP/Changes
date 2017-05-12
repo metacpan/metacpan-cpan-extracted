@@ -1,0 +1,19 @@
+Changelog for ResourcePool::Resource::Net::LDAP
+
+V1.0002 - 2003-09-26
+
+  *  Export of ':all' from Net::LDAP::Constants has been replaced by 
+     the actually required constants only. 
+
+V1.0001 - 2003-01-06
+
+  *  Support for start_tls has been added. 
+
+  *  A little bit obsolete code has been removed which causes a minor 
+     performance improvement. 
+
+V1.0000 - 2003-01-02
+
+  *  This package was previously included in the ResourcePool core 
+     distribution. 
+

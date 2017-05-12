@@ -1,0 +1,7 @@
+Revision history for RT-Extension-Drafts
+
+0.02    Mon, 04 Apr 2016 13:45:14 +0200
+        Fix drafts loading for 4.4.x
+
+0.01    Fri, 06 May 2011 09:43:52 +0200
+        Initial release.

@@ -1,0 +1,21 @@
+<div id="content">
+<div class="blog">
+  <div class="blogbody">
+
+  <a id="entry"></a>
+  <h2 class="title">{{Blog}}</a></h2>
+
+<div class="upper-nav"><a href="[% script %]?[% top_page %]" accesskey="1">[% loc_top_page %]</a> | 
+[% IF has_privacy %]
+<a href="blog.html">[% loc_blog_page %]</a> | 
+[% END %]
+<a href="[% script %]?[% changes_page %]">[% loc_changes_page %]</a> | 
+<a href="[% script %]?action=prefs">[% loc_preferences_page %]</a> | 
+<a href="[% script %]?{{KwikiHelpIndex}}">{{KwikiHelpIndex}}</a> | 
+<form method="post" action="[% script %]" enctype="application/x-www-form-urlencoded">
+<input type="text" name="search" size="15" value="{{Search}}" onfocus="this.value=''" />
+<input type="hidden" name="action" value="search" />
+</form>
+</div><!-- close "upper-nav" -->
+<a id="skip-upper-nav"></a>
+<hr />

@@ -1,0 +1,51 @@
+=widget ListView
+
+=extends collection
+
+=for layout header
+
+[% pager_fragment %]
+
+=for layout footer
+
+[% pager_fragment %]
+
+[% actions %]
+
+=for layout actions
+
+<ul class="collection_actions">
+  [% call_next %]
+</ul>
+
+=for layout action
+
+<li>[% call_next %]</li>
+
+=for layout pager
+
+<ul class="pager">
+  [% first_page %]
+  [% previous_page %]
+  [% page_list %]
+  [% next_page %]
+  [% last_page %]
+</ul>
+
+=for layout numbered_page_this_page
+
+<li> [% page_number %] </li>
+
+=for layout numbered_page
+
+<li> <a href="[% page_uri %]">[% page_number %]</a> </li>
+
+=for layout named_page
+
+<li> <a href="[% page_uri %]">[% page_name %]</a> </li>
+
+=for layout named_page_no_page
+
+<li> [% page_name %] </li>
+
+=cut

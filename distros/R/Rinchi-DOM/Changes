@@ -1,0 +1,6 @@
+Revision history for Perl extension Rinchi::DOM.
+
+0.01  Sun Mar 30 02:17:39 2008
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.8.1 -n Rinchi::DOM
+

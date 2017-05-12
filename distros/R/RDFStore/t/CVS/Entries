@@ -1,0 +1,13 @@
+/00_utf8.t/1.1/Mon May  5 17:57:46 2003//
+/01_rdfstore.t/1.30/Fri Jan  7 09:16:18 2005//
+/02_parser.t/1.9/Wed Dec 17 16:59:11 2003//
+/03_model.t/1.8/Mon Feb 21 18:11:40 2005//
+/04_rdql.t/1.26/Mon Mar  6 15:45:10 2006//
+/05_serializer.t/1.3/Wed Dec 17 16:59:11 2003//
+/06_objects.t/1.2/Wed Jul  7 15:08:59 2004//
+/rdf-syntax-ns-examples.xml/1.1.1.1/Mon Jun 17 09:30:53 2002//
+/reify.xml/1.1.1.1/Mon Jun 17 09:30:53 2002//
+/reify1.xml/1.1.1.1/Mon Jun 17 09:30:53 2002//
+/reify2.xml/1.1.1.1/Mon Jun 17 09:30:53 2002//
+/reify3.xml/1.1.1.1/Mon Jun 17 09:30:53 2002//
+D/rdql-tests////

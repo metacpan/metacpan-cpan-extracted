@@ -1,0 +1,413 @@
+# German translation for Kwiki.
+# Copyright (C) 2003 Sören Michael Laird Sörries
+# This file is distributed under the terms of the GPL.
+# "Sören M. Laird Sörries" <info@perlmongers.de>, 2003.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kwiki 0.18\n"
+"POT-Creation-Date: 2002-07-16 17:27+0800\n"
+"PO-Revision-Date: 2003-10-06 18:20-0300\n"
+"Last-Translator: Sören M. Laird Sörries <info@perlmongers.de>\n"
+"Language-Team: Sören M. Laird Sörries <info@perlmongers.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/CGI/Kwiki/Search.pm:40
+#. (scalar @results)
+msgid "%1 pages found"
+msgstr "%1 Seiten gefunden"
+
+#: lib/CGI/Kwiki/Search.pm:37
+#. (scalar @results, $search)
+msgid "%1 pages found containing '%2'"
+msgstr "%1 Seiten enthalten '%2'"
+
+#: lib/CGI/Kwiki/Template.pm.orig:482 lib/CGI/Kwiki/Template.pm:482
+msgid "(Click the SAVE button after making changes)"
+msgstr "(Klicke den SICHERN-Knopf, sobald die Änderungen abgeschlossen sind)"
+
+#: lib/CGI/Kwiki/Template.pm.orig:456 lib/CGI/Kwiki/Template.pm:456
+msgid "(You must be a site administrator to login)"
+msgstr "(Du mußt ein Administrator dieser Seiten sein um dich anzumelden)"
+
+#: lib/CGI/Kwiki/Changes.pm:32
+msgid "12 hours"
+msgstr "12 Stunden"
+
+#: lib/CGI/Kwiki/Changes.pm:34
+msgid "2 days"
+msgstr "2 Tage"
+
+#: lib/CGI/Kwiki/Changes.pm:37
+msgid "2 weeks"
+msgstr "2 Wochen"
+
+#: lib/CGI/Kwiki/Changes.pm:33
+msgid "24 hours"
+msgstr "24 Stunden"
+
+#: lib/CGI/Kwiki/Changes.pm:35
+msgid "3 days"
+msgstr "3 Tage"
+
+#: lib/CGI/Kwiki/Changes.pm:30
+msgid "3 hours"
+msgstr "3 Stunden"
+
+#: lib/CGI/Kwiki/Changes.pm:39
+msgid "3 months"
+msgstr "3 Monate"
+
+#: lib/CGI/Kwiki/Changes.pm:31
+msgid "6 hours"
+msgstr "6 Stunden"
+
+#: lib/CGI/Kwiki/I18N.pm:29 lib/CGI/Kwiki/Template.pm.orig:239 lib/CGI/Kwiki/Template.pm:239
+msgid "Blog"
+msgstr "Blog"
+
+#: lib/CGI/Kwiki/Template.pm.orig:442 lib/CGI/Kwiki/Template.pm:442
+msgid "Blog this page on SAVE"
+msgstr "Blogge diese Seiten beim SICHERN"
+
+#: lib/CGI/Kwiki/I18N.pm:31
+msgid "BrianIngerson"
+msgstr ""
+
+#: lib/CGI/Kwiki/Changes.pm:47
+#. ($range->[0])
+msgid "Changes in the last %1:"
+msgstr "Änderungen der letzten %1:"
+
+#: lib/CGI/Kwiki/Edit.pm:25
+msgid "Describe the new page here."
+msgstr "Schreibe hier die neue Seite"
+
+#: lib/CGI/Kwiki/Template.pm.orig:280 lib/CGI/Kwiki/Template.pm.orig:399 lib/CGI/Kwiki/Template.pm:280 lib/CGI/Kwiki/Template.pm:399
+msgid "EDIT"
+msgstr "BEARBEITEN"
+
+#: lib/CGI/Kwiki/Formatter.pm:495
+msgid "Go"
+msgstr "Los"
+
+#: lib/CGI/Kwiki/I18N.pm:26 lib/CGI/Kwiki/I18N.pm:32
+msgid "HomePage"
+msgstr ""
+
+#: lib/CGI/Kwiki/Template.pm.orig:391 lib/CGI/Kwiki/Template.pm:391
+msgid "Import"
+msgstr "Importieren"
+
+#: lib/CGI/Kwiki/Edit.pm:128
+#. ($page_id_new)
+msgid "Invalid page name '%1'"
+msgstr "'%1' ist kein zulässiger Seitenname"
+
+#: lib/CGI/Kwiki/Template.pm.orig:251 lib/CGI/Kwiki/Template.pm.orig:258 lib/CGI/Kwiki/Template.pm.orig:260 lib/CGI/Kwiki/Template.pm:251 lib/CGI/Kwiki/Template.pm:258 lib/CGI/Kwiki/Template.pm:260
+msgid "Kwiki Blog"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:33
+msgid "KwikiAbout"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:34
+msgid "KwikiBackup"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:35
+msgid "KwikiBlog"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:66
+msgid "KwikiCgiModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:69
+msgid "KwikiChangesModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:58
+msgid "KwikiConfigModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:59
+msgid "KwikiConfigYamlModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:67
+msgid "KwikiCookieModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:36
+msgid "KwikiCustomization"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:61
+msgid "KwikiDatabaseModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:63
+msgid "KwikiDisplayModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:57
+msgid "KwikiDriverModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:64
+msgid "KwikiEditModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:37
+msgid "KwikiFeatures"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:38
+msgid "KwikiFit"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:60
+msgid "KwikiFormatterModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:39
+msgid "KwikiFormattingRules"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:40
+msgid "KwikiHelpIndex"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:41
+msgid "KwikiHotKeys"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:42
+msgid "KwikiInstallation"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:75
+msgid "KwikiJavascriptModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:43
+msgid "KwikiKnownBugs"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:44
+msgid "KwikiLogoImage"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:62
+msgid "KwikiMetadataModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:45
+msgid "KwikiModPerl"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:56
+msgid "KwikiModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:46 lib/CGI/Kwiki/Template.pm.orig:166 lib/CGI/Kwiki/Template.pm.orig:213 lib/CGI/Kwiki/Template.pm.orig:323 lib/CGI/Kwiki/Template.pm:166 lib/CGI/Kwiki/Template.pm:213 lib/CGI/Kwiki/Template.pm:323
+msgid "KwikiNavigation"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:71
+msgid "KwikiNewModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:72
+msgid "KwikiPagesModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:47
+msgid "KwikiPod"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:70
+msgid "KwikiPrefsModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:48
+msgid "KwikiPrivacy"
+msgstr ""
+
+#: lib/CGI/Kwiki/Formatter.pm:245 lib/CGI/Kwiki/I18N.pm:49
+msgid "KwikiPrivatePage"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:74
+msgid "KwikiScriptsModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:68
+msgid "KwikiSearchModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:50
+msgid "KwikiSisters"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:51
+msgid "KwikiSlideShow"
+msgstr ""
+
+#: lib/CGI/Kwiki/Template.pm.orig:503 lib/CGI/Kwiki/Template.pm:503
+msgid "KwikiSlides"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:76
+msgid "KwikiSlidesModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:73
+msgid "KwikiStyleModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:65
+msgid "KwikiTemplateModule"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:52
+msgid "KwikiTodo"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:53
+msgid "KwikiUpgrading"
+msgstr ""
+
+#: lib/CGI/Kwiki/I18N.pm:54
+msgid "KwikiUserName"
+msgstr ""
+
+#: lib/CGI/Kwiki/Template.pm.orig:283 lib/CGI/Kwiki/Template.pm.orig:454 lib/CGI/Kwiki/Template.pm:283 lib/CGI/Kwiki/Template.pm:454
+msgid "LOGIN"
+msgstr "ANMELDEN"
+
+#: lib/CGI/Kwiki/Template.pm.orig:464 lib/CGI/Kwiki/Template.pm:464
+msgid "LOGOUT"
+msgstr "ABMELDEN"
+
+#: lib/CGI/Kwiki/I18N.pm:30
+msgid "New Page Name"
+msgstr "Neuer Seitenname"
+
+#: lib/CGI/Kwiki/Plugin/Diff.pm:90
+msgid "No history"
+msgstr "Keine Historie"
+
+#: lib/CGI/Kwiki/Template.pm.orig:413 lib/CGI/Kwiki/Template.pm.orig:486 lib/CGI/Kwiki/Template.pm:413 lib/CGI/Kwiki/Template.pm:486
+msgid "PREVIEW"
+msgstr "VORSCHAU"
+
+#: lib/CGI/Kwiki/Edit.pm:131
+#. ($page_id_new)
+msgid "Page name '%1' already exists"
+msgstr "Die Seite '%1' gibt es bereits"
+
+#: lib/CGI/Kwiki/Template.pm.orig:445 lib/CGI/Kwiki/Template.pm:445
+msgid "Permanently delete this page on SAVE"
+msgstr "Dauerhaft diese Seite beim SICHERN löschen"
+
+#: lib/CGI/Kwiki/I18N.pm:28
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: lib/CGI/Kwiki/Template.pm.orig:427 lib/CGI/Kwiki/Template.pm:427
+msgid "Private"
+msgstr "Privat"
+
+#: lib/CGI/Kwiki/Template.pm.orig:425 lib/CGI/Kwiki/Template.pm:425
+msgid "Protected"
+msgstr "Geschützt"
+
+#: lib/CGI/Kwiki/Template.pm.orig:423 lib/CGI/Kwiki/Template.pm:423
+msgid "Public"
+msgstr "Öffentlich"
+
+#: lib/CGI/Kwiki/I18N.pm:27
+msgid "RecentChanges"
+msgstr "NeuesteÄnderungen"
+
+#: lib/CGI/Kwiki/Plugin/Diff.pm:44
+#. (($self->script . '?' . $self->escape($page_id)
+msgid "Revision Diffs for <a href='%1'>%2</a>:"
+msgstr "Änderungen der Revision für <a href='%1'>%2</a>:"
+
+#: lib/CGI/Kwiki/Template.pm.orig:410 lib/CGI/Kwiki/Template.pm.orig:481 lib/CGI/Kwiki/Template.pm:410 lib/CGI/Kwiki/Template.pm:481
+msgid "SAVE"
+msgstr "SICHERN"
+
+#: lib/CGI/Kwiki/Template.pm.orig:155 lib/CGI/Kwiki/Template.pm.orig:160 lib/CGI/Kwiki/Template.pm.orig:202 lib/CGI/Kwiki/Template.pm.orig:207 lib/CGI/Kwiki/Template.pm.orig:267 lib/CGI/Kwiki/Template.pm.orig:312 lib/CGI/Kwiki/Template.pm.orig:317 lib/CGI/Kwiki/Template.pm.orig:387 lib/CGI/Kwiki/Template.pm:155 lib/CGI/Kwiki/Template.pm:160 lib/CGI/Kwiki/Template.pm:202 lib/CGI/Kwiki/Template.pm:207 lib/CGI/Kwiki/Template.pm:267 lib/CGI/Kwiki/Template.pm:312 lib/CGI/Kwiki/Template.pm:317 lib/CGI/Kwiki/Template.pm:387
+msgid "Search"
+msgstr "Suchen"
+
+#: lib/CGI/Kwiki/CGI.pm:57
+msgid "SearchResults"
+msgstr "SuchErgebnisse"
+
+#: lib/CGI/Kwiki/Template.pm.orig:477 lib/CGI/Kwiki/Template.pm:477
+msgid "Show changed message at bottom of display."
+msgstr "Zeige veränderte Nachricht am unteren Ende der Seite."
+
+#: lib/CGI/Kwiki/Template.pm.orig:478 lib/CGI/Kwiki/Template.pm:478
+msgid "Show diff pulldown at bottom of display."
+msgstr "Zeige Auswahl der Änderungen am unteren Ende der Seite."
+
+#: lib/CGI/Kwiki/Template.pm.orig:479 lib/CGI/Kwiki/Template.pm:479
+msgid "Show latest diff at bottom of display."
+msgstr "Zeige die letzte Änderung am unteren Ende der Seite."
+
+#: lib/CGI/Kwiki/CGI.pm:57
+msgid "SiteMap"
+msgstr "SeitenÜbersicht"
+
+#: lib/CGI/Kwiki/Template.pm.orig:496 lib/CGI/Kwiki/Template.pm:496
+msgid "This is a protected page. Only the site administrator can edit it."
+msgstr "Dies ist eine geschützte Seite. Nur der Administrator der Seiten kann sie verändern."
+
+#: lib/CGI/Kwiki/Template.pm.orig:291 lib/CGI/Kwiki/Template.pm:291
+msgid "This page last changed on [[% edit_time %]] by [[% edit_by %]]"
+msgstr "Diese Seite wurde zuletzt verändert um [[% edit_time %]] durch [[% edit_by %]]"
+
+#: lib/CGI/Kwiki/Slides.pm:13
+msgid "Title Goes Here"
+msgstr "Hier kommt der Titel hin"
+
+#: lib/CGI/Kwiki/Template.pm.orig:474 lib/CGI/Kwiki/Template.pm:474
+msgid "UserName: &nbsp;"
+msgstr "Benutzername: &nbsp;"
+
+#: lib/CGI/Kwiki/Prefs.pm:64
+msgid "Username must be a valid wiki page (about yourself)."
+msgstr "Der Benutzername muß ein gültiger Wiki-Seitenname (über dich selbst) sein."
+
+#: lib/CGI/Kwiki/Template.pm.orig:471 lib/CGI/Kwiki/Template.pm:471
+msgid "Your [KwikiUserName] will be used to indicate who changed a page. This can be viewed in [[% changes_page %]]."
+msgstr "Dein [KwikiUserName] wird verwendet um anzuzeigen, wer eine Seite geändert hat und erscheint in [[% changes_page %]]."
+
+#: lib/CGI/Kwiki/Formatter.pm:116
+msgid "fullscreen"
+msgstr "bildschirmfüllend"
+
+#: lib/CGI/Kwiki/Changes.pm:29
+msgid "hour"
+msgstr "Stunde"
+
+#: lib/CGI/Kwiki/Changes.pm:38
+msgid "month"
+msgstr "Monat"
+
+#: lib/CGI/Kwiki/Formatter.pm:110
+msgid "start"
+msgstr "Start"
+
+#: lib/CGI/Kwiki/Changes.pm:36
+msgid "week"
+msgstr "Woche"

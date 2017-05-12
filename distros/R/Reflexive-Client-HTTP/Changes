@@ -1,0 +1,128 @@
+==================================================
+Changes from 1738-12-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2012-10-04 01:27:33 +0000
+------------------------------------------
+
+  Change: 426678b069d6d7bda97f3b45b8969f2a2b1e0a88
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-04 03:27:14 +0000
+
+    Fixed tests after failing reports, cause of possible randomness of
+    responses in promise test 
+
+  Change: f44e52f5ed7c0d139d00452a7c7b2d3606496bba
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-02 08:06:02 +0000
+
+    Hups, wrong ending leads to not getting executed.... 
+
+  Change: 8c33945e7851811e7769d539d0f8ab856eb4e36c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-02 07:55:00 +0000
+
+    Added much more tests via Test::HTTP::Server, great module 
+
+  Change: 1e7ee9ae087b2167b8d5d49fdaa40d3109d1d6f7
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-02 06:48:33 +0000
+
+    Added chain documentation, 2 examples inside request, disabled buffer
+    in testscripts and added FindBin usage 
+
+  Change: c680758f1f9c0b5c6168e4ed2ad8fe79df095e5c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-02 04:51:24 +0000
+
+    Fixed rights 
+
+  Change: ed516d4379a71abb68830b2d8a71e31196ea27b0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-02 04:51:01 +0000
+
+    Added chain feature (undocumented yet) 
+
+  Change: a9ddf9d4720e7ae2dbe8e875120e45795d020eaa
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-01 02:33:07 +0000
+
+    Yes of course, Role's arent immutable..., Tuned emit_response 
+
+  Change: b44d1ea3bcdbaefa17a53931b8a38a658d0ddf6b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 23:08:58 +0000
+
+    Added emit_response 
+
+  Change: 1b1404b67994cc1837ea7e9de3683a27e113cb64
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 09:35:21 +0000
+
+    added __PACKAGE__->meta->make_immutable; 
+
+  Change: bb366553f1c06fd71ecc3bcda3dfd855f60ef02f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 09:33:14 +0000
+
+    Yeah of course, i dont need Reflex::Base on usage of the role 
+
+  Change: 2f60af87725f1a7e270059ccbc49701ed96dbd0f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 09:29:58 +0000
+
+    pod fixes, moved the loaded classes around 
+
+  Change: 2c80d3cdf55453ca4231442bcbc7adca101a01be
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 09:15:50 +0000
+
+    Dont need Reflex::POE::Event 
+
+  Change: e1c4ca156c6869d54deef00ae71357604c7e6b28
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 09:08:04 +0000
+
+    Added documentation for the role and added eg/ example to synopsis 
+
+  Change: e30d1b3336b6bf6e24466f829684d604e45473de
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 09:00:02 +0000
+
+    Added Reflexive::Client::HTTP::Role 
+
+  Change: fa7cba723c9b1d4a585ccfe97c8215732add2610
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 08:19:16 +0000
+
+    little pod changes 
+
+  Change: 17d178adea796910e44d60c030816622f8a10f3b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 07:48:49 +0000
+
+    Yeah of course, AFTER release i see that i wasnt done... sure... 
+
+  Change: 090c9682950dcacac0f1845ae75679dd11ddd61b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 07:25:09 +0000
+
+    Copied tons of documentation from POE::Component::Client::HTTP, added
+    more documentation for the own attributes and method, added synopsis 
+
+  Change: 64baa177ad6a10600734c2391e1bccc94583f1c9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 06:44:43 +0000
+
+    First working release 
+
+  Change: ba6c9f00a416e4e99745b2b304ce40d88f1cb0f2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-29 01:09:18 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

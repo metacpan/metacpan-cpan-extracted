@@ -1,0 +1,118 @@
+# ABSTRACT: Simple Riap protocol over any stream socket
+# PODNAME: Riap::Simple
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Riap::Simple - Simple Riap protocol over any stream socket
+
+=head1 VERSION
+
+This document describes version 1.2.4 of Riap::Simple (from Perl distribution Riap), released on 2015-09-04.
+
+=head1 SYNOPSIS
+
+This document specifies a simple L<Riap> protocol over any stream socket like
+TCP, Unix, or piping to program.
+
+=head1 DESCRIPTION
+
+Riap::Simple is a simpler alternative to L<Riap::HTTP>. It supports less
+features (currently only supports sending/receiving Riap request and response in
+JSON encoding, no encryption, no authentication, no sending of logging
+messages). It is suitable for localhost/localnet communication (e.g. between
+processes of different languages). For public-facing service, Riap::HTTP is more
+recommended.
+
+Riap::Simple does not support Rinci's input/output stream.
+
+=head2 Request
+
+B<Client> first sends a request line of the following format:
+
+ "j" <JSON> <CRLF>
+
+That is, the lowercase letter C<j> followed by JSON data (must all be in one
+line), followed by CRLF.
+
+=head2 Response
+
+ "j" <JSON> <CRLF>
+
+That is, the lowercase letter C<j> followed by enveloped result encoded in JSON
+(will all be in one line) and a single <CRLF>. The next request can then be sent
+by client.
+
+If client/server sends an invalid request/response line, the connection can be
+closed.
+
+=head1 PROTOCOL VERSION
+
+ 1.2
+
+=head1 EXAMPLES
+
+Below are some examples of what is sent and received on the wire.
+
+ j{"v":0.9}
+ j[501,"Protocol version not implemented"]
+
+ j{
+ j[400,"Invalid JSON"]
+
+ j{"action":"call","uri":"/Math/mult","args":{"a":2,"b":3}}
+ j[200,"OK",6]
+
+ j{"v":1.2,"action":"call","uri":"/Math/mult","args":{"a":2,"b":4}}
+ j[200,"OK",8,{"riap.v":1.2}]
+
+ j{"v":1.1,"action":"info","uri":"/Math/mult"}
+ j[200,"OK",{"type":"function","uri":"/Math/mult"}]
+
+An example of sending and returning binary data (Riap v1.2 only):
+
+ j{"v":1.2,"action":"call","uri":"/bitflip","args":{"data:base64":"AAAA"}}
+ j[200,"OK","////",{"riap.v":1.2,"riap.result_encoding":"base64"}]
+
+The example belows shows calling a function that bit-flips 0x000000 into
+0xffffff.
+
+=head1 FAQ
+
+=head1 SEE ALSO
+
+L<Riap>, L<Riap::HTTP>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Riap>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Riap>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Riap>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

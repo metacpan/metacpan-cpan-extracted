@@ -1,0 +1,5 @@
+<html>
+  <body>
+    [% PROCESS $template %]
+  </body>
+</html>

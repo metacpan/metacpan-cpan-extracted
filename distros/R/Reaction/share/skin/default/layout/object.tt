@@ -1,0 +1,11 @@
+=extends NEXT
+
+=for layout container
+
+  [% call_next %] <br>
+
+=for layout action
+
+<td>[% call_next %]</td>
+
+=cut

@@ -1,0 +1,5 @@
+
+This file has extension .dsd. However, since the .xml file
+exists, request to .xml should not touch this file. If it
+ever does, it should fail because we made this file a non-XML.
+

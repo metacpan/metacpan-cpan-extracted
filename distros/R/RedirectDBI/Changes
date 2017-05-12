@@ -1,0 +1,8 @@
+Revision history for Perl extension Apache::RedirectDBI
+
+0.02  Oct 05 18:59:00 2001
+  Added the following directives to Apache::RedirectDBI V 0.01
+    PerlSetVar RedirectDBI_field       DB_field_name_containing_username
+    PerlSetVar RedirectDBI_url         DB_field_name_containing_redirect_url
+    PerlSetVar RedirectDBI_external    External_REDIRECT_is_issued
+  Added $debug variable and related fprintf STDERR strings.

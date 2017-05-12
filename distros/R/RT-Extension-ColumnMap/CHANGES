@@ -1,0 +1,9 @@
+0.02 2009-11-21
+
+    * 'CustomField{...}'
+    * fix watchers
+    * bring more sense into checking collections
+
+0.01 2009-11-05
+
+    * initial release

@@ -1,0 +1,37 @@
+Revision history for Rose-DBx-Object-Indexed
+
+0.001   31 Oct 2008
+        First version, released on an unsuspecting world.
+
+
+0.002   10 Dec 2008
+        * add debug() and force_load() opts
+
+0.003   17 Dec 2008
+        * fix bug where -u option was not passed to swish-e on insert()
+          and existing index was being wiped out.
+
+0.004   26 Jan 2009
+        * SWISH::Prog 0.25 or later required
+        * add tree_opts() method to Indexer
+
+0.005   26 Feb 2009
+        * fix typo with = vs =~
+
+0.006   07 Jan 2009
+        * add KinoSearch support via SWISH::Prog::KSx.
+        * fix bug in Indexer where native index must be
+          seeded with a dummy file.
+
+0.007   05 March 2010
+        * fix pod bug in KSx indexer
+        * fix t/01 bug by detecting if swish-e has incremental support.
+
+0.008   12 Dec 2010
+        * add Xapian indexer
+
+0.009   22 Oct 2012
+        * pass @_ into perl_to_xml() from Indexer->to_xml() so that
+          strip_plurals feature is supported.
+
+

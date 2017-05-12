@@ -1,0 +1,7 @@
+=extends NEXT
+
+=for layout widget
+
+[% call_next %] <br />
+
+=cut

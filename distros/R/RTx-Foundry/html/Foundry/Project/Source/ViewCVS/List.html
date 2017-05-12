@@ -1,0 +1,15 @@
+%# To invent, you need a good imagination and a pile of junk.
+%# 		-- Thomas Edison
+<%INIT>
+our ($Get, $Post, $ua, $wws);
+my $args = { map { $_ => $ARGS{$_} } grep /^[_a-z]/, keys %ARGS };
+
+my $out;
+if ($r->path_info =~ m{^(.*)}) {
+    require URI;
+    my $url = URI->new('http:');
+    $url->query_form(%$args);
+    $out = $Get->("$1?" . $url->query);
+    $m->print($out);
+}
+</%INIT>

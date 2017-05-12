@@ -1,0 +1,797 @@
+Revision history for Rinci
+
+1.1.84  2016-12-28 (PERLANCAR)
+
+        - No spec changes.
+
+        - [dist] Remove spec prereq to Sah::Schemas since Sah::Schema::rinci::*
+          have been split to Sah-Schemas-Rinci.
+
+        - [dist] Fix expressing spec prereq relationship with x_spec.
+
+
+1.1.83  2016-12-15 (PERLANCAR)
+
+	- Specify that dry_run feature can also be a hash, to be able to
+	  set default dry_run mode.
+
+
+1.1.82  2016-12-10 (PERLANCAR)
+
+	- Introduce argument spec property 'index_completion'.
+
+	- Typo [RT#118381].
+
+
+1.1.81  2016-07-28 (PERLANCAR)
+
+	- No spec changes.
+
+	- Split Sah schemas to Sah-Schemas-Rinci so that schema tweaks
+	  don't require releasing a new spec release.
+
+
+1.1.80  2016-05-10 (PERLANCAR)
+
+	- No spec changes.
+
+	- [Incompatible change] Follow Sah::Schemas spec (each individual schema
+          is put in a separate Sah::Schema::* package). Sah::Schema::Rinci is
+          now replaced with Sah::Schema::rinci::* packages.
+
+
+1.1.79  2016-02-25 (PERLANCAR)
+
+	- Define new command-line source for function argument
+	  (cmdline_src): stdin_or_args.
+
+
+1.1.78  2015-09-03 (PERLANCAR)
+
+	- No spec changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+1.1.77  2015-05-01 (PERLANCAR)
+
+	- No spec changes.
+
+	- Typos (args_rels, not args_schema) & wording.
+
+
+1.1.76  2015-04-30 (PERLANCAR)
+
+	- Replace function property 'args_groups' with 'args_rels'. This
+          allows us to reuse the Sah 0.9.34+ specification, since the hash type
+          now also contains clauses that specifies relationships between keys
+          (arguments), e.g. choose_one, choose_all, req_one, req_all, dep_one,
+          dep_all, req_dep_one, req_dep_all.
+
+
+1.1.75  2015-03-28 (PERLANCAR)
+
+	- Add (experimental) argument specification: filters.
+
+
+1.1.74  2015-03-18 (PERLANCAR)
+
+        - [Incompatible change] Use DefHash's 'caption' property for link title,
+          instead of using another ('title').
+
+        - Introduce another value for 'cmdline_src' argument spec property:
+          'stdin_or_file' (in addition to 'stdin_or_files').
+
+
+1.1.73  2015-02-07 (PERLANCAR)
+
+	- No spec changes.
+
+	- Forgot to update schema.
+
+
+1.1.72  2015-02-07 (PERLANCAR)
+
+	- Introduce function property 'args_groups' to allow things like
+	  requiring {only one,all} members of a group of args must be specified
+	  (and possibly others in the future). UPDATE: Now replaced with
+	  'args_rels'.
+
+	- Specify argument specification property 'deps', to allow an argument
+	  to depend on others.
+
+
+1.1.71  2015-01-17 (PERLANCAR)
+
+	- Specify that streaming input and output now uses coderef instead of
+	  filehandle/etc. This is simpler and has the side-effects of easier to
+	  do wrapping for (see Perinci::Sub::Wrapper) where one can just wrap
+	  the coderef to do per-record validation of streaming input/output.
+
+
+1.1.70  2014-11-19 (PERLANCAR)
+
+	- Add 'links' property to arg spec.
+
+
+1.1.69  2014-10-30 (PERLANCAR)
+
+	- No spec changes.
+
+	- [Bugfix] forgot to update Sah schema.
+
+
+1.1.68  2014-10-30 (PERLANCAR)
+
+	- Forgot to mention 'stream' argument spec property.
+
+
+1.1.67  2014-10-30 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Tweaks/changes to sending of partial argument value: feature
+          'partial_arg' is removed as it is redundant (argument property
+          'partial' already hints this capability). When sending partial value,
+          aside from '-arg_part_start' and '-arg_part_len', client now must also
+          send '-arg_len' which is the total size. This is to follow more
+          closely with HTTP Content-Range semantic.
+
+        - Tweaks/changes to returning partial result: feature 'partial_res' is
+          removed, function can now instead hint using the 'partial' property in
+          its 'result' property. Result metadata properties 'res_part_start' and
+          'res_part_len' are now renamed to 'part_start' and 'part_len'. 'len'
+          is now also added to return information on total size (to follow HTTP
+          Content-Range semantic more closely).
+
+        [ENHANCEMENTS]
+
+        - Introduce argument property 'stream' to signify accepting input
+          stream. Input stream (like stdin) is a basic feature in most
+          programming environment so it should be supported. Implementation of
+          command-line framework will provide a filehandle for the argument,
+          where the function can read data from.
+
+        - Introduce result metadata property 'stream' to signify output is a
+          stream. Output stream (like stdout) is a basic feature in most
+          programming environment so it should be supported. This feature is
+          actually already in Unixish for some time.
+
+
+1.1.66  2014-10-29 (PERLANCAR)
+
+        - Currently limit that there should at most be one argument with
+          partial=1. The special arguments become just '-arg_part_start' and
+          '-arg_part_len'.
+
+
+1.1.65  2014-10-29 (PERLANCAR)
+
+	- No spec changes.
+
+	- [Bugfix] Forgot to update Sah schema.
+
+
+1.1.64  2014-10-29 (PERLANCAR)
+
+        [ENHANCEMENTS]
+
+        - Introduce sending partial arguments and returning partial result,
+          similar in spirit to Ranges in HTTP/1.1. New argument specification
+          properties: 'partial'. New features: 'partial_arg', 'partial_res'. New
+          special arguments: '-arg_part_start', '-arg_part_len',
+          '-res_part_start', '-res_part_len'. New result metadata properties:
+          'res_part_start', 'res_part_len'. UPDATE in 1.1.67: 'partial_res' is
+          removed, '-res_part_start' & '-res_part_len' renamed to 'part_start &
+          part_len'.
+
+
+1.1.63  2014-10-28 (PERLANCAR)
+
+        [ENHANCEMENTS]
+
+        - Introduce statuses 201, 204.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Introduce status 207. Replace result metadata properties 'arg_errors'
+          & 'arg_warnings' with the more generic 'results' to report
+          per-item/detailed statuses.
+
+
+1.1.62  2014-10-23 (PERLANCAR)
+
+        [REMOVED FEATURES]
+
+        - Cancel support for 'encoding' (in result metadata as well in argument
+          specification and result specification). This is an issue with JSON
+          which cannot handle binary data and should be handled in the Riap
+          level, not Rinci. Note: to mark a function argument or result as
+          containing binary data, use the schema type 'buf'.
+
+
+1.1.61  2014-10-22 (PERLANCAR)
+
+        - Introduce 'encoding' property in result specification, to give hints
+          to tools that function wants to encode its result by default. Said
+          tool can encode the result and set the 'encoding' property in the
+          result metadata. UPDATE in 1.1.62: removed.
+
+
+1.1.60  2014-10-22 (PERLANCAR)
+
+        - No spec changes.
+
+        - Forgot to update Sah schemas.
+
+
+1.1.59  2014-10-22 (PERLANCAR)
+
+        - Update to DefHash 1.0.6 (introduced 'caption' property, which actually
+          doesn't affect us much).
+
+        - Introduce 'encoding' property in result metadata and argument
+          specification. Currently the only known encoding is 'base64'. This is
+          for functions that want to accept/return binary data, when transport
+          protocol (e.g. 'json' format in Riap) does not support binary data
+          (one can also use binary-safe formats in Riap e.g. Storable or Sereal,
+          but this is not widely supported across languages like JSON). Tools
+          can be written to support automatic decoding of function arguments and
+          automatic encoding of function result. In Perl, see CPAN module
+          Perinci::Sub::Wrapper. UPDATE in 1.1.62: removed.
+
+        - Introduce 'arg_errors' and 'arg_warnings' properties in result
+          metadata. This is for functions that do form processing, because often
+          we want to send the error message for all non-validating arguments
+          (form fields) instead of just the first one found. In Perl, see CPAN
+          module Borang. UPDATE in 1.1.63: replaced with 'results'.
+
+        - Introduce '-action' special argument and the 'check_arg' feature. The
+          '-action' can toggle special invocation modes to the function. This is
+          like '-tx_action' except is not necessarily related to transactions.
+          Currently the only known action is 'check_arg', to check a single
+          argument. This is for functions that do form processing, e.g. when
+          user is editing a form field on the browser and we do AJAX calls to
+          do validation as user types.
+
+
+1.1.58  2014-10-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rename Rinci::result -> Rinci::resmeta.
+
+
+1.1.57  2014-10-11 (PERLANCAR)
+
+	- Introduce is_flag bool property on command-line alias. This is just a
+          convenience so you don't have to write: schema => [bool => {is=>1}].
+
+
+1.1.56  2014-10-10 (PERLANCAR)
+
+	- Introduce argument element submetadata (element_meta property in
+	  argument specification, experimental). This is to support forms.
+
+
+1.1.55  2014-10-09 (PERLANCAR)
+
+	- Introduce argument submetadata (experimental). This is to support
+          forms where one submits form (including subforms) to a function.
+
+
+1.1.54  2014-09-12 (PERLANCAR)
+
+	- Add result metadata property: perm_err.
+
+        - Add FAQ and other POD tweaks.
+
+
+1.1.53  2014-09-11 (PERLANCAR)
+
+	- Introduce function argument spec properties: cmdline_prompt,
+	  is_password. This is to enable CLI programs to prompt password
+	  interactively.
+
+
+1.1.52   2014-06-29 (SHARYANTO)
+
+         - Allow completion routine to return hash (completion reply + metadata)
+           instead of just array (completion reply), as already implemented in
+           Perinci::Sub::Complete and Complete::Util. This allows giving hints
+           on how to escape completion entries (which might be different
+           depending on the type of completion, e.g. files vs environment
+           variables where we don't want to escape '$', and so on).
+
+
+1.1.51   2014-06-25 (SHARYANTO)
+
+         - No spec changes.
+
+         - Tweak/fix Sah schema.
+
+
+1.1.50   2014-06-13 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Revert previous change (args/as -> args_as; args/as conflicts with
+           actual arguments!). Revert result/is_naked -> result_naked too, not
+           worth the trouble of breaking every function out there. What was
+           steven-- thinking?
+
+
+1.1.49   2014-06-13 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename args_as to args/as, result_naked to result/is_naked to make
+           top-level properties cleaner. Implementation should still support the
+           old properties for a while. UPDATE in 1.1.50: renamed back.
+
+        [BUG FIXES]
+
+        - Checking dep func/pkg should be done using Riap info action and not
+          meta.
+
+
+1.1.48   2014-05-28 (SHARYANTO)
+
+         - function: Specify two new function dependency: pkg & func.
+
+
+1.1.47   2014-05-01 (SHARYANTO)
+
+         - No spec changes.
+
+         - Tweak/fix schema.
+
+
+1.1.46   2014-04-30 (SHARYANTO)
+
+         - No spec changes.
+
+         - Tweak/fix schema.
+
+
+1.1.45   2014-04-28 (SHARYANTO)
+
+         - No spec changes.
+
+         - Tweak schema.
+
+
+1.1.44   2014-04-27 (SHARYANTO)
+
+         - Add Sah::Schema::Rinci (replaces Rinci::Schema).
+
+         [REMOVED FEATURES]
+
+         - function: Remove argument spec's 'cmdline_on_getarg' (for now?)
+           because the current implementation does not allow calling the hook on
+           a per-encountered basis (the argv is remainder from Getopt::Long
+           after all the options have been processed).
+
+
+1.1.43   2013-12-25 (SHARYANTO) - Ho ho ho!
+
+         - function: Add argument spec's 'cmdline_on_getopt' and
+           'cmdline_on_getarg'. UPDATE in 1.1.44: 'cmdline_on_getarg' removed.
+
+
+1.1.42   2013-11-14 (SHARYANTO)
+
+         - function: Add argument spec's 'delete' and 'element_completion'
+           properties.
+
+
+1.1.41   2013-11-08 (SHARYANTO)
+
+         - function: Introduce value 'file' for argument spec property
+           'cmdline_src', to allow function to get file content in its
+           argument.
+
+         - function: Introduce property 'test' on example spec, to allow test
+           module to skip testing a certain examples.
+
+
+1.1.40   2013-10-28 (SHARYANTO)
+
+         - result: Add properties 'func.*'.
+
+
+1.1.39   2013-10-15 (SHARYANTO) - with the smell of burning goat meat in the house!
+
+         - function: examples: Introduce 'src' and 'src_plang' so that more
+           general examples can be specified.
+
+         - function: cmdline_aliases: 'code' now gets (\%args, $val) instead of
+           just (\%args).
+
+
+1.1.38   2013-09-15 (SHARYANTO)
+
+         - result: Add property 'logs'.
+
+
+1.1.37   2013-09-13 (SHARYANTO)
+
+         - result: Replace property 'error_stack' with 'prev'.
+
+
+1.1.36   2013-09-07 (SHARYANTO)
+
+         - Rename property 'entity_version' to 'entity_v' to be more consistent
+           with DefHash ('defhash_v').
+
+
+1.1.35   2013-04-11 (SHARYANTO)
+
+         - Introduce property 'x' (from DefHash 1.0.3).
+
+
+1.1.34   2012-11-07 (SHARYANTO)
+
+         - function: Introduce status 44x and 54x (experimental).
+
+
+1.1.33   2012-11-07 (SHARYANTO)
+
+         - No spec changes. (Temporarily?) split Rinci::Schema to its own dist
+           so I can release them often separately. UPDATE in 1.1.44:
+           Rinci::Schema replaced with Sah::Schema::Rinci.
+
+
+1.1.32   2012-11-01 (SHARYANTO)
+
+         - result: Add property 'error_stack'.
+
+         - function: property 'result': Add key 'statuses'.
+
+
+1.1.31   2012-09-19 (SHARYANTO)
+
+         - Base specification on DefHash.
+
+         - Remove 'text_markup' property. Will depend on DefHash for this.
+
+
+1.1.30   2012-09-07 (SHARYANTO)
+
+         - No spec changes. Rename back a file (Rinci/Schema.pm) that I thought
+           was not used (me--). [CT]
+
+
+1.1.29   2012-09-04 (SHARYANTO)
+
+         - Transaction: In 'check_state' phase, specify that result message
+           should contain a description of what needs to be fixed, or how it is
+           already fixed, or how it is unfixable; the message can then be logged
+           by TM to be displayed to user.
+
+
+1.1.28   2012-08-29 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGE]
+
+         - Transaction: To link between 'check_state' call and 'fix_state' call
+           (e.g. function want to preserve some value between call), previously
+           in 'fix_state' call TM passes '-tx_undo_actions' containing the undo
+           actions from the 'check_state'. Now a simpler way is introduced to
+           replace this: '-tx_action_id' containing a unique UUID (in
+           32-character hexdigit). BTW, '-tx_undo_actions' has not been
+           implemented in Perinci::Tx::Manager, so the next release of
+           Perinci::Tx::Manager will just implement '-tx_action_id'.
+
+
+1.1.27   2012-08-28 (SHARYANTO)
+
+         - Introduce status code 331.
+
+         - Mark which status codes are in HTTP spec, which are introduced by us.
+
+
+1.1.26   2012-08-22 (SHARYANTO)
+
+         - Term change: call -> action.
+
+
+1.1.25   2012-08-22 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Remove properties 'use' and 'req' in 'tx' feature. This is to make
+           things simpler. use=>1 is redundant, if function follows transaction
+           protocol it means you can use it in transaction. req=>1 is also
+           removed, all functions should just require transaction and
+           potentially return 'do_actions'. A simple wrapper can be created to
+           execute those actions without transaction, if wanted.
+
+
+1.1.24   2012-08-21 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Deprecate undo protocol, now undo should be implemented solely using
+           transaction.
+
+         - Revise transaction specification. Introduce protocol version (v) and
+           bump it to v=2. Require 'tx' feature to specify protocol version.
+           Incompatibilities include: 1) transaction now no longer uses undo
+           protocol but adapts mechanism from Perinci::Sub::Gen::Undoable (which
+           will also be deprecated as the mechanism is now elevated into
+           standards); 2) TM object no longer needs to be passed to function,
+           this should be safer; function now detects transaction using
+           '-tx_action' special argument.
+
+         [ENHANCEMENTS]
+
+         - Specify TM's interface in more details (moved from Riap::Transaction,
+           which now becomes shorter).
+
+         - Specify steps for action, rollback, and crash recovery in more
+           details, with example.
+
+
+1.1.23   2012-08-14 (SHARYANTO)
+
+         - Major rewrite of transaction specification. The main motivation is to
+           remove the concept of 'steps' as this is a false dichotomy. Steps are
+           actually functions themselves, the units of work are still functions.
+           Eventually, a complex system will need to nest functions inside
+           functions, to more than two levels of nesting. Why divide and limit
+           into two levels (function-step)? So:
+
+         - Everything is a bit clearer now
+
+         - $tm interface is saner ($tm->call, easier to call function inside
+           another)
+
+         - No more mention of unused transaction status: e
+
+         - New transaction statuses: v (rollback of undoing process), e
+           (rollback of redoing process).
+
+         - Recovery does not always mean rollback (to R). For transactions in u
+           and d status, we continue the undoing/redoing. For transactions in v
+           and e status, we continue the rollback to final status C and U,
+           respectively.
+
+
+1.1.22   2012-08-09 (SHARYANTO)
+
+         - tx: Describe the ordering of calls during undo/rollback/redo when
+           there is nested call. The same function may be called twice or more
+           with parts of undo/redo steps.
+
+         - tx: In transaction mode, function now gets undo/redo data from the
+           usual -undo_data special argument, like in non-transaction mode.
+           Txm's API get_undo_steps() and get_redo_steps() are now removed.
+
+
+1.1.21   2012-07-23 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - function: Remove argument specification key 'src', use 'cmdline_src'
+           instead. I think 'src' is too general.
+
+
+1.1.20   2012-07-21 (SHARYANTO)
+
+         - function: Add argument specification keys 'src' and 'cmdline_src'.
+           UPDATE in 1.1.21: 'src' removed.
+
+
+1.1.19   2012-06-22 (SHARYANTO)
+
+         - Adjust transaction status labels. Final statuses are now in
+           uppercase: C, R, U, X; while transient statuses are in lowercase: i,
+           a, u, d, e.
+
+         - Add response status 429 (too many requests).
+
+
+1.1.18   2012-06-06 (SHARYANTO)
+
+         - Refinements to transaction details.
+
+         - Remove dependency clause 'undo_storage'. Add dependency clauses
+           'tmp_dir', 'trash_dir', 'undo_trash_dir'.
+
+
+1.1.17   2012-05-31 (SHARYANTO)
+
+         - Specify transactional system (Rinci::function::Transaction). Split
+           specification for undo to Rinci::function::Undo and specify undo/redo
+           protocol under transaction. UPDATE in 1.1.24: Undo protocol
+           deprecated.
+
+
+1.1.16   2012-05-03 (SHARYANTO)
+
+         - Refine undo protocol documentation. Specify interaction with
+           undo/transaction manager. '-undo_hint' is now replaced by
+           '-undo_storage'. Declare 'undo_storage' dependency clause. UPDATE
+           in 1.1.24: Undo protocol deprecated in favor of transaction.
+
+
+1.1.15   2012-05-02 (SHARYANTO)
+
+         - No spec changes.
+
+         [INCOMPATIBLE CHANGE]
+
+         - Update Sah schema syntax (pre-0.03, [merge:X] -> [mergeX])
+
+
+1.1.14   2012-05-02 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGE]
+
+         - Change 'exec' dependency clause to 'prog' (avoid possible confusion
+           because 'exec' can imply that we need to execute the program; there
+           can be other future dep clause for that).
+
+
+1.1.13   2012-03-23 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Each tag in 'tags' property can also be a tag metadata hash (for
+           translatable message, etc).
+
+
+1.1.12   2012-03-13 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add 'Rinci::result'.
+
+
+1.1.11   2012-03-13 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - package: Remove property 'pkg_version' (use 'entity_version'
+           instead).
+
+         [ENHANCEMENTS]
+
+         - Add property 'entity_version'. UPDATE in 1.1.36: renamed to
+           'entity_v'.
+
+
+1.1.10   2012-02-28 (SHARYANTO)
+
+         - function: arg spec 'aliases': Add alias spec 'schema'
+
+
+1.1.9    2012-02-28 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGE]
+
+         - function: Change (back) 'set' alias spec to 'code', in arg spec
+           'aliases' (for backward compatibility with 1.0)
+
+
+1.1.8    2012-02-28 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - function: Replace (back) 'alias_for' argument spec with
+           'cmdline_aliases'. I first used 'alias_for' so I can list each alias
+           as a key in 'args' property. The goal is so I can get all argument
+           names (- aliases) simply by doing a keys() on 'args' hash. And the
+           goal of that is to add a 'complete_arg_name' Riap action which is
+           more lightweight than a full 'meta' just to get argument names. Turns
+           out that I don't need 'alias_for' just to support
+           'complete_arg_name', and also turns out that completing argument name
+           needs more than just all argument names - aliases. You also need
+           'pos' information. So a full 'meta' is currently used. The reason I
+           now revert to 'cmdline_aliases' style is because I don't want
+           command-line aliases to become full/first-class argument.
+
+
+1.1.7    2012-02-23 (SHARYANTO)
+
+         - package: Add property 'pkg_version'. UPDATE in 1.1.11 & 1.1.36:
+           replaced by 'entity_v'.
+
+
+1.1.6    2012-02-21 (SHARYANTO)
+
+         - function: Add 'alias_for' argument specification. UPDATE 1.1.8:
+           removed.
+
+
+1.1.5    2012-02-10 (SHARYANTO)
+
+         - No spec changes.
+
+         - Add Rinci::Schema.
+
+
+1.1.4    2012-02-01 (SHARYANTO)
+
+         - Declare that 1.1 series might introduce minor backward compatibility
+           problems between revisions.
+
+         - Rename 'arg_pass_style' and 'result_envelope' to the old
+           (Sub::Spec-era) 'args_as' and 'result_naked'. New names are not
+           better.
+
+         - Code entity URI now moved to Riap specification as the 'riap' URI
+           scheme.
+
+         - Some minor revisions.
+
+
+1.1.3    2012-01-27 (SHARYANTO)
+
+         - Change syntax of code entity URI, from 'Pkg.SubPkg.func' to
+           'pm:/Pkg/SubPkg/func' (or 'py:', 'php:', and so on).
+
+         - Some minor revisions like wording and paragraph reorganization.
+
+
+1.1.2    2012-01-19 (SHARYANTO)
+
+         - Add 'default_lang' property. Add guidelines on what to put in 'summary'
+           and 'description'.
+
+         - variable: Add 'schema' property.
+
+
+1.1.1    2012-01-18 (SHARYANTO)
+
+         - No spec changes. Update module names (Rinci::HTTP -> Riap, Rias ->
+           Perinci). Add documents Rinci::Upgrading and Rinci::Tutorial (stub).
+
+
+1.1.0    2012-01-15 (SHARYANTO)
+
+         - First release. Spun off from Sub::Spec.
+
+         [INCOMPATIBLE CHANGES FROM Sub::Spec 1.0.x]
+
+         - Terminology: 'spec clause' becomes 'property'. This is to avoid
+           confusion with 'clause' as used in Sah schema language.
+
+         - Default text markup format changed from Org to Markdown, but a new
+           properties 'text_markup' is added to allow specifying 'org' or
+           'markdown' (or 'none'). UPDATE in 1.1.31: 'text_markup' property
+           removed.
+
+         - 'v' clause is now required to declare Rinci spec version (with value
+           1.1, if unspecified then assumed spec is old Sub::Spec 1.0).
+
+         - function: Incompatible changes to 'args' and 'result' properties;
+           'args' is now a hash of arg names and arg *specs* (instead of arg
+           schemas). 'result' is now a hash of data, instead of schema. The
+           purpose is to keep Sah schema clean from custom, non-schema-related
+           schema clauses, like arg_* (thus requiring custom Sah extensions,
+           etc). Mixing them into schemas was not the right way.
+
+         - function: property 'type' removed, replaced with 'is_func',
+           'is_meth', 'is_static_meth'. This is because a single
+           subroutine/function can act as all.
+
+         - function: Other properties which are also removed/replaced: 'timeout'
+           (non-core), 'retry' (non-core), 'scope' (can be replaced by using
+           tags), 'result_naked' (replaced by 'result_envelope'), 'args_as'
+           (replaced by 'arg_pass_style'). UPDATE in 1.1.4: 'arg_pass_style'
+           renamed back to 'args_as', 'result_envelope' renamed back to
+           'result_naked'.
+
+         - function: property 'deps': terminology change ('dep clause' -> 'dep
+           type'), rename dep types: 'sub' -> 'func', 'mod' -> 'perl_module'.
+
+         [NEW FEATURES FROM Sub::Spec 1.0.x]
+
+         - Keys beginning with "_" are allowed and ignored. This can be used to
+           store extra information.
+
+         - New properties: 'tags', 'links', 'examples'.

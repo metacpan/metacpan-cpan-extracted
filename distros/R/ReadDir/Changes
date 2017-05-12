@@ -1,0 +1,13 @@
+Revision history for Perl extension ReadDir.
+
+0.03  Fri Jun 25 23:22:33 NZST 2004
+	- another memory leak fix
+
+0.02  Thu Jan  2 18:40:29 NZDT 2003
+        - added readdir_hashref, readdir_arrayref and fixed a nasty
+          memory leak
+
+0.01  Fri Nov  2 15:32:44 2001
+	- original version; created by h2xs 1.21 with options
+		-A -n ReadDir
+

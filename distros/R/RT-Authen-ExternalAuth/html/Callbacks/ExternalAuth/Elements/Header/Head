@@ -1,0 +1,11 @@
+% if ( $session{CurrentUser}->UserObj->__Value('Password') eq '*NO-PASSWORD*') {
+<style>
+#user-prefs-password {
+    display: none;
+}
+</style>
+% }
+<%INIT>
+return unless $m->request_comp->path eq '/User/Prefs.html';
+return unless $session{CurrentUser} && $session{CurrentUser}->id;
+</%INIT>

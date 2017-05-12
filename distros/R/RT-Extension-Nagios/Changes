@@ -1,0 +1,30 @@
+1.01 2014-12-16
+ - Support FLAPPINGSTART and FLAPPINGSTOP states
+
+1.00 2014-12-15
+ - Packaging and documentation updates
+
+0.07 2013-10-08
+ - Update install infrastructure for RT 4.2
+ - Fix errors for RECOVERY with no open
+
+0.06 2011-05-21
+ - customize the merge direction
+
+0.05 2011-04-05
+ - customize resolved status via config NagiosResolvedStatus
+ - use the actual active status instead of new/open/stalled
+
+0.04 2011-04-04
+ - make it work with RT 4.0
+
+0.03 2011-01-10
+ - acknowledgement support
+ - problem_type can be empty
+
+0.02 2009-11-03
+ - fix scrip action name
+
+0.01 2009-09-24
+ - initial release
+

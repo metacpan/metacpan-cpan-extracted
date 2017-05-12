@@ -1,0 +1,1520 @@
+<MACRO>
+<NAME>RAPTOR_API</NAME>
+#    define RAPTOR_API
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_API</NAME>
+#      define RAPTOR_API _declspec(dllexport)
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_API</NAME>
+#      define RAPTOR_API _declspec(dllimport)
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_API</NAME>
+#  define RAPTOR_API
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_DEPRECATED</NAME>
+#define RAPTOR_DEPRECATED
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_DEPRECATED</NAME>
+#define RAPTOR_DEPRECATED __attribute__((deprecated))
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_DEPRECATED</NAME>
+#define RAPTOR_DEPRECATED
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_PRINTF_FORMAT</NAME>
+#define RAPTOR_PRINTF_FORMAT(string_index, first_to_check_index) \
+  __attribute__((__format__(__printf__, string_index, first_to_check_index)))
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_PRINTF_FORMAT</NAME>
+#define RAPTOR_PRINTF_FORMAT(string_index, first_to_check_index)
+</MACRO>
+<TYPEDEF>
+<NAME>raptor_uri</NAME>
+typedef void* raptor_uri;
+</TYPEDEF>
+<VARIABLE>
+<NAME>raptor_version_major</NAME>
+extern const unsigned int raptor_version_major;
+</VARIABLE>
+<VARIABLE>
+<NAME>raptor_version_minor</NAME>
+extern const unsigned int raptor_version_minor;
+</VARIABLE>
+<VARIABLE>
+<NAME>raptor_version_release</NAME>
+extern const unsigned int raptor_version_release;
+</VARIABLE>
+<VARIABLE>
+<NAME>raptor_version_decimal</NAME>
+extern const unsigned int raptor_version_decimal;
+</VARIABLE>
+<VARIABLE>
+<NAME>raptor_rdf_namespace_uri_len</NAME>
+extern const unsigned int raptor_rdf_namespace_uri_len;
+</VARIABLE>
+<VARIABLE>
+<NAME>raptor_xml_literal_datatype_uri_string_len</NAME>
+extern const unsigned int raptor_xml_literal_datatype_uri_string_len;
+</VARIABLE>
+<TYPEDEF>
+<NAME>raptor_parser</NAME>
+typedef struct raptor_parser_s raptor_parser;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_serializer</NAME>
+typedef struct raptor_serializer_s raptor_serializer;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_www</NAME>
+typedef struct raptor_www_s raptor_www;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_iostream</NAME>
+typedef struct raptor_iostream_s raptor_iostream;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_xml_element</NAME>
+typedef struct raptor_xml_element_s raptor_xml_element;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_xml_writer</NAME>
+typedef struct raptor_xml_writer_s raptor_xml_writer;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_qname</NAME>
+typedef struct raptor_qname_s raptor_qname;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_namespace</NAME>
+typedef struct raptor_namespace_s raptor_namespace;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_namespace_stack</NAME>
+typedef struct raptor_namespace_stack_s raptor_namespace_stack;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_ntriples_parser</NAME>
+typedef raptor_parser raptor_ntriples_parser;
+</TYPEDEF>
+<ENUM>
+<NAME>raptor_identifier_type</NAME>
+typedef enum {
+  RAPTOR_IDENTIFIER_TYPE_UNKNOWN,
+  RAPTOR_IDENTIFIER_TYPE_RESOURCE,
+  RAPTOR_IDENTIFIER_TYPE_ANONYMOUS,
+  RAPTOR_IDENTIFIER_TYPE_PREDICATE,
+  RAPTOR_IDENTIFIER_TYPE_ORDINAL,
+  RAPTOR_IDENTIFIER_TYPE_LITERAL,
+  RAPTOR_IDENTIFIER_TYPE_XML_LITERAL
+} raptor_identifier_type;
+</ENUM>
+<ENUM>
+<NAME>raptor_uri_source</NAME>
+typedef enum { RAPTOR_URI_SOURCE_UNKNOWN, RAPTOR_URI_SOURCE_NOT_URI, RAPTOR_URI_SOURCE_ELEMENT, RAPTOR_URI_SOURCE_ATTRIBUTE, RAPTOR_URI_SOURCE_ID, RAPTOR_URI_SOURCE_URI, RAPTOR_URI_SOURCE_GENERATED, RAPTOR_URI_SOURCE_BLANK_ID } raptor_uri_source;
+</ENUM>
+<ENUM>
+<NAME>raptor_ntriples_term_type</NAME>
+typedef enum { RAPTOR_NTRIPLES_TERM_TYPE_URI_REF, RAPTOR_NTRIPLES_TERM_TYPE_BLANK_NODE, RAPTOR_NTRIPLES_TERM_TYPE_LITERAL } raptor_ntriples_term_type;
+</ENUM>
+<STRUCT>
+<NAME>raptor_locator</NAME>
+typedef struct {
+  raptor_uri *uri;
+  const char *file;
+  int line;
+  int column;
+  int byte;  
+} raptor_locator;
+</STRUCT>
+<ENUM>
+<NAME>raptor_feature</NAME>
+typedef enum {
+  RAPTOR_FEATURE_SCANNING,
+  RAPTOR_FEATURE_ASSUME_IS_RDF,
+  RAPTOR_FEATURE_ALLOW_NON_NS_ATTRIBUTES,
+  RAPTOR_FEATURE_ALLOW_OTHER_PARSETYPES,
+  RAPTOR_FEATURE_ALLOW_BAGID,
+  RAPTOR_FEATURE_ALLOW_RDF_TYPE_RDF_LIST,
+  RAPTOR_FEATURE_NORMALIZE_LANGUAGE,
+  RAPTOR_FEATURE_NON_NFC_FATAL,
+  RAPTOR_FEATURE_WARN_OTHER_PARSETYPES,
+  RAPTOR_FEATURE_CHECK_RDF_ID,
+  RAPTOR_FEATURE_RELATIVE_URIS,
+  RAPTOR_FEATURE_START_URI,
+  RAPTOR_FEATURE_WRITER_AUTO_INDENT,
+  RAPTOR_FEATURE_WRITER_AUTO_EMPTY,
+  RAPTOR_FEATURE_WRITER_INDENT_WIDTH,
+  RAPTOR_FEATURE_WRITER_XML_VERSION,
+  RAPTOR_FEATURE_WRITER_XML_DECLARATION,
+  RAPTOR_FEATURE_NO_NET,
+  RAPTOR_FEATURE_LAST=RAPTOR_FEATURE_NO_NET
+} raptor_feature;
+</ENUM>
+<ENUM>
+<NAME>raptor_genid_type</NAME>
+typedef enum {
+  RAPTOR_GENID_TYPE_BNODEID,
+  RAPTOR_GENID_TYPE_BAGID
+} raptor_genid_type;
+</ENUM>
+<STRUCT>
+<NAME>raptor_identifier</NAME>
+typedef struct {
+  raptor_identifier_type type;
+  raptor_uri *uri;
+  raptor_uri_source uri_source;
+  const unsigned char *id;
+  int ordinal;
+  int is_malloced;
+  const unsigned char *literal;
+  raptor_uri *literal_datatype;
+  const unsigned char *literal_language;
+} raptor_identifier;
+</STRUCT>
+<STRUCT>
+<NAME>raptor_statement</NAME>
+typedef struct {
+  const void *subject;
+  raptor_identifier_type subject_type;
+  const void *predicate;
+  raptor_identifier_type predicate_type;
+  const void *object;
+  raptor_identifier_type object_type;
+  raptor_uri *object_literal_datatype;
+  const unsigned char *object_literal_language;
+} raptor_statement;
+</STRUCT>
+<USER_FUNCTION>
+<NAME>raptor_new_uri_func</NAME>
+<RETURNS>raptor_uri *</RETURNS>
+void *context, const unsigned char *uri_string
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_new_uri_from_uri_local_name_func</NAME>
+<RETURNS>raptor_uri *</RETURNS>
+void *context, raptor_uri *uri, const unsigned char *local_name
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_new_uri_relative_to_base_func</NAME>
+<RETURNS>raptor_uri *</RETURNS>
+void *context, raptor_uri *base_uri, const unsigned char *uri_string
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_new_uri_for_rdf_concept_func</NAME>
+<RETURNS>raptor_uri *</RETURNS>
+void *context, const char *name
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_free_uri_func</NAME>
+<RETURNS>void </RETURNS>
+void *context, raptor_uri *uri
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_uri_equals_func</NAME>
+<RETURNS>int </RETURNS>
+void *context, raptor_uri* uri1, raptor_uri* uri2
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_uri_copy_func</NAME>
+<RETURNS>raptor_uri *</RETURNS>
+void *context, raptor_uri *uri
+</USER_FUNCTION>
+<STRUCT>
+<NAME>raptor_uri_handler</NAME>
+typedef struct {
+  /* constructors */
+  raptor_new_uri_func                     new_uri;
+  raptor_new_uri_from_uri_local_name_func new_uri_from_uri_local_name;
+  raptor_new_uri_relative_to_base_func    new_uri_relative_to_base;
+  raptor_new_uri_for_rdf_concept_func     new_uri_for_rdf_concept;
+  /* destructor */
+  raptor_free_uri_func                    free_uri;
+  /* methods */
+  raptor_uri_equals_func                  uri_equals;
+  raptor_uri_copy_func                    uri_copy; /* well, copy constructor */
+  raptor_uri_as_string_func               uri_as_string;
+  raptor_uri_as_counted_string_func       uri_as_counted_string;
+  int initialised;
+} raptor_uri_handler;
+</STRUCT>
+<USER_FUNCTION>
+<NAME>raptor_simple_message_handler</NAME>
+<RETURNS>void </RETURNS>
+void *user_data, const char *message, ...
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_message_handler</NAME>
+<RETURNS>void </RETURNS>
+void *user_data, raptor_locator* locator, const char *message
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_statement_handler</NAME>
+<RETURNS>void </RETURNS>
+void *user_data, const raptor_statement *statement
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_namespace_handler</NAME>
+<RETURNS>void </RETURNS>
+void* user_data, raptor_namespace *nspace
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_www_write_bytes_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_www* www, void *userdata, const void *ptr, size_t size, size_t nmemb
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_www_content_type_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_www* www, void *userdata, const char *content_type
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_uri_filter_func</NAME>
+<RETURNS>int </RETURNS>
+void *user_data, raptor_uri* uri
+</USER_FUNCTION>
+<FUNCTION>
+<NAME>raptor_init</NAME>
+<RETURNS>void </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_finish</NAME>
+<RETURNS>void </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parsers_enumerate</NAME>
+<RETURNS>int </RETURNS>
+const unsigned int counter, const char **name, const char **label
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_syntaxes_enumerate</NAME>
+<RETURNS>int </RETURNS>
+const unsigned int counter, const char **name, const char **label, const char **mime_type, const unsigned char **uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_syntax_name_check</NAME>
+<RETURNS>int </RETURNS>
+const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_guess_parser_name</NAME>
+<RETURNS>const char*</RETURNS>
+raptor_uri *uri, const char *mime_type, const unsigned char *buffer, size_t len, const unsigned char *identifier
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_parser</NAME>
+<RETURNS>raptor_parser*</RETURNS>
+const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_parser_for_content</NAME>
+<RETURNS>raptor_parser*</RETURNS>
+raptor_uri *uri, const char *mime_type, const unsigned char *buffer, size_t len, const unsigned char *identifier
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_start_parse</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser *rdf_parser, raptor_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_parser</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* parser
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_fatal_error_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* parser, void *user_data, raptor_message_handler handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_error_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* parser, void *user_data, raptor_message_handler handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_warning_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* parser, void *user_data, raptor_message_handler handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_statement_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* parser, void *user_data, raptor_statement_handler handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_generate_id_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* parser, void *user_data, raptor_generate_id_handler handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_namespace_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* parser, void *user_data, raptor_namespace_handler handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parser_set_uri_filter</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* parser, raptor_uri_filter_func filter, void* user_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_print_statement</NAME>
+<RETURNS>void </RETURNS>
+const raptor_statement * statement, FILE *stream
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_print_statement_as_ntriples</NAME>
+<RETURNS>void </RETURNS>
+const raptor_statement * statement, FILE *stream
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_print_statement_detailed</NAME>
+<RETURNS>void </RETURNS>
+const raptor_statement * statement, int detailed, FILE *stream
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_statement_part_as_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+const void *term, raptor_identifier_type type, raptor_uri* literal_datatype, const unsigned char *literal_language, size_t* len_p
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_statement_part_as_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+const void *term, raptor_identifier_type type, raptor_uri* literal_datatype, const unsigned char *literal_language
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_get_locator</NAME>
+<RETURNS>raptor_locator*</RETURNS>
+raptor_parser* rdf_parser
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_default_generate_id_parameters</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* rdf_parser, char *prefix, int base
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parse_chunk</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser* rdf_parser, const unsigned char *buffer, size_t len, int is_end
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parse_file_stream</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser* rdf_parser, FILE *stream, const char *filename, raptor_uri *base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parse_file</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser* rdf_parser, raptor_uri *uri, raptor_uri *base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parse_uri</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser* rdf_parser, raptor_uri *uri, raptor_uri *base_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parse_uri_with_connection</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser* rdf_parser, raptor_uri *uri, raptor_uri *base_uri, void *connection
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parse_abort</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* rdf_parser
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_print_locator</NAME>
+<RETURNS>void </RETURNS>
+FILE *stream, raptor_locator* locator
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_format_locator</NAME>
+<RETURNS>int </RETURNS>
+char *buffer, size_t length, raptor_locator* locator
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_locator_line</NAME>
+<RETURNS>int </RETURNS>
+raptor_locator *locator
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_locator_column</NAME>
+<RETURNS>int </RETURNS>
+raptor_locator *locator
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_locator_byte</NAME>
+<RETURNS>int </RETURNS>
+raptor_locator *locator
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_locator_file</NAME>
+<RETURNS>const char *</RETURNS>
+raptor_locator *locator
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_locator_uri</NAME>
+<RETURNS>const char *</RETURNS>
+raptor_locator *locator
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_get_name</NAME>
+<RETURNS>const char*</RETURNS>
+raptor_parser *rdf_parser
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_get_label</NAME>
+<RETURNS>const char*</RETURNS>
+raptor_parser *rdf_parser
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_get_mime_type</NAME>
+<RETURNS>const char*</RETURNS>
+raptor_parser *rdf_parser
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_get_need_base_uri</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser *rdf_parser
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_features_enumerate</NAME>
+<RETURNS>int </RETURNS>
+const raptor_feature feature, const char **name, raptor_uri **uri, const char **label
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_feature</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser *parser, raptor_feature feature, int value
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parser_set_feature_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser *parser, raptor_feature feature, const unsigned char *value
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_get_feature</NAME>
+<RETURNS>int </RETURNS>
+raptor_parser *parser, raptor_feature feature
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parser_get_feature_string</NAME>
+<RETURNS>const unsigned char*</RETURNS>
+raptor_parser *parser, raptor_feature feature
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_get_feature_count</NAME>
+<RETURNS>unsigned int </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_set_parser_strict</NAME>
+<RETURNS>void </RETURNS>
+raptor_parser* rdf_parser, int is_strict
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_parser_get_accept_header</NAME>
+<RETURNS>const char*</RETURNS>
+raptor_parser* rdf_parser
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializers_enumerate</NAME>
+<RETURNS>int </RETURNS>
+const unsigned int counter, const char **name, const char **label, const char **mime_type, const unsigned char **uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_syntax_name_check</NAME>
+<RETURNS>int </RETURNS>
+const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_serializer</NAME>
+<RETURNS>raptor_serializer*</RETURNS>
+const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_serializer</NAME>
+<RETURNS>void </RETURNS>
+raptor_serializer* rdf_serializer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serialize_start</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer *rdf_serializer, raptor_uri *uri, raptor_iostream *iostream
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serialize_start_to_filename</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer *rdf_serializer, const char *filename
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serialize_start_to_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer *rdf_serializer, raptor_uri *uri, void **string_p, size_t *length_p
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serialize_start_to_file_handle</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer *rdf_serializer, raptor_uri *uri, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serialize_set_namespace</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer* rdf_serializer, raptor_uri *uri, const unsigned char *prefix
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serialize_set_namespace_from_namespace</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer* rdf_serializer, raptor_namespace *nspace
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serialize_statement</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer* rdf_serializer, const raptor_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serialize_end</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer *rdf_serializer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_get_iostream</NAME>
+<RETURNS>raptor_iostream*</RETURNS>
+raptor_serializer *serializer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_set_error_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_serializer* serializer, void *user_data, raptor_message_handler handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_set_warning_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_serializer* serializer, void *user_data, raptor_message_handler handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_get_locator</NAME>
+<RETURNS>raptor_locator*</RETURNS>
+raptor_serializer *rdf_serializer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_features_enumerate</NAME>
+<RETURNS>int </RETURNS>
+const raptor_feature feature, const char **name,  raptor_uri **uri, const char **label
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_set_feature</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer *serializer, raptor_feature feature, int value
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_set_feature_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer *serializer, raptor_feature feature, const unsigned char *value
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_get_feature</NAME>
+<RETURNS>int </RETURNS>
+raptor_serializer *serializer, raptor_feature feature
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_serializer_get_feature_string</NAME>
+<RETURNS>const unsigned char *</RETURNS>
+raptor_serializer *serializer, raptor_feature feature
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_memory</NAME>
+<RETURNS>void </RETURNS>
+void *ptr
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_alloc_memory</NAME>
+<RETURNS>void*</RETURNS>
+size_t size
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_calloc_memory</NAME>
+<RETURNS>void*</RETURNS>
+size_t nmemb, size_t size
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_uri</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+const unsigned char *uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_uri_from_uri_local_name</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+raptor_uri *uri, const unsigned char *local_name
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_uri_relative_to_base</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+raptor_uri *base_uri, const unsigned char *uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_uri_from_id</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+raptor_uri *base_uri, const unsigned char *id
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_uri_for_rdf_concept</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_uri</NAME>
+<RETURNS>void </RETURNS>
+raptor_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_equals</NAME>
+<RETURNS>int </RETURNS>
+raptor_uri* uri1, raptor_uri* uri2
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_copy</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+raptor_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_as_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+raptor_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_as_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+raptor_uri *uri, size_t* len_p
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_uri_for_xmlbase</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+raptor_uri* old_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_uri_for_retrieval</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+raptor_uri* old_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_identifier</NAME>
+<RETURNS>raptor_identifier*</RETURNS>
+raptor_identifier_type type, raptor_uri *uri, raptor_uri_source uri_source, const unsigned char *id, const unsigned char *literal, raptor_uri *literal_datatype, const unsigned char *literal_language
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_copy_identifier</NAME>
+<RETURNS>int </RETURNS>
+raptor_identifier *dest, raptor_identifier *src
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_identifier</NAME>
+<RETURNS>void </RETURNS>
+raptor_identifier *identifier
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_print_ntriples_string</NAME>
+<RETURNS>int </RETURNS>
+FILE *stream, const unsigned char *string, const char delim
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_ntriples_string_as_utf8_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+raptor_parser* rdf_parser, const unsigned char *src, int len, size_t *dest_lenp
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_ntriples_term_as_string</NAME>
+<RETURNS>const char*</RETURNS>
+raptor_ntriples_term_type term
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_string_ntriples</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream *iostr, const unsigned char *string, size_t len, const char delim
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_statement_ntriples</NAME>
+<RETURNS>void </RETURNS>
+raptor_iostream* iostr, const raptor_statement *statement
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_any_escape_string</NAME>
+<RETURNS>int </RETURNS>
+const unsigned char *string, size_t len, unsigned char *buffer, size_t length, char quote, int xml_version, raptor_simple_message_handler error_handler, void *error_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_xml_any_escaped_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream* iostr, const unsigned char *string, size_t len, char quote, int xml_version, raptor_simple_message_handler error_handler, void *error_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_escape_string</NAME>
+<RETURNS>int </RETURNS>
+const unsigned char *string, size_t len, unsigned char *buffer, size_t length, char quote, raptor_simple_message_handler error_handler, void *error_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_xml_escaped_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream* iostr, const unsigned char *string, size_t len, char quote, raptor_simple_message_handler error_handler, void *error_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_vsnprintf</NAME>
+<RETURNS>char*</RETURNS>
+const char *message, va_list arguments) RAPTOR_PRINTF_FORMAT(1, 0
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_name_check</NAME>
+<RETURNS>int </RETURNS>
+const unsigned char *string, size_t length, int xml_version
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_resolve_uri_reference</NAME>
+<RETURNS>void </RETURNS>
+const unsigned char *base_uri, const unsigned char *reference_uri, unsigned char* buffer, size_t length
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_filename_to_uri_string</NAME>
+<RETURNS>unsigned char *</RETURNS>
+const char *filename
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_uri_string_to_filename</NAME>
+<RETURNS>char *</RETURNS>
+const unsigned char *uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_uri_string_to_filename_fragment</NAME>
+<RETURNS>char *</RETURNS>
+const unsigned char *uri_string, unsigned char **fragment_p
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_is_file_uri</NAME>
+<RETURNS>int </RETURNS>
+const unsigned char* uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_uri_string_is_file_uri</NAME>
+<RETURNS>int </RETURNS>
+const unsigned char* uri_string
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_to_relative_counted_uri_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+raptor_uri *base_uri, raptor_uri *reference_uri, size_t *length_p
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_to_relative_uri_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+raptor_uri *base_uri,  raptor_uri *reference_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_print</NAME>
+<RETURNS>void </RETURNS>
+const raptor_uri* uri, FILE *stream
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_to_counted_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+raptor_uri *uri, size_t *len_p
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_to_string</NAME>
+<RETURNS>unsigned char*</RETURNS>
+raptor_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_set_handler</NAME>
+<RETURNS>void </RETURNS>
+const raptor_uri_handler *handler, void *context
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_uri_get_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_uri_handler **handler, void **context
+</FUNCTION>
+<MACRO>
+<NAME>RAPTOR_RDF_MS_URI</NAME>
+#define RAPTOR_RDF_MS_URI raptor_rdf_namespace_uri
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_RDF_SCHEMA_URI</NAME>
+#define RAPTOR_RDF_SCHEMA_URI raptor_rdf_schema_namespace_uri
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_XMLSCHEMA_DATATYPES_URI</NAME>
+#define RAPTOR_XMLSCHEMA_DATATYPES_URI raptor_xmlschema_datatypes_namespace_uri
+</MACRO>
+<MACRO>
+<NAME>RAPTOR_OWL_URI</NAME>
+#define RAPTOR_OWL_URI raptor_owl_namespace_uri
+</MACRO>
+<FUNCTION>
+<NAME>raptor_www_init</NAME>
+<RETURNS>void </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_finish</NAME>
+<RETURNS>void </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_no_www_library_init_finish</NAME>
+<RETURNS>void </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_new</NAME>
+<RETURNS>raptor_www *</RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_new_with_connection</NAME>
+<RETURNS>raptor_www *</RETURNS>
+void* connection
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_free</NAME>
+<RETURNS>void </RETURNS>
+raptor_www *www
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_set_user_agent</NAME>
+<RETURNS>void </RETURNS>
+raptor_www *www, const char *user_agent
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_set_proxy</NAME>
+<RETURNS>void </RETURNS>
+raptor_www *www, const char *proxy
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_set_http_accept</NAME>
+<RETURNS>void </RETURNS>
+raptor_www *www, const char *value
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_set_write_bytes_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_www *www, raptor_www_write_bytes_handler handler, void *user_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_set_content_type_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_www *www, raptor_www_content_type_handler handler, void *user_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_set_error_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_www *www, raptor_message_handler error_handler, void *error_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_set_uri_filter</NAME>
+<RETURNS>void </RETURNS>
+raptor_www* www, raptor_uri_filter_func filter, void* user_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_fetch</NAME>
+<RETURNS>int </RETURNS>
+raptor_www *www, raptor_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_fetch_to_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_www *www, raptor_uri *uri, void **string_p, size_t *length_p, void *(*malloc_handler)(size_t size)
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_get_connection</NAME>
+<RETURNS>void*</RETURNS>
+raptor_www *www
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_www_abort</NAME>
+<RETURNS>void </RETURNS>
+raptor_www *www, const char *reason
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_qname</NAME>
+<RETURNS>raptor_qname*</RETURNS>
+raptor_namespace_stack *nstack, const unsigned char *name, const unsigned char *value, raptor_simple_message_handler error_handler, void *error_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_qname_from_namespace_local_name</NAME>
+<RETURNS>raptor_qname*</RETURNS>
+raptor_namespace *ns, const unsigned char *local_name, const unsigned char *value
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_qname_copy</NAME>
+<RETURNS>raptor_qname*</RETURNS>
+raptor_qname *qname
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_qname</NAME>
+<RETURNS>void </RETURNS>
+raptor_qname* name
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_qname_equal</NAME>
+<RETURNS>int </RETURNS>
+raptor_qname *name1, raptor_qname *name2
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_qname_string_to_uri</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+raptor_namespace_stack *nstack,  const unsigned char *name, size_t name_len, raptor_simple_message_handler error_handler, void *error_data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_qname</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream* iostr, raptor_qname *qname
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_qname_get_namespace</NAME>
+<RETURNS>const raptor_namespace*</RETURNS>
+raptor_qname* name
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_namespace_from_uri</NAME>
+<RETURNS>raptor_namespace*</RETURNS>
+raptor_namespace_stack *nstack, const unsigned char *prefix,  raptor_uri* ns_uri, int depth
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_namespaces</NAME>
+<RETURNS>raptor_namespace_stack*</RETURNS>
+raptor_uri_handler *uri_handler, void *uri_context, raptor_simple_message_handler error_handler, void *error_data, int defaults
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_init</NAME>
+<RETURNS>void </RETURNS>
+raptor_namespace_stack *nstack, raptor_uri_handler *uri_handler, void *uri_context, raptor_simple_message_handler error_handler, void *error_data, int defaults
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_clear</NAME>
+<RETURNS>void </RETURNS>
+raptor_namespace_stack *nstack
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_namespaces</NAME>
+<RETURNS>void </RETURNS>
+raptor_namespace_stack *nstack
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_start_namespace</NAME>
+<RETURNS>void </RETURNS>
+raptor_namespace_stack *nstack, raptor_namespace *nspace
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_start_namespace_full</NAME>
+<RETURNS>int </RETURNS>
+raptor_namespace_stack *nstack, const unsigned char *prefix, const unsigned char *ns_uri_string, int depth
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_end_for_depth</NAME>
+<RETURNS>void </RETURNS>
+raptor_namespace_stack *nstack, int depth
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_get_default_namespace</NAME>
+<RETURNS>raptor_namespace*</RETURNS>
+raptor_namespace_stack *nstack
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_find_namespace</NAME>
+<RETURNS>raptor_namespace *</RETURNS>
+raptor_namespace_stack *nstack, const unsigned char *prefix, int prefix_length
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_find_namespace_by_uri</NAME>
+<RETURNS>raptor_namespace*</RETURNS>
+raptor_namespace_stack *nstack, raptor_uri *ns_uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_namespace_in_scope</NAME>
+<RETURNS>int </RETURNS>
+raptor_namespace_stack *nstack, const raptor_namespace *nspace
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_qname_from_uri</NAME>
+<RETURNS>raptor_qname*</RETURNS>
+raptor_namespace_stack *nstack,  raptor_uri *uri, int xml_version
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_namespace</NAME>
+<RETURNS>raptor_namespace*</RETURNS>
+raptor_namespace_stack *nstack, const unsigned char *prefix, const unsigned char *ns_uri_string, int depth
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_namespace</NAME>
+<RETURNS>void </RETURNS>
+raptor_namespace *ns
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespace_copy</NAME>
+<RETURNS>int </RETURNS>
+raptor_namespace_stack *nstack, raptor_namespace *ns, int new_depth
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespace_get_uri</NAME>
+<RETURNS>raptor_uri*</RETURNS>
+const raptor_namespace *ns
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespace_get_prefix</NAME>
+<RETURNS>const unsigned char*</RETURNS>
+const raptor_namespace *ns
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespace_get_counted_prefix</NAME>
+<RETURNS>const unsigned char*</RETURNS>
+const raptor_namespace *ns, size_t *length_p
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_namespaces_format</NAME>
+<RETURNS>unsigned char *</RETURNS>
+const raptor_namespace *ns, size_t *length_p
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_namespace</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream* iostr, raptor_namespace *ns
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_namespace_parts_from_string</NAME>
+<RETURNS>int </RETURNS>
+const unsigned char *string, unsigned char **prefix, unsigned char **uri_string
+</FUNCTION>
+<TYPEDEF>
+<NAME>raptor_stringbuffer</NAME>
+typedef struct raptor_stringbuffer_s raptor_stringbuffer;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>raptor_sequence</NAME>
+typedef struct raptor_sequence_s raptor_sequence;
+</TYPEDEF>
+<FUNCTION>
+<NAME>raptor_new_sequence</NAME>
+<RETURNS>raptor_sequence*</RETURNS>
+raptor_sequence_free_handler* free_handler, raptor_sequence_print_handler* print_handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_sequence</NAME>
+<RETURNS>void </RETURNS>
+raptor_sequence* seq
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_size</NAME>
+<RETURNS>int </RETURNS>
+raptor_sequence* seq
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_set_at</NAME>
+<RETURNS>int </RETURNS>
+raptor_sequence* seq, int idx, void *data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_push</NAME>
+<RETURNS>int </RETURNS>
+raptor_sequence* seq, void *data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_shift</NAME>
+<RETURNS>int </RETURNS>
+raptor_sequence* seq, void *data
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_get_at</NAME>
+<RETURNS>void*</RETURNS>
+raptor_sequence* seq, int idx
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_pop</NAME>
+<RETURNS>void*</RETURNS>
+raptor_sequence* seq
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_unshift</NAME>
+<RETURNS>void*</RETURNS>
+raptor_sequence* seq
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_compare_strings</NAME>
+<RETURNS>int </RETURNS>
+const void *a, const void *b
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_sort</NAME>
+<RETURNS>void </RETURNS>
+raptor_sequence* seq, int(*compare)(const void *, const void *)
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_print_string</NAME>
+<RETURNS>void </RETURNS>
+char *data, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_print_uri</NAME>
+<RETURNS>void </RETURNS>
+char *data, FILE *fh
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_set_print_handler</NAME>
+<RETURNS>void </RETURNS>
+raptor_sequence *seq, raptor_sequence_print_handler *print_handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_print</NAME>
+<RETURNS>void </RETURNS>
+raptor_sequence* seq, FILE* fh
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_sequence_join</NAME>
+<RETURNS>int </RETURNS>
+raptor_sequence* dest, raptor_sequence *src
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_unicode_char_to_utf8</NAME>
+<RETURNS>int </RETURNS>
+unsigned long c, unsigned char *output
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_utf8_to_unicode_char</NAME>
+<RETURNS>int </RETURNS>
+unsigned long *output, const unsigned char *input, int length
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_unicode_is_xml11_namestartchar</NAME>
+<RETURNS>int </RETURNS>
+long c
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_unicode_is_xml10_namestartchar</NAME>
+<RETURNS>int </RETURNS>
+long c
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_unicode_is_xml11_namechar</NAME>
+<RETURNS>int </RETURNS>
+long c
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_unicode_is_xml10_namechar</NAME>
+<RETURNS>int </RETURNS>
+long c
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_utf8_check</NAME>
+<RETURNS>int </RETURNS>
+const unsigned char *string, size_t length
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_stringbuffer</NAME>
+<RETURNS>raptor_stringbuffer*</RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_stringbuffer</NAME>
+<RETURNS>void </RETURNS>
+raptor_stringbuffer *stringbuffer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_append_counted_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_stringbuffer* stringbuffer, const unsigned char *string, size_t length, int do_copy
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_append_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_stringbuffer* stringbuffer, const unsigned char *string, int do_copy
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_append_decimal</NAME>
+<RETURNS>int </RETURNS>
+raptor_stringbuffer* stringbuffer, int integer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_append_stringbuffer</NAME>
+<RETURNS>int </RETURNS>
+raptor_stringbuffer* stringbuffer, raptor_stringbuffer* append
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_prepend_counted_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_stringbuffer* stringbuffer, const unsigned char *string, size_t length, int do_copy
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_prepend_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_stringbuffer* stringbuffer, const unsigned char *string, int do_copy
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_as_string</NAME>
+<RETURNS>unsigned char *</RETURNS>
+raptor_stringbuffer* stringbuffer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_length</NAME>
+<RETURNS>size_t </RETURNS>
+raptor_stringbuffer* stringbuffer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_stringbuffer_copy_to_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_stringbuffer* stringbuffer, unsigned char *string, size_t length
+</FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_iostream_init_func</NAME>
+<RETURNS>int </RETURNS>
+void *context
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_iostream_finish_func</NAME>
+<RETURNS>void </RETURNS>
+void *context
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_iostream_write_byte_func</NAME>
+<RETURNS>int </RETURNS>
+void *context, const int byte
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_iostream_write_bytes_func</NAME>
+<RETURNS>int </RETURNS>
+void *context, const void *ptr, size_t size, size_t nmemb
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>raptor_iostream_write_end_func</NAME>
+<RETURNS>void </RETURNS>
+void *context
+</USER_FUNCTION>
+<STRUCT>
+<NAME>raptor_iostream_handler</NAME>
+typedef struct {
+  raptor_iostream_init_func         init;
+  raptor_iostream_finish_func       finish;
+  raptor_iostream_write_byte_func   write_byte;
+  raptor_iostream_write_bytes_func  write_bytes;
+  raptor_iostream_write_end_func    write_end;
+} raptor_iostream_handler;
+</STRUCT>
+<FUNCTION>
+<NAME>raptor_new_iostream_from_handler</NAME>
+<RETURNS>raptor_iostream*</RETURNS>
+void *context, const raptor_iostream_handler *handler
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_iostream_to_sink</NAME>
+<RETURNS>raptor_iostream*</RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_iostream_to_filename</NAME>
+<RETURNS>raptor_iostream*</RETURNS>
+const char *filename
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_iostream_to_file_handle</NAME>
+<RETURNS>raptor_iostream*</RETURNS>
+FILE *handle
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_iostream_to_string</NAME>
+<RETURNS>raptor_iostream*</RETURNS>
+void **string_p, size_t *length_p, void *(*malloc_handler)(size_t size)
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_iostream</NAME>
+<RETURNS>void </RETURNS>
+raptor_iostream *iostr
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_bytes</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream *iostr, const void *ptr, size_t size, size_t nmemb
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_byte</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream *iostr, const int byte
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_end</NAME>
+<RETURNS>void </RETURNS>
+raptor_iostream *iostr
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream *iostr, const void *string
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_counted_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream *iostr, const void *string, size_t len
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_get_bytes_written_count</NAME>
+<RETURNS>size_t </RETURNS>
+raptor_iostream *iostr
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_decimal</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream* iostr, int integer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_format_hexadecimal</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream* iostr, unsigned int integer, int width
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_stringbuffer</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream* iostr, raptor_stringbuffer *sb
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_uri</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream *iostr,  raptor_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_feature_from_uri</NAME>
+<RETURNS>raptor_feature </RETURNS>
+raptor_uri *uri
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_feature_value_type</NAME>
+<RETURNS>int </RETURNS>
+const raptor_feature feature
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_xml_element</NAME>
+<RETURNS>raptor_xml_element*</RETURNS>
+raptor_qname* name, const unsigned char* xml_language, raptor_uri* xml_base
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_xml_element</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_element *element
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_element_get_name</NAME>
+<RETURNS>raptor_qname*</RETURNS>
+raptor_xml_element *xml_element
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_element_set_attributes</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_element* xml_element, raptor_qname **attributes, int count
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_element_get_attributes</NAME>
+<RETURNS>raptor_qname**</RETURNS>
+raptor_xml_element* xml_element
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_element_get_attributes_count</NAME>
+<RETURNS>int </RETURNS>
+raptor_xml_element* xml_element
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_element_declare_namespace</NAME>
+<RETURNS>int </RETURNS>
+raptor_xml_element* xml_element, raptor_namespace *nspace
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_iostream_write_xml_element</NAME>
+<RETURNS>int </RETURNS>
+raptor_iostream *iostr, raptor_xml_element *element, raptor_namespace_stack *nstack, int is_empty, int is_end, raptor_simple_message_handler error_handler, void *error_data, int depth
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_element_is_empty</NAME>
+<RETURNS>int </RETURNS>
+raptor_xml_element* xml_element
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_new_xml_writer</NAME>
+<RETURNS>raptor_xml_writer*</RETURNS>
+raptor_namespace_stack *nstack, raptor_uri_handler *uri_handler, void *uri_context, raptor_iostream* iostr, raptor_simple_message_handler error_handler, void *error_data, int canonicalize
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_free_xml_writer</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_empty_element</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, raptor_xml_element *element
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_start_element</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, raptor_xml_element *element
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_end_element</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, raptor_xml_element *element
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_cdata</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, const unsigned char *s
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_cdata_counted</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, const unsigned char *s, unsigned int len
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_raw</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, const unsigned char *s
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_raw_counted</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, const unsigned char *s, unsigned int len
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_comment</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, const unsigned char *s
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_comment_counted</NAME>
+<RETURNS>void </RETURNS>
+raptor_xml_writer* xml_writer, const unsigned char *s, unsigned int len
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_features_enumerate</NAME>
+<RETURNS>int </RETURNS>
+const raptor_feature feature, const char **name,  raptor_uri **uri, const char **label
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_set_feature</NAME>
+<RETURNS>int </RETURNS>
+raptor_xml_writer *xml_writer, raptor_feature feature, int value
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_set_feature_string</NAME>
+<RETURNS>int </RETURNS>
+raptor_xml_writer *xml_writer, raptor_feature feature, const unsigned char *value
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_get_feature</NAME>
+<RETURNS>int </RETURNS>
+raptor_xml_writer *xml_writer, raptor_feature feature
+</FUNCTION>
+<FUNCTION>
+<NAME>raptor_xml_writer_get_feature_string</NAME>
+<RETURNS>const unsigned char *</RETURNS>
+raptor_xml_writer *xml_writer, raptor_feature feature
+</FUNCTION>

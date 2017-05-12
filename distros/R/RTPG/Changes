@@ -1,0 +1,19 @@
+0.1
+	Added Changes
+	Fixed version number for cpan
+
+0.3
+    Added set_files_priorities method
+
+0.4
+    It works with rtorrent 0.8.5
+
+0.5
+    API XML::Parser was changed, fixed.
+
+0.9
+    Added a few new commands.
+    Enabled support for non-latin symbols in rpc_command.
+
+0.92
+    Added queue mode.

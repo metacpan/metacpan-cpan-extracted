@@ -1,0 +1,46 @@
+% layout 'project';
+% title 'New Rexfile';
+<h2>Create a new Rexfile</h2>
+
+
+<form action="/project/<%= $project->directory %>/rexfile/new" method="post" enctype="multipart/form-data">
+  <div class="panel panel-default">
+
+    <div class="panel-heading">Basic Settings</div>
+    <div class="panel-body">
+
+      <div class="form-group">
+        <label for="rexfile_name">Rexfile Name</label>
+        <input type="text" class="form-control" id="rexfile_name" name="rexfile_name" placeholder="" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="rexfile_description">Rexfile Description</label>
+        <textarea class="form-control" id="rexfile_description" name="rexfile_description"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="rexfile_url">Rexfile URL (only git supported)</label>
+        <input type="text" class="form-control" id="rexfile_url" name="rexfile_url" placeholder="">
+      </div>
+      <p>For example:</p>
+      <ul>
+        <li>https://github.com/RexOps/service-loadbalancer.git</li>
+      </ul>
+
+      <hr>
+      <p>You can also upload a <i>tar.gz</i> file that contains the Rexfile and every needed files. The tar.gz file need to have the following structure.</p>
+      <pre><code class="bash">+ some-name
++--+ Rexfile
+   + files      # optional
+   + templates  # optional
+   + ... other files</code></pre>
+
+      %= file_field 'rexfile_archive'
+
+    </div>
+
+  </div>
+
+  <button type="submit" class="btn btn-primary">Create Rexfile</button>
+</form>

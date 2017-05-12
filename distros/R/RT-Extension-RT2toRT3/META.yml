@@ -1,0 +1,13 @@
+abstract: This tool migrates your RT2 instance to an RT 3.x instance
+author: Kevin Falcone C<< <falcone@bestpractical.com> >>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: RT-Extension-RT2toRT3
+no_index: 
+  directory: 
+    - tools
+    - examples
+    - inc
+    - t
+version: 1.26

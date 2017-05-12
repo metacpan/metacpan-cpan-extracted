@@ -1,0 +1,83 @@
+@prefix :     <http://usefulinc.com/ns/doap#> .
+@prefix dc:   <http://purl.org/dc/terms/> .
+@prefix my:   <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Template/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dcs:  <http://ontologi.es/doap-changeset#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+
+<>
+    dc:title     "DOAP for RDF-RDFa-Template"@en ;
+    dc:subject   my:project ;
+    dc:creator   <http://www.kjetil.kjernsmo.net/foaf#me> .
+
+my:project	 
+    a           :Project ;
+    :name       "RDF-RDFa-Template" ;
+    :shortdesc  "A simple RDFa-like templating language"@en ;
+    :created    "2009-01-13"^^xsd:date ;
+    :programming-language "Perl" ;
+    :maintainer <http://www.kjetil.kjernsmo.net/foaf#me> ;
+    :repository <http://svn.kjernsmo.net/RDF-RDFa-Template/> ;
+    :homepage   <http://www.kjetil.kjernsmo.net/software/rat/> ;
+    :bug-database <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=RDF-RDFa-Template> ;
+    :release    my:v_0_01 ;
+    :release    my:v_0_02 ;
+    :release    my:v_0_04 ;
+    :release    my:v_0_05 .
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+    a           foaf:Person ;
+    owl:sameAs  <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+    foaf:name   "Kjetil Kjernsmo" ;
+    foaf:mbox   <mailto:kjetilk@cpan.org> .
+
+<http://svn.kjernsmo.net/RDF-RDFa-Template/> a :SVNRepository .
+
+my:v_0_01
+    a           :Version ;
+    dc:issued   "2010-04-04"^^xsd:date ;
+    dc:description "Initial release, mainly for discussion purposes"@en ;
+    :revision   "0.01"^^xsd:string .
+
+my:v_0_02      
+    a           :Version ;
+    dc:issued   "2010-04-05"^^xsd:date ;
+    :revision   "0.02"^^xsd:string ;
+    rdfs:label  "Fixing packaging and update to latest parser"@en ; 
+    dcs:changeset [
+      dcs:item
+        [ rdfs:label "Remove named_graphs since it is deprecated by RDF::RDFa::Parser 1.0."@en ] ,
+        [ rdfs:label "Forgot 'tests' om external test plan."@en ; a dcs:Bugfix ] ,
+        [ rdfs:label "Add Test::Perl::Critic."@en ; a dcs:Addition ] ,
+        [ rdfs:label "Depend upon RDF::RDFa::Parser 1.0."@en ; a dcs:Addition ] ,
+        [ rdfs:label "Minor Perl::Critic stuff."@en ; a dcs:Bugfix ] ,
+        [ rdfs:label "Add HTTP::Server::Simple::CGI requirement for now."@en ; a dcs:Addition ] ,
+	[ rdfs:label "Remove auto_install"@en ; a dcs:Removal ]	
+    ] .
+
+my:v_0_04      
+    a           :Version ;
+    dc:issued   "2010-04-06"^^xsd:date ;
+    :revision   "0.04"^^xsd:string ;
+    rdfs:label  "Use author tests"@en ; 
+    dcs:changeset [
+      dcs:item
+        [ rdfs:label "Forgot named_graph in Document POD."@en ; a dcs:Bugfix ] ,
+        [ rdfs:label "Move the Test::Signature and Perl::Critic tests to xt/."@en ; a dcs:Bugfix ] 
+    ] .
+
+my:v_0_05      
+    a           :Version ;
+    dc:issued   "2010-04-22"^^xsd:date ;
+    :revision   "0.05"^^xsd:string ;
+    rdfs:label  "Add more documentation; bugfixes"@en ; 
+    dcs:changeset [
+      dcs:item
+        [ rdfs:label "Add something about finding the example script."@en ; a dcs:Addition ] ,
+        [ rdfs:label "Smaller README changes."@en ; a dcs:Addition ] ,
+        [ rdfs:label "DBPedia has updated ontology on units."@en ; a dcs:Bugfix ] ,
+        [ rdfs:label "It is literal_datatype, not literal_value_datatype."@en ; a dcs:Bugfix ] ,
+        [ rdfs:label "Move the doap.ttl back"@en ] 
+    ] .

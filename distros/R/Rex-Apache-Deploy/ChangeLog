@@ -1,0 +1,41 @@
+2013-03-25 Jan Gehring <jan.gehring, gmail.com> (0.11.1)
+  * abort inject operation with die() if re-pack fails
+
+2013-02-09 Jan Gehring <jan.gehring, gmail.com> (0.11.0)
+  * build command now pluggable
+  * added possibility to create deb packages
+  * added possibility to create rpm packages
+  * added git deploy method
+  * get_version_from can now be a CODE ref.
+  * added global package_option settings
+
+2012-08-21 Jan Gehring <jan.gehring, gmail.com> (0.10.1)
+  * fixed a path calculation
+
+2012-08-21 Jan Gehring <jan.gehring, gmail.com> (0.10.0)
+  * allow full pathname for inject
+
+2011-12-08 Jan Gehring <jan.gehring, gmail.com> (0.9.0)
+  * added full support for non compressed sources
+  * use current time if no version is available
+  * extended regexp for version detection
+
+2011-09-11 Jan Gehring <jan.gehring, gmail.com> (0.8.0)
+  * added windows support
+
+2011-09-11 Jan Gehring <jan.gehring, gmail.com> (0.7.0)
+  * added sprocketize command
+  * added coffeescript support
+  * added sass support
+
+2011-08-13 Jan Gehring <jan.gehring, gmail.com> (0.6.0)
+  * added yui compressor support
+  * [Deploy::Symlink] added a default function for generate_deploy_directory
+    the default awaits now files in the format: name-[0-9\._~]+.zip|tar\.gz|tar\.bz2|war
+  * Added support to build .tar.gz packages
+
+2011-07-05 Jan Gehring <jan.gehring, gmail.com> (0.5.2)
+  * added tab as an allowed property seperator
+  * fixed another property parsing bug
+  * enable/disable tomcat instances in mod_jk
+

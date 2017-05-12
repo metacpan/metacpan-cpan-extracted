@@ -1,0 +1,108 @@
+RDF-Endpoint
+============
+
+Created:      2010-06-19
+Home page:    <http://search.cpan.org/dist/RDF-Endpoint/>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Endpoint>
+Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
+
+0.08  2017-01-05
+
+ - (Addition) Replaced use of Config::JFDI with Config::ZOMG (github issue
+   #142).
+
+0.07  2014-08-04
+
+ - (Addition) Added Plack::App::RDF::Endpoint.
+ - (Update) Updated RDF::Endpoint to quote raw-value ETag values (github
+   issue #106).
+ - (Update) Updated endpoint.psgi to look for PERLRDF_STORE environment
+   variable.
+ - (Update) Use base64 encoding of tags to get shorter strings (patch from
+   Kjetil Kjernsmo).
+
+0.06  2014-07-01
+
+ - (Addition) Add Server header (from Kjetil Kjernsmo via github pull
+   request #93).
+ - (Addition) Added initial support for application/json-problem errors.
+ - (Update) Added Allow header to HTTP 405 responses.
+ - (Update) Added SPARQL 1.1 WG protocol tests.
+ - (Update) Fixed config bug in t/psgi.t.
+ - (Update) Made RDF::Endpoint->new die on invalid config (when both
+   load_data and update options are specified).
+ - (Update) The load_data and update configuration flags cannot both be
+   true at the same time.
+ - (Update) Updated RDF::Endpoint to return a 400 error when datasets are
+   specified both in protocol and query.
+
+0.05  2012-05-28
+
+ - (Addition) Let RDF_ENDPOINT_FILE env variable override the Config::JFDI
+   default.
+ - (Addition) Use a default in-memory store if no config file is available.
+ - (Update) Added Service Description resultFormat triples for SPARQL XML
+   and JSON Results.
+ - (Update) Added use of Plack::Builder and Plack::Middleware::AccessLog in
+   default configuration.
+ - (Update) Croak when unable to open file handles
+ - (Update) Fixed bug in handling of update requests.
+ - (Update) Improved HTTP error status code messages.
+ - (Update) Improved conformance with SPARQL 1.1 Protocol spec.
+ - (Update) Removed custom logging code (should be done with Plack
+   middleware).
+ - (Update) Renamed Service Description sd:defaultDatasetDescription
+   property to sd:defaultDataset.
+ - (Update) Require a recent version (0.99) of Plack::Request with support
+   for logging.
+ - (Update) Updated see also link to SPARQL Protocol (1.1).
+
+0.04  2011-07-19
+
+ - (Addition) Added RDFa serialization tests (from KjetilK).
+ - (Update) Allow the service description default graph to be a URI or a
+   blank node (based on config value).
+ - (Update) Fixed bug introduced by commit 3fb5e48 causing query results to
+   disappear from HTML results page.
+ - (Update) Require RDF::RDFa::Generator 0.102 (fixes RDFa service
+   description serialization bug).
+
+0.03  2011-06-07
+
+ - (Update) Actually dereference correctly endpoint_path, and make the test
+   use root (from kjetilk).
+ - (Update) Add merging of namespace hashes (from kjetilk).
+ - (Update) Make endpoint path configurable (from kjetilk).
+ - (Update) Removed duplicated, hard-coded HTML to allow better
+   customization of HTML (from nichtich).
+ - (Update) Replace new_with_string with new and change docs (from
+   kjetilk).
+ - (Update) Updated service description RDF to use sd:endpoint instead of
+   sd:url (tracking updates in the SD spec).
+ - (Update) style element must go in head (from kjetilk).
+
+0.02  2011-04-16
+
+ - (Addition) Added CodeMirror files for syntax highlighting SPARQL query
+   form markup.
+ - (Addition) Added ETag support for query results, varying based on Accept
+   and Accept-Encoding headers, and query string.
+ - (Addition) Added support for POSTing queries and updates directly using
+   the appropriate media types.
+ - (Update) Changes to align with SPARQL Protocol 1.1.
+ - (Update) Fixed caching bug in which browsers would use cached results
+   across endpoint instantiations.
+ - (Update) Moved endpoint-specific configuration variables into top-level
+   'endpoint' hash.
+ - (Update) Service description is now cached in the RDF::Endpoint object.
+ - (Update) Updated RDF::Endpoint to use a persistent model object across
+   run() calls.
+ - (Update) Updated content negotiation quality values.
+ - (Update) Updated endpoint.psgi to move config parsing and endpoint
+   object construction outside of the request handler.
+ - (Update) Updated tests to test functionality directly via PSGI.
+
+0.01  2010-07-14
+
+ - (Addition) First release.
+

@@ -1,0 +1,16 @@
+<%ARGS>
+%catalogs => ()
+</%ARGS>
+<%init>
+my $CustomFields = RT::CustomFields->new( $session{'CurrentUser'});
+foreach my $id (keys %catalogs) {
+    my $catalog = RT::Catalog->new($session{'CurrentUser'});
+    $catalog->Load($id);
+    next unless $catalog->Id;
+    $CustomFields->LimitToCatalog($catalog->Id);
+    $CustomFields->SetContextObject( $catalog ) if keys %catalogs == 1;
+}
+$CustomFields->LimitToCatalog(0);
+$CustomFields->OrderBy( FIELD => 'Name', ORDER => 'ASC' );
+</%init>
+<& /Search/Elements/PickCFs, %ARGS, CustomFields => $CustomFields &>

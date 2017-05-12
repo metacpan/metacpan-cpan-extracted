@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 90d0e973881181497915b04702eb97b6f052f8bd Changes
+SHA1 813c64a0e378d8a5100042fdb5947c22366040c9 MANIFEST
+SHA1 72c862ce255ab9ca6c4bdfbc4d451470fd99c76a META.yml
+SHA1 38b3e92e0cd1154041f1d0709f854986423a6693 Makefile.PL
+SHA1 4d7a72acce2319e90045853c9e76289ec2df9395 README
+SHA1 8271964accba9499aa4b6c2fd0ca3495be191f9c html/Admin/Actions/Create.html
+SHA1 b9eb894b39c0516c1e7ddf9bd7a15b4b1bd926a2 html/Admin/Actions/Display.html
+SHA1 4b65c4a64218c455ea7dfefa729874ead161e7cd html/Admin/Actions/Elements/EditBasics
+SHA1 0835dbc84986e6ee0d18b147466567214a4a0c7e html/Admin/Actions/Elements/ShowBasics
+SHA1 4022165ca0f948ae3878d55999cdaa49782869a9 html/Admin/Actions/Modify.html
+SHA1 53baefbba4284c3067d6cf88570f77f09b878fde html/Admin/Actions/autohandler
+SHA1 9d64dc3732c2f8d534c8e70ebf910393071d7a2a html/Admin/Conditions/Create.html
+SHA1 a053aa5a8fd51913b4d5e0df89b921059e6c5673 html/Admin/Conditions/Display.html
+SHA1 a4f4a16ef96ab1b51fae852a6ff677827a7e7cce html/Admin/Conditions/Elements/EditBasics
+SHA1 06a828f3fe7be0e85bac06611019823c39539ffe html/Admin/Conditions/Elements/ShowBasics
+SHA1 6df249aa3046e9a0836b3cb76408dea3ef15ca53 html/Admin/Conditions/Modify.html
+SHA1 991487a27ee148a2f99f2d40a18ceb308dcd477d html/Admin/Conditions/autohandler
+SHA1 8d6d0b6423c8a280819236e9301faac9adce9773 html/Admin/Elements/EditActions
+SHA1 412969fa6c17c1ca875bd63133198121cb477c53 html/Admin/Elements/EditConditions
+SHA1 6b8447fc113b99f46fe6d140f700476c8f96ab0e html/Admin/Global/Actions.html
+SHA1 a6a3ce69784f9e587d1254ae9a7b2986756e5e79 html/Admin/Global/Conditions.html
+SHA1 592d8492c76f344bcab801dd1ebf3abd5a577de9 html/Callbacks/AdminConditionsAndActions/Elements/Tabs/Privileged
+SHA1 81990748c0af8a9c55dcc78b846eaaf22bc7c959 html/Elements/RT__ScripAction/ColumnMap
+SHA1 81990748c0af8a9c55dcc78b846eaaf22bc7c959 html/Elements/RT__ScripCondition/ColumnMap
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 73023535a342ff05a827540024c1d461e8f13b75 lib/RT/Extension/AdminConditionsAndActions.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJYNMiwAAoJEDdW4lQxRAUg+h8QAIuijTzIdV/S/Ol/09QxwRtm
+jNVokFzL12a3M5PcqHXMEmHBoHnp33LDj1MEFt5/6pFaYcjIAfsjV2kUPTwJ0TkD
+r/ISPE1RFUcuEA6/g7ioH1tOIoYmBuAqA6KrrBpV7u+65XZpPNOgi03I608fWW+E
+EPZfCLgtToDmDZ+7gea58+DJTVyDBmz8RQPXQy59KtWlpR/h2E5MrrLAcFzS46X/
+ICtvo4SGKDXBiaHSqwlvd8yr8uzNoJjkizEkYpY4CPduvcM5gQ44q506DW9pDDVn
+cCUfOBrDAuddF4TAI+BVDFuTx1ivLZXdkQ+kyJyLTDjKGRXlhwgXXlEW3pWHYEZ6
+12MYRgpgW5535rNiAFdYTAcJvml+wBLBNJYAWhrxRNDQ+eWYEjmxHvHqrBlWaDG4
+XVt/dHRbuP7AmC5hAh3Nn71SBj6pJMAJzobFSemdl2JQXrplJiGWXTB1pQa3iMJs
+MkNWe8TthJ6dF4Lx/woJ/PAPWDrp4hYglPpeDbNXq2ypVehsvXvxmIDSVw+J44dh
+ePDyvGoS2nLoVdnC3T47JYHSFfNaLhzVNaiVMeEtX36sVbYx5VtPepLKqNhyM8NG
+FAmM5LTr3j77YRWaJsQZg3uq3vop8uvkbN/P1Qk+jZfrpNv34PuTs7k6EaBA+w9I
+n31fEm6RjJuBM7QXKzUs
+=u3I3
+-----END PGP SIGNATURE-----

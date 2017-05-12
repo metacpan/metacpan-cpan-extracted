@@ -1,0 +1,13 @@
+<%INIT>
+my $ARGSRef = $ARGS{'ARGSRef'};
+if ( (!exists $$ARGSRef{'AddMoreAttach'}) and (defined($$ARGSRef{'id'}) and $$ARGSRef{'id'} eq 'new') ) {
+    if ( (!$$ARGSRef{'Subject'}) || ($$ARGSRef{'Subject'} =~ /^[ \t]*$/) ) {
+        $$skip_create = 1;
+        push @{$results}, loc('Error: empty subject');
+    }
+}
+</%INIT>
+<%ARGS>
+$skip_create => undef
+$results => undef
+</%ARGS>

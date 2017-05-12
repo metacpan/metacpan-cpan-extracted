@@ -1,0 +1,22 @@
+<%ARGS>
+  $tagsRaw_ => undef,
+  $tagsTypes => undef,
+  $tagsLinkType => 1,
+  $Title => "Tag Cloud",
+  $TitleHREF => RT->Config->Get('WebPath') . "/Search/TagCloud.html",
+</%ARGS>
+<%INIT>
+  use RTx::Tags;
+</%INIT>
+
+<&|/Widgets/TitleBox, title=>$Title, title_href=>$TitleHREF &>
+  <div class="rtxtags">
+  <%perl>
+  my @args = ( tagsTypes => $tagsTypes,
+	       tagsLinkType => $tagsLinkType,
+	       $tagsRaw_ ? (tagsRaw_=>1) : ()
+	       );
+  print RTx::Tags::cloud( @args )->html();
+  </%perl>
+  </div>
+</&>

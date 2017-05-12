@@ -1,0 +1,55 @@
+<& /Minimal/Elements/Header, 
+    Title       => $title,
+    current_tab => "/Minimal/Vis.html",
+&>
+<& /Elements/ListActions, actions => \@results &>
+% if($feed){
+<& Elements/ImpactChart, feed => $feed, q => $q &>
+% }
+
+<%INIT>
+require JSON;
+my $title = loc("Collective Intelligence");
+my $feed;
+
+if($q){
+    require CIF::Client;
+    my ($client,$err) = CIF::Client->new({
+        host            => RT->Config->Get('CIFMinimal_APIHostname') || RT->Config->Get('WebBaseURL').'/api',
+        simple_hashes   => 1,
+        group_map       => 1,
+    });
+    if($err){
+        $RT::Logger->error($err);
+        push(@results,$err);
+    } else {
+        require CIF::WebAPI::APIKey;
+        my @recs = CIF::WebAPI::APIKey->search(uuid_alias => $session{'CurrentUser'}->UserObj->EmailAddress());
+        unless($recs[0] && $recs[0]->uuid()){
+            # generate apikey
+            require RT::CIFMinimal;
+            my $id = RT::CIFMinimal::generate_apikey({ user => $session{'CurrentUser'}->UserObj(), key_description => 'generated automatically for WebUI search' });
+            push(@recs,$id);
+            push(@results,'default WebUI apikey '.$id->uuid().' automatically generated');
+        } else {
+            $client->{'apikey'} = $recs[0]->uuid();
+            $feed = $client->GET(
+                query   => $q,
+                limit   => 500,
+                nolog   => $nolog,
+            );
+        }
+    }
+} else {
+    push(@results,'missing query');
+}
+</%INIT>
+
+
+<%ARGS>
+$q => undef
+$text => undef
+@results => undef
+$nolog => undef
+$type   => 'chart'
+</%ARGS>

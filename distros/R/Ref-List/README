@@ -1,0 +1,42 @@
+NAME
+    Ref::List - Punctuation-free dereferencing of arrayrefs and hashrefs
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+      use Ref::List qw(list);
+
+      my $data = {
+        countries => [
+            { name => 'Bulgaria', language = 'Bulgarian' },
+            { name => 'Germany', language = 'German' },
+        ],
+      };
+
+      print $_->{name} for list $data->{countries};
+
+DESCRIPTION
+    This tiny module exports a single function, "list", which dereferences
+    the arrayref or hashref passed to it as an argument. "list $argument" is
+    basically a synonym for "@{$argument}", but is less awkward when
+    $argument is a longer expression part of a nested data structure and may
+    appeal to people with a dislike of punctuation overuse.
+
+    As of perl 5.14 you should be using the built-in "values" function
+    instead.
+
+FUNCTIONS
+  list (HASHREF|ARRAYREF)
+    Given a hash or array reference, dereference it and return its contents
+    as a list. If the argument is "undef", returns "undef".
+
+AUTHOR
+    Peter Shangov <pshangov@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Peter Shangov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

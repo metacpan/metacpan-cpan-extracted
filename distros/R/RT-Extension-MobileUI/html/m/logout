@@ -1,0 +1,7 @@
+<%init>
+if (keys %session) {
+    RT::Interface::Web::InstantiateNewSession();
+    $session{'CurrentUser'} = RT::CurrentUser->new;
+}
+RT::Interface::Web::Redirect(RT->Config->Get('WebURL')."m/");
+</%init>

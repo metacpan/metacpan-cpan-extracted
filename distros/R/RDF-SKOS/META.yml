@@ -1,0 +1,38 @@
+---
+name: RDF-SKOS
+version: 0.03
+author:
+  - 'Robert Barta <drrho@cpan.org>'
+abstract: 'SKOS - Simple Knowledge Organization System'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  RDF::Redland: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Text::CSV_XS: 0
+provides:
+  RDF::SKOS:
+    file: lib/RDF/SKOS.pm
+    version: 0.03
+  RDF::SKOS::Concept:
+    file: lib/RDF/SKOS/Concept.pm
+    version: 0.01
+  RDF::SKOS::OeNACE:
+    file: lib/RDF/SKOS/OeNACE.pm
+    version: 0.01
+  RDF::SKOS::Redland:
+    file: lib/RDF/SKOS/Redland.pm
+    version: 0.01
+  RDF::SKOS::STW:
+    file: lib/RDF/SKOS/STW.pm
+    version: 0.01
+  RDF::SKOS::Scheme:
+    file: lib/RDF/SKOS/Scheme.pm
+    version: 0.01
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

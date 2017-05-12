@@ -1,0 +1,58 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Role-Commons
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Role-Commons
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Object/AUTHORITY.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/02oaa.t
+ t/Object-AUTHORITY/01basic.t
+ t/Object-AUTHORITY/02return.t
+ t/Object-AUTHORITY/03croak.t
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Role/Commons.pm
+ lib/Role/Commons/Authority.pm
+ lib/Role/Commons/ObjectID.pm
+ lib/Role/Commons/Tap.pm
+Copyright: This software is copyright (c) 2012, 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

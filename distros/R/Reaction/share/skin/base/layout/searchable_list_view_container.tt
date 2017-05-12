@@ -1,0 +1,7 @@
+=for layout widget
+
+[% search_form %]
+
+[% listview %]
+
+=cut

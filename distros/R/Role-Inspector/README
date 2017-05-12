@@ -1,0 +1,154 @@
+NAME
+    Role::Inspector - introspection for roles
+
+SYNOPSIS
+       use strict;
+       use warnings;
+       use feature qw(say);
+   
+       {
+          package Local::Role;
+          use Role::Tiny;   # or Moose::Role, Mouse::Role, etc...
+      
+          requires qw( foo );
+      
+          sub bar { ... }
+       }
+   
+       use Role::Inspector qw( get_role_info );
+   
+       my $info = get_role_info('Local::Role');
+   
+       say $info->{name};          # Local::Role
+       say $info->{type};          # Role::Tiny
+       say for @{$info->{api}};    # bar
+                                   # foo
+
+DESCRIPTION
+    This module allows you to retrieve a hashref of information about a given
+    role. The following role implementations are supported:
+
+    *   Moose::Role
+
+    *   Mouse::Role
+
+    *   Moo::Role
+
+    *   Role::Tiny
+
+    *   Role::Basic
+
+    *   p5-mop-redux <https://github.com/stevan/p5-mop-redux>
+
+  Functions
+    `get_role_info($package_name)`
+        Returns a hashref of information about a role; returns `undef` if the
+        package does not appear to be a role. Attempts to load the package
+        using Module::Runtime if it's not already loaded.
+
+        The hashref may contain the following keys:
+
+        *   `name` - the package name of the role
+
+        *   `type` - the role implementation used by the role
+
+        *   `api` - an arrayref of method names required/provided by the role
+
+        *   `provides` and `requires` - the same as `api`, but split into
+            lists of methods provided and required by the role
+
+        *   `meta` - a metaobject for the role (e.g. a Moose::Meta::Role
+            object). This key may be absent if the role implementation does
+            not provide a metaobject
+
+        This function may be exported, but is not exported by default.
+
+    `does_role($thing, $role)`
+        Returns a boolean indicating if $thing does role $role. $thing can be
+        an object, a class name, or a role name.
+
+        This should mostly give the same answers as `$thing->DOES($role)`, but
+        may be slightly more reliable in some cross-implementation (i.e. Moose
+        roles consuming Moo roles) cases.
+
+        This function may be exported, but is not exported by default.
+
+  Methods
+    If you do not wish to export the functions provided by Role::Inspector,
+    you may call them as a class methods:
+
+       my $info = Role::Inspector->get_role_info($package_name);
+
+       $thing->blah() if Role::Inspector->does_role($thing, $role);
+
+  Extending Role::Inspector
+    `Role::Inspector::learn { BLOCK }`
+        In the unlikely situation that you have to deal with some other role
+        implementation that Role::Inspector doesn't know about, you can teach
+        it:
+
+           use Role::Inspector qw( learn );
+   
+           learn {
+              my $r = shift;
+              return unless My::Implementation::is_role($r);
+              return {
+                 name     => $r,
+                 type     => 'My::Implementation',
+                 provides => [ sort(@{My::Implementation::provides($r)}) ],
+                 requires => [ sort(@{My::Implementation::requires($r)}) ],
+              };
+           };
+
+        An alternative way to do this is:
+
+           push @Role::Inspector::SCANNERS, sub {
+              my $r = shift;
+              ...;
+           };
+
+        You can do the `push` thing without having loaded Role::Inspector.
+        This makes it suitable for doing inside My::Implementation itself,
+        without introducing an additional dependency on Role::Inspector.
+
+        Note that if you don't provide all of `provides`, `requires`, and
+        `api`, Role::Inspector will attempt to guess the missing parts.
+
+CAVEATS
+    *   It is difficult to distinguish between Moo::Role and Role::Tiny roles.
+        (The distinction is not often important anyway.) Thus sometimes the
+        `type` for a Moo::Role may say "Role::Tiny".
+
+    *   The way that Role::Basic roles are detected and introspected is a bit
+        dodgy, relying on undocumented methods.
+
+    *   Where Moose or Mouse roles define attributes, those attributes tend to
+        result in accessor methods being generated. However neither of these
+        frameworks provides a decent way of figuring out which accessor
+        methods will result from composing the role with the class.
+
+        Role::Inspector does its damnedest to figure out the list of likely
+        methods, but (especially in the case of unusual attribute traits) may
+        get things wrong from time to time.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Role-Inspector>.
+
+SEE ALSO
+    Class::Inspector.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

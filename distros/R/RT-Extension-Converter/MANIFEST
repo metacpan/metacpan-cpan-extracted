@@ -1,0 +1,24 @@
+bin/rt1-to-rt3
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RT/Extension/Converter.pm
+lib/RT/Extension/Converter/Config.pm
+lib/RT/Extension/Converter/RT1.pm
+lib/RT/Extension/Converter/RT1/Config.pm
+lib/RT/Extension/Converter/RT3.pm
+lib/RT/Extension/Converter/RT3/Config.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/99.pod-coverage.t
+t/99.pod.t
+t/basic.t

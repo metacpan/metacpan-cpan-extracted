@@ -1,0 +1,36 @@
+Role-Inspector
+==============
+
+Created:      2014-04-08
+Home page:    <https://metacpan.org/release/Role-Inspector>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Role-Inspector>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-27
+
+ [ Documentation ]
+ - Split documentation for `learn` and `@SCANNERS` into a separate section.
+ - Split documentation for method call style into a separate section.
+
+ [ Test Suite ]
+ - Tests for indirect consumption of roles.
+
+ [ Other ]
+ - Added: Provide the `does_role` function.
+
+0.004	2014-04-15
+
+ - Added: Include 'provides' and 'requires' keys in the returned hashref.
+
+0.003	2014-04-09
+
+ [ Test Suite ]
+ - Tests added for Moo::Role roles when Moose is in memory.
+ - Tests added for Role::Tiny and Moose::Role roles when Moo is in memory.
+
+0.002	2014-04-09
+
+ [ Documentation ]
+ - Correct name for @Role::Inspector::SCANNERS in example.
+
+0.001	2014-04-08	Initial release

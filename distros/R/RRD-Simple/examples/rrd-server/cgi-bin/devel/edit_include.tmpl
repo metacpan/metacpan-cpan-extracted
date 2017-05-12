@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <style type="text/css">
+      <TMPL_INCLUDE rrd-browse.css>
+    </style>
+  </head>
+  <body>
+    <table width="100%">
+      <tr>
+        <th align="left">Host:</th>
+        <td>boromir.rbsov.tfb.net</td>
+      </tr>
+      <tr>
+        <th align="left">File:</th>
+        <td><select name="file">
+          <option>include.html</option>
+          <option>include.css</option>
+          <option>include_summary.txt</option>
+        </select></td>
+      </tr>
+      <tr>
+        <th align="left">Template:</th>
+        <td><select name="symlink">
+          <option value="">-none-</option>
+          <option>theme-ubuntu.css</option>
+          <option>theme-red.css</option>
+          <option>theme-green.css</option>
+          <option>theme-magenta.css</option>
+        </select></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <textarea rows="10" cols="50"></textarea>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" align="right">
+          <input type="reset" value="Revert to Saved" />
+          <input type="submit" value="Save Changes" />
+        </td>
+      </tr>
+    </table>
+  </body
+</html>

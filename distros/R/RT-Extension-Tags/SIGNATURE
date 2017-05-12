@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e255717f054a99d05f486a1b50d7b82a70cdf9a0 Changes
+SHA1 6d9b15ac59e26c481b1b8da03df4bf4278309e1d MANIFEST
+SHA1 521449991900e17b0a691260b4d07dc23dfaf656 META.yml
+SHA1 dc989e200c6d1be056241c87923ebe0aa9521aa2 Makefile.PL
+SHA1 2b9f1899a670ce6eb1f7b3a1cbd780c6bb21fe76 README
+SHA1 3d48089ff246383bcdd93528b0ecc0e24dd33a2c etc/initialdata
+SHA1 bbec488245a592dbddf4e2c9a27a4d3ee5b5c774 html/Elements/EditCustomFieldTags
+SHA1 5db51ab93c6b269ab81a6a4620e828a39f90f6bb html/Elements/ShowCustomFieldTags
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 0102fa16c41dd5ff87923bd844e7807ff704f3dd lib/RT/Extension/Tags.pm
+SHA1 c4658b430d568013eefbd9c8a689a9c652ee8158 static/css/jquery.tagit.css
+SHA1 0e563d80dbfb3981cd52ce375037af6b4ea23a37 static/js/tag-it.min.js
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJYqxC4AAoJEBXncVGnZqUUMpkH/3iITURd6c+8seL9SqswB7dG
+cNgGdU3vxci7t1jFF5MFVydrII3BY0YE5/VhurGOYNqx9oh3/LfKwKdj2qSMqNiD
+G2b7+b3R6tsupasSdP7GuWORtYo4kDTtdkxagsiNMXJbK1fTpQLJPPosZ+2P7Xb8
+F7KFtANXWgmzAXyyZNrvd+VQkCMnvUobzDwKz0/MK86G4ua3DHpXW/UfN+IQoE/s
+uQWNW12H/Pxq9td5/J9ll2hXVmVWTobij3FB7IVT9exVsq+5nJDH3Ci1vxDGB0g+
+NDy//Muh0FJ5Iou5AbXuX2RySwHVvXr/xahLYQC8vCuXneb47nmssjrevhWgB40=
+=eHhi
+-----END PGP SIGNATURE-----

@@ -1,0 +1,6 @@
+Revision history for Perl extension RPSL.
+
+0.01  Sun Feb 24 08:51:06 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn RPSL
+

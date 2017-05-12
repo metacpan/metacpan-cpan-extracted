@@ -1,0 +1,16 @@
+Changes
+eg/notmatch.pl
+lib/Regexp/Log/BlueCoat.pm
+Makefile.PL
+MANIFEST
+README
+t/00basic.t
+t/10accessors.t
+t/20ufs.t
+t/30log_1.t
+t/30log_2.t
+t/bc1.log
+t/bc2.log
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

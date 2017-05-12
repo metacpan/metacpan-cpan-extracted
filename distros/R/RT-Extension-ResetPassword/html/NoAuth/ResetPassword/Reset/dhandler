@@ -1,0 +1,78 @@
+<%init>
+# The URL They're visitng
+# @{[$RT::WebURL]}/NoAuth/Reset/@{[$token]}/@{[$u->id]}
+my @results;
+my $show_form    = 1;
+my $title        = loc('Reset your password');
+my $virtual_path = $m->dhandler_arg();
+my ( $submitted_token, $id ) = split( '/', $virtual_path );
+my $token;
+# Validate the token
+my $u = RT::User->new($RT::SystemUser);
+$u->LoadByCols( id => $id );
+if ( $u->id ) {
+    $token = Digest::MD5->new()->add( $u->id, $u->__Value('Password'),
+        $RT::DatabasePassword, $u->LastUpdated,
+        @{[$RT::WebPath]} . '/NoAuth/ResetPassword/Reset' )->hexdigest();
+}
+else {
+    push @results,
+        loc("Something went wrong. Please contact your RT administrator.");
+    $show_form = 0;
+}
+
+# If the token validation fails, throw them an error
+if ( $submitted_token ne $token ) {
+    push @results,
+        loc(
+        "It looks like the URL you clicked on has expired or wasn't quite right. Maybe you didn't paste the whole thing?"
+        );
+    $show_form = 0;
+}
+
+# if the validation succeeds, continue on
+else {
+
+    # If they've supplied a new password twice, change it and redirect to home
+    if (    ( $submitted_token eq $token )
+        and $ARGS{'password'}
+        and $ARGS{'password2'}
+        and ( $ARGS{'password'} eq $ARGS{'password2'} ) )
+    {
+        my ( $val, $msg ) = $u->SetPassword( $ARGS{'password'} );
+        push @results, $msg;
+        if ($val) { $show_form = 0;}
+    }
+    elsif ( $ARGS{'password'} ) {
+        push @results, loc("The two passwords you typed didn't match.");
+    }
+
+}
+# otherwise, show the form
+
+
+</%init>
+<& /Elements/Header, Title => $title &>
+<div id="body" class="login-body">
+
+<h1><%$title%></h1>
+<& /Elements/ListActions, actions => \@results  &>
+<p>
+
+
+% if ($show_form) {
+<form method="post" action="<%$id%>">
+<table>
+  <tr>
+    <td class="label"><label name="password"><&|/l&>New password</&>:</label></td>
+    <td class="value"><input name="password" type="password"></td>
+  </tr>
+  <tr>
+    <td class="label"><label name="password2"><&|/l&>Retype Password</&>:</label></td>
+    <td class="value"><input name="password2" type="password"></td>
+  </tr>
+</table>
+<input type ="submit" value ="<%loc('Change password')%>">
+</form>
+%}
+<a href="<%$RT::WebURL|n%>"><&|/l&>Login</&></a>

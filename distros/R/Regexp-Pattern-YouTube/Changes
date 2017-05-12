@@ -1,0 +1,12 @@
+Revision history for Regexp-Pattern-YouTube
+
+0.002   2016-09-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Use {DZP,PWP}:Regexp::Pattern.
+
+
+0.001   2016-09-12 (PERLANCAR)
+
+        - First release.

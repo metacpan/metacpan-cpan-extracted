@@ -1,0 +1,7 @@
+% if ($ARGSRef->{'id'} && $ARGSRef->{'id'} eq 'new') {
+<& /Elements/AttachmentWarning, %ARGS &>
+% }
+
+<%args>
+$ARGSRef
+</%args>

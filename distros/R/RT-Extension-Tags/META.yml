@@ -1,0 +1,31 @@
+---
+abstract: 'RT-Extension-Tags Extension'
+author:
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: gplv2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-Tags
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+    - static
+requires:
+  perl: 5.8.3
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://github.com/bestpractical/rt-extension-tags
+version: '0.04'
+x_module_install_rtx_version: '0.38'
+x_requires_rt: 4.0.0
+x_rt_too_new: 4.6.0

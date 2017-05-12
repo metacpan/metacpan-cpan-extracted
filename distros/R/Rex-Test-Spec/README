@@ -1,0 +1,136 @@
+NAME
+    Rex::Test::Spec - Write Rex::Test like RSpec!
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use Rex::Test::Spec;
+        describe "Nginx Test", sub {
+            context run("nginx -t"), "nginx.conf testing", sub {
+                like its('stdout'), qr/ok/;
+            };
+            context file("~/.ssh/id_rsa"), sub {
+                is its('ensure'), 'file';
+                is its('mode'), '0600';
+                like its('content'), qr/name\@email\.com/;
+            };
+            context file("/data"), sub {
+                is its('ensure'), 'directory';
+                is its('owner'), 'www';
+                is its('mounted_on'), '/dev/sdb1';
+                isnt its('writable');
+            };
+            context service("nginx"), sub {
+                is its('ensure'), 'running';
+            };
+            context pkg("nginx"), sub {
+                is its('ensure'), 'present';
+                is its('version'), '1.5.8';
+            };
+            context cron, sub {
+                like its('www'), 'logrotate';
+            };
+            context gateway, sub {
+                is it, '192.168.0.1';
+            };
+            context group('www'), sub {
+                ok its('ensure');
+            };
+            context iptables, sub {
+            };
+            context port(80), sub {
+                is its('bind'), '0.0.0.0';
+                is its('proto'), 'tcp';
+                is its('command'), 'nginx';
+            };
+            context process('nginx'), sub {
+                like its('command'), qr(nginx -c /etc/nginx.conf);
+                ok its('mem') > 1024;
+            };
+            context routes, sub {
+                is_deeply its(1), {
+                    destination => $dest,
+                    gateway     => $gw,
+                    genmask     => $genmask,
+                    flags       => $flags,
+                    mss         => $mss,
+                    irtt        => $irtt,
+                    iface       => $iface,
+                };
+            };
+            context sysctl, sub {
+                is its('vm.swapiness'), 1;
+            };
+            context user('www'), sub {
+                ok its('ensure');
+                is its('home'), '/var/www/html';
+                is its('shell'), '/sbin/nologin';
+                is_deeply its('belong_to'), ['www', 'nogroup'];
+            };
+        };
+        done_testing;
+
+EXPORT FUNCTIONS
+  Spec definition functions
+    These are the functions you will use to define behaviors and run your
+    specs: *describe* (and alias to *context*), *its* (alias to *it*).
+
+    Normally suggest "describe "strings"" and "context resource type
+    object", use "its(key)" return value, "it" return objects by default.
+
+  Test::More export functions
+    This now include *is*, *isnt*, *ok*, *is_deeply*, *like*, *unlike*,
+    *done_testing*. You'll use these to assert correct behavior.
+
+    The resource type name will be automatic passed as testing message.
+
+  Rex resource type generation functions
+    Now support *cron*, *gateway*, *iptables*, *port*, *routes*, *service*,
+    *user*, *file*, *group*, *pkg*, *process*, *run*, *sysctl*.
+
+    See "SYNOPSIS" for more details.
+
+AUTHOR
+    Rao Chenlin(chenryn), "<rao.chenlin at gmail.com>"
+
+SEE ALSO
+    1. Rspec
+        <http://rspec.info/>
+
+    2. Serverspec
+        <http://serverspec.org/>
+
+    3. TDD (Test Driven Development)
+        <http://en.wikipedia.org/wiki/Test-driven_development>
+
+    4. BDD (Behavior Driven Development)
+        <http://en.wikipedia.org/wiki/Behavior_Driven_Development>
+
+    5. Test::More
+    6. Rex
+
+BUGS
+    Please report any bugs or feature requests to "bug-rex-test-spec at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Rex-Test-Spec>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+    Also accept pull requests and issue at
+    <https://github.com/chenryn/Rex--Test--Spec>.
+
+LICENSE AND COPYRIGHT
+    Copyright 2014 Rao Chenlin(chenryn).
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    
+    <http://www.apache.org/licenses/LICENSE-2.0>
+    
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.

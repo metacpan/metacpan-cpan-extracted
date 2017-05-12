@@ -1,0 +1,16 @@
+digraph {
+ rankdir=LR;
+ node [shape=Mrecord];
+ in [
+  label = "{Input source}"
+ ];
+ out [
+  label = "{Output sink}"
+ ];
+ Transform [
+  label = "{{Ryu::Transform|<sink> sink\l|<source> source\l}}"
+ ];
+ in -> Transform:sink;
+ Transform:source -> out;
+}
+

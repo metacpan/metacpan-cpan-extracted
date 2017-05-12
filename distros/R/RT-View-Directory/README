@@ -1,0 +1,8 @@
+This RT extension (designed for RT 3.4) adds a "tree-like" view of files and
+attachments for a given search. 
+
+To install it:
+
+    perl Makefile.PL
+    make
+    make install

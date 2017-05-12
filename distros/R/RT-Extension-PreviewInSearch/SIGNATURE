@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 03a49f044db056da64784af13c3f84a8d93c23ac Changes
+SHA1 44acb7ae0ffcec32bd764a1326d501ee6623c069 MANIFEST
+SHA1 28b1f10e72814d61b02967e5ecdaece01db57dfc META.yml
+SHA1 cce36fa22630e9a325720718144c4d87aa231a14 Makefile.PL
+SHA1 ed32c40481c9526def3572b263045b41f82cc836 README
+SHA1 513c9bbddbfbb4363f861c6e9f4266e7f7dd0539 doc/images/preview-screenshot.png
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 html/Callbacks/RT-Extension-PreviewInSearch/Search/Results.html/AfterResults
+SHA1 e024245f81d6c573558497e5b13f21d8b48dc7e4 html/Callbacks/RT-Extension-PreviewInSearch/Search/Results.html/BeforeResults
+SHA1 ae5691feaf7096d74084e281e6647a6266b69754 html/Helpers/TicketPreview
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 7173d20065379a781d0218b7e747ca7a9b11f7a0 inc/YAML/Tiny.pm
+SHA1 8165d6b758b309d0f5f24014b03d4aab02a7b4b9 lib/RT/Extension/PreviewInSearch.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlT40/wACgkQMflWJZZAbqAJ6QCeNI08aZRiblFH6oKt0niopNyI
+fCoAoIezVHBbaY23hZjGCIbXjBOhtfKW
+=YVuL
+-----END PGP SIGNATURE-----

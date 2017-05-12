@@ -1,0 +1,12 @@
+Revision history for Regexp-Common-IRC2
+
+0.0.4  2008-03-07
+    + fix for hyphens in nicks (Robin Berjon)
+
+0.0.3  2007-09-19
+    + Bug fix against RT ???
+    + Packaging fixes
+    
+0.0.1  Wed Aug  3 17:26:16 2005
+       Initial release.
+

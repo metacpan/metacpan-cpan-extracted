@@ -1,0 +1,11 @@
+name    = Rex-Group-Lookup-Nagios
+author  = Rolf Schaufelberger <rs@rsopen.de>
+license = Perl_5
+copyright_holder = Rolf Schaufelberger
+copyright_year   = 2015
+
+version = 0.001
+
+[@Basic]
+
+[AutoPrereqs]

@@ -1,0 +1,22 @@
+Revision history for Perl extension Redis-LeaderBoard
+
+1.11 2016-02-06T13:55:11Z
+    - Make limit atomic (shogo82148++)
+
+1.10 2015-11-23T16:22:42Z
+    - add `limit` accessor
+
+1.01 2015-09-30T11:52:00Z
+    - add `get_rank_by_score` method and refactory
+
+1.00 2015-09-29T16:18:10Z
+    - optimize `ranking` method using 'WITHSCORES'
+
+0.03 2014-02-03T08:23:10Z
+    - add `expire_at` constructor option.
+
+0.02 2013-12-30T03:54:16Z
+    - `member_count` method can accept $from and $to arguments
+
+0.01 2013-06-02T07:18:21Z
+    - original version

@@ -1,0 +1,74 @@
+#!/bin/sh
+
+doc_dir="html"
+doc_idx="$doc_dir/index.html"
+css_url="http://articles.mongueurs.net/css/pod2html.css"
+title="RackMan Documentation"
+
+for module in Pod::Tree; do
+	if ! perl -M$module -e1 2>/dev/null ; then
+		echo "please install $module" >&2
+		exit
+	fi
+done
+
+mkdir -p $doc_dir
+
+# generate the documentation for all modules
+pods2html --css "$css_url"  --index "$title"  --hr 0  lib/  $doc_dir
+
+# generate the documentation of the commands
+cmd_docs="\n<h2>Commands</h2>\n<ul>\n"
+
+for cmd in `/bin/ls bin/`; do
+	echo bin/$cmd
+	podtree2html --css "$css_url"  --hr 0  bin/$cmd  $doc_dir/$cmd.html
+	cmd_docs="$cmd_docs"'<li><a href="'"$cmd"'.html">'"$cmd</a></li>\n"
+done
+
+cmd_docs="$cmd_docs</ul>\n"
+
+# generate the HTML from the pure Pod files
+pod_docs="\n<h2>Documentation</h2>\n<ul>\n"
+
+for pod in `find pod -name '*.pod'`; do
+	echo $pod
+	name=`echo "$pod" | sed -e s/^pod.// -e s/.pod//`
+	# Pod::Tree doesn't support UTF-8 Pods, so convert them to Latin1 -_-;
+	latin1="html/temp.pod"
+	piconv --from utf8 --to latin1 <"$pod" >"$latin1"
+	perl -pi -e 's/=encoding +utf-8//' "$latin1"
+	html="$name.html"
+	podtree2html --css "$css_url"  --hr 0  "$latin1"  "$doc_dir/$html"
+	pod_docs="$pod_docs"'<li><a href="'"$html"'">'"$name</a></li>\n"
+done
+rm "$latin1"
+
+pod_docs="$pod_docs</ul>\n"
+
+# modify the index to include betters headers and links to the additional docs
+mod_head="\n<h2>RackMan modules</h2>\n"
+perl -pi -e "/<UL>/i&&print+qq|$cmd_docs$pod_docs$mod_head|"  $doc_idx
+
+mod_head="</UL>\n\n<h2>RackTables ORM modules</h2>\n<UL>\n"
+perl -pi -e "/>RackTables.Schema</&&print+qq|$mod_head|"  $doc_idx
+perl -pi -e 's{>([^<]+)<}{(my $a = $1) =~ s!/!::!g; ">$a<" }e' $doc_idx
+
+perl -pi -le '/<TITLE>/&&print+q|<link rel="stylesheet" type="text/css" href="'"$css_url"'"/>|'  $doc_idx
+
+# modify the generated HTML docs so the index has an "index" ID
+find $doc_dir -type f -name '*.html' \! -name index.html \
+	-exec perl -pi -e '/<UL>/i&&($d||=(1,s::<ul id="index">\n<li id="index-toc">Index</li>:))' {} \;
+
+# generate redirection pages for external modules
+refresh='<html><head><meta http-equiv="refresh" content="0;URL=https://metacpan.org/module/%s"></head></html>'
+mkdir -p $doc_dir/Config
+mkdir -p $doc_dir/DBIx/Class/Schema
+mkdir -p $doc_dir/HTML/Template/Filter
+printf "$refresh" Config::IniFiles > $doc_dir/Config/IniFiles.html
+printf "$refresh" DBIx::Class > $doc_dir/DBIx/Class.html
+printf "$refresh" DBIx::Class::Schema > $doc_dir/DBIx/Class/Schema.html
+printf "$refresh" DBIx::Class::Schema::Loader > $doc_dir/DBIx/Class/Schema/Loader.html
+printf "$refresh" HTML::Template > $doc_dir/HTML/Template.html
+printf "$refresh" HTML::Template::Filter::TT2 > $doc_dir/HTML/Template/Filter/TT2.html
+

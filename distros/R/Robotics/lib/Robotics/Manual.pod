@@ -1,0 +1,339 @@
+=pod
+
+=head1 NAME
+
+Robotics::Manual - Manual for Perl Robotics and Robotics::(Devices)
+
+=head1 What is the Robotics Module?
+
+I<Robotics> is an operational, Perl object-oriented framework for 
+controlling, networking, and adding hardware devices which integrate
+into an automated physical robotics system.  
+
+The I<Robotics> module controls real physical hardware such as
+motor controllers, embedded microprocessor systems, sensors, 
+power control systems, and so on.
+ 
+
+=head1 Design Concepts
+
+=item * The I<Robotics> module probes the local system for
+connected hardware devices.  The list of connected hardware
+is returned to the user, with each device having a uniquely
+addressable name.
+
+=item * The user application chooses device(s) from the list which 
+are to be controlled and calls new() for each device.
+
+=item * The user application "attaches" to the hardware device.
+The hardware device may exist across the network on a machine running
+ a Robotics server.  For locally-connected hardware, the user
+ application can choose to start a network service.
+When I<attached>, the hardware is ready to be used.  Otherwise, the hardware
+may be busy.  
+
+=item * For networked hardware, the user application supplies
+a password for authentication and/or secure communication.
+
+=item * The user application sends commands through the hardware
+objects, which result in compiled commands sent to the hardware.
+
+
+Technical details: 
+This & related modules use YAML to allow users (and the module
+itself) to use configuration data in a readable way.  The
+configuration data contains:  physical locations of objects to
+interact with, physical points in space to navigate from/to,
+dictionary definitions, equipment lists, and so on, as well as the
+tokens for the low-level robotics commands.
+
+=head1 Modules
+
+The main Robotics.pm module is an abstraction layer for many types
+of robotics devices and related peripheral hardware.  Other
+hardware, motor controllers, CNC, or peripheral devices may exist
+below this module, or under Devices::, or under other libraries, and
+new implementation is welcomed.
+
+
+
+=head2 Robotics::Tecan Data Flow
+
+=begin text
+
+Data Flow block diagram:
+
+ (Robotics object) -->  (Tecan object)  --future-work--> (other device object)
+                          |                                           |
+                          v                                           v
+             (Genesis device object)  -----> Genesis::DATAPATH -> Tecan::Client
+                          ^
+                          +---------------<- Genesis::DATAPATH <- Tecan::Server
+                          v
+                  (Gemini object)   -----> named pipe  <->  hardware
+
+
+
+=head1 EXAMPLES
+
+
+To use this software with locally-connected robotics hardware:
+
+=item Use the module(s)
+
+=item Use the query method to probe for connected hardware or
+(in the future) remote robotics hardware servers via the network
+
+=item Create a 'new' robotics object from the desired hardware
+
+=item Use the robotics object to 'Attach' to the robotics hardware
+for communications
+
+=item Use the robotics object to control the physical hardware,
+perhaps using very high level semantics which translate into
+multiple lower-level robotics commands.
+
+Example (Please see currently working examples in the distribution):
+
+    use Robotics;
+    use Robotics::Tecan;
+
+    my %hardware = Robotics::query();
+    if ($hardware{"Tecan-Genesis"} eq "ok") { 
+    	print "Found locally-connected Tecan Genesis robotics!\n";
+    }
+    elsif ($hardware{"Tecan-Genesis"} eq "busy") {
+    	print "Found locally-connected Tecan Genesis robotics but it is busy moving!\n";
+    	exit -2;
+    }
+    else {
+    	print "No robotics hardware connected\n";
+    	exit -3;
+    }
+    my $tecan = Robotics->new("Tecan") || die;
+    $tecan->attach() || die;    # initiate communications 
+    $tecan->configure("my-worktable.yaml");      # Load YAML configuration file (optional)
+    $tecan->park("roma0");      # move robotics arm to 'home' position
+    $tecan->move("roma0", "platestack", "s");    # move robotics named arm to vector start
+    $tecan->grip("roma0");    # grip the plate with the named arm
+    $tecan->move("roma0", "platestack", "e");    # move robotics named arm to vector end
+    # TBD $tecan->fetch_tips($tip, $tip_rack);   # move liquid handling arm to get tips
+    # TBD $tecan->liquid_move($aspiratevol, $dispensevol, $from, $to);
+    ...
+
+To use this software with remote robotics hardware over the network:
+
+  # On the local machine, run:
+    use Robotics;
+    use Robotics::Tecan;
+
+	my %hardware = Robotics::query();
+    my $tecan = Robotics->new("Tecan") || die "no tecan found\n";
+    $tecan->attach() || die;
+    # TBD $tecan->configure("my work table configuration file") || die;
+    # Run the server and process commands
+    while (1) {
+      $error = $tecan->server(passwordplaintext => "0xd290"); # start the server
+      # Internally runs communications between client->server->robotics
+      if ($tecan->lastClientCommand() =~ /^shutdown/) { 
+        last;   
+      
+    }
+    $tecan->detach();   # stop server, end robotics communciations
+    exit(0);
+
+  # On the remote machine (the client), run:
+    use Robotics;
+    use Robotics::Tecan;
+
+    my $server = "heavybio.dyndns.org:8080";
+    my $password = "0xd290";
+    my $tecan = Robotics->new("Tecan");
+    $tecan->connect($server, $mypassword) || die;
+    $tecan->home();
+    $tecan->configure("my-worktable.yaml");      # Load YAML configuration file (optional)
+     
+    ... same as first example with communication automatically routing over network ...
+    $tecan->detach();   # end communications
+    exit(0);
+
+
+=head1 FUNCTION DESCRIPTION
+
+=head2 new
+
+
+The user application must call this method to find hardware prior to 
+attempting to access the hardware.
+
+Developer design note: 
+Robotics modules must all provide a mechanism for finding attached
+hardware and return the hash.  Communication must not allowed
+to any hardware device unless queried (probed) for status first.
+This mechanism eliminates operating system issues (hanging device
+drivers, etc) when the hardware does not exist or is not ready for
+communication.
+
+
+=head1 IMPLEMENTATION DISCUSSION
+
+
+Many of these robotics devices are designed 
+primarily or exclusively for MSWin systems.  This means module
+requirements and internal code must be activeperl and MSWin friendly.
+This author suggests discussing with the manufacturer(s)
+requesting more Unix/OSX/POSIX compatibility when appropriate.
+
+
+
+=head2 Why use Perl for Robotics?
+
+Many robotics systems are controlled with serial peripherals 
+(RS-232, USB, CAN, GPIB, ...) which accept byte or text-based 
+commands. Perl is a good language for rapid development of
+software using byte or strings and for implementing compilers
+which translate more human-readable commands into 
+machine-command strings.
+
+Perl has long found use on the world wide web (WWW), 
+common gateway interfaces (CGI), and client-server protocol 
+development, thus Perl has many strengths for networking
+robotics devices.  CPAN is a growing library of open source
+Perl modules which can be easily installed and integrated
+with this module.
+
+Perl also allows relative ease in developing user application
+code as simple or quick & dirty scripts.  Perl's "Do What I Mean"
+oriented language is a good match for users who simply want
+the robotics hardware to also "do what I mean".
+
+A vital community of users and developers in biology use
+bioperl.  The I<Robotics> modules started as a tool for
+improving robotics automation for genomic sequencing, which
+is closely related to bioperl.
+
+
+=head3 Weakness to Watch For
+
+Robotics applications typically require real time performance.
+Perl may not be sufficient for these purposes.  Though most
+of the real time operation is handled within the target
+hardware, the client/server side may need deterministic timing.
+
+Perl allows rapid development of user applications with a
+test-as-you-go implementation paradigm.  This may create
+problems with robotics where bad code can physically damage
+hardware due to collisions.
+
+
+=head3 Why not (Other language) ?
+
+=item Java - A good choice, though interfacing to
+physical hardware with byte or nibble operations is
+a hassle since Java is designed to abstract away
+from hardware.  Requires compilation and isn't
+readily script-able.  Many Java applications have
+been written to control robotics and lends itself
+directly to applets, so may be the next choice.
+
+=item Processing.org - A good choice for a Java
+framework which could provide visualization, timing
+through graphics framerate, and 
+easy applet development, though has the same
+weaknesses as Java itself and a small developer base.
+
+=item C - too much work to parse strings.
+
+=item C++, C# - non-programmers can't write it.
+
+=item Python - the user community isn't large enough yet.
+This is the next best choice though.  Porting this
+module to Python is a good idea.
+
+=item Lisp, Prologue, ...  - to be useful for many users 
+and extendable by many developers, rather 
+than obscure, a larger programming community is desired.
+
+
+=head1 REFERENCE ON NAMED PIPES
+
+=item * Named pipes are used with some robotics device drivers to allow
+external software to access the hardware.
+
+Named pipes must be accessed as UNCs. This means that the computer name where the 
+named pipe is running is a part of its name. Just like any UNC a share name must 
+be specified. For named pipes the share name is pipe. Examples are:
+
+\\machinename\pipe\My Named Pipe
+\\machinename\pipe\Test
+\\machinename\pipe\data\Logs\user_access.log
+
+Notice how the third example makes use of an arbitrarly long path and that 
+it has what appear to be subdirectories. Since a named pipe is not truly a part 
+of the a disk based file system there is no need to create the data\logs subdirectories; 
+they are simply part of the named pipes name.
+Also notice that the third example uses a file extension (.log). This extension does 
+absolutely nothing and is (like the subdirectories) simply part of the named pipes name.
+
+When a client process attempts to connect to a named pipe it must specify a full UNC. 
+If, however, the named pipe is on the same computer as the client process then the 
+machine name part of the UNC can be replaced with a dot "." as in:
+
+\\.\pipe\My Named Pipe
+
+
+=head1 AUTHOR
+
+Jonathan Cline, C<< <jcline at ieee.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-robotics at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Robotics>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Robotics::Manual
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Robotics>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Robotics>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Robotics>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Robotics/>
+
+=back
+
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Jonathan Cline.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+

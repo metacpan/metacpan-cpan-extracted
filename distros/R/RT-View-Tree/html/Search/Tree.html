@@ -1,0 +1,283 @@
+<%ARGS>
+$TreeviewMagic => undef
+$id => undef
+$Query => undef
+$Format => undef
+$Rows => undef
+$OrderBy => undef
+$Order => undef
+$Page => undef
+$MaxDepth => 7
+$ShowChildren => undef
+$ShowDependencies => undef
+@ShowStatus => ();
+</%ARGS>
+<%init>
+
+my @statuses = RT::Queue->new($session{'CurrentUser'})->StatusArray;
+unless ($TreeviewMagic) {
+    unless (defined $ShowChildren) {
+        $ShowChildren = 1;
+    }
+    unless (defined $ShowDependencies) {
+	$ShowDependencies = 1;
+    }
+    unless( @ShowStatus ) {
+	@ShowStatus = qw(new open stalled);
+    }
+}
+
+
+# {{{ Generic setup
+
+my $title = loc('Tree view');
+
+my $QueryString = "?".
+    $m->comp(
+    '/Elements/QueryString',
+    Query            => $Query,
+    Format           => $Format,
+    Rows             => $Rows,
+    OrderBy          => $OrderBy,
+    Order            => $Order,
+    Page             => $Page,
+    MaxDepth         => $MaxDepth,
+    ShowChildren     => $ShowChildren,
+    ShowDependencies => $ShowDependencies,
+  );
+# QueryString couldn't handle array refs
+$QueryString = join( '&', $QueryString,
+			  map { 'ShowStatus='. $m->interp->apply_escapes($_,'u') }
+			  	@ShowStatus);
+
+# }}}
+
+# {{{ If we load a ticket, this search is on a given ticket and we'll get the
+# ticket menus instead of the tree ones
+my $Ticket;
+if ($id) {
+    $Ticket = RT::Ticket->new( $session{'CurrentUser'} );
+    $Ticket->Load($id);
+    $Query = "id = $id";
+}
+# }}}
+
+# {{{ Scrub the html of the format string to remove any potential nasties.
+$Format = $m->comp( '/Elements/ScrubHTML', Content => ($Format||
+			           $RT::DefaultSearchResultFormat));
+my (@Format) =
+  $m->comp( '/Elements/CollectionAsTable/ParseFormat', Format => $Format );
+
+# Alter the format to do treeview indents.
+foreach my $entry (@Format) {
+    my @output;
+    foreach my $item ( @{ $entry->{'output'} } ) {
+        if ( $item eq '__Subject__' ) {
+	    # add indent whitespaces before link
+	    unshift @output, '___RT_TreeView_Indent__';
+	    push @output, $item;
+        }
+        else {
+            push @output, $item;
+        }
+    }
+    if( lc $entry->{'attribute'} eq 'id' ) {
+	for my $item ( @output ) {
+	    $item =~ s/<A\s/<A target="_blank" /iso if $item =~ /<A\s/iso;
+	}
+    }
+    $entry->{'output'} = \@output;
+}
+# }}}
+
+my $tickets = RT::Tickets->new( $session{'CurrentUser'} );
+$tickets->FromSQL($Query);
+$tickets->OrderBy( FIELD => $OrderBy, ORDER => $Order );
+
+my @tickets = @{ $tickets->ItemsArrayRef || [] };
+my $TopTickets = {};
+$TopTickets->{ $_->id } = $_ foreach( @tickets );
+
+my @tree;
+foreach my $ticket (@tickets) {
+
+    # If the parent ticket hasn't been invalidated by being displayed deeper...
+    # recurse now and add it in
+    next unless exists $TopTickets->{ $ticket->id };
+    my $kids = build_subtree(
+        Ticket           => $ticket,
+        TopTickets       => $TopTickets,
+        Depth            => 1,
+        MaxDepth         => $MaxDepth,
+        ShowChildren     => $ShowChildren,
+        ShowDependencies => $ShowDependencies,
+	ShowStatus       => \@ShowStatus,
+    );
+    unless( $kids && @$kids ) {
+	next unless grep $_ eq $ticket->Status, @ShowStatus;
+    }
+
+    push @tree, [ $ticket, $kids ];
+}
+
+# Ok. Let's build up our tree of tickets, recursing down.
+sub build_subtree {
+    my %args = (
+        Ticket           => undef,
+        TopTickets       => undef,
+        ShowChildren     => undef,
+        ShowDependencies => undef,
+	ShowStatus       => undef,
+        Depth            => undef,
+        MaxDepth         => undef,
+        @_
+    );
+
+    return if ( $args{'Depth'} > $args{'MaxDepth'} );
+
+    my @query;
+    push @query, 'DependsOn = ' . $args{'Ticket'}->id
+		  if ( $args{'ShowDependencies'} );
+    push @query, 'MemberOf = ' . $args{'Ticket'}->id
+		  if ( $args{'ShowChildren'} );
+
+    my $deps = RT::Tickets->new( $session{'CurrentUser'} );
+    $deps->FromSQL( join( ' OR ', @query ) );
+    $deps->OrderBy( FIELD => $args{'OrderBy'}, ORDER => $args{'Order'} );
+
+    my @tickets;
+    while ( my $dep = $deps->Next ) {
+        delete $args{'TopTickets'}->{ $dep->id };
+        my $kids = undef;
+        $kids = build_subtree(
+	    %args,
+            Ticket     => $dep,
+            Depth      => $args{'Depth'} + 1,
+          );
+	unless( $kids && @$kids ) {
+	    next unless grep $_ eq $dep->Status, @{ $args{'ShowStatus'} };
+        }
+        push @tickets, [ $dep, $kids ];
+    }
+
+    return ( \@tickets );
+}
+
+
+</%init>
+<& /Elements/Header, Title => $title, Refresh => $session{'tickets_refresh_interval'} &>
+<& /Ticket/Elements/Tabs, 
+    current_tab => "Search/Tree.html".$QueryString,
+    Ticket => $Ticket,
+    Title => $title,
+    Format => $Format,
+    Query => $Query,
+    Rows => $Rows,
+    OrderBy => $OrderBy,
+    Order => $Order &>
+<hr>
+<TABLE BORDER=0 cellspacing=0 cellpadding=1 WIDTH=100%>
+<& /Elements/CollectionAsTable/Header,
+    Format => \@Format,
+    AllowSorting => 0,
+    Query => $Query,
+
+&>
+<%perl>
+unshift @{$Format[0]->{'output'}}, "[<a
+    href=\"$RT::WebPath/Search/Tree.html?$QueryString&id=",
+    '__id__','">+</a>]';
+    foreach my $row (@tree) {
+        $m->comp( '.entry',
+            Ticket   => $row->[0],
+            Depth    => 0,
+            Format   => \@Format,
+            Children => $row->[1],
+            Parents =>  { $row->[0]->id => 1 }
+        );
+
+    }
+</%perl>
+</table>
+<hr>
+<form method="get" action="<%$RT::WebPath%>/Search/Tree.html">
+<input type="hidden" name="Query" value="<%$Query%>">
+<input type="hidden" name="Format" value="<%$Format%>">
+<& /Elements/TitleBoxStart, title => loc('Display options') &>
+<ul>
+<li><&|/l&>Sublevel display depth</&>: <input type=text size=3 name="MaxDepth"
+value=<%$MaxDepth%>> 
+</li>
+%# Checkboxes have binary logic. "Off" looks like "never existed
+%# TreeviewMagic emulates trinary logic for them
+<input type="hidden" name="TreeviewMagic" value="1">
+<li><input type="checkbox" name="ShowChildren" <% $ShowChildren
+ &&
+'CHECKED'%>><&|/l&>Show children in sublevels</&></li>
+<li><input type="checkbox" name="ShowDependencies" <%$ShowDependencies&& 
+'CHECKED'%>><&|/l&>Show dependencies in sublevels</&></li>
+<li><&|/l&>Status</&>:<SELECT name="ShowStatus" multiple size=6>
+% foreach my $s(@statuses) {
+<option value="<% $s %>" <% (grep $_ eq $s, @ShowStatus)? 'selected': ''%>><&|/l&><% $s %></&></option>
+% }
+</select></li>
+</ul>
+<& /Elements/Submit &>
+<& /Elements/TitleBoxEnd &>
+</form>
+
+
+<%DEF .entry>
+<%args>
+$Ticket
+$Depth => 0
+$Children => undef
+@Format => undef
+$MaxDepth => undef
+$Parents => undef
+</%args>
+<%init>
+
+$m->comp('/Elements/CollectionAsTable/Row', Format => \@Format, i => $Depth,
+record => $Ticket);
+    foreach my $row (@$Children) {
+        if (!exists $Parents->{$row->[0]->id}) {
+            $Parents->{$row->[0]->id} = 1;
+            #        look to see if the child is a parent up the tree
+            $m->comp(
+                '.entry',
+                Ticket           => $row->[0],
+                Children        => $row->[1],
+                Depth            => ( $Depth + 1 ),
+                MaxDepth         => $MaxDepth,
+                Format           => \@Format,
+                Parents          => $Parents
+            );
+        }
+    else {    # found a loop
+        my @Blank;
+        foreach my $entry (@Format) {
+            my @output = ['&nbsp;'];
+            my $title = '';
+            foreach my $item ( @{ $entry->{'output'} } ) {
+                if ( $item =~ /Subject/i ) {
+                    @output = [ '___RT_TreeView_Indent__', '...' ];
+                } elsif ($item =~ /__NEWLINE__/i ) {
+                    $title = 'NEWLINE';
+               }
+            }
+            push @Blank, { output => @output, title => $title };
+        }
+        $m->comp(
+            '/Elements/CollectionAsTable/Row',
+            Format => \@Blank,
+            i      => $Depth + 1,
+            record => $Ticket
+        );
+
+    }
+    }
+</%init>
+</%DEF>
+
+

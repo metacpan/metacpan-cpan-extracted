@@ -1,0 +1,12 @@
+
+=widget URI
+
+=for layout widget
+
+<a href="[% uri %]">[% display_fragment %]</a>
+
+=for layout display_string
+
+[% string_value %]
+
+=cut

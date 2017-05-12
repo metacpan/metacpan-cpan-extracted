@@ -1,0 +1,88 @@
+#!perl
+use strict;
+use warnings;
+# PODNAME: reply
+# ABSTRACT: read, eval, print, loop, yay!
+
+use Reply::App;
+
+
+exit(Reply::App->new->run(@ARGV));
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+reply - read, eval, print, loop, yay!
+
+=head1 VERSION
+
+version 0.42
+
+=head1 SYNOPSIS
+
+  reply [-lb] [-I dir] [-M mod] [--version] [--help] [--cfg file]
+
+=head1 DESCRIPTION
+
+This script runs the L<Reply> shell. It looks for a configuration file in
+C<.replyrc> in your home directory, and will generate a basic configuration for
+you if that file does not exist.
+
+See the L<Reply> documentation for more information about using and configuring
+this program.
+
+=head1 OPTIONS
+
+reply takes these command line options:
+
+=over 4
+
+=item -I lib
+
+Adds the given directory to C<@INC>.
+
+=item -l
+
+Equivalent to C<-I lib>.
+
+=item -b
+
+Equivalent to C<-I blib/lib -I blib/arch>.
+
+=item -M Carp::Always
+
+Loads the specified module before starting the repl. It is loaded within the
+repl, so things like exporting work properly.
+
+=item --cfg ~/.replyrc
+
+Specifies a different configuration file to use. C<~/.replyrc> is the default.
+
+=item --version
+
+Displays the program version.
+
+=item --help
+
+Displays usage information.
+
+=back
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

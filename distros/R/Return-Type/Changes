@@ -1,0 +1,36 @@
+Return-Type
+===========
+
+Created:      2013-10-30
+Home page:    <https://metacpan.org/release/Return-Type>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Return-Type>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-07
+
+ - Updated: Replace uses of Sub::Name+Sub::Identify with Sub::Util, which
+   is expected to be a core module soon.
+
+0.004	2014-07-30
+
+ [ Packaging ]
+ - No longer require Scope::Upper.
+
+ [ Other ]
+ - Make the Scope::Upper stuff optional, and disabled by default.
+
+0.003	2013-11-14
+
+ [ Documentation ]
+ - Fix typo in SYNOPSIS code.
+
+0.002	2013-11-03
+
+ [ Bug Fixes ]
+ - Fix non-inlineble type constraints and coercions.
+
+ [ Other ]
+ - Allow per-context (i.e. different for scalar and list contexts) control
+   over coercion.
+
+0.001	2013-10-30	Initial release

@@ -1,0 +1,23 @@
+Revision history for Robotics
+
+0.10    20 Jun 2009
+        First version, originally Bio::Robotics and Bio::Robotics::Tecan.
+0.20    10 Aug 2009
+        Register namespace, Robotics and Robotics::Tecan.
+0.21	7 Sep 2009
+		Release to CPAN, working for Tecan arm movement, basic code
+		YAML configuration for robotics environment
+0.22	17 Sep 2009
+		Release to CPAN, upgrades for OO and Moose
+		Add command compiler for "long" robotics hardware commands
+		Add separate client, server, local connection data paths
+		Framework for hardware "plugin" exists though still TODO.
+		Robotics, 
+		Robotics::Tecan, 
+		Robotics::Tecan::Genesis, Robotics::Tecan::Gemini
+0.23    xx Oct 2009
+        Add FIAlab MicroSIA device (syringe, pump) as
+                Fialab::Microsia - basic test successful for local
+                operation
+        Add Tecan XS commands and "type1" commands for 
+                liquid handling

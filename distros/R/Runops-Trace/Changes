@@ -1,0 +1,61 @@
+0.01 - Thu Oct  6 01:35:32 UTC 2005
+    First version, based on RGS's Runops::Switch.
+
+0.02 - Sun Jun 17              2007
+    Patched from chromatic's for my own used.
+
+0.03 - Mon Jun 18              2007
+    Finished initial distribution.
+    Added functions:
+     - Runops::Trace->trace( TRACE, CODE )
+     - trace_code( CODE )
+     - checksum_code_path( CODE )
+
+0.04 - Thu Jun 21              2007
+    Ought to build on threaded perls
+    Traps die() now.
+
+0.05 - Thu Jun 21              2007
+    Actually require Digest::MD5
+
+0.06 - Sun Jun 24              2007
+    Pre-YAPC release
+    trace wasn't exportable, now it is.
+
+0.07 - Wed Aug  1              2007
+    Speed.
+    API Change.
+
+      The trace callback recieves only the numeric pointer of the op
+      now. Future versions will be given a B::OP object. ATM,
+      marshalling the pointer to a B::OP object is your
+      responsibility.
+
+      The number is also the same scalar all the time. References
+      taken to it will only reflect the last used value.
+
+0.08 - Thu Aug  2              2007
+    Just PAUSE fluff. This is the same as 0.07
+
+0.09 - Thu Aug  2              2007
+    Document requirement for 5.8.0.
+
+0.10 - Sun May 11              2008
+    Merged in Runops::Hook
+
+0.11 - Sat Jul 26              2008
+    opmask is now a bitfield instead of a bool array (hoping this also takes
+    care of compilation problems), and other minor tweaks.
+
+    opcode arity detection that caused a segfault fixed
+
+0.12 - Sun Jul 27              2008
+    Get B::UNOP::first in a well behaved manner
+
+0.13 - Tue Nov 11              2008
+    Fixed a compilation error for unthreaded perl
+
+... - Sun Jan 16              2010
+    Fixed "Out of memory during array extend" for aassign
+    Add .gitignore
+    Build with Dist::Zilla

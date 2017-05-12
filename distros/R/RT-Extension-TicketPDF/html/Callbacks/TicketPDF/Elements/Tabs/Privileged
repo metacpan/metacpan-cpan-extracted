@@ -1,0 +1,34 @@
+<%init>
+# Make sure we are on the ticket page.
+    my $request_path = $HTML::Mason::Commands::r->path_info;
+    return unless $request_path =~ m{^/Ticket/};
+    return unless ($DECODED_ARGS->{'id'} && $DECODED_ARGS->{'id'} =~ /^\d+$/);
+
+# Make sure we have a valid ticket.
+    my $id  = $DECODED_ARGS->{'id'};
+    my $obj = RT::Ticket->new( $session{'CurrentUser'} );
+    $obj->Load($id);
+    return unless $obj->id;
+
+# Restrict to certain queues
+    # return unless $obj->QueueObj->id =~ /^(6)$/;
+
+# Add PDF links to the menu
+    my $ticketpdf = PageMenu()->child(
+        'ticketpdf', title => 'Generate PDF', sort_order => 1
+    );
+
+    my $url = RT->Config->Get('WebBaseURL') . RT->Config->Get('WebPath');
+    $ticketpdf->child( 'pdf-simple',
+        title       => 'Simple',
+        path        => "$url/Ticket/PDF/Display.pdf?id=$id;tpl=Simple",
+    );
+    $ticketpdf->child( 'pdf-display',
+        title       => 'Display',
+        path        => "$url/Ticket/PDF/Display.pdf?id=$id;tpl=Display",
+    );
+
+</%init>
+<%args>
+</%args>
+

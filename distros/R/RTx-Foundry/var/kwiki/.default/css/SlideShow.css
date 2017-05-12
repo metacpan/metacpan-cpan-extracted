@@ -1,0 +1,4 @@
+pre { font-family: courier, monospace; font-weight: bolder }
+li  { font-size: 20pt; padding-top: 10 }
+.slide-body li { line-height: 140%; }
+.slide-body h4 { height: 0em; line-height: 0em; }

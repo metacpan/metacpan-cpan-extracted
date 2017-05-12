@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Runops-Recorder
+version:            0.09
+abstract:           Runops replacement which saves what is being performed
+author:
+    - Claes Jakobsson <claesjac@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    accessors::ro:  0
+    Term::ReadKey:  0
+    Term::Screen:   0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

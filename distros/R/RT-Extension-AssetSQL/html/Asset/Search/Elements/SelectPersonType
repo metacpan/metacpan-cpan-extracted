@@ -1,0 +1,28 @@
+<select id="<%$Name%>" name="<%$Name%>">
+% if ($AllowNull) {
+<option value="">-</option>
+% }
+% for my $option (@types) {
+%  if ($Suffix) {
+<option value="<% $option %><% $Suffix %>"<%$option eq $Default && qq[ selected="selected"] |n %> ><% loc($option) %> <% loc('Group') %></option>
+%   next;
+%  }
+%  foreach my $subtype (@subtypes) {
+<option value="<%"$option.$subtype"%>"<%$option eq $Default && $subtype eq 'EmailAddress' && qq[ selected="selected"] |n %> ><% loc($option) %> <% loc($subtype) %></option>
+%  }
+% }
+</select>
+
+<%INIT>
+my @types = qw(Owner HeldBy Contact);
+my @subtypes = @{ $RT::Assets::SEARCHABLE_SUBFIELDS{'User'} };
+
+$m->callback(Types => \@types, Subtypes => \@subtypes);
+</%INIT>
+<%ARGS>
+$AllowNull => 1
+$Suffix => ''
+$Default =>undef
+$Scope => 'asset'
+$Name => 'WatcherType'
+</%ARGS>

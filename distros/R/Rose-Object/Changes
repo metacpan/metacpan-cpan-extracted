@@ -1,0 +1,119 @@
+0.860 (10.03.2013) - John Siracusa <siracusa@gmail.com>
+
+	* Fixed typos in the documentation. (RT 89241)
+
+0.859 (10.17.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Eliminated non-numeric warning in Class::XSAccessor version check.
+    * Update copyright date.
+
+0.858 (02.10.2010) - John Siracusa <siracusa@gmail.com>
+
+    * The CPAN shell in 5.10.1 (on Mac OS X, anyway) chokes on the
+      t/debugger.t test.  I've moved it to the xt directory.
+
+0.857 (02.09.2010) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug that caused methods to be created more than once,
+      triggering a fatal error, when running under the debugger in
+      perl 5.10.1 and up.  (RT 54444, patch by Christopher Masto)
+
+0.856 (10.16.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Updated eval blocks to avoid stomping on $@ from an outer scope.
+
+0.855 (01.22.2009) - John Siracusa <siracusa@gmail.com>
+
+    * Added Class::XSAccessor support.
+
+0.854 (12.09.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Altered the default name for the adds_method and inherits_method
+      method types in the inherited_hash class method maker.
+
+0.853 (07.30.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug in the hash get_set_init method interface.  (Reported
+      by Bill Moseley)
+
+0.852 (06.25.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Documented Rose::Object::MixIn->import()'s -target_class parameter.
+
+0.851 (06.06.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Corrected mistakes in the Rose::Class::MakeMethods::Generic POD.
+
+0.85 (05.28.2008) - John Siracusa <siracusa@gmail.com>
+
+    * Added "inherited_hash" and "inheritable_boolean" class method types.
+    * Documented shift, unshift, and pop array method maker method type.
+    * Fixed a bug that prevented "--opt=0" options from being honored
+      (Reported by Bill Moseley)
+
+0.84 (05.17.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug in Rose::Object::MixIn that caused Rose::DB::Object's
+      "helpers" setup() parameter to work incorrectly.
+
+0.83 (05.04.2007) - John Siracusa <siracusa@gmail.com>
+
+    * Moved Rose::Object::MixIn here from Rose::DB::Object.
+
+0.821 (11.13.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Minor fix to the test suite.
+
+0.82 (10.06.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Forcibly reloading a module that uses one of the method makers
+      no longer causes a fatal "method redefined" error.
+    * Added the allow_apparent_reload() class attribute to control
+      the new ability described above.
+
+0.81 (06.20.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug in the inheritable_set method maker that caused
+      set values not to be inherited by subclasses more than one
+      superclass away.  (Reported by Michael Lackhoff)
+    * Added more links to the documentation.
+
+0.80 (03.07.2006) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a typo in the documentation.
+    * Big version number bump to reflect progress towards 1.0.
+
+0.016 (10.26.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug in the inheritable class hash method maker's "delete"
+      method type that could cause an extra key to be deleted under some
+      rare circumstances.
+
+0.015 (08.30.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added "clear" method to inheritable and inherited sets.
+    * Added ability to set inherited and inheritable sets using
+      the list_method method type.
+
+0.014 (08.18.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added get_set_init_all interface to hash method maker.
+
+0.013 (02.13.2005) - John Siracusa <siracusa@gmail.com>
+
+    * Added hash and inheritable_hash class methods to method maker.
+
+0.012 (12.07.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Renamed get_set_items array interface to get_set_item.
+    * Added "ignore_existing" flag to method maker.
+    * Renamed "override" and "ignore_existing" method maker flags 
+      to "override_existing" and "preserve_existing".
+
+0.011 (11.14.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Added copyright info.  Version 0.01 removed.
+
+0.01 (11.13.2004) - John Siracusa <siracusa@gmail.com>
+
+    * Initial release.

@@ -1,0 +1,151 @@
+# NAME
+
+Random::PoissonDisc - distribute points aesthetically in R^n
+
+# SYNOPSIS
+
+    my $points = Random::PoissonDisc->points(
+        dimensions => [100,100],
+        r => $r,
+    );
+    print join( ",", @$_),"\n"
+        for @$points;
+
+This module allows relatively fast
+(linear in the number of points generated) generation of random points in
+_n_-dimensional space with a distance of
+at least `r` between each other. This distribution
+results in aesthetic so called "blue noise".
+
+The algorithm was adapted from a sketch
+by Robert Bridson
+in [http://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf](http://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf).
+
+# DATA REPRESENTATION
+
+All vectors (or points) are represented
+as anonymous arrays of numbers. All have the same
+dimension as the cardinality of the `dimensions`
+array passed in the `->points` method.
+
+## USER INTERFACE
+
+### `Random::PoissonDisc->points( %options )`
+
+Returns a reference to an array of points.
+
+Acceptable options are:
+
+- ` r ` - minimum distance between points.
+
+    Default is 10 units.
+
+- ` dimensions ` - number of dimensions and respective value range as an arrayref.
+
+    Default is
+
+        [ 100, 100 ]
+
+    meaning all points will be in R^2 , with each coordinate in the
+    range \[0, 100).
+
+- ` candidates ` - Number of candidates to inspect before deciding that no
+ew neighbours can be placed around a point.
+
+    Default is 30.
+
+    This number may or may not need to be tweaked if you go further up in
+    dimensionality beyond 3 dimensions. The more candidates you inspect
+    the longer the algorithm will run for generating a number of points.
+
+    In the algorithm description, this constant is named _k_.
+
+## INTERNAL SUBROUTINES
+
+These subroutines are used for the algorithm.
+If you want to port this module to PDL or any other
+vector library, you will likely have to rewrite these.
+
+### `rnd( $low, $high )`
+
+    print rnd( 0, 1 );
+
+Returns a uniform distributed random number
+in `[ $low, $high )`.
+
+### `grid_coords( $grid_size, $point )`
+
+Returns the string representing the coordinates
+of the grid cell in which `$point` falls.
+
+### `norm( @vector )`
+
+    print norm( 1,1 ); # 1.4142
+
+Returns the Euclidean length of the vector, passed in as array.
+
+### `vdist( $l, $r )`
+
+    print vdist( [1,0], [0,1] ); # 1.4142
+
+Returns the Euclidean distance between two points
+(or vectors)
+
+### `neighbour_points( $size, $point, $grid )`
+
+    my @neighbours = neighbour_points( $size, $p, \%grid )
+
+Returns the points from the grid that have a distance
+between 0 and 2r around `$point`. These points are
+the candidates to check when trying to insert a new
+random point into the space.
+
+### `random_unit_vector( $dimensions )`
+
+    print join ",", @{ random_unit_vector( 2 ) };
+
+Returns a vector of unit length
+pointing in a random uniform distributed
+_n_-dimensional direction
+angle
+and returns a unit vector pointing in
+that direction
+
+The algorithm used is outlined in 
+Knuth, \_The Art of Computer Programming\_, vol. 2,
+3rd. ed., section 3.4.1.E.6.
+but has not been verified formally or mathematically
+by the module author.
+
+# TODO
+
+The module does not use [PDL](https://metacpan.org/pod/PDL) or any other
+vector library.
+
+# REPOSITORY
+
+The public repository of this module is 
+[http://github.com/Corion/random-poissondisc](http://github.com/Corion/random-poissondisc).
+
+# SUPPORT
+
+The public support forum of this module is
+[http://perlmonks.org/](http://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Random-PoissonDisc](https://rt.cpan.org/Public/Dist/Display.html?Name=Random-PoissonDisc)
+or via mail to [random-poissondisc@rt.cpan.org](https://metacpan.org/pod/random-poissondisc@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2011 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

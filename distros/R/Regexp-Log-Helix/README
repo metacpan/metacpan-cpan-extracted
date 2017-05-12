@@ -1,0 +1,50 @@
+NAME
+    Regexp::Log::Helix - A regular expression parser for Helix log format.
+
+SYNOPSIS
+        my $foo = Regexp::Log::Helix->new(
+              format  => ':style11_3',
+              capture => [qw( ip date req )],
+        );
+        my $re = $foo->regexp;
+
+DESCRIPTION
+    This module parses access logs created by Real's Helix 11.
+
+    For more information on how to use this module, please see Regexp::Log.
+
+ABSTRACT
+    Regexp::Log::Helix enables simple parsing of log files created by Helix.
+
+CAPTURE FIELDS
+    * ip rfc authuser date ts
+    * request req req_method req_file req_query req_protocol
+    * status bytes
+    * ua id stats
+    * filesize filetime conntime resends failedresends
+    * components startts serverip
+
+SEE ALSO
+    Regexp::Log, Regexp::Log::Common
+
+AUTHOR
+    Ben H Kram <bkram@barkley.dce.harvard.edu>
+
+COPYRIGHT
+       Copyright 2006, Harvard University.  All rights reserved.
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+
+TODO
+    I have only written support for logging style 3. Adding 1,2 and 4 may be
+    helpful.
+
+CHANGES
+    $Log: Helix.pm,v $ Revision 1.4 2006/08/22 21:40:03 bkram Added support
+    for req_method req_file req_query req_protocol
+
+    Revision 1.3 2006/08/22 16:52:17 bkram fixed version formatting
+
+    Revision 1.2 2006/08/22 16:46:43 bkram prepping for CPAN
+

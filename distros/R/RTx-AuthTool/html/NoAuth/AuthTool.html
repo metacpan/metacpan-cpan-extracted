@@ -1,0 +1,54 @@
+% unless (grep length, values %ARGS) {
+<form action="" method="get">
+<table>
+%   foreach my $field (qw( user pass right )) {
+<tr><td>
+<label><% "\u$field" %>:
+</td><td>
+<input
+    type="<% ($field eq 'pass') ? 'password' : 'input' %>"
+    name="<% $field %>" />
+</label>
+</td></tr>
+% }
+</table>
+<input type="submit">
+<!--
+<input name="object_class">
+<input name="object_id">
+-->
+</form>
+%  return;
+% }
+OK
+<%INIT>
+my $CurrentUser = RT::CurrentUser->new;
+
+if (length $user) {
+    $CurrentUser->Load($user);
+    $CurrentUser->Id or $m->abort(401);
+}
+
+if (length $pass) {
+    # authenticate
+    $CurrentUser->IsPassword($pass) or $m->abort(401);
+}
+
+if (length $object_class and length $object_id) {
+    # check right against an object
+    # ...
+}
+elsif (length $right) {
+    $CurrentUser->UserObj->HasRight(
+        Right => $right,
+        Object => $RT::System
+    ) or $m->abort(403);
+}
+</%INIT>
+<%ARGS>
+$user => undef
+$pass => undef
+$right => undef
+$object_class => undef
+$object_id => undef
+</%ARGS>

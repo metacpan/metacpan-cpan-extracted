@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Regexp/MultiLanguage.pm
+lib/Regexp/MultiLanguage/BaseDialect.pm
+lib/Regexp/MultiLanguage/JavaScript.pm
+lib/Regexp/MultiLanguage/Perl.pm
+lib/Regexp/MultiLanguage/PHP.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml

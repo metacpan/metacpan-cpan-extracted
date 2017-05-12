@@ -1,0 +1,5 @@
+% layout 'help';
+% title "Help";
+<h2>Help</h2>
+
+<p>If you need help please feel free to contact us via irc on <a href="irc://irc.freenode.net/rex">irc.freenode.net/rex</a> or join our <a href="https://groups.google.com/forum/#!forum/rex-users">Google Group</a>.</p>

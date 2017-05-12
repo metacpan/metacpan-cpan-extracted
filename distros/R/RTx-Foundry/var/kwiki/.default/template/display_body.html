@@ -1,0 +1,28 @@
+<div class="wiki">
+[% display %]
+</div>
+
+[% IF is_editable %]
+<hr />
+<form class="edit">
+<input type="submit" name="button-edit" value="{{EDIT}}">
+<input type="hidden" name="action" value="edit">
+<input type="hidden" name="page_id" value="[% page_id %]">
+</form>
+[% END %]
+
+[% IF show_changed %]
+    <div class="posted">
+    <i>{{This page last changed on [[% edit_time %]] by [[% edit_by %]]}}</i><br />
+    </div><!-- close "posted" -->
+[% END %]
+
+  </div><!-- close "blogbody" -->
+
+  <div class="comments-head">
+[% Diff.entry_form() %]
+  </div><!-- close "comments-head" -->
+
+  <div class="comments-body">
+  <br /><a id="diff"></a>
+[% Diff.display_diff() %]

@@ -1,0 +1,29 @@
+<%ARGS>
+$Ticket
+$Actions => undef
+$ARGSRef => undef
+</%ARGS>
+
+<%INIT>
+my $Lock = $$ARGSRef{'Lock'};
+return unless $Lock;
+if ($Lock eq 'add') {
+    if ($Ticket->Lock('Hard')) {
+        push @$Actions, loc('You now have a lock on this ticket');
+    } else {
+        push @$Actions, loc('Your attempt to lock this ticket failed');
+    }
+    return;
+}
+if ( $Lock eq 'remove' ) {
+    my ($elapsed, $msg) = $Ticket->Unlock('Hard');
+    push @$Actions, loc($msg);
+    $$ARGSRef{'Duration'} = $elapsed if $elapsed;
+    return;
+}
+if ($Lock eq 'break') {
+    $Ticket->BreakLock();
+    push @$Actions, loc('You have broken the lock on this ticket');
+}
+return;
+</%INIT>

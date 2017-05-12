@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=[% encoding %]" />
+  <title>[% page_id %] - {{KwikiSlides}}</title>
+  <link rel="stylesheet" type="text/css" href="css/[% stylesheet %]">
+  <link rel="stylesheet" type="text/css" href="css/SlideShow.css">
+  <script src="javascript/SlideShow.js"></script>
+</head>
+
+<body style="[% IF bgcolor %]background-color:[% bgcolor %];[% IF fgcolor %]color: [% fgcolor %];[% END %][% END %]">
+
+<div class="slide-body">
+<div class="blogbody">
+
+<div id="banner" style="line-height:100%">
+<h2>[% title %]</h2>
+[% IF subtitle %]<h4>( [% subtitle %] )</h4>[% END %]
+</div><!-- close "banner" -->
+
+<div style="padding:5%">
+[% slide %]
+</div>
+
+<form method="POST" action="[% script %]">
+<input type="hidden" name="control" value="none">
+<input type="hidden" name="slide_num" value="[% slide_num %]">
+<input type="hidden" name="line_num" value="[% line_num %]">
+<input type="hidden" name="action" value="slides">
+<input type="hidden" name="page_id" value="[% page_id %]">
+</form>
+
+</div><!-- close "blogbody" -->
+</div><!-- close "slide-body" -->
+
+</body>
+</html>

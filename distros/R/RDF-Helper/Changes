@@ -1,0 +1,302 @@
+2006-07-30 23:20  kingubu
+
+	* .DS_Store, Changes, Makefile.PL, lib/RDF/.DS_Store,
+	  lib/RDF/Helper.pm, lib/RDF/Helper/RDFQuery.pm,
+	  lib/RDF/Helper/RDFRedland.pm, t/2_model_basics.t,
+	  t/6_query_perl.t, t/7_property_hash.t, t/8_rdf_object.t: Added
+	  SPARQL/RDQL query support for RDF::Core (via RDF::Query). Core
+	  now has full parity.
+
+2006-07-27 12:44  kingubu
+
+	* lib/RDF/Helper/DBI.pm: tiny doc patch
+
+2006-07-27 11:57  kingubu
+
+	* lib/RDF/Helper/DBI/Query.pm: Added missing files
+
+2006-07-27 11:55  kingubu
+
+	* lib/RDF/Helper.pm, lib/RDF/Helper/DBI.pm,
+	  lib/RDF/Helper/RDFCore.pm, lib/RDF/Helper/RDFRedland.pm,
+	  t/1_nodes.t, t/2_model_basics.t, t/7_property_hash.t: Beta
+	  support for pure-DBI models added and working
+
+2006-07-24 18:33  kingubu
+
+	* lib/RDF/Helper.pm, lib/RDF/Helper/PerlConvenience.pm,
+	  lib/RDF/Helper/RDFCore.pm, lib/RDF/Helper/RDFRedland.pm,
+	  t/1_nodes.t, t/2_model_basics.t: More refactoring to support
+	  generalized abstraction.
+
+2006-07-21 18:36  kingubu
+
+	* lib/RDF/Helper/DBI.pm, lib/RDF/Helper/Statement.pm,
+	  t/10_deep_prop_recursive.t: Added missing files.
+
+2006-07-21 18:34  kingubu
+
+	* META.yml, lib/RDF/Helper.pm, lib/RDF/Helper/PerlConvenience.pm,
+	  lib/RDF/Helper/RDFCore.pm, lib/RDF/Helper/RDFRedland.pm,
+	  lib/RDF/Helper/TiedPropertyHash.pm,
+	  lib/RDF/Helper/RDFRedland/TiedPropertyHash.pm, t/0_basic.t,
+	  t/1_nodes.t, t/5_rdf2perl.t: Checkpoint checkin
+
+2006-07-11 23:21  nachbaur
+
+	* lib/RDF/Helper.pm: Added docs for the BaseURI constructor
+	  argument
+
+2006-07-11 23:11  nachbaur
+
+	* lib/RDF/Helper.pm: Various documentation spelling corrections and
+	  POD formatting tags
+
+2006-07-10 10:57  kingubu
+
+	* lib/RDF/Helper.pm, lib/RDF/Helper/PerlConvenience.pm,
+	  lib/RDF/Helper/RDFCore.pm, lib/RDF/Helper/RDFRedland.pm,
+	  t/2_model_basics.t, t/3_include_model.t, t/4_include_rdfxml.t,
+	  t/5_rdf2perl.t, t/6_query_perl.t, t/7_property_hash.t: Update
+	  RDF::Core support. Still more TODO but things are better.
+
+2006-07-09 11:52  kingubu
+
+	* lib/RDF/: Helper.pm, Helper/RDFRedland/Query.pm: More docs
+	  patches.
+
+2006-07-09 11:33  kingubu
+
+	* MANIFEST, META.yml, lib/RDF/Helper.pm, lib/RDF/Helper/RDFCore.pm,
+	  lib/RDF/Helper/RDFRedland.pm, t/0_basic.t, t/1_nodes.t: More docs
+	  patches.
+
+2006-07-08 15:59  kingubu
+
+	* lib/RDF/: Helper.pm, Helper/RDFRedland.pm: More doc-hacking, very
+	  near a release.
+
+2006-07-07 02:36  nachbaur
+
+	* t/8_rdf_object.t: Bollocks!  I always forget to update the bloody
+	  test count...
+
+2006-07-07 02:34  nachbaur
+
+	* lib/RDF/Helper/Object.pm, t/8_rdf_object.t, t/data/use.perl.rss:
+	  Added tests showing that multi-level object traversal works.
+	  Also some document stubs that I forgot I'd added
+
+2006-07-06 12:30  nachbaur
+
+	* lib/RDF/Helper.pm: More methods doc'd; handing it off to ubu
+
+2006-07-06 04:08  nachbaur
+
+	* lib/RDF/Helper.pm: Re-added documentation that one of ubu's
+	  checkins walked over
+
+2006-07-06 03:05  kingubu
+
+	* lib/RDF/Helper.pm: Added DESCRIPTION section to the POD, and
+	  doc'd the various constructor options.
+
+2006-07-06 02:27  kingubu
+
+	* lib/RDF/Helper.pm: Checkpoint checkin.
+
+2006-07-06 02:17  kingubu
+
+	* t/9_pod.t: Added automated POD tests
+
+2006-07-06 01:36  kingubu
+
+	* lib/RDF/Helper.pm, lib/RDF/Helper/Object.pm,
+	  lib/RDF/Helper/PerlConvenience.pm, lib/RDF/Helper/RDFRedland.pm,
+	  t/1_nodes.t, t/2_model_basics.t: Added optional QName expansion
+	  support for all convenioence methods. Added tests to exercise new
+	  funtionality.
+
+2006-07-05 18:10  nachbaur
+
+	* lib/RDF/Helper.pm: Yet another docs ci; still a work in progress
+
+2006-07-05 13:52  nachbaur
+
+	* lib/RDF/Helper.pm: Added initial method documentation; more to
+	  follow
+
+2006-07-05 09:50  nachbaur
+
+	* lib/RDF/Helper.pm: Added RDF::Redland as the default
+	  BaseInterface
+
+2006-07-03 00:08  kingubu
+
+	* lib/RDF/Helper.pm, lib/RDF/Helper/RDFQuery.pm,
+	  lib/RDF/Helper/RDFRedland.pm, t/6_query_perl.t, t/8_rdf_object.t:
+	  Added initial support for RDF::Query to the RDFRedland Helper
+
+2006-07-01 21:01  kingubu
+
+	* lib/RDF/Helper/RDFRedland.pm, t/7_property_hash.t: Updated
+	  Helper::RDFRedland::tied_property_hash to accept and pass on
+	  options (like Deep). All tests now pass (including rdf_object).
+
+2006-06-30 18:57  nachbaur
+
+	* lib/RDF/Helper/RDFRedland.pm: Dur, that teaches me for
+	  checking-in new code without running "make test" first
+
+2006-06-30 18:55  nachbaur
+
+	* lib/RDF/Helper/RDFRedland.pm: Added the Options argument back to
+	  the TiedPropertyHash creation for objects, since the previous
+	  version accidentally walked over it
+
+2006-06-30 17:57  kingubu
+
+	* lib/RDF/Helper/RDFRedland.pm, t/2_model_basics.t: Added
+	  workaround for literal-as-bare-numeric bug. added test to
+	  exercise the fix.
+
+2006-06-30 10:54  nachbaur
+
+	* lib/RDF/Helper/Object.pm, lib/RDF/Helper/RDFRedland.pm,
+	  lib/RDF/Helper/RDFRedland/TiedPropertyHash.pm,
+	  t/7_property_hash.t: * Rolled back default behaviour of the tied
+	  property hash to only return results one-level deep; this is as
+	  per a discussion between Kip and myself.
+
+	  * The RDF::Helper::Object implementation now explicitly sets that
+	  deep property hashes will be returned, keeping their current
+	  behaviour.
+
+	  * Tests extended to check for this.
+
+	  This rolls back the tied hash's functionality to be easier to use
+	  for one-off users (no mystical checking if a value is a reference
+	  or not), as well as making it work for our dayjob application.
+
+2006-06-18 10:08  nachbaur
+
+	* Makefile.PL: Added the Data::Uniqid dependancy to Makefile.PL
+
+2006-06-16 00:40  kingubu
+
+	* MANIFEST, MANIFEST.SKIP, META.yml, README, lib/RDF/Helper.pm:
+	  Prep for CPAN release
+
+2006-04-19 22:52  kingubu
+
+	* lib/RDF/Helper.pm: Bump revision number pending update release.
+
+2006-04-19 22:49  kingubu
+
+	* lib/RDF/Helper/RDFRedland/TiedPropertyHash.pm,
+	  t/7_property_hash.t: Added somewhat smarter logic to the
+	  TiedPropertyHash impementation to allow for resources to be
+	  stored in arrarefs
+
+2006-04-18 18:03  nachbaur
+
+	* t/7_property_hash.t: Added additional test to detect a bug in
+	  URI/resource detection
+
+2006-04-18 16:48  nachbaur
+
+	* t/: 7_property_hash.t, 8_rdf_object.t: Added some more tests to
+	  verify that URI-like properties are set as resources, rather than
+	  literals
+
+2006-04-18 16:19  nachbaur
+
+	* Makefile: Removed the Makefile that apparently was accidentally
+	  added; this should be built automagically from the Makefile.PL
+
+2006-03-17 14:29  nachbaur
+
+	* lib/RDF/Helper/Object.pm,
+	  lib/RDF/Helper/RDFRedland/TiedPropertyHash.pm,
+	  t/7_property_hash.t, t/8_rdf_object.t: Added resource traversal
+	  to Tied Hashes.  Added similar functionality to
+	  RDF::Helper::Object.	Added test cases.
+
+2006-02-02 19:36  nachbaur
+
+	* lib/RDF/Helper/RDFRedland.pm, t/8_rdf_object.t: Added the
+	  convenience method get_object() to RDF::Helper::RDFRedland to
+	  ease the process of using RDF::Helper::Object
+
+2006-01-25 16:14  nachbaur
+
+	* lib/RDF/Helper/Object.pm, lib/RDF/Helper/RDFRedland.pm,
+	  t/8_rdf_object.t: Added RDF::Helper::Object support
+
+2006-01-25 16:13  nachbaur
+
+	* t/: 1_nodes.t, 6_query_perl.t: Fixed tests so they pass on
+	  install
+
+2005-11-21 21:33  nachbaur
+
+	* lib/RDF/Helper/: PerlConvenience.pm, RDFRedland.pm: - Checked in
+	  some sick auto-expansion of namespace prefixes, rdf:about
+	  labelling for hashref2rdf, and auto-detection of resource
+	  identifiers
+
+2005-11-21 20:23  nachbaur
+
+	* META.yml, lib/RDF/Helper.pm, lib/RDF/Helper/RDFRedland.pm: -
+	  Checked in some of ubu's changes
+
+2005-06-03 01:45  kingubu
+
+	* lib/RDF/Helper/RDFRedland.pm: Better type magic for hashref2rdf
+
+2005-05-26 11:23  nachbaur
+
+	* lib/RDF/Helper/RDFRedland.pm: Serialize the RDF model using any
+	  provided namespace prefixes
+
+2005-05-19 07:31  kingubu
+
+	* META.yml, lib/RDF/Helper/RDFRedland.pm: New convenience function:
+	  hashlist_from_statement
+
+2005-05-13 13:33  kingubu
+
+	* lib/RDF/Helper.pm: lose the 'our' bit
+
+2005-05-13 13:31  kingubu
+
+	* Makefile.PL, lib/RDF/Helper.pm: remove Trix requirement
+
+2005-05-13 13:20  kingubu
+
+	* dump.rdf: remove debugging dumpfile
+
+2005-05-13 13:13  kingubu
+
+	* .DS_Store, Changes, MANIFEST, MANIFEST.SKIP, META.yml, Makefile,
+	  Makefile.PL, README, dump.rdf, lib/RDF/.DS_Store,
+	  lib/RDF/Helper.pm, lib/RDF/Helper/Constants.pm,
+	  lib/RDF/Helper/PerlConvenience.pm, lib/RDF/Helper/RDFCore.pm,
+	  lib/RDF/Helper/RDFRedland.pm, lib/RDF/Helper/RDFRedland/Query.pm,
+	  lib/RDF/Helper/RDFRedland/TiedPropertyHash.pm, t/0_basic.t,
+	  t/1_nodes.t, t/2_model_basics.t, t/3_include_model.t,
+	  t/4_include_rdfxml.t, t/5_rdf2perl.t, t/6_query_perl.t,
+	  t/7_property_hash.t, t/data/use.perl.rss: Initial commit
+
+2005-05-13 13:13  kingubu
+
+	* .DS_Store, Changes, MANIFEST, MANIFEST.SKIP, META.yml, Makefile,
+	  Makefile.PL, README, dump.rdf, lib/RDF/.DS_Store,
+	  lib/RDF/Helper.pm, lib/RDF/Helper/Constants.pm,
+	  lib/RDF/Helper/PerlConvenience.pm, lib/RDF/Helper/RDFCore.pm,
+	  lib/RDF/Helper/RDFRedland.pm, lib/RDF/Helper/RDFRedland/Query.pm,
+	  lib/RDF/Helper/RDFRedland/TiedPropertyHash.pm, t/0_basic.t,
+	  t/1_nodes.t, t/2_model_basics.t, t/3_include_model.t,
+	  t/4_include_rdfxml.t, t/5_rdf2perl.t, t/6_query_perl.t,
+	  t/7_property_hash.t, t/data/use.perl.rss: Initial revision
+

@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.69.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 507ea1e7bfd81663e8c988e7da6005c1b1a4291f Changes
+SHA1 f8347ca9bb90cb1f42c2baf6112ed3b91af68bb2 MANIFEST
+SHA1 abc86c1b57cc2c50471305b364372478f7df541c META.yml
+SHA1 db5b15f1e3eade3c906b2909c6ac3d8d9bbf5df6 Makefile.PL
+SHA1 c23391dbd70ac6b561bfe7c0911a65b5add1cdaf README
+SHA1 4f2803f3e2e26a4a577837c34895e1cf72d06a9e html/Callbacks/LinkedTicketsHistory/Elements/ShowHistory/SkipTransaction
+SHA1 4dcaa1938bd850ce2659c8a102365c7f8454f2c2 html/Callbacks/LinkedTicketsHistory/Ticket/Display.html/AfterShowHistory
+SHA1 2ae20c82f795a9707442bb0fe6ab987cc06cbbc8 html/Ticket/Elements/LinkedTicketsHistory
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 40df6f8d889b52eef379f04af6227f9302b23bf9 inc/Module/Install/RTx.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 5897e2e245e1795a1d82da479087cae0bd38924c lib/RT/Extension/LinkedTicketsHistory.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlKDvEMACgkQMflWJZZAbqAW7gCgxrb0iLoZfz/+8t5fCsxBPm9y
+Og8An3MR2nj7HBY91XzfvU8gSS5503Wo
+=bqKY
+-----END PGP SIGNATURE-----

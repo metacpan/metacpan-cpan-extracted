@@ -1,0 +1,35 @@
+<%INIT>
+my %props = (
+    width   => 320,
+    height  => 100,
+    ptsize  => 40,
+    lines   => 10,
+    %{ RT->Config->Get('Captcha')->{'ImageProperties'} },
+);
+unless ( $props{'font'} ) {
+    my $opt = RT->Config->Get('ChartFont');
+    $opt = $opt->{'others'} if ref $opt;
+    $props{'font'} = $opt;
+}
+if ( $props{'font'} && !(-e $props{'font'} && -r _) ) {
+    $RT::Logger->error(
+        "Font '$props{'font'}' doesn't exist or is not readable."
+        ." Captcha images will be blank. Check ChartFont option"
+        ." and Captcha->ImageProperties->font option."
+    );
+}
+
+my $str = $session{'Captcha'}{'String'}
+    ||= uc $session{'CurrentUser'}->GenerateRandomPassword(6, 9);
+my ($image, $type, $rnd) = GD::SecurityImage->new( %props )
+    ->random( $str )->create( 'ttf', 'circle' )->particle->out;
+
+$session{'Captcha'}{'String'} = $str;
+
+$m->clear_buffer;
+$r->content_type( $type );
+$m->out( $image );
+$m->flush_buffer;
+$m->abort;
+
+</%INIT>

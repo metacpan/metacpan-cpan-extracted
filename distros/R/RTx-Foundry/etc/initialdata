@@ -1,0 +1,1307 @@
+# Initial data for a fresh Foundry Installation.
+@Users = (
+           {
+             'Privileged' => '1',
+             'Name' => 'guest'
+           },
+         );
+@Queues = (
+            {
+              'Disabled' => '1',
+              'Name' => 'NewUser',
+              'Description' => 'RT Foundry System',
+            },
+            {
+              'Disabled' => '1',
+              'Name' => 'NewProject',
+              'Description' => 'RT Foundry System',
+            },
+            {
+              'Disabled' => '1',
+              'Name' => 'LostPassword',
+              'Description' => 'RT Foundry System',
+            },
+            {
+              'Disabled' => '1',
+              'Name' => 'MemberChange',
+              'Description' => 'RT Foundry System',
+            }
+          );
+@ScripActions = (
+                  {
+                    'Argument' => 'Owner,Cc,AdminCc',
+                    'ExecModule' => 'NotifyAsComment',
+                    'Description' => 'Send mail to Owner, Ccs and AdminCcs as a "comment"',
+                    'Name' => 'Notify Owner, Ccs and AdminCcs as Comment'
+                  },
+                  {
+                    'Argument' => 'Owner,Cc,AdminCc',
+                    'ExecModule' => 'Notify',
+                    'Description' => 'Send mail to Owner, Ccs and AdminCcs',
+                    'Name' => 'Notify Owner, Ccs and AdminCcs'
+                  }
+                );
+@Templates = (
+               {
+                 'Queue' => 'NewUser',
+                 'Content' => 'Subject: Confirm Registration
+
+{loc(\'Thank you for registering on the [_1] web site.\', $RT::Organization)}
+{loc("You have an account with username \'[_1]\' created for you.",
+    $Ticket->CustomFieldValues(\'Name\')->First->Content)}
+{loc(\'In order to complete your registration, visit the following URL:\')}
+
+    {$RT::WebBaseURL}/Foundry/Home/Guest/Verify.html?id={$Ticket->Id}
+
+{loc(\'Or just reply to this mail, keeping this string in the subject line:\')}
+
+    [{$rtname} #{$Ticket->id}]
+
+                        {loc(\'Thank you.\')}
+                        {$RT::Organization}
+',
+                 'Name' => 'Registration',
+                 'Description' => 'Confirm the registration'
+               },
+               {
+                 'Queue' => 'NewUser',
+                 'Content' => 'Subject: Registration complete
+
+{loc(\'You are now a registered user on [_1].\', $RT::Organization)}
+
+{loc(\'As a registered user, you can participate fully in the activities on the site:\')}
+  - {loc(\'Post messages to the project message forums\')}
+  - {loc(\'Post bugs and patches for projects\')}
+  - {loc(\'Sign on as a project developer\')}
+  - {loc(\'Start your own project!\')}
+
+{loc(\'You should take some time to read through the Site Documentation,\')}
+{loc(\'so you may take full advantage of [_1].\', $RT::Organization)}
+
+{loc(\'Please provide us with feedback on ways that we can improve [_1].\', $RT::Organization)}
+
+                        {loc(\'Thank you.\')}
+                        {$RT::Organization}
+',
+                 'Name' => 'Complete',
+                 'Description' => 'Registration Complete'
+               },
+               {
+                 'Queue' => 'NewProject',
+                 'Content' => 'Subject: Project Submitted
+
+
+{loc(\'Your project has been submitted to the [_1] administrators.\', $RT::Organization)}
+{loc(\'Within 72 hours, you will receive notification of further instructions.\')}
+
+{loc(\'There is no need to reply to this message right now.\')}
+
+                        {loc(\'Thank you.\')}
+                        {$RT::Organization}
+',
+                 'Name' => 'Notification',
+                 'Description' => 'Notify the user of the new project'
+               },
+               {
+                 'Queue' => 'NewProject',
+                 'Content' => '===Create-Ticket: BEGIN
+### BEGIN ### { require RT::Workflow; %X = () } ###############################
+# {eval \\{ RT::Workflow::condition($Tickets\\{TOP\\}, \'BEGIN\') \\} or die "=$@"} #
+###############################################################################
+Subject: BEGIN #{$Tickets\\{TOP\\}->Id}
+Queue: ___Approvals
+Type: code
+Status: resolved
+Content:
+"BEGIN #{$Tickets\\{TOP\\}->Id}"
+ENDOFCONTENT
+
+===Create-Ticket: T1
+### CONDITION ### { require RT::Workflow } ####################################
+## { eval \\{ RT::Workflow::condition($TOP, \'any\', \'\') \\} or die "=$@" } #
+### ENTRY POINT ### { "\\nDepends-On: BEGIN\\n" } ###############################
+{join(\'\',map{"Depended-On-By: ".( $_ ? ( $X{"T$_"}{$ID}++, "T$_" ) : "TOP" ).$/}do{0,
+### NEXT STATE ################################################################
+
+###############################################################################
+}).join($/,map"Requestor: $_",$TOP->Requestors->MemberEmailAddresses)}
+###############################################################################
+Subject: autoresolve
+Type: code
+IsEntryPoint: 1
+Queue: ___Approvals
+ConditionSatisfy: any
+ActionProcedure: AutoResolve
+OwnerClass: owner
+Content-Type: text/plain
+Content:
+require RT::Workflow;
+RT::Workflow::action($TOP, \'AutoResolve\', \'\');
+
+ENDOFCONTENT
+
+',
+                 'Name' => 'DefaultApproval',
+                 'Description' => 'DefaultApproval'
+               },
+               {
+                 'Queue' => 'NewUser',
+                 'Content' => 'Foundry Terms and Conditions of Use
+
+Before using this website, please read this agreement relating to your use
+of this site carefully.
+
+1. ACCEPTANCE OF TERMS
+
+    By using this website, you agree to be bound by these terms and conditions.
+    If you do not agree to these terms and conditions, please do not use the
+    site.
+
+2. NO UNLAWFUL OR PROHIBITED USE
+
+    By using the Foundry website, you warrant to Foundry that you will not use
+    this website, or any of the content obtained from this website, for any
+    purpose that is unlawful or prohibited by these Terms. If you violate any
+    of these Terms, your permission to use the Foundry website
+    automatically terminates.
+
+3. VIOLATIONS OF TERMS
+
+    Please report any violations of the Terms to the Foundry Support Manager.
+
+',
+                 'Name' => 'TermOfUse',
+                 'Description' => 'Term Of Use'
+               },
+               {
+                 'Queue' => 'LostPassword',
+                 'Content' => '===Create-Ticket: BEGIN
+### BEGIN ### { require RT::Workflow; %X = () } ###############################
+# {eval \\{ RT::Workflow::condition($Tickets\\{TOP\\}, \'BEGIN\') \\} or die "=$@"} #
+###############################################################################
+Subject: BEGIN #{$Tickets\\{TOP\\}->Id}
+Queue: ___Approvals
+Type: code
+Status: resolved
+Content:
+"BEGIN #{$Tickets\\{TOP\\}->Id}"
+ENDOFCONTENT
+
+===Create-Ticket: T1
+### CONDITION ### { require RT::Workflow } ####################################
+## { eval \\{ RT::Workflow::condition($TOP, \'any\', \'\') \\} or die "=$@" } #
+### ENTRY POINT ### { "\\nDepends-On: BEGIN\\n" } ###############################
+{join(\'\',map{"Depended-On-By: ".( $_ ? ( $X{"T$_"}{$ID}++, "T$_" ) : "TOP" ).$/}do{0,
+### NEXT STATE ################################################################
+
+###############################################################################
+}).join($/,map"Requestor: $_",$TOP->Requestors->MemberEmailAddresses)}
+###############################################################################
+Subject: autoresolve
+Type: code
+IsEntryPoint: 1
+Queue: ___Approvals
+ConditionSatisfy: any
+ActionProcedure: AutoResolve
+OwnerClass: owner
+Content-Type: text/plain
+Content:
+require RT::Workflow;
+RT::Workflow::action($TOP, \'AutoResolve\', \'\');
+
+ENDOFCONTENT
+
+',
+                 'Name' => 'DefaultApproval',
+                 'Description' => 'DefaultApproval'
+               },
+               {
+                 'Queue' => 'LostPassword',
+                 'Content' => 'Subject: Reset Password
+
+{loc(\'Please visit this URL to reset your password on [_1]:\', $RT::Organization)}
+    { $RT::WebBaseURL }/Foundry/Home/Guest/Recover.html?token={ $Ticket->Requestors->UserMembersObj->First->RecoverPasswordHash }
+
+{loc(\'Thank you.\')}
+
+',
+                 'Name' => 'RecoverPassword',
+                 'Description' => 'Recover Password'
+               },
+               {
+                 'Queue' => 'NewProject',
+                 'Content' => 'Foundry Terms and Conditions of Use
+
+Before using this website, please read this agreement relating to your use
+of this site carefully.
+
+1. ACCEPTANCE OF TERMS
+
+    By using this website, you agree to be bound by these terms and conditions.
+    If you do not agree to these terms and conditions, please do not use the
+    site.
+
+2. NO UNLAWFUL OR PROHIBITED USE
+
+    By using the Foundry website, you warrant to Foundry that you will not use
+    this website, or any of the content obtained from this website, for any
+    purpose that is unlawful or prohibited by these Terms. If you violate any
+    of these Terms, your permission to use the Foundry website
+    automatically terminates.
+
+3. VIOLATIONS OF TERMS
+
+    Please report any violations of the Terms to the Foundry Support Manager.
+
+',
+                 'Name' => 'TermOfProject',
+                 'Description' => 'Term of new project'
+               },
+               {
+                 'Queue' => 'NewProject',
+                 'Content' => 'Subject: Project Created
+
+{loc(\'Thank you for choosing [_1].\', $RT::Organization)}
+
+{loc(\'You have now successfully registered a project on [_1].\', $RT::Organization)}
+
+                        {loc(\'Thank you.\')}
+                        {$RT::Organization}
+',
+                 'Name' => 'CreateProject',
+                 'Description' => 'Notify user the completion of project'
+               },
+               {
+                 'Queue' => '0',
+                 'Content' => 'RT-Attach-Message: yes
+
+
+{
+    my $date = $Transaction->CreatedObj;
+    $date->OriginalUser( $Transaction->OriginalUser );
+    $date->AsString;
+}: {loc(\'Request [_1] was acted upon.\', $Ticket->id)}
+{join("\\n",
+loc(\'       Queue: [_1]\', $Ticket->QueueObj->Name),
+loc(\'     Subject: [_1]\', $Ticket->Subject || loc("(No subject given)")),
+loc(\'       Owner: [_1]\', $Ticket->OwnerObj->Name),
+loc(\'  Requestors: [_1]\', $Ticket->RequestorNames),
+loc(\'      Status: [_1]\', loc($Ticket->Status)),
+loc(\' Ticket <URL: [_1] >\', $RT::WebURL.\'Foundry/Project/Tracker/Display.html?id=\'.$Ticket->id.\'&Queue=\'.$Ticket->QueueObj->Id),
+loc("(Contact project admins if you don\'t want to receive mails in this project.)"),
+)
+}
+
+{
+    my @Batch = @{$Ticket->TransactionBatch};
+    foreach my $Transaction (grep {!$_->ContentObj} @Batch) {
+        $OUT .= "* " . $Transaction->Description . "\\n";
+    }
+    foreach my $Transaction (grep {$_->ContentObj} @Batch) {
+        $OUT .= "* " . $Transaction->Description . "\\n\\n";
+        $OUT .= $Transaction->ContentObj->Content . "\\n\\n";
+    }
+}
+
+',
+                 'Name' => 'BatchReply',
+                 'Description' => 'Batch Reply'
+               },
+               {
+                 'Queue' => 'MemberChange',
+                 'Content' => '{
+    my ($Type, $Role, $QueueId, $Queue) = split(/\\s+/, $Ticket->Subject, 4);
+
+    (($Type eq \'Invite\') ? (
+	"Subject: Invitation to $RT::Organization\\n\\n" . loc(
+	    "An administrator of \'[_1]\' has invited you to its staff list.",
+	    $Queue
+	) . "\\n" . loc(
+	    "Your role in the project will be \'[_1]\'.", loc(
+		($Role =~ /^Admin/) ? \'Admin\' : \'Member\'
+	    )
+	) . "\\n" . loc(
+	    "This invitation will expire in 14 days."
+	) . "\\n\\n" . loc(
+	    "Please visit the following URL to register your account on [_1]:",
+	    $RT::Organization
+	) . "\\n" . "    $RT::WebBaseURL/Foundry/Home/Guest/Register.html?Email=" . 
+	$Ticket->OwnerObj->EmailAddress
+    ) : (
+	"Subject: Project Role Changed\\n\\n" . loc((
+	    ($Type eq \'Add\')
+		? "An administrator of \'[_1]\' has added you to its staff list." :
+	    ($Type eq \'Edit\')
+		? "An administrator of \'[_1]\' has changed your role in the staff list." :
+	    ($Type eq \'Delete\')
+		? "An administrator of \'[_1]\' has removed you from its staff list." :
+	    die "!"
+	), $Queue) . "\\n" . (
+	    $Role ? loc("Your role in the project is now \'[_1]\'.", loc(
+			($Role =~ /^Admin/) ? \'Admin\' : \'Member\'
+		    ))
+		: loc("You no longer have staff privileges in the project.")
+	)
+    )) . "\\n\\n" . loc(
+	"If you have any questions, please contact \'[_1]\'.",
+	($Type eq \'Invite\') ? $Ticket->RequestorAddresses : $Ticket->RequestorNames
+    )
+}
+
+			{loc("Thank you.")}
+			{$RT::Organization}
+',
+                 'Name' => 'MemberChange',
+                 'Description' => 'MemberChange'
+               },
+               {
+                 'Queue' => 'MemberChange',
+                 'Content' => '===Create-Ticket: BEGIN
+### BEGIN ### { require RT::Workflow; %X = () } ###############################
+# {eval \\{ RT::Workflow::condition($Tickets\\{TOP\\}, \'BEGIN\') \\} or die "=$@"} #
+###############################################################################
+Subject: BEGIN #{$Tickets\\{TOP\\}->Id}
+Queue: ___Approvals
+Type: code
+Status: resolved
+Content:
+"BEGIN #{$Tickets\\{TOP\\}->Id}"
+ENDOFCONTENT
+
+===Create-Ticket: T1
+### CONDITION ### { require RT::Workflow } ####################################
+## { eval \\{ RT::Workflow::condition($TOP, \'any\', \'\') \\} or die "=$@" } #
+### ENTRY POINT ### { "\\nDepends-On: BEGIN\\n" } ###############################
+{join(\'\',map{"Depended-On-By: ".( $_ ? ( $X{"T$_"}{$ID}++, "T$_" ) : "TOP" ).$/}do{0,
+### NEXT STATE ################################################################
+
+###############################################################################
+}).join($/,map"Requestor: $_",$TOP->Requestors->MemberEmailAddresses)}
+###############################################################################
+Subject: AutoResolve
+Type: code
+IsEntryPoint: 1
+Queue: ___Approvals
+ConditionSatisfy: any
+ActionProcedure: AutoResolve
+OwnerClass: owner
+Content-Type: text/plain
+Content:
+require RT::Workflow;
+RT::Workflow::action($TOP, \'AutoResolve\', \'\');
+
+ENDOFCONTENT
+
+',
+                 'Name' => 'DefaultApproval',
+                 'Description' => 'DefaultApproval'
+               }
+             );
+@Scrips = (
+            {
+              'ScripCondition' => 'On Create',
+              'ScripAction' => 'Autoreply To Requestors',
+              'Template' => 'Registration',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'NewUser',
+              'Description' => 'Registration'
+            },
+            {
+              'CustomPrepareCode' => '1;',
+              'ScripCondition' => 'On Correspond',
+              'ScripAction' => 'User Defined',
+              'CustomCommitCode' => '$self->TicketObj->SetStatus(\'resolved\');',
+              'Template' => 'DefaultApproval',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'NewUser',
+              'Description' => 'Resolve on correspond'
+            },
+            {
+              'ScripCondition' => 'On Resolve',
+              'ScripAction' => 'Autoreply To Requestors',
+              'Template' => 'Complete',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'NewUser',
+              'Description' => 'Process registration'
+            },
+            {
+              'CustomPrepareCode' => '1;',
+              'ScripCondition' => 'On Resolve',
+              'ScripAction' => 'User Defined',
+              'CustomCommitCode' => 'my $Ticket = $self->TicketObj;
+my ($Name, $Password, $RealName, $Email)
+    = map { eval{$Ticket->CustomFieldValue($_)} }
+	qw(Name Password RealName Email);
+
+my $OrigObj = RT::User->new($RT::SystemUser);
+$OrigObj->Load($Email);
+$OrigObj->SetEmailAddress(\'\');
+my $UserObj = RT::User->new($RT::SystemUser);
+my ($val, $msg) = $UserObj->Create( Name => $Name );
+
+if (!$val) {
+    # die $msg;
+    $UserObj->Load($Name);
+    die $msg unless $UserObj->Id;
+}
+
+$UserObj->SetPassword($Password);
+$UserObj->SetRealName($RealName || $Name);
+$UserObj->SetEmailAddress($Email);
+$UserObj->SetPrivileged(1);
+',
+              'Template' => 'Blank',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'NewUser',
+              'Description' => 'CreateUser'
+            },
+            {
+              'ScripCondition' => 'On Create',
+              'ScripAction' => 'Autoreply To Requestors',
+              'Template' => 'Notification',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'NewProject',
+              'Description' => 'Notification'
+            },
+            {
+              'ScripCondition' => 'On Create',
+              'ScripAction' => 'Create Tickets',
+              'Template' => 'DefaultApproval',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'NewProject',
+              'Description' => 'Default Approval'
+            },
+            {
+              'CustomPrepareCode' => '1;',
+              'ScripCondition' => 'On Resolve',
+              'ScripAction' => 'User Defined',
+              'CustomCommitCode' => 'my $Ticket = $self->TicketObj;
+my $Requestor = $Ticket->FirstRequestor or die;
+
+my ($Name, $Description)
+    = map $Ticket->CustomFieldValues($_)->First->Content,
+	(\'ProjectName\', \'PublicDescription\');
+
+my $QueueObj = RT::Queue->new($RT::SystemUser);
+
+my ($val, $msg) = $QueueObj->Create(
+    Name => $Name,
+    Description => $Description,
+);
+$RT::Logger->info($msg);
+
+if (!$val) {
+    # die $msg;
+    $QueueObj->Load($Name);
+    die $msg unless $QueueObj->Id;
+}
+
+$QueueObj->SetOrigin($Ticket->Id);
+
+my $AdminCc = $QueueObj->AdminCc;
+$RT::Logger->debug($AdminCc->AddMember($Requestor->PrincipalId));
+
+my @Rights = qw(
+    AdminCustomFields AdminQueue
+    CommentOnTicket CreateTicket
+    OwnTicket ReplyToTicket SeeQueue ShowTicket
+    ShowTicketComments Watch WatchAsAdminCc
+);
+
+foreach my $right (@Rights) {
+    my $ace = RT::ACE->new( $RT::SystemUser );
+    $RT::Logger->debug($ace->Create(
+        RightName       => $right,
+        Object          => $QueueObj,
+        PrincipalType   => \'Group\',
+        PrincipalId     => $AdminCc->Id,
+    ));
+}
+
+1;
+',
+              'Template' => 'Blank',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'NewProject',
+              'Description' => 'CreateProject'
+            },
+            {
+              'ScripCondition' => 'On Create',
+              'ScripAction' => 'Create Tickets',
+              'Template' => 'DefaultApproval',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'LostPassword',
+              'Description' => 'Default Approval'
+            },
+            {
+              'ScripCondition' => 'On Create',
+              'ScripAction' => 'Autoreply To Requestors',
+              'Template' => 'RecoverPassword',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'LostPassword',
+              'Description' => 'SendNotification'
+            },
+            {
+              'ScripCondition' => 'On Resolve',
+              'ScripAction' => 'Autoreply To Requestors',
+              'Template' => 'CreateProject',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'NewProject',
+              'Description' => 'Complete'
+            },
+            {
+              'CustomIsApplicableCode' => '$self->TicketObj->Type eq \'ticket\'
+    and not grep { $_->Type eq \'Comment\' } @{$self->TicketObj->TransactionBatch};
+',
+              'ScripCondition' => 'User Defined',
+              'ScripAction' => 'Notify Requestors, Ccs and AdminCcs',
+              'Template' => 'BatchReply',
+              'Stage' => 'TransactionBatch',
+              'Queue' => '0',
+              'Description' => 'BatchNotify'
+            },
+            {
+              'CustomIsApplicableCode' => '$self->TicketObj->Type eq \'ticket\'
+    and grep { $_->Type eq \'Comment\' } @{$self->TicketObj->TransactionBatch};
+',
+              'ScripCondition' => 'User Defined',
+              'ScripAction' => 'Notify Owner, Ccs and AdminCcs as Comment',
+              'Template' => 'BatchReply',
+              'Stage' => 'TransactionBatch',
+              'Queue' => '0',
+              'Description' => 'CommentNotify'
+            },
+            {
+              'ScripCondition' => 'On Resolve',
+              'ScripAction' => 'Notify Owner',
+              'Template' => 'MemberChange',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'MemberChange',
+              'Description' => 'MemberChange'
+            },
+            {
+              'ScripCondition' => 'On Create',
+              'ScripAction' => 'Create Tickets',
+              'Template' => 'DefaultApproval',
+              'Stage' => 'TransactionCreate',
+              'Queue' => 'MemberChange',
+              'Description' => 'Default Approval'
+            }
+          );
+@ACL = (
+         {
+           'Queue' => 'NewUser',
+           'Right' => 'CommentOnTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Everyone'
+         },
+         {
+           'Queue' => 'NewUser',
+           'Right' => 'ReplyToTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Everyone'
+         },
+         {
+           'Right' => 'AdminCustomFields',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'AdminQueue',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'CommentOnTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'CreateTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'DeleteTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'ModifySelf',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'ModifyTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'OwnTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'ReplyToTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'SeeQueue',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'ShowTicket',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'ShowTicketComments',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         },
+         {
+           'Right' => 'Watch',
+           'GroupDomain' => 'SystemInternal',
+           'GroupType' => 'Privileged'
+         }
+       );
+@CustomFields = (
+                  {
+                    'Type' => 'FreeformSingle',
+                    'Attributes' => {
+                                      'Hints' => 'Name must be 3-15 characters of digits, letters or underscore, beginning with a letter',
+                                      'Pattern' => '^[A-Za-z]\\w{2,14}$',
+                                      'OnChange' => 'readonly'
+                                    },
+                    'SortOrder' => '1',
+                    'Queue' => 'NewUser',
+                    'Name' => 'Name',
+                    'Description' => 'Login Name'
+                  },
+                  {
+                    'Type' => 'FreeformPassword',
+                    'Attributes' => {
+                                      'Hints' => 'Password must be at least 6 letters',
+                                      'Pattern' => '^.{6}'
+                                    },
+                    'SortOrder' => '2',
+                    'Queue' => 'NewUser',
+                    'Name' => 'Password',
+                    'Description' => 'Password'
+                  },
+                  {
+                    'Type' => 'FreeformPassword',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'Pattern' => '^.{6}'
+                                    },
+                    'SortOrder' => '3',
+                    'Queue' => 'NewUser',
+                    'Name' => 'PasswordCheck',
+                    'Description' => 'Password (repeat)'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'SortOrder' => '4',
+                    'Queue' => 'NewUser',
+                    'Name' => 'RealName',
+                    'Description' => 'Full Name'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'Pattern' => '.'
+                                    },
+                    'SortOrder' => '5',
+                    'Queue' => 'NewUser',
+                    'Name' => 'Email',
+                    'Description' => 'Email Address'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'Attributes' => {
+                                      'Hints' => 'Project Name must be at most 40 charaters',
+                                      'Pattern' => '^.{1,40}$'
+                                    },
+                    'SortOrder' => '6',
+                    'Queue' => 'NewProject',
+                    'Name' => 'ProjectName',
+                    'Description' => 'Project Name'
+                  },
+                  {
+                    'Type' => 'SelectMultiple',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'Pattern' => '.'
+                                    },
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'Creative Commons',
+                                    'Name' => 'CC'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'BSD',
+                                    'Name' => 'BSD'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'GNU Public',
+                                    'Name' => 'GPL'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'Lesser GNU Public',
+                                    'Name' => 'LGPL'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'Mozilla Public',
+                                    'Name' => 'MPL'
+                                  },
+                                  {
+                                    'SortOrder' => '6',
+                                    'Description' => 'MIT X',
+                                    'Name' => 'MIT'
+                                  },
+                                  {
+                                    'SortOrder' => '7',
+                                    'Description' => 'Netscape Public',
+                                    'Name' => 'NPL'
+                                  },
+                                  {
+                                    'SortOrder' => '8',
+                                    'Description' => 'Perl',
+                                    'Name' => 'Perl'
+                                  }
+                                ],
+                    'SortOrder' => '29',
+                    'Queue' => 'NewProject',
+                    'Name' => 'License',
+                    'Description' => 'License'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'Attributes' => {
+                                      'Hints' => 'ID must be 3-15 characters of lower-case letters or digits, beginning with a letter',
+                                      'Pattern' => '^[a-z][0-9a-z]{2,14}$',
+                                      'OnChange' => 'readonly'
+                                    },
+                    'SortOrder' => '7',
+                    'Queue' => 'NewProject',
+                    'Name' => 'UnixName',
+                    'Description' => 'Project ID'
+                  },
+                  {
+                    'Type' => 'SelectSingle',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'Pattern' => '.'
+                                    },
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'Idea',
+                                    'Name' => 'Idea'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'Pre-Alpha',
+                                    'Name' => 'Pre-Alpha'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'Alpha',
+                                    'Name' => 'Alpha'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'Beta',
+                                    'Name' => 'Beta'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'Released',
+                                    'Name' => 'Released'
+                                  },
+                                  {
+                                    'SortOrder' => '6',
+                                    'Description' => 'Mature',
+                                    'Name' => 'Mature'
+                                  },
+                                  {
+                                    'SortOrder' => '7',
+                                    'Description' => 'Standard',
+                                    'Name' => 'Standard'
+                                  }
+                                ],
+                    'SortOrder' => '12',
+                    'Queue' => 'NewProject',
+                    'Name' => 'Maturity',
+                    'Description' => 'Maturity'
+                  },
+                  {
+                    'Type' => 'SelectMultiple',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'Pattern' => '.'
+                                    },
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'Assembly',
+                                    'Name' => 'Assembly'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'C',
+                                    'Name' => 'C'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'C++',
+                                    'Name' => 'C++'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'Java',
+                                    'Name' => 'Java'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'Perl',
+                                    'Name' => 'Perl'
+                                  },
+                                  {
+                                    'SortOrder' => '6',
+                                    'Description' => 'PHP',
+                                    'Name' => 'PHP'
+                                  },
+                                  {
+                                    'SortOrder' => '7',
+                                    'Description' => 'Python',
+                                    'Name' => 'Python'
+                                  },
+                                  {
+                                    'SortOrder' => '8',
+                                    'Description' => 'Ruby',
+                                    'Name' => 'Ruby'
+                                  }
+                                ],
+                    'SortOrder' => '30',
+                    'Queue' => 'NewProject',
+                    'Name' => 'ProgrammingLanguage',
+                    'Description' => 'Programming Language'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'Attributes' => {
+                                      'Hints' => 'Optional; fill in an email address or URL'
+                                    },
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'BeOS',
+                                    'Name' => 'BeOS'
+                                  }
+                                ],
+                    'SortOrder' => '11',
+                    'Queue' => 'NewProject',
+                    'Name' => 'ContactInfo',
+                    'Description' => 'Contact Info'
+                  },
+                  {
+                    'Type' => 'SelectMultiple',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'Pattern' => '.'
+                                    },
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'General Use',
+                                    'Name' => 'General Use'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'Programmer',
+                                    'Name' => 'Programmer'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'System Administrator',
+                                    'Name' => 'System Administrator'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'Education',
+                                    'Name' => 'Education'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'Researcher',
+                                    'Name' => 'Researcher'
+                                  },
+                                  {
+                                    'SortOrder' => '6',
+                                    'Description' => 'Other',
+                                    'Name' => 'Other'
+                                  }
+                                ],
+                    'SortOrder' => '31',
+                    'Queue' => 'NewProject',
+                    'Name' => 'IntendedAudience',
+                    'Description' => 'Intended Audience'
+                  },
+                  {
+                    'Type' => 'SelectResolution',
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'FIXED',
+                                    'Name' => 'FIXED'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'LATER',
+                                    'Name' => 'LATER'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'INVALID',
+                                    'Name' => 'INVALID'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'WONTFIX',
+                                    'Name' => 'WONTFIX'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'WORKSFORME',
+                                    'Name' => 'WORKSFORME'
+                                  }
+                                ],
+                    'SortOrder' => '17',
+                    'Queue' => '0',
+                    'Name' => 'Resolution',
+                    'Description' => 'Resolution'
+                  },
+                  {
+                    'Type' => 'SelectSingle',
+                    'Attributes' => {
+                                      'OnCreate' => 'readonly'
+                                    },
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'defect',
+                                    'Name' => 'defect'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'patch',
+                                    'Name' => 'patch'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'task',
+                                    'Name' => 'task'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'feature',
+                                    'Name' => 'feature'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'enhancement',
+                                    'Name' => 'enhancement'
+                                  }
+                                ],
+                    'SortOrder' => '18',
+                    'Queue' => '0',
+                    'Name' => 'Type',
+                    'Description' => 'Type'
+                  },
+                  {
+                    'Type' => 'SelectSingle',
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'Backend',
+                                    'Name' => 'Backend'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'Interface',
+                                    'Name' => 'Interface'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'Other',
+                                    'Name' => 'Other'
+                                  }
+                                ],
+                    'SortOrder' => '19',
+                    'Queue' => '0',
+                    'Name' => 'Subcomponent',
+                    'Description' => 'Subcomponent'
+                  },
+                  {
+                    'Type' => 'SelectSingle',
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'All Architectures',
+                                    'Name' => 'All'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'i386 PC',
+                                    'Name' => 'PC'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'Mac',
+                                    'Name' => 'Mac'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'Other',
+                                    'Name' => 'Other'
+                                  }
+                                ],
+                    'SortOrder' => '20',
+                    'Queue' => '0',
+                    'Name' => 'Architecture',
+                    'Description' => 'Architecture'
+                  },
+                  {
+                    'Type' => 'SelectSingle',
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'All Platforms',
+                                    'Name' => 'All'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'Linux',
+                                    'Name' => 'Linux'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'MS Windows',
+                                    'Name' => 'Win32'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'FreeBSD',
+                                    'Name' => 'FreeBSD'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'Other',
+                                    'Name' => 'Other'
+                                  }
+                                ],
+                    'SortOrder' => '21',
+                    'Queue' => '0',
+                    'Name' => 'Platform',
+                    'Description' => 'Platform'
+                  },
+                  {
+                    'Type' => 'SelectSingle',
+                    'Attributes' => {
+                                      'OnCreate' => 'hidden'
+                                    },
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'Most Important',
+                                    'Name' => 'P1'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'Important',
+                                    'Name' => 'P2'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'Normal',
+                                    'Name' => 'P3'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'Less Important',
+                                    'Name' => 'P4'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => 'Least Important',
+                                    'Name' => 'P5'
+                                  }
+                                ],
+                    'SortOrder' => '22',
+                    'Queue' => '0',
+                    'Name' => 'Severity',
+                    'Description' => 'Severity'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'SortOrder' => '23',
+                    'Queue' => 'NewUser',
+                    'Name' => 'PersonalHomepage',
+                    'Description' => 'PersonalHomepage'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'SortOrder' => '24',
+                    'Queue' => 'LostPassword',
+                    'Name' => 'Name',
+                    'Description' => 'Name'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'SortOrder' => '25',
+                    'Queue' => 'LostPassword',
+                    'Name' => 'Email',
+                    'Description' => 'Email'
+                  },
+                  {
+                    'Type' => 'SelectVersion',
+                    'SortOrder' => '26',
+                    'Queue' => '0',
+                    'Name' => 'Version',
+                    'Description' => 'Version'
+                  },
+                  {
+                    'Type' => 'SelectVersion',
+                    'SortOrder' => '27',
+                    'Queue' => '0',
+                    'Name' => 'TargetVersion',
+                    'Description' => 'TargetVersion'
+                  },
+                  {
+                    'Type' => 'SelectMultiple',
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'Email Address',
+                                    'Name' => 'Email'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'Real Name',
+                                    'Name' => 'RealName'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'Personal Homepage',
+                                    'Name' => 'PersonalHomepage'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'Self Introduction',
+                                    'Name' => 'Intro'
+                                  }
+                                ],
+                    'SortOrder' => '28',
+                    'Queue' => 'NewUser',
+                    'Name' => 'Public Info',
+                    'Description' => 'Public Info'
+                  },
+                  {
+                    'Type' => 'FreeformMultiple',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'OnUpdate' => 'hidden',
+                                      'Pattern' => '.',
+                                      'OnChange' => 'hidden'
+                                    },
+                    'SortOrder' => '8',
+                    'Queue' => 'NewProject',
+                    'Name' => 'Rationale',
+                    'Description' => 'Rationale'
+                  },
+                  {
+                    'Type' => 'FreeformSingle',
+                    'Attributes' => {
+                                      'Hints' => 'Public Description must be at most 255 charaters',
+                                      'Pattern' => '^[\\d\\D]{1,255}$'
+                                    },
+                    'SortOrder' => '9',
+                    'Queue' => 'NewProject',
+                    'Name' => 'PublicDescription',
+                    'Description' => 'Public Description'
+                  },
+                  {
+                    'Type' => 'SelectMultiple',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'Pattern' => '.'
+                                    },
+                    'Values' => [
+                                  {
+                                    'SortOrder' => '1',
+                                    'Description' => 'Windows',
+                                    'Name' => 'Windows'
+                                  },
+                                  {
+                                    'SortOrder' => '2',
+                                    'Description' => 'FreeBSD',
+                                    'Name' => 'FreeBSD'
+                                  },
+                                  {
+                                    'SortOrder' => '3',
+                                    'Description' => 'Linux',
+                                    'Name' => 'Linux'
+                                  },
+                                  {
+                                    'SortOrder' => '4',
+                                    'Description' => 'Java Environment',
+                                    'Name' => 'Java Environment'
+                                  },
+                                  {
+                                    'SortOrder' => '5',
+                                    'Description' => '.NET Environment',
+                                    'Name' => '.NET Environment'
+                                  }
+                                ],
+                    'SortOrder' => '13',
+                    'Queue' => 'NewProject',
+                    'Name' => 'Platform',
+                    'Description' => 'Platform'
+                  },
+                  {
+                    'Type' => 'LabelContent',
+                    'SortOrder' => '32',
+                    'Queue' => 'NewUser',
+                    'Name' => 'Intro',
+                    'Description' => 'About Me'
+                  },
+                  {
+                    'Type' => 'LabelSubject',
+                    'Attributes' => {
+                                      'Hints' => 'Mandatory',
+                                      'OnUpdate' => 'hidden',
+                                      'Pattern' => '.'
+                                    },
+                    'SortOrder' => '36',
+                    'Queue' => '0',
+                    'Name' => 'Subject',
+                    'Description' => 'Subject'
+                  },
+                  {
+                    'Type' => 'LabelAttachments',
+                    'SortOrder' => '35',
+                    'Queue' => '0',
+                    'Name' => 'Attachments',
+                    'Description' => 'Attachments'
+                  },
+                );

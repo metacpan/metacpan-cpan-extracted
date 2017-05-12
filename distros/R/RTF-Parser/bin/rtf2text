@@ -1,0 +1,69 @@
+#!/usr/local/bin/perl
+# Sonovision-Itep, Verdret 1995-1999
+package App::rtf2text;
+$App::rtf2text::VERSION = '1.12';
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Basename;
+
+use vars qw/$BASENAME $DIRNAME/;
+
+BEGIN {
+    ( $BASENAME, $DIRNAME ) = fileparse($0);
+}
+use lib "$DIRNAME/lib";
+
+my $usage = "usage: 
+ -h                    print this help
+ -l log_file RTF_file  process RTF_file and generate a log file
+ -V                    print version number
+";
+my $help = "";
+
+use vars qw($EOM $trace);
+$trace = 0;
+$EOM   = "\n";    # end of message
+
+use RTF::Config;
+
+die "$usage" unless @ARGV;
+use vars qw($trace $opt_d $opt_h $opt_t $opt_v $opt_V);
+{
+    local $SIG{__WARN__} = sub { };
+    GetOptions(
+        'h',      # Help
+        't=s',    # name of the target document
+        'r=s',    # name of the report file
+        'd',      # debugging mode
+        'v',      # verbose
+        'V',      # print version number
+        'l=s' => \$LOG_FILE,    # -l logfile
+    ) or die "$usage$EOM";
+}
+
+if ($opt_h) {
+    print STDOUT "$help\n";
+    exit 0;
+}
+if ($opt_V) {
+    print STDOUT "$VERSION\n";
+    exit 0;
+}
+if ($opt_d) {
+    $|   = 1;
+    $EOM = "";
+}
+
+select(STDOUT);
+
+require RTF::TEXT::Converter;
+my $self =
+    new RTF::TEXT::Converter( Output => \*STDOUT );    # actually the default
+
+foreach my $filename (@ARGV) {
+    $self->parse_stream($filename);
+}
+
+1;

@@ -1,0 +1,6 @@
+@Queues = ( {
+    Name => 'Service Updates',
+    Description => 'Service update and outage notifications',
+    CommentAddress =>'',
+    CorrespondAddress => ''
+});

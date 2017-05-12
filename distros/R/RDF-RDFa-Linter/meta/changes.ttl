@@ -1,0 +1,96 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Linter/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2010-05-19"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Linter-0.01.tar.gz> ;
+	rdfs:label      "First release"@en .
+	
+my:project :release my:v_0-02 .
+my:v_0-02
+	a               :Version ;
+	dc:issued       "2010-05-21"^^xsd:date ;
+	:revision       "0.02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Linter-0.02.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-01 ;
+		dcs:item [ a dcs:Addition ; rdfs:label "Add longitude and latitude sanity checks for OGP."@en ]
+		] .
+
+my:project :release my:v_0-03 .
+my:v_0-03
+	a               :Version ;
+	dc:issued       "2010-05-22"^^xsd:date ;
+	:revision       "0.03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Linter-0.03.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-02 ;
+		dcs:item [ a dcs:Addition ; rdfs:label "Add very minimal checks for Google Rich Snippets."@en ]
+		] .
+
+my:project :release my:v_0-04 .
+my:v_0-04
+	a               :Version ;
+	dc:issued       "2010-05-22"^^xsd:date ;
+	:revision       "0.04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Linter-0.04.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-03 ;
+		dcs:item [ a dcs:Bugfix ; rdfs:label "Include Google.pm in the MANIFEST file."@en ]
+		] .
+
+my:project :release my:v_0-050 .
+my:v_0-050
+	a               :Version ;
+	dc:issued       "2010-12-21"^^xsd:date ;
+	:revision       "0.050"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Linter-0.050.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-04 ;
+		dcs:item [ a dcs:Update ; rdfs:label "Support ogp.me namespace for Open Graph Protocol data."@en ]
+		] .
+
+my:project :release my:v_0-051 .
+my:v_0-051
+	a               :Version ;
+	dc:issued       "2010-12-22"^^xsd:date ;
+	:revision       "0.051"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Linter-0.051.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-050 ;
+		dcs:item [ rdfs:label "Add RDF::RDFa::Generator dependency to Makefile.PL."@en ]
+		] .
+
+my:project :release my:v_0-052 .
+my:v_0-052
+	a               :Version ;
+	dc:issued       "2011-10-18"^^xsd:date ;
+	:revision       "0.052"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Linter-0.052.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-051 ;
+		dcs:item [ rdfs:label "RDF::RDFa::Linter::Service::SchemaOrg."@en ; a dcs:Addition ] ;
+		dcs:item [ rdfs:label "RDF::RDFa::Linter::Service::Facebook."@en ; a dcs:Update ] ;
+		dcs:item [ rdfs:label "use Module::Package::RDF"@en ; a dcs:Packaging ]
+		] .
+
+my:project :release my:v_0-053 .
+my:v_0-053
+	a               :Version ;
+	dc:issued       "2012-12-12"^^xsd:date ;
+	:revision       "0.053"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Linter-0.053.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-052 ;
+		dcs:item [ rdfs:label "Switch from RDF::TrineShortcuts to RDF::TrineX::Functions."@en ; a dcs:Update ] ;
+	] .
+

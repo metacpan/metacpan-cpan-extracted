@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+##- Nanar <nanardon@zarb.org>
+##-
+##- This program is free software; you can redistribute it and/or modify
+##- it under the terms of the GNU General Public License as published by
+##- the Free Software Foundation; either version 2, or (at your option)
+##- any later version.
+##-
+##- This program is distributed in the hope that it will be useful,
+##- but WITHOUT ANY WARRANTY; without even the implied warranty of
+##- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##- GNU General Public License for more details.
+##-
+##- You should have received a copy of the GNU General Public License
+##- along with this program; if not, write to the Free Software
+##- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+
+use strict;
+use RPM4;
+use Getopt::Long;
+
+(@ARGV) or die 
+"$0 specfile1.spec [specfile2.spec [...]] 
+Give rpms filename produce by a specfile
+";
+
+foreach (@ARGV) {
+    RPM4::readconfig();
+    my $spec = RPM4::specnew($_, undef, undef, undef, 1, 1);
+    defined $spec or do {
+        warn "unable to parse $_\n";
+        next;
+    };
+    print "$_:\n";
+    print $spec->srcrpm . "\n";
+    foreach my $bin ($spec->binrpm) {
+        print "$bin\n";
+    }
+}

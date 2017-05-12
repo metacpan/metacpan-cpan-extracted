@@ -1,0 +1,25 @@
+Revision history for Regexp::DeferredExecution.
+
+0.05  Sat Jan 17 09:45:54 2004
+	- added tests for multiple execution
+	- mention perl.com article in docs
+
+0.04  Fri Jan 16 12:03:44 2004
+	- bug fix to make multiple code blocks work again; local @c
+          was obliterating everything (fix local @c = @c).
+	- more POD fixes (thanks to Mike Castle for pointing some
+          out some remaining Regexp::Deferred misnomers).
+
+0.03  Wed Jan 14 09:22:28 2004
+	- stack was misnamed @Regexp::Deferred::C; fixed.
+	- various POD fixes, cleanups.
+
+0.02  Tue Jan 13 18:24:39 2004
+	- simplified @Regexp::DeferredExecution::c code stack, very
+          slight speed improvement.
+
+0.01  Tue Jan 13 10:34:26 2004
+
+	- original version; created by h2xs 1.23 with options -PAXn
+          Regexp::DeferredExecution
+

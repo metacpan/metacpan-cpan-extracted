@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 156f498ee9e232dd86bf36218f42d2e6ae5ff736 Changes
+SHA1 d62a1b852e5314d58928279b3e26d540dd36cfa8 MANIFEST
+SHA1 30b2407d4b73b6c749b6161aebef6c81c61c76d4 MANIFEST.SKIP
+SHA1 fa2b3198a7d043013d41b87c80180d3cf04a2ebe META.yml
+SHA1 70001fa7c2548cafaf6fd8f9c1909ad42f936db6 Makefile.PL
+SHA1 b3b720a8eea6f8919e0bc68a60db7cfce8e6089a README
+SHA1 c42297373f0a0d37bd1803b5634833a4240b5593 html/Callbacks/RTx-QuickUpdateUserComments/Ticket/Elements/ShowRequestor/AfterComments
+SHA1 08ef9dc87e4c9f4dc2cc1c99b75238bfbc50d9f2 html/Callbacks/RTx-QuickUpdateUserComments/User/Summary.html/BeforePortlets
+SHA1 cb54fad16a545f903a53f438992e3d73e6423fdf html/User/Elements/Portlets/EditComments
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 40df6f8d889b52eef379f04af6227f9302b23bf9 inc/Module/Install/RTx.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 c4f9d3344f6e76618e4cdfbcb319c93374ff48e8 lib/RTx/QuickUpdateUserComments.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (Darwin)
+
+iQEVAwUBUuqjsmDwnESVNIQzAQLE1wgAuW2uKncsVqaC61i4Ts36px03SzXPsnRX
+oimZ9TYCpBMCcJwXR99LLeNwcyYwoqaHJ33KtbpZ3+ly9y9nmK/RcW7yRDO97L30
+dYkCvJgHKb7vuTfkFOlefp82GwDacpFM7arXHWLyv0em7D5EaZjI/2YPYLf5vBK0
+IeWlJcuBJ/+hHkdOEAuiojUQF4VuteSk7lcimFpd056YbPkJTXbr3pJ5B2zUSNNC
+4ZkyQNPPJMT+lbjBv1Ayf3tPHE5ehINqLpSB2ybWUcvo/AS0JSMWarYQ3QCRSElj
+uxHc8AEhKGm336eIutF6iNkmpIxzHz2H/tJ+uQBBcOQX5yB1A6enaA==
+=GaSq
+-----END PGP SIGNATURE-----

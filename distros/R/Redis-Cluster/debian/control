@@ -1,0 +1,12 @@
+Source: libredis-cluster-perl
+Section: perl
+Priority: optional
+Maintainer: SMS Online <dev.opensource@sms-online.com>
+Build-Depends: debhelper (>=9), dh-make-perl, libpod-coverage-perl, libtest-eol-perl, libtest-exception-perl, libtest-fixme-perl, libtest-kwalitee-perl, libtest-perl-critic-perl, libtest-pod-perl, libtest-pod-coverage-perl, libtest-strict-perl
+
+Package: libredis-cluster-perl
+Section: perl
+Priority: optional
+Architecture: all
+Depends: perl (>=5.008), perl-base, perl-modules, libdigest-crc-perl, liblist-moreutils-perl, libparams-validate-perl, libredis-perl, libtry-tiny-perl
+Description: Redis Cluster client for Perl

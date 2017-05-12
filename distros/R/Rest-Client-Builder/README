@@ -1,0 +1,46 @@
+Rest::Client::Builder
+
+DESCRIPTION
+
+Base class to build simple object-oriented REST clients
+
+INSTALLATION
+
+In order to install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Rest::Client::Builder
+
+You can also look for information at:
+
+	RT, CPAN's request tracker
+		http://rt.cpan.org/NoAuth/Bugs.html?Dist=Rest::Client::Builder
+
+	Search CPAN
+		http://search.cpan.org/dist/Rest::Client::Builder/
+
+	Code Repository at GitHub
+		http://github.com/alexey-komarov/Rest-Client-Builder
+
+	GitHub Issue Tracker
+		http://github.com/alexey-komarov/Rest-Client-Builder/issues
+
+AUTHOR
+
+Alexey A. Komarov <alexkom@cpan.org>
+
+COPYRIGHT AND LICENCE
+
+2014 Alexey A. Komarov
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

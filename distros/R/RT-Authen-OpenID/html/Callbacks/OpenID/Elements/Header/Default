@@ -1,0 +1,9 @@
+<%INIT>
+  use RT::Authen::OpenID;
+ #  my $account_url = $bc->account_url( r => $RT::WebURL );
+	my $account_url;
+</%INIT>
+
+% if ($session{'BitcardUser'}) {
+    | <a href="<% $account_url %>"><&|/l&>Manage Bitcard account</&></a>
+% }

@@ -1,0 +1,31 @@
+#!perl
+use strict;
+use warnings;
+use feature ':5.10';
+use Treemap::Squarified;
+use Storable qw( retrieve );
+use Treemap::Output::Imager;
+use File::Basename qw( dirname );
+use lib dirname(__FILE__);
+use TM qw( size );
+
+my $in_tree = "$ARGV[0].tree";
+my $out_png = "$ARGV[0].png";
+
+if ( ! -e 'ImUgly.ttf' ) {
+    die 'Missing ImUgly.ttf';
+}
+
+my $input = 
+my $output = Treemap::Output::Imager->new( WIDTH => 1024, HEIGHT => 768, FONT_FILE => 'ImUgly.ttf' );
+
+say "Read $in_tree (@{[ size( -s $in_tree ) ]})";
+say 'Treemap::Squarified->new';
+my $treemap = Treemap::Squarified->new( INPUT=>(bless {
+    DATA => retrieve( $in_tree ) }, 'Treemap::Input::XML'), OUTPUT=>$output );
+
+say 'Mapping';
+$treemap->map;
+
+say 'Saving';
+$output->save($out_png);

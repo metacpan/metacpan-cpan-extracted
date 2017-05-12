@@ -1,0 +1,20 @@
+<NLQUESTION language="EN">
+    VERBOSE=0
+    REGEXFORM = 1
+    UNION = 0
+    SEMANTICTYPECORRESPONDANCE  = "/etc/nlquestion/SemanticTypeCorresp.rc"
+    URL_PREFIX = "http://localhost:8890/sparql?default-graph-uri=&query="
+    # URL_SUFFIX = "&format=sparql&timeout=0&debug=on"
+    # URL_PREFIX = "http://vtentacle.techfak.uni-bielefeld.de:443/sparql?default-graph-uri=&query="
+    # URL_SUFFIX = "&format=text%2Ftab-separated-values&timeout=0&debug=on"
+    URL_SUFFIX = "&format=csv&timeout=0&debug=on"
+</NLQUESTION>
+
+<NLQUESTION language="FR">
+    VERBOSE=0
+    REGEXFORM = 1
+    UNION = 0
+    SEMANTICTYPECORRESPONDANCE  = "/etc/nlquestion/SemanticTypeCorresp.rc"
+    URL_PREFIX = "http://vtentacle.techfak.uni-bielefeld.de:443/sparql?default-graph-uri=&query="
+    URL_SUFFIX = "&format=text%2Ftab-separated-values&timeout=0&debug=on"
+</NLQUESTION>

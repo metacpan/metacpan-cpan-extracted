@@ -1,0 +1,57 @@
+<!-- $Id: presentation.html,v 1.3 2000/10/22 10:59:00 aigan Exp $ -->
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "dtd/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="se" lang="se">
+  <head>
+    <title>
+      Web Resource Application Framework
+    </title>
+  </head>
+  <body> 
+    <h1>Web Resource Application Framework</h1>
+    
+    <p>Wraf implements a <a href="http://www.w3.org/RDF/">RDF</a> API.
+      The purpose is to enable the construction of applications that
+      fully uses the RDF data model in order to realize <a
+      href="http://www.w3.org/DesignIssues/" >the Semantic
+      Web</a>.</p>
+    
+    <ol>
+      
+      <li>All data is described in RDF</li>
+
+      <li>The User Interface is defined in RDF.  Data presentation
+	will be dependent on the user profile, situation context, and
+	just what information can be found from trusted sources.</li>
+
+      <li>All functions and program code are named, described and
+	handled as RDF Literals.  Running an application can result in
+	method calls to services on other internet servers.  New
+	functions could by reference transparently be downladed and
+	executed from trusted sources.  The actual code is <a
+	href="http://www.perl.com/">Perl</a> but the system could be
+	extended to recognize other languages.</li>
+
+      <li>The development of applications is done in the same system
+	used to run the application.  Wraf will be extended
+	and developed from within iteself.</li>
+
+    </ol>
+
+    <p>Wraf uses interfaces to other sources in order to integrate all
+      data in one enviroment, regardless of storage format.  You can
+      read and update information from configuration files, databases,
+      XML files, LDAP, etc.</p>
+
+    <p>The system will use intelligent caching and optimizations in
+      order to gain in speed without sacrifice any flexibility.  A
+      persistant backend service deamon will take requests from
+      clients in <a href="http://perl.apache.org">mod_perl</a>.  Other
+      non-browser interfaces could also use the service.</p>
+
+    <p>Wraf will be idealy suited for complex, interconnected systems
+      there the addition of new data often breakes the previous format
+      and the exceptions is the rule.  It can be used for personalized
+      content generation, topic communities, intranets and more.</p>
+  </body>
+</html>

@@ -1,0 +1,78 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 791f2a5739dcc356aa1d7f535ffb784a1f504287 Changes
+SHA1 860ac5b0fb548cf6d295087aefd6f3e9768e7dd6 MANIFEST
+SHA1 35b3f5cec24e815b72dff2518fad91c77cb49312 META.yml
+SHA1 b5c29425470bb119d547862367055a17e2f280ac Makefile.PL
+SHA1 164dbb14dea0417755fc771e0932cdb7b6f8dccb README
+SHA1 724567b3c0a4218f0fe2599432026ac6f24f1556 TODO
+SHA1 11c5b664aa674a0ad43c56ce83492b21d3823276 html/Callbacks/MandatoryFields/SelfService/Create.html/BeforeCreate
+SHA1 deb06a648b85a69ec091c9d897c13e1a1df279ab html/Callbacks/MandatoryFields/Ticket/Create.html/BeforeCreate
+SHA1 15dcda02840c3fd99c1afb5b3964e99c990cf1c1 html/Callbacks/MandatoryFields/index.html/Initial
+SHA1 232f4c97414c56d94f3b58d1d6a980ed4b7b72ce inc/Module/AutoInstall.pm
+SHA1 08297ddab7b9077cd14c569694c07a1cff0e6e81 inc/Module/Install.pm
+SHA1 6f600f997754e378372022338397e11304bcd4a1 inc/Module/Install/Admin.pm
+SHA1 cd0a3b098547ab4e8ade00c5330aa9f6b3b8da1c inc/Module/Install/Admin/Bundle.pm
+SHA1 cb5e4e4e7ed502288b859696fac6bd88761b5095 inc/Module/Install/Admin/Compiler.pm
+SHA1 ade2cd33c1dd7a50ca7a583c038c1bae3e0dce4b inc/Module/Install/Admin/Find.pm
+SHA1 cbd7f1b8b1305e5e1e021d98c4ccd426abee636a inc/Module/Install/Admin/Include.pm
+SHA1 8b56c5ab23aff87d3f26ead0413ed76a27fbde6b inc/Module/Install/Admin/Makefile.pm
+SHA1 ef1e5c0c4b93909b88db1858a8dc1c3670917c00 inc/Module/Install/Admin/Manifest.pm
+SHA1 af2d9b16870213c343692025d8467ae7f98778f1 inc/Module/Install/Admin/Metadata.pm
+SHA1 b09e0ac66677f2d146b0e461665b5e5f26478bcd inc/Module/Install/Admin/ScanDeps.pm
+SHA1 74113163f6c42f84e0b18df6a8d2dc15ac21dc30 inc/Module/Install/Admin/WriteAll.pm
+SHA1 63e1527b13cdc1b5271e7215852df6d3de12adc4 inc/Module/Install/AutoInstall.pm
+SHA1 cf824f6553c0c1ca740b8070238ccb1b09f12c34 inc/Module/Install/Base.pm
+SHA1 77f87d329ab629d75df7e5d3a23e5641f53f6652 inc/Module/Install/Bundle.pm
+SHA1 3d9dd511eab36b1a1ef67473c9831f0a8edd0c05 inc/Module/Install/Can.pm
+SHA1 c7f612458ae4a2fababab8806d21ed31876aae4f inc/Module/Install/Compiler.pm
+SHA1 6cd2a70d0b2ad1a63280c4b56f35f0be5579b721 inc/Module/Install/DSL.pm
+SHA1 0bf8ecfd36d43df7f03832e8693146fdfca29821 inc/Module/Install/Deprecated.pm
+SHA1 dc0fddf64d77872bef20939c87af5f8b77e1280f inc/Module/Install/External.pm
+SHA1 bd1ef7ac4d4cc9f019c1ce2e56321b7e22fb3184 inc/Module/Install/Fetch.pm
+SHA1 1dc51bed18c981159179e2570a5e939e388b31a8 inc/Module/Install/Include.pm
+SHA1 253bd29a58ffd37e8c81b1905b05506311e254c3 inc/Module/Install/Inline.pm
+SHA1 a28f105ac4a31e0e91691c1da699dd5021f34c39 inc/Module/Install/MakeMaker.pm
+SHA1 8a60c0ee8ecb233aed0c180a959d5595d503690b inc/Module/Install/Makefile.pm
+SHA1 3882d9c8be1397b93472f11beff898f6ff30224b inc/Module/Install/Metadata.pm
+SHA1 47911f4ab8b32265e837017dc2be798161f8aaff inc/Module/Install/PAR.pm
+SHA1 696e605f50d9c5710f69f5a80513ef3c908fe0b1 inc/Module/Install/Philosophy.pod
+SHA1 e51d256f3c61dc968e1f3226d04c6fd06c3586d8 inc/Module/Install/RTx.pm
+SHA1 5c589819986050dd79faf8572992a9790ae89f2e inc/Module/Install/RTx/Factory.pm
+SHA1 dc972927565015ffbbaae806ff44634cae6fa1d2 inc/Module/Install/ReadmeFromPod.pm
+SHA1 ec573ce8b2ad78c33cabd2c5db16d89544f0bde3 inc/Module/Install/Run.pm
+SHA1 e3a659d39ea4dafc3710a699c3f6b1899b70fa54 inc/Module/Install/Scripts.pm
+SHA1 8057872efd55c155d12f009cb190a81f7f775703 inc/Module/Install/Share.pm
+SHA1 3ef36786817df816cca65bcae5e987591512aeeb inc/Module/Install/Win32.pm
+SHA1 1349967ec3cd8c41a7717750ae23ede9824a2f39 inc/Module/Install/With.pm
+SHA1 b7fc200ced09546b337e460a29379e4bd6927ca2 inc/Module/Install/WriteAll.pm
+SHA1 c2ff748a5a1cf2e95ff8823abb746295c0753e03 lib/RT/Extension/MandatoryFields.pm
+SHA1 07906c6c7ba6bcdc8533fd3e3d0a29c0002ae2c6 po/ca.po
+SHA1 a39fa4ac0cd843324b39364a1b323cc61cdccbc1 po/de.po
+SHA1 b69d307a809b8083a8cf37bc1f3bf663b80b3aa3 po/es.po
+SHA1 9acc253dcb4105e7553d5eaffc3478e56dbf848b po/it.po
+SHA1 d31067f48b1ae76459f9acae8abc75450d7654e7 t/00-load.t
+SHA1 105efdbac9828b2091f518dcd06d1f0f63ee7f0d t/boilerplate.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlGx0ccACgkQWFkxZRfLwXIp6ACglokpxY3rpbewffcU2WsA+dP/
+MnIAn1DhQuCKkoxmIpuVFWCaRMVONjhf
+=8Ilr
+-----END PGP SIGNATURE-----

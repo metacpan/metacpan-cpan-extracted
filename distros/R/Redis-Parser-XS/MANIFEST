@@ -1,0 +1,16 @@
+Changes
+eg/bench.pl
+lib/Redis/Parser/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+ppport.h
+README
+t/00-use.t
+t/01-protocol.t
+t/02-pipelined.t
+t/03-retvals.t
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

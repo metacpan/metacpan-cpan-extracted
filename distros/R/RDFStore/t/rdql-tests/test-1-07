@@ -1,0 +1,7 @@
+/*
+ * Test 1-07 : fixed triple pattern, no variables
+ */
+
+SELECT *
+SOURCE <model1.nt>
+WHERE  (<http://rdf.org/r-1>, <http://rdf.org/p-1>, "v-1-1")

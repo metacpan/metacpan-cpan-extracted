@@ -1,0 +1,10 @@
+Revision history for Perl extension Rose::HTMLx::Form::Field::Autocomplete.
+
+0.01  Fri Mar 23 10:52:13 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Rose::HTMLx::Form::Field::Autocomplete
+
+0.02  13 April 2007
+        * added uri_as_string() method (could be refactored to use URI::Escape e.g.)
+
+

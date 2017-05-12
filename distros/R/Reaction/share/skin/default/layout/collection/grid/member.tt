@@ -1,0 +1,17 @@
+=extends NEXT
+
+=for layout widget
+
+<tr>
+  [% call_next %]
+</tr>
+
+=for layout field
+
+<td>[% call_next %]</td>
+
+=for layout action
+
+<td>[% call_next %]</td>
+
+=cut

@@ -1,0 +1,380 @@
+#!/usr/bin/perl
+
+=pod
+
+redist.pl
+
+Author: Chen Gang
+Blog: http://blog.yikuyiku.com
+At 2014-02-25 Beijing
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Storable qw(retrieve store);
+use Redis;
+use List::MoreUtils qw(uniq);
+use Term::ReadLine;
+use Term::ReadLine::Perl;
+use Term::ReadKey;
+use Text::TabularDisplay;
+use Redis::Term;
+
+$0 = "redist " . join " ", @ARGV;
+my %opts;
+getopt( 'hpP', \%opts );
+my $addr   = $opts{'h'} || '127.0.0.1';
+my $port   = $opts{'P'} || 6379;
+my $passwd = $opts{'p'} || '';
+my $name   = time;
+
+my %conf = (
+    server      => "$addr:$port",
+    name        => "$name",
+    every       => 1000,            #milisecs
+    cnx_timeout => 2,               #seconds
+);
+$conf{'password'} = $passwd if $passwd;
+
+my $r          = Redis->new(%conf);
+my $redis_info = $r->info;
+
+print <<WELCOME;
+Welcome to the Redis Terminal.  Commands end with ENTER.
+Your Redis connection name is $name
+Connected to: $addr:$port
+Redis Server version: $redis_info->{redis_version}
+Redis Term version: $Redis::Term::VERSION
+
+Copyright (c) 2014-2015, Chen Gang. This is free software.
+
+Type 'help' for help.
+
+WELCOME
+
+my $cmd_history_file = $ENV{HOME} . '/.redist_history';
+my $cmd_history;
+my @cmd_history;
+eval { $cmd_history = retrieve $cmd_history_file if -s $cmd_history_file; };
+@cmd_history = @$cmd_history if $cmd_history;
+my $term   = Term::ReadLine->new("redist");
+my $prompt = "redis> ";
+$term->ornaments(0);
+
+foreach (@cmd_history) {
+    $term->addhistory($_);
+}
+my $help_data = do { local $/; <DATA> };
+my %help_hash = eval($help_data);
+my %command;
+my $help_text;
+foreach ( sort keys %help_hash ) {
+    my $group_name = $_;
+    $help_text .= "\n" . uc($group_name) . "\n";
+    my $tb = Text::TabularDisplay->new(qw(Command Description));
+    foreach ( sort keys %{ $help_hash{$group_name} } ) {
+        my $command_name = $_;
+        $command{$command_name} = 1;
+        $tb->add( $command_name, $help_hash{$group_name}{$_} );
+    }
+    $help_text .= $tb->render . "\n";
+}
+
+while ( defined( $_ = $term->readline($prompt) ) ) {
+    $_ =~ s/\s*$//g;
+    $_ =~ s/^\s*//g;
+    my @input = split /\s/, $_;
+  SWITCH:
+    {
+        push @cmd_history, $_ if $_;
+        if (/(quit|exit)/) {
+            goto BYE;
+        }
+        elsif ( !$_ ) {
+            last SWITCH;
+        }
+        elsif (/^help$/) {
+            print "Type:\thelp [group]\n";
+            foreach ( sort keys %help_hash ) {
+                print "\thelp $_\n";
+            }
+            print "\thelp all\n";
+            last SWITCH;
+        }
+        elsif (/^help all$/) {
+            print "$help_text\n";
+            last SWITCH;
+        }
+        elsif (/^help [a-z]+$/) {
+            my ($group_name) = $_ =~ /^help ([a-z]+)$/;
+            print "\n" . uc($group_name) . "\n";
+            my $tb = Text::TabularDisplay->new(qw(Command Description));
+            foreach ( sort keys %{ $help_hash{$group_name} } ) {
+                my $command_name = $_;
+                $command{$command_name} = 1;
+                $tb->add( $command_name, $help_hash{$group_name}{$_} );
+            }
+            print $tb->render . "\n";
+            last SWITCH;
+        }
+        elsif (/info/) {
+            my $info = $r->info;
+            my $tb   = Text::TabularDisplay->new(qw(Variable_name Value));
+            foreach ( keys %{$info} ) {
+                $tb->add( $_, $info->{$_} );
+            }
+            print $tb->render, "\n";
+            last SWITCH;
+        }
+        elsif ( exists( $command{ lc( $input[0] ) } ) ) {
+            my $c = shift @input;
+            eval {
+                my @result = $r->$c(@input);
+                print tb_dump( \@result );
+                print "\n";
+            };
+            if ($@) {
+                print "ERROR: Wrong arguments for command '$_'\n";
+            }
+
+            last SWITCH;
+        }
+        else {
+            print "ERROR: No command named '$input[0]'\n";
+            last SWITCH;
+        }
+    }
+}
+
+BYE:
+@cmd_history = uniq @cmd_history;
+store \@cmd_history, $cmd_history_file;
+print "bye\n";
+
+sub tb_dump {
+    my $var    = shift;
+    my $typeof = ref($var);
+    if ( $typeof eq 'SCALAR' ) {
+        return $var;
+    }
+    elsif ( $typeof eq 'ARRAY' ) {
+        my $tb = Text::TabularDisplay->new(qw(Value));
+        foreach ( @{$var} ) {
+            $tb->add($_);
+        }
+        return $tb->render, "\n";
+    }
+    elsif ( $typeof eq 'HASH' ) {
+        my $tb = Text::TabularDisplay->new(qw(Key Value));
+        foreach ( keys %{$var} ) {
+            $tb->add( $_, $var->{$_} );
+        }
+        return $tb->render, "\n";
+    }
+    else {
+        return $var;
+    }
+}
+
+1;
+__DATA__
+(
+  "scripting",
+  {
+    "eval"          => "Execute a Lua script server side",
+    "evalsha"       => "Execute a Lua script server side",
+    "script exists" => "Check existence of scripts in the script cache.",
+    "script flush"  => "Remove all the scripts from the script cache.",
+    "script kill"   => "Kill the script currently in execution.",
+    "script load"   => "Load the specified Lua script into the script cache.",
+  },
+  "connection",
+  {
+    auth   => "Authenticate to the server",
+    echo   => "Echo the given string",
+    ping   => "Ping the server",
+    quit   => "Close the connection",
+    select => "Change the selected database for the current connection",
+  },
+  "hyperloglog",
+  {
+    pfadd   => "Adds the specified elements to the specified HyperLogLog.",
+    pfcount => "Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).",
+    pfmerge => "Merge N different HyperLogLogs into a single one.",
+  },
+  "string",
+  {
+    append      => "Append a value to a key",
+    bitcount    => "Count set bits in a string",
+    bitop       => "Perform bitwise operations between strings",
+    bitpos      => "Find first bit set or clear in a string",
+    decr        => "Decrement the integer value of a key by one",
+    decrby      => "Decrement the integer value of a key by the given number",
+    get         => "Get the value of a key",
+    getbit      => "Returns the bit value at offset in the string value stored at key",
+    getrange    => "Get a substring of the string stored at a key",
+    getset      => "Set the string value of a key and return its old value",
+    incr        => "Increment the integer value of a key by one",
+    incrby      => "Increment the integer value of a key by the given amount",
+    incrbyfloat => "Increment the float value of a key by the given amount",
+    mget        => "Get the values of all the given keys",
+    mset        => "Set multiple keys to multiple values",
+    msetnx      => "Set multiple keys to multiple values, only if none of the keys exist",
+    psetex      => "Set the value and expiration in milliseconds of a key",
+    set         => "Set the string value of a key",
+    setbit      => "Sets or clears the bit at offset in the string value stored at key",
+    setex       => "Set the value and expiration of a key",
+    setnx       => "Set the value of a key, only if the key does not exist",
+    setrange    => "Overwrite part of a string at key starting at the specified offset",
+    strlen      => "Get the length of the value stored in a key",
+  },
+  "sorted_set",
+  {
+    zadd => "Add one or more members to a sorted set, or update its score if it already exists",
+    zcard => "Get the number of members in a sorted set",
+    zcount => "Count the members in a sorted set with scores within the given values",
+    zincrby => "Increment the score of a member in a sorted set",
+    zinterstore => "Intersect multiple sorted sets and store the resulting sorted set in a new key",
+    zlexcount => "Count the number of members in a sorted set between a given lexicographical range",
+    zrange => "Return a range of members in a sorted set, by index",
+    zrangebylex => "Return a range of members in a sorted set, by lexicographical range",
+    zrangebyscore => "Return a range of members in a sorted set, by score",
+    zrank => "Determine the index of a member in a sorted set",
+    zrem => "Remove one or more members from a sorted set",
+    zremrangebylex => "Remove all members in a sorted set between the given lexicographical range",
+    zremrangebyrank => "Remove all members in a sorted set within the given indexes",
+    zremrangebyscore => "Remove all members in a sorted set within the given scores",
+    zrevrange => "Return a range of members in a sorted set, by index, with scores ordered from high to low",
+    zrevrangebyscore => "Return a range of members in a sorted set, by score, with scores ordered from high to low",
+    zrevrank => "Determine the index of a member in a sorted set, with scores ordered from high to low",
+    zscan => "Incrementally iterate sorted sets elements and associated scores",
+    zscore => "Get the score associated with the given member in a sorted set",
+    zunionstore => "Add multiple sorted sets and store the resulting sorted set in a new key",
+  },
+  "hash",
+  {
+    hdel         => "Delete one or more hash fields",
+    hexists      => "Determine if a hash field exists",
+    hget         => "Get the value of a hash field",
+    hgetall      => "Get all the fields and values in a hash",
+    hincrby      => "Increment the integer value of a hash field by the given number",
+    hincrbyfloat => "Increment the float value of a hash field by the given amount",
+    hkeys        => "Get all the fields in a hash",
+    hlen         => "Get the number of fields in a hash",
+    hmget        => "Get the values of all the given hash fields",
+    hmset        => "Set multiple hash fields to multiple values",
+    hscan        => "Incrementally iterate hash fields and associated values",
+    hset         => "Set the string value of a hash field",
+    hsetnx       => "Set the value of a hash field, only if the field does not exist",
+    hvals        => "Get all the values in a hash",
+  },
+  "generic",
+  {
+    del       => "Delete a key",
+    dump      => "Return a serialized version of the value stored at the specified key.",
+    exists    => "Determine if a key exists",
+    expire    => "Set a key's time to live in seconds",
+    expireat  => "Set the expiration for a key as a UNIX timestamp",
+    keys      => "Find all keys matching the given pattern",
+    migrate   => "Atomically transfer a key from a Redis instance to another one.",
+    move      => "Move a key to another database",
+    object    => "Inspect the internals of Redis objects",
+    persist   => "Remove the expiration from a key",
+    pexpire   => "Set a key's time to live in milliseconds",
+    pexpireat => "Set the expiration for a key as a UNIX timestamp specified in milliseconds",
+    pttl      => "Get the time to live for a key in milliseconds",
+    randomkey => "Return a random key from the keyspace",
+    rename    => "Rename a key",
+    renamenx  => "Rename a key, only if the new key does not exist",
+    restore   => "Create a key using the provided serialized value, previously obtained using DUMP.",
+    scan      => "Incrementally iterate the keys space",
+    sort      => "Sort the elements in a list, set or sorted set",
+    ttl       => "Get the time to live for a key",
+    type      => "Determine the type stored at key",
+  },
+  "pubsub",
+  {
+    psubscribe   => "Listen for messages published to channels matching the given patterns",
+    publish      => "Post a message to a channel",
+    pubsub       => "Inspect the state of the Pub/Sub subsystem",
+    punsubscribe => "Stop listening for messages posted to channels matching the given patterns",
+    subscribe    => "Listen for messages published to the given channels",
+    unsubscribe  => "Stop listening for messages posted to the given channels",
+  },
+  "transactions",
+  {
+    discard => "Discard all commands issued after MULTI",
+    exec    => "Execute all commands issued after MULTI",
+    multi   => "Mark the start of a transaction block",
+    unwatch => "Forget about all watched keys",
+    watch   => "Watch the given keys to determine execution of the MULTI/EXEC block",
+  },
+  "server",
+  {
+    "bgrewriteaof"     => "Asynchronously rewrite the append-only file",
+    "bgsave"           => "Asynchronously save the dataset to disk",
+    "client getname"   => "Get the current connection name",
+    "client kill"      => "Kill the connection of a client",
+    "client list"      => "Get the list of client connections",
+    "client pause"     => "Stop processing commands from clients for some time",
+    "client setname"   => "Set the current connection name",
+    "config get"       => "Get the value of a configuration parameter",
+    "config resetstat" => "Reset the stats returned by INFO",
+    "config rewrite"   => "Rewrite the configuration file with the in memory configuration",
+    "config set"       => "Set a configuration parameter to the given value",
+    "dbsize"           => "Return the number of keys in the selected database",
+    "debug object"     => "Get debugging information about a key",
+    "debug segfault"   => "Make the server crash",
+    "flushall"         => "Remove all keys from all databases",
+    "flushdb"          => "Remove all keys from the current database",
+    "info"             => "Get information and statistics about the server",
+    "lastsave"         => "Get the UNIX time stamp of the last successful save to disk",
+    "monitor"          => "Listen for all requests received by the server in real time",
+    "save"             => "Synchronously save the dataset to disk",
+    "shutdown"         => "Synchronously save the dataset to disk and then shut down the server",
+    "slaveof"          => "Make the server a slave of another instance, or promote it as master",
+    "slowlog"          => "Manages the Redis slow queries log",
+    "sync"             => "Internal command used for replication",
+    "time"             => "Return the current server time",
+  },
+  "set",
+  {
+    sadd => "Add one or more members to a set",
+    scard => "Get the number of members in a set",
+    sdiff => "Subtract multiple sets",
+    sdiffstore => "Subtract multiple sets and store the resulting set in a key",
+    sinter => "Intersect multiple sets",
+    sinterstore => "Intersect multiple sets and store the resulting set in a key",
+    sismember => "Determine if a given value is a member of a set",
+    smembers => "Get all the members in a set",
+    smove => "Move a member from one set to another",
+    spop => "Remove and return a random member from a set",
+    srandmember => "Get one or multiple random members from a set",
+    srem => "Remove one or more members from a set",
+    sscan => "Incrementally iterate Set elements",
+    sunion => "Add multiple sets",
+    sunionstore => "Add multiple sets and store the resulting set in a key",
+  },
+  "list",
+  {
+    blpop      => "Remove and get the first element in a list, or block until one is available",
+    brpop      => "Remove and get the last element in a list, or block until one is available",
+    brpoplpush => "Pop a value from a list, push it to another list and return it; or block until one is available",
+    lindex     => "Get an element from a list by its index",
+    linsert    => "Insert an element before or after another element in a list",
+    llen       => "Get the length of a list",
+    lpop       => "Remove and get the first element in a list",
+    lpush      => "Prepend one or multiple values to a list",
+    lpushx     => "Prepend a value to a list, only if the list exists",
+    lrange     => "Get a range of elements from a list",
+    lrem       => "Remove elements from a list",
+    lset       => "Set the value of an element in a list by its index",
+    ltrim      => "Trim a list to the specified range",
+    rpop       => "Remove and get the last element in a list",
+    rpoplpush  => "Remove the last element in a list, append it to another list and return it",
+    rpush      => "Append one or multiple values to a list",
+    rpushx     => "Append a value to a list, only if the list exists",
+  },
+)

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Configurable prompt for reply",
+   "author" : [
+      "Takuya Tsuchida <tsucchi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Reply-Plugin-ConfigurablePrompt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Reply::Plugin" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Reply::Plugin::ConfigurablePrompt" : {
+         "file" : "lib/Reply/Plugin/ConfigurablePrompt.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tsucchi/p5-Reply-Plugin-ConfigurablePrompt/issues"
+      },
+      "homepage" : "https://github.com/tsucchi/p5-Reply-Plugin-ConfigurablePrompt",
+      "repository" : {
+         "url" : "git://github.com/tsucchi/p5-Reply-Plugin-ConfigurablePrompt.git",
+         "web" : "https://github.com/tsucchi/p5-Reply-Plugin-ConfigurablePrompt"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

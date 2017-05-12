@@ -1,0 +1,28 @@
+NAME
+       Reprepro::Uploaders - Emulates reprepro's upload permissions
+
+SYNOPSIS
+       use Reprepro::Uploaders;
+
+       # Initialize
+       my $uploaders = Reprepro::Uploaders->new(
+          uploaders   => "/etc/reprepro/uploaders",  # Mandatory, no default
+          verbose     => 1,                          # Or debug for more messages
+          augeas_opts => {                           # Setup Config::Augeas
+             root     => "/var/lib/fakeroot",
+          },
+       );
+
+       my %package = (
+          source         => 'libfoo-bar-perl',
+          binaries       => [ 'libfoo-bar-perl' ],
+          key            => 'ABCD1234',
+          architectures  => [ 'source' ],
+          sections       => [ 'main/perl' ],
+       );
+
+       print "Package accepted".$/ if ($uploaders->check_package(\%package));
+
+SEE ALSO
+    Config::Augeas
+

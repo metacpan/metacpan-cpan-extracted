@@ -1,0 +1,68 @@
+---
+abstract: 'An RDF Framework for Perl'
+author:
+  - 'Gregory Todd Williams  C<< <gwilliams@cpan.org> >>'
+  - 'Gregory Todd Williams <gwilliams@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::JSON: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RDF-Trine
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+recommends:
+  Term::ANSIColor: 0
+  XML::LibXML: 1.7
+requires:
+  Algorithm::Combinatorics: 0
+  Cache::LRU: 0
+  DBD::SQLite: 1.14
+  DBI: 0
+  DBIx::Connector: 0
+  Data::UUID: 0
+  Digest::MD5: 0
+  Digest::SHA: 0
+  Error: 0
+  HTTP::Negotiate: 0
+  IRI: 0
+  JSON: 2
+  LWP::UserAgent: 0
+  List::Util: 1.33
+  Log::Log4perl: 0
+  Math::BigInt: 0
+  Module::Load::Conditional: 0.38
+  Moose: 2
+  MooseX::ArrayRef: 0
+  Scalar::Util: 1.24
+  Set::Scalar: 0
+  Storable: 0
+  Text::CSV_XS: 0
+  Text::Table: 0
+  Time::HiRes: 0
+  URI: 1.52
+  XML::CommonNS: 0.04
+  XML::Namespace: 0
+  XML::SAX: 0.96
+  perl: 5.10.0
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  bugtracker: https://github.com/kasei/perlrdf/issues
+  homepage: http://search.cpan.org/dist/RDF-Trine/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/kasei/perlrdf/
+version: '1.016'

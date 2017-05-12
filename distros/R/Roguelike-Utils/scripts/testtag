@@ -1,0 +1,28 @@
+use Games::Roguelike::Console;
+
+use Getopt::Long;
+
+our $opt_console = $^O =~ /win32/i ? 'win32' : 'curses';
+
+GetOptions("console=s");
+
+my $con;
+
+if ($opt_console eq 'curses') {
+	require Games::Roguelike::Console::Curses;
+	$con = Games::Roguelike::Console::Curses->new();
+} elsif ($opt_console eq 'win32') {
+	require Games::Roguelike::Console::Win32;
+	$con = Games::Roguelike::Console::Win32->new();
+} elsif ($opt_console eq 'ansi') {
+	require Games::Roguelike::Console::ANSI;
+	$con = Games::Roguelike::Console::ANSI->new();
+}
+
+$con->tagstr("This is normal<red>This is red");
+
+$con->refresh();
+
+$con->getch();
+
+undef $con;

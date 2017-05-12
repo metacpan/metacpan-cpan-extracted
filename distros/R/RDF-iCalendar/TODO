@@ -1,0 +1,8 @@
+* Still to do:
+
+	- VTIMEZONE entities
+	- RELATED-TO properties
+
+* Need to do more testing and polishing.
+
+* And of course iCalendar -> RDF.

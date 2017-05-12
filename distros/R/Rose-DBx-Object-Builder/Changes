@@ -1,0 +1,26 @@
+Revision history for Rose-DBx-Object-Builder
+
+0.09    20/11/2010
+        Added 'required' and 'boolean' column types.
+0.08    07/11/2010
+        Added 'references table name' syntax.
+        Added tests.
+        Updated POD.
+0.07    16/03/2010
+        Moved 'table_prefix' into the 'db' option within the config hash in order to be consistent with Rose::DBx::Object::Renderer(Suggested by Stewart Heckenberg).
+0.06    11/08/2009
+        Fixed column definition for 'percentage'.
+0.05    10/08/2009
+        Added the 'table_prefix' option into config.
+        Fixed foreign key column naming in "... has ... as ..." construct.
+        Updated POD.
+0.04    25/06/2009
+        Make the space character before '(...)' constructs optional.
+        Fixed Typos in POD.
+0.03    04/06/2009
+        Updated change log.
+0.02    04/06/2009
+        Fixed a bug in config() failing to change 'map_table' and 'add_clause'.
+        Fixed typos in POD.
+0.01    01/06/2009
+        First version, released on an unsuspecting world.

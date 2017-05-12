@@ -1,0 +1,90 @@
+<TMPL_INCLUDE header.tmpl>
+<h1><TMPL_VAR title></h1>
+
+<div class="contents">
+  <div class="index">
+  <p class="welcome">Welcome to <TMPL_VAR HTTP_HOST>.</p>
+
+  <table border="0"><tr><td valign="top" width="50%">
+    <ul>
+      <li><a href="<TMPL_VAR self_url>?template=by_host.tmpl">Browse by host</a> - overview of all monitored hosts</li>
+      <li><a href="<TMPL_VAR self_url>?template=list_hosts.tmpl">List of hosts</a> - list of all monitored hosts</li>
+      <li><a href="<TMPL_VAR self_url>?template=by_graph.tmpl">Browse by graph</a> - overview of all monitors</li>
+      <li><a href="<TMPL_VAR self_url>?template=list_graphs.tmpl">List of graphs</a> - list of all monitors</li>
+    </ul>
+  </td><td valign="top" width="50%">
+    <ul>
+      <li><a href="<TMPL_VAR self_url>?template=by_graph.tmpl&LIKE=connections|state|loadavg|cpu_util|mem|net_traffic_eth">View most popular graphs</a></li>
+      <li><a href="<TMPL_VAR self_url>?template=by_graph.tmpl&LIKE=cpu_">View all CPU graphs</a></li>
+      <li><a href="<TMPL_VAR self_url>?template=by_graph.tmpl&LIKE=net_traffic_">View all network traffic graphs</a></li>
+      <li><a href="<TMPL_VAR self_url>?template=by_graph.tmpl&LIKE=mem_">View all memory usage graphs</a></li>
+      <li><a href="<TMPL_VAR self_url>?template=by_graph.tmpl&LIKE=apache_">View all Apache graphs</a></li>
+      <li><a href="<TMPL_VAR self_url>?template=by_graph.tmpl&LIKE=_temp">View all temperate graphs</a></li>
+    </ul>
+  </td></tr></table>
+
+  <div class="index_introduction">
+  <p>
+    If you would like your server to be monitored by <TMPL_VAR HTTP_HOST>, you will
+    need to download a copy of the data gathering client script (rrd-client.pl).
+    <a href="/rrd-client.pl">Click here to download a copy of rrd-client.pl</a>. rrd-client.pl
+    currently works best on Linux 2.6 installs or higher, but will does have limited
+    support for Linux 2.4 distributions, BSD, Darwin and Solaris. Cross platform
+    support will improve over time. To get the best results by monitoring as much
+    as possible, you should make sure that you have the following programs installed:
+
+    <br /><br />
+    <table border="0" cellspacing="0" cellpadding="0"><tr>
+      <td align="left" valign="top" style="padding-right: 30px;">
+        <ul>
+          <li>/usr/bin/iostat - Monitors hard disk IO</li>
+          <li>/usr/bin/vmstat - Monitors CPU utilisation</li>
+          <li>/usr/bin/sensors - Monitor CPU temperature</li>
+          <li>/usr/bin/hddtemp - Monitor hard disk temperature</li>
+        </ul>
+      </td>
+      <td align="left" valign="top" style="background: #eeeeff; padding: 2px 6px 4px 6px;">
+        Tree-hugging Debian &amp; Ubuntu users can install these using:<br />
+        <code>sudo apt-get install sysstat hddtemp lm-sensors procps</code><br /><br />
+        Clever-clogs Fedora, RedHat &amp; CentOS users can install these using:<br />
+        <code>yum install sysstat hddtemp lm-sensors procps</code>
+      </td>
+    </tr></table>
+    <br />
+
+    Once you have downloaded rrd-client.pl and tested that it generates output, (try
+    running: <code> wget -O - -q http://<TMPL_VAR HTTP_HOST>/rrd-client.pl | perl -w</code> to
+    see if rrd-client.pl will work on your system without actually installing it on
+    disk) you should add it to your crontab to HTTP POST the data to our server run
+    every 4 or 5 minutes. A typical crontab entry might be:<br /><br />
+
+    <code><span class="tooltip">*/4<span>If you are not using a Vixie complaint
+      cron daemon, or which to offset execution another minute, you may wish to
+      use the following instead:<br />1,6,11,16,21,26,31,36,41,46,51,56</span></span>
+      * * * * <span class="tooltip">sleep 10;<span>By delaying the execution
+      of your rrd-client.pl script until 10 seconds after the minute, you will help
+      avoid taking misrepresentative elevated data samples due to spawning
+      cron tasks that happen on the minute.</span></span> /usr/local/bin/rrd-client.pl
+       -q -p http://<TMPL_VAR HTTP_HOST>/cgi-bin/rrd-server.cgi >/dev/null</code>
+  </p>
+
+  <p>
+    <b>To setup your own RRD::Simple Monitoring server, download the
+    latest version of <a href="http://search.cpan.org/~nicolaw/RRD-Simple/">RRD::Simple</a>
+    (version 1.39 or higher), and follow
+    <a href="<TMPL_VAR self_url>?template=instructions.tmpl">these instructions</a>.
+    You can find the very latest version of the RRD::Simple Monitoring software that
+    is in live use on <TMPL_VAR HTTP_HOST>,
+    <a href="http://<TMPL_VAR HTTP_HOST>/rrd-simple-monitoring.tar.gz">here</a>.</b>
+  </p>
+
+  <p>
+    <em>If you like this software, why not show your appreciation by sending the
+    author something nice from her
+    <a href="http://www.amazon.co.uk/gp/registry/1VZXC59ESWYK0?sort=priority">Amazon wishlist</a>?</em>
+  </p>
+  </div>
+  </div>
+</div>
+
+<TMPL_INCLUDE footer.tmpl>

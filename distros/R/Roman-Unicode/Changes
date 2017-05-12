@@ -1,0 +1,43 @@
+
+1.031 2016-09-19T22:23:07Z
+	* Bump to stable version
+
+1.03_01 2016-05-28T20:37:42Z
+	* Some minor changes in preparation to solve a PAUSE indexing 
+	issue
+
+1.03 - 2014-01-04
+	* bump to stable version
+
+1.02_04 - 2014-01-04
+	* Get rid of MYMETA
+
+1.02_04 - 2014-01-04
+	* Get rid of MYMETA
+
+1.02_04 - 2014-01-03
+	* Get rid of MYMETA
+
+1.02_03 - 2011-07-25
+	* Improve user-defined properties
+	* Demonstrate lowercasing with Unicode::Casing
+
+1.02_03 - 2011-07-24
+	* Use Unicode::Casing for case mapping
+	* Create the IsLowercaseRoman property from the IsUppercaseRoman
+	property with some Unicode::UCD magic
+
+1.02_02 - 2011-07-21
+	* Use the Perligata ASCII decompositions, like |)))
+
+1.02_01 - 2011-07-20
+	* Minor doc updates
+
+1.02 - 2011-07-15
+	* Convert to ASCII with NFKD, to extent possible and cheat
+	otherwise
+	* Use user-defined properties to check for valid numerals
+
+1.01 - 2011-07-14
+	* Modify Roman.pm to use the fancy Unicode characters
+

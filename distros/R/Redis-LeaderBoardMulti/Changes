@@ -1,0 +1,9 @@
+Revision history for Perl extension Redis-LeaderBoardMulti
+
+0.02 2016-12-24T00:03:39Z
+    - fix errors in 32bit environment
+
+0.01 2016-03-18T16:55:12Z
+
+    - original version
+

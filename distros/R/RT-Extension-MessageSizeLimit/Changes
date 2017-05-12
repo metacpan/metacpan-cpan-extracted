@@ -1,0 +1,9 @@
+Revision history for RT-Extension-MessageSizeLimit
+
+0.02    Tue, 31 May 2016 18:51:44 +0200
+        Fix undef log warnings
+        Fix packaging
+
+0.01    Tue, 31 May 2016 17:49:21 +0200
+        Initial release.
+

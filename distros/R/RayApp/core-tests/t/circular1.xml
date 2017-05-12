@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<is id='circular1' type="hash">
+	<x typeref="circular2.xml#circular2"/>
+</is>
+

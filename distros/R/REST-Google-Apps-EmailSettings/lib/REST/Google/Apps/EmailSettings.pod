@@ -1,0 +1,442 @@
+=head1 NAME
+
+REST::Google::Apps::EmailSettings - A Perl library to Google's RESTful Apps
+Email Settings API
+
+=head1 SYNOPSIS
+
+  use REST::Google::Apps::EmailSettings
+
+  $google = REST::Google::Apps::EmailSettings->new(
+      domain   => 'company.com',
+      username => 'admin',
+      password => 'g00gl34pp5!'
+  );
+
+  $google->enableForwarding(
+      username  => 'jsmith',
+      forwardTo => 'joe@example.net'
+  );
+
+=head1 DESCRIPTION
+
+REST::Google::Apps::EmailSettings provides a Perl interface to Google's
+RESTful Apps API.
+
+=head1 CONSTRUCTOR
+
+=head2 new ( DOMAIN, USERNAME, PASSWORD )
+
+Creates a new B<REST::Google::Apps::EmailSettings> object.  A domain parameter
+is required.
+
+Supplying authentication information to the constructor is optional, but needs
+to happen either here or with a call to the B<authenticate> method.
+
+B<Example>
+
+  $google = REST::Google::Apps::EmailSettings->new(
+      domain   => 'company.com',
+      username => 'admin',
+      password => 'g00gl34pp5!'
+  );
+
+=head1 METHODS
+
+=head2 authenticate ( USERNAME, PASSWORD )
+
+Authenticate a session.
+
+B<Example>
+
+  $google->authenticate(
+      username => 'admin',
+      password => 'g00gl34pp5!'
+  )
+  || die "Could not authenticate";
+
+=head2 createLabel ( USERNAME, LABEL )
+
+Create a new label.
+
+B<Example>
+
+  $google->createLabel(
+      username => 'jsmith',
+      label    => 'Receipts'
+  )
+  || die "Could not create label";
+
+=head2 createFilter ( USERNAME, CRITERIA, ACTION )
+
+Create a new filter.
+
+One or more of the following parameters is required to define the criteria
+for the filter:
+
+=over 4
+
+=item from
+
+Specifies the e-mail address of the sender.
+
+B<Example>
+
+  from => 'j.q.public@company.com'
+
+=item to
+
+Specifies the e-mail address the message was sent to.
+
+B<Example>
+
+  to => 'jsmith@example.net'
+
+=item subject
+
+Filters for a string anywhere in the e-mail's subject line.
+
+B<Example>
+
+  subject => 'project'
+
+=item hasWord
+
+Filters for a string anywhere in the e-mail's subject line or body.
+
+B<Example>
+
+  hasWord => 'work'
+
+=item noWord
+
+Specifies that the e-mail cannot have a string anywhere in the subject or
+body.
+
+B<Example>
+
+  noWord => 'proposal'
+
+=item attachment
+
+Can be 'true' or 'false', representing whether or not the e-mail contains
+an attachment
+
+B<Example>
+
+  attachment => 'true'
+
+=back
+
+One or more of the following parameters is required to define the action
+to be taken when the specified criteria has been met:
+
+=over 4
+
+=item label
+
+Specifies the name of the label to apply to the message.  The label must
+already exist to be used (see the B<createLabel> function).
+
+B<Example>
+
+  label => 'Receipts'
+
+=item markAsRead
+
+Can be 'true' or 'false', representing whether or not to mark the message
+as read.
+
+  markAsRead => 'true'
+
+=item archive
+
+Can be 'true' or 'false', representing whether or not to archive the
+message if the criteria is met.
+
+B<Example>
+
+  archive => 'true'
+
+=back
+
+B<Examples>
+
+  $google->createFilter(
+      username => 'jsmith',
+      hasWord  => 'receipt',
+      label    => 'Receipts'
+  )
+  || die "Could not create filter";
+
+  $google->createFilter(
+      username => 'jsmith',
+      from     => 'spam@example.net',
+      archive  => 'true'
+  )
+  || die "Could not create filter";
+
+=head2 createSendAs ( USERNAME, NAME, ADDRESS, REPLYTO, DEFAULT )
+
+Create a send-as alias.
+
+=over 4
+
+=item username
+
+Required.  Specified the username of the mail account.
+
+=back
+
+=over 4
+
+=item name
+
+Required.  The name that will appear in the 'from' field for this user.
+
+=back
+
+=over 4
+
+=item address
+
+Required.  The e-mail address that appears as the origination address for
+emails sent by this user.
+
+=back
+
+=over 4
+
+=item replyTo
+
+Optional.  If set, this address will be included as the reply-to address
+in emails sent using the alias.
+
+=back
+
+=over 4
+
+=item default
+
+Optional.  Can be 'true' or 'false', representing whether or not this alias
+will be become the new default alias to send-as for this user.
+
+=back
+
+B<Example>
+
+  $google->createSendAs(
+    username => 'jsmith',
+    name     => 'Sales',
+    address  => 'sales@company.com',
+    default  => 'true'
+  )
+  || die "Could not create send-as alias";
+
+=head2 enableWebClips ( USERNAME )
+
+=head2 disableWebClips ( USERNAME )
+
+Enable or disable web clips.
+
+B<Example>
+
+  $google->enableWebClips( username => 'jsmith' );
+
+=head2 enableForwarding ( USERNAME, FORWARDTO, ACTION )
+
+Enable forwarding.
+
+B<action> is an optional parameter defining what Google should do with mail
+once forwarding is enabled.  Valid options are 'archive', 'keep' (the
+default), and 'delete'.
+
+B<Example>
+
+  $google->enableForwarding(
+      username   => 'jsmith',
+      forwareTo  => 'joe@example.net',
+      action     => 'archive'
+  )
+  || die "Could not enable forwarding";
+
+=head2 disableForwarding ( USERNAME )
+
+Disable forwarding.
+
+B<Example>
+
+  $google->disableForwarding( username => 'jsmith' );
+
+=head2 enablePOP ( USERNAME, ENABLEFOR, ACTION )
+
+Enable POP access.
+
+=over 4
+
+=item action
+
+An optional parameter defining what Google should do with mail once POP
+access is enabled.  Valid options are 'archive', 'keep' (the default),
+and 'delete'.
+
+=item enableFor
+
+An optional parameter defining whether to enable POP for all mail, or mail
+from now on.  Valid options are 'all', and 'now' (the default).
+
+=back
+
+B<Example>
+
+  $google->enablePOP(
+      username   => 'jsmith',
+      enableFor  => 'all',
+      action     => 'archive'
+  )
+  || die "Could not enable POP";
+
+=head2 disablePOP ( USERNAME )
+
+Disable POP access.
+
+B<Example>
+
+  $google->disablePOP( username => 'jsmith' );
+
+=head2 enableIMAP ( USERNAME )
+
+=head2 disableIMAP ( USERNAME )
+
+Enable or disable IMAP access.
+
+B<Example>
+
+  $google->enableIMAP( username => 'jsmith' );
+
+=head2 enableVacation ( USERNAME, SUBJECT, MESSAGE, CONTACTSONLY )
+
+Enable a vacation/out-of-office auto-responder.
+
+=over 4
+
+=item subject
+
+The subject line for the vacation auto-responder.
+
+=back
+
+=over 4
+
+=item message
+
+The message body of the vacation auto-responder.  Up to 100 KB is
+allowed.
+
+=back
+
+=over 4
+
+=item contactsOnly
+
+Whether to only send the autoresponse to known contacts.
+
+=back
+
+B<Example>
+
+  $google->enableVacation(
+      username => 'jsmith',
+      subject  => 'Out of the office',
+      message  => 'I will be out of the office until Tuesday.  Please '
+                . 'contact me at 555-5555 for all urgent matters.'
+  )
+  || die "Could not enable vacation auto-responder";
+
+=head2 disableVacation ( USERNAME )
+
+Disable a vacation auto-responder.
+
+B<Example>
+
+  $google->disableVacation( username => 'jsmith' );
+
+=head2 enableSignature ( USERNAME, SIGNATURE )
+
+Enable an e-mail signature.
+
+B<Example>
+
+  $google->enableSignature(
+      username  => 'jsmith',
+      signature => 'Joey Smith - (+1) 555-555-5555'
+  )
+  || die "Could not enable signature";
+
+=head2 disableSignature ( USERNAME )
+
+Disable a signature.
+
+B<Example>
+
+  $google->disableSignature( username => 'jsmith' );
+
+=head2 setLanguage ( USERNAME, LANGUAGE )
+
+Updating the display language setting.
+
+B<Example>
+
+  $google->setLanguage(
+      username => 'jsmith',
+      language => 'de'
+  );
+
+=head2 setPageSize ( USERNAME, PAGESIZE )
+
+Set the number of conversations to be shown per page.
+
+B<Example>
+
+  $google->setPageSize(
+      username => 'jsmith',
+      pageSize => '50'
+  );
+
+=head2 enableShortcuts ( USERNAME )
+
+=head2 disableShortcuts ( USERNAME )
+
+Enable or disable keyboard shortcuts.
+
+B<Example>
+
+  $google->enableShortcuts( username => 'jsmith' );
+
+=head2 enableArrows ( USERNAME )
+
+=head2 disableArrows ( USERNAME )
+
+Enable or disable arrow-shaped personal indicators ( › and » ) next to
+emails that were sent specifically to the user.
+
+B<Example>
+
+  $google->enableArrows( username => 'jsmith' );
+
+=head2 enableSnippets ( USERNAME )
+
+=head2 disableSnippets ( USERNAME )
+
+Enable or disable snippets of messages in the inbox and when searching.
+
+B<Example>
+
+  $google->enableSnippets( username => 'jsmith' );
+
+=head1 AUTHOR
+
+Scott Schneider <sschneid@gmail.com>
+
+=cut
+

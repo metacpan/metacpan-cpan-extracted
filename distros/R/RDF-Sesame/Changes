@@ -1,0 +1,61 @@
+---
+version : 0.17
+date    : 2008-08-12T13:36:25Z
+changes :
+    - Fix test failures under modern Test::More
+    - Migrate the repository to Git
+---
+version : 0.16
+date    : 2007-05-25T15:58:29Z
+changes :
+    - Documented some of the limits of using the binary results format
+    - Correct triple count when uploading more than 999 triples.  Thanks Benno Blumenthal.
+    - Add server_file option to upload_uri.  Thanks Benno Blumenthal.
+---
+version : 0.15
+date    : 2006-04-19T19:24:13Z
+changes :
+    - >
+      added support for binary table results format which parses
+      *much* (50-500 times) faster than the XML results format."
+    - use binary table results format by default
+    - minor code cleanup
+
+---
+version : 0.14
+date    : 2006-04-17T20:46:10Z
+changes :
+    - updated the year on copyright statements
+    - added extract() to RDF::Sesame::Repository
+    - added construct() to RDF::Sesame::Repository (rt.cpan.org #13600)
+
+---
+version : 0.13
+date    : 2006-02-07T09:45:46Z
+changes :
+    - added test coverage statistics to the POD
+    - added compatibility statement for Sesame 1.2.3 and 1.2.4
+    - added rudimentary debugging/profiling support (RDFSESAME_DEBUG)
+    - corrected the connect() call in the SYNOPSIS
+    - added a test for POD coverage
+    - add "use strict" and "use warnings" to all modules
+
+---
+version : 0.12
+date    : 2005-09-29T17:31:30Z
+changes : 
+    - highlighted that inferencing must be disabled to run tests
+    - added compatibility table
+    - added a module signature
+
+---
+version : 0.11
+date    : 2005-07-14T15:58:24Z
+changes :
+    - corrected the repository.t test
+
+---
+version : 0.10
+date    : 2005-07-05T22:27:10Z
+changes :
+    - original version

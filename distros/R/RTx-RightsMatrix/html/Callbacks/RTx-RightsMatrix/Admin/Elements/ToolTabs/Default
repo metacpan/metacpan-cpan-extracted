@@ -1,0 +1,10 @@
+<%ARGS>
+$tabs => {}
+</%ARGS>
+<%INIT>
+$tabs->{'zz'} = {
+	title => loc('Rights Matrix'),
+	path  => 'Admin/Tools/RightsMatrix/',
+};
+
+</%INIT>

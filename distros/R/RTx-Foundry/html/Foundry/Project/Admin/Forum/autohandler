@@ -1,0 +1,99 @@
+%# ...
+</form>
+% $m->call_next(%ARGS);
+<%SHARED>
+use MIME::Base64;
+use WWW::Mechanize;
+use Digest::MD5;
+use HTTP::Cookies;
+
+if (!$RT::SympaSecret) {
+    foreach my $dir (qw(
+        /home/sympa/etc/sympa.conf
+        /etc/sympa.conf
+        /usr/local/etc/sympa.conf
+    )) {
+        $RT::SympaConfig = $dir if -e $dir and !-e $RT::SympaConfig;
+    }
+
+    open my $conf, $RT::SympaConfig or die $!;
+    while (<$conf>) {
+	$RT::SympaURL = $1 if /^\s*wwsympa_url\s+(.+?)\s*$/;
+	$RT::SympaSecret = $1 if /^\s*cookie\s+(.+?)\s*$/;
+    }
+}
+
+my $u = $session{'CurrentUser'}->UserObj;
+my $email = $u->Name . "\@$RT::EmailHost";
+
+my $md5 = Digest::MD5->new;
+$md5->add($email . $RT::SympaSecret);
+$md5 = substr( unpack("H*", $md5->digest) , -8 );
+
+$RT::BaseURL = "/Foundry/Project/Admin/Forum/List.html";
+
+our $wws = $RT::SympaURL;
+our $jar = HTTP::Cookies->new;
+our $ua = WWW::Mechanize->new( cookie_jar => $jar );
+
+$jar->set_cookie(
+    0, 'sympauser', "$email:$md5", '/',
+    URI->new($wws)->host, URI->new($wws)->port,
+    0, 0, 1, 0
+) unless $u->Name eq 'guest';
+
+our ($Get, $Post) = map {
+    my $method = $_;
+    sub {
+	my $url = shift;
+	$url = $wws . $url unless $url =~ /^\w+:\//;
+	my $rv;
+	if ($method eq 'get') {
+	    $ua->get($url, @_);
+	    $rv = $ua->content;
+	}
+	else {
+	    $rv = $ua->post($url, @_)->as_string;
+	}
+	
+	if (!$ua->is_html) {
+	    # Send out things verbatim
+	    $m->clear_buffer;
+	    $r->content_type($ua->ct);
+	    $ua->res->headers->scan(sub {$r->header_out(@_)});
+	    $r->print($ua->res->content);
+	    $m->flush_buffer;
+	    $m->abort;
+	}
+
+	Encode::_utf8_on($rv);
+	my $base = $1 if $rv =~ m{<BASE HREF=".*?(/wws[^>]+/).*?">};
+	# my $script = $1 if $rv =~ s{(<SCRIPT\b.*?</SCRIPT>)}{}is;
+	# $m->print($script) unless $m->notes('RV'); # -- moved to Pro.js
+	$m->notes( RV => $rv );
+
+	$rv =~ s/(\bACTION=")\/wws(".*>)/$1$RT::BaseURL$2/gi;
+	$rv =~ s{\bHREF="(/wws[^>]*>)}{<A HREF="$RT::BaseURL$1}gi;
+	$rv =~ s{\bACTION="(/wws[^>]*>)}{ACTION="$RT::BaseURL$1}gi;
+	$rv =~ s{\bHREF="(?! )([^/][^>]*>)}{<A HREF="$RT::BaseURL$base$1}gi;
+	$rv =~ s{\bSRC="/icons/sympa}{SRC="/Foundry/Icons}gi;
+	$rv =~ s{(<INPUT TYPE=")button(".*?)OnClick="request_confirm.*?"(.*?>)}{${1}submit$2}gis;
+	$rv =~ s{.*<!-- end menu.tt2 -->}{}s;
+	$rv =~ s{\s*</TD>\s*</TR>\s*</TABLE></TD></TR></TABLE>.*}{}s;
+	$rv =~ s{<FORM.*?<INPUT NAME="action"  TYPE="hidden" Value="arcsearch">.*?</FORM>}{}s;
+	$rv =~ s{<PRE>\s+(\w+-\w+)\s+</PRE>}{<a href="List.html/wws/arc/$1">$1</a>};
+	$rv =~ s{<font size=-1 color="#0f6080">.*?<!-- MHonArc v\S+ -->}{}s;
+	$rv =~ s{<!-- MHonArc v\S+ -->.*?<!--X-Body-Begin-->}{}s;
+	$rv =~ s{<TR VALIGN="top">(?:\s*<[^>]+>)*\s*topics.*?^</TR>}{}ms;
+	$rv;
+    };
+} qw(get post);
+
+my $tag = $session{CurrentUser}->LanguageHandle->language_tag;
+$tag =~ s/.*-//;
+$tag = 'us' if $tag eq 'en';
+$Post->( "/", { action => 'set_lang', lang => $tag } );
+</%SHARED>
+<%ATTR>
+AutoFlush => 0
+</%ATTR>

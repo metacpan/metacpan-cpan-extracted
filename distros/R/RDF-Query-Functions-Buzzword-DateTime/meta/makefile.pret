@@ -1,0 +1,15 @@
+# This file provides instructions for packaging.
+
+`RDF-Query-Functions-Buzzword-DateTime`
+	perl_version_from m`RDF::Query::Functions::Buzzword::DateTime`;
+	version_from      m`RDF::Query::Functions::Buzzword::DateTime`;
+	readme_from       m`RDF::Query::Functions::Buzzword::DateTime`;
+	requires          p`DateTime 0`;
+	requires          p`DateTime::Format::Duration 0`;
+	requires          p`DateTime::Format::ISO8601 0`;
+	requires          p`DateTime::Format::Natural 0`;
+	requires          p`RDF::Query 2.903`;
+	recommends        p`RDF::Query::Functions::Buzzword::Util 0.003`;
+	test_requires     p`Test::More 0.61`;
+.
+

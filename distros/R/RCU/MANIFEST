@@ -1,0 +1,21 @@
+README
+INSTALL
+Changes
+MANIFEST
+COPYING
+Makefile.PL
+helper.c
+t/00_load.t
+RCU.pm
+RCU.xs
+RCU/Event.pm
+RCU/Context.pm
+RCU/Receipts.pod
+Irman/Makefile.PL
+Irman/Irman.pm
+Irman/Irman.xs
+Irman/rcu-irman-helper.c
+Lirc/Makefile.PL
+Lirc/Lirc.pm
+Lirc/Lirc.xs
+META.yml                                 Module meta-data (added by MakeMaker)

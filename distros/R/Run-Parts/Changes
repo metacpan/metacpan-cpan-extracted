@@ -1,0 +1,117 @@
+Revision history for Run-Parts
+
+0.09    2015-08-18 02:23:22+0200
+
+        Replace Modern::Perl with "use 5.010;" + strict and warnings.
+        Drop perlcritic.rc.
+
+        Add release test to verify 5.010 compatibility (for now).
+
+        Polish README a little bit.
+
+        Move release tests to xt/release and drop %ENV checking code.
+
+        Require Test::Warnings >= 0.005 for "warnings".
+
+        Replace individual xt/release/kwalitee.t with
+        Dist::Zilla::Plugin::Test::Kwalitee
+
+0.08    2014-09-11 16:57:00+02:00
+
+        Fix dist.ini to exclude emacs style backup files (except in
+        the test data directory) as well as the cover_db.
+
+        Hack around RT#66485 to be able to use done_testing() together
+        with Test::NoWarnings. Also fixes number of skipped tests in
+        t/basic-functionality.t on non-debianoid platforms.
+
+        Fix Author vs Release test in t/manifest.t's skip message.
+
+        Only run t/changes.t if $RELEASE_TESTING is set.
+
+        Update t/win-*.t skip messages to in line with the others.
+
+        Add a Test::Kwalitee based test.
+
+0.07    2014-09-10 00:33:03+02:00
+
+        Add test that the change log conforms to CPAN::Changes::Spec.
+
+        Convert dates in change log to conform with
+        CPAN::Changes::Spec.
+
+        Require CPAN::Changes >= 0.23 for running the test suite.
+
+        Switch to Dist::Zilla (with ExtUtils::MakeMaker) instead of
+        Module::Build. Remove convenience Makefile.
+
+        Fix Perl::Critic warning "Don't modify $_ in list functions"
+
+        Consider Modern::Perl as ok for
+        Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict
+
+        Use Travis CI for smoke testing and Coveralls.io for coverage
+        reporting.
+
+        Fix passing backends as reference. Add test for that.
+
+        Use "use_ok" instead of "use" in all tests.
+
+        Drop unreachable else clause while listing the directory
+        contents.
+
+        Simplify condition in Run::Parts::Debian::run_parts_command.
+
+        Further new tests added:
+        + Verify behaviour upon unknown backend parameter.
+        + Verify that chomped_lines and lines die if called like a method.
+        + Alternative backend names (module=perl, run-parts=debian)
+
+0.06    2013-07-22 20:47:16+02:00
+
+        Bump Module::Build requirement to 0.4004 for test_requires.
+
+        Remove all environment variables listed as relevant for taint
+        mode in perlsec(1) from the affected tests.
+
+0.05    2013-07-21 17:56:01+02:00
+
+        Fix test skipping numbers in t/basic-functionality.t.
+
+        Documentation deduplication.
+
+0.04    2013-07-10 19:55:57+02:00
+
+        New method concat.
+
+        New helper module Run::Parts::Common.
+
+        Run::Parts::Perl now works properly on DOS-ish platforms
+
+        Some refactoring which pulls in new dependencies.
+
+0.03    2013-07-05 21:01:59+02:00
+
+        Run::Parts has been split up into frontend and backend
+        modules.
+
+        A pure Perl backend module has been added.
+
+        Run::Parts now can either choose the appropriate backend
+        itself or use a given backend.
+
+0.02    2013-06-08 20:04:53+02:00
+
+	Skip functionality tests if /bin/run-parts is not there or not
+	executable.
+
+	Add POD encoding to make Test::Pod happy
+
+	State in Build.PL that the test suite needs Test::Differences and
+	that Run::Parts itself needs Perl >= 5.10.
+
+        Disable Makefile.PL compatibility.
+
+0.01    2013-06-07 20:26:57+02:00
+
+        Initial release. More or less a proof of concept.

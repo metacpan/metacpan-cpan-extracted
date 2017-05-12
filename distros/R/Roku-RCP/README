@@ -1,0 +1,123 @@
+Roku::RCP(3)          User Contributed Perl Documentation         Roku::RCP(3)
+
+
+
+NNAAMMEE
+       Roku::RCP - Object approach to controlling RCP enabled Roku products,
+       such as the Roku SoundBridge.
+
+SSYYNNOOPPSSIISS
+           use Roku::RCP;
+
+           # Connect to the sleeping Roku, wake him up and tell him to play
+           # the All_Dynamic playlist
+           my $rcp = new Roku::RCP('192.168.0.102');
+
+           # You can leave out this whole if-statement if your Roku is already
+           # connected to a media server (and thus not in standby mode).
+           if (!$rcp->GetConnectedServer()) {
+             print "Not connected to firefly. Connecting ...\n";
+             die "Couldn't connect to Firefly\n" unless $rcp->ServerConnectByName("Firefly");
+           }
+           $rcp->PlayPlaylist("All_Dynamic") or die "No Can Do\n";
+           $rcp->Shuffle("on");
+           $rcp->Quit();
+
+DDEESSCCRRIIPPTTIIOONN
+       "Roku::RCP" Gives you an object through which you can communicate with
+       your Roku Control Protocol-enabled Roku product. For the most part, the
+       commands are merely passed through onto the connection and the results
+       are parsed and returned to you either in an array in list context, or a
+       giant string in scalar context. Should the command fail, undef is
+       returned.
+
+       You'll want to familiarize yourself with the Roku Control Protocol
+       (RCP) by visting the Roku Labs site http://www.rokulabs.com and reading
+       the RCP spec. Although this module provides some convenience functions,
+       you'll need to have an understanding of the basic commands if you'd
+       like to do anything more fancy.
+
+MMEETTHHOODDSS
+       "my $rcp = new Roku::RCP($hostname, %options)"
+           Construct a new object.
+
+               $rcp = new Roku::RCP('192.168.0.102', Debug=>1, RawResults=>1, Port=>5555, Timeout=>50);
+
+           If RawResults is set, you'll get back everything Roku sends back.
+           If it's not set, you'll just get back the data without any meta-
+           data. You can probably use RawResults along with Port=>4444 to send
+           non RCP commands over to the normal Roku telnet interface. The tel-
+           net interface listening on port 4444 is mostly operating system-
+           type commands and aren't related to media playback. Using Roku::RCP
+           to communicate with the regular telnet interface is a usage case
+           that hasn't been tested, but it should work. The module uses
+           AUTOLOAD to take whatever function you call and send that down the
+           connection.
+
+       "$rcp->ServerConnectByName($server_name)"
+           "ServerConnectByName()" Is a convenience function that takes a par-
+           tial or complete media server name and tries to connect to it. An
+           example of such would be "FireFly";
+
+       "$rcp->PlayPlayList($playlist_name)"
+           A convenience function that takes a partial or complete playlist
+           name and tries to start playing it.
+
+       "$rcp->PlayArtist($artist_name)"
+           A convenience function that takes an exact, case-sensitive artist
+           name and tries to play all the songs by that artist. Note that if
+           you'd like to do partial matching, you'll have to first call
+           $rcp->SearchArtists("vast"), get the resulting list back, pick one
+           and then call _P_l_a_y_A_r_t_i_s_t_(_) with that string.
+
+       "$rcp->PlayAlbum($album_name)"
+           A convenience function that takes an exact, case-sensitive album
+           name and tries to play all the songs on that album. Note that if
+           you'd like to do partial matching, you'll have to first call
+           $rcp->SearchAlbums("visual audio sensory theat"), get the resulting
+           list back, pick one and then call _P_l_a_y_A_l_b_u_m_(_) with that string.
+
+       "$rcp->PlaySong($song_name)"
+           A convenience function that takes a partial, case insensitive song
+           name and tries to play all the songs matching that string.
+
+       "$rcp->InsertSong($song_name)"
+           A convenience function that takes a partial, case insensitive song
+           name and tries to insert all matching songs into the queue and play
+           them. Note that if the song/s is/are already in your queue, the
+           position won't change and the next song in your queue will start
+           playing.
+
+       "$rcp->Quit()"
+           Cleanly close the connection. This will get called automatically
+           when the object is destroyed.
+
+       "$rcp->ROKU_RCP_COMMAND($arg1, $arg2, ...)"
+           Any commands not specifically listed here are considered to be RCP
+           commands and sent along down the connection. Here are a few to wet
+           your whistle: Next, Previous, Reboot, QueueAndPlay, GetTimeZone,
+           ListServers, ListPlaylists. Generally the paradigm is that you con-
+           nect to Roku, issue a command that lists out songs and then you
+           QueueAndPlay. Roku assumes you mean the last listing of songs.
+           Unless you want to wait for thousands and thousands of song titles
+           to come back, you generally want to tell Roku to forgo sending you
+           the entire list and just send you the total number.
+           $rcp->SetListResultType("partial") is your friend. Take a look at
+           how I did the _P_l_a_y_A_r_t_i_s_t_(_) convenience function as a good starting
+           place.
+
+LLEEGGAALLEESSEE
+       Copyright 2007 by Robert Powers, all rights reserved. This program is
+       free software, you can redistribute it and/or modify it under the same
+       terms as Perl itself.
+
+BBUUGGSS
+       This module is not 100% tested, but I use it every day, so it'll get
+       better over time.
+
+AAUUTTHHOORR
+       2007, Robert Powers <batman@cpan.org>
+
+
+
+perl v5.6.1                       2007-03-31                      Roku::RCP(3)

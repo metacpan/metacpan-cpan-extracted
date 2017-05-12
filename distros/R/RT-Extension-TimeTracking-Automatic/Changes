@@ -1,0 +1,7 @@
+Revision history for RT-Extension-TimeTracking-Automatic
+
+0.02 2016-10-06
+ - Also auto-track time on create.
+
+0.01 2016-09-15
+ - Initial version

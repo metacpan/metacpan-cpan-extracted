@@ -1,0 +1,3 @@
+% if(my $txt = RT->Config->Get("CIFMinimal_ApikeyWarning")){
+<pre><% $txt %></pre>
+% }

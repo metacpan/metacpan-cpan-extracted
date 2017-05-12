@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+@ScripActions = (
+    # Send a pushover notification
+    {
+      Name                  => '[2QSupport] Pushover notify',
+      Description           => 'Send a pushover notification to the RT::User objects in @$$Recipients',
+      ExecModule            => 'PushoverNotify',
+    },
+);
+
+1;

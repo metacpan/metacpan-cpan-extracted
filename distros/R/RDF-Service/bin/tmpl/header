@@ -1,0 +1,20 @@
+[% PROCESS components %]
+<HTML><HEAD><TITLE>Wraf: $template.title</TITLE>
+[% INCLUDE js %]
+</HEAD><BODY>
+
+<h1>Wraf 0.04: $template.title</h1>
+
+[% view_result %]
+
+[% TRY %]
+[% agent = s.arc_obj("${NS_LS}#agent").li %]
+<p>You are now operating as
+    [% agent.arc_obj("${NS_LD}/Property#first_name").li.value %]
+    [% agent.arc_obj("${NS_LD}/Property#last_name").li.value %]
+</p>
+[% CATCH; CLEAR; reset %]
+<p>Not logged in: $error.info</p>
+[% END %]
+
+<form name="f" action="$me" method="post">

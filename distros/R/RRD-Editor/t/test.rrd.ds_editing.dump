@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE rrd SYSTEM "http://oss.oetiker.ch/rrdtool/rrdtool.dtd">
+<!-- Round Robin Database Dump -->
+<rrd>
+	<version>0003</version>
+	<step>300</step> <!-- Seconds -->
+	<lastupdate>920806800</lastupdate>
+	
+	<ds>
+		<name>new1</name>
+		<type>COUNTER</type>
+		<minimal_heartbeat>600</minimal_heartbeat>
+		<min>nan</min>
+		<max>nan</max>
+		
+		<!-- PDP Status -->
+		<last_ds>67</last_ds>
+		<value>0.00000e+00</value>
+		<unknown_sec>0</unknown_sec>
+	</ds>
+
+	<ds>
+		<name>el2</name>
+		<type>ABSOLUTE</type>
+		<minimal_heartbeat>1200</minimal_heartbeat>
+		<min>0</min>
+		<max>1</max>
+		
+		<!-- PDP Status -->
+		<last_ds>1.0</last_ds>
+		<value>0.00000e+00</value>
+		<unknown_sec>0</unknown_sec>
+	</ds>
+
+	<ds>
+		<name>el4</name>
+		<type>ABSOLUTE</type>
+		<minimal_heartbeat>600</minimal_heartbeat>
+		<min>nan</min>
+		<max>nan</max>
+		
+		<!-- PDP Status -->
+		<last_ds>2</last_ds>
+		<value>0.00000e+00</value>
+		<unknown_sec>0</unknown_sec>
+	</ds>
+
+	<ds>
+		<name>added</name>
+		<type>GAUGE</type>
+		<minimal_heartbeat>600</minimal_heartbeat>
+		<min>nan</min>
+		<max>nan</max>
+		
+		<!-- PDP Status -->
+		<last_ds>U</last_ds>
+		<value>0.00000e+00</value>
+		<unknown_sec>0</unknown_sec>
+	</ds>
+
+	<!-- Round Robin Archives -->
+	<rra>
+		<cf>AVERAGE</cf>
+		<pdp_per_row>1</pdp_per_row> <!-- 300 seconds -->
+
+		<params>
+		<xff>5.00000e-01</xff>
+		</params>
+		<cdp_prep>
+			<ds>
+			<primary_value>1.43166e+07</primary_value>
+			<secondary_value>0.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>1.00000e+00</primary_value>
+			<secondary_value>0.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>6.66667e-03</primary_value>
+			<secondary_value>0.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>0.00000e+00</primary_value>
+			<secondary_value>0.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+		</cdp_prep>
+		<database>
+		<row><v>6.66667e-02</v><v>2.57000e+02</v><v>2.50797e+01</v><v>nan</v></row>
+		<row><v>1.43166e+07</v><v>-5.00000e+00</v><v>2.00000e-02</v><v>nan</v></row>
+		<row><v>2.40000e-01</v><v>6.90000e+00</v><v>2.20000e-01</v><v>nan</v></row>
+		<row><v>2.17667e+00</v><v>2.99000e+00</v><v>1.89667e-01</v><v>nan</v></row>
+		<row><v>1.43166e+07</v><v>1.00000e+00</v><v>6.66667e-03</v><v>nan</v></row>
+		</database>
+	</rra>
+	<rra>
+		<cf>AVERAGE</cf>
+		<pdp_per_row>2</pdp_per_row> <!-- 600 seconds -->
+
+		<params>
+		<xff>5.00000e-01</xff>
+		</params>
+		<cdp_prep>
+			<ds>
+			<primary_value>7.15828e+06</primary_value>
+			<secondary_value>1.43166e+07</secondary_value>
+			<value>0.00000e+00</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>1.99500e+00</primary_value>
+			<secondary_value>1.00000e+00</secondary_value>
+			<value>0.00000e+00</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>9.81667e-02</primary_value>
+			<secondary_value>6.66667e-03</secondary_value>
+			<value>0.00000e+00</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>0.00000e+00</primary_value>
+			<secondary_value>0.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+		</cdp_prep>
+		<database>
+		<row><v>nan</v><v>nan</v><v>nan</v><v>nan</v></row>
+		<row><v>7.15828e+06</v><v>7.60850e+02</v><v>9.56000e-01</v><v>nan</v></row>
+		<row><v>9.00000e-02</v><v>3.83056e+04</v><v>1.26515e+01</v><v>nan</v></row>
+		<row><v>7.15828e+06</v><v>9.50000e-01</v><v>1.20000e-01</v><v>nan</v></row>
+		<row><v>7.15828e+06</v><v>1.99500e+00</v><v>9.81667e-02</v><v>nan</v></row>
+		</database>
+	</rra>
+	<rra>
+		<cf>LAST</cf>
+		<pdp_per_row>2</pdp_per_row> <!-- 600 seconds -->
+
+		<params>
+		<xff>5.00000e-01</xff>
+		</params>
+		<cdp_prep>
+			<ds>
+			<primary_value>1.43166e+07</primary_value>
+			<secondary_value>1.43166e+07</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>1.00000e+00</primary_value>
+			<secondary_value>1.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>6.66667e-03</primary_value>
+			<secondary_value>6.66667e-03</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>0.00000e+00</primary_value>
+			<secondary_value>0.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+		</cdp_prep>
+		<database>
+		<row><v>nan</v><v>nan</v><v>nan</v><v>nan</v></row>
+		<row><v>1.43165e+07</v><v>6.79300e+02</v><v>2.98667e-01</v><v>nan</v></row>
+		<row><v>6.66667e-02</v><v>2.57000e+02</v><v>2.50797e+01</v><v>nan</v></row>
+		<row><v>2.40000e-01</v><v>6.90000e+00</v><v>2.20000e-01</v><v>nan</v></row>
+		<row><v>1.43166e+07</v><v>1.00000e+00</v><v>6.66667e-03</v><v>nan</v></row>
+		</database>
+	</rra>
+	<rra>
+		<cf>MAX</cf>
+		<pdp_per_row>2</pdp_per_row> <!-- 600 seconds -->
+
+		<params>
+		<xff>5.00000e-01</xff>
+		</params>
+		<cdp_prep>
+			<ds>
+			<primary_value>1.43166e+07</primary_value>
+			<secondary_value>1.43166e+07</secondary_value>
+			<value>-inf</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>2.99000e+00</primary_value>
+			<secondary_value>1.00000e+00</secondary_value>
+			<value>-inf</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>1.89667e-01</primary_value>
+			<secondary_value>6.66667e-03</secondary_value>
+			<value>-inf</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>0.00000e+00</primary_value>
+			<secondary_value>0.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+		</cdp_prep>
+		<database>
+		<row><v>nan</v><v>nan</v><v>nan</v><v>nan</v></row>
+		<row><v>1.43165e+07</v><v>8.42400e+02</v><v>1.61333e+00</v><v>nan</v></row>
+		<row><v>1.13333e-01</v><v>7.63542e+04</v><v>2.50797e+01</v><v>nan</v></row>
+		<row><v>1.43166e+07</v><v>6.90000e+00</v><v>2.20000e-01</v><v>nan</v></row>
+		<row><v>1.43166e+07</v><v>2.99000e+00</v><v>1.89667e-01</v><v>nan</v></row>
+		</database>
+	</rra>
+	<rra>
+		<cf>MIN</cf>
+		<pdp_per_row>2</pdp_per_row> <!-- 600 seconds -->
+
+		<params>
+		<xff>5.00000e-01</xff>
+		</params>
+		<cdp_prep>
+			<ds>
+			<primary_value>2.17667e+00</primary_value>
+			<secondary_value>1.43166e+07</secondary_value>
+			<value>inf</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>1.00000e+00</primary_value>
+			<secondary_value>1.00000e+00</secondary_value>
+			<value>inf</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>6.66667e-03</primary_value>
+			<secondary_value>6.66667e-03</secondary_value>
+			<value>inf</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+			<ds>
+			<primary_value>0.00000e+00</primary_value>
+			<secondary_value>0.00000e+00</secondary_value>
+			<value>nan</value>
+			<unknown_datapoints>0</unknown_datapoints>
+			</ds>
+		</cdp_prep>
+		<database>
+		<row><v>nan</v><v>nan</v><v>nan</v><v>nan</v></row>
+		<row><v>2.15667e+01</v><v>6.79300e+02</v><v>2.98667e-01</v><v>nan</v></row>
+		<row><v>6.66667e-02</v><v>2.57000e+02</v><v>2.23333e-01</v><v>nan</v></row>
+		<row><v>2.40000e-01</v><v>-5.00000e+00</v><v>2.00000e-02</v><v>nan</v></row>
+		<row><v>2.17667e+00</v><v>1.00000e+00</v><v>6.66667e-03</v><v>nan</v></row>
+		</database>
+	</rra>
+</rrd>

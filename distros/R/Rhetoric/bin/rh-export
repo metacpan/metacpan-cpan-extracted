@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+use common::sense;
+use Rhetoric 'With::MockRequest';
+use Getopt::Long;
+use Data::Dump 'pp';
+use File::Path::Tiny;
+use File::Basename;
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+  \%_,
+  'help|h'
+  'config|c=s%',
+);
+
+# mkpath
+*mk = \&File::Path::Tiny::mk;
+
+do 'rhetoric.psgi';
+
+my $C = \%Rhetoric::CONFIG;
+for (keys %{$_{config}}) {
+  if (/\[/ || /\{/) {
+    my $key = $_;
+    eval '$C->'.$key.' = $_{config}'."{'$key'}";
+  } else {
+    $C->{$_} = $_{config}{$_}
+  }
+}
+pp $C;
+
+Rhetoric->init;
+
+package Rhetoric::Controllers;
+use IO::All;
+use File::Basename;
+
+*mk = \&File::Path::Tiny::mk;
+
+# evil
+my $output_dir = "output";
+mkdir($output_dir);
+
+# TODO - add archives when that controller is ready
+# TODO - add categories when that controller is ready
+my %replacement = (
+  Home     => [ '/index.html', '/page/(\d+).html' ],
+  Post     => [ '/(\d+)/(\d+)/([\w-]+).html' ],
+  Category => [ '/category/(\w+).html' ],
+  Archive  => [ '/archive/(\d+)/(\d+).html' ],
+  Page     => [ '/(.*).html' ],
+);
+
+while (my ($controller, $urls) = each(%replacement)) {
+  $Rhetoric::Controllers::C{$controller}->{urls} = $urls;
+}
+#pp \%Rhetoric::Controllers::C;
+
+# TODO - export pages for Home controller
+my ($cc, $content) = Rhetoric->get('Home');
+my $blog = $cc->env->storage;
+my ($posts, $pager) = $blog->posts($C->{posts_per_page}, 1);
+my $last_page = $pager->last_page;
+$content > io($output_dir . R('Home'));
+mk("$output_dir/page");
+if ($last_page > 1) {
+  for my $page (2 .. $last_page) {
+    my ($cc, $content) = Rhetoric->get('Home', $page);
+    $content > io($output_dir . R('Home', $page));
+  }
+}
+
+# export pages for Post controller
+($posts, $pager) = $blog->posts(2 ** 31, 1);
+for my $post (@$posts) {
+  my ($cc, $content) = Rhetoric->get('Post', $post->year, $post->month, $post->slug);
+  mk(sprintf("$output_dir/%d/%02d", $post->year, $post->month));
+  $content > io($output_dir . R('Post', $post->year, $post->month, $post->slug));
+}
+
+# export pages for Page controller
+my (@pages) = $blog->pages;
+for my $page (@pages) {
+  my ($cc, $content) = Rhetoric->get('Page', $page);
+  my $dir_name = dirname($output_dir . R('Page', $page));
+  mk($dir_name);
+  $content > io($output_dir . R('Page', $page));
+}
+
+# export pages for Archive controller
+my (@archives) = $blog->archives;
+for my $archive (@archives) {
+  my ($cc, $content) = Rhetoric->get('Archive', $archive->year, $archive->month);
+  my $dir_name = dirname($output_dir . R('Archive', $archive->year, $archive->month));
+  mk($dir_name);
+  $content > io($output_dir . R('Archive', $archive->year, $archive->month));
+}
+
+# export pages for Category controller
+my (@categories) = $blog->categories;
+for my $category (@categories) {
+  my ($cc, $content) = Rhetoric->get('Category', $category);
+  my $dir_name = dirname($output_dir . R('Category', $category));
+  mk($dir_name);
+  $content > io($output_dir . R('Category', $category));
+}
+
+# export static files for themes
+system("rsync -a '$C->{'theme.base'}/' '$output_dir/theme/'");
+
+# tar it up
+system("tar czvf output.tgz output/") if ($C->{tar});

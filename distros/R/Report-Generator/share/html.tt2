@@ -1,0 +1,43 @@
+[% USE HTML -%]
+[%- MACRO htmltable(d)
+    BLOCK;
+	IF ADD_TIMESTAMP;
+	    d.cols.push(TIMESTAMP_COLNAME);
+	END;
+	tattr = {};
+	IF d.id;
+	    tattr.id = d.id;
+	END;
+	IF d.name;
+	    tattr.name = d.name;
+	END;
+	HTML.element( table => tattr );
+	IF d.caption;
+	    HTML.element( 'caption' );
+	    d.caption;
+	    HTML.element( '/caption' );
+	END;
+	HTML.element( 'tr' );
+	FOREACH colname IN d.cols;
+	    HTML.element( 'th' );
+	    colname;
+	    HTML.element( '/th' );
+	END;
+	HTML.element( '/tr' );
+	FOREACH line IN d.data;
+	    NEXT UNLESS line.size() > 0;
+	    IF ADD_TIMESTAMP;
+		line.push(TIMESTAMP_COLVALUE);
+	    END;
+	    HTML.element( 'tr' );
+	    FOREACH col IN line;
+		HTML.element( 'td' );
+		IF col.defined;
+		    col;
+		END;
+		HTML.element( '/td' );
+	    END;
+	    HTML.element( '/tr' );
+	END;
+	HTML.element( '/table' );
+    END -%]

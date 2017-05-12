@@ -1,0 +1,51 @@
+=extends field/mutable
+
+=for layout widget
+
+[% label_fragment %]
+[% message_fragment %]
+[% field %]
+
+=for layout field
+
+<table>
+  <tr>
+    <td> [% available_values %] </td>
+    <td>  [% action_buttons %]  </td>
+    <td>
+      [% selected_values %]
+      [% current_values  %]
+    </td>
+  </tr>
+</table>
+
+=for layout available_values
+
+<select size="10" multiple="multiple"  name="[% event_id_add_values %]">
+ [% call_next %]
+</select>
+
+=for layout selected_values
+
+<select size="10" multiple="multiple"  name="[% event_id_remove_values %]">
+ [% call_next %]
+</select>
+
+=for layout hidden_value
+
+<input type="hidden" name="[% field_name %]" value="[% hidden_value %]">
+
+=for layout value_option
+
+<option value="[% option_value %]">[% option_name %]</option>
+
+=for layout action_buttons
+
+<input type="submit" value="&gt;&gt;" name="[% event_id_add_all_values %]" />
+<input type="submit" value="&gt;" name="[% event_id_do_add_values %]" />
+<input type="submit" value="&lt;" name="[% event_id_do_remove_values %]" />
+<input type="submit" value="&lt;&lt;" name="[% event_id_remove_all_values %]" />
+
+=for layout message
+
+=cut

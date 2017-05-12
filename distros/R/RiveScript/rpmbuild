@@ -1,0 +1,125 @@
+#!/usr/bin/perl -w
+
+# Build an RPM. Usage:
+#   rpmbuild.pl [lib path]
+use strict;
+use warnings;
+use File::Copy;
+use Template;
+use lib "./lib";
+use RiveScript; # So we get its version no.
+use RiveScript::WD;
+
+# Use the pwd command to get the current working directory.
+my $pwd = `pwd`;
+chomp($pwd);
+
+# Build number = today's date.
+my @time = localtime();
+my $build = join("",
+	sprintf("%04d", $time[5] + 1900),
+	sprintf("%02d", $time[4] + 1),
+	sprintf("%02d", $time[3]),
+);
+
+print "Preparing build root...\n";
+makedir("./build", "./build/usr");
+command("perl Makefile.PL PREFIX=build/usr");
+command("make");
+command("make test");
+command("make install");
+
+print "Copying utils from bin/...\n";
+makedir("./build/usr/bin");
+copy("./bin/rivescript", "./build/usr/bin/");
+
+print "\n";
+
+print "Preparing Template Toolkit...\n";
+my $tt = Template->new ({
+	RELATIVE   => 1,
+	PRE_CHOMP  => 0,
+	POST_CHOMP => 0,
+});
+my $vars = {
+	version     => $RiveScript::VERSION,
+	build       => $build,
+	wd_version  => $RiveScript::WD::VERSION,
+	files       => [],
+};
+
+print "Making file list from buildroot...\n";
+my @flist = &crawl("./build");
+foreach my $file (@flist) {
+	$file =~ s/^\.\/build//i;
+	if ($file =~ /rpmbuild\.pl$/ || $file =~ /perllocal\.pod$/ || $file =~ /\.packlist$/) {
+		unlink("./build/$file");
+		next;
+	}
+	my $attr = "0644";
+	if (-d $file || $file =~ /^\/usr\/bin/i) {
+		$attr = "0755";
+	}
+	push (@{$vars->{files}}, "%attr($attr,root,root) $file");
+}
+
+print "Creating RPM spec file...\n";
+my $output;
+eval {
+	$tt->process("./perl-RiveScript.spec.tt", $vars, \$output) or die $@;
+};
+if ($@) {
+	die $@;
+}
+open (SPEC, ">perl-RiveScript.spec");
+print SPEC $output;
+close (SPEC);
+
+print "Building RPM...\n";
+command("rpmbuild --target=noarch --buildroot=$pwd/build -ba perl-RiveScript.spec");
+
+print "Cleaning up...\n";
+command("make clean");
+command("rm -rf build/");
+unlink("./perl-RiveScript.spec");
+
+sub command {
+	my $cmd = shift;
+	print "\$ $cmd\n";
+	system($cmd);
+}
+
+sub crawl {
+	my $dir = shift;
+
+	my @files = ();
+
+	opendir (DIR, $dir);
+	foreach my $file (readdir(DIR)) {
+		next if $file eq ".";
+		next if $file eq "..";
+		if (-d "$dir/$file") {
+			push (@files, &crawl("$dir/$file"));
+		}
+		else {
+			push (@files, "$dir/$file");
+		}
+	}
+
+	return @files;
+}
+
+sub makedir {
+	my @dirs = @_;
+	foreach my $d (@dirs) {
+		print "mkdir $d\n";
+		mkdir($d) unless -d $d;
+	}
+}
+
+sub prompt {
+	my $q = shift;
+	print "$q ";
+	chomp (my $answer = <STDIN>);
+	return $answer;
+}

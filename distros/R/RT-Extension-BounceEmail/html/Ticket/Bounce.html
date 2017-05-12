@@ -1,0 +1,212 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%#
+%# COPYRIGHT:
+%#
+%# This software is Copyright (c) 1996-2015 Best Practical Solutions, LLC
+%#                                          <sales@bestpractical.com>
+%#
+%# (Except where explicitly superseded by other copyright notices)
+%#
+%#
+%# LICENSE:
+%#
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%#
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+%# 02110-1301 or visit their web page on the internet at
+%# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+%#
+%#
+%# CONTRIBUTION SUBMISSION POLICY:
+%#
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%#
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%#
+%# END BPS TAGGED BLOCK }}}
+<& /Elements/Header, Title => $Title &>
+<& /Elements/Tabs &>
+
+% $m->callback(CallbackName => 'BeforeActionList', Actions => \@results, ARGSRef => \%ARGS, Ticket => $TicketObj);
+<& /Elements/ListActions, actions => \@results &>
+
+<form action="Bounce.html" id="ForwardMessage" name="ForwardMessage" method="post">
+% $m->callback( CallbackName => 'FormStart', ARGSRef => \%ARGS );
+<input type="hidden" class="hidden" name="id" value="<% $id %>" /><br />
+<input type="hidden" class="hidden" name="QuoteTransaction" value="<% $ARGS{'QuoteTransaction'} || '' %>" />
+
+<table border="0">
+<tr><td align="right"><&|/l&>From</&>:</td>
+<td><% $from %></td></tr>
+
+<tr><td align="right"><&|/l&>Subject</&>:</td>
+<td><input name="Subject" disabled="disabled" size="60" value="<% $ARGS{'Subject'} || $subject %>" /></td></tr>
+
+<tr><td align="right"><&|/l&>To</&>:</td>
+<td><& /Elements/EmailInput, Name => "To", AutocompleteMultiple => 1, Default => $ARGS{'To'} &></td></tr>
+
+<tr><td align="right"><&|/l&>Cc</&>:</td>
+<td><& /Elements/EmailInput, Name => "Cc", AutocompleteMultiple => 1, Default => $ARGS{'Cc'} &></td></tr>
+
+<tr><td align="right"><&|/l&>Bcc</&>:</td>
+<td><& /Elements/EmailInput, Name => "Bcc", AutocompleteMultiple => 1, Default => $ARGS{'Bcc'} &></td></tr>
+
+
+<tr>
+<td><&|/l&>Content</&>:</td>
+<td>
+<textarea disabled="disabled" id="message" cols="60" rows="24" name="body"><% $Content %></textarea>
+</td>
+</tr>
+
+</table>
+
+<& /Ticket/Elements/ShowAttachments, Ticket => $TicketObj, Attachments => $attachments &>
+
+<& /Elements/Submit, Label => loc('Bounce Message and Return'), Name => 'BounceAndReturn' &>
+<& /Elements/Submit, Label => loc('Bounce Message'), Name => 'Bounce' &>
+</form>
+<%INIT>
+my $TicketObj = LoadTicket($id);
+$id = $ARGS{'id'} = $TicketObj->id;
+
+Abort( loc("Permission Denied") )
+    unless $TicketObj->CurrentUserHasRight('ForwardMessage');
+
+my $txn = RT::Transaction->new( $session{'CurrentUser'} );
+$txn->Load( $QuoteTransaction );
+Abort( loc("Couldn't load transaction #[_1]", $QuoteTransaction) )
+    unless $txn->id;
+
+my @results;
+if ( $Bounce || $BounceAndReturn ) {
+# my ( $status, $msg ) = $TicketObj->Forward( Transaction => $txn, %ARGS );
+my ( $status, $msg ) = Bounce($TicketObj, Transaction => $txn, %ARGS );
+    push @results, $msg;
+
+    if ( $BounceAndReturn ) {
+        $session{'i'}++;
+        my $key = Digest::MD5::md5_hex(rand(1024));
+        push @{ $session{"Actions"}->{$key}  ||= [] }, @results;
+        RT::Interface::Web::Redirect( RT->Config->Get('WebURL') ."Ticket/Display.html?id=". $id."&results=".$key);
+    }
+}
+
+my $Title = loc('Bounce transaction #[_1]', $txn->id);
+
+my $from = RT::Interface::Email::GetForwardFrom( Transaction => $txn );
+
+my $subject = $txn->Subject;
+
+my $Content = $txn->Content;
+
+my $attachments = RT::Interface::Email::GetForwardAttachments(
+    Ticket => $TicketObj,
+    Transaction => $txn,
+);
+
+# this should possibly somwhere else but wtf
+sub Bounce {
+  my $self = shift;
+  my %args = (
+        Transaction    => undef,
+        Subject        => '',
+        To             => '',
+        Cc             => '',
+        Bcc            => '',
+        Content        => '',
+        ContentType    => 'text/plain',
+        DryRun         => 0,
+        CommitScrips   => 1,
+        @_
+    );
+
+    unless ( $self->CurrentUserHasRight('ForwardMessage') ) {
+        return ( 0, $self->loc("Permission Denied") );
+    }
+
+    $args{$_} = join ", ", map { $_->format } RT::EmailParser->ParseEmailAddress( $args{$_} || '' ) for qw(To Cc Bcc);
+
+    return (0, $self->loc("Can't bounce: no valid email addresses specified") )
+        unless grep {length $args{$_}} qw/To Cc Bcc/;
+
+    my $mime = MIME::Entity->build(
+        Type    => $args{ContentType},
+        Data    => Encode::encode( "UTF-8", $args{Content} ),
+    );
+
+    $mime->head->replace( $_ => Encode::encode('UTF-8',$args{$_} ) )
+      for grep defined $args{$_}, qw(Subject To Cc Bcc);
+    $mime->head->replace(
+        From => Encode::encode( 'UTF-8',
+            RT::Interface::Email::GetForwardFrom(
+                Transaction => $args{Transaction},
+                Ticket      => $self,
+            )
+        )
+    );
+
+    if ($args{'DryRun'}) {
+        $RT::Handle->BeginTransaction();
+        $args{'CommitScrips'} = 0;
+    }
+    #use Data::Dumper;
+    #print STDERR "*** ". $args{Transaction} ."\n";
+    #print STDERR Dumper $args{Transaction};
+
+    my ( $ret, $msg ) = $self->_NewTransaction(
+        $args{Transaction}
+        ? (
+            Type  => 'Bounce Transaction',
+            Field => $args{Transaction}->id,
+          )
+        : (
+            Type  => 'Bounce Ticket',
+            Field => $self->id,
+        ),
+       Data  => join( ', ', grep { length } $args{To}, $args{Cc}, $args{Bcc} ),
+       MIMEObj => $mime,
+       CommitScrips => $args{'CommitScrips'},
+    );
+
+    unless ($ret) {
+        $RT::Logger->error("Failed to create transaction: $msg");
+    }
+
+    if ($args{'DryRun'}) {
+        $RT::Handle->Rollback();
+    }
+    return ( $ret, $self->loc('Message recorded') );
+}
+
+
+
+</%INIT>
+
+<%ARGS>
+$id => undef
+$QuoteTransaction => 1
+$BounceAndReturn => 0,
+$Bounce          => $BounceAndReturn,
+</%ARGS>

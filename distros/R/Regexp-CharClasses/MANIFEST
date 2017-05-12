@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Regexp/CharClasses.pm
+t/00_basic.t
+t/01_digits.t
+t/02_digits_named.t
+t/03_digits_numbers.t
+t/04_digits_multi.t
+t/05_sigil.t
+t/06_parenthesis.t
+t/07_vowels.t
+t/08_lang_digits.t
+t/09_encode.t
+t/50_export.t
+t/90_pod.t
+t/95_pod_coverage.t
+t/Data.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

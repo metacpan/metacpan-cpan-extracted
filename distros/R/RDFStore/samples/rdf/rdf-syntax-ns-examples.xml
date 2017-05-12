@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- RDF test suite coming from http://www.w3.org/1999/02/22-rdf-syntax-ns -->
+<RDF
+    xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:s="http://description.org/schema/"
+    xmlns:a="http://description.org/schema/"
+    xmlns:v="http://description.org/schema/">
+
+<!-- Basic Serialization Syntax -->
+
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila">
+      <s:Creator>Ora Lassila</s:Creator>
+    </rdf:Description>
+
+<Description rdf:about="http://www.w3.org/Home/Lassila">
+      <s:Creator>Ora Lassila</s:Creator>
+    </Description>
+
+<Description rdf:about="http://www.w3.org/Home/Lassila">
+      <s:Creator xmlns:s="http://description.org/schema/">Ora Lassila</s:Creator>
+    </Description>
+
+<Description rdf:about="http://www.w3.org/Home/Lassila">
+      <Creator xmlns="http://description.org/schema/">Ora Lassila</Creator>
+    </Description>
+
+<!-- Basic Abbreviated Syntax -->
+
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila"
+                     s:Creator="Ora Lassila" />
+
+<rdf:Description rdf:about="http://www.w3.org">
+      <s:Publisher>World Wide Web Consortium</s:Publisher>
+      <s:Title>W3C Home Page</s:Title>
+      <s:Date>1998-10-03T02:27</s:Date>
+    </rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org"
+         s:Publisher="World Wide Web Consortium"
+         s:Title="W3C Home Page"
+         s:Date="1998-10-03T02:27"/>
+
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila">
+      <s:Creator rdf:resource="http://www.w3.org/staffId/85740"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://www.w3.org/staffId/85740">
+      <v:Name>Ora Lassila</v:Name>
+      <v:Email>lassila@w3.org</v:Email>
+    </rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila">
+      <s:Creator>
+        <rdf:Description rdf:about="http://www.w3.org/staffId/85740">
+          <v:Name>Ora Lassila</v:Name>
+          <v:Email>lassila@w3.org</v:Email>
+        </rdf:Description>
+      </s:Creator>
+    </rdf:Description>
+
+<!--
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila">
+      <s:Creator rdf:resource="http://www.w3.org/staffId/85740"
+         v:Name="Ora Lassila"
+         v:Email="lassila@w3.org" />
+    </rdf:Description>
+-->
+
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila">
+      <s:Creator>
+        <rdf:Description rdf:about="http://www.w3.org/staffId/85740">
+          <rdf:type rdf:resource="http://description.org/schema/Person"/>
+          <v:Name>Ora Lassila</v:Name>
+          <v:Email>lassila@w3.org</v:Email>
+        </rdf:Description>
+      </s:Creator>
+    </rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila">
+      <s:Creator>
+        <s:Person rdf:about="http://www.w3.org/staffId/85740">
+          <v:Name>Ora Lassila</v:Name>
+          <v:Email>lassila@w3.org</v:Email>
+        </s:Person>
+      </s:Creator>
+    </rdf:Description>
+
+<!-- Containers -->
+
+<rdf:Description rdf:about="http://mycollege.edu/courses/6.001">
+      <s:students>
+        <rdf:Bag>
+          <rdf:li rdf:resource="http://mycollege.edu/students/Amy"/>
+          <rdf:li rdf:resource="http://mycollege.edu/students/Tim"/>
+          <rdf:li rdf:resource="http://mycollege.edu/students/John"/>
+          <rdf:li rdf:resource="http://mycollege.edu/students/Mary"/>
+          <rdf:li rdf:resource="http://mycollege.edu/students/Sue"/>
+        </rdf:Bag>
+      </s:students>
+    </rdf:Description>
+
+<rdf:Description rdf:about="http://x.org/packages/X11">
+      <s:DistributionSite>
+        <rdf:Alt>
+          <rdf:li rdf:resource="ftp://ftp.x.org"/>
+          <rdf:li rdf:resource="ftp://ftp.cs.purdue.edu"/>
+          <rdf:li rdf:resource="ftp://ftp.eu.net"/>
+        </rdf:Alt>
+      </s:DistributionSite>
+    </rdf:Description>
+
+<!-- Distributive Referents: Statements about Members of a Container -->
+
+<rdf:Bag ID="pages">
+    <rdf:li rdf:resource="http://foo.org/foo.html" />
+    <rdf:li rdf:resource="http://bar.org/bar.html" />
+  </rdf:Bag>
+
+  <rdf:Description rdf:about="#pages">
+    <s:Creator>Ora Lassila</s:Creator>
+  </rdf:Description>
+
+<!-- not supported by PenRDF -->
+<!--
+<rdf:Description aboutEach="#pages">
+    <s:Creator>Ora Lassila</s:Creator>
+  </rdf:Description>
+
+<rdf:Description rdf:about="http://foo.org/foo.html">
+    <s:Creator>Ora Lassila</s:Creator>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://bar.org/bar.html">
+    <s:Creator>Ora Lassila</s:Creator>
+  </rdf:Description>
+
+<rdf:Description aboutEachPrefix="http://foo.org/doc">
+    <s:Copyright>© 1998, The Foo Organization</s:Copyright>
+  </rdf:Description>
+
+<rdf:Description rdf:about="http://foo.org/doc/page1">
+    <s:Copyright>© 1998, The Foo Organization</s:Copyright>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://foo.org/doc/page2">
+    <s:Copyright>© 1998, The Foo Organization</s:Copyright>
+  </rdf:Description>
+
+<rdf:Description aboutEach="#docpages">
+    <s:Copyright>© 1998, The Foo Organization</s:Copyright>
+  </rdf:Description>
+  <rdf:Bag ID="docpages">
+    <rdf:li rdf:resource="http://foo.org/doc/page1"/>
+    <rdf:li rdf:resource="http://foo.org/doc/page2"/>
+  </rdf:Bag>
+-->
+
+<!-- Reification -->
+
+<rdf:Description>
+      <rdf:subject rdf:resource="http://www.w3.org/Home/Lassila" />
+      <rdf:predicate rdf:resource="http://description.org/schema/Creator" />
+      <rdf:object>Ora Lassila</rdf:object>
+      <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement" />
+      <a:attributedTo>Ralph Swick</a:attributedTo>
+    </rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/Home/Lassila" bagID="D_001">
+      <s:Creator>Ora Lassila</s:Creator>
+      <s:Title>Ora's Home Page</s:Title>
+    </rdf:Description>
+
+<!-- Syntactic Shorthand for Statements About Statements -->
+<!-- not suppoerted 
+<rdf:Description aboutEach="#D_001">
+    <a:attributedTo>Ralph Swick</a:attributedTo>
+  </rdf:Description>
+-->
+
+</RDF>

@@ -1,0 +1,90 @@
+#!perl
+use strict;
+use warnings;
+use feature ':5.10';
+use autodie 'system';
+use Carp::Always;
+use Getopt::Long qw( GetOptions );
+
+GetOptions(
+  help => sub { die },
+  'dir=s' => \my $dir,
+  'movie=s' => \my $movie,
+)
+  or die "Invalid options?";
+$dir or die "Need a --dir";
+$movie //= "$dir/movie.mp4";
+
+# Skip forward to the first frame.
+my $frame;
+while (my $_ = <STDIN>) {
+    if ( /^Runops::Movie frame (\d+)/ ) {
+        $frame = $1;
+        last;
+    }
+}
+
+FRAME:
+while (1) {
+    my $fn = "$dir/frame.log";
+    open my($fh), '>', $fn
+        or die "Can't open $fn for writing: !";
+
+  LINE:
+    while ( 1 ) {
+        my $_ = <STDIN>;
+
+
+        # Last frame
+        #
+        if ( ! defined ) {
+            close $fh
+                or die "Can't close $fn: $!";
+            system 'pm-frame-render',
+                '--dir', $dir,
+                '--in', $fn,
+                '--png', sprintf "$dir/frame-%06d.png", $frame;
+            undef $!;
+            unlink glob "$dir/frame.*";
+            if ( $! && ! $!{ENOENT} ) {
+                die "Can't unlink $fn: $!";
+            }
+            last FRAME;
+        }
+
+
+        # Middle frames
+        #
+        elsif ( /^Runops::Movie frame (\d+)/ ) {
+
+            $frame = $1;
+            close $fh
+                or die "Can't close $fn: $!";
+            system 'pm-frame-render',
+                '--dir', $dir,
+                '--in',$fn,
+                '--png', sprintf "$dir/frame-%06d.png", $frame;
+            undef $!;
+            unlink glob "$dir/frame.*";
+            if ( $! && ! $!{ENOENT} ) {
+                die "Can't unlink $fn: $!";
+            }
+            next FRAME;
+        }
+
+        # Inside a frame
+        else {
+            print { $fh } $_
+                or die "Can't write to $fn: $!";
+        }
+    }
+}
+
+system
+  'find', $dir,
+  '-ls';
+
+system
+  'pm-frames-mp4',
+  '--frames' => "$dir/frame-%06d.png",
+  '--movie'  => $movie;

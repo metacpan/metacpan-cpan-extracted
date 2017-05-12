@@ -1,0 +1,66 @@
+RDF-TriN3
+=========
+
+Created:      2010-07-02
+Home page:    <https://metacpan.org/release/RDF-TriN3>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-TriN3>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.206  2013-09-18
+
+ - (Bugfix) Fix for 'BackCompat' and 'Tests' keywords in Pretdsl.
+
+0.205  2013-09-03
+
+ - (Update) Add the 'deps' prefix, and 'BackCompat' and 'Tests' keywords to
+   Pretdsl.
+
+0.204  2013-07-17
+
+ - (Bugfix) Eliminate uninitialized warnings from
+   RDF::TrineX::Parser::Pretdsl.
+ - (Bugfix) Fix spelling of 'Regression' data type in Pretdsl profile.
+
+0.203  2012-12-12
+
+ - (Bugfix) Drop last dependency on obsolete version of
+   RDF::Trine::Parser::Turtle.
+
+0.202  2012-07-06
+
+ - (Bugfix Packaging) Note the Module::Runtime and namespace::clean
+   dependencies.
+
+0.201  2012-07-05
+
+ - (Bugfix Packaging) Note the RDF::NS::Trine dependency.
+
+0.200  2012-07-04
+
+ - (Addition) RDF::TrineX::Parser::Pretdsl
+ - (Documentation) Copyright 2012.
+
+0.136  2011-10-24  Happy Birthday
+
+ - (Addition) N3 Parser now supports 'has' keyword (essentially a no-op).
+ - (Addition) ShorthandRDF how has @import and @profile directives.
+ - (Documentation) Copyright 2011.
+ - (Packaging) Module::Package::RDF
+ - (Update) Add file extensions to ShorthandRDF and N3 parsers.
+ - (Update) Add format URIs to ShorthandRDF and N3 parsers.
+ - (Update) use 5.010
+
+0.129  2010-10-04
+
+ - Changed ShorthandRDF syntax.
+
+0.128  2010-09-29
+
+ - (Addition) RDF::Trine::Parser::ShorthandRDF
+ - (Bugfix) RDF::Trine::Parser::Notation3::parse_formula works.
+ - (Bugfix) RDF::Trine::Store::DBI compatibility note.
+ - Added more test cases.
+
+0.126  2010-08-17
+
+

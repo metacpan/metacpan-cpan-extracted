@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+use strict;
+
+package myworld;
+use base 'Games::Roguelike::World';
+
+my $WINNER;
+
+my $world = myworld->new(w=>10,h=>10,msgw=>60,dispy=>2);     # creates a world with specified width/height & map display width/height
+$world->area(new Games::Roguelike::Area(name=>'1'));                     # create a new area in this world called "1"
+
+# defined map and key to look like a tic-tac-toe board
+
+my $map = '
+ | | 
+-+-+-
+ | | 
+-+-+-
+ | | 
+';
+
+my %key = ('+'=>{color=>'yellow'});
+
+my @WINS = (
+	[[0,0],[0,1],[0,2]],
+	[[1,0],[1,1],[1,2]],
+	[[2,0],[2,1],[2,2]],
+	[[0,0],[1,0],[2,0]],
+	[[0,1],[1,1],[2,1]],
+	[[0,2],[1,2],[2,2]],
+	[[0,0],[1,1],[2,2]],
+	[[0,2],[1,1],[2,0]],
+);
+
+# load map
+$world->area->load(map=>$map, key=>\%key);
+
+my $char = mychar->new($world->area, sym=>'@', color=>'green', pov=>-1);
+$world->drawmap();
+$world->showmsg("<red>Press SPACE to place your X");
+
+while (!((my $c = $world->getch()) eq 'q')) {
+	if ($c eq ' ' && !$WINNER) {
+		# make a move
+        	$char->putx();
+	} else {
+		# walk around
+        	$char->kbdmove($c);
+	}
+        $world->drawmap();
+}
+
+package mychar;
+use base 'Games::Roguelike::Mob';
+
+# allow character to walk anywhere in the area
+sub checkmove {
+	my $self = shift;
+	my ($x, $y) = @_;
+	return $self->area->inbound($x, $y);
+}
+
+sub putx {
+	my $self = shift;
+	my ($x, $y) = ($self->{x}, $self->{y});
+
+	# return unless empty
+	return unless $self->area->map($x, $y) eq ' ';
+
+	# translate to "game coordinates"
+	my ($tx, $ty) = ($x/2, $y/2);
+
+	# make player's "X" move
+	$self->area->setmapsym($x, $y, 'X');
+	my $msg = "X At $tx, $ty";
+	if ($self->checkwin('X')) {
+		$msg .= ", X Wins!";
+		$WINNER = 'X';
+	} else {
+		# ok, this is bad AI... just pick a random empty location
+		my ($ox, $oy) = $self->area->findrandmap(' ', 1);
+		if (defined($ox)) {
+			$msg .= ", O At $ox, $oy";
+			$self->area->setmapsym($ox, $oy, 'O');
+			if ($self->checkwin('O')) {
+				$msg .= ", O Wins!";
+				$WINNER = 'O';
+			}
+		}
+	}
+	$world->showmsg($msg);
+}
+
+sub checkwin {
+	my $self = shift;
+	my $xo = shift;
+
+	# loop through all win combos and see if all 3 are set to "$xo"
+
+	for my $row (@WINS) {
+		my $won = 1;
+		for my $point (@$row) {
+			my ($tx, $ty) = @$point;
+			$won = 0 unless $self->area->map($tx*2, $ty*2) eq $xo;
+		}
+		return 1 if $won;
+	}
+	return 0;
+}

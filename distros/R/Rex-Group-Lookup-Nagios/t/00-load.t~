@@ -1,0 +1,12 @@
+#!perl 
+
+use Test::More;
+
+BEGIN {
+
+    use_ok( 'Rex::Group::Lookup::Nagios');
+}
+
+done_testing();
+
+diag( "Testing Rex::Group::Lookup::Nagios $Testing Rex::Group::Lookup::Nagios::VERSION, Perl $], $^X" );

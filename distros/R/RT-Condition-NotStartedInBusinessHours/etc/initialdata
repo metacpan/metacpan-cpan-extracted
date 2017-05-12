@@ -1,0 +1,6 @@
+@ScripConditions = ({
+    Name                 => 'Not started in business hours',
+    Description          => 'Check for unstarted tickets within business hours',
+    ApplicableTransTypes => 'Any',
+    ExecModule           => 'NotStartedInBusinessHours',
+});

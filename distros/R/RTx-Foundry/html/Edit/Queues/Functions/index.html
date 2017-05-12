@@ -1,0 +1,11 @@
+%# "All my life I wanted to be someone; I guess I should have been more specific."
+%# 		-- Jane Wagner
+<& ../index.html,
+    %ARGS,
+    FindDisabledQueues => 1,
+    QueueString => 'RT Foundry System',
+    QueueOp => '=',
+    QueueField => 'Description',
+    URL => '/Edit/Queues/Functions/',
+    NoUI => 1,
+&>

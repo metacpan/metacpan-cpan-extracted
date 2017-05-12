@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Redland RDF Library Perl Binding</title>
+</head>
+<body>
+
+<h1 style="text-align:center">Redland RDF Library Perl Binding</h1>
+
+<h2>Configuring the Redland Perl Binding</h2>
+
+<p>This can be built two ways - using the <tt>configure</tt>
+program or using Perl's CPAN style <tt>perl Makefile.PL</tt>
+</p>
+
+<h3>Configuring the Perl binding with <tt>configure</tt></h3>
+
+<p>Run <tt>./configure</tt> optionally with
+<tt>--with-perl=<em>/path/to/perl</em></tt> to use a particular perl
+version/program.  The standard 'make' at the top level will then
+compile the binding against Redland.  If Redland is not already
+installed, an internal copy will be configured and built.</p>
+
+<h3>Configuring the Perl building with CPAN <tt>perl Makefile.PL</tt></h3>
+
+<p>Run <tt>perl Makefile.PL</tt> and a top-level Makefile will be
+created that is suitable for using in a CPAN or perl MakeMaker
+style.  It will invoke <tt>configure</tt> and the makefile
+it generates internally.
+</p>
+
+<h2>Building the Perl binding</h2>
+
+<pre>
+  $ make
+</pre>
+
+and optionally
+<pre>
+  $ make check
+</pre>
+
+
+<h2>Testing the Redland Perl binding</h2>
+
+<p>If you did the install below, run the perl example program
+with:</p>
+<pre>
+  perl ./example.pl
+</pre>
+
+<p>Otherwise, to run in the source tree do:</p>
+<pre>
+  perl -Iblib/arch -Iblib/lib ./example.pl
+</pre>
+
+<p>and the result should be:</p>
+<pre>
+  Creating storage
+
+  Creating model
+
+  Creating statement
+
+  Adding statement to model
+
+  Adding statement (new Statement(n, n, n)) to model
+
+  Adding statement (n,n,n) to model
+
+  Parsing URI (file) ../data/dc.rdf
+  Parsing added 3 statements
+
+  Printing all statements
+  Statement: {[http://example.org/foo], [http://example.org/foo], [http://example.org/foo]}
+  Statement: {[http://example.org/foo], [http://example.org/foo], [http://example.org/foo]}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page of Dave Beckett."}
+
+  Searching model for statements matching predicate http://purl.org/dc/elements/1.1/creator
+  Matching Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+    Subject: [http://purl.org/net/dajobe/]
+    Predicate: [http://purl.org/dc/elements/1.1/creator]
+    Object: Dave Beckett
+  Matching Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+    Subject: [http://purl.org/net/dajobe/]
+    Predicate: [http://purl.org/dc/elements/1.1/creator]
+    Object: Dave Beckett
+
+  Searching model for targets of subject http://purl.org/net/dajobe/ predicate http://purl.org/dc/elements/1.1/creator
+  Matching Node: Dave Beckett
+  Matching Node: Dave Beckett
+  Querying for dc:titles:
+  result 1: {
+    a=[http://purl.org/net/dajobe/]
+    c=Dave Beckett's Home Page
+  }
+
+  Writing model to test-out.rdf as rdf/xml
+
+Done
+</pre>
+
+
+<h2>Installing the Perl Binding</h2>
+
+<p>To install the binding system wide do this as <em>root</em> (or
+maybe via sudo make install):</p>
+
+<pre>
+  root# make install
+</pre>
+
+<p>The Redland Perl interface is mature has been tested with the
+following versions (5.6.0 is the likely minimum; 5.005 is too
+old).</p>
+
+<blockquote>
+5.8.3 on Solaris/Sparc<br />
+5.8.3 on Linux/x86<br />
+5.8.2 on Linux/x86<br />
+5.8.1-RC3 on OSX/PPC<br />
+5.8.0 on Linux/x86<br />
+5.8.0 on Linux/IA64
+</blockquote>
+
+
+
+<h2>Using the Redland Perl API</h2>
+
+<p>Read the <a href="pod/RDF/Redland.html">Redland Perl POD</a>
+documentation for full details of the classes and methods provided along with
+examples of use.</p>
+
+<p>The Perl API is an object-based API reflecting the same structure
+of the Redland objects with simple mappings between them:</p>
+
+<table border="1">
+<tr>
+<th>Concept</th><th>Redland Class</th><th>Perl Class</th><th>Purpose</th>
+</tr>
+<tr>
+<td>Resource / Literal</td><td><span class="redland_class">librdf_node</span></td><td><tt><a href="pod/RDF/Redland/Node.html">RDF::Redland::Node</a></tt>,<br />
+<tt><a href="pod/RDF/Redland/BlankNode.html">RDF::Redland::BlankNode</a></tt>,<br />
+<tt><a href="pod/RDF/Redland/URINode.html">RDF::Redland::URINode</a></tt>,<br />
+<tt><a href="pod/RDF/Redland/LiteralNode.html">RDF::Redland::LiteralNode</a></tt> and<br />
+<tt><a href="pod/RDF/Redland/XMLLiteralNode.html">RDF::Redland::XMLLiteralNode</a></tt>
+</td>
+<td>RDF Model &amp; Syntax nodes</td>
+</tr>
+<tr>
+<td>Statement / Triple</td><td><span class="redland_class">librdf_statement</span></td><td><tt><a href="pod/RDF/Redland/Statement.html">RDF::Redland::Statement</a></tt></td>
+<td>RDF Model &amp; Syntax arcs (statements, triples) [isa Resource]</td>
+</tr>
+<tr>
+<td>Model</td><td><span class="redland_class">librdf_model</span></td><td><tt><a href="pod/RDF/Redland/Model.html">RDF::Redland::Model</a></tt></td>
+<td>Set of <em>Statement</em>s usually held in one <em>Storage</em>.</td>
+</tr>
+<tr>
+<td>Storage</td><td><span class="redland_class">librdf_storage</span></td><td><tt><a href="pod/RDF/Redland/Storage.html">RDF::Redland::Storage</a></tt></td>
+<td>Storage for <em>Model</em>s either persistant or in-memory.</td>
+</tr>
+<tr>
+<td>Stream</td><td><span class="redland_class">librdf_stream</span></td><td><tt><a href="pod/RDF/Redland/Stream.html">RDF::Redland::Stream</a></tt></td>
+<td>Providing sequences of <em>Statement</em>s from <em>Parser</em>s, queries.</td>
+</tr>
+<tr>
+<td>Parser</td><td><span class="redland_class">librdf_parser</span></td><td><tt><a href="pod/RDF/Redland/Parser.html">RDF::Redland::Parser</a></tt></td>
+<td>Syntaxes parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
+</tr>
+<tr>
+<td>Query</td><td><span class="redland_class">librdf_query</span></td><td><tt><a href="pod/RDF/Redland/Query.html">RDF::Redland::Query</a></tt></td>
+<td>Querying of an <em>Model</em> delivering a <em>QueryResults</em></td>
+</tr>
+<tr>
+<td>QueryResults</td><td><span class="redland_class">librdf_query_results</span></td><td><tt><a href="pod/RDF/Redland/QueryResults.html">RDF::Redland::QueryResults</a></tt></td>
+<td>Results of applying an <em>Query</em> to a <em>Model</em> giving either variable bindings with <em>Node</em> values or <em>Stream</em> of <em>Statement</em>s</td>
+</tr>
+<tr>
+<td>Serializer</td><td><span class="redland_class">librdf_serializer</span></td><td><tt><a href="pod/RDF/Redland/Serializer.html">RDF::Redland::Serializer</a></tt></td>
+<td>Serializes a <em>Model</em> into a syntax such as RDF/XML</td>
+</tr>
+<tr>
+<td>Iterator</td><td><span class="redland_class">librdf_iterator</span></td><td><tt><a href="pod/RDF/Redland/Iterator.html">RDF::Redland::Iterator</a></tt></td>
+<td>Enumerating lists (of <em>Node</em>) from queries.</td>
+</tr>
+<tr>
+<td>URI</td><td><span class="redland_class">librdf_uri</span></td><td><tt><a href="pod/RDF/Redland/URI.html">RDF::Redland::URI</a></tt></td>
+<td>Provides URIs for <em>Resource</em>s, <em>Parser</em>s, ...</td>
+</tr>
+<tr>
+<td>World</td><td>&nbsp;</td><td><tt><a href="pod/RDF/Redland.html">RDF::Redland</a></tt></td>
+<td>RDF wrapper class handling Redland startup/shutdown</td>
+</tr>
+<tr>
+<td>Digest</td><td><span class="redland_class">librdf_digest</span></td><td>&nbsp;</td>
+<td>Internal content digest class</td>
+</tr>
+<tr>
+<td>Hash</td><td><span class="redland_class">librdf_hash</span></td><td>&nbsp;</td>
+<td>Internal key:value maps class</td>
+</tr>
+<tr>
+<td>&nbsp;</td><td>&nbsp;</td><td><tt><a href="pod/RDF/Redland/RSS.html">RDF::Redland::RSS</a></tt></td>
+<td>Perl Module providing <a href="http://purl.org/rss/1.0/">RSS 1.0</a> support.</td>
+</tr>
+</table>
+
+<h2>Perl API Reference Documentation</h2>
+
+<p>Either use any of the <tt>RDF::Redland::</tt> module links above or start
+at the <a href="pod/RDF/Redland.html">main RDF::Redland module</a>
+and follow the references from there.</p>
+
+<hr />
+
+<p>Copyright (C) 2000-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, Copyright (C) 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>

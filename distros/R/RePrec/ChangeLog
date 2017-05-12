@@ -1,0 +1,195 @@
+2003-12-08  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.032
+	
+	* Makefile.PL: create README for CPAN on the fly
+
+	* script/reprec (POD): added copyright statement
+
+2003-06-13  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.031
+
+	* transfer prcs -> cvs done
+
+2003-01-20  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.030
+	
+	* lib/RePrec.pm (_sortrfdata): at least with RePrec::PRR also
+	multi-values relevance scales can now be used; the internal data
+	structures have been updated accordingly
+
+2002-07-25  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.029
+
+	* script/reprec: cosmetical fix w. r. t. debugging output
+
+	* lib/RePrec/EP.pm (precision): fixed method call (choose instead
+	of choose)
+
+	* Makefile.PL: clean target
+
+	* MANIFEST.SKIP: new file
+
+	* ChangeLog: renamed file from Changes
+
+2001-01-03  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.028
+
+2001-01-03  Ingo Frommholz  <frommhol@ls6.cs.uni-dortmund.de>
+
+	* script/reprec: option -gnuplot
+
+2000-12-20  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.027
+
+	* script/reprec: new option -maxdocs
+
+	* lib/RePrec/Searchresult.pm (rels, nrels): number of (non-)relevant
+	documents found 
+
+2000-12-11  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.026
+
+	* rewrite of major parts
+
+	* script/reprec: rewrote this tool to handle TREC style result and
+	collection files 
+
+2000-10-30  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* lib/RePrec/Average.pm lib/RePrec.pm (gnuplot): default settings
+	for plots changed
+
+2000-08-31  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* RePrec.prj: PRCS mode
+
+2000-02-11  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.025
+
+	* lib/RePrec.pm (gnuplot): removed dubious print
+
+2000-02-03  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.024
+	
+	* lib/RePrec/Searchresult/HySpirit.pm (_init): fixed matching of
+	document ids in HySpirit's search results
+
+	* lib/RePrec/Collection/FERMI.pm (_init): the number of relevant
+	documents per query have not been counted; why did this ever work?
+	improved matching of relevance judgements
+
+	* lib/RePrec/Average.pm (calculate): incrementing divisor in order
+	to avoid illegal division by zero is not really a solution if
+	there are no valid results
+
+1999-12-01  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.023
+
+	* t/reprec.t: fixed typo 
+
+	*** 0.022
+
+	* RePrec.prj: minor fix
+
+1999-07-21  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.020
+
+1999-05-21  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* lib/RePrec.pm lib/RePrec/Average.pm (gnuplot): extension eps for
+	terminal types `postscript eps'
+
+	*** 0.012
+
+	* lib/RePrec.pm (_sortrfdata): documentation
+
+	*** 0.011
+	
+	* lib/RePrec/Collection.pm (get_numrels): return 0 instead of
+	undef if number of relevant documents not set
+
+	*** 0.010
+
+	* lib/RePrec/Collection.pm (in_collection): removed function
+
+	* lib/RePrec.pm lib/RePrec/Average.pm (gnuplot): extension eps for
+	terminal types `postscript eps'
+
+1999-05-20  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* MANIFEST: added test files
+
+	* t/reprec.t t/data/searchresult t/data/judgement: can be used to
+	play with the examples from Fuhr:96s
+
+	* lib/RePrec.pm lib/RePrec/Average.pm: modification w. r. t. gnuplot
+	options
+
+	* lib/RePrec/PRR.pm: adapted new data structures (see below)
+
+	* lib/RePrec.pm: comments for data structures. Note that the first
+	rank is stored with array index 0, not 1 any longer. Note also
+	that the rank for the 1st relevant document is stored with array
+	index 0, not 1 any longer.
+
+	* lib/RePrec/Searchresult.pm: generic parse interface for search
+	results. Added documentation.
+
+	* lib/RePrec/Collection.pm: generic parse interface for relevance
+	judgements. Added documentation.
+
+1999-01-12  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.009
+	
+	* lib/RePrec/Average.pm: same addings as for lib/RePrec.pm
+
+1999-01-11  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* lib/RePrec.pm (gnuplot): average of an recall precision curve is
+	now contained in an additional gnuplot data file;
+	fixed bug with argument handling;
+	new handling of exit status of system call to gnuplot (see
+	perlfunc(1) for details)
+
+1998-12-09  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* version 0.6
+	
+	* script/reprec: some bug fixes; tests for lists of
+	relevant/non-relevant documents
+
+	* lib/RePrec/Searchresult.pm: added methods rels/nrels in order to
+	provide lists of relevant/non-relevant documents
+
+1998-11-10  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* version 0.5
+	
+	* lib/*.pm: minor fixes after testing 
+
+1998-11-09  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* version 0.4
+	
+	* MANIFEST: forgot to maintain this file...
+
+	* lib/RePrec/Collection/FERMI.pm: new file: more generic than
+	lib/RePrec/Collection/CACM.pm
+
+	* lib/RePrec/Searchresult/HySpirit.pm: new regexp for parsing
+	result lines 
+
+        * RePrec: revision history.
+          original version created by ls6h2xs 1.011

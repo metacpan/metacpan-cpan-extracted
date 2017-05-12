@@ -1,0 +1,34 @@
+<& Elements/Tabs &>
+<%$msg && '<h2>'.$msg.'</h2>'|n%>
+<%$content_msg && '<h2>'.$content_msg.'</h2>'|n%>
+<form action="Edit.html" method="post">
+<input type="hidden" name="id" value="<%$ticket->Id%>">
+
+Category: <input name="Category" value="<%$ticket->FirstCustomFieldValue('Category')%>"><br>
+
+<textarea rows=20 cols=80 name="Content"><%$attachment->Content%></textarea>
+<input type=submit>
+</form>
+
+<%INIT>
+my ($msg, $val, $content_msg, $content_val);
+my $ticket = LoadTicket($id);
+my $cf = RT::CustomField->new($session{'CurrentUser'});
+$cf->LoadByNameAndQueue(Queue => $ticket->QueueObj->id, Name => 'Category');
+my $txn = $ticket->Transactions->First;
+my $attachment = $txn->Attachments->First;
+if ($ARGS{'Category'} && $ticket->FirstCustomFieldValue('Category') ne $ARGS{'Category'}) {
+	($val, $msg) = $ticket->AddCustomFieldValue(Field => $cf, Value => $ARGS{'Category'});
+}
+if ($ARGS{'Content'} ) {
+        # this is an egregious hack and should never exist. 
+        # We need an "Alter ticket content right"
+        # it should be "permission denied, not 'immutable'
+        ($content_val,$content_msg) = $attachment->_Set( Field =>'Content', Value => $ARGS{'Content'});
+}
+
+
+</%INIT>
+<%ARGS>
+$id => undef
+</%ARGS>

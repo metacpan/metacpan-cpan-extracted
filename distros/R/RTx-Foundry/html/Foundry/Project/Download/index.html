@@ -1,0 +1,54 @@
+%# Never call a man a fool; borrow from him.
+
+<& List, List => $List, Queue => $QueueObj->Id, ListCount => $ListCount &>
+<%INIT>
+my $List = [];
+my $ListCount = {};
+my $Tickets = RT::Tickets->new( $session{'CurrentUser'} );
+$Tickets->LimitQueue( VALUE => $QueueObj->Id );
+$Tickets->LimitType( VALUE => 'release' );
+$Tickets->LimitStatus( VALUE => 'resolved' );
+$Tickets->OrderBy( FIELD => 'Starts', ORDER => 'DESC' );
+
+while (my $Item = $Tickets->Next) {
+    my (%url, %description, %documents);
+    my $transactions = $Item->Transactions;
+    while (my $trans = $transactions->Next) {
+	my $attachments = $trans->Attachments;
+	$attachments->Columns( qw( Id Filename ContentType Headers Subject ) );
+	my $subject;
+	while (my $attach = $attachments->Next) {
+	    $subject ||= $attach->Subject;
+	    length($attach->Filename) or next;
+
+	    $documents{$attach->Filename} = $attach;
+	    $description{$attach->Id} = $subject;
+	    $url{$attach->Id} = join(
+		'/',
+		"/Foundry/Project/Download/Attachment",
+		$trans->Id,
+		$attach->Id,
+		$attach->Filename
+	    );
+	}
+    }
+
+    my $count = 0;
+    foreach my $key (sort keys %documents) {
+	my $Id = $documents{$key}->Id;
+	push @$List, {
+	    Id		=> $Id,
+	    ReleaseObj	=> $Item,
+	    Attachment	=> $documents{$key},
+	    URL		=> $url{$Id},
+	    Description	=> $description{$Id},
+	};
+	$count++;
+    }
+
+    $ListCount->{$Item->Id} = $count;
+}
+</%INIT>
+<%ARGS>
+$QueueObj
+</%ARGS>

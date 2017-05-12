@@ -1,0 +1,10 @@
+<%INIT>
+  $tabs->{'zy'} = { 'title' => loc('My Rights'),
+                           path => 'Admin/Tools/RightsMatrix/User/',
+                         };
+</%INIT>
+
+
+<%ARGS>
+$tabs
+</%ARGS>

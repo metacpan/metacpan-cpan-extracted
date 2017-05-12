@@ -1,0 +1,66 @@
+%# Never call a man a fool; borrow from him.
+
+% return unless $QueueObj->OriginObj;
+% if (@Error) {
+<tr><td colspan="3">
+%	    foreach my $error (@Error) {
+		&nbsp;* <font color="red"><% $error %></font><br>
+%	    }
+<br><br>
+</td></tr>
+% }
+<table><tr><td>
+<& /Work/Tickets/Elements/EditCustomFields, Ticket => $QueueObj->OriginObj, Loc => 1  &>
+</td></tr></table>
+% if ( $session{CurrentUser}->UserObj->HasRight( Right => 'SuperUser', Object => $QueueObj ) ) {
+<input type="checkbox" name="Enabled" <% $QueueObj->Disabled ? '' : 'CHECKED' %>>
+<input type="hidden" name="DoEnabled" value="1">
+<&|/l&>Enabled (Unchecking this box disables this queue)</&>
+% }
+</td></tr>
+<tr><td align="center">
+<br>
+<input type="submit" value="<&|/l&>Submit</&>" name="Action-Submit">
+</td></tr>
+
+<%INIT>
+my @Error;
+
+if ($ARGS{'Action-Submit'}) {
+    $QueueObj->SetDisabled($Enabled ? 0 : 1) if $DoEnabled;
+
+    my $id = $QueueObj->OriginObj->Id;
+    $ARGS{"Ticket-$id-CustomField-".RT::CustomField->NameToId('UnixName')."-Values"}
+	= $QueueObj->OriginObj->CustomFieldValue('UnixName');
+    my ($ProjectName, $UnixName, $Rationale, $Description, $Platform,
+	$License, $Language, $Audience
+    ) = @ARGS{
+	map "Ticket-$id-CustomField-".RT::CustomField->NameToId($_, "NewProject")."-Values",
+	qw( ProjectName UnixName Rationale PublicDescription Platform
+	    License ProgrammingLanguage IntendedAudience )
+    };
+
+    push @Error, loc('Missing mandatory fields')
+	unless $ProjectName and $Description and $Platform and $License and $Language and $Audience;
+
+    push @Error, loc(
+	'ID must be 3-15 characters of lower-case letters or digits, beginning with a letter'
+    ) unless !$UnixName or $UnixName =~ /^[a-z][0-9a-z]{2,14}$/;
+    push @Error, loc(
+	'Project Name must be at most 40 charaters'
+    ) unless !$ProjectName or length($ProjectName) <= 40;
+
+    if (!@Error) {
+	ProcessTicketCustomFieldUpdates( ARGSRef => \%ARGS );
+	if ($ProjectName ne $QueueObj->Name) {
+	    $QueueObj->SetName($ProjectName);
+	    push @Error, loc("Project Name has been modified.  Please reload page to see the change.");
+	}
+    }
+}
+</%INIT>
+<%ARGS>
+$QueueObj
+$DoEnabled  => 0
+$Enabled    => 0
+</%ARGS>

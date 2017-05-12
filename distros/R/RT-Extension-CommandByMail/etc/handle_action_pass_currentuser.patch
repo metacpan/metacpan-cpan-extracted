@@ -1,0 +1,12 @@
+diff --git a/lib/RT/Interface/Email.pm b/lib/RT/Interface/Email.pm
+index 175805d..7ffba8e 100644
+--- a/lib/RT/Interface/Email.pm
++++ b/lib/RT/Interface/Email.pm
+@@ -248,6 +248,7 @@ sub Gateway {
+             Action      => $action,
+             Subject     => $Subject,
+             Message     => $Message,
++            CurrentUser => $CurrentUser,
+             Ticket      => $Ticket,
+             TicketId    => $args{ticket},
+             Queue       => $SystemQueueObj,

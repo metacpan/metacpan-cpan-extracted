@@ -1,0 +1,82 @@
+<SELECT NAME="Principal">
+<OPTION VALUE="">-specify username-
+% if ($IncludeCurrentUser) {
+<OPTION <%$Principal eq $session{CurrentUser}->id ? 'SELECTED' : !defined $Principal ? 'SELECTED' : ''%> VALUE="<%$session{CurrentUser}->id%>">User: <%$session{CurrentUser}->Name%>
+% }
+% if ($IncludeRoles) {
+<OPTION VALUE="">Roles:
+%    if (ref($System) eq 'RT::System') {
+<OPTION <%$ARGS{Principal} eq 'Owner-Role' ? 'SELECTED' : ''%> VALUE="Owner-Role"        >&nbsp;&nbsp;  Owner
+<OPTION <%$ARGS{Principal} eq 'Requestor-Role' ? 'SELECTED' : ''%> VALUE="Requestor-Role">&nbsp;&nbsp;  Requestor
+<OPTION <%$ARGS{Principal} eq 'Cc-Role' ? 'SELECTED' : ''%> VALUE="Cc-Role"              >&nbsp;&nbsp;  Cc
+<OPTION <%$ARGS{Principal} eq 'AdminCc-Role' ? 'SELECTED' : ''%> VALUE="AdminCc-Role"    >&nbsp;&nbsp;  AdminCc
+%    }
+%    elsif (ref($System) eq 'RTx::AssetTracker::System') {
+%        if ( %RTx::AssetTracker::Type::DEFAULT_ROLES ) {
+%#           AT configurable roles is supported
+%            foreach my $role ( RTx::AssetTracker::Type->ActiveRoleArray() ) {
+<OPTION <%$ARGS{Principal} eq "$role-Role" ? 'SELECTED' : ''%> VALUE="<%$role%>-Role"    >&nbsp;&nbsp;  <% $role %>
+%            }
+%        }
+%        else {
+<OPTION <%$ARGS{Principal} eq 'Owner-Role' ? 'SELECTED' : ''%> VALUE="Owner-Role"    >&nbsp;&nbsp;  Owner
+<OPTION <%$ARGS{Principal} eq 'Admin-Role' ? 'SELECTED' : ''%> VALUE="Admin-Role"    >&nbsp;&nbsp;  Admin
+%        }
+%    }
+% }
+% if ($IncludeSystemGroups) {
+<OPTION VALUE="">System Groups:
+<OPTION <%$ARGS{Principal} eq $SysGroupID{Everyone} ? 'SELECTED' : ''%> VALUE="<%$SysGroupID{Everyone}%>">&nbsp;&nbsp;  Everyone
+<OPTION <%$ARGS{Principal} eq $SysGroupID{Privileged} ? 'SELECTED' : ''%> VALUE="<%$SysGroupID{Privileged}%>">&nbsp;&nbsp;  Privileged Users
+<OPTION <%$ARGS{Principal} eq $SysGroupID{Unprivileged} ? 'SELECTED' : ''%> VALUE="<%$SysGroupID{Unprivileged}%>">&nbsp;&nbsp;  Unprivileged Users
+% }
+% if ($IncludePrincipalGroups and !$NoGroups) {
+<OPTION VALUE="">Groups you are a member of:
+%    foreach my $group (sort { $a->Name() cmp $b->Name() } values %groups) {
+%      next unless $group->HasMemberRecursively($session{CurrentUser}->PrincipalObj);
+<OPTION <%$ARGS{Principal} == $group->id ? 'SELECTED=1' : ''%> VALUE="<%$group->id%>">&nbsp;&nbsp;  <%$group->Name%>
+%      delete $groups{$group->Name()};
+%    }
+% }
+% if ($IncludeAdminGroups and !$NoGroups and %groups) {
+<OPTION VALUE="">Groups you can administer:
+%    foreach my $group (sort { $a->Name() cmp $b->Name() } values %groups) {
+%      next unless $session{CurrentUser}->HasRight(Right => 'AdminGroup', Object => $group);
+<OPTION <%$ARGS{Principal} == $group->id ? 'SELECTED=1' : ''%> VALUE="<%$group->id%>">&nbsp;&nbsp;  <%$group->Name%>
+%      delete $groups{$group->Name()};
+%    }
+% }
+% if ($IncludeOtherGroups and !$NoGroups and %groups) {
+<OPTION VALUE="">Other groups you can see:
+%    foreach my $group (sort { $a->Name() cmp $b->Name() } values %groups) {
+<OPTION <%$ARGS{Principal} == $group->id ? 'SELECTED=1' : ''%> VALUE="<%$group->id%>">&nbsp;&nbsp;  <%$group->Name%>
+%    }
+% }
+</SELECT>
+
+<%INIT>
+my $groups = new RT::Groups($session{'CurrentUser'});
+$groups->Limit(FIELD => 'Domain', VALUE => 'UserDefined');
+my %groups = map { $_->Name() => $_ } @{$groups->ItemsArrayRef};
+</%INIT>
+
+<%ARGS>
+$Principal
+$IncludeRoles        => 1
+$IncludeSystemGroups => 1
+$IncludePrincipalGroups => 1
+$IncludeAdminGroups     => 1
+$IncludeOtherGroups     => 1
+$IncludeCurrentUser  => 1
+$NoGroups => 0
+$System => $RT::System
+</%ARGS>
+<%ONCE>
+my @SystemGroups = ( 'Everyone', 'Privileged', 'Unprivileged' );
+my %SysGroupID;
+foreach ( @SystemGroups ) {
+    my $group = RT::Group->new( $RT::SystemUser );
+    $group->LoadSystemInternalGroup( $_ );
+    $SysGroupID{ $_ } = $group->PrincipalId();
+}
+</%ONCE>

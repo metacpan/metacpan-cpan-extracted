@@ -1,0 +1,26 @@
+1.01 2014-12-15
+ - Remove 4.2 note in INSTALLATION, as it is not 4.2-compatible
+
+1.00 2014-12-15
+ - Packaging and documentation updates
+
+0.06 2014-02-19
+ - Doc updates
+ - Declare incompatibility with 4.2
+
+0.05 2011-09-06
+ - RT 4.0 compatibility fixes
+
+0.04 2010-01-28
+ - add RequestorSummary and possibility to summarize by other users'
+   fields, for exmaple Organization, Country, ...
+
+0.03 2009-07-17
+ - fix group by clause, numbers was incorrect, note there is a new patch
+
+0.02 2009-07-03
+ - reuse queue-summary class for styling
+
+0.01 2009-07-03
+ - initial release
+

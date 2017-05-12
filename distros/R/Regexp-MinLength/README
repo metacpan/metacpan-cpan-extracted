@@ -1,0 +1,31 @@
+Regexp::MinLength version 0.01
+===================
+
+SYNOPSIS
+   Regex::MinLength was created to determine the minimum length of a string
+   that will match a given regular expression.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+No dependencies
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Leigh  Metcalf
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,18 @@
+Revision history for Perl extension Router::PathInfo.
+
+0.01  Mon Jun  6 22:11:18 2011
+	- original version; created by h2xs 1.23 with options
+		-AX Router::PathInfo
+
+0.02  Mon Jun 20 18:09:40 2011
+    - add cache
+    
+0.03  Mon Jun 20 18:09:40 2011
+    - fix bug with callback and cache
+
+0.04  Mon Oct 10 12:26:06 2011    
+    - Version less than 0.04 is depricated.
+    - sub-attribute ':name(...)' has been added
+    
+0.05  Fri Oct 14 15:18:23 2011    
+    - Fix critical bug with cache for controller with callback    

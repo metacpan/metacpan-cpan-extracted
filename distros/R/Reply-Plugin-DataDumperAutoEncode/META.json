@@ -1,0 +1,79 @@
+{
+   "abstract" : "format and decode results using Data::Dumper::AutoEncode",
+   "author" : [
+      "Takuya Tsuchida <tsucchi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.13.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Reply-Plugin-DataDumperAutoEncode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper::AutoEncode" : "0",
+            "Reply::Plugin" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Reply::Plugin::DataDumperAutoEncode" : {
+         "file" : "lib/Reply/Plugin/DataDumperAutoEncode.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tsucchi/Reply-Plugin-DataDumperAutoEncode/issues"
+      },
+      "homepage" : "https://github.com/tsucchi/Reply-Plugin-DataDumperAutoEncode",
+      "repository" : {
+         "url" : "git://github.com/tsucchi/Reply-Plugin-DataDumperAutoEncode.git",
+         "web" : "https://github.com/tsucchi/Reply-Plugin-DataDumperAutoEncode"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Takuya Tsuchida <takuya.tsuchida@gmail.com>"
+   ]
+}

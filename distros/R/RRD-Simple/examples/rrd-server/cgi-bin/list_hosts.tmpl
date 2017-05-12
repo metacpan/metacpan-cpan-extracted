@@ -1,0 +1,15 @@
+<TMPL_INCLUDE header.tmpl>
+<h1><a href="<TMPL_VAR self_url>">Index</a> &gt; <TMPL_VAR title></h1>
+
+<div class="contents">
+  <ul>
+<TMPL_LOOP hosts>
+    <li>[<a href="<TMPL_VAR self_url>?template=by_host.tmpl&HOST=<TMPL_VAR host>&PERIOD=<TMPL_VAR PERIOD>">Overview</a>]
+      <a href="<TMPL_VAR self_url>?template=host.tmpl&HOST=<TMPL_VAR host>&PERIOD=<TMPL_VAR PERIOD>"><TMPL_VAR host></a>
+      <TMPL_IF include_summary_txt> - <TMPL_VAR EXPR="slurp(include_summary_txt)"></TMPL_IF>
+      - <TMPL_IF no_graphs><i>No graphs yet</i><TMPL_ELSE><TMPL_VAR total_graphs> graphs</TMPL_IF></li>
+</TMPL_LOOP>
+  </ul>
+</div>
+
+<TMPL_INCLUDE footer.tmpl>

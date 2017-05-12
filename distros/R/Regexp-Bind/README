@@ -1,0 +1,44 @@
+NAME
+       Regexp::Bind - Bind variables to captured buffers
+
+SYNOPSIS
+         use Regexp::Bind qw(
+                             bind global_bind
+                             bind_array global_bind_array
+                            );
+
+         $record = bind($string, $regexp, @fields);
+         @record = global_bind($string, $regexp, @fields);
+
+         $record = bind_array($string, $regexp);
+         @record = global_bind_array($string, $regexp);
+
+         $record = bind($string, $embedded_regexp);
+         @record = global_bind($string, $embedded_egexp);
+
+DESCRIPTION
+       This module is an extension to perl's native regexp func-
+       tion. It binds anonymous hashes or named variables to
+       matched buffers. Both normal regexp syntax and embedded
+       regexp syntax are supported. You can view it as a tiny and
+       petite data extraction system.
+
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Yung-chung Lin (a.k.a. xern) <xern@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself
+

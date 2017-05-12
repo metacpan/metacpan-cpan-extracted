@@ -1,0 +1,12 @@
+<%init>
+if($Ticket){
+	if($Ticket->QueueObj->Name() =~ /^(Incidents|Incident Reports)$/) {
+		$actions->{'iodef_xml'} = { title => loc('IODEF'), path => 'IODEF/IODEF.html?id='.$Ticket->id };
+	}
+}
+</%init>
+<%args>
+$Ticket =>undef
+$tabs => undef
+$actions => undef
+</%args>

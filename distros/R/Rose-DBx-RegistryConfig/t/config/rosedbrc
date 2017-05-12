@@ -1,0 +1,19 @@
+# -----------------------------------------------------------------------------
+#
+#   ROSEDBRC: fix-up file
+#
+#   This file demonstrates how auto_load_fixups() can load updates to a
+#   data source registry.
+#
+#   This file uses the compressed data source namespace representation that is
+#   used by default in Rose::DBx::RegistryConfig
+#
+# -----------------------------------------------------------------------------
+production:
+    defaults:
+        host:       localhost
+        username:   me
+        password:   foo
+    db1:
+    db2:
+    db3:

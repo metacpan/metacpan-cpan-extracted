@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/RDR/Collector.pm
+lib/RDR/Processor.pm
+examples/example_rdr_collect_only.pl
+examples/example_process_raw.pl
+examples/example_rdr_collect_only_realtime.pl
+examples/example_rdr_collect_only_realtime_db.pl
+META.yml                                 Module meta-data (added by MakeMaker)

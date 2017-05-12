@@ -1,0 +1,571 @@
+=pod
+
+=begin readme text
+
+RPC::ExtDirect::Client::Async
+=============================
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+RPC::ExtDirect::Client::Async - Asynchronous Ext.Direct client in Perl
+
+=head1 SYNOPSIS
+
+    use RPC::ExtDirect::Client::Async;
+    
+    my $client = RPC::ExtDirect::Client::Async->new(host => 'localhost');
+    
+    $client->call_async(
+        action   => 'Action',
+        method   => 'Method',
+        arg      => [ 'foo', 'bar' ],
+        cookies  => { foo => 'bar' },
+        metadata => { baz => 'qux' },
+        cb       => sub {
+            my ($result, $success, $error) = @_;
+            
+            if ( $success ) {
+                # Do something with $result
+                ...
+            }
+            else {
+                # Handle $error
+                ...
+            }
+        },
+    );
+
+=head1 DESCRIPTION
+
+=for readme continue
+
+This module implements a fully asynchronous Ext.Direct client based on
+L<AnyEvent::HTTP>. It can be used with any event loop supported by
+L<AnyEvent>.
+
+=for readme stop
+
+If you are not familiar with Ext.Direct, start with L<RPC::ExtDirect::Intro>
+before going further.
+
+=head1 CAVEATS
+
+=head2 API initialization
+
+This client is fully asynchronous, and does not block on any operation.
+However before a client object can run Ext.Direct requests, it will need
+an instance of L<RPC::ExtDirect::API> that holds the available API
+declaration. This object can be initialized in two ways: either remotely
+from a server, or locally by passing the C<api> argument to the Client
+constructor:
+
+    my $api = RPC::ExtDirect::API->new_from_hashref({
+        api_href => { ... },
+    });
+    
+    my $client = RPC::ExtDirect::Client::Async->new(
+        host => 'localhost',
+        port => 8080,
+        api  => $api,
+    );
+
+If no local API instance is provided, the client object will attempt to
+retrieve it from the server. This operation is non-blocking; constructor
+will return the client object immediately and it can be used to make
+calls without waiting for the API to be initialized. However any requests
+made to the client before its API object is available will be queued
+internally by the client object, and dispatched only when API is
+retrieved. This is done transparently to the caller.
+
+You can pass an option callback to be fired when the API is available
+via L</api_cb> option:
+
+    my $client = RPC::ExtDirect::Client::Async->new(
+        ...
+        api_cb => sub {
+            my ($client, $success, $error) = @_;
+            
+            if ( !$success ) {
+                # $error is defined
+                ...
+            }
+        },
+    );
+
+This callback will be fired when a local API instance is provided, too.
+
+If the remote API cannot be retrieved for some reason, the client object
+will set the error internally as fatal exception. Every request that was
+queued before the API retrieval failed will have its callback fired as if
+the request itself has failed, with the C<$error> argument set to the
+API retrieval exception. Every subsequent request will have its callback
+sub fired immediately with an error.
+
+=head2 Error handling
+
+In a cooperative multi-tasking environment such as L<AnyEvent> it is
+very hard, if at all possible, to guarantee that an exception thrown
+in the module code will be caught properly in the calling code. Because
+of that, Async client will not C<die> upon encountering errors, except
+when the error is fatal. Instead, the error will be passed to the
+callback:
+
+    $client->call_async(
+        action => 'foo',
+        method => 'bar',
+        ...
+        cb => sub {
+            my ($result, $success, $error) = @_;
+            
+            if ( $success ) {
+                # $result is defined, $error is undefined
+            }
+            else {
+                # vice versa: $result is undefined, $error is set
+            }
+        },
+    );
+
+There are two exceptions to this rule: fatal errors encountered in Client
+constructor, and missing callback argument in L</call_async>,
+L</submit_async>, or L</poll_async>. This kind of errors usually means
+that there is a typo somewhere in the calling code, and should be caught
+early on.
+
+=head2 Condition variables
+
+Async client supports AnyEvent's condition variables to signal beginning
+and finishing a request, if such variable is provided. This can be used
+to block until several requests are finished:
+
+    my $cv = AnyEvent->condvar;
+    
+    $client->call_async(   ..., cv => $cv );
+    $client->upload_async( ..., cv => $cv );
+    
+    # This will return only when both requests are done
+    $cv->recv;
+
+Condition variable can also be used instead of a callback sub:
+
+    my $cv = AnyEvent->condvar;
+    
+    $client->call_async( ..., cb => $cv );
+    
+    # This will block until the request has finished
+    my $result = $cv->recv;
+    
+    # Handle the error, if any
+    if ( not defined $result ) {
+        my $error = ($cv->recv)[2];
+        
+        ...
+    }
+
+See L<AnyEvent/"CONDITION VARIABLES"> for more information.
+
+=head1 CLIENT OBJECT INTERFACE
+
+RPC::ExtDirect::Client::Async provides several public methods:
+
+=over 4
+
+=item C<new>
+
+Constructor. Returns a new Client instance and initializes an
+L<Ext.Direct API|RPC::ExtDirect::Intro/API> instance from the server,
+unless L</api> parameter is provided. Accepts named arguments in a
+hash.
+
+Parameters:
+
+=over 8
+
+=item C<api>
+
+Optional L<RPC::ExtDirect::API> instance to use. If not given, a new
+instance will be created from the remote API provided by the server.
+
+=item C<config>
+
+Optional L<RPC::ExtDirect::Config> instance to use. If not provided,
+a new Config instance will be created unless L</api> parameter is
+provided, in which case the Config instance in the API object will be
+used instead.
+
+=item C<host>
+
+Server's host name or IP address. This parameter is mandatory.
+
+=item C<port>
+
+Optional port number to use when connecting to the server. Defaults
+to C<80>.
+
+=item C<api_cb>
+
+Optional callback to be fired when API retrieval operation is finished.
+This function will receive three positional arguments: the Client
+reference, success flag, and the error string if it occured.
+An example:
+
+    my $client = RPC::ExtDirect::Client::Async->new(
+        ...
+        api_cb => sub {
+            my ($client, $success, $error) = @_;
+            
+            # $error is only defined when API retrieval failed
+            if ( !$success ) {
+                ...
+            }
+        },
+    );
+
+=item C<cv>
+
+Optional condition variable to be signaled when API retrieval finishes.
+See L</"Condition variables"> for more detail.
+
+=item C<cookies>
+
+Cookies to set when calling server side; can be either L<HTTP::Cookies>
+object or a hashref containing key-value pairs. Setting this in
+constructor will pass the same cookies to all subsequent client calls.
+
+=item C<...>
+
+All other arguments are stored as options and are applied to HTTP
+requests. See L<AnyEvent::HTTP/http_request> for more detail.
+
+=back
+
+Instance method. Returns an L</api_class_client> object with the
+L<Ext.Direct API|RPC::ExtDirect::Intro/API> declaration published by
+the server.
+
+Accepts one mandatory positional argument, API type, that can be either
+C<'remoting'> or C<'polling'> to retrieve the corresponding API object.
+
+=item C<call_async>
+
+Instance method. Calls the specified
+L<Ext.Direct Method|RPC::ExtDirect::Intro/Method> on the server side
+and passes the execution
+L<Result|RPC::ExtDirect::Intro/Result> or
+L<Exception|RPC::ExtDirect::Intro/Exception> to the callback function
+specified in arguments. Accepts named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<action>
+
+L<Ext.Direct Action|RPC::ExtDirect::Intro/Action> (class) name. This
+parameter is mandatory.
+
+=item C<method>
+
+L<Ext.Direct Method|RPC::ExtDirect::Intro/Method> name to call. This
+parameter is mandatory.
+
+=item C<arg>
+
+Ext.Direct Method arguments; use arrayref for methods that accept ordered
+parameters or hashref for named parameters. This parameter is mandatory
+even for Methods that accept no arguments; in such case, pass an empty
+arrayref.
+
+=item C<metadata>
+
+Ext.Direct Method metadata. Use arrayref for methods that accept ordered
+metadata, or hashref for named metadata. This parameter is always optional,
+as metadata itself is optional.
+
+=item C<cb>
+
+Mandatory callback function that will be fired when request finishes.
+This function will receive three positional arguments: the execution
+Result (or Exception), success flag, and error string if an error
+has occured:
+
+    $client->call_async(
+        ...
+        cb => sub {
+            my ($result, $success, $error) = @_;
+            
+            if ( $success ) {
+                # Do something with $result
+                ...
+            }
+            else {
+                # Handle the $error
+                ...
+            }
+        },
+    );
+
+=item C<cv>
+
+Optional condition variable to be signaled when the request is finished.
+See L</"Condition variables"> for more detail.
+
+=item C<cookies>
+
+Optional set of cookies for this particular call only. Cookies should be
+in the same format as for constructor, see L</new>.
+
+=item C<...>
+
+Any other arguments are passed on to C<http_request> function. See
+L<AnyEvent::HTTP/http_request>.
+
+=back
+
+=item C<submit_async>
+
+Instance method. Submits an HTML form request to a
+L<Form Handler|RPC::ExtDirect::Intro/"Form Handler Method"> method and
+passes the execution L<Result|RPC::ExtDirect::Intro/Result> or
+L<Exception|RPC::ExtDirect::Intro/Exception> to the callback function
+specified in arguments. Accepts named arguments in a hash.
+
+Parameters:
+
+=over 8
+
+=item C<action>
+
+L<Ext.Direct Action|RPC::ExtDirect::Intro/Action> (class) name. This
+parameter is mandatory.
+
+=item C<method>
+
+L<Ext.Direct Method|RPC::ExtDirect::Intro/Method> name to call. This
+parameter is mandatory.
+
+=item C<arg>
+
+A hashref of the Method arguments. This parameter is mandatory, unless
+L</upload> is specified.
+
+=item C<metadata>
+
+Metadata array- or hashref for this Method invocation. This parameter
+is always optional.
+
+=item C<upload>
+
+An optional arrayref of file names to upload. Files should be readable
+by the current process, or L</submit> will die with an error.
+
+=item C<cb>
+
+Mandatory callback function that will be fired when request finishes.
+See L</call_async>.
+
+=item C<cv>
+
+Optional condition variable to be signaled when the request is finished.
+See L</"Condition variables"> for more detail.
+
+=item C<cookies>
+
+Optional set of cookies for this particular call only. Cookies should be
+in the same format as for constructor, see L</new>.
+
+=back
+
+=item C<upload_async>
+
+A shortcut for L</submit_async>, for better readability when uploading
+files.
+
+=item C<poll_async>
+
+Instance method. Polls server side for
+L<Ext.Direct Events|RPC::ExtDirect::Intro/Event>, and passes the
+result to the callback function specified in arguments. Accepts
+named arguments in a hash.
+
+In case of successful poll, i.e. when no errors have occured, the
+callback will receive an arrayref of event hashrefs:
+
+    $client->poll_async(
+        ...
+        cb => sub {
+            my ($events, $success, $error) = @_;
+            
+            if ( $success ) {
+                # Do something with event data
+                for my $event ( @$events ) {
+                    ...
+                }
+            }
+        }
+    );
+
+A poll may return an empty event list, in which case an empty
+arrayref will be passed to the callback. This is not an error.
+
+Parameters:
+
+=over 8
+
+=item C<cb>
+
+Mandatory callback function that will be fired when the poll finishes.
+See above.
+
+=item C<cv>
+
+Optional condition variable to be signaled when the request is finished.
+See L</"Condition variables"> for more detail.
+
+=item C<cookies>
+
+Optional set of cookies for this particular call only. Cookies should be
+in the same format as for constructor, see L</new>.
+
+=back
+
+=back
+
+=head1 CONFIGURATION OPTIONS
+
+RPC::ExtDirect::Client::Async adds the following option specific to the
+Client, and sets it in the L<RPC::ExtDirect::Config> instance it uses:
+
+=over 4
+
+=item C<api_class_client>
+
+Class name to use when instantiating API objects from remote server
+JavaScript response. Default is C<RPC::ExtDirect::Client::API>; use
+subclass name if you need to augment the stock API class behavior.
+
+=back
+
+=head1 ACCESSOR METHODS
+
+For RPC::ExtDirect::Client::Async, the following
+L<accessor methods|RPC::ExtDirect::Config/"ACCESSOR METHODS"> are
+provided:
+
+=over 4
+
+=item C<config>
+
+Return the current L<RPC::ExtDirect::Config> instance held in the
+client object, or set a new one.
+
+=item C<host>
+
+Return the current host name or IP address of the server, or set
+a new one.
+
+=item C<port>
+
+Return the current port used to connect to the server, or set
+a new one.
+
+=item C<cookies>
+
+Return the set of cookies to use with every Ext.Direct request,
+or set a new one. See L</new> for more information.
+
+=item C<http_params>
+
+Return a hashref with HTTP parameters to be used with every Ext.Direct
+request, or set a new one. These parameters will be passed to the
+HTTP request, see L<AnyEvent::HTTP/http_request>.
+
+By default this hashref will be populated with all "extra" arguments
+passed to L</new> and does not need to be manipulated directly.
+
+=item C<api_cb>
+
+Return the optional API retrieval callback function, or set a new one.
+See L</"API initialization"> for more information.
+
+=item C<api_ready>
+
+Will return truthy value if API has been successfully initialized,
+or falsy if it has not been initialized yet, or an error has
+occured while retrieving remote API declaration. See L</exception>
+below.
+
+=item C<exception>
+
+Will return the error that API retrieval resulted in, if any.
+The same error will be passed to the callback functions of all
+subsequent requests made through the Client object.
+
+=back
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make && make test
+    make install
+
+=end readme
+
+=for readme stop
+
+=head1 SEE ALSO
+
+For more information on using Ext.Direct with Perl, see L<RPC::ExtDirect>.
+For a blocking synchronous client, see L<RPC::ExtDirect::Client>.
+
+=head1 KNOWN ISSUES
+
+L<AnyEvent::HTTP> tries to reuse existing connection for idempotent
+requests, but for some obscure reason this does not always work
+as expected. As a consequence, first GET request (Ext.Direct API
+declaration retrieval) succeeds, while subsequent GET requests, e.g.
+event polling, will fail with 'Connection reset by peer' error.
+Which is not very helpful, to say the least.
+
+To work around this issue, persistent connections has been disabled by
+default for all types of requests, including idempotent ones. If you are
+sure that this issue will not be a problem for you and want to use
+persistent connections, pass C<< persistent => 1 >> parameter either
+to Client constructor, or to the individual L</poll_async> calls.
+
+Note that this issue does not apply to L</call_async> or L</submit_async>
+calls, since both of these are translated into HTTP POST requests
+which are not affected.
+
+=head1 ACKNOWLEDGEMENTS
+
+I would like to thank IntelliSurvey, Inc for sponsoring my work
+on this module.
+
+=head1 BUGS AND LIMITATIONS
+
+At this time there are no known bugs in this module. Please report
+problems to the author, patches are always welcome.
+
+Use L<Github tracker|https://github.com/nohuhu/RPC-ExtDirect-Client-Async/issues>
+to open bug reports, this is the easiest and quickest way to get your
+issue fixed.
+
+=for readme continue
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2013-2016 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

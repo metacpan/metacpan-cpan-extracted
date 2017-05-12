@@ -1,0 +1,7 @@
+<%INIT>
+local $@;
+eval { require RT::Extension::TicketLocking };
+$RT::Logger->error( $@ ) if $@;
+
+return;
+</%INIT>

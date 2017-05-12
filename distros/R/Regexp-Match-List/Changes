@@ -1,0 +1,7 @@
+Revision history for Perl extension Regexp::Match::List.
+
+0.5  Wed Apr 28 18:18:07 2004
+	- Initial CPAN distribution
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -A -X -n Regexp::Match::List
+

@@ -1,0 +1,11 @@
+name: RTx-MD5Auth
+version: 0.01
+abstract: RT MD5Auth Extension
+author: Autrijus Tang <autrijus@autrijus.org>
+license: gpl
+distribution_type: module
+no_index:
+  directory:
+    - html
+    - inc
+generated_by: Module::Install version 0.31

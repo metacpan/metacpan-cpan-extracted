@@ -1,0 +1,16 @@
+Regexp::Log
+-----------
+
+This module is intented to simplify the process of writing regular
+expressions for parsing log files.
+
+Wouldn't it be nice to be able to feed your Apache or Squid LogFormat
+configuration string to a Perl object, put in the list of fields you
+want to capture, and ask the object to give you the adequate regular
+expression?
+
+This module makes it possible.
+
+You just have to write the adequate subclass, and put it on CPAN
+for others to use.
+

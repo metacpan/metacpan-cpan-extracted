@@ -1,0 +1,92 @@
+NAME
+    RPi::SPI - Communicate with devices over the Serial Peripheral Interface
+    (SPI) bus on Raspberry Pi
+
+SYNOPSIS
+        # channel 0 and 1 are the hardware SPI pins
+        # CE0 and CE1
+
+        my $spi = RPi::SPI->new(0);
+
+        my $buf = [0x01, 0x02];
+        my $len = 2;
+
+        @$buf = $spi->rw($buf, $len);
+
+        # use a GPIO pin to expand the number of SPI
+        # channels. We'll bit-bang automatically. The
+        # GPIO pin must connect to the CS/SS pin on the
+        # IC you're using
+
+        $spi = RPi::SPI->new(26); # GPIO 26 is the CS
+
+DESCRIPTION
+    This distribution provides you the ability to communicate with devices
+    attached to the channels on the Serial Peripheral Interface (SPI) bus.
+    Although it was designed for the Raspberry Pi, that's not a hard
+    requirement, and it should work on any Unix-type system that has support
+    for SPI.
+
+    You can use the hardware SPI pins CE0 and CE1 on the Raspberry Pi, but
+    if you need more SPI slaves, we'll also automatically bit-bang the SPI
+    bus using a standard GPIO pin for the Slave Select instead.
+
+METHODS
+  new
+    Instantiates a new RPi::SPI instance, prepares a specific SPI bus
+    channel for use, then returns the object.
+
+    Parameters:
+
+        $channel
+
+    The SPI bus channel to initialize.
+
+    Mandatory: Integer, `0' for `/dev/spidev0.0' or `1' for
+    `/dev/spidev0.1'. You can also send in any number above `1'. If so,
+    we'll treat it as a GPIO pin (connected to the CS/SS pin of the IC), and
+    we'll bit-bang the CS automatically as to free up the onboard hardware
+    channels.
+
+        $speed
+
+    Optional, Integer. The data rate to communicate on the bus using.
+    Defaults to `1000000' (1MHz).
+
+    Dies if we can't open the SPI bus.
+
+  rw
+    Writes specified data to the bus on the channel specified in `new()',
+    then after completion, does a read of the bus and re-populates the write
+    buffer with the freshly read data, and returns it as an array.
+
+    Parameters:
+
+        $buf
+
+    Mandatory: Array reference where each element is an unsigned char
+    (0-255). This array is the write buffer; the data we'll be sending to
+    the SPI bus.
+
+        $len
+
+    Mandatory: Integer, the number of array elements in the `$buf' parameter
+    sent in above.
+
+    Return: The write buffer, after being re-populated with the read data,
+    as a Perl array reference.
+
+    Dies if we can't open the SPI bus.
+
+AUTHOR
+    Steve Bertrand, `<steveb at cpan.org>'
+
+LICENSE AND COPYRIGHT
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

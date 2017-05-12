@@ -1,0 +1,10 @@
+name = "Readonly"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+license="artistic_2"
+
+[release]
+pause_config = "C:/Strawberry/pause.upload"
+
+[ReleaseTest]
+MinimumVersion = false

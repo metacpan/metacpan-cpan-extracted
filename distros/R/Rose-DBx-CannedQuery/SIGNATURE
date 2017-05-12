@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 11e59ccec4156bf26776faaf086bb503d35b7cff Build.PL
+SHA1 a3c04fdcf14e8a2721609b2c4067dff1a590b548 Changes
+SHA1 d36443d62e5b4f64abc2f016ff25e5b589693f52 Changes~
+SHA1 d9fdf99a6d98de3eefec5bd387283cf03a96916d INSTALL
+SHA1 dc3eeff4a63235e1aab81d8c8ac30c68a8eb874e MANIFEST
+SHA1 9938aad2288491b01d4bc758506ce38024f696e3 META.json
+SHA1 d19d6097c11849a5a4c4e8049ef075fd79806ebb Makefile.PL
+SHA1 18851d42bf0990722844b1a7875e05d2faa49e5c README
+SHA1 850baf508f9c1b4d2d833375e2d1d76bab8d9c58 lib/Rose/DBx/CannedQuery.pm
+SHA1 81f9adc65a3d5a79b27d1df5e430cbba0b74c1b0 lib/Rose/DBx/CannedQuery.pm~
+SHA1 7d7d31b3559b2b9144551e6baad0e49a85bd0a4e lib/Rose/DBx/CannedQuery/SimpleQueryCache.pm
+SHA1 e86dc456a450ba998df0fe95ab8ff1789193a13d lib/Rose/DBx/CannedQuery/SimpleQueryCache.pm~
+SHA1 47eb1ab3290898e9c2ce97ff18c1a0a59394a04f t/00-report-prereqs.dd
+SHA1 7167a6ec318c24b45b6d0a70078155d788b52f0b t/00-report-prereqs.t
+SHA1 680f85f5d90fa6871806eaa64cee1f1ad080df3d t/00basic.t
+SHA1 b0e27aa47283c3c6403c1cdc8c820f6fccf8649c t/cache.t
+SHA1 8b889d59b8a7a1aa313732cb900439d50dcbcd03 t/canned.t
+SHA1 e1b365278138761ce64889531d06712cbd16274e t/canned.t~
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJVNqsJAAoJEFXmkwhreRSJZ5oIAJQD/BsJVibAbsPFjtqsBicZ
+lCmF1sWgSj8ThmWkdCnWX5skIBw8tea5MUcKbv1xXgLQ1v9T4Cmd4lpRSUXryanb
+J7XxN3DRv7UONwdBLwBIjI8y3NKQx0hAwQf02GrmPgZadnpcFYFrKlh0ibFqfQwC
+oxZlQDVLL/2cCrgso/NOG5D7eL5uLJBGikybLiFH6Qg2oStOh6pkukihnGTiw4uX
+7cx69wdgkst/MC4a4aPdS1U4gQh/QZ1vAkB25FkOpDg1Er5v2JJZ0aTqvAFNpIm+
+g/1SDKc8GakImw6azrQODtqshGMtGpnPmSBUDj0SiEc8Ki5BgXWtxw7iKRGCPNk=
+=awm8
+-----END PGP SIGNATURE-----

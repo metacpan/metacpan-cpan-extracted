@@ -1,0 +1,67 @@
+# $File: //depot/RT/osf/etc/sitemap.yml $ $Author: autrijus $
+# $Revision: #1 $ $Change: 9321 $ $DateTime: 2003/12/15 06:17:38 $
+# RT Foundry Site Map
+Home:
+  - Announcements
+  - RT Foundry NewsLetter
+  - Foundry News
+  - Statistics
+  - Top Downloads
+Member Login (Guest):
+  - Login
+  - Register
+  - Password Reminder
+My Page (Registered):
+  - Overview:
+      - Tickets I requested
+      - Tickets I own
+      - My Projects
+  - Preferences:
+      - Identity
+      - Password
+      - Public Info
+      - Self Introduction
+  - Register Project
+Project Directory:
+  - Overview
+  - Maturity
+  - Platform
+  - License
+  - ProgrammingLanguage
+  - IntendedAudience
+Site Admin (SuperUser):
+  - Site Admin
+  - User Setup:
+      - Save/Delete
+      - Identity
+      - Password
+      - Public Info
+      - Self Introduction
+  - Queue Setup:
+      - Projects
+      - Functions
+      - Configuration
+  - Global Setup:
+      - Basics
+      - Custom Fields
+      - Templates
+      - Scrips
+      - User Rights
+      - Group Rights
+"ProjectName":
+  - Summary
+  - Tracker
+  - Forums
+  - Wiki
+  - Version Control
+  - Downloads
+  - Project Admin:
+      - Basics
+      - Members
+      - Release Files
+      - Forums
+      - Tracker Fields
+      - Statistics
+"~UserName":
+  - Personal Information
+  - Involved Projects

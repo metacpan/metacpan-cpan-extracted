@@ -1,0 +1,10 @@
+/*
+ * Test 3-06 : Triple patterns and constraints : no results
+ */
+
+SELECT *
+SOURCE <model1.nt>
+WHERE  (?x, ?y, ?z)
+AND    ?x eq <http://rdf.org/r-1> , 
+       ?y eq <http://rdf.org/p-1> ,
+       ?z eq "v-2-1"

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b73248a8f1a1dbf8d21958517b880e387f4f9696 Changes
+SHA1 ebc76994ee26f81fa29cd69a622d2179a28c3202 MANIFEST
+SHA1 30836b582eef7a5592c64d0fd628ccef392dd02a MANIFEST.SKIP
+SHA1 7887288f2e1804d8003ee9e84b9a2e3a49253b7a META.yml
+SHA1 b699da220444a8bf2898108803fd2237d453f37d Makefile.PL
+SHA1 e057e1ded1dbccae1fa309643ec32654304602ad README
+SHA1 6d96e54427782ea00b44396e438e6af34e589221 html/Callbacks/RT-Tree-View/Elements/RT__Ticket/ColumnMap/ColumnMap
+SHA1 4fa106beae5f0db0f576edf76b39cb0655e0d51a html/Callbacks/RT-Tree-View/Search/Elements/PickBasics/EndOfList
+SHA1 1ae28ee3f55a45be31f7c60fd5e756b3d1cb0d05 html/Callbacks/RT-Tree-View/Search/Results.html/SearchActions
+SHA1 db1587077376f6ff28ea3dc521c884affe2b0ae2 html/Callbacks/RT-Tree-View/Ticket/Elements/Tabs/Default
+SHA1 f826f37a24eb0fee553c1795fc3e1457e1f3c971 html/Search/Tree.html
+SHA1 05d89e1fe6d49cd518b5a3e6694cc313e655fb02 inc/Module/Install.pm
+SHA1 2e300b145ee61eea9dfd71624b17b0bc9218aa4f inc/Module/Install/Base.pm
+SHA1 29ce36027266c1839b496bf660396e0a91ab53cf inc/Module/Install/Can.pm
+SHA1 c0f347c388074beb42aad080661c7e3552110c71 inc/Module/Install/Fetch.pm
+SHA1 e094fe96aef06c68d7a424818c12e52b11f1ccdd inc/Module/Install/Makefile.pm
+SHA1 e448c6dc5351ef425e3f8bdbeb642409120bc3ca inc/Module/Install/Metadata.pm
+SHA1 4514aade933a86275cbe91ff736b3a8f4b8d3b92 inc/Module/Install/RTx.pm
+SHA1 134de6ff2f762873b6a1af950dd53f8e0a801d73 inc/Module/Install/Win32.pm
+SHA1 1ec06df292af7f652d33db6129e9e4c7cc8b5095 inc/Module/Install/WriteAll.pm
+SHA1 7e81c6ce987d6761e3ea2c98de4e1d245a0a90a8 lib/RT/View/Tree.pm
+SHA1 5677ad47fb3dccdfb7c71a431ad2812ac23cd4ab testdata
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFC3Dk5Ei9d9xCOQEYRAmo1AKCOKwdXt6xv+xtwUm9vNdZ637Qr2QCgiIji
+AyuhQbOZY74v5YliavlcvQ8=
+=gaeu
+-----END PGP SIGNATURE-----

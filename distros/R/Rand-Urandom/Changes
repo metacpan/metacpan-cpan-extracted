@@ -1,0 +1,9 @@
+Revision history for Perl extension Rand::Urandom.
+
+0.03 Tue Nov  3 13:33:15 MST 2015
+	* add support for getentropy(2) on OpenBSD
+	* speed-up by remembering if we have a syscall or not
+
+0.02
+
+0.01  Sun Oct 19 18:17:08 2014

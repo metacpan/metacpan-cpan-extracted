@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/dets
+lib/Regexp/Chinese/TradSimp.pm
+t/01_load.t
+t/02_no_chinese.t
+t/03_no_differences.t
+t/04_matching.t
+t/05_existing_regex_stuff.t
+t/06_ise_ize.t
+META.yml                                 Module meta-data (added by MakeMaker)

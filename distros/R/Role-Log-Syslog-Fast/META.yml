@@ -1,0 +1,18 @@
+---
+abstract: 'A Logging role for Moose on Log::Syslog::Fast'
+author:
+  - 'Thiago Rondon <thiago@nsms.com.br>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Role-Log-Syslog-Fast
+resources:
+  bugtracker: http://github.com/maluco/Role-Log-Syslog-Fast/issues
+  repository: git://github.com/maluco/Role-Log-Syslog-Fast
+version: 0.14

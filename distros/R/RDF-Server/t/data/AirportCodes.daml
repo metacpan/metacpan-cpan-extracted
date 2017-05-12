@@ -1,0 +1,982 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
+         xmlns:daml="http://www.daml.org/2001/03/daml+oil#" 
+         xmlns="http://www.daml.ri.cmu.edu/ont/AirportCodes.daml#">
+  <daml:Ontology about="">
+    <rdfs:comment>
+      Airline Code Ontology
+	NOTE:	THIS IS NOT INTENDED TO BE A DEFINITIVE LIST OF ALL
+		AIRPORT CODES, BUT IS AS COMPLETE AS POSSIBLE.
+    </rdfs:comment>
+    <daml:imports rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns"/>
+    <daml:imports rdf:resource="http://www.w3.org/2000/01/rdf-schema"/>
+    <daml:imports rdf:resource="http://www.daml.org/2001/03/daml+oil"/>
+  </daml:Ontology>
+ 
+  <rdfs:Class rdf:ID="AirportCode">
+    <rdfs:label>AirportCode</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.daml.org/2001/03/daml+oil#Thing"/>
+  </rdfs:Class>
+ 
+  <!--  The property ranges are mostly undefined for now 
+	and appear as strings.  As other ontologies emerge
+	for these cities, then the ranges will become URIs.
+    -->
+
+  <rdf:Property rdf:ID="city">
+    <rdfs:domain rdf:resource="#AirportCode"/>
+  </rdf:Property> 
+
+  <rdf:Property rdf:ID="state">
+    <rdfs:domain rdf:resource="#AirportCode"/>
+  </rdf:Property> 
+
+  <rdf:Property rdf:ID="country">
+    <rdfs:domain rdf:resource="#AirportCode"/>
+  </rdf:Property> 
+
+  <rdf:Property rdf:ID="airport">
+    <rdfs:domain rdf:resource="#AirportCode"/>
+  </rdf:Property> 
+
+  <!-- Now to instantiate the codes -->
+
+  <AirportCode rdf:ID="AAE">
+    <city>Annaba</city>
+    <country>Algeria</country>
+    <airport>Les Salines </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AAL">
+    <city>Aalborg</city>
+    <country>Denmark</country>
+    <airport>Aalborg </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AAR">
+    <city>Aarhus</city>
+    <country>Denmark</country>
+    <airport>Tirstrup </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABE">
+    <city>Allentown</city>
+    <state>PA</state>
+    <country>USA</country>
+    <airport>Allentown-Bethlehem-Easton Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABI">
+    <city>Abilene</city>
+    <state>TX</state>
+    <country>USA</country>
+    <airport>Municipal </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABJ">
+    <city>Abidjan</city>
+    <country>Cote D'ivoire</country>
+    <airport>Port Bouet </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABL">
+    <city>Ambler</city>
+    <state>AK</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABM">
+    <city>Bamaga</city>
+    <state>Queensland</state>
+    <country>Australia</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABQ">
+    <city>Albuquerque</city>
+    <state>NM</state>
+    <country>USA</country>
+    <airport>Albuquerque International Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABR">
+    <city>Aberdeen</city>
+    <state>SD</state>
+    <country>USA</country>
+    <airport>Aberdeen Regional Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABS">
+    <city>Abu Simbel</city>
+    <country>Egypt</country>
+    <airport>Abu Simbel </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABX">
+    <city>Albury</city>
+    <state>New South Wales</state>
+    <country>Australia</country>
+    <airport>Albury </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABY">
+    <city>Albany</city>
+    <state>GA</state>
+    <country>USA</country>
+    <airport>Dougherty County </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ABZ">
+    <city>Aberdeen</city>
+    <state>Scotland</state>
+    <country>United Kingdom</country>
+    <airport>Dyce </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ACA">
+    <city>Acapulco</city>
+    <state>Guerrero</state>
+    <country>Mexico</country>
+    <airport>Alvarez International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ACC">
+    <city>Accra</city>
+    <country>Ghana</country>
+    <airport>Kotoka </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ACE">
+    <city>Lanzarote</city>
+    <state>Canary Islands</state>
+    <country>Spain</country>
+    <airport>Lanzarote </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ACI">
+    <city>Alderney</city>
+    <state>Channel Islands</state>
+    <country>United Kingdom</country>
+    <airport>The Blaye </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ACK">
+    <city>Nantucket</city>
+    <state>MA</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ACT">
+    <city>Waco</city>
+    <state>TX</state>
+    <country>USA</country>
+    <airport>Madison Cooper </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ACV">
+    <city>Arcata</city>
+    <state>CA</state>
+    <country>USA</country>
+    <airport>Arcata/Eureka Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ACY">
+    <city>Atlantic City          /Atlantic Cty</city>
+    <state>NJ</state>
+    <country>USA</country>
+    <airport>Atlantic City International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ADA">
+    <city>Adana</city>
+    <country>Turkey</country>
+    <airport>Adana </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ADB">
+    <city>Izmir</city>
+    <country>Turkey</country>
+    <airport>Adnam Menderes </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ADD">
+    <city>Addis Ababa</city>
+    <country>Ethiopia</country>
+    <airport>Bole </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ADJ">
+    <city>Amman</city>
+    <country>Jordan</country>
+    <airport>Civil </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ADL">
+    <city>Adelaide</city>
+    <state>South Australia</state>
+    <country>Australia</country>
+    <airport>Adelaide </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ADQ">
+    <city>Kodiak</city>
+    <state>AK</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ADZ">
+    <city>San Andres Island</city>
+    <country>Colombia</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AEP">
+    <city>Buenos Aires</city>
+    <state>Buenos Aires</state>
+    <country>Argentina</country>
+    <airport>Jorge Newberry </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AES">
+    <city>Aalesund</city>
+    <country>Norway</country>
+    <airport>Vigra </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AET">
+    <city>Allakaket</city>
+    <state>AK</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AEX">
+    <city>Alexandria</city>
+    <state>LA</state>
+    <country>USA</country>
+    <airport>Alexandria Intl Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AEY">
+    <city>Akureyri</city>
+    <country>Iceland</country>
+    <airport>Akureyri </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AGA">
+    <city>Agadir</city>
+    <country>Morocco</country>
+    <airport>Inezgane </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AGB">
+    <city>Augsburg</city>
+    <country>Germany</country>
+    <airport>Muehlhausen </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AGF">
+    <city>Agen</city>
+    <country>France</country>
+    <airport>La Garenne </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AGH">
+    <city>Helsingborg</city>
+    <country>Sweden</country>
+    <airport>Angelholm/Helsingborg </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AGP">
+    <city>Malaga</city>
+    <country>Spain</country>
+    <airport>Malaga </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AGR">
+    <city>Agra</city>
+    <country>India</country>
+    <airport>Kheria </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AGS">
+    <city>Augusta</city>
+    <state>GA</state>
+    <country>USA</country>
+    <airport>Bush Field </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AGU">
+    <city>Aguascalientes</city>
+    <state>Aguascalientes</state>
+    <country>Mexico</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AHN">
+    <city>Athens</city>
+    <state>GA</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AHO">
+    <city>Alghero</city>
+    <state>Sardinia</state>
+    <country>Italy</country>
+    <airport>Fertilia </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AIA">
+    <city>Alliance</city>
+    <state>NE</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AIN">
+    <city>Wainwright</city>
+    <state>AK</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AJN">
+    <city>Anjouan</city>
+    <country>Comoros </country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AJA">
+    <city>Ajaccio</city>
+    <state>Corsica</state>
+    <country>France</country>
+    <airport>Campo Dell Oro </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AJU">
+    <city>Aracaju</city>
+    <state>Sergipe</state>
+    <country>Brazil</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AKJ">
+    <city>Asahikawa</city>
+    <country>Japan</country>
+    <airport>Asahikawa </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AKL">
+    <city>Auckland</city>
+    <country>New Zealand</country>
+    <airport>Auckland International Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALA">
+    <city>Almaty</city>
+    <country>Kazakhstan</country>
+    <airport>Almaty </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALB">
+    <city>Albany</city>
+    <state>NY</state>
+    <country>USA</country>
+    <airport>Albany County Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALC">
+    <city>Alicante</city>
+    <country>Spain</country>
+    <airport>Alicante </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALE">
+    <city>Alpine</city>
+    <state>TX</state>
+    <country>USA</country>
+    <airport>Alpine Texas </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALF">
+    <city>Alta</city>
+    <country>Norway</country>
+    <airport>Elvebakken </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALG">
+    <city>Algiers</city>
+    <country>Algeria</country>
+    <airport>Houari Boumedienne </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALM">
+    <city>Alamogordo</city>
+    <state>NM</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALO">
+    <city>Waterloo</city>
+    <state>IA</state>
+    <country>USA</country>
+    <airport>Waterloo Municipal Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALP">
+    <city>Aleppo</city>
+    <country>Syria</country>
+    <airport>Nejrab </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALS">
+    <city>Alamosa</city>
+    <state>CO</state>
+    <country>USA</country>
+    <airport>Bergman Field </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALW">
+    <city>Walla Walla</city>
+    <state>WA</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ALY">
+    <city>Alexandria</city>
+    <country>Egypt</country>
+    <airport>Alexandria </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AMA">
+    <city>Amarillo</city>
+    <state>TX</state>
+    <country>USA</country>
+    <airport>Amarillo International Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AMD">
+    <city>Ahmedabad</city>
+    <country>India</country>
+    <airport>Ahmedabad </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AMI">
+    <city>Mataram</city>
+    <country>Indonesia</country>
+    <airport>Selaparang </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AMM">
+    <city>Amman</city>
+    <country>Jordan</country>
+    <airport>Queen Alia International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AMQ">
+    <city>Ambon</city>
+    <country>Indonesia</country>
+    <airport>Pattimura </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AMS">
+    <city>Amsterdam</city>
+    <country>Netherlands</country>
+    <airport>Schiphol </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ANB">
+    <city>Anniston</city>
+    <state>AL</state>
+    <country>USA</country>
+    <airport>Municipal </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ANC">
+    <city>Anchorage</city>
+    <state>AK</state>
+    <country>USA</country>
+    <airport>Anchorage International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ANF">
+    <city>Antofagasta</city>
+    <country>Chile</country>
+    <airport>Cerro Moreno </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ANG">
+    <city>Angouleme</city>
+    <country>France</country>
+    <airport>Gel-Air </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ANI">
+    <city>Aniak</city>
+    <state>AK</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ANR">
+    <city>Antwerp</city>
+    <country>Belgium</country>
+    <airport>Deurne </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ANU">
+    <city>Saint Johns / Antigua</city>
+    <country>Antigua And Barbuda</country>
+    <airport>Vc Bird International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ANV">
+    <city>Anvik</city>
+    <state>AK</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AOI">
+    <city>Ancona</city>
+    <country>Italy</country>
+    <airport>Falconara </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AOJ">
+    <city>Aomori</city>
+    <country>Japan</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AOK">
+    <city>Karpathos</city>
+    <country>Greece</country>
+    <airport>Karpathos </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AOO">
+    <city>Altoona / Martinsburg</city>
+    <state>PA</state>
+    <country>USA</country>
+    <airport>Blair County </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AOR">
+    <city>Alor Setar</city>
+    <country>Malaysia</country>
+    <airport>Sultan Abdul Halim </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="APF">
+    <city>Naples</city>
+    <state>FL</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="APL">
+    <city>Nampula</city>
+    <country>Mozambique</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="APN">
+    <city>Alpena</city>
+    <state>MI</state>
+    <country>USA</country>
+    <airport>Alpena Regional Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="APW">
+    <city>Apia</city>
+    <country>Samoa</country>
+    <airport>Faleolo </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AQJ">
+    <city>Aqaba</city>
+    <country>Jordan</country>
+    <airport>Aqaba </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AQP">
+    <city>Arequipa</city>
+    <country>Peru</country>
+    <airport>Rodriguez Ballon </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ARH">
+    <city>Arkhangelsk</city>
+    <country>Russia</country>
+    <airport>Arkhangelsk </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ARI">
+    <city>Arica</city>
+    <country>Chile</country>
+    <airport>Chacalluta </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ARM">
+    <city>Armidale</city>
+    <state>New South Wales</state>
+    <country>Australia</country>
+    <airport>Armidale </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ARN">
+    <city>Stockholm</city>
+    <country>Sweden</country>
+    <airport>Arlanda International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ART">
+    <city>Watertown</city>
+    <state>NY</state>
+    <country>USA</country>
+    <airport>Watertown </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ASD">
+    <city>Andros Town</city>
+    <country>Bahamas</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ASE">
+    <city>Aspen</city>
+    <state>CO</state>
+    <country>USA</country>
+    <airport>Pitkin County Airport Sardy Field </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ASM">
+    <city>Asmara</city>
+    <country>Eritrea</country>
+    <airport>Asmara Intl/Yohannes Iv </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ASP">
+    <city>Alice Springs</city>
+    <state>Northern Territory</state>
+    <country>Australia</country>
+    <airport>Alice Springs </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ASU">
+    <city>Asuncion</city>
+    <country>Paraguay</country>
+    <airport>Silvio Pettirossi </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ASW">
+    <city>Aswan</city>
+    <country>Egypt</country>
+    <airport>Daraw </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ATC">
+    <city>Arthurs Town</city>
+    <country>Bahamas</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ATH">
+    <city>Athens</city>
+    <country>Greece</country>
+    <airport>Hellinikon </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ATL">
+    <city>Atlanta</city>
+    <state>GA</state>
+    <country>USA</country>
+    <airport>Hartsfield International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ATW">
+    <city>Appleton</city>
+    <state>WI</state>
+    <country>USA</country>
+    <airport>Outagamie County Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="ATY">
+    <city>Watertown</city>
+    <state>SD</state>
+    <country>USA</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AUA">
+    <city>Aruba</city>
+    <country>Aruba</country>
+    <airport>Reina Beatrix </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AUC">
+    <city>Arauca</city>
+    <country>Colombia</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AUG">
+    <city>Augusta</city>
+    <state>ME</state>
+    <country>USA</country>
+    <airport>Maine State </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AUH">
+    <city>Abu Dhabi</city>
+    <country>United Arab Emirates</country>
+    <airport>Abu Dhabi International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AUS">
+    <city>Austin</city>
+    <state>TX</state>
+    <country>USA</country>
+    <airport>Robert Mueller Municipal Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AVL">
+    <city>Asheville / Hendersonville</city>
+    <state>NC</state>
+    <country>USA</country>
+    <airport>Asheville Regional Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AVN">
+    <city>Avignon</city>
+    <country>France</country>
+    <airport>Caumont </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AVP">
+    <city>Wilkes Barre/Scranton</city>
+    <state>PA</state>
+    <country>USA</country>
+    <airport>Wilkes-Barre/Scranton Intl </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AXA">
+    <city>Anguilla</city>
+    <country>Anguilla</country>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AXD">
+    <city>Alexandroupolis</city>
+    <country>Greece</country>
+    <airport>Alexandroupolis </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AYQ">
+    <city>Ayers Rock</city>
+    <state>Northern Territory</state>
+    <country>Australia</country>
+    <airport>Connellan </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AYT">
+    <city>Antalya</city>
+    <country>Turkey</country>
+    <airport>Antalya </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="AZO">
+    <city>Kalamazoo</city>
+    <state>MI</state>
+    <country>USA</country>
+    <airport>Kalamazoo/Battle Creek Intl </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BAH">
+    <city>Bahrain</city>
+    <country>Bahrain</country>
+    <airport>Bahrain International  Bahrain </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BAK">
+    <city>Baku</city>
+    <country>Azerbaijan</country>
+    <airport>Baku </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BAL">
+    <city>Batman</city>
+    <country>Turkey</country>
+    <airport>Nearest Air Service Through Diyarbakir </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BAQ">
+    <city>Barranquilla</city>
+    <country>Colombia</country>
+    <airport>E Cortissoz </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BAX">
+    <city>Barnaul</city>
+    <country>Russia</country>
+    <airport>Barnaul Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BBI">
+    <city>Bhubaneswar</city>
+    <country>India</country>
+    <airport>Bhubaneswar </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BBK">
+    <city>Kasane</city>
+    <country>Botswana</country>
+    <airport>Kasane </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BBU">
+    <city>Bucharest</city>
+    <country>Romania</country>
+    <airport>Baneasa </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BCD">
+    <city>Bacolod</city>
+    <country>Philippines</country>
+    <airport>Bacolod </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BCN">
+    <city>Barcelona</city>
+    <country>Spain</country>
+    <airport>Barcelona </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BDA">
+    <city>Bermuda/Hamilton</city>
+    <country>Bermuda</country>
+    <airport>Kindley Airfield/Civil Air Terminal </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BDJ">
+    <city>Banjarmasin</city>
+    <country>Indonesia</country>
+    <airport>Syamsudin Noor </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BDL">
+    <city>Hartford</city>
+    <state>CT</state>
+    <country>USA</country>
+    <airport>Bradley International Airport </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BDO">
+    <city>Bandung</city>
+    <country>Indonesia</country>
+    <airport>Husein Sastranegara </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BDQ">
+    <city>Vadodara</city>
+    <country>India</country>
+    <airport>Vadodara </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BDR">
+    <city>Bridgeport</city>
+    <state>CT</state>
+    <country>USA</country>
+    <airport>Sikorsky Memorial </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BED">
+    <city>Bedford</city>
+    <state>MA</state>
+    <country>USA</country>
+    <airport>Bedford </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BEG">
+    <city>Belgrade</city>
+    <country>Yugoslavia</country>
+    <airport>Belgrade-Beograd </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BEH">
+    <city>Benton Harbor</city>
+    <state>MI</state>
+    <country>USA</country>
+    <airport>Ross Field </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BEI">
+    <city>Beica</city>
+    <country>Ethiopia</country>
+    <airport>Beica </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BEL">
+    <city>Belem</city>
+    <state>Para</state>
+    <country>Brazil</country>
+    <airport>Val De Cans </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BEO">
+    <city>Newcastle</city>
+    <state>New South Wales</state>
+    <country>Australia</country>
+    <airport>Belmont </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BER">
+    <city>Berlin</city>
+    <country>Germany</country>
+    <airport>Schoenefeld </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BES">
+    <city>Brest</city>
+    <country>France</country>
+    <airport>Guipavas </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BET">
+    <city>Bethel</city>
+    <state>AK</state>
+    <country>USA</country>
+    <airport>Bethel </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BEW">
+    <city>Beira</city>
+    <country>Mozambique</country>
+    <airport>Beira </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BEY">
+    <city>Beirut</city>
+    <country>Lebanon</country>
+    <airport>International </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BFD">
+    <city>Bradford</city>
+    <state>PA</state>
+    <country>USA</country>
+    <airport>Bradford Regional </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BFF">
+    <city>Scottsbluff</city>
+    <state>NE</state>
+    <country>USA</country>
+    <airport>William B Heiling Field </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BFL">
+    <city>Bakersfield</city>
+    <state>CA</state>
+    <country>USA</country>
+    <airport>Meadows Field </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BFN">
+    <city>Bloemfontein</city>
+    <country>South Africa</country>
+    <airport>Jbm Hertzog </airport>
+  </AirportCode>
+  
+  <AirportCode rdf:ID="BFS">
+    <city>Belfast</city>
+    <state>Northern Ireland</state>
+    <country>United Kingdom</country>
+    <airport>Belfast International </airport>
+  </AirportCode>
+  
+</rdf:RDF>

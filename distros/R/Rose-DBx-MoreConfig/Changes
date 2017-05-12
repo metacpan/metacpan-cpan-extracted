@@ -1,0 +1,4 @@
+1.01      2015-03-18
+  * Add test prerequisite of YAML; Rose::DB does't include this requirement.
+1.00      2015-03-15
+  * First CPAN publication

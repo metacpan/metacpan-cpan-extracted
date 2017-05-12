@@ -1,0 +1,18 @@
+--- Web.pm.orig 2011-09-20 15:01:56.000000000 +0000
++++ Web.pm  2011-09-20 15:04:29.000000000 +0000
+@@ -465,12 +465,12 @@
+ 
+         # if the user is trying to access a ticket, redirect them
+         if ( $m->request_comp->path =~ '^(/+)Ticket/Display.html' && $ARGS->{'id'} ) {
+-            RT::Interface::Web::Redirect( RT->Config->Get('WebURL') . "SelfService/Display.html?id=" . $ARGS->{'id'} );
++            RT::Interface::Web::Redirect( RT->Config->Get('WebURL') . "Minimal/Display.html?id=" . $ARGS->{'id'} );
+         }
+ 
+         # otherwise, drop the user at the SelfService default page
+-        elsif ( $m->base_comp->path !~ RT->Config->Get('SelfServiceRegex') ) {
+-            RT::Interface::Web::Redirect( RT->Config->Get('WebURL') . "SelfService/" );
++        elsif ( $m->base_comp->path !~ RT->Config->Get('MinimalRegex') ) {
++            RT::Interface::Web::Redirect( RT->Config->Get('WebURL') . "Minimal/Observation.html" );
+         }
+ 
+         # if user is in SelfService dir let him do anything

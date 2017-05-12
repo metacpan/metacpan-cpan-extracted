@@ -1,0 +1,181 @@
+=head1 NAME
+
+Reaction::Manual::ActionPrototypes - Changes to the Action Prototype Mechanism
+
+=head1 DESCRIPTION
+
+After Reaction 0.001001 the API used to create links for different actions in
+the L<ViewPort::Collection::Grid|Reaction::UI::ViewPort::Collection::Grid>
+changed significantly. The aim of the changes was to create a simpler API that
+was more concise, flexible, and didn't tie unneccessary controller logic in the
+ViewPort layer.
+
+=head1 Major Changes
+
+=head2 Controller Layer
+
+=head3 L<Reaction::UI::Controller::Collection>
+
+=over 4
+
+=item The default display class for the C<list> action is now
+L<Grid|Reaction::UI::ViewPort::Collection::Grid>.
+
+=item Addition of the C<default_member_actions> and C<default_collection_actions>
+
+=item Addition of the C<_build_member_action_prototype> and
+C<_build_collection_action_prototype> methods. These are used by
+C<_build_action_viewport_args> to create prototypes for collection and member
+actions.
+
+=back
+
+=head3 L<Reaction::UI::Controller::Collection::CRUD>
+
+By default, enable C<create>, C<update>, C<delete>, C<delete_all>, actions. 
+
+=head2 ViewPort Layer
+
+=head3 L<Reaction::UI::ViewPort::Collection::Grid>
+
+=over 4
+
+=item Add the C<member_action_count> attribute. It allows the controller to
+know how many actions to expect to lay out the UI properly.
+
+=item Default to member-class
+L<Grid::Member|Reaction::UI::ViewPort::Collection::Grid::Member>
+
+=back
+
+=head2 L<Reaction::UI::ViewPort::Role::Actions>
+
+Completely revamped the action-prototypes, added ordering support and moved to
+using the new C<ViewPort::URI|Reaction::UI::ViewPort::URI>.
+
+Most notably C<action_prototypes> is now a HASH ref.
+
+=head1 Migration
+
+In most cases, you shouldn't need to change much for migration, but if you had
+custom actions in your controllers that were linked to by the CRUD system, or
+you had excluded certain classes, you'll need to create some minor updates.
+
+=head2 A custom collection action in your controller.
+
+    #old code
+    sub custom_action { ... }
+    sub _build_action_viewport_map {
+      my $map = shift->next::method(@_);
+      $map->{custom_action} = 'Reaction::UI::ViewPort::Action';
+      return $map;
+    }
+    sub _build_action_viewport_args {
+      my $args = shift->next::method(@_);
+      my $custom_proto = {
+        label => 'Create',
+        action => sub { [ '', 'create',    $_[1]->req->captures ] } 
+      };
+      my $protos = $args->{list}->{action_prototypes};
+      push(@$protos, $custom_proto);
+      return $args;
+    }
+
+    #new code:
+    sub custom_action { ... }
+    sub _build_action_viewport_map {
+      my $map = shift->next::method(@_);
+      $map->{custom_action} = 'Reaction::UI::ViewPort::Action';
+      return $map;
+    }
+    sub _build_default_collection_actions {
+      [ @{shift->next::method(@_)}, 'custom_action'];
+    }
+
+=head2 A custom member action in your controller.
+
+    #old code
+    sub custom_action { ... }
+    sub _build_action_viewport_map {
+      my $map = shift->next::method(@_);
+      $map->{custom_action} = 'Reaction::UI::ViewPort::Action';
+      return $map;
+    }
+    sub _build_action_viewport_args {
+      my $args = shift->next::method(@_);
+      my $custom_proto = {
+        label => 'Create',
+        action => sub { [ '', 'create',    $_[1]->req->captures ] } 
+      };
+      my $protos = $args->{list}->{Member}->{action_prototypes};
+      push(@$protos, $custom_proto);
+      return $args;
+    }
+
+    #new code:
+    sub custom_action { ... }
+    sub _build_action_viewport_map {
+      my $map = shift->next::method(@_);
+      $map->{custom_action} = 'Reaction::UI::ViewPort::Action';
+      return $map;
+    }
+    sub _build_default_member_actions {
+      [ @{shift->next::method(@_)}, 'custom_action'];
+    }
+
+
+=head2 Disabling a default collection action
+
+    #old code
+    sub delete_all {}
+    sub _build_action_viewport_args {
+      my $args = shift->next::method(@_);
+      #remove the delete all action
+      my $protos = $args->{list}->{action_prototypes};
+      @$protos = grep { $_->{label} !~ /Delete all/i } @$protos;
+      return $args;
+    }
+
+    #new code
+    sub delete_all {}
+    sub _build_default_collection_actions {
+      [ grep {$_ ne 'delete_all'} @{ shift->next::method(@_) } ];
+    }
+
+    #or ...
+    sub delete_all {}
+    sub _build_action_viewport_args {
+      my $args = shift->next::method(@_);
+      my $protos = $args->{list}->{action_prototypes};
+      delete $protos->{delete_all};
+      return $args;
+    }
+
+
+=head2 Changing the label of a collection action
+
+    #old code
+    sub _build_action_viewport_args {
+      my $args = shift->next::method(@_);
+      my $protos = $args->{list}->{action_prototypes};
+      $proto = grep { $_->{label} eq 'Delete all' } @$protos;
+      $proto->{label} = 'New Label';
+      return $args;
+    }
+
+    #new code
+    sub delete_all {}
+    sub _build_action_viewport_args {
+      my $args = shift->next::method(@_);
+      my $protos = $args->{list}->{action_prototypes};
+      $proto->{delete_all}->{label} = 'New Label';
+      return $args;
+    }
+
+    #or ...
+    __PACKAGE__->config(action => { list => { ViewPort => {
+        action_prototypes => { delete_all => {label => 'New Label'} }
+      },
+    );
+
+=cut

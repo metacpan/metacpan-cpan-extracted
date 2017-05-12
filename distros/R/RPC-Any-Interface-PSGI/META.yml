@@ -1,0 +1,30 @@
+---
+abstract: 'PSGI interface for RPC::Any'
+author:
+  - 'Sherwin Daganato <sherwin@daganato.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RPC-Any-Interface-PSGI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  Plack: 0
+  RPC::Any: 0
+  perl: 5.8.1
+resources:
+  bugtracker: https://github.com/sherwind/RPC-Any-Interface-PSGI/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/sherwind/RPC-Any-Interface-PSGI.git
+version: 0.03

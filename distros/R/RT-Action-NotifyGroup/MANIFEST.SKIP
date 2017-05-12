@@ -1,0 +1,6 @@
+^Makefile$
+^sbin/rt-notify-group-admin$
+^blib/
+^_build/
+^autom4te\.cache
+^config\.

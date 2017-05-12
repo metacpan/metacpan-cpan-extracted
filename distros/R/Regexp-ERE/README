@@ -1,0 +1,68 @@
+ERE.pm
+
+Copyright (C) 2012, Loïc Jonas Etienne
+
+
+OVERVIEW
+
+Pure perl module for:
+
+  - Parsing POSIX Extended Regular Expressions (ERE) into
+    Non-Deterministic Finite Automata (nfa)
+
+  - Manipulating nfa (and-ing, or-ing, concatenating)
+    and inspecting them (transparent, documented data structure)
+
+  - Computing Deterministic Finite Automata (dfa) from nfa
+    (powerset construction)
+
+  - Computing minimal dfa from dfa
+    (Hopcrofts's algorithm)
+
+  - Computing ERE or Perl Regular Expressions from nfa or dfa
+    (Warshall algorithm)
+
+  - Heuristically deriving from a nfa or dfa (possibly weaker) constraints
+    suitable for display in a graphical user interface,
+    i.e. a sequence of widgets of type 'free text' and 'drop down';
+    Example: '^(abc|def).*' => $nfa => [['abc', 'def'], 'free text']
+
+
+INSTALLATION
+
+    See the file INSTALL
+
+VERSIONS
+
+    0.01 initial version
+    0.02 minor documentation improvements
+         fixes for bugs revealed by perl 17:
+           - results independent of the hash key order
+           - improved prefix/suffix factorization
+           - improved test cases
+    0.03 minor documentation improvements
+         new quote function
+         improved ere parsing (a+ as a*a or aa* depending on the context)
+         improved tree construction/factorization
+         additional test cases
+         bug fixes:
+           - _tree_to_regex missed a starification
+           - drop-downs including the empty string were discarded
+    0.04 bug fixes
+           - oversimplification in _nfa_concat corrected
+
+
+AUTHOR
+
+    Loïc Jonas Etienne <loic.etienne@tech.swisssign.com>
+
+
+LICENSE INFORMATION
+
+    This module is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0. For details, see the full
+    text of the license in the file LICENSE.
+
+    This program is distributed in the hope that it will be useful, but it
+    is provided "as is" and without any express or implied warranties. For
+    details, see the full text of the license in the file LICENSE.

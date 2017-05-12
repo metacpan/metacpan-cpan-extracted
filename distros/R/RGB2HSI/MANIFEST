@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/RGB2HSI.pm
+t/001-translate.t

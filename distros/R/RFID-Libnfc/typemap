@@ -1,0 +1,44 @@
+_Bool                       T_IV
+byte_t                      T_U_CHAR
+byte_t *                    T_PV
+const byte_t *              T_PV
+void *                      T_PTROBJ
+const void *                T_PTROBJ
+nfc_device_spec_t           T_PTROBJ
+nfc_device_option_t         T_U_CHAR
+nfc_chip_t                  T_U_CHAR
+nfc_modulation_type_t       T_ENUM
+nfc_modulation_type_t *     T_PTROBJ
+nfc_baud_rate_t             T_ENUM
+nfc_baud_rate_t *           T_PTROBJ
+uint32_t                    T_UV
+uint32_t *                  T_PTROBJ
+size_t *                    T_PTROBJ
+uint64_t                    T_NV
+uint8_t                     T_U_CHAR
+RFID::Libnfc::ISO14443AInfo T_PTROBJ
+RFID::Libnfc::TargetInfo    T_PTROBJ
+RFID::Libnfc::Device        T_PTROBJ
+RFID::Libnfc::Target        T_PTROBJ
+RFID::Libnfc::Modulation    T_PTROBJ
+
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+    if (sv_derived_from($arg, \"${ntype}\")) {
+        STRLEN len;
+        char  *s = SvPV((SV*)SvRV($arg), len);
+
+        if (len != sizeof($var))
+        croak(\"Size %d of packed data != expected %d\",
+            len, sizeof($var));
+        $var = *($type *)s;
+    }
+    else
+        croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+    sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));
+
+

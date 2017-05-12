@@ -1,0 +1,119 @@
+=head1 NAME
+
+Runops::Optimized design
+
+=head1 DESCRIPTION
+
+Runops::Optimized unrolls the optree of a Perl subroutine in execution order,
+so that the CPU has a better chance of branch prediction and improved cache
+usage.
+
+It takes a minimal approach to this and aims to simply return to a variant of
+the normal perl runloop if an op is seen that will have unpredictable results.
+
+Eventually some small hot ops such as pp_nextstate, pp_const, etc may be
+inlined.
+
+Some people may call this JIT but I'm of the opinion that until it actually has
+a closer understanding of what the underlying ops are doing it is just
+unrolling.
+
+=head1 COMPONENTS
+
+=over 4
+
+=item * sljit
+
+Sljit is used to actually generate the underlying machine code, this handles
+support for the most common CPUs and means the code isn't tied to a particular
+machine. It is considerably simpler than LLVM and can be shipped with this
+module as it is small.
+
+Sljit is stackless, so it doesn't make use of the normal C level stack (in the
+normal way anyway), this is what makes it possible to safely return to the
+interpreter at any point. This makes dealing with edge cases easy.
+
+=item * Inserting code
+
+This is one slightly evil area. Each CV is unrolled on the second time it is
+executed. The idea for waiting until the second time is unrolling certain setup
+subroutines would be of limited value.
+
+This is recorded in the bits known as op_spare and the result of unrolling is
+patched straight into op_ppcode. Obviously this isn't ideal and eventually this
+may be stored in structure separate to the optree (potentially with a lock for
+threaded support).
+
+=back
+
+=head1 ISSUES / TODO
+
+This is only a proof of concept really, so there's many issues.
+
+=over 4
+
+=item * Test other CPUs
+
+I've only tested this on x86_64 on OS X. This should work on anything sljit
+supports but needs testing.
+
+=item * Better code for following execution order
+
+The code for following execution order is lame (see comment in unroll.c). It
+can even get stuck in a loop on some branches.
+
+=item * Unroll flow-control ops
+
+C<last>, C<next>, etc. result in a return. These should be supported,
+but are quite complex. (C<next> should be fairly easy though.)
+
+=item * No-multiplicity support
+
+This only works for a non-multiplicity, non-threaded build of perl.  Neither
+would be impossible to support, but are more work.
+
+=item * More tests, etc
+
+This has only received limited testing, it probably misses even important core
+perl ops.
+
+Probably worth having author tests, e.g. C<export PERL5OPT=-mRunops::Optimized>
+and then run some large modules test suites.
+
+=item * Custom ops
+
+Custom ops and things that do unexpected things may present issues. Some of
+this is mitigated by doing the unrolling at run time, so any compile time
+modifications to the op tree will be picked up.
+
+=item * Inlining hot ops
+
+For more speed it would be interesting
+
+=item * Investigate memory/CPU tradeoff
+
+How much overhead does unrolling everything have for large programs?
+
+  $ PERL5LIB= /usr/bin/time bleadperl -MRunops::Optimized -MMoose -e1 
+        0.87 real         0.81 user         0.03 sys
+  $ PERL5LIB= /usr/bin/time bleadperl -MMoose -e1                    
+        0.76 real         0.72 user         0.02 sys
+
+=back
+
+=head1 DEBUGGING
+
+This will break. You'll need to debug it.
+
+First of all compile with debugging support:
+
+  perl Makefile.PL DEBUG=1
+
+This does two things, enable an environment variable that prints out the inner
+workings when it is set:
+
+  export RUNOPS_OPTIMIZED_DEBUG=
+
+Additionally it generates trap instructions (int3 on IA32) that run when
+C<PL_op> isn't in the expected place.
+

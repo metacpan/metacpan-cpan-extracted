@@ -1,0 +1,63 @@
+2016-08-23 Jan Gehring <jfried, mailbox.org> (1.2.1)
+  * added possibility to sign rpm packages #43
+	* fixed downloading of the last deb packages in a repository #42
+
+2015-09-27 Jan Gehring <jfried, mailbox.org> (1.2.0)
+  * replaced Log::Log4perl with Log::Dispatch #32 - mrproper
+  * removed progressbar in favour of console and crontab compatible output #32 - mrproper
+  * added --log-level cli option to overwrite configured ScreenLevel #32 - mrproper
+  * changed checking of packages to use filesize as default. This speeds up syncing drastically #32 - mrproper
+  * added --checksums cli option to use checksum again #32 - mrproper
+  * refactored 'sub download' and '_download_binary_file'' to handle retrying more gracefully #32 - mrproper
+  * split off checksums for sha to its own sub to be consistent with the rest of the types #32 - mrproper
+  * added checksum for size, this is the default behaviour as mentioned above for packages #32 - mrproper
+  * minor formatting changes #32 - mrproper
+  * refactored sub get_repo_dir #32 - mrproper
+  * general code cleanup #31 - djzort 
+  * tuned Config::General usage to allow conf.d style directories #30 - djzort
+  * updated documentation #30 - djzort
+  * introduces a config option that places the tag directory at the bottom most directory rather than the top #30 - djzort
+  * add --clonetag option, which allows an existing tag to be cloned (copied). #29 - djzort
+  * add --force option to --tag, so that an existing tag is not over written unless you mean really it. #29 - djzort
+  * use File::Spec throughout &tag, also check that the $dir opens and logcroak() if not #29 - djzort
+  
+2015-05-09 Jan Gehring <jfried, mailbox.org> (1.1.0)
+  * added proxy support for embededd webserver/proxy #19
+	* download LiveOS/squashfs.img if available #20
+	* fixed problem with ubuntu images #23
+	* don't create zero size files if remote file os not available #21
+
+2015-04-06 Jan Gehring <jan.gehring, gmail.com> (1.0.0)
+  * added proxy support for docker registry
+
+2015-03-26 Jan Gehring <jan.gehring, gmail.com> (0.7.0)
+  * added proxy support for linux repositories
+  * added OpenSuSE mirror support
+	* fixed a problem when using the same tag twice
+
+2015-03-05 Jan Gehring <jan.gehring, gmail.com> (0.6.0)
+  * fixed a bug mirroring debian installation repositories
+	* fixed a bug mirroring some type of debian repositories
+  * added plain http directory mirror
+
+2015-01-23 Jan Gehring <jan.gehring, gmail.com> (0.5.0)
+  * added progressbar
+  * fixed typos - dirkcjelli
+
+2015-01-05 Jan Gehring <jan.gehring, gmail.com> (0.3.2)
+  * fixed errata query if no package available
+
+2015-01-05 Jan Gehring <jan.gehring, gmail.com> (0.3.1)
+  * fixed errata query if no updates available
+
+2015-01-04 Jan Gehring <jan.gehring, gmail.com> (0.3.0)
+  * added initial docker support (login, push, pull, search)
+  * added file server for apt and yum
+  * added errata database support
+
+2015-01-02 Jan Gehring <jan.gehring, gmail.com> (0.2.0)
+  * added possibility to sign repositories (apt and yum)
+  * fixed centos mirror bug (CentOS 7 - efidisk.img not existing) - #4
+
+2014-03-18 Jan Gehring <jan.gehring, gmail.com> (0.1.0)
+  * added apt repository management

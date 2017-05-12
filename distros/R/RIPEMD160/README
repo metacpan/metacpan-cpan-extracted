@@ -1,0 +1,81 @@
+RIPEMD160 Extension Version 0.02
+
+RIPEMD160 adcO "RIPEMD-160 message digest algorithm" CHGEUER
+
+#########################################################################
+
+INSTALLATION:
+
+This is a Perl5 extension interface to the RIPEMD-160
+Message Digest algorithm. Documentation is in RIPEMD160.pm
+
+To build the extension, unpack this distribution under the ext/
+directory of your Perl source distribution, create the Makefile using
+'perl Makefile.PL' and do a 'make'.
+
+Then try a 'make test' and wait for performing all tests.
+
+#########################################################################
+
+SOURCES:
+
+All files in doc/ and the rmd160.*-files are taken from a sample
+implementation of RIPEMD-160. 
+
+see also the RIPEMD160-Homepage: 
+http://www.esat.kuleuven.ac.be/~bosselae/ripemd160.html
+
+The wrap_160.*-files are wrapper-code to allow the user to add 
+small pieces of data to the message digest and to have the same 
+convenient API like MD5 and SHA give. The Wrapper-Code was written 
+by Christian Geuer. 
+
+The rest (RIPEMD160.pm, RIPEMD160.xs, typemap, test.pl and Makefile.PL) are 
+stolen and modified from MD5-1.7 and SHA-1.1. Thanks to Neil Wilton and
+Uwe Hollerbach for writing this code.
+
+#########################################################################
+
+ADRESSES:
+
+Christian Geuer: christian.geuer@crypto.gun.de
+Neil Wilton: N.Wilton@axion.bt.co.uk
+Uwe Hollerbach: uh@alumni.caltech.edu
+
+#########################################################################
+
+PROBLEMS:
+
+In this version (v0.02) there is no cool support for automatic
+detection of byte-order (little/big-endian). This module was
+developed on a Intel running Linux (little-endian).
+
+This is a BETA Version. In the future it will be located in Crypt::RIPEMD160
+and not in RIPEMD160. 
+
+#########################################################################
+
+TEST-VECTORS:
+
+RIPEMD-160 test suite results (ASCII):
+
+* message: "" (empty string)
+  hashcode: 9c1185a5c5e9fc54612808977ee8f548b2258d31
+* message: "a"
+  hashcode: 0bdc9d2d256b3ee9daae347be6f4dc835a467ffe
+* message: "abc"
+  hashcode: 8eb208f7e05d987a9b044a8e98c6b087f15a0bfc
+* message: "message digest"
+  hashcode: 5d0689ef49d2fae572b881b123a85ffa21595f36
+* message: "abcdefghijklmnopqrstuvwxyz"
+  hashcode: f71c27109c692c1b56bbdceb5b9d2865b3708dbc
+* message: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
+  hashcode: 12a053384a9c0c88e405a06c27dcf49ada62eb2b
+* message: "A...Za...z0...9"
+  hashcode: b0e20b6e3116640286ed3a87a5713079b21f5189
+* message: 8 times "1234567890"
+  hashcode: 9b752e45573d4b39f4dbd3323cab82bf63326bfb
+* message: 1 million times "a"
+  hashcode: 52783243c1697bdbe16d37f97f68f08325dc1528
+
+#########################################################################

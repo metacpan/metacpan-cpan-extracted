@@ -1,0 +1,12 @@
+<%ARGS>
+$ARGSRef
+</%ARGS>
+<%INIT>
+# $m->comp('Display.html', TicketObj => $Ticket, %$ARGSRef);
+# use Data::Dumper; print STDERR Dumper $ARGSRef;
+# this works
+if ($ARGSRef->{AfterSubmitReturn} && $ARGSRef->{AfterSubmitReturn} == 1) {
+  RT::Interface::Web::Redirect( RT->Config->Get('WebURL') . '/Search/Results.html?Query='. $session{CurrentSearchHash}->{Query} );
+
+}
+</%INIT>

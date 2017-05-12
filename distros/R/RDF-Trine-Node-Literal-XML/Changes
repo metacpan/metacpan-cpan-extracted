@@ -1,0 +1,27 @@
+############################################################################
+## DOAP for RDF-Trine-Node-Literal-XML #####################################
+############################################################################
+
+RDF-Trine-Node-Literal-XML
+==========================
+
+Created:      2009-12-06
+Home page:    <http://search.cpan.org/dist/RDF-Trine-Node-Literal-XML/>
+Bug tracker:  <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=RDF-Trine-Node-Literal-XML>
+Maintainer:   Kjetil Kjernsmo <mailto:kjetilk@cpan.org>
+
+0.16 [2011-03-04] # Make Test::Signature author test
+ - Minor cleanup POD.
+ - Make Test::Signature author test.
+ - Minor cleanup in Makefile.PL.
+ - Another test.
+
+0.15 [2010-04-05] # Mostly packaging issues and minor fixes
+ - (Bugfix) Minor Perl::Critic stuff.
+ - require libxml2 2.6.27.
+ - Run perltidy.
+ - (Addition) Add Test::Perl::Critic author test.
+ - (Addition) Add auto_set_repository, auto_set_bugtracker,
+   write_doap_changes.
+ - Set configure_requires XML::LibXML.
+

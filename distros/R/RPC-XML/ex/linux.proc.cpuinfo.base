@@ -1,0 +1,7 @@
+Name:		linux.proc.cpuinfo
+Type:		procedure
+Version:	1.0
+Hidden:		no
+Signature:	struct
+Helpfile:	linux.proc.cpuinfo.help
+Codefile:	linux.proc.cpuinfo.code

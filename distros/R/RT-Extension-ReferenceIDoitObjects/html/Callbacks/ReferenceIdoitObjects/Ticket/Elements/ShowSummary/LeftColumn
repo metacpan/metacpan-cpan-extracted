@@ -1,0 +1,38 @@
+%# RT::Extension::ReferenceIDoitObjects
+%#
+%# Copyright (C) 2011-17 synetics GmbH, <https://i-doit.com/>
+%#
+%# This program is free software: you can redistribute it and/or modify
+%# it under the terms of the GNU Affero General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# This program is distributed in the hope that it will be useful,
+%# but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%# GNU Affero General Public License for more details.
+%#
+%# You should have received a copy of the GNU Affero General Public License
+%# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%#
+%# Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+<&| /Widgets/TitleBox,
+    title => loc('Referenced i-doit objects'),
+    (($can_modify || $can_modify_idoitobject) ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyIDoitObjects.html?id=".$Ticket->Id) : ()),
+    class => 'ticket-info-basics'
+&>
+<& /Ticket/Elements/ShowIDoitObjects, ticket => $Ticket &>
+</&>
+
+<%INIT>
+my $can_modify = $Ticket->CurrentUserHasRight('ModifyTicket');
+my $can_modify_idoitobject =
+    $Ticket->CurrentUserHasRight('OwnTicket') ||
+    $Ticket->CurrentUserHasRight('TakeTicket') ||
+    $Ticket->CurrentUserHasRight('StealTicket');
+</%INIT>
+
+<%ARGS>
+$Ticket => undef
+</%ARGS>

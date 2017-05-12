@@ -1,0 +1,37 @@
+---
+abstract: "It's new $module"
+author:
+  - =over
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redmine-Fetch
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Redmine::Fetch:
+    file: lib/Redmine/Fetch.pm
+    version: '0.01'
+requires:
+  Data::Printer: '0'
+  DateTime: '0'
+  Mojo::UserAgent: '0'
+  perl: '5.008001'
+version: '0.01'
+x_contributors:
+  - 'Patrick Kilter <pas.freelance@googlemail.com>'

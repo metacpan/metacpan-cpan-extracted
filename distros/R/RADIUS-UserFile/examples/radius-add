@@ -1,0 +1,74 @@
+#!/usr/local/bin/perl -Tw
+
+use 5.004;
+use strict;
+use vars qw($USERS_FILE);
+use RADIUS::UserFile 0.97;
+use Getopt::Long;
+use Tie::IxHash;
+
+##
+# radius-add:  add the named user to the RADIUS users file.
+# 
+# The arguments should be specified as a series of "--attrib key=value"
+# arguments.  Multiple attributes with the same name can be specified.
+# usage is actually the same as in radius-user, which has a nicer help/
+# manual interface.  The RADIUS users file should be defined in the
+# variable $USERS_FILE, in the BEGIN {} block below.
+# 
+# Note that any entry that already exists for a user is removed before
+# the specified one is added.
+##
+
+
+BEGIN {
+    # Since we'll probably be running as root, and we want taint checking
+    # on (the -T switch at the top), clean things up a little.
+    $ENV{PATH} = '';
+    $0 = 'radius-add';
+
+    $USERS_FILE = '/etc/raddb/users';
+}
+
+
+my (%opts,                  # command-line options
+    $user,                  # users we're adding
+    %attribs,               # attributes to insert
+    $radius                 # the representation of $USERS_FILE
+);
+
+my $usage = <<EOusage;
+$0: usage:
+$0:     $0 --attrib key=val [ --attrib key=val ... ] username
+EOusage
+
+
+GetOptions(\%opts, qw(attrib=s@)) or die($usage);
+
+@ARGV > 1     and die("$0: Whoa!  One user at a time, please.\n", $usage);
+$user = shift or  die("$0: Please specify a user.\n", $usage);
+
+$radius = new RADIUS::UserFile(File => $USERS_FILE) or
+ die("$0: Apparently $USERS_FILE isn't a valid RADIUS users file.\n");
+
+tie %attribs, 'Tie::IxHash';
+foreach (@{$opts{attrib}}) {
+    @_ = split /=/, $_, 2;
+    scalar @_ == 2 or
+     warn("$0: Ignored: this attribute pair doesn't look right: $_\n"),
+     next;
+    push @{$attribs{$_[0]}}, $_[1];
+}
+
+$radius->remove($user), warn("$0: Overriding old entry for $user.\n") 
+ if defined $radius->user($user);
+
+$radius->add(Who        => $user,
+             Attributes => \%attribs,
+             Comment    => "$user added on ". localtime)
+ or die("$0: There was a problem adding $user\n");
+
+$radius->update(Who => $user)
+ or die("$0: There was a problem updating $USERS_FILE.\n");
+
+exit 0;

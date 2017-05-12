@@ -1,0 +1,29 @@
+---
+abstract: 'R language build on Perl'
+author:
+  - 'Yuki Kimoto <kimoto.yuki@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Rstats
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Round: '0.06'
+  Object::Simple: '3.10'
+  Text::UnicodeTable::Simple: '0.09'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/yuki-kimoto/Rstats/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/yuki-kimoto/Rstats.git
+version: '0.0148'

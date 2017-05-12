@@ -1,0 +1,12 @@
+1.01 2016-06-07
+ - Packaging updates
+ - Compatibility with RT 4.4.x
+
+1.00 2014-06-17
+ - Packaging updates
+ - Quiet warnings when bare email addresses are found
+
+0.02 2013-02-19
+ - Critical bug fix: avoids template error and mail sending failure
+ - Return the empty string instead of undef for friendlier use in templates
+ - Abort early if we don't have a ticket and transaction

@@ -1,0 +1,43 @@
+#!/usr/local/bin/perl
+# $File: //depot/RT/osf/sbin/foundry-cvs-commitcheck $ $Author: autrijus $
+# $Revision: #3 $ $Change: 10127 $ $DateTime: 2004/02/18 07:52:14 $
+
+use strict;
+use FindBin;
+use LWP::Simple;
+
+eval { require "$FindBin::Bin/../etc/foundry.conf" };
+eval { require "$FindBin::Bin/../etc/Foundry/foundry.conf" };
+
+my ($cvs_base) = grep { defined and -d } (
+    $ENV{CVSROOT},
+    '/home/cvs',
+    '/usr/depot/cvsrepo'
+) or die "Cannot find CVSROOT";
+
+my $cvs_user = $ENV{CVSUSER} || 'cvs';
+my $cvs_group = $ENV{CVSGROUP} || 'cvs';
+
+# disallow cvs user directly
+if ($ENV{USER} eq $cvs_user) {
+    print "this is anonymous readonly cvs\n";
+    exit 1;
+}
+
+my $module = shift or exit 1;
+my $rt_url = $ENV{RT_URL} or die 'Must specify $ENV{RT_URL}'.$/;
+
+$module =~ s|^\Q$cvs_base\E/(.*?)(/.*)?|$1|;
+$module =~ s|/$||;
+$module =~ s|^.*/||;
+
+# bypass cvsroot commit
+exit 0 if $module eq 'CVSROOT';
+
+my $content = get("$rt_url/REST/0.0/NoAuth/has_member?Queue=$module&User=$ENV{USER}");
+
+exit 0 if $content =~ '^OK';
+
+print "permission denied for user $ENV{USER} committing into $module";
+
+exit 1;

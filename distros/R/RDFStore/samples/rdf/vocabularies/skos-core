@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+	<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	<!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+	<!ENTITY dc "http://purl.org/dc/elements/1.1/">
+	<!ENTITY dct "http://purl.org/dc/terms/">
+	<!ENTITY foaf "http://xmlns.com/foaf/0.1/">
+	<!ENTITY owl "http://www.w3.org/2002/07/owl#">
+	<!ENTITY vs "http://www.w3.org/2003/06/sw-vocab-status/ns#">
+]>
+<rdf:RDF xml:base="http://www.w3.org/2004/02/skos/core" xmlns:rdf="&rdf;" xmlns:rdfs="&rdfs;" xmlns:dc="&dc;" xmlns:dct="&dct;" xmlns:owl="&owl;" xmlns:vs="&vs;">
+	
+	<!-- 
+	This is the SKOS Core RDF Vocabulary for describing thesauri, terminologies, glossaries and 
+	similar sorts of knowledge organisation system.  
+	
+	Current documentation:
+	
+	SKOS Core Guide: http://www.w3.org/2001/sw/Europe/reports/thes/1.0/guide/
+	SKOS Core Guidelines for Migration: http://www.w3.org/2001/sw/Europe/reports/thes/1.0/migrate/
+	
+	This is an evolving RDF vocabulary - all modification are reported to the SKOS Changelog
+	http://esw.w3.org/mt/esw/archives/cat_skos_changelog.html
+	
+	To contribute to development of this vocabulary, subscribe to the public-esw-thes@w3.org 
+	mailing list.
+	
+	See also:
+	
+	SKOS Core home page: http://www.w3.org/2004/02/skos/core/
+	Mailing list archive: http://lists.w3.org/Archives/Public/public-esw-thes/
+	SkosDev wiki: http://esw.w3.org/topic/SkosDev
+	-->
+
+	<!-- Description of this schema -->
+	
+	<rdf:Description rdf:about="">
+		<dc:title>SKOS Core RDF Vocabulary</dc:title>
+		<dc:description>An RDF schema for encoding simple concept schemes such as thesauri and subject heading schemes.</dc:description>
+		<dc:creator>Alistair Miles</dc:creator>
+		<dc:creator>Nikki Rogers</dc:creator>
+		<dc:creator>Dave Beckett</dc:creator>
+		<dc:contributor>Members of the public-esw-thes@w3.org mailing list.</dc:contributor>
+		<dct:modified>2004-08-19</dct:modified>
+	</rdf:Description>
+	
+	<!-- Fundamental classes -->
+
+	<rdfs:Class rdf:ID="ConceptScheme">
+		<rdfs:label>Concept Scheme</rdfs:label>
+		<rdfs:comment>A concept scheme is a collection of concepts.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdfs:Class>
+	
+	<rdfs:Class rdf:ID="Concept">
+		<rdfs:label>Concept</rdfs:label>
+		<rdfs:comment>A concept is any unit of thought that can be defined or described.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdfs:Class>
+
+  <!-- 
+  N.B. skos:TopConcept is now deprecated.  To indicate that a concept is a top concept in
+  a scheme, now use the skos:hasTopConcept property.
+  -->
+  
+	<owl:DeprecatedClass rdf:ID="TopConcept">
+		<rdfs:label>Top Concept</rdfs:label>
+		<rdfs:comment>A concept that sits at the top of the concept hierarchy.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+		<owl:versionInfo>This class is now deprecated.  To indicate that a concept is a top concept in a scheme, now use the skos:hasTopConcept property.</owl:versionInfo>
+    <dct:isReplacedBy rdf:resource="#hasTopConcept"/>
+		<dct:modified>2004-08-19</dct:modified>
+	</owl:DeprecatedClass>
+	
+	<!-- Basic properties of concept schemes -->
+	
+	<!-- 
+	N.B. the skos:hasTopConcept property now replaces the deprecated skos:TopConcept class.
+	-->
+	
+	<rdf:Property rdf:ID="hasTopConcept">
+	  <rdfs:label>has top concept</rdfs:label>
+		<rdfs:domain rdf:resource="#ConceptScheme"/>
+		<rdfs:range rdf:resource="#Concept"/>
+	  <rdfs:comment>Use this property to indicate that a concept is a top concept in a specific concept scheme.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+		<owl:versionInfo>This property replaces the deprecated skos:TopConcept class.</owl:versionInfo>
+		<dct:replaces rdf:resource="#TopConcept"/>
+		<dct:created>2004-08-19</dct:created>
+	</rdf:Property>
+		
+	<!-- Basic properties of concepts -->
+
+	<rdf:Property rdf:ID="inScheme">
+		<rdfs:label>in scheme</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="&rdfs;isDefinedBy"/>
+		<rdfs:domain rdf:resource="#Concept"/>
+		<rdfs:range rdf:resource="#ConceptScheme"/>
+		<rdfs:comment>Use this property to state that a concept is a part of some concept scheme.  A concept may be a part of more than one scheme.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="prefLabel">
+		<rdfs:label>preferred label</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="&rdfs;label"/>
+		<rdfs:comment>Use this property to indicate a preferred label for a resource.  If the resource is a concept in some conceptual scheme, then it is strongly recommended that the preferred label be a unique label within that scheme.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="altLabel">
+		<rdfs:label>alternative label</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="&rdfs;label"/>
+		<rdfs:comment>Use this property to indicate an alternative (non-preferred) label for a resource.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="prefSymbol">
+		<rdfs:label>preferred symbol</rdfs:label>
+		<rdfs:domain rdf:resource="&rdf;Resource"/>
+		<rdfs:range rdf:resource="&foaf;Image"/>
+		<rdfs:comment>Use this property to indicate a preferred symbolic representation for a resource.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="altSymbol">
+		<rdfs:label>alternative symbol</rdfs:label>
+		<rdfs:domain rdf:resource="&rdf;Resource"/>
+		<rdfs:range rdf:resource="&foaf;Image"/>
+		<rdfs:comment>Use this property to indicate an alternative (non-preferred) symbolic representation for a resource.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="externalID">
+		<rdfs:label>identifier</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="&rdf;value"/>
+		<rdfs:domain rdf:resource="#Concept"/>
+		<rdfs:comment>Use or extend this property to indicate any non-URI code that is used to uniquely identify a concept within a conceptual scheme.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="semanticRelation">
+		<rdfs:label>semantic relation</rdfs:label>
+		<rdfs:domain rdf:resource="#Concept"/>
+		<rdfs:range rdf:resource="#Concept"/>
+		<rdfs:comment>This is the super-property of all properties used to make statements about how concepts within the same conceptual scheme relate to each other.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<!-- Basic semantic relation properties -->
+	
+	<rdf:Property rdf:ID="broader">
+		<rdfs:label>has broader</rdfs:label>
+		<rdf:type rdf:resource="&owl;TransitiveProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#semanticRelation"/>
+		<rdfs:comment>This property carries weak semantics.  It may be used to state that the object is in some way more general in meaning than the subject.  Essentially it provides a means of organising concepts into a hierarchy (tree), without being restrictive about the exact semantic implications of the hierarchical structure itself.  Extend this property to create properties that carry stronger semantics, but may be reduced to a hierarchical structure for simple visual displays.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="narrower">
+		<rdfs:label>has narrower</rdfs:label>
+		<rdf:type rdf:resource="&owl;TransitiveProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#semanticRelation"/>
+		<owl:inverseOf rdf:resource="#broader"/>
+		<rdfs:comment>This property is the inverse of the 'broader' property.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="related">
+		<rdfs:label>related to</rdfs:label>
+		<rdf:type rdf:resource="&owl;SymmetricProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#semanticRelation"/>
+		<rdfs:subPropertyOf rdf:resource="&rdfs;seeAlso"/>
+		<rdfs:comment>This property carries weak semantics.  It may be used to state that that the object is in some way related to the subject, and the relationship is NOT to be treated as hierarchical.  Essentially it provides a means of linking concepts in different branches of a hierarchy (tree).  Extend this property to create properties with stronger semantics, but may still be reduced to an associative structure for simple visual display.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<!-- Semantic relation property extensions -->
+	
+	<rdf:Property rdf:ID="broaderInstantive">
+		<rdfs:label>instance of</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="#broader"/>
+		<rdfs:subPropertyOf rdf:resource="&rdf;type"/>
+		<rdfs:comment>An extension of the 'broader' property to specify the instantiation (instance of) relationship between two concepts.  This property is semantically equivalent to the 'rdf:type' property.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="narrowerInstantive">
+		<rdfs:label>has instance</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="#narrower"/>
+		<owl:inverseOf rdf:resource="#broaderInstantive"/>
+		<rdfs:comment>This property is the inverse of the 'broaderInstantive' property.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="broaderGeneric">
+		<rdfs:label>sub-class of</rdfs:label>
+		<rdf:type rdf:resource="&owl;TransitiveProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#broader"/>
+		<rdfs:subPropertyOf rdf:resource="&rdfs;subClassOf"/>
+		<rdfs:comment>An extension of the 'broader' property to specify the class subsumption (sub-class/super-class) relationship between two concepts.  This property is semantically equivalent to the 'rdfs:subClassOf' property.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="narrowerGeneric">
+		<rdfs:label>super-class of</rdfs:label>
+		<rdf:type rdf:resource="&owl;TransitiveProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#narrower"/>
+		<owl:inverseOf rdf:resource="#broaderGeneric"/>
+		<rdfs:comment>This property is the inverse of the 'broaderGeneric' property.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="broaderPartitive">
+		<rdfs:label>part of</rdfs:label>
+		<rdf:type rdf:resource="&owl;TransitiveProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#broader"/>
+		<rdfs:subPropertyOf rdf:resource="&dct;isPartOf"/>
+		<rdfs:comment>An extension of the 'broader' property to specify a partitive (part of) relationship between two concepts.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="narrowerPartitive">
+		<rdfs:label>has part</rdfs:label>
+		<rdf:type rdf:resource="&owl;TransitiveProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#narrower"/>
+		<rdfs:subPropertyOf rdf:resource="&dct;hasPart"/>
+		<owl:inverseOf rdf:resource="#broaderPartitive"/>
+		<rdfs:comment>This property is the inverse of the 'broaderPartitive' property.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="relatedPartOf">
+		<rdfs:label>part of</rdfs:label>
+		<rdf:type rdf:resource="&owl;TransitiveProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#related"/>
+		<rdfs:subPropertyOf rdf:resource="&dct;isPartOf"/>
+		<rdfs:comment>An extension of the 'related' property.  Use this property to express a partitive relationship between concepts, where it is desired that such a relationship be treated as associative (i.e. linking separate branches of a hierarchy) and NOT hierarchical.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="relatedHasPart">
+		<rdfs:label>has part</rdfs:label>
+		<rdf:type rdf:resource="&owl;TransitiveProperty"/>
+		<rdfs:subPropertyOf rdf:resource="#related"/>
+		<rdfs:subPropertyOf rdf:resource="&dct;hasPart"/>
+		<owl:inverseOf rdf:resource="#relatedPartOf"/>
+		<rdfs:comment>This property is the inverse of the 'relatedPartOf' property.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>unstable</vs:term_status>
+	</rdf:Property>	
+
+	<!-- Scope notes, definitions and examples -->
+	
+	<rdf:Property rdf:ID="scopeNote">
+		<rdfs:label>scope note</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="&rdfs;comment"/>
+		<rdfs:comment>A scope note is a piece of text that in some way helps to elucidate the intended meaning of a concept.</rdfs:comment>
+		<rdfs:domain rdf:resource="#Concept"/>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="definition">
+		<rdfs:label>definition</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="&rdfs;comment"/>
+		<rdfs:comment>A formal (dictionary style) definition of the intended meaning of a concept.</rdfs:comment>
+		<rdfs:domain rdf:resource="#Concept"/>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="example">
+		<rdfs:label>example</rdfs:label>
+		<rdfs:subPropertyOf rdf:resource="&rdfs;comment"/>
+		<rdfs:comment>A contextual example of the use of a concept, that helps to elucidate its intended meaning.</rdfs:comment>
+		<rdfs:domain rdf:resource="#Concept"/>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<vs:term_status>testing</vs:term_status>
+	</rdf:Property>
+
+	<!-- N.B. use the foaf:depiction property to attach an image depicting a concept. -->
+		
+</rdf:RDF>

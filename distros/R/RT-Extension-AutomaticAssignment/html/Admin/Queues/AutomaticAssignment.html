@@ -1,0 +1,146 @@
+<& /Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form method="post" id="automatic-assignment" class="automatic-assignment" action="AutomaticAssignment.html">
+<input type="hidden" class="hidden" name="id" value="<%$QueueObj->Id%>" />
+
+<div class="filters">
+
+<h1>Filters</h1>
+
+<p><i>Filters reduce the pool of eligible owners. Each user must fulfill the requirements of all the filters below to be included in this queue's automatic assignment.</i></p>
+
+<select name="FilterType">
+<option value="">-</option>
+
+% for my $filter (@filters) {
+% my $class = "RT::Extension::AutomaticAssignment::Filter::$filter";
+% unless ($class->require) {
+%     RT->Logger->error("Couldn't load class '$class': $@");
+%     $m->abort;
+% }
+<option value="<% $filter %>"><% $class->Description %></option>
+% }
+
+</select>
+
+<input type="submit" class="button" name="AddFilter" value="Add Filter">
+
+<span class="loading">Loading...</span>
+
+<div class="filter-list">
+
+% my $i = 0;
+% my $filters_value = "";
+% for my $filter (@{ $config->{filters} }) {
+%    ++$i;
+%    my $name = $filter->{_name};
+%    my $path = "/Admin/Queues/Elements/Filter/$name";
+%    my $prefix = "Filter_${name}_$i";
+%    $filters_value .= "$prefix,";
+
+%    $m->comp($path, prefix => $prefix, config => $filter, queue => $QueueObj);
+% }
+
+</div>
+
+<input type="hidden" class="hidden" name="Filters" value="<% $filters_value %>" />
+
+</div>
+
+<hr />
+
+<div class="chooser">
+
+<h1>Chooser</h1>
+
+<p><i>A chooser selects a single owner from the filtered set of eligible users.</i></p>
+
+% my $chooser_config = $config->{chooser};
+% my $name = $chooser_config->{_name};
+% my $prefix = "Chooser_${name}";
+
+<select name="ChooserType">
+
+% for my $chooser (@choosers) {
+% my $class = "RT::Extension::AutomaticAssignment::Chooser::$chooser";
+% unless ($class->require) {
+%     RT->Logger->error("Couldn't load class '$class': $@");
+%     $m->abort;
+% }
+<option <% $name eq $chooser ? "selected" : "" %> value="<% $chooser %>"><% $class->Description %></option>
+% }
+
+</select>
+
+<span class="loading">Loading...</span>
+
+% my $path = "/Admin/Queues/Elements/Chooser/$name";
+% $m->comp($path, prefix => $prefix, config => $chooser_config, queue => $QueueObj);
+
+<input type="hidden" class="hidden" name="Chooser" value="<% $prefix %>" />
+
+</div>
+
+<& /Elements/Submit, Name => 'Update', Label => loc('Save Changes') &>
+
+</form>
+
+<%INIT>
+my @results;
+
+my $QueueObj = RT::Queue->new($session{'CurrentUser'});
+$QueueObj->Load($id) || Abort(loc("Couldn't load queue", $id));
+
+my $title = loc('Automatic Assignment for queue [_1]', $QueueObj->Name);
+
+my @filters = RT->Config->Get('AutomaticAssignmentFilters');
+my @choosers = RT->Config->Get('AutomaticAssignmentChoosers');
+
+if ($Update) {
+    my @filters_config;
+    my %chooser_config;
+
+    for my $filter_prefix (split /,/, $Filters) {
+        my @config_keys = grep { s/^\Q$filter_prefix\E_// ? $_ : () } keys %ARGS;
+        my %filter_config = map { $_ => $ARGS{"${filter_prefix}_$_"} } @config_keys;
+        push @filters_config, \%filter_config;
+    }
+
+    {
+        my @config_keys = grep { s/^\Q$Chooser\E_// ? $_ : () } keys %ARGS;
+        %chooser_config = map { $_ => $ARGS{"${Chooser}_$_"} } @config_keys;
+    }
+
+    my ($ok, $msg) = RT::Extension::AutomaticAssignment->_SetConfigForQueue(
+        $QueueObj,
+        \@filters_config,
+        \%chooser_config,
+    );
+
+    if ($ok) {
+        push @results, 'Automatic assignment updated';
+    }
+    else {
+        push @results, $msg;
+    }
+}
+
+my $attr = $QueueObj->FirstAttribute('AutomaticAssignment');
+my $config = $attr ? $attr->Content : {
+    filters => [],
+    chooser => { _name => $choosers[0] },
+};
+
+my $scrips = RT::Extension::AutomaticAssignment->_ScripsForQueue($QueueObj);
+if ($scrips->Count == 0) {
+    push @results, "No scrips for automatic assignment are applied to this queue. Please see the AutomaticAssignment documentation for setup instructions.";
+}
+</%INIT>
+<%ARGS>
+$id => undef
+$Update => undef
+$Filters => undef
+$Chooser => undef
+</%ARGS>

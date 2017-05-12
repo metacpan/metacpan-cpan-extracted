@@ -1,0 +1,149 @@
+NAME
+    RDF::Generator::HTTP - Generate RDF from a HTTP message
+
+SYNOPSIS
+      use LWP::UserAgent;
+      my $ua = LWP::UserAgent->new;
+      my $response = $ua->get('http://search.cpan.org/');
+
+      use RDF::Generator::HTTP;
+      use RDF::Trine qw(iri);
+      my $g = RDF::Generator::HTTP->new(message => $response,
+                                        graph => iri('http://example.org/graphname'),
+                                        blacklist => ['Last-Modified', 'Accept']);
+      my $model = $g->generate;
+      print $model->size;
+      my $s   = RDF::Trine::Serializer->new('turtle', namespaces =>
+                                            { httph => 'http://www.w3.org/2007/ont/httph#',
+                                              http => 'http://www.w3.org/2007/ont/http#' } );
+      $s->serialize_model_to_file(\*STDOUT, $model);
+
+DESCRIPTION
+    This module simply takes a HTTP::Message object, and based on its content,
+    especially the content the HTTP::Header object(s) it contains, creates a
+    simple RDF representation of the contents. It is useful chiefly for
+    recording data when crawling resources on the Web, but it may also have
+    other uses.
+
+  Constructor
+    `new(%attributes)`
+        Moose-style constructor function.
+
+  Attributes
+    These attributes may be passed to the constructor to set them, or called
+    like methods to get them.
+
+    `message`
+        A HTTP::Message (or subclass thereof) object to generate RDF for.
+        Required.
+
+    `blacklist`
+        An `ArrayRef` of header field names that you do not want to see in the
+        output.
+
+    `whitelist`
+        An `ArrayRef` of the only header field names that you want to see in
+        the output. The whitelist will be ignored if the blacklist is set.
+
+    `graph`
+        You may pass an optional graph name to be used for all triples in the
+        output. This must be an object of RDF::Trine::Node::Resource.
+
+    `ns`
+        An URI::NamespaceMap object containing namespace prefixes used in the
+        module. You should probably not override this even though you can.
+
+    `request_subject`
+        An RDF::Trine::Node object containing the subject of any statements
+        describing requests. If unset, it will default to a blank node.
+
+    `response_subject`
+        An RDF::Trine::Node object containing the subject of any statements
+        describing responses. If unset, it will default to a blank node.
+
+  Methods
+    The above attributes all have read-accessors by the same name.
+    `blacklist`, `whitelist` and `graph` also has writers and predicates,
+    which is used to test if the attribute has been set, by prefixing `has_`
+    to the attribute name.
+
+    This class has two methods:
+
+    `generate ( [ $model ] )`
+        This method will generate the RDF. It may optionally take an
+        RDF::Trine::Model as parameter. If it exists, the RDF will be added to
+        this model, if not, a new Memory model will be created and returned.
+
+    `ok_to_add ( $field )`
+        This method will look up in the blacklists and whitelists and return
+        true if the given field and value may be added to the model.
+
+EXAMPLES
+    For an example of what the module can be used to create, consider the
+    example in the "SYNOPSIS", which at the time of this writing outputs the
+    following Turtle:
+
+      @prefix http: <http://www.w3.org/2007/ont/http#> .
+      @prefix httph: <http://www.w3.org/2007/ont/httph#> .
+
+      [] a http:RequestMessage ;
+            http:hasResponse [
+                    a http:ResponseMessage ;
+                    http:status "200" ;
+                    httph:client_date "Sun, 14 Dec 2014 21:28:21 GMT" ;
+                    httph:client_peer "207.171.7.59:80" ;
+                    httph:client_response_num "1" ;
+                    httph:connection "close" ;
+                    httph:content_length "3643" ;
+                    httph:content_type "text/html" ;
+                    httph:date "Sun, 14 Dec 2014 21:28:21 GMT" ;
+                    httph:link "<http://search.cpan.org/uploads.rdf>; rel=\"alternate\"; title=\"RSS 1.0\"; type=\"application/rss+xml\"", "<http://st.pimg.net/tucs/opensearch.xml>; rel=\"search\"; title=\"SearchCPAN\"; type=\"application/opensearchdescription+xml\"", "<http://st.pimg.net/tucs/print.css>; media=\"print\"; rel=\"stylesheet\"; type=\"text/css\"", "<http://st.pimg.net/tucs/style.css?3>; rel=\"stylesheet\"; type=\"text/css\"" ;
+                    httph:server "Plack/Starman (Perl)" ;
+                    httph:title "The CPAN Search Site - search.cpan.org" ;
+                    httph:x_proxy "proxy2"
+            ] ;
+            http:method "GET" ;
+            http:requestURI <http://search.cpan.org/> ;
+            httph:user_agent "libwww-perl/6.05" .
+
+NOTES
+  HTTP Vocabularies
+    There have been many efforts to create HTTP vocabularies (or ontologies),
+    where the most elaborate and complete is the HTTP Vocabulary in RDF 1.0
+    <http://www.w3.org/TR/HTTP-in-RDF/>. Nevertheless, I decided not to
+    support this, but rather support an older and much less complete
+    vocabulary that has been in the Tabulator
+    <https://github.com/linkeddata/tabulator-firefox> project, with the
+    namespace prefixes <http://www.w3.org/2007/ont/http#> and
+    <http://www.w3.org/2007/ont/httph#>. The problem of modelling HTTP is that
+    headers modify each other, so if you want to record the HTTP headers so
+    that they can be used in an actual HTTP dialogue afterwards, they have to
+    be in a container so that the order can be reconstructed. Moreover, there
+    is a lot of microstructure in the values, and that also adds complexity if
+    you want to translate all that to RDF. That's what the former vocabulary
+    does. However, for now, all the author wants to do is to record them, and
+    then neither of these concerns are important. Therefore, I opted to go for
+    a much simpler vocabulary, where each field is a simple predicate. That is
+    not to say that the former approach isn't valid, it is just not something
+    I need now.
+
+BUGS
+    This is a very early release, but it works for the author.
+
+    Please report any bugs to
+    <https://github.com/kjetilk/p5-rdf-generator-http/issues>.
+
+AUTHOR
+    Kjetil Kjernsmo <kjetilk@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Kjetil Kjernsmo.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

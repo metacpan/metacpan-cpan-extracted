@@ -1,0 +1,12 @@
+<div id="Ticket-Create-captcha"><a name="captcha"></a><& /Elements/Captcha &></div>
+<%ARGS>
+$ARGSRef => {}
+</%ARGS>
+<%INIT>
+my $queue = RT::Queue->new( $session{'CurrentUser'} );
+$queue->Load( $ARGSRef->{'Queue'} );
+return unless $queue->id;
+
+return if $queue->CurrentUserHasRight('NoCaptchaOnCreate');
+
+</%INIT>

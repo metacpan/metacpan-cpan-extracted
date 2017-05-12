@@ -1,0 +1,37 @@
+<%INIT>
+my $request_path = $HTML::Mason::Commands::r->path_info;
+
+return unless $request_path =~ m{^/Ticket/};
+return unless ( $DECODED_ARGS->{'id'} || '' ) =~ /^(\d+)$/;
+my $id  = $1;
+
+my $Ticket = RT::Ticket->new( $session{'CurrentUser'} );
+$Ticket->Load($id);
+return unless $Ticket->id;
+
+if ( my $right = $RT::Ticket::CheckRightOnLock{'Hard'} ) {
+    return unless $Ticket->CurrentUserHasRight( $right );
+}
+
+if ( my $Lock = $Ticket->Locked ) {
+    if ( $Lock->Content->{'User'} == $session{'CurrentUser'}->id ) {
+        PageMenu()->child('actions')->child(
+            'unlock',
+            path  => "/Ticket/Display.html?Lock=remove&id=" . $Ticket->Id,
+            title => loc('Unlock'),
+        );
+    } else {
+        PageMenu()->child('actions')->child(
+            'break-lock',
+            path  => "/Ticket/Display.html?Lock=break&id=" . $Ticket->Id,
+            title => loc('Break lock'),
+        );
+    }
+} else {
+    PageMenu()->child('actions')->child(
+        'lock',
+        path  => "/Ticket/Display.html?Lock=add&id=". $Ticket->Id,
+        title => loc('Lock'),
+    );
+}
+</%INIT>

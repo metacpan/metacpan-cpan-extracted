@@ -1,0 +1,106 @@
+NAME
+    RDF::Query::Functions::Buzzword::DateTime - plugin for buzzword.org.uk
+    datetime functions
+
+SYNOPSIS
+      use RDF::TrineX::Functions -shortcuts;
+      use RDF::Query;
+  
+      my $data = rdf_parse(<<'TURTLE', type=>'turtle', base=>$baseuri);
+      @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+      @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+  
+      <http://tobyinkster.co.uk/#i>
+        foaf:birthday "1980-06-01"^^<http://www.w3.org/2001/XMLSchema#date> .
+      TURTLE
+  
+      my $query = RDF::Query->new(<<'SPARQL');
+      PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+      PREFIX util: <http://buzzword.org.uk/2011/functions/util#>
+      PREFIX dt:   <http://buzzword.org.uk/2011/functions/datetime#>
+      PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+      SELECT
+        (dt:now() AS ?now)
+        (dt:today() AS ?today)
+        ?bday
+        (dt:format_duration(dt:difference(dt:now(), ?bday), "%Y years, %m months") AS ?age)
+        (dt:add(?bday, "P10Y"^^xsd:duration) AS ?tenthbday)
+        (dt:strtotime("yesterday morning"@en) AS ?yesterdaymorning)
+        (dt:strftime(?bday, "%a, %d %b %Y"@en) AS ?fmtbday)
+        (dt:strtodate("1/6/1980"@en-gb) AS ?guessbday)
+      WHERE
+      {
+        ?person foaf:birthday ?bday .
+      }
+      SPARQL
+
+      print $query->execute($data)->as_xml;
+
+DESCRIPTION
+    This is a plugin for RDF::Query providing a number of extension
+    functions for dates and times.
+
+    *   http://buzzword.org.uk/2011/functions/datetime#add
+
+        Given an xsd:dateTime or xsd:date, and an xsd:duration, adds the
+        duration to the datetime. Returns an xsd:date if it was passed an
+        xsd:date and the xsd:duration didn't specify any hours, minutes or
+        seconds. Returns an xsd:dateTime otherwise.
+
+    *   http://buzzword.org.uk/2011/functions/datetime#difference
+
+        Given two xsd:dateTime or xsd:date literals, returns an xsd:duration
+        representing the difference between them.
+
+    *   http://buzzword.org.uk/2011/functions/datetime#format_duration
+
+        Given an xsd:duration and a literal formatting string, returns a
+        formatted duration. See DateTime::Format::Duration.
+
+    *   http://buzzword.org.uk/2011/functions/datetime#now
+
+        Returns the current xsd:dateTime, with supposed nanosecond
+        precision. If called multiple times in the same SPARQL query, will
+        always return the same instant.
+
+    *   http://buzzword.org.uk/2011/functions/datetime#strftime
+
+        Takes a xsd:datetime and a literal formatting string and returns a
+        formattted date. See DateTime.
+
+    *   http://buzzword.org.uk/2011/functions/datetime#strtodate
+
+        Attempts to parse an arbitrary literal using natural language and
+        convert it into an xsd:date. Smart enough to tell the difference
+        between "1/6/1980"@en-us and "1/6/1980"@en-gb.
+
+        Can safely be passed an existing xsd:date or xsd:dateTime.
+
+    *   http://buzzword.org.uk/2011/functions/datetime#strtotime
+
+        As per "strtodate" but returns an xsd:dateTime.
+
+        "add", "difference" and "strftime" all implicitly call "strtotime"
+        on their xsd:dateTime arguments, which means they don't need to be
+        given strict xsd:date/dateTime input.
+
+    *   http://buzzword.org.uk/2011/functions/datetime#today
+
+        Like "now" but returns an xsd:date.
+
+SEE ALSO
+    RDF::Query, RDF::Query::Functions::Buzzword::Util.
+
+    DateTime.
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2011-2012 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

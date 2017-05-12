@@ -1,0 +1,88 @@
+Robotics
+Robotics::Tecan
+Robotics::Tecan::Genesis
+Robotics::(vendor)::(model)
+
+This is the perl module for controlling laboratory
+robotics & peripheral devices in either industrial
+laboratory or homebrew environments.  Provides easy-to-use
+software interface to the physical robots and allows
+programming the robots at a higher level.  Provides
+network communication using a client-server for
+manufacturers which provide third-party applications to
+access the robot; this allows a remote computer running
+this module to communicate to the robot's computer running
+this module.
+
+* Support for Tecan Genesis is provided.
+
+* Support for other Perl CPAN modules is under discussion,
+such as: LEGO Mindstorm, Microchip UBW, etc.
+
+* Support for other devices and manufacturers is open for
+discussion or contributon (author is available for funded
+work - email to discuss).  
+
+This module requires: 
+
+  Robotics hardware; may require physical connection
+  (serial port or USB, etc) from the Perl computer to the
+  robot, or may require internet connection.  For network
+  communication, this module uses IO::Socket.
+
+  There may be simulation modes available (so hardware is
+  not required) however simulation of the robotics is not
+  the goal -- getting them physically working is!
+
+NO WARRANTIES:  Author(s) are not responsible for physical
+damage to hardware or people!  WATCH OUT.  (All user
+applications you write should also include warnings prior
+to executing movement as a general guideline.
+
+Namespace note:  The name "Robotics" is used rather than
+"Robot" since there are many perl software modules for
+internet / web / script automation which are incorrectly
+called "robots".  The more correct term for such labelled
+software is "user software agent" or simply "agent".
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Robotics
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Robotics
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Robotics
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Robotics
+
+    Search CPAN
+        http://search.cpan.org/dist/Robotics/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Jonathan Cline, jcline@ieee.org
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

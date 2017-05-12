@@ -1,0 +1,94 @@
+ChangeLog                      # Ch-ch-ch-changes
+ChangeLog.xml                  # See my swanky new XML format!
+MANIFEST                       # This file
+Makefile.PL                    # MakeMaker skeleton
+README                         # Overview
+README.apache2                 # Notes on Apache2 and mod_perl2
+etc/make_method                # Tool to create *.xpl files
+etc/rpc-method.dtd             # DTD for the *.xpl file structure
+ex/linux.proc.meminfo.base     # Base/help/code files for the sample methods
+ex/linux.proc.meminfo.code     # in the ex/ directory
+ex/linux.proc.meminfo.help
+ex/linux.proc.cpuinfo.base
+ex/linux.proc.cpuinfo.code
+ex/linux.proc.cpuinfo.help
+ex/README                      # Description of the contents of the ex/ dir
+ex/Makefile                    # Makefile to generate *.xpl files in ex/
+lib/Apache/RPC/Server.pm       # Apache-centric server implementation
+lib/Apache/RPC/Status.pm       # Apache::Status for Apache::RPC::Server data
+lib/Apache/RPC/status.base     # Apache version of the system.status method
+lib/Apache/RPC/status.code
+lib/Apache/RPC/status.help
+lib/RPC/XML.pm                 # Base data-type manipuation, etc.
+lib/RPC/XML/Client.pm          # Basic client class
+lib/RPC/XML/Parser.pm          # Parser base class
+lib/RPC/XML/Parser/XMLParser.pm # Parser implementation class (XML::Parser)
+lib/RPC/XML/Parser/XMLLibXML.pm # Parser implementation class (XML::LibXML)
+lib/RPC/XML/ParserFactory.pm   # Parser factory-class
+lib/RPC/XML/Procedure.pm       # Class encapsulation of RPC procedures
+lib/RPC/XML/Server.pm          # Basic server class
+methods/identity.base          # Everything under method/ is template for the
+methods/identity.code          # etc/make_method tool to create *.xpl files.
+methods/identity.help
+methods/introspection.base
+methods/introspection.code
+methods/introspection.help
+methods/listMethods.base
+methods/listMethods.code
+methods/listMethods.help
+methods/methodHelp.base
+methods/methodHelp.code
+methods/methodHelp.help
+methods/methodSignature.base
+methods/methodSignature.code
+methods/methodSignature.help
+methods/multicall.base
+methods/multicall.code
+methods/multicall.help
+methods/status.base
+methods/status.code
+methods/status.help
+t/00_load.t                    # Test suites
+t/10_data.t
+t/11_base64_fh.t
+t/12_nil.t
+t/13_no_deep_recursion.t
+t/14_datetime_iso8601.t
+t/15_serialize.t
+t/20_xml_parser.t
+t/21_xml_libxml.t
+t/25_parser_negative.t
+t/29_parserfactory.t
+t/30_procedure.t
+t/35_namespaces.t
+t/40_server.t
+t/40_server_xmllibxml.t
+t/41_server_hang.t
+t/50_client.t
+t/51_client_with_host_header.t
+t/60_net_server.t
+t/70_compression_detect.t
+t/90_rt50013_parser_bugs.t
+t/90_rt54183_sigpipe.t
+t/90_rt54494_blessed_refs.t
+t/90_rt58065_allow_nil.t
+t/90_rt58323_push_parser.t
+t/BadParserClass.pm
+t/meth_bad_1.xpl
+t/meth_bad_2.xpl
+t/meth_good_1.xpl
+t/meth_good_2.xpl
+t/meth_good_3.xpl
+t/namespace1.xpl
+t/namespace2.xpl
+t/namespace3.xpl
+t/svsm_text.b64
+t/svsm_text.gif
+t/util.pl
+xt/01_pod.t
+xt/02_pod_coverage.t
+xt/03_meta.t
+xt/04_minimumversion.t
+xt/05_critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

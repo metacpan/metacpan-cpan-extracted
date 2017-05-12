@@ -1,0 +1,9 @@
+Makefile.PL
+Build.PL
+lib/Regexp/Genex.pm
+eg/Gx.pm
+MANIFEST			This list of files
+META.yml
+README
+Changes
+test.pl

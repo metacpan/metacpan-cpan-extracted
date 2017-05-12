@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl client for Redis 2.4 and up",
+   "author" : [
+      "Mike Friedman <friedo@friedo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-Client",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "IO::Socket::INET" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Scalar::Util" : "0",
+            "aliased" : "0",
+            "namespace::sweep" : "0.003",
+            "overload" : "0",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/friedo/perl-redis-client.git",
+         "web" : "https://github.com/friedo/perl-redis-client"
+      }
+   },
+   "version" : "0.015"
+}
+

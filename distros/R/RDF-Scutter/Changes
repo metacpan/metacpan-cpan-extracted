@@ -1,0 +1,51 @@
+Revision history for Perl extension RDF::Scutter.
+
+2005-11-01  Kjetil Kjernsmo  <kjetil@kjernsmo.net>
+
+	* 0.1:
+	  - A lot of robustness changes, and more testing.
+	  - It can check if the parse and queries are successful and will
+	    not croak, but add an error instead.
+	  - Skip by regexp, maxcount fixes.
+	  - Checking for redirects and add them to the queue.
+	  - More comments and whitespace.
+
+
+2005-10-14  Kjetil Kjernsmo  <kjetil@kjernsmo.net>
+
+	* 0.06:
+	  - Minor documentation bugs.
+	
+2005-10-13  Kjetil Kjernsmo  <kjetil@kjernsmo.net>
+
+	* 0.05:
+	  - Adding the rdf:types of the ScutterVocab to the model.
+	  - Add a skip reason if we find that it is robots.txt that makes
+	    us skip a resource.
+	
+2005-10-12  Kjetil Kjernsmo  <kjetil@kjernsmo.net>
+
+	* 0.04: 
+	  - Reordering the addition of the ScutterVocab stuff.
+	  - More error support in the output RDF.
+	  - Had forgotten to add the actual context nodes many places.
+
+2005-10-11  Kjetil Kjernsmo  <kjetil@kjernsmo.net>
+
+	* 0.03: 
+	  - First stab at Redland contexts and ScutterVocab
+	  - Reworked the algorithm a bit to make it rely less in 
+	    VISITED and add Referer header
+	
+2005-09-15  Kjetil Kjernsmo  <kjetil@kjernsmo.net>
+
+	* 0.02: Quoting the Redland version to make packaging right.
+	* Add SIGNATURE
+
+
+2005-09-14  Kjetil Kjernsmo  <kjetil@kjernsmo.net>
+
+	* 0.01: Initial release
+
+
+	

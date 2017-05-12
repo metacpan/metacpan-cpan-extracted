@@ -1,0 +1,10 @@
+Revision history for Rose-HTMLx-Form-Field-Serial
+
+0.001   11 Sept 2008
+        First version, released on an unsuspecting world.
+
+0.002   12 Sept 2008
+        * add missing req in Makefile.PL
+
+
+

@@ -1,0 +1,13 @@
+Modified: rt/branches/3.4-RELEASE/lib/RT/Action/AutoOpen.pm                     
+==============================================================================  
+--- rt/branches/3.4-RELEASE/lib/RT/Action/AutoOpen.pm   (original)              
++++ rt/branches/3.4-RELEASE/lib/RT/Action/AutoOpen.pm   Thu Jun  2 00:15:13 2005
+@@ -74,6 +74,8 @@                                                               
+     if ( ( $self->TicketObj->Status eq 'open' )                                
+          || ( ( $self->TicketObj->Status eq 'new' )
+               && $self->TransactionObj->IsInbound )
++         || ( defined $self->TransactionObj->Message->First                    
++              && $self->TransactionObj->Message->First->GetHeader('RT-Control') =~ /\bno-autoopen\b/i )
+       ) {
+
+         return undef;

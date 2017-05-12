@@ -1,0 +1,48 @@
+%# Nature is by and large to be found out of doors, a location where, it
+%# cannot be argued, there are never enough comfortable chairs.
+%# 		-- Fran Leibowitz
+
+% if ($OK) {
+
+<&|/l&>The new value has been set.</&><p>
+<a href="/Foundry/Home/Guest/"><&|/l&>Login</&></a>.
+
+% } else {
+
+<input type="hidden" name="token" value="<% $token %>">
+<& Elements/NewPassword &>
+
+% }
+
+<%INIT>
+my $OK;
+my $id = (split(/,/, $token))[0];
+my $user = RT::User->new($RT::SystemUser);
+$user->Load($id);
+
+unless ($user->Id and $user->VerifyPasswordHash($token)) {
+    return $m->comp('Reminder.html', Error => loc('Invalid data'));
+}
+
+if ($pass or $pass2) {
+    if ($pass ne $pass2) {
+	$m->notes( error => loc("Passwords do not match. Your password has not been changed") );
+    }
+    elsif ( length($pass) < $RT::MinimumPasswordLength ) {
+	$m->notes( error => loc('Password must be at least [_1] letters', $RT::MinimumPasswordLength) );
+    }
+    else {
+	$user->SetPassword($pass);
+	$OK = 1;
+    }
+}
+
+</%INIT>
+<%ATTR>
+Tab2	=> 'Password Reminder'
+</%ATTR>
+<%ARGS>
+$token => undef
+$pass => undef
+$pass2 => undef
+</%ARGS>

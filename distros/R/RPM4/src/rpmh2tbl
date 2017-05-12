@@ -1,0 +1,226 @@
+#!/usr/bin/perl
+
+##- Nanar <nanardon@zarb.org>
+##-
+##- This program is free software; you can redistribute it and/or modify
+##- it under the terms of the GNU General Public License as published by
+##- the Free Software Foundation; either version 2, or (at your option)
+##- any later version.
+##-
+##- This program is distributed in the hope that it will be useful,
+##- but WITHOUT ANY WARRANTY; without even the implied warranty of
+##- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##- GNU General Public License for more details.
+##-
+##- You should have received a copy of the GNU General Public License
+##- along with this program; if not, write to the Free Software
+##- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# $Id$
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my @availlabletables;
+
+# Binding we want
+# In this file we'll found
+# FILE.h => 
+#   Constant matching the REGEXP goes in this table.
+#   'REGEXP' => table,
+
+my %file_const = (
+    'rpmlib.h' => {
+        '^(RPM_MACHTABLE_[\w_]+)' => 'rpm_machtable',
+        '^(INSTALL_[\w_]+)' => 'rpmInstallInterfaceFlags',
+        '^(UNINSTALL_[\w_]+)' => 'rpmEraseInterfaceFlags',
+    },
+    'header.h' => {
+        '^(HEADER_MAGIC_[\w_]+)' => 'hMagic',
+    },
+    'rpmbuild.h' => {
+        '^(RPMBUILD_[\w_]+)' => 'rpmBuildFlags',
+        '^(PART_[\w_]+)' => 'rpmParseState',
+    },
+    'rpmcli.h' => {
+        '^(RPMSIGN_[\w_]+)' => 'rpmSignFlags',
+    },
+    'rpmdb.h' => {
+        '^(RPMMIRE_[\w_]+)' => 'rpmMireMode',
+    },
+    'rpmds.h' => {
+        '^_?(RPMSENSE_[\w_]+)' => 'rpmsenseflags',
+    },
+    'rpmerr.h' => {
+        '^(RPMERR_[\w_]+)' => 'rpmerrCode',
+    },
+    'rpmfi.h' => {
+        '^(RPMFILE_[^(STATE_|IS)][\w_]+)' => 'rpmfileAttrs',
+        '^(RPMFILE_ICON)' => 'rpmfileAttrs',
+        '^(RPMFILE_STATE_[\w_]+)' => 'rpmfileState',
+        '^(PIPE|CDEV|XDIR|BDEV|REG|LINK|SOCK)$' => 'fileTypes',
+        '^(FA_[\w_]+)' => 'fileAction',
+    },
+    'rpmlog.h' => {
+        '^(RPMLOG_(?!PRI$|MAKEPRI$|FAC$|MASK$|UPTO$)[\w_]+)' => 'rpmlog',
+    },
+    'rpmmacro.h' => {
+        '^(RMIL_[\w_]+)' => 'rpmMacrosContext',
+    },
+    'rpmmessage.h' => {
+        '^(RPMCALLBACK_[\w_]+)' => 'rpmCallbackType',
+        '^(RPMMESS_[\w_]+)' => 'rpmmess',
+    },
+    'rpmps.h' => {
+        '^(RPMPROB_FILTER_[\w_]+)' => 'rpmprobFilterFlags',
+        '^(RPMPROB_[^(FILTER_)][\w_]+)' => 'rpmProblemType',
+
+    },
+    'rpmtag.h' => {
+        '^(RPMDBI_[\w_]+)' => 'rpmdbi',
+	'^(RPMSIGTAG_[\w_]+)' => 'rpmtagSignature',
+        '^(RPMTAG_[\w_]+)' => 'rpmTag',
+        '^(RPM_[\w]+)_TYPE$' => 'rpmTagType',
+    },
+    'rpmte.h' => {
+        '^(TR_[\w_]+)' => 'rpmElementType',
+    },
+    'rpmts.h' => {
+        '^_?(RPMVSF_[\w_]+)' => 'rpmvsflags',
+        '^(RPMTRANS_FLAG_[\w_]+)' => 'rpmtransFlags',
+        '^(RPMTRANS_TYPE_[\w_]+)' => 'rpmtsType',
+        '^(RPMTS_OP_[\w_]+)' => 'rpmtsOpX',
+    },
+    'rpmtypes.h' => {
+        '^(RPMRC_[\w_]+)' => 'rpmRC',
+    },
+    'rpmvf.h' => {
+        '^(VERIFY_[\w_]+)' => 'rpmVerifyFlags',
+    },
+);
+
+my %tableprefix = (
+    rpmmess => 'RPMMESS_',
+    rpmCallbackType => 'RPMCALLBACK_',
+    rpmlog => 'RPMLOG_',
+    rpmdbi => 'RPMDBI_',
+    rpmElementType => 'TR_',
+    rpmMacrosContext => 'RMIL_',
+    rpmerrCode => 'RPMERR_',
+    rpmParseState => 'PART_',
+    rpmBuildFlags => 'RPMBUILD_',
+    rpmTagType => 'RPM_',
+    hMagic => '',
+    rpmMireMode => 'RPMMIRE_',
+    rpmsenseflags => 'RPMSENSE_',
+    rpmtsTransFlag => 'RPMVSF_',
+    rpmTag => 'RPMTAG_',
+    rpmtsType => 'RPMTRANS_TYPE_',
+    rpmtsOpX => 'RPMTS_OP_',
+    rpmRC => 'RPMRC_',
+    rpmfileState => 'RPMFILE_STATE_',
+    rpmfileState => 'RPMFILE_',
+    rpm_machtable => 'RPM_MACHTABLE_',
+    rpmprobFilterFlags => 'RPMPROB_FILTER_',
+    fileAction => 'FA_',
+    fileTypes => '',
+    rpmtransFlags => 'RPMTRANS_FLAG_',
+    rpmInstallInterfaceFlags => 'INSTALL_',
+    rpmEraseInterfaceFlags => 'UNINSTALL_',
+    rpmtagSignature => 'RPMSIGTAG_',
+    rpmProblemType => 'RPMPROB_',
+    rpmSignFlags => 'RPMSIGN_',
+    rpmVerifyFlags => 'VERIFY_',
+    rpmvsflags => 'RPMVSF_',
+);
+
+
+my $ch = *STDOUT;
+
+sub parseconst {
+    my ($header) = @_;
+    my ($hbasename) = $header =~ m!(?:.*/)(.*)$!;
+
+    my $hconstant = $file_const{$hbasename} or return;
+    open(my $hheader, "<", $header) or die "Can't open $header\n";
+
+    my %constants_found;
+    my $i;
+    
+    my $line = <$hheader>;
+    my $headerdef;
+    $headerdef = $1 if $line =~ /^\s*#\s*ifndef\s+(\S+)/;
+    
+    while ($line = <$hheader>) {
+        $line =~ s!^\s*/\*[^\*]*\*/!!;
+        my ($w, $c) = $line =~ m!(?:#\s*define\s*)?([\w_]+)[^(/\*)]*(/\*.*\*/)?!;
+        defined($w) or next;
+        foreach my $regexp (keys %$hconstant) {
+            if ($w =~ /$regexp/) {
+                $constants_found{$hconstant->{$regexp}}{$w}{n} ||= ++$i;
+                $constants_found{$hconstant->{$regexp}}{$w}{c} ||= $c;
+                $constants_found{$hconstant->{$regexp}}{$w}{s} ||= $1;
+            }
+        }
+    }
+
+    close($hheader);
+
+    while (my ($tbl, $const) = each %constants_found) {
+        $tableprefix{$tbl} ||= "";
+        print $ch <<EOF;
+
+/* From $hbasename
+ * prefix tag: $tableprefix{$tbl}
+ * table: $tbl */
+EOF
+        printf $ch "static const struct rpmconstant_s %sctbl[] = {\n",
+            $tbl;
+        print $ch "#ifdef $headerdef\n" if $headerdef;
+        foreach my $c (sort { $const->{$a}{n} <=> $const->{$b}{n} } keys %$const) {
+            printf $ch qq(\t{ "%s", %s }, %s\n),
+                uc($const->{$c}{s} || $c), $c, $const->{$c}{c} || "";
+        }
+        print $ch "#endif /* $headerdef */\n" if $headerdef;
+        printf $ch "\t{ %s, %s } /* NULL terminated (%s) */\n", "NULL", "0", $tbl;
+        print $ch "};\n";
+        printf $ch "const struct rpmconstant_s * %sctable = %sctbl;\n\n", $tbl, $tbl;
+
+        push @availlabletables, $tbl;
+    }
+}
+
+printf $ch <<EOF
+/* File automatically generate by $0
+ * Olivier Thauvin <thauvin at aerov.jussieu.fr>
+ * Parsed files:
+ * %s
+ */
+
+#define RPMCONSTANT_INTERNAL
+#include "rpmconstant.h"
+ 
+EOF
+, join("\n * ", @ARGV);
+
+GetOptions(
+);
+
+foreach (@ARGV) {
+    parseconst($_);
+}
+
+print $ch "static const struct rpmconstantlist_s rpmconstanttp[] = {\n";
+foreach (sort(@availlabletables)) {
+    printf $ch "\t{ %s, %s, %s },\n", 
+        '(void *)' . $_ . "ctbl",
+        '"' . lc($_) . '"',
+        $tableprefix{$_} ? qq("$tableprefix{$_}") : "NULL";
+}
+printf $ch "\t{ %s, %s, %s } /* NULL terminated */\n", "(void *) NULL", "NULL", "NULL";
+print $ch "};\n";
+printf $ch "const struct rpmconstantlist_s * rpmconstanttype = rpmconstanttp;\n";
+print $ch "const int rpmconstanttypesize = sizeof(rpmconstanttp) / sizeof(rpmconstanttp[0]) -1;\n";
+

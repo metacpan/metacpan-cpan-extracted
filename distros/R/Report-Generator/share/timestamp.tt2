@@ -1,0 +1,3 @@
+[%  USE date(format = '%c', locale = 'de_DE');
+    TIMESTAMP_COLNAME  = 'timestamp';
+    TIMESTAMP_COLVALUE = date.format( date.now ) -%]

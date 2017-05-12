@@ -1,0 +1,45 @@
+---
+name: RRD-Daemon
+version: 1.01
+author:
+  - 'M J Pearce <fluffy@cpan.org>'
+abstract: perl daemon rrd collector
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IPC::System::Simple: 1.18
+  Log::Dispatch::FileRotate: 1.19
+  Log::Log4perl: 1.23
+  Params::Attr: 1.00
+  Params::Validate: 0.91
+  RRDs: 1.3001
+  perl: v5.10.0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  RRD::Daemon:
+    file: lib/RRD/Daemon.pm
+    version: 1.01
+  RRD::Daemon::Plugin:
+    file: lib/RRD/Daemon/Plugin.pm
+  RRD::Daemon::Plugin::HDDTemp:
+    file: lib/RRD/Daemon/Plugin/HDDTemp.pm
+  RRD::Daemon::Plugin::LMSensors:
+    file: lib/RRD/Daemon/Plugin/LMSensors.pm
+  RRD::Daemon::Plugin::VMStat:
+    file: lib/RRD/Daemon/Plugin/VMStat.pm
+  RRD::Daemon::RRDB:
+    file: lib/RRD/Daemon/RRDB.pm
+  RRD::Daemon::RRDB::DS:
+    file: lib/RRD/Daemon/RRDB/DS.pm
+  RRD::Daemon::RRDB::Graph:
+    file: lib/RRD/Daemon/RRDB/Graph.pm
+  RRD::Daemon::RRDB::RRA:
+    file: lib/RRD/Daemon/RRDB/RRA.pm
+  RRD::Daemon::Util:
+    file: lib/RRD/Daemon/Util.pm
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

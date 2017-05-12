@@ -1,0 +1,233 @@
+Revision history for Perl extension RiveScript.
+
+  2.0.3  Aug 26 2016
+  - Fix inline comment regexp that was making URLs impossible to represent
+    in replies.
+
+  2.0.2  Jan 11 2016
+  - Fix typo in changelog.
+
+  2.0.1  Jan 11 2016
+  - When formatting a user's message, consolidate multiple consecutive spaces
+    down to one.
+  - Apply downstream Debian patch that fixes a typo in RiveScript::WD.
+
+  2.0.0  Dec 28 2015
+  - Switch from old-style floating point version number notation to dotted
+    decimal notation. This bumps the version number to `2.0.0` because the next
+    dotted-decimal version greater than `1.42` (`v1.420.0`) is `v1.421.0` and
+    I don't like having that many digits in the version number. This release is
+    simply a version update; no breaking API changes were introduced.
+
+  1.42  Nov 20 2015
+  - Add configurable `unicode_punctuation` attribute to strip out punctuation
+    when running in UTF-8 mode.
+
+  1.40  Oct 10 2015
+  - Fix the regexp used when matching optionals so that the triggers don't match
+    on inputs where they shouldn't. (RiveScript-JS issue #46)
+
+  1.38  Jul 21 2015
+  - New algorithm for handling variable tags (<get>, <set>, <add>, <sub>,
+    <mult>, <div>, <bot> and <env>) that allows for iterative nesting of these
+    tags (for example, <set copy=<get orig>> will work now).
+  - Fix trigger sorting so that triggers with matching word counts are sorted
+    by length descending.
+  - Add support for `! local concat` option to override concatenation mode
+    (file scoped)
+  - Bugfix where Perl object macros set via `setSubroutine()` failed to load
+    because they were missing a programming language internally.
+
+  1.36  Nov 26 2014
+  - Relicense under the MIT License.
+  - Strip punctuation from the bot's responses in UTF-8 mode to
+    support compatibility with %Previous.
+  - Bugfix in deparse(): If you had two matching triggers, one with a %Previous
+    and one without, you'd lose the data for one of them in the output.
+
+  1.34  Feb 26 2014
+  - Update README.md to include module documentation for github.
+  - Fixes to META.yml
+
+  1.32  Feb 24 2014
+  - Maintenance release to fix some errors per the CPANTS.
+  - Add license to Makefile.PL
+  - Make Makefile.PL not executable
+  - Make version numbers consistent
+
+  1.30  Nov 25 2013
+  - Added "TCP Mode" to the `rivescript` command so that it can listen on a
+    socket instead of using standard input and output.
+  - Added a "--data" option to the `rivescript` command for providing JSON
+    input as a command line argument instead of standard input.
+  - Added experimental UTF-8 support.
+  - Bugfix: don't use hacky ROT13-encoded placeholders for message
+    substitutions... use a null character method instead. ;)
+  - Make .rive the default preferred file extension for RiveScript documents
+    instead of .rs (which conflicts with the Rust programming language).
+    Backwards compatibility remains to load .rs files, though.
+
+  1.28  Aug 14 2012
+  - FIXED: Typos in RiveScript::WD (Bug #77618)
+  - Added constants RS_ERR_MATCH and RS_ERR_REPLY.
+
+  1.26  May 29 2012
+  - Added EXE_FILES to Makefile.PL so the rivescript utility installs
+    correctly.
+
+  1.24  May 15 2012
+  - Fixed: having a single-line, multiline comment, e.g. /* ... */
+  - Fixed: you can use <input> and <reply> in triggers now, instead of only
+    <input1>-<input9> and <reply1>-<reply9>
+  - When a trigger consists of nothing but multiple wildcard symbols, sort
+    the trigger by length, this way you can have '* * * * *' type triggers
+    still work correctly (each <star> tag would get one word, with the final
+    <star> collecting the remainder).
+  - Backported new feature from Python lib: you can now use <bot> and <env>
+    to SET variables (eg. <bot mood=happy>). The {!...} tag is deprecated.
+  - New feature: deparse() will return a Perl data structure representing all
+    of the RiveScript code parsed by the module so far. This way you can build
+    a user interface for editing replies without requiring a user to edit the
+    code directly.
+  - New method: write() will use deparse() to write a RiveScript document using
+    all of the in-memory triggers/responses/etc.
+  - Cleaned up the POD documentation, put POD code along side the Perl functions
+    it documents, removed useless bloat from the docs.
+  - POD documentation now only shows recent changes. For older changes, see the
+    "CHANGES" file in the distribution.
+  - Removed the `rsup` script from the distribution (it upgrades RiveScript 1.x
+    code to 2.x; there probably isn't any 1.x code out in the wild anyway).
+
+  1.22  Sep 22 2011
+  - Cleaned up the documentation of RiveScript; moved the JavaScript object
+    example to a separate document in the `docs' directory.
+  - Obsoleted the `rsdemo` command that used to ship with the distribution. In
+    its place is `rivescript`, which can also be used non-interactively so that a
+    third party, non-Perl application could still make use of RiveScript.
+  - RiveScript.pm is now dual licensed. It uses the GPLv2 for open source
+    applications as before, but you can contact the author for details if you
+    want to use RiveScript.pm in a closed source commercial application.
+
+  1.20  Jul 30 2009
+  - Added automatic syntax checking when parsing RiveScript code. Also added
+    'strict mode' - if true (default), a syntax error is a fatal error. If false,
+    a syntax error is a warning, and RiveScript aborts processing the file any
+    further.
+  - Changed the behavior of "inherits" a bit: a new type has been added called
+    "includes" which does what the old "inherits" does (mixes the trigger list
+    of both topics together into the same pool). The new "inherits" option though
+    causes the trigger list from the source topic to be higher in matching priority
+    than the trigger list of the inherited topic.
+  - Moving to a new versioning scheme: development releases will have odd
+    version numbers, stable (CPAN) versions will have even numbers.
+  - Fixed the Eliza brain; in many places a <star2> was used when there was only one
+    star in the trigger. Fixes lots of issues with Eliza.
+  - Bugfix: recursion depth limits weren't taken into account when the {@} tag
+    was responsible for a redirection. Fixed.
+  - Bugfix: there was a problem in the regular expression that counts real words
+    while sorting triggers, so that triggers with *'s in them weren't sorted
+    properly and would therefore cause matching issues.
+  - Bugfix: when the internal _getreply is called because of a recursive
+    redirection (@, {@}), the %previous tags should be ignored. They weren't.
+    since "lastreply" is always the same no matter how deeply recursive _getreply
+    is going, it could result in some infinite recursion in rare cases. Fixed.
+  - Bugfix: using a reserved name as a global variable wasn't working properly
+    and would crash RiveScript. Fixed.
+
+  1.19  Apr 12 2009
+  - Added support for defining custom object handlers for non-Perl programming
+    languages.
+  - All the methods like setGlobal, setVariable, setUservar, etc. will now
+    accept undef or "<undef>" as values - this will delete the variables.
+  - There are no reserved global variable names anymore. Now, if a variable name
+    would conflict with a reserved name, it is put into a "protected" space
+    elsewhere in the object. Still take note of which names are reserved though.
+
+  1.18  Dec 31 2008
+  - Added support for topics to inherit their triggers from other topics.
+    e.g. > topic alpha inherits beta
+  - Fixed some bugs related to !array with ^continue's, and expanded its
+    functionality therein.
+  - Updated the getUservars() function to optionally be able to get just a specific
+    variable from the user's data. Added getUservar() as a grammatically correct
+    alias to this new functionality.
+  - Added the functions freezeUservars() and thawUservars() to back up and
+    restore a user's variables.
+  - Added the function lastMatch(), which returns the text of the trigger that
+    matched the user's last message.
+  - The # command for RiveScript comments has been deprecated in revision 7 of
+    the RiveScript Working Draft. The Perl module will now emit warnings each
+    time the # comments are processed.
+  - Modified a couple of triggers in the default Eliza brain to improve matching
+    issues therein.
+  - +Triggers can contain user <get> tags now.
+  - Updated the RiveScript Working Draft.
+
+  1.17  Sep 15 2008
+  - Updated the rsdemo tool to be more flexible as a general debugging and
+    developing program. Also updated rsdemo and rsup to include POD documentation
+    that can be read via `perldoc`.
+  - Added a global variable $RiveScript::basedir which is the the path to your
+    Perl lib/RiveScript folder. This is used by `rsdemo` as its default location
+    to search for replies.
+  - Tweak: Triggers of only # and _ can exist now alongside the old single-wildcard
+    trigger of *.
+  - Bugfix: The lookahead code would throw Perl warnings if the following line
+    had a single space in it, but was otherwise empty.
+  - Bugfix: Inline comment removing has been fixed.
+  - Bugfix: In conditionals, any blank side of the equality will get a default
+    value of "undefined". This way you can use a matching array inside an optional
+    and check if that <star> tag is defined.
+    + i am wearing a [(@colors)] shirt
+    * <star> ne undefined => Why are you wearing a <star> shirt?
+    - What color is it?
+  - Updated the RiveScript Working Draft.
+
+  1.16  Jul 22 2008
+  - New options to the constructor: 'verbose' and 'debugfile'. See the new()
+    constructor for details.
+  - Added new wildcard variants:
+    * matches anything (previous behavior)
+    # matches only numbers
+    _ matches only letters
+    So you can have a trigger like "+ i am # years old" and "+ i am * years old",
+    with the latter trigger telling them to try that again and use a NUMBER this
+    time. :)
+  - Bugfix: when there were multiple +trigger's that had a common %previous,
+    there was no internal sort buffer for those +trigger's. As a result, matching
+    wasn't very efficient. Added the method sortThatTriggers() to fix this.
+  - Bugfix: tags weren't being processed in @Redirects when they really
+    should've!
+  - Bugfix: The ^Continue lookahead code wouldn't work if the next line began
+    with a tab. Fixed!
+  - Updated the RiveScript Working Draft.
+
+  1.15  Jun 19 2008
+  - Person substitutions support multiple-word patterns now.
+  - Message substititons also support multiple-word patterns now.
+  - Added syntax tracking, so Deep Recursion errors can give you a filename and
+    line number where the problem occurred.
+  - Added a handler for detecting when a user was put into an empty topic.
+  - Rearranged tag priority.
+  - Updated the RiveScript Working Draft.
+
+  1.14  Apr  2 2008
+  - Bugfix: If a BEGIN/request trigger didn't exist, RiveScript would not fetch
+    any replies for the client's message. Fixed.
+  - Bugfix: Tags weren't being re-processed for the text of the BEGIN statement,
+    so i.e. {uppercase}{ok}{/uppercase} wasn't working as expected. Fixed.
+  - Bugfix: RiveScript wasn't parsing out inline comments properly.
+  - Rearranged tag priorities.
+  - Optimization: When substituting <star>s in, an added bit of code will insert
+    '' (nothing) if the variable is undefined. This prevents Perl warnings that
+    occurred frequently with the Eliza brain.
+  - Updated the RiveScript Working Draft.
+
+  1.13  Mar 18 2008
+  - Included an "rsup" script for upgrading old RiveScript code.
+  - Attempted to fix the package for CPAN (1.12 was a broken upload).
+  - Bugfix: <bot> didn't have higher priority than <set>, so
+    i.e. <set name=<bot name>> wouldn't work as expected. Fixed.
+
+  1.12  Mar 16 2008
+  - Initial beta release for a RiveScript 2.00 parser.

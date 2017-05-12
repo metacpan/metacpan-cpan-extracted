@@ -1,0 +1,90 @@
+<%args>
+$id => undef
+$comment => undef
+</%args>
+<%init>
+my $post = RT::Ticket->new( $session{'CurrentUser'} );
+my @Actions;
+if ( $ARGS{'id'} eq 'new' ) {    # new ticket?
+    my $q = RT::Queue->new( $session{'CurrentUser'} );
+    $q->Load($RT::JournalQueue);
+    $ARGS{'Queue'}  = $q->id;
+    $ARGS{'Owner'}  = $session{'CurrentUser'}->id;
+    $ARGS{'Status'} = 'new';
+
+    my $cat = RT::CustomField->new( $session{'CurrentUser'} );
+    $cat->LoadByNameAndQueue( Queue => $q->Id, Name => 'RT::Journal-Category');
+
+    $ARGS{ 'CustomField-' . $cat->Id } = $ARGS{'Category'};
+
+    #$ARGS{'Attachments'}{'Upload'} = $ARGS{'Attach'};
+    delete $ARGS{'Attach'};
+
+    ( $post, @Actions ) = CreateTicket(%ARGS);
+
+}
+else {
+    $post->Load($id);
+    if ($comment) {
+        $post->Correspond( Content => $comment );
+    }
+}
+</%init>
+%$m->comp( 'Elements/Tabs', Title => $post->CreatorObj->Name.": ".$post->Subject );
+
+<h1> <%$post->Subject%> </h1>
+( <%$post->CreatedObj->AsString%>)<br>
+
+<%$post->FirstCustomFieldValue('RT-Journal::Category')%>
+<br>
+<%perl>
+ my $content = $post->Transactions->First->Content;
+ $content =~ s/-- (.*)$//gism;
+ $content =~ s/\n/<br>/gi;
+ $m->print( $content );
+
+ my $refto = $post->RefersTo;
+</%perl>
+<div align="right">
+
+% while( my $link = $refto->Next ) {
+<A href=" <%$link->TargetURI->Resolver->HREF%> "> <%$link->TargetURI->Resolver->HREF%> </a><br>
+
+% }
+</div>
+
+% #Todo, only let the right person edit
+% if ($session{'CurrentUser'} ) {
+[<a href=" <%$RT::WebPath%> /Journal/Edit.html?id= <%$post->Id%> ">Edit</a>]
+
+% }
+<hr>
+
+% my $history = $post->Transactions();
+% $history->Limit(FIELD => 'Type', VALUE => 'Correspond');
+% while (my $comment = $history->Next) {
+% my $attach = $comment->Attachments;
+
+
+<%$comment->CreatorObj->Name%> - ( <%$post->CreatedObj->AsString%>)<br>
+
+<%$comment->Content%>
+
+
+% $attach->Limit(FIELD => 'ContentType', OPERATOR => 'LIKE', VALUE => 'image/jpeg');
+%  while (my $file = $attach->Next) {
+Found : <%$attach->id%> / <%$attach->Filename%> 
+
+% }
+<hr>
+
+%}
+<hr>
+<form action="Article.html" method="post">
+<input type=hidden name="id" value="<%$post->id%>">
+<textarea name="comment" rows=10 cols=70></textarea>
+<input type="submit">
+</form>
+
+-- 
+

@@ -1,0 +1,2 @@
+TYPEMAP
+Redis::hiredis T_PTROBJ

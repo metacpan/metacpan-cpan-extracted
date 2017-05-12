@@ -1,0 +1,14 @@
+<%init>
+if ( $ARGSRef->{AppleGSXUpdate} ) {
+    my ($ok, @results) = $Asset->UpdateGSX;
+    MaybeRedirectForResults(
+        Actions   => \@results,
+        Arguments => { id => $Asset->id }
+    );
+}
+</%init>
+
+<%args>
+$ARGSRef
+$Asset
+</%args>

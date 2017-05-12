@@ -1,0 +1,102 @@
+NAME
+
+    RPi::DHT11 - Fetch the temperature/humidity from the DHT11 hygrometer
+    sensor on Raspberry Pi
+
+SYNOPSIS
+
+        use RPi::DHT11;
+    
+        my $pin = 18;
+    
+        my $env = RPi::DHT11->new($pin);
+    
+        my $temp     = $env->temp;
+        my $humidity = $env->humidity;
+
+DESCRIPTION
+
+    This module is an interface to the DHT11 temperature/humidity sensor
+    when connected to a Raspberry Pi's GPIO pins. We use the BCM GPIO pin
+    numbering scheme.
+
+    If you create an RPi::WiringPi object before creating an object in this
+    class, you can set up the RPi::WiringPi object with whichever pin
+    numbering scheme you choose, and this module will follow suit. Eg: if
+    you set RPi::WiringPi to wpi pin scheme, we'll use it here as well.
+    Note, though, that you MUST create the RPi::WiringPi object before you
+    create one of this class!
+
+    This module requires the wiringPi <http://wiringpi.com/> library to be
+    installed, and uses WiringPi's GPIO pin numbering scheme (see gpio
+    readall at the command line).
+
+METHODS
+
+ new($pin, $debug)
+
+    Parameters:
+
+        $pin
+
+    Mandatory. BCM GPIO pin number for the DHT11 sensor's DATA pin..
+
+        $debug
+
+    Optional: Bool. True, 1 to enable debug output, False, 0 to disable.
+
+ temp('f')
+
+    Fetches the current temperature.
+
+    Returns an integer of the temperature, in Celcius by default.
+
+    Parameters:
+
+        'f'
+
+    Optional: Send in the string char 'f' to receive the temp in Farenheit.
+
+ humidity
+
+    Fetches the current humidity.
+
+    Returns the current humidity percentage as an integer.
+
+ cleanup
+
+    Returns the pin back to default state if it's not already. Called
+    automatically by DESTROY().
+
+ENVIRONMENT VARIABLES
+
+    There are a couple of env vars to help prototype and run unit tests
+    when not on a RPi board.
+
+ RDE_HAS_BOARD
+
+    Set to 1 to tell the unit test runner that we're on a Pi.
+
+ RDE_NOBOARD_TEST
+
+    Set to 1 to tell the system we're not on a Pi. Most methods/functions
+    will return default (ie. non-live) data when in this mode.
+
+SEE ALSO
+
+    - wiringPi <http://wiringpi.com/>, WiringPi::API, RPi::WiringPi
+
+AUTHOR
+
+    Steve Bertrand, <steveb@cpan.org<gt>
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

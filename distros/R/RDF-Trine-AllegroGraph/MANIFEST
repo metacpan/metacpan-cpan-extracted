@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+README
+TODO
+lib/RDF/Trine/AllegroGraph.pm
+lib/RDF/Trine/AllegroGraph/FAQ.pm
+lib/RDF/Trine/Store/AllegroGraph.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/01_store.t
+t/02_endpoint.t
+t/03_query.t
+t/04_bulk.t
+Makefile.PL
+META.yml

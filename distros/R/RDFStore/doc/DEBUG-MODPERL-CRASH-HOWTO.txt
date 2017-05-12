@@ -1,0 +1,23 @@
+
+Did you get somethig like
+
+[Tue Jan  7 17:18:00 2003] [notice] child pid 7460 exit signal Segmentation fault (11)
+[Tue Jan  7 17:18:01 2003] [notice] child pid 7466 exit signal Segmentation fault (11)
+
+in your apache+mod_perl errorlog and you do not have a clue where it is happening?
+
+Try the follwing GDB procedure:
+
+% gdb httpd
+(gdb) source mod_perl-x.xx/.gdbinit
+(gdb) run -X
+[make a request that core dumps]
+(gdb) curinfo
+
+should print the Perl filename:linenumber
+
+i.e. mod_perl-x.xx/.gdbinit debugging info which allows you to nicely display where the crash actually happened
+
+see also http://archive.davintech.ca/modperl/2000-08/msg00575.phtml
+
+Alberto

@@ -1,0 +1,11 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+cpanfile
+lib/RDF/TrineX/Merge/Bnodes.pm
+t/author-critic.t
+t/duplicated.t
+t/merge_bnodes.t

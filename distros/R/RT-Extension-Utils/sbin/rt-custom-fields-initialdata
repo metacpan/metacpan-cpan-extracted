@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+
+use 5.008003;
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+=head1 NAME
+
+rt-custom-fields-initialdata - export CFs in format suitable for rt-setup-database
+
+=head1 DESCRIPTION
+
+Print info about all enabled tickets' custom fields in format rt-setup-database
+understands. Set of supported custom fields is very basic. Patches are welcome.
+
+=cut
+
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+print "\@CustomFields = (\n";
+
+my $cfs = RT::CustomFields->new( $RT::SystemUser );
+$cfs->LimitToLookupType('RT::Queue-RT::Ticket');
+while ( my $cf = $cfs->Next ) {
+    print "    {\n";
+    foreach my $field ( qw(Name Description) ) {
+        print "        $field => ". quote($cf->$field()) .",\n";
+    }
+    print "        Type => ". quote($cf->Type . ($cf->MaxValues? 'Single' : 'Multiple')) .",\n";
+    dump_queues($cf);
+    dump_values($cf);
+    print "    },\n";
+}
+
+print ");\n";
+
+exit 0;
+
+sub dump_queues {
+    my $cf = shift;
+    my $ocfs = RT::ObjectCustomFields->new( $cf->CurrentUser );
+    $ocfs->LimitToCustomField( $cf->id );
+
+    my @list;
+    while ( my $ocf = $ocfs->Next ) {
+        if ( my $id = $ocf->ObjectId ) {
+            push @list, $id;
+        } else {
+            @list = (0);
+            last;
+        }
+    }
+    return unless @list;
+    
+    if ( $list[0] == 0 ) {
+        print "        Queue => 0,\n";
+        return;
+    }
+
+    foreach my $id (splice @list) {
+        my $queue = RT::Queue->new( $cf->CurrentUser );
+        $queue->Load( $id );
+        push @list, quote( $queue->Name );
+    }
+
+    if ( @list == 1 ) {
+        print "        Queue => $list[0],\n";
+    } else {
+        print "        Queue => [". join(', ', @list) ."],\n";
+    }
+    return;
+}
+
+sub dump_values {
+    my $cf = shift;
+    my $cfvs = $cf->Values;
+    return unless $cfvs->Count;
+
+    print "        Values => [\n";
+    while ( my $cfv = $cfvs->Next ) {
+        print "            { Name => ". quote($cfv->Name) .","
+            ." SortOrder => ". quote($cfv->SortOrder) ." },\n";
+    }
+    print "        ],\n";
+}
+
+sub quote {
+    my $v = shift;
+    $v =~ s{('|\\(?=['\\]))}{\\$1}g;
+    return "'$v'";
+}

@@ -1,0 +1,28 @@
+@ScripActions = (
+    {
+        Name        => 'Update Parent TimeWorked',    # loc
+        Description => 'Update Parent TimeWorked',    # loc
+        ExecModule  => 'UpdateParentTimeWorked',
+    },
+);
+
+
+@ScripConditions = (
+    {
+        Name                 => 'On TimeWorked Change',        # loc
+        Description          => 'When TimeWorked Change',    # loc
+        ApplicableTransTypes => 'Any',
+        ExecModule           => 'TimeWorkedChange',
+    },
+);
+
+@Scrips = (
+    {
+        Description    => 'On TimeWorked Change Update Parent TimeWorked',
+        ScripCondition => 'On TimeWorked Change',
+        ScripAction    => 'Update Parent TimeWorked',
+        Template       => 'Blank',
+    },
+);
+
+1;

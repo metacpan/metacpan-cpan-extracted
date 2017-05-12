@@ -1,0 +1,50 @@
+Changes                             History of this package
+ex/coverage.sh                      Control code coverage
+ex/example.pl                       JobQueue client demonstration
+MANIFEST                            This file
+Makefile.PL                         Makefile generator
+README                              Get you started with this package
+lib/Redis/JobQueue.pm
+lib/Redis/JobQueue/Job.pm
+lib/Redis/JobQueue/Util.pm
+t/00_compile.t
+t/00_Job/00_compile.t
+t/00_Job/01_new.t
+t/00_Job/02_accessor.t
+t/00_Job/03_modified.t
+t/00_Job/04_job_attributes.t
+t/00_Job/05_meta_data.t
+t/01_JobQueue/00_compile.t
+t/01_JobQueue/01_new.t
+t/01_JobQueue/02_add_job.t
+t/01_JobQueue/04_load_job.t
+t/01_JobQueue/05_get_next_job.t
+t/01_JobQueue/06_update_job.t
+t/01_JobQueue/07_delete_job.t
+t/01_JobQueue/08_get_job_ids.t
+t/01_JobQueue/09_quit.t
+t/01_JobQueue/10_max_datasize.t
+t/01_JobQueue/11_last_errorcode.t
+t/01_JobQueue/12_timeout.t
+t/01_JobQueue/13_get_job_meta_fields.t
+t/01_JobQueue/14_get_job_data.t
+t/01_JobQueue/15_queue_status.t
+t/01_JobQueue/16_utf8.t
+t/tlib/Redis/JobQueue/Test/Utils.pm
+xt/author/.perlcritic.rc
+xt/author/92_vars.t
+xt/author/93_versions.t
+xt/author/94_fixme.t
+xt/author/95_critic.t
+xt/author/96_PureASCII.t
+xt/release/95_kwalitee.t
+xt/release/96_kwalitee_extra.t
+xt/release/97_distribution.t
+xt/release/98_pod.t
+xt/release/99_pod_coverage.t
+xt/release/00_Job/98_pod.t
+xt/release/00_Job/99_pod_coverage.t
+xt/release/01_JobQueue/98_pod.t
+xt/release/01_JobQueue/99_pod_coverage.t
+META.yml                            Module meta-data (added by MakeMaker)
+META.json                           Module meta-data (added by MakeMaker)

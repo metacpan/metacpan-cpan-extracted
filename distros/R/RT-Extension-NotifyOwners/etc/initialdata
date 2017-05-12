@@ -1,0 +1,40 @@
+@ScripActions = (
+      { Name        => 'Notify Last Owner',
+        Description => 'Sends a message to the last owner of a ticket',
+        ExecModule  => 'NotifyOwners', 
+        Argument    => 'LastOwner',
+      },
+
+      { Name        => 'Notify Potential Owners',
+        Description => 'Sends a message to the potential owners of a ticket',
+        ExecModule  => 'NotifyOwners', 
+        Argument    => 'PotentialOwners',
+      },
+
+      { Name        => 'Notify Previous Owners',
+        Description => 'Sends a message to all previous owners of a ticket',
+        ExecModule  => 'NotifyOwners', 
+        Argument    => 'PrevOwners',
+      },
+);
+
+@Templates = (
+
+    {  Queue       => '0',
+       Name        => 'Potential owners notification',
+       Description => 'Default NotifyPotentialOwners template',
+       Content     =>
+'RT-Attach-Message: yes
+
+
+New ticket {$Ticket->id} has been created in {$Ticket->QueueObj->Name}.
+
+You are receiving this email because you can own this ticket.
+
+     Subject: {$Transaction->Subject || $Ticket->Subject || "(No subject given)"}
+  Requestors: {$Ticket->RequestorAddresses}
+      Status: {$Ticket->Status}
+ Ticket <URL: {$RT::WebURL}Ticket/Display.html?id={$Ticket->id} >
+'
+    },
+);

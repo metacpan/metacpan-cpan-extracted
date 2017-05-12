@@ -1,0 +1,14 @@
+abstract: RT Integration-SVN Extension
+author: 'Jesse Vincent <jesse@bestpractical.com>'
+build_requires:
+  Module::Install::RTx: 0.08
+distribution_type: module
+generated_by: Module::Install version 0.52
+license: GPLv2
+name: RT-Integration-SVN
+no_index:
+  directory:
+    - html
+    - inc
+    - t
+version: 0.04

@@ -1,0 +1,26 @@
+---
+name: Reprepro-Uploaders
+version: 0.004
+author:
+  - 'RaphaÃ«l Pinson <raphink@cpan.org>'
+abstract: Emulate reprepro's upload permissions
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+  repository: https://github.com/raphink/reprepro-uploaders
+build_requires:
+  Test::More: 0
+requires:
+  Class::Accessor: 0
+  Config::Augeas: 0.801
+  Text::Glob: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Reprepro::Uploaders:
+    file: lib/Reprepro/Uploaders.pm
+    version: 0.004
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

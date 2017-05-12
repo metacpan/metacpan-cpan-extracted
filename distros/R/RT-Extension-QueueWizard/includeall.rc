@@ -1,0 +1,7 @@
+:0
+* LIST ?? ^^()^^
+{ NEXTONE   LIST = `ls auto` }  # happens on first run only
+
+:0
+* $ LIST ?? ^$\NEXTONE^?\/.+
+{ NEXTONE = $MATCH   INCLUDERC = auto/$NEXTONE  SWITCHRC = $_ }

@@ -1,0 +1,25 @@
+Revision history for Ryu-Async
+
+0.004     2017-03-26 11:51:12+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Distribution metadata:
+    * Update dist.ini
+    * Minimum Ryu version updated
+
+0.003     2017-03-19 23:45:36+08:00 Asia/Kuala_Lumpur
+    Features:
+    * Perl 5.14 support
+
+0.002     2017-01-12 21:51:25+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Distribution metadata:
+
+    * perl version is now listed in `requires`, rather than just
+    `build_requires` - thanks to Mohammad S Anwar for the idea
+    * `provides` metadata added
+    * test dependencies updated in `cpanfile`
+
+0.001     2017-01-11 02:02:36+08:00 Asia/Kuala_Lumpur
+    Initial CPAN release

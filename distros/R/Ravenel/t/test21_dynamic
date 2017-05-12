@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel;
+use Ravenel::Document;
+
+my $res = Ravenel::Document->render( {
+	'data'         => qq(
+	<table>
+		<r:get_rows format>
+			<tr><td>{name}</td><td>{rank}</td><td>{serial_number}</td></tr>
+		<block id="empty"/>
+			<tr><td>No Rows returned</td></tr>
+		</r:get_rows>
+	</table>
+	), 
+	'prefix'       => 'r:',
+	'content_type' => 'html',
+	'name'         => 'test',
+	'functions'    => {
+		'get_rows' => sub {
+        		my Ravenel::Block $block_obj = shift;
+
+			my $row_count = int(rand(5));
+			if ( $row_count ) {
+        			my $block = $block_obj->get_block();
+				# just making this up here, pretend that I did a DB query and got an array of hashrefs
+				$block_obj->format( [ map { { 'name' => 'dextius', 'rank' => 'SrA', 'serial_number' => '12345' } } 0..$row_count ] );
+			} else {
+        			return $block_obj->get_block('empty');
+			}
+		},
+	},
+} );
+
+print $res . "\n";
+

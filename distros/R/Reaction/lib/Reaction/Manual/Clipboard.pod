@@ -1,0 +1,191 @@
+=head1 NAME
+
+Reaction::Manual::Clipboard - snippets of Reaction docs
+
+
+
+=head2 These should probably go in the glossary.
+
+=over
+
+=item Domain Model 
+
+DBIx::Class::Schema, MyApp::Foo, MyApp::Bar, etc.
+
+=item Interface Model 
+
+InterfaceModel::DBIC::Schema, InterfaceModel::Action,
+MyApp::InterfaceModel::Foo classes.
+
+=item Controller 
+
+Mediation and navigation.
+
+=item ViewPort
+
+Event handling encapsulation.
+
+=item Widget
+
+View logic.
+
+=item Renderer 
+
+MyApp::View:: classes, renders viewports.
+
+=back
+
+
+These should go in the tutorial?
+
+
+=head1 SETTING UP A REACTION APPLICATION
+
+Reaction applications are set up just like Catalyst:
+
+    $ catalyst.pl MyApp
+    # output ommited
+    $ cd MyApp
+
+=head2 Models
+
+Reaction provides a reflector component which automagically
+maps a L<DBIx::Class::Schema> into a set of Interface Models which can be used
+by Reaction to build the interface components. If you're not familiar with
+L<DBIx::Class> or don't have a schema handy, now is a good time to go through
+L<DBIx::Class::Manual::Intro> to get a schema set up.
+
+It is important that your Result-objects implement the meta-protocol of Moose.
+One way to achive that is to do the following:
+
+    package MyApp::Schema::Result::Bar;
+    use base 'DBIx::Class';
+    use Moose;
+    
+    has 'name' => (isa => 'Str', required => 1, rw => 1);
+    
+    use namespace::autoclean;
+    
+    __PACKAGE__->load_components(qw(Core));
+    __PACKAGE__->table('bar');
+    __PACKAGE__->add_columns(
+        name => {
+            data_type   => 'varchar',
+            size        => 255,
+            is_nullable => 0,
+        }
+    );
+    __PACKAGE__->primary_key('name');
+    1;
+    
+Once you have your schema set up like that, you can create the InferfaceModel:
+
+    package MyApp::InterfaceModel::DBIC;
+
+    use base 'Reaction::InterfaceModel::Object';
+    use Reaction::InterfaceModel::Reflector::DBIC;
+
+    my $reflector = Reaction::InterfaceModel::Reflector::DBIC->new;
+
+    $reflector->reflect_schema(
+         model_class  => __PACKAGE__,
+         schema_class => 'MyApp::Schema',
+         sources => [qw/Foo Baz/],
+    );
+
+    1;
+
+Then you create a MyApp::Model that uses this InferfaceModel:
+
+    package Myapp::Model::IM;
+    
+    use Reaction::Class;
+    
+    extends 'Catalyst::Model::Reaction::InterfaceModel::DBIC';
+
+    1;
+    
+=head2 Controllers
+
+=head3 Root controller
+
+Your Reaction application must have a Root controller which inherits from
+C<Reaction::UI::Controller::Root>.
+
+    package MyApp::Controller::Root;
+
+    use warnings;
+    use strict;
+    use base qw/Reaction::UI::Controller::Root/;
+
+    __PACKAGE__->config(
+        view_name => 'Site',
+        window_title => 'My Reaction App',
+        namespace => ''
+    );
+
+    sub base : Chained('/') PathPart('') CaptureArgs(0) {
+        # do some setup for every request
+        # also provides a chain root for other controllers to use
+    }
+
+    1;
+
+=head3 Individual controllers
+
+For each Collection(table?) in your DB, you need to create a controller
+
+    package MyApp::Controller::Foo;
+
+    use base 'Reaction::UI::Controller::Collection::CRUD';
+    use Reaction::Class;
+
+    __PACKAGE__->config(
+      model_name => 'IM',   # This corresponds to the name of the MyApp::Model you created earlier
+      collection_name => 'Foo', # Name of one of the sources in your InterfaceModel
+      action => {
+        base => { Chained => '/base',  # chain to the base action in the root controller
+                  PathPart => 'foo' },
+      },
+    );
+
+    1;
+    
+XX TODO
+
+=head2 View
+
+One of the views in your application should look something like this:
+
+    package MyApp::View::TT;
+
+    use Reaction::Class;
+
+    extends 'Reaction::UI::View::TT';
+
+    1;
+
+    __END__;
+
+    
+XX TODO
+
+=head1 SEE ALSO
+
+=over 
+
+=item * L<Reaction::Manual::Cookbook>
+
+=item * L<Reaction::Manual::FAQ>
+
+=back
+
+=head1 AUTHORS
+
+See L<Reaction::Class> for authors.
+
+=head1 LICENSE
+
+See L<Reaction::Class> for the license.
+
+=cut

@@ -1,0 +1,5 @@
+快纪 (Kwiki) 能够备份每一次的页面变更，所以你可以很轻易地就把每一个页面回复成早先的版本。目前唯一的备份模块是 CGI::Kwiki::Backup::Rcs ，这个模块使用 RCS 来备份。大致上任何当前的 Unix 系统里都可以找到 RCS 。
+
+[备份快纪]预设并不会启用。如果你要启用这个功能的话，请编辑你的 config.yaml 档案，然后加入这一列：
+
+    backup_class: CGI::Kwiki::Backup::Rcs

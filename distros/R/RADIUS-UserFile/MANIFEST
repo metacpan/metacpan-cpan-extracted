@@ -1,0 +1,13 @@
+BUGS                      List of known problems
+Changes                   Package modification history
+MANIFEST                  This list of files in the distribution
+Makefile.PL               Perl makefile template
+README                    General description, installation instructions, etc.
+UserFile.pm               RADIUS::UserFile module
+docs/users-file-syntax.1  Useful Ascend radius distribution file
+examples/radius-add       Sample script using RADIUS::UserFile
+examples/radius-del       Sample script using RADIUS::UserFile
+examples/radius-user      Sample script using RADIUS::UserFile
+examples/radius-edit      Sample script using RADIUS::UserFile
+examples/users            Sample users data file
+test.pl                   Script for testing the module

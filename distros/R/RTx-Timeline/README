@@ -1,0 +1,16 @@
+This extension adds data visualization to RT ticket
+search results. It uses Timeline, by Simile.
+
+http://simile.mit.edu/timeline/
+
+This version links to the Timeline javascript API
+hosted at MIT. (So it won't work if your browser
+can't get to the site. But at least you will almost
+always be using the latest. :)
+
+Copyright 2006 Todd Chapman
+
+This software is distributed under the same license as Perl 5.8.8.
+
+-Todd Chapman
+todd@chaka.net

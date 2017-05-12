@@ -1,0 +1,21 @@
+TYPEMAP
+parser_context_t*    T_xmlTextReaderPtr
+
+
+INPUT
+T_xmlTextReaderPtr
+    if (sv_derived_from($arg, \"RPC::XML::Parser::XS::Reader\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ($type)tmp;
+    }
+    else {
+        croak(\"$var is not of type RPC::XML::Parser::XS::Reader\");
+    }
+
+
+OUTPUT
+T_xmlTextReaderPtr
+    sv_setref_pv(
+        $arg,
+        \"RPC::XML::Parser::XS::Reader\",
+        (void*)$var);

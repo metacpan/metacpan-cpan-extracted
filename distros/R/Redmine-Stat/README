@@ -1,0 +1,82 @@
+NAME
+    Redmine::Stat - Perl extension for dealing with Redmine Rest api.
+
+SYNOPSIS
+            use Redmine::Stat;
+            my $redmine = new Redmine::Stat;
+
+            $redmine->auth_key('your_secret_key_to_api');
+            $redmine->url('https://your.redmine.url');
+            $redmine->query_id(100500) #id of redmine query, which stats your are gathering
+
+
+            use Redmine::Stat;
+            my $redmine = new Redmine::Stat->new(
+                    auth_key        => 'your_secret_key_to_api',
+                    url             => 'https://your.redmine.url');
+                    query_id        => 100500,
+            );
+
+
+
+            $redmine->query(); #this does all the work
+
+            $issues_count   = $redmine->total_issues;
+            $projects_count = $redmine->total_projects;
+            $trackers_count = $redmine->total_trackers;
+
+            foreach ($redmine->projects)
+            {
+                    print "Project: ". $_->{name} . " ";
+                    print "Path: ". $_->{redmine_path} ." ";
+                    print "Descripttion: ". $_->{description} ." ";
+                    print "Issues count: ". $_->{issues_count} ." ";
+                    print "\r\n";
+            }
+
+            foreach ($redmine->trackers)
+            {
+                    print "Tracker: ". $_->{name}  ." ";
+                    print "Issues count: ". $_->{issues_count} ." ";
+                    print "\r\n";
+            }
+
+            $trackers{bug} = $redmine->tracker('BUG'); #you can search trackers by name
+            $trackers{feature} = $remdine->tracker(4); #or by redmine id
+
+            $projects{test.com} = $redmine->project('test.com'); #projects by name
+            $projects{test.org} = $redmine->project(15); #by id
+            $projects{test.net} = $redmine->project('test_net') #by redmine project path
+
+DESCRIPTION
+    This module is designed for statistic purposes only, it does not apply
+    CRUD or any other operations. I have wrote this module because i wanted
+    to combine RRDtool with my Redmine.
+
+    Redmine::Stat works with Redmine REST api
+    (<http://www.redmine.org/projects/redmine/wiki/Rest_api>). By default
+    redmine forces clients to use pagination, and does not allow unlimited
+    queries, what is a bad idea imho. You need some modifications in Redmine
+    core for this module to work correctly. Otherwise, if you don't need
+    by-project or by-tracker issue statistics, you may not modify Redmine -
+    this module will deal with "meta" fields, such as total_count. Maximum
+    limit (100) is located as a Magick number in
+    app/controllers/application_controller.rb:415 as of my version 1.4.2.
+
+    You may get almost any statistics by creating your own queries in
+    redmine, and parsing them through this module.
+
+SEE ALSO
+    Redmine REST api <http://www.redmine.org/projects/redmine/wiki/Rest_api>
+    Net::Redmine
+
+AUTHOR
+    Fedor A Borshev, <fedor@shogo.ru>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Fedor A Borshev
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

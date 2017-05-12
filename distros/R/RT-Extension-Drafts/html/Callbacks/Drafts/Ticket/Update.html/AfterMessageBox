@@ -1,0 +1,23 @@
+% if ( $Draft && $Draft->Content ) {
+<input type="submit" class="button" name="LoadDraft" value="<&|/l&>Load draft</&>" />
+% }
+<input type="submit" class="button" name="SaveDraft" value="<% ($Draft && $Draft->id) ? loc('Update draft') : loc('Save draft')%>" />
+<%init>
+my $Ticket = LoadTicket($ARGS{'id'});
+
+my $Draft = RT::Attribute->new( $session{'CurrentUser'} );
+$Draft->LoadByNameAndObject( Object => $session{'CurrentUser'}->UserObj, Name => 'Draft-'.$Ticket->id );
+
+if ( $ARGS{'SaveDraft'} ) {
+    if ( $Draft && $Draft->Id ) {
+        $Draft->SetContent( $ARGS{'UpdateContent'} );
+        $Draft->SetContentType( $ARGS{'UpdateContentType'} || 'text/plain' );
+    } else {
+        $Draft->Create( Name => 'Draft-'.$Ticket->id,
+            Object => $session{'CurrentUser'}->UserObj,
+            Content => $ARGS{'UpdateContent'},
+            ContentType => $ARGS{'UpdateContentType'} || 'text/plain',
+        );
+    }
+}
+</%init>

@@ -1,0 +1,35 @@
+%# One way to stop a runaway horse is to bet on him.
+<& /Foundry/Elements/Header,
+    Title => '~' . $UserObj->Name,
+    ($action ? (Action => $action) : ()),
+    ($method ? (Method => $method) : ()),
+&>
+<input type="hidden" name="User" value="<% $ARGS{User} %>">
+
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td valign="top"> 
+      <table border="0" cellspacing="0" cellpadding="4" class="poptable" width="100%">
+        <tr> 
+          <td valign="top"> 
+% $m->call_next(%ARGS, UserObj => $UserObj);
+	  </td>
+	</tr>
+      </table>
+<br>
+
+<& /Foundry/Elements/Footer &>
+<%INIT>
+my $UserObj = RT::User->new($session{'CurrentUser'}); 
+$UserObj->Load($ARGS{User}||=$session{LastUser}||=$session{CurrentUser}->UserObj->Id);
+$ARGS{User} = $session{LastUser} = $UserObj->Id || $session{LastUser};
+my $s = "?User=$ARGS{User}";
+
+my $action = $m->base_comp->attr('Action');
+my $method = $m->base_comp->attr('Method');
+</%INIT>
+<%ATTR>
+Action	=> undef
+Method	=> undef
+</%ATTR>

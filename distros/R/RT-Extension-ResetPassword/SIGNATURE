@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f36944c6f5b628fe5fe3a53c76e1c2d255dace9d Changes
+SHA1 a532a85c86e4b60c6ed06c93fb62bf159f0bab56 MANIFEST
+SHA1 0adcd7cdda430f2e7dbbacbefada3a0af255b5ad META.yml
+SHA1 bf975311a45adfd4da65a2b3614e440c0b365cc4 Makefile.PL
+SHA1 d8c5dd22534248085f1e4947d2a8a1d75b2ee231 README
+SHA1 aa8aa3d9512d7ef1ce98d5b2921776adc961fa7e etc/initialdata
+SHA1 6fab2c0c83c72aa30556578ae4b324b25d6fe9c3 html/Callbacks/RT-Extension-ResetPassword/Elements/Login/Default
+SHA1 07da398d027e387459d6e785891923c578ff0000 html/NoAuth/ResetPassword/Request.html
+SHA1 957b33bce599f8d73778be00a1029717c70c75da html/NoAuth/ResetPassword/Reset/dhandler
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 05a05009a56ed3324a5c037bd433f57d6726bb33 lib/RT/Extension/ResetPassword.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJYGN3qAAoJEBXncVGnZqUUMr4H/3v5fFdiX64GwIZ/1Gx1Pkvv
+Nd51tVtSNdYPXMHjA8KsCu3tRcoRHJ3pYKqFKg7YAKa2elKI/ekkJ8Ii4G55+ufy
+MtjP42J1jkVg5LXHXPUtLnfQygmbYKBNUDlcmFXgFBYeZBhzay9LhSdXaFo/c05C
+wAdGFlPXi3I2wKXmicL0TU50dQGT5EOAJ4JgwXvgv/QvvuCFOInGy8tgCXFtG3M/
+AiDzcrlTVNrqORq7OkgZKytIhD4sS02IQg7aNGhuyJvlwYTqro8/Rtp++fGNyRLV
+8fSqm7YTb1MJ1di5PUka7R4yPe1kFC1D99d1+s/fe2z9mpilQn1JJBuRDoc/7fM=
+=8ws0
+-----END PGP SIGNATURE-----

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Reflexive-Stream-Filtering,
+version 1.122150:
+
+  Provides a Reflex Stream object that can use POE::Filters
+
+This software is copyright (c) 2012 by Nicholas R. Perez <nperez@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

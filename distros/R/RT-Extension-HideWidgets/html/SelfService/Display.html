@@ -1,0 +1,158 @@
+<& /SelfService/Elements/Header, Title => loc('#[_1]: [_2]', $Ticket->id, $Ticket->Subject) &>
+
+% $m->callback(CallbackName => 'BeforeActionList', %ARGS, Actions => \@results, ARGSRef => \%ARGS, Ticket => $Ticket );
+
+<& /Elements/ListActions, actions => \@results &>
+<& /Ticket/Elements/ShowUpdateStatus, Ticket => $Ticket &>
+
+  <table width="100%" class="ticket-summary" >
+      <tr>
+        <td valign="top" width="50%" class="boxcontainer">
+%# Oeris::HideWidgets - Basics
+% my $OerisHideWidgetBasics = 0;
+% $OerisHideWidgetBasics = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetBasics');
+% my $groups = RT::Groups->new($session{'CurrentUser'});
+% $groups->LimitToUserDefinedGroups;
+% $groups->ForWhichCurrentUserHasRight(
+%     Right             => 'OerisHideWidgetBasics',
+%     IncludeSuperusers => 0,
+% );
+% $OerisHideWidgetBasics = 1 if $groups->Count;
+
+% $RT::Logger->debug("Oeris::HideWidgets - Basics : Current User Has Right ? ".$OerisHideWidgetBasics);
+% unless ( $OerisHideWidgetBasics ) {
+
+          <&| /Widgets/TitleBox, title => loc('The Basics'),
+                class => 'ticket-info-basics',
+                ($LinkBasicsTitle ? (title_href => $title_box_link) : ()),
+                title_class=> 'inverse',
+                color => "#993333" &>
+                <& /Ticket/Elements/ShowBasics, Ticket => $Ticket, UngroupedCFs => 1 &>
+          </&>
+
+    <& /Elements/ShowCustomFieldCustomGroupings,
+        Object       => $Ticket,
+        title_href   => ($LinkBasicsTitle ? RT->Config->Get('WebPath')."/SelfService/Update.html" : "" ),
+        Groupings    => [ grep {$_ !~ /^(Basics|Dates)$/} RT::CustomField->Groupings( "RT::Ticket" ) ],
+        &>
+% } else {
+	&nbsp;
+% }
+</td>
+        <td valign="top" width="50%" class="boxcontainer">
+%# Oeris::HideWidgets - Dates
+% my $OerisHideWidgetDates = 0;
+% $OerisHideWidgetDates = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetDates');
+% $groups = RT::Groups->new($session{'CurrentUser'});
+% $groups->LimitToUserDefinedGroups;
+% $groups->ForWhichCurrentUserHasRight(
+%     Right             => 'OerisHideWidgetDates',
+%     IncludeSuperusers => 0,
+% );
+% $OerisHideWidgetDates = 1 if $groups->Count;
+
+% $RT::Logger->debug("Oeris::HideWidgets - Dates : Current User Has Right ? ".$OerisHideWidgetDates);
+% unless ( $OerisHideWidgetDates ) {
+          <&| /Widgets/TitleBox, title => loc("Dates"),
+                 class => 'ticket-info-dates',
+                 title_class=> 'inverse',
+                 color => "#663366" &>
+          <& /Ticket/Elements/ShowDates, Ticket => $Ticket, UpdatedLink => 0 &>
+          </&>
+% } else {
+	&nbsp;
+% }
+</td>
+</tr>
+</table>
+
+% $m->callback(CallbackName => 'BeforeShowHistory', ARGSRef=> \%ARGS, Ticket => $Ticket );
+
+<& /Elements/ShowHistory,
+      Object => $Ticket,
+      ShowHeaders => $ARGS{'ShowHeaders'},
+      DownloadableHeaders => 0,
+&>
+
+
+
+<%INIT>
+
+my ( $field, @results );
+
+$m->callback( ARGSRef => \%ARGS, CallbackName => 'Initial' );
+
+# Load the ticket
+#If we get handed two ids, mason will make them an array. bleck.
+# We want teh first one. Just because there's no other sensible way
+# to deal
+my @id = ( ref $id eq 'ARRAY' ) ? @{$id} : ($id);
+
+my $Ticket = RT::Ticket->new( $session{'CurrentUser'} );
+
+if ( ($id[0]||'') eq 'new' ) {
+
+    my $Queue = RT::Queue->new( $session{'CurrentUser'} );
+    Abort( loc('Queue not found') ) unless $Queue->Load( $ARGS{'Queue'} );
+
+    Abort( loc('You have no permission to create tickets in that queue.') )
+        unless $Queue->CurrentUserHasRight('CreateTicket');
+
+    ( $Ticket, @results ) = CreateTicket( %ARGS );
+
+    Abort( join("\n", @results ) ) unless $Ticket->id;
+
+}
+else {
+    $Ticket = LoadTicket($ARGS{'id'});
+
+    push @results, ProcessUpdateMessage(
+        ARGSRef   => \%ARGS,
+        TicketObj => $Ticket
+    );
+
+    my @cfupdates = ProcessObjectCustomFieldUpdates(Object => $Ticket, ARGSRef => \%ARGS);
+    push (@results, @cfupdates);
+
+    #Update the status
+    if (    ( defined $ARGS{'Status'} )
+        and $ARGS{'Status'}
+        and ( $ARGS{'Status'} ne $Ticket->Status ) )
+    {
+        my ($code, $msg) = $Ticket->SetStatus( $ARGS{'Status'} );
+        push @results, "$msg";
+    }
+
+}
+
+# This code does automatic redirection if any updates happen.
+
+unless ( $Ticket->CurrentUserHasRight('ShowTicket') ) {
+    Abort( loc("No permission to display that ticket") );
+}
+
+if ( $ARGS{'MarkAsSeen'} ) {
+    $Ticket->SetAttribute(
+        Name    => 'User-'. $Ticket->CurrentUser->id .'-SeenUpTo',
+        Content => $Ticket->LastUpdated,
+    );
+    push @results, loc('Marked all messages as seen');
+}
+
+MaybeRedirectForResults(
+    Actions   => \@results,
+    Path      => '/SelfService/Display.html',
+    Anchor    => $ARGS{'Anchor'},
+    Arguments => { 'id' => $Ticket->id },
+);
+
+my $LinkBasicsTitle = $Ticket->CurrentUserHasRight('ModifyTicket')
+                      || $Ticket->CurrentUserHasRight('ReplyToTicket');
+my $title_box_link = RT->Config->Get('WebPath')."/SelfService/Update.html?id=".$Ticket->Id;
+$m->callback(CallbackName => 'BeforeDisplay', Ticket => \$Ticket, ARGSRef => \%ARGS, title_box_link => \$title_box_link);
+</%INIT>
+
+
+<%ARGS>
+$id => undef
+</%ARGS>

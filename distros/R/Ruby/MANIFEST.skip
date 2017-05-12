@@ -1,0 +1,10 @@
+^blib
+\bCVS\b
+\.(?:o|obj|old|bak|def|bs|tar\.gz|out)$
+~$
+^Ruby\.c$
+^pm_to_blib$
+^Makefile$
+^test\.pl$
+^cover_db
+^META\.yml$

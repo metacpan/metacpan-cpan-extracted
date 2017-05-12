@@ -1,0 +1,190 @@
+Revision history for Perl extension Remedy::ARSTools.
+
+1.21	Fri Jan 15 10:56:23 CST 2016
+	when LoadARSConfig() detects a stale config (or missing schema) it will now MERGE the missing
+	data into the config file, rather than blow away the old one and replace it with a new one
+	containing only the missing data. To think I lived with so many unnecessary config loads
+	for all these years ... 
+	
+	necessity may be the mother of invention but irritation is surely the mother of innovation.
+
+1.20	Fri Sep 18 14:36:44 CDT 2015
+	ARSTools object now sets '_API_Message' attribute when non-fatal API messages
+	are received from the ARServer (you don't have to set the debug mode to see them now)
+
+1.19	Thu Sep 17 14:32:05 CDT 2015
+	added JoinFormPostSubmitQuery support to PushFields (so you can now PushFields onto a join form and not have to use
+	the automated query to find the thing you submitted).
+
+1.18	Mon Sep 29 10:23:48 CDT 2014
+	* fixed bug in ConvertFieldsToHumanReadable causing null enum field values to evaluate "0"
+
+1.17    Wed Aug 20 13:30:15 CDT 2014
+        * fixed bug in ConvertFieldsToHumanReadable causing null datetime, time_of_day and date values to be interpreted as "0"
+
+1.16    Tue Jul  1 14:48:35 CDT 2014
+        * fixed sort-order issue on CreateTicket where multiple results match the post-submit query for a 
+          join form (previous to 1.16 the sort order was not consistent).
+
+1.15    Fri May 30 11:41:50 CDT 2014
+            
+        * LoadARSConfig now captures "entry_mode" on field meta-data ("required", "optional", or "display-only")
+        * LoadARSConfig now checks loaded cache files for missing schemas specified on object instantiation and refreshes config from server
+        * CreateTicket (join form mode) now excludes display-only fields from post-submit query
+        * CreateTicket (join form mode) now interpolates "" as $NULL$ in post-submit query
+        * CreateTicket (join form mode) now allows override of auto-generated post-submit query qualification on JoinFormPostSubmitQuery option
+		
+1.14    Thu May 29 10:55:34 CDT 2014
+
+        * bolted 'AlternateSortOrder' onto PushFields
+
+1.13    Wed May 28 10:17:43 CDT 2014
+
+        * fixed bug on CreateTicket, obscuring ARS::ars_errstr on submit to join form where 
+          OverrideJoinSubmitQuery is set
+			  
+1.12    Tue May 27 10:04:08 CDT 2014
+
+        * added MatchAction => "Nothing" to PushFields
+
+1.11    Fri May 16 14:28:08 CDT 2014
+
+        * added PushFields function
+        * modified CreateTicket to deal with join forms
+        * TO-DO: update the test suite for these two thangs ...
+
+1.1     Mon May  5 11:18:28 CDT 2014
+
+        * fixed typo in CreateTicket sub causing misleading errstr when required options missing
+
+1.09    Tue Apr  8 08:31:29 CDT 2014
+
+        * fixed regex on line 512, preventing CheckFields properly dealing with already-epoch-encoded datetime values
+
+1.08    Wed Feb 26 13:45:57 CST 2014
+
+        * fixed inverted logic in CheckFields / TruncateOK, prevented field lengths from being truncated
+        * fixed error in CreateTicket causing CheckFields output to be returned instead of undef when CheckFields fails
+        * fixed CheckFields date & time_of_day conversions to not die on NULL field values
+                
+         adding this to the to-do list
+           
+        * CoalesceRecords  -> add two records together, spit out complete record with updates
+        * IntersectRecords -> take two records, spit out only the fields they have in common
+        * SubtractRecords  -> take two records, spit out only the fields that are different
+        * CompareRecord	   -> take two records, compare them. spit out a 1 if they're the same 0 if they're different
+
+1.07    Mon Jan 27 16:49:06 CST 2014
+        forgot to update dependencies in Makefile.PL to include Date::Parse and Time::Interval
+
+1.06    Mon Jan 27 11:23:05 CST 2014
+
+        * added automatic date, datetime & time_of_day string<->integer conversions on 
+          CreateTicket, ModifyTicket, MergeTicket and Query
+        * added ImportDefinition
+        * added 'dataType' to cache field datastructure
+        * added '__Remedy_ARSTools_Version' to cache datastructure
+        * added automatic rebuild of cache for upgraded Remedy::ARSTools version
+        * enhanced non-sequential custom enum decoding / encoding
+        * added user-definable GMT offset for date/time conversions
+        * enhanced ParseDBDiary to use datetime conversions
+        * added EncodeDBDiary
+        * added automatic diary datastructure -> string encoding for MergeTickets
+        * added ExportDefinition
+        * added TunnelSQL
+        * added DeleteObjectFromServer
+        * added more complete test suite w/optional test form import
+            
+        some things on my to-do list:
+                  
+            * FindFilterInGuides
+              find all the filter guides containing the specified filter name
+              
+            * FindActiveLinkInGuides
+              find all the active link guides containing the specified active link name
+              
+            * some kinda hack to make CreateTicket not return undef every time you create a ticket on a join form
+              though presently I'm stumped. Querying by $LASTID$ in that scenario actually core dumped my 8.1 test arserver.
+              suggestions welcome.
+			  
+1.05    Tue Jun 12 23:30:02 GMT 2012
+        fixed bug in CheckFields causing enums to return null value match
+                
+1.04    Sat Apr 28 00:46:04 GMT 2012
+        fixed CheckFields bug preventing ModifyTicket from setting a null value on an enum field.
+        fixed the hacky duct-tape that was the 1.03 implementation of custom enum value lists with 
+        the help mister John Zhang <jzhang@silverspringnet.com>. Thanks, man!
+
+1.031   Sat Apr 28 00:46:04 GMT 2012
+        fixed CheckFields bug preventing ModifyTicket from setting a null value on an enum field.
+
+1.03    Fri Mar 23 16:49:48 EDT 2012
+        LoadARSConfig now supports enums with custom value lists
+
+1.02    Mon Nov 14 18:19:17 EST 2011
+        added Merge function
+
+1.01	Mon Jul 20 20:12:36 CDT 2009
+	fixed problem with matching ARSPerl version number
+
+1.0	Mon Nov 13 20:59:52 GMT 2006
+	complete re-write. should work for all versions of ARSperl.
+	a lot of things changed, a lot of things stayed the same.
+	
+		- now works without a config file (but faster WITH one)
+		- reloads field definition data when missing config data
+		- automatically reconnects on ARERR161 type errors
+		- converts strings to integers for enum fields
+		- removed snarky comments
+		- rewrote documentation, removed even more snarky comments
+		- removed 'timeout' option
+		
+0.92	Tue Oct 17 21:45:35 GMT 2006
+        added 'timeout' option. If set, the control structure is reloaded if last access 
+	was more than that long ago
+	goddam this module needs a rewrite like a new set of drawers. it's FUNKY in there! ;-)
+
+0.91	Tue Mar 21 16:16:25 GMT 2006	
+	modified checkFieldLengths to accept blessed references on the Fields argument.
+
+0.9	Fri Jul  9 09:46:50 EDT 2004
+	well crap! 0.6 says I added truncate, but damn if I can find it in the code
+	now ... added the TruncateOK => 1 option to CheckFieldLengths that will 
+	truncate long fields. CreateTicket and ModifyTicket will pass this option
+	allong to CheckFieldLengths.
+
+0.8	01/30/04 16:12:02
+	still carrying all the "things to do"
+	CreateTicket now spews field value submissions in Debug mode
+
+0.7 	05/12/03 21:50:47
+	now exports procedural methods to calling namespace
+	nothing else added/changed, so considder all the "things to do" 
+        from .06 be the things to do for .08
+	procrastination is the mother of intervention.
+
+0.6	05/05/03 21:50:35
+	added TruncateFieldLengths, and Truncate support to CreateTicket and ModifyTicket.
+	Pod updated to reflect new options to CreateTicket and ModifyTicket.
+	-Things To Do for 0.7:
+		add docs to pod for actual TruncateFieldLengths method
+		add better port switching via: ars_SetServerPort(ctrl, serverName, TCPport, RPCnumber)
+		add the self-healing config
+		legit test suite
+		switch GenerateARSConfig to _GenerateARSConfig (fix autosplit problem)
+	
+0.5 	Wed 10/30/02 11:27:02
+	initial release to CPAN under Remedy::ARSTools namespace
+	added ParseDiay
+    	added ParseDBDiary
+	added support for auto-generating config files at object creation
+	added support for auto-regenerating config files when fields not found
+	modified RefreshConfig
+	added GenerateConfig
+	added GenerateARSConfig
+	added GetFieldData
+	-Still To Do:
+	'AutoConfig' automatically refresh ConfigFile upon field data exceptions
+	Write Test Suite.
+	Make complains about GenerateConfig and GenerateARSConfig: that they are
+	not unique when truncated to 8 chars. Fix in next release.

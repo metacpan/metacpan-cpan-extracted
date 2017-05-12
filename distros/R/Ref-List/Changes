@@ -1,0 +1,12 @@
+Revision history for Ref-List
+
+0.02    1 April 2011
+        Reference perl 5.14's value function in docs
+        Remove world-writable dirs
+        Remove tabs
+        Remove dos line endings
+        More tests in dist.ini
+        Add weaver.ini
+
+0.01    14 July 2010
+        Initial release

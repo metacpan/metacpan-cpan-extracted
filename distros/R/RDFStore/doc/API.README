@@ -1,0 +1,114 @@
+=head1 LICENSE
+
+
+ # *
+ # *     Copyright (c) 2000-2006 Alberto Reggiori <areggiori@webweaving.org>
+ # *                        Dirk-Willem van Gulik <dirkx@webweaving.org>
+ # *
+ # * NOTICE
+ # *
+ # * This product is distributed under a BSD/ASF like license as described in the 'LICENSE'
+ # * file you should have received together with this source code. If you did not get a
+ # * a copy of such a license agreement you can pick up one at:
+ # *
+ # *     http://rdfstore.sourceforge.net/LICENSE
+ # *
+
+
+=head1 NAME
+
+RDFStore - This is a set of Perl modules that implement an object-based DBMS and API to manipulate RDF models
+
+=head1 DESCRIPTION
+
+RDFStore is a set of Perl modules to manage Resource Description Framework (RDF) model databases in a easy and straightforward way. The software started as a pure Perl implementation of the Draft Java API (see http://www-db.stanford.edu/~melnik/rdf/api.html) from the Stanford University DataBase Group by Sergey Melnik.  A set of companion modules RDFStore::Parser::SiRPAC(3) RDFStore::Parser::OpenHealth(3) and Data::MagicTie(3) the suite allow a user to fetch, parse, process, store and query RDF models.
+
+=head1 Toolkit package organisation
+
+Modules like RDFStore::Stanford::RDFNode, RDFStore::Stanford::Literal, RDFStore::Stanford::Resource, RDFStore::Stanford::Model and define a set of "O-O interfaces" implemented by concrete counterparts such as RDFStore::RDFNode, RDFStore:::Literal, RDFStore::Resource, RDFStore::Model. The modules defined by RDFStore correspond to the Java org.w3c.rdf.model, org.w3c.rdf.util, org.w3c.rdf.implementation.model, edu.stanford.db.rdf.model.i, org.w3c.tools.crypt, edu.stanford.db.rdf.schema, edu.stanford.db.rdf.vocabulary, org.w3c.rdf.vocabulary.rdf_syntax_19990222, org.w3c.rdf.vocabulary.rdf_schema_19990303, org.w3c.rdf.vocabulary.dublin_core_1999070 packages defined by Sergey Melnik; the Perl code has been structured as follow:
+
+
+-----------------------------------------------------------------------------------------------
+	Perl packages 		                Java classes
+-----------------------------------------------------------------------------------------------
+RDFStore::Stanford::*                           org.w3c.rdf.model
+-----------------------------------------------------------------------------------------------
+RDFStore::Stanford::Model                       org.w3c.rdf.model.Model
+RDFStore::Stanford::Literal                     org.w3c.rdf.model.Literal
+RDFStore::Stanford::RDFNode                     org.w3c.rdf.model.RDFNode
+RDFStore::Stanford::Resource                    org.w3c.rdf.model.Resource
+RDFStore::Stanford::Statement                   org.w3c.rdf.model.Statement
+RDFStore::Stanford::NodeFactory                 org.w3c.rdf.model.NodeFactory
+RDFStore::Stanford::VirtualModel                org.w3c.rdf.model.VirtualModel
+RDFStore::Stanford::SetModel                    org.w3c.rdf.model.SetModel
+
+
+-----------------------------------------------------------------------------------------------
+RDFStore::Stanford::Digest::*                   org.w3c.rdf.util,org.w3c.tools.crypt
+-----------------------------------------------------------------------------------------------
+RDFStore::Stanford::Digest                      org.w3c.rdf.digest.Digest
+RDFStore::Stanford::Digest::Util                org.w3c.rdf.digest.DigestUtil
+RDFStore::Stanford::Digest::AbstractDigest      org.w3c.rdf.digest.DigestUtil
+RDFStore::Stanford::Digest::GenericDigest       org.w3c.rdf.digest.DigestUtil
+RDFStore::Stanford::Digest::MD5                 org.w3c.rdf.digest.DigestUtil
+RDFStore::Stanford::Digest::SHA1                org.w3c.rdf.digest.DigestUtil
+
+
+-----------------------------------------------------------------------------------------------
+RDFStore::*                                     edu.stanford.db.rdf.model.i
+                                                org.w3c.rdf.implementation.model
+                                                edu.stanford.db.rdf.schema
+-----------------------------------------------------------------------------------------------
+RDFStore::Model			                edu.stanford.db.rdf.model.i.ModelImpl
+RDFStore::Literal		                edu.stanford.db.rdf.model.i.LiteralImpl
+RDFStore::RDFNode		                edu.stanford.db.rdf.model.i.RDFNodeImpl
+RDFStore::Resource		                edu.stanford.db.rdf.model.i.ResourceImpl
+RDFStore::Statement		                edu.stanford.db.rdf.model.i.StatementImpl
+RDFStore::NodeFactory		                edu.stanford.db.rdf.model.i.NodeFactoryImpl
+RDFStore::VirtualModel		                org.w3c.rdf.implementation.model.VirtualModel
+RDFStore::SetModel		                org.w3c.rdf.implementation.model.SetModel
+RDFStore::SchemaModel		                edu.stanford.db.rdf.schema.RDFSchemaModel
+
+-----------------------------------------------------------------------------------------------
+RDFStore::Stanford::Vocabulary::*               edu.stanford.db.rdf.vocabulary
+-----------------------------------------------------------------------------------------------
+RDFStore::Stanford::Vocabulary::Generator       edu.stanford.db.rdf.vocabulary.Generator
+
+-----------------------------------------------------------------------------------------------
+Other classes
+-----------------------------------------------------------------------------------------------
+RDFStore::Vocabulary::RDF			org.w3c.rdf.vocabulary.rdf_syntax_19990222.RDF
+RDFStore::Vocabulary::RDFS			org.w3c.rdf.vocabulary.rdf_schema_19990303.RDFS
+RDFStore::Vocabulary::DC			org.w3c.rdf.vocabulary.dublin_core_19990702.DC
+RDFStore::Vocabulary::DAML			edu.stanford.db.rdf.vocabulary.daml_o_20001011.DAML_O
+
+The Perl RDF API implementation is almost aligned with the Java one. In the RDFStore branch the modules code has been extended and modified to use the Data::MagicTie(3) interface and a different B<indexing model> for RDFStore::Model(3). Similarly the RDFStore::Stanford::Vocabulary::Generator(3) now generates valid Perl5 modules containing constants definitions of input RDF Schema.
+
+For the whole API documentation you can temporarly refer to the JavaDoc version at http://www-db.stanford.edu/~melnik/rdf/api-doc/
+
+In addition I invite you to look at the samples and utils directory coming with the RDFStore distribution for a fruitful set of examples to play with :-)
+
+=head1 BUGS
+
+This module implements most of the classes and packages as its Java counterpart, but some feature have been missied on purposed or just forgotten ;-)
+This RDFStore version is aligned with the latest changes from current revision: 2001-01-19 of Stanford Java API.
+
+Not supported:
+
+	* order/backorder experimental from Sergey Melnik
+
+=head1 SEE ALSO
+
+ RDFStore::Parser::SiRPAC(3), DBMS(3) and XML::Parser(3) XML::Parser::Expat(3)
+RDFStore::Stanford::Model(3) RDFStore::NodeFactory(3)
+Summary of Recent Discussions about an Application Programming Interface for RDF - http://nestroy.wi-inf.uni-essen.de/rdf/sum_rdf_api/
+RDF Model and Syntax Specification - http://www.w3.org/TR/REC-rdf-syntax
+RDF Schema Specification 1.0 - http://www.w3.org/TR/2000/CR-rdf-schema-20000327
+Statements/Statings - http://ilrt.org/discovery/2000/11/statements/
+
+=head1 AUTHOR
+
+	Alberto Reggiori <areggiori@webweaving.org>
+	Dirk-Willem van Gulik <dirkx@webweaving.org>
+
+	Sergey Melnik <melnik@db.stanford.edu> is the original author of the Java RDF API - txs Sergey!

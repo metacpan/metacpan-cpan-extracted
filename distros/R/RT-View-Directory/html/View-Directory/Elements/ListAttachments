@@ -1,0 +1,117 @@
+<%args>
+$Query => undef
+$OrderBy => 'id'
+$Order => 'asc'
+$Ticket => undef
+$Filename => undef
+$OrderAttachmentsBy => undef
+$AttachmentOrder => undef
+</%args>
+<%init>
+
+my $default_args = join(';', "Order=$Order", "OrderBy=$OrderBy", "Query=$Query");
+
+
+
+#A default implementation here loops through all transactions and pulls out all their attachments.
+# We end up doing an end-run around that to get a bit more performance
+
+# We force the cache of ticket transactions to get populated up front. otherwise, the
+# code that looks at attachments will look at each one in turn.
+my $attachments = RT::Attachments->new( $session{'CurrentUser'} );
+
+$attachments->Columns(
+    qw( Id Filename ContentType Headers Subject 
+        Parent ContentEncoding ContentType TransactionId Created)
+);
+
+my $transactions = $attachments->NewAlias('Transactions');
+$attachments->Join(
+    ALIAS1 => 'main',
+    FIELD1 => 'TransactionId',
+    ALIAS2 => $transactions,
+    FIELD2 => 'id'
+);
+
+my $Tickets = $attachments->NewAlias('Tickets');
+
+$attachments->Join(
+    ALIAS1 => $transactions,
+    FIELD1 => 'ObjectId',
+    ALIAS2 => $Tickets,
+    FIELD2 => 'id'
+);
+
+$attachments->Limit( ALIAS => $transactions, FIELD => 'ObjectType', VALUE => 'RT::Ticket');
+$attachments->Limit( ALIAS => $Tickets, FIELD => 'EffectiveId', VALUE => $Ticket->id());
+
+$attachments->Limit( FIELD => 'Filename', VALUE => $Filename) if ($Filename);
+
+my @documents;
+while ( my $attach = $attachments->Next() ) {
+    next unless ( $attach->Filename() );
+
+    unshift( @documents , $attach );
+}
+
+my @headers = qw(Created Creator Size);
+if (not $Filename) {
+    unshift @headers, 'Filename';
+}
+
+    if ($OrderAttachmentsBy eq 'Creator') {
+        @documents = sort { $a->CreatorObj->Name cmp $b->CreatorObj->Name     } @documents;    
+    }
+    elsif ($OrderAttachmentsBy eq 'Created') {
+        @documents = sort { $a->CreatedObj->Unix <=> $b->CreatedObj->Unix     } @documents;
+    }
+    elsif ($OrderAttachmentsBy eq 'Size') {
+        @documents = sort { $a->ContentLength <=> $b->ContentLength     } @documents;
+    }
+    elsif ($OrderAttachmentsBy eq 'Filename') {
+        @documents = sort { $a->Filename <=> $b->Filename     } @documents;
+    }
+
+    if ($AttachmentOrder eq 'DESC') {
+        @documents = reverse @documents; 
+    }
+
+</%init>
+
+
+
+
+<table width="100%" cellspacing="0">
+<tr>
+% my $filename ='';
+% $filename = "/File/$Filename" if ($Filename);
+% foreach my $header (@headers) {
+% my $header_args = $default_args .';'.join(';', "OrderAttachmentsBy=$header", "AttachmentOrder=".($AttachmentOrder eq 'ASC' ? 'DESC' :'ASC'));
+<th><a href="<%$RT::WebPath%>/View-Directory/Ticket/<%$Ticket->id%><%$filename%>?<%$header_args|n%>"><%$header%></a></th>
+% }
+</tr>
+%my $i = 0;
+% foreach my $rev (@documents) {
+% $i++;
+<%PERL>
+my $size = $rev->ContentLength;
+
+if ($size) {
+    if ($size > 1024) { $size = int($size/102.4)/10 . "k"; }
+    else { $size = $size ."b"; }
+}
+</%PERL>
+<tr class="<%$i%2 ? 'oddline' : 'evenline' |n%>">
+% if (not $Filename) {
+    <td><%$rev->Filename%><a href="<%$Ticket->id%>/File/<%$rev->Filename%>?<%$default_args|n%>">(Show only this file)</a></td>
+% }
+<td>
+<%$rev->CreatedAsString%> 
+<a href="<%$RT::WebPath%>/Ticket/Attachment/<%$rev->TransactionId%>/<%$rev->Id%>/<%$rev->Filename | u%>?<%$default_args|n%>">
+(Download this version)</a></td>
+<td><%$rev->CreatorObj->Name%></td>
+<td><%$size%></td>
+</td>
+
+% }
+</table>

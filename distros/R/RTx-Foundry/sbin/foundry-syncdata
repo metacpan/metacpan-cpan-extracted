@@ -1,0 +1,154 @@
+#!/usr/local/bin/perl
+# $File: //depot/RT/osf/sbin/foundry-syncdata $ $Author: autrijus $
+# $Revision: #11 $ $Change: 10131 $ $DateTime: 2004/02/18 08:48:36 $
+
+use strict;
+use FindBin;
+use DBI;
+use File::Copy;
+use File::Path;
+use Proc::PID_File;
+
+eval {
+
+my $tmp = File::Spec->tmpdir.'/foundry';
+mkpath([$tmp], 0, 0755) unless -d $tmp;
+my $lock_file = "$tmp/syncdata.lock";
+exit if hold_pid_file($lock_file);
+
+eval { require "$FindBin::Bin/../etc/foundry.conf" };
+eval { require "$FindBin::Bin/../etc/Foundry/foundry.conf" };
+
+my ($svn_base) = grep { defined and -d } (
+    $ENV{SVNROOT}, 
+    '/home/svn',
+    '/home/svn-repositories',
+) or die "Cannot find SVNROOT";
+my ($cvs_base) = grep { defined and -d } (
+    $ENV{CVSROOT},
+    '/home/cvs',
+    '/usr/depot/cvsrepo'
+) or die "Cannot find CVSROOT";
+
+$svn_base .= "/foundry-repos";
+$cvs_base .= "/foundry-repos";
+
+my $rt_dsn = $ENV{RT_DSN} || join(';',
+    "dbi:$ENV{DB_TYPE}:dbname=rt3",
+    map { $ENV{"DB_$_"} ? qq(\L$_\E=$ENV{"DB_$_"}) : () }
+	qw(SID HOST PORT REQUIRESSL),
+);
+my $cvs_user = $ENV{CVSUSER} || 'cvs';
+my $cvs_group = $ENV{CVSGROUP} || 'cvs';
+my $cvs_uid = (getpwnam($cvs_user))[2] or die "Cannot find user $cvs_user";
+my $dbh = DBI->connect($rt_dsn, $ENV{DB_DBA_USER}, $ENV{DB_DBA_PASSWORD}) or exit;
+
+mkpath([$svn_base], 0, 0755) unless -d $svn_base;
+
+my $commitcheck = "$FindBin::Bin/foundry-cvs-commitcheck";
+my $start_commit = "$FindBin::Bin/foundry-svn-start-commit";
+my $pre_revprop_change = "$FindBin::Bin/foundry-svn-pre-revprop-change";
+
+#
+# this block build the CVS Repostiory, run only once 
+#  XXX should it be set in the setup procedure
+#
+unless (-d $cvs_base) {
+    mkpath([$cvs_base], 0, 0755);
+    system(qw( cvs -d ), $cvs_base, 'init');
+
+    my $_commitcheck = "$cvs_base/CVSROOT/commitcheck";
+    my $_commitinfo = "$cvs_base/CVSROOT/commitinfo";
+    open my $fh, ">", $_commitcheck or die $!;
+    print $fh "#!/bin/sh\n";
+    print $fh "exec $commitcheck \$\@\n";
+    close $fh;
+    chmod(0755, $_commitcheck);
+    open $fh, ">>", $_commitinfo or die $!;
+    print $fh "ALL     \$CVSROOT/CVSROOT/commitcheck\n";
+    close $fh;
+    system(qw( chown -R ), "$cvs_user:$cvs_group", $cvs_base);
+}
+
+#
+# The following block get user id from database
+#
+my $users = $dbh->selectcol_arrayref(q{
+    SELECT Users.Name
+      FROM Users, GroupMembers
+     WHERE Users.Password != '*NO-PASSWORD*'
+       AND Users.Id = GroupMembers.MemberId
+  GROUP BY Users.Name;
+});
+
+foreach my $name (@{$users||[]}) {
+    next if defined getpwnam($name);
+    system(
+	'pw',
+	useradd => $name,
+	-h	=> '-',
+	-s	=> '/bin/sh',
+	-d	=> $cvs_base,
+	-u	=> $cvs_uid,
+	-g	=> $cvs_group,
+	-o	=> ()
+    );
+}
+
+#
+# The following block get project id from database
+#
+my $projects = $dbh->selectcol_arrayref(q{
+    SELECT TicketCustomFieldValues.Content
+      FROM TicketCustomFieldValues, Queues, CustomFields
+     WHERE TicketCustomFieldValues.Ticket = Queues.DefaultDueIn
+       AND Queues.Disabled = 0
+       AND TicketCustomFieldValues.CustomField = CustomFields.Id
+       AND CustomFields.Name = 'UnixName'
+  GROUP BY TicketCustomFieldValues.Content
+});
+
+#
+# The following block setup svn repository hooks
+#
+foreach my $name (@{$projects||[]}) {
+    $name = lc($name);
+    $name =~ /^[a-z][0-9a-z]{2,14}$/ or exit;
+
+    my $cvs_name = "$cvs_base/$name";
+    my $svn_name = "$svn_base/$name";
+
+    mkdir $cvs_name unless -d $cvs_name;
+    chmod(0777, $cvs_name);
+
+    system("svnadmin", "create", $svn_name) unless -d $svn_name;
+    
+    my $_start_commit = "$svn_name/hooks/start-commit";
+    my $_pre_revprop_change = "$svn_name/hooks/pre-revprop-change";
+
+    if (!-s $_start_commit) {
+	unlink $_start_commit if -e $_start_commit;
+	symlink($start_commit => $_start_commit);
+    }
+    if (!-s $_pre_revprop_change) {
+	unlink $_pre_revprop_change if -e $_pre_revprop_change;
+	symlink($pre_revprop_change => $_pre_revprop_change);
+    }
+}
+
+$dbh->disconnect;
+
+# END of EVAL{} block
+
+};
+
+#
+# exec myself, take care the PID file
+#
+if (my $interval = shift) {
+    warn $@ if $@;
+    $interval = 1 if $interval < 1;
+    sleep $interval;
+    exec($^X, $0, $interval);
+}
+die $@ if $@;

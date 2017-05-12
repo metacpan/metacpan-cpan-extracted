@@ -1,0 +1,15 @@
+Since 1.03
+
+	Fixed bug in edit(): second else clause ought to be elsif.
+	Fixed bug in DESTROY(): _SAFE renamed as Safe.
+
+Since 1.02
+
+	Fixed a bug in load(), that caused modified "resources.*" resources
+	not to be updated.
+
+	Fixed EXAMPLE section in the POD doc.
+
+Since 1.01b
+
+	Improved inheritance syntax and documentation.

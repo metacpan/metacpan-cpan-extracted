@@ -1,0 +1,15 @@
+<%init>
+my $queue_obj = RT::Queue->new( $session{'CurrentUser'} );
+$queue_obj->Load($queue_id);
+
+if ( $queue_obj and $queue_obj->id and $queue_obj->CurrentUserHasRight('AdminQueue') ) {
+    $page_menu->child('history')->add_after( announcesimple =>
+        title => loc('Announce'),
+        path  => '/Admin/Queues/AnnounceSimple.html?id=' . $queue_id,
+    );
+}
+</%init>
+<%args>
+$queue_id
+$page_menu
+</%args>

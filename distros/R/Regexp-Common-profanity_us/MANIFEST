@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Regexp/Common/profanity_us.pm
+lib/Regexp/Profanity/US.pm
+profile.ini
+test.pl
+wertyderds.el
+wertyderds.txt

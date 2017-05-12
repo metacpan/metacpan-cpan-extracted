@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+# $Id$
+
+use strict;
+use warnings;
+use Regexp::Log::DateRange;
+use Getopt::Long;
+
+my (@files, @filters);
+
+my %months = (
+	jan => 1,
+	feb => 2,
+	mar => 3,
+	apr => 4,
+	may => 5,
+	jun => 6,
+	jul => 7,
+	aug => 8,
+	sep => 9,
+	oct => 10,
+	nov => 11,
+	dec => 12,
+);
+
+my %options = (
+	help  => 0,
+	debug  => 0,
+);
+		
+GetOptions(\%options,
+	"help|?",
+	"debug",
+	"from|f=s",
+	"to|t=s",
+);
+
+if ( @ARGV) {
+	@files = @ARGV;
+} elsif ( not -t STDIN) {
+	@files = ('-')
+}
+
+print <<USAGE and exit if $options{help} or !@files;
+
+greplog - filter log entries by time scope
+
+format:
+   $0 [options] [list of files]
+
+options:
+   --help     - print options
+   --debug    - be verbose
+   --from     - beginning of time scope 
+   --to       - end of time scope 
+
+time scopes are in MMM/DD[/HH:MM] format
+
+example:
+   $0 --from jul/19 --to jul/20/10:00
+
+USAGE
+	
+if ( exists $options{from} or exists $options{to}) {
+	push @filters, parse_time2( 
+		exists ($options{from}) ? $options{from} : 'Jan/1',
+		exists ($options{to}) ? $options{to} : 'Dec/31',
+	);
+}
+
+sub parse_time2
+{
+	my ( $t1, $t2) = @_;
+
+	die "Invalid time `$t1', must be in format 'MMM/DD/[HH:MM]\n" if
+		$t1 !~ m/^(\w{3})\/(\d{1,2})(?:\/(\d{1,2})\:(\d{1,2}))?$/ or
+		!exists $months{lc($1)} or
+		$2 > 31 or
+		( defined($3) and $3 > 23) or
+		( defined($4) and $4 > 59); 
+	my @d1 = ( $months{lc $1}, $2, defined($3) ? $3 : 0, defined($4) ? $4 : 0);
+
+	die "Invalid time `$t2', must be in format 'MMM/DD/[HH:MM]\n" if
+		$t2 !~ m/^(\w{3})\/(\d{1,2})(?:\/(\d{1,2})\:(\d{1,2}))?$/ or
+		!exists $months{lc($1)} or
+		$2 > 31 or
+		( defined($3) and $3 > 23) or
+		( defined($4) and $4 > 59); 
+	my @d2 = ( $months{lc $1}, $2, defined($3) ? $3 : 23, defined($4) ? $4 : 59);
+
+	my $rx = '^' . Regexp::Log::DateRange-> new( 'syslog', \@d1, \@d2);
+	
+	print "parse_time($t1,$t2) => $rx\n" if $options{debug};
+
+	return [ qr/$rx/i, 0 ];
+}
+
+sub parse_time
+{
+	my ( $t, $d) = @_;
+
+	return $d ? parse_time2( 'Jan/1', $t) : parse_time2( $t, 'Dec/31');
+}
+
+
+# read logs from one or more files, including stdin, print out filtered lines
+for my $file ( @files) {
+	if ( $file ne '-') {
+		open F, "< $file" or die "Cannot read $file:$!\n";
+	} else {
+		*F = \*STDIN;
+	}
+	NEXTLINE: while (<F>) {
+		for my $rx ( @filters) {
+			my $ret = ( $_ =~ /$rx->[0]/) ? 1 : 0;
+			if ( $rx->[1]) {
+				next unless $ret;
+				last;
+			} else {
+				next NEXTLINE unless $ret;
+			}
+		}
+		print;
+	}
+	close F;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+greplog - filter log entries by time scope
+
+=head1 COPYRIGHT
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Dmitry Karasik <dmitry@karasik.eu.org>
+
+=cut

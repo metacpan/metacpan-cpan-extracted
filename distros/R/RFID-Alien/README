@@ -1,0 +1,15 @@
+# Written by Scott Gifford <gifford@umich.edu>
+# Copyright (C) 2004-2006 The Regents of the University of Michigan.
+# See the file LICENSE included with the distribution for license
+# information.
+
+The modules under RFID::Alien provide access to the Alien RFID reader,
+by implementing the host/reader communication protocol.
+
+See the perldoc for RFID::Alien::Reader for an overview, and the
+file alien.pl for some sample code.
+
+See the rfid-perl Web page for other information, and instructions for
+subscribing to the mailing list:
+
+    http://whereabouts.eecs.umich.edu/code/rfid-perl/

@@ -1,0 +1,32 @@
+RTSP-Client
+=======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Moose, RTSP::Lite
+ 
+TESTS
+
+   To run some tests against a real live RTSP server:
+   RTSP_CLIENT_TEST_URI="rtsp://10.0.1.105:554/mpeg4/media.amp" perl -Ilib t/RTSP-Client.t
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Mischa Spiegelmock
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

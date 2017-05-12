@@ -1,0 +1,33 @@
+<%init>
+
+my %orig =
+  map { $_ => 1 } (
+    ref $ARGSRef->{Attached}
+    ? @{ $ARGSRef->{Attached} }
+    : $ARGSRef->{Attached} || (),
+  );
+
+my %current = map { $_ => 1 } keys %{ $session{'Attachments'} || {} };
+
+my @added = grep { !$orig{$_} } keys %current;
+my @removed = grep { !$current{$_} } keys %orig;
+
+if (@added || @removed) {
+    $m->notes( 'attachment_warning', 1 );
+    if (@added) {
+        push @$results,
+          loc( "Attachments leaked in from another tab!  Please examine and remove before continuing: [_1]", join ', ', @added );
+    }
+    if (@removed) {
+        push @$results,
+          loc( "Attachments vanished to another tab!  Please examine and re-attach before continuing: [_1]", join ', ', @removed );
+    }
+}
+
+
+</%init>
+
+<%args>
+$results
+$ARGSRef
+</%args>

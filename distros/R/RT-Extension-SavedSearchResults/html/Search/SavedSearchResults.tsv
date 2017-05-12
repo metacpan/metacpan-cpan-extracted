@@ -1,0 +1,21 @@
+<%ARGS>
+    $SavedSearchId => undef
+</%ARGS>
+<%INIT>
+    # Load SavedSearch and pass through to Results.tsv
+    use URI::Escape qw/uri_escape uri_unescape/;
+    my %data;
+    if ( $SavedSearchId ) {
+       
+        # RT::User-1-SavedSearch-8
+        $SavedSearchId = uri_unescape( $SavedSearchId );
+
+        if ($SavedSearchId =~ m/^((?:.*-)?(\d+))$/) {
+            my $id = $2;
+            my $search = RT::Attribute->new( $session{'CurrentUser'} );
+            my ($ok, $msg) = $search->Load($id);
+            %data = %{$search->Content} if $ok;
+        }
+    }
+    $m->comp('/Search/Results.tsv', %data);
+</%INIT>

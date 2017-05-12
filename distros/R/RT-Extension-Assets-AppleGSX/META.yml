@@ -1,0 +1,29 @@
+---
+abstract: 'RT Extension-Assets-AppleGSX Extension'
+author:
+  - 'sunnavy <sunnavy@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gplv2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-Assets-AppleGSX
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+requires:
+  Class::Accessor::Fast: 0
+  LWP::UserAgent: 0
+  XML::SAX: 0
+  XML::Simple: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 1.0

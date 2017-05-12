@@ -1,0 +1,50 @@
+%# If life is a stage, I want some better lighting.
+
+% if ($OK) {
+<&|/l&>You are now being sent a confirmation email to reset your password.</&>
+%    return;
+% }
+
+% $m->print($out);
+
+<%INIT>
+my $QueueObj = RT::Queue->new($session{CurrentUser});
+$QueueObj->Load('LostPassword') or die "Can't load LostPassword queue";
+my $name_id = $QueueObj->CustomField('Name')->Id or die "Can't find field 'Name'";
+my $email_id = $QueueObj->CustomField('Email')->Id or die "Can't find field 'Email'";
+
+my $Name = $ARGS{"CustomField-$name_id-Values"};
+my $Email = $ARGS{"CustomField-$email_id-Values"};
+my $OK;
+
+if ( exists $ARGS{'Subject'} ) {
+    if (!length($Name) or !length($Email)) {
+	$Error = loc( "No user or email address specified" );
+    }
+    else {
+	my $Users = RT::Users->new($RT::SystemUser);
+	$Users->Limit( FIELD => 'Name', VALUE => $Name );
+	$Users->LimitToEmail( $Email );
+	$Error = loc( "No users matching search criteria found." ) unless $Users->Count;
+    }
+    $OK = !$Error;
+}
+
+my $out = $m->scomp(
+    '/Work/Tickets/Create.html',
+    Queue => 'LostPassword',
+    NoUI => 1,
+    Loc => 1,
+    Subject => 'Password Reminder',
+    NoCF => { Notes => 1, Attachments => 1 },
+    ($Error ? () : %ARGS, Requestors => $Email),
+);
+
+$m->notes( error => $Error );
+</%INIT>
+<%ATTR>
+Tab2	=> 'Password Reminder'
+</%ATTR>
+<%ARGS>
+$Error => undef
+</%ARGS>

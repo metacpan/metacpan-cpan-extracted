@@ -1,0 +1,33 @@
+SYNOPSIS
+
+     {
+         local @INC = (Require::Hook::Noop->new( modules => [qw/Foo::Bar Qux/] ));
+         require Foo::Bar; # will be no-op'ed
+         require Baz;      # will be loaded
+         # ...
+     }
+
+DESCRIPTION
+
+    This is a Require::Hook version of lib::noop.
+
+METHODS
+
+ new([ %args ]) => obj
+
+    Constructor. Known arguments:
+
+      * modules => array
+
+      Module names to no-op, e.g. ["Mod::SubMod", "Mod2"].
+
+      * debug => bool
+
+      If set to true, will print debug statements to STDERR.
+
+SEE ALSO
+
+    lib::noop
+
+    Other Require::Hook::* modules.
+

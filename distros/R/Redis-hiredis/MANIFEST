@@ -1,0 +1,35 @@
+Changes
+COPYRIGHT
+hiredis-COPYRIGHT
+Makefile.PL
+MANIFEST
+ppport.h
+README
+async.c
+async.h
+dict.c
+dict.h
+fmacros.h
+hiredis.c
+hiredis.h
+net.c
+net.h
+sds.c
+sds.h
+t/001_strings.t
+t/002_generic.t
+t/003_lists.t
+t/004_sets.t
+t/005_zsets.t
+t/006_hashes.t
+t/007_transactions.t
+t/008_pipeline.t
+t/009_errors.t
+t/010_argv.t
+t/011_autoload.t
+t/012_connect_unix.t
+lib/Redis/hiredis.pm
+Redis-hiredis.xs
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

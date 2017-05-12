@@ -1,0 +1,36 @@
+Remind::Parser
+==============
+
+Parse the output of remind(1).
+
+See the module documentation for more information.
+
+
+INSTALLATION
+------------
+
+Installation requires Module::Build.
+
+To install this module, type the following:
+
+   perl Build.PL
+   ./build
+   ./build test
+   ./build install
+
+
+DEPENDENCIES
+------------
+
+Date::DayOfWeek
+YAML (optional)
+
+
+COPYRIGHT
+---------
+
+Copyright 2007-2009 Paul M. Hoffman <nkuitse AT cpan DOT org>.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

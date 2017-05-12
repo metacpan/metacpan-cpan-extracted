@@ -1,0 +1,154 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use JSON qw/to_json/;
+use Plack::Util;
+use Pod::Usage;
+use Term::ANSIColor;
+use YAML qw/Dump/;
+
+use Raisin;
+
+binmode STDOUT, ":encoding(UTF-8)";
+
+my ($show_help, $show_version, $show_params,
+    $show_openapi_spec, $show_openapi_spec_format);
+
+GetOptions(
+    'help'     => \$show_help,
+    'version'  => \$show_version,
+    'params'   => \$show_params,
+    'openapi'  => \$show_openapi_spec,
+    'format=s' => \$show_openapi_spec_format,
+);
+
+my $file = $ARGV[0] || do { $show_help = 1; '' };
+
+if ($show_version) {
+    print "Raisin $Raisin::VERSION\n";
+}
+elsif ($show_help) {
+    pod2usage(1);
+}
+elsif ($show_params) {
+    print_routes(with_params => $show_params);
+}
+elsif ($show_openapi_spec) {
+    print_openapi_spec();
+}
+
+exit 0;
+
+### ###
+
+sub print_openapi_spec {
+    if (!$file || !-e $file) {
+        print "$0: file `$file` doesn't exist\n";
+        exit;
+    }
+
+    my $spec;
+    {
+        no warnings 'redefine';
+        *Raisin::run = sub {
+            my $self = shift;
+
+            my %env = (
+                'psgi.url_scheme' => 'http',
+                PATH_INFO       => '/',
+                QUERY_STRING    => '',
+                REQUEST_METHOD  => 'GET',
+                REQUEST_URI     => '/',
+                SERVER_NAME     => 'localhost',
+                SERVER_PORT     => 5000,
+                SERVER_PROTOCOL => 'HTTP/1.1'
+            );
+
+            $self->req(Raisin::Request->new($self, \%env));
+
+            $self->load_plugin('Swagger');
+            $spec = $self->swagger_build_spec;
+        };
+    }
+    Plack::Util::load_psgi($file);
+
+    if (lc($show_openapi_spec_format || '') eq 'json') {
+        print to_json($spec);
+    }
+    else {
+        print Dump($spec);
+    }
+}
+
+sub print_routes {
+    my %args = @_;
+
+    if (!$file || !-e $file) {
+        print "$0: file `$file` doesn't exist\n";
+        exit;
+    }
+
+    my $routes;
+    {
+        no warnings 'redefine';
+        *Raisin::run = sub { $routes = shift->routes->routes };
+    }
+    Plack::Util::load_psgi($file);
+
+    for my $r (@$routes) {
+        my $path = $r->path;
+        $path =~ s#:([^/]+)#colored(['green'], ":$1")#ge;
+        printf "%-7s %s\n", $r->method, $path;
+
+        if ($args{with_params}) {
+            my $longest = 0;
+            for my $p (@{ $r->params }) {
+                $longest = length($p->name) if length($p->name) > $longest;
+            }
+
+            for my $p (@{ $r->params }) {
+                my $default_str = do {
+                    if (defined $p->default) {
+                        '{' . colored(['green'], $p->default) . '}';
+                    }
+                };
+
+                printf "  %s%-${longest}s %s%s\n",
+                    $p->required ? colored(['cyan'], '*') : ' ',
+                    $p->name,
+                    colored(['yellow'], $p->type->name),
+                    $default_str;
+            }
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+raisin - Raisin command script.
+
+=head1 SYNOPSIS
+
+    raisin [options] <raisin-app>
+
+    Options:
+        --help          This help text
+        --version       Prints version number
+        --params        Prints params
+        --openapi       Prints OpenAPI specification
+        --format        To use with `--openapi': json or yaml
+
+    Required params are marked with a star.
+    Default values are showed in a curly brackets.
+
+=head1 DESCRIPTION
+
+List L<Raisin> application routes.
+
+=cut
+

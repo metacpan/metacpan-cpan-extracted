@@ -1,0 +1,24 @@
+Written by Bryan Henderson, San Jose California, December 2006.
+
+13.11.08 Release 1.05
+
+         Add ability to control the Curl timeout transport parameter.
+
+13.08.15 Release 1.04
+
+         Fix memory leak in Value::valueSimple() with arrays and structs.
+
+12.03.11 Release 1.03
+
+         Add Serialize.
+
+07.01.13 Release 1.02
+
+         Client::Curl::createObject():  Allow caller to specify all of the
+         Curl transport parameters.
+
+         Client::Curl::createObject():  Allow missing TRANSPORT_PARMS argument.
+
+06.12.30 Release 1.01
+
+         First release.

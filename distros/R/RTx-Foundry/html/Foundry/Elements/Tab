@@ -1,0 +1,53 @@
+%# To be sure of hitting the target, shoot first and, whatever you hit,
+%# call it the target.
+
+<table cellpadding=0 cellspacing=0 border=0 width="80%" align="center">
+<tr><td>
+<br>
+<table border=0 cellpadding=0 cellspacing=0 width="100%">
+  <tr> 
+% my $c = 0;
+% while (my ($k, $v) = splice(@Tabs, 0, 2)) {
+%   my $t = loc($k);
+%   $c++;
+%#   $t = "~" . $session{CurrentUser}->Name if $k eq 'My Page';
+%   if ($k eq $Text) {
+    <td background="/img/tabLeft.png" width=2></td>
+    <td align="center" background="/img/tabMiddle.png"><div style="padding: 3px; padding-left: 10px; padding-right: 10px;position:relative;top:2px;color:white"><label><a href="<% $v %>" style="color: white"><b><% $t %></b></a></label></div></td>
+    <td background="/img/tabRight.png" width=2></td>
+%   } else {
+    <td background="/img/tabLeftTop.png" width=2></td>
+    <td align="center" style="cursor: hand" onclick="javascript:location.href='<% $v %>'" background="/img/tabMiddleTop.png"><div style="padding: 3px; padding-left: 10px; padding-right: 10px;position:relative;top:2px;color:black"><a accesskey="<% $c %>" style="color: black" href="<% $v %>"><% $t %></a></div>
+    </td>
+    <td background="/img/tabRightTop.png" width=2></td>
+%   }
+% }
+  </tr>
+</table>
+</td></tr></table>
+<%INIT>
+my @Tabs= (
+'Homepage'	    => '/Foundry/',
+($RT::Guest ? 'Member Login' : 'My Page')	    => '/Foundry/Home/',
+'Project Directory' => "/Foundry/Trove/",
+#'Search'	    => "/Foundry/Search/",
+);
+if ($session{CurrentUser}->UserObj->HasRight(Object => $RT::System, Right => 'SuperUser')) {
+    push @Tabs, (
+'Site Admin'	    => "/Edit/?SiteAdmin",
+    )
+};
+if ($Text and !grep {$_ eq $Text} @Tabs) {
+    if ($Text =~ /^~/) {
+	push @Tabs, ( $Text => "/Foundry/User/?User=$session{LastUser}" );
+    }
+    else {
+	push @Tabs, ( $Text => "/Foundry/Project/?Queue=$session{LastQueue}" );
+    }
+}
+#'Project Foo'	    => "/Foundry/Project/",
+</%INIT>
+<%ARGS>
+$Text
+$Recurse => 0
+</%ARGS>

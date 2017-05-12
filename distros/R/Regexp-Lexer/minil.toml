@@ -1,0 +1,6 @@
+name = "Regexp-Lexer"
+badges = ["travis"]
+authority="cpan:MOZNION"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,204 @@
+#!perl
+use strict;
+use warnings;
+use 5.010_000;
+use feature ':5.10';
+use Getopt::Long qw( GetOptions );
+use Runops::Movie::Util qw( printf_pretty_size );
+use File::Spec::Functions qw( catfile );
+use Carp::Always;
+use Alien::Judy;
+use Judy::1;
+use Judy::L;
+use Inline
+    C => 'DATA',
+    ( # Config:
+	OPTIMIZE => '-g',
+	CLEAN_AFTER_BUILD => 1,
+	INC => join( ' ',
+		     map { "-I$_" }
+		     Alien::Judy::inc_dirs()
+	),
+	LIBS => join( ' ',
+		      (
+		          map { "-L$_" }
+		          Alien::Judy::lib_dirs()
+		      ),
+		      '-lJudy'
+	)
+    );
+
+GetOptions(
+    help         => sub { die 'pod2usage( -verbose => 2 )' },
+    'dir=s'      => \my($dir),
+    'rulledge=s' => \my($in_rulledge),
+    'vertex=s'   => \my($in_vertex),
+    'arity=s'    => \my($in_arity),
+    'edge=s'     => \my($out_edge),
+)
+  or die 'pod2usage( -verbose => 2 )';
+
+# --dir automagic
+#
+if ( $dir ) {
+    $in_vertex   //= catfile( $dir, 'frame.vertex'   );
+    $in_rulledge //= catfile( $dir, 'frame.rulledge' );
+    $in_arity    //= catfile( $dir, 'frame.arity'    );
+    $out_edge    //= catfile( $dir, 'frame.edge'     );
+}
+
+my $rulledge;
+{
+    printf_pretty_size(
+        "Read $in_rulledge (%s)\n",
+        -s $in_rulledge
+    );
+    open my($fh), '<', $in_rulledge
+        or die "Can't open $in_rulledge: $!";
+    $rulledge = read_rulledge($fh);
+}
+
+my $arity;
+{
+    printf_pretty_size(
+        "Read $in_arity (%s)\n",
+        -s $in_arity
+    );
+    open my($fh), '<', $in_arity
+        or die "Can't open $in_arity: $!";
+    $arity = read_arity($fh);
+}
+
+
+open my($ifh), '<', $in_vertex
+    or die "Can't open $in_vertex: $!";
+open my($ofh), '>', $out_edge
+    or die "Can't open $out_edge: $!";
+
+deparent( $ifh, $ofh, $rulledge, $arity );
+printf_pretty_size(
+    "Wrote $out_edge (%s)\n",
+    -s $out_edge
+);
+
+# Free judy
+{
+    Judy::L::Free($arity);
+    my ( undef, $yedge, $x ) = Judy::L::First( $rulledge, 0 );
+    while ( defined $x ) {
+        Judy::1::Free( $yedge );
+        ( undef, $yedge, $x ) = Judy::L::Next( $rulledge, $x );
+    }
+    Judy::L::Free($rulledge);
+}
+
+__DATA__
+__C__
+#include <Judy.h>
+
+void*
+read_rulledge(PerlIO *fh) {
+    SV *line_sv;
+    char *line;
+    Pvoid_t rulledge = 0;
+    Pvoid_t *pxedge;
+    STRLEN line_len;
+    int Rc_int, x, y;
+
+    line_sv = newSVpv("",0);
+    while (sv_gets(line_sv,fh,0)) {
+        line = SvPV(line_sv,line_len);
+        if ( 2 != sscanf(line,"rdge(%x,%x).",&y,&x) ) {
+            croak(line);
+        }
+
+        /* Upsert rulledge[y] //= yedge */
+        JLI(pxedge,rulledge,y);
+
+        /* rulledge[y][x] = 1 */
+        J1S(Rc_int,*pxedge,x);
+    }
+    SvREFCNT_dec(line_sv);
+
+    return rulledge;
+}
+
+void*
+read_arity(PerlIO *fh) {
+    SV *line_sv;
+    char *line;
+    Pvoid_t arity = 0;
+    STRLEN line_len;
+    int x;
+    PWord_t pxarity;
+    Word_t xarity;
+
+    line_sv = newSVpv("",0);
+    while (sv_gets(line_sv,fh,0)) {
+        line = SvPV(line_sv,line_len);
+        if ( 2 != sscanf(line,"arity(%x,%d).",&x,&xarity) ) {
+            croak(line);
+        }
+
+        JLI(pxarity,arity,x);
+        *pxarity = xarity;
+    }
+    SvREFCNT_dec(line_sv);
+
+    return arity;
+}
+
+void
+deparent( PerlIO *ifh, PerlIO *ofh, void *rulledge, void *arity ) {
+    SV *line_sv;
+    char *line;
+    Pvoid_t *pxedge;
+    PWord_t pxarity;
+    Word_t x,y,best_x,best_x_arity;
+    STRLEN line_len;
+    int found_x;
+
+    /* for each line */
+    line_sv = newSVpv("",0);
+    while (sv_gets(line_sv,ifh,0)) {
+        line = SvPV(line_sv,line_len);
+        if ( 1 != sscanf(line,"vertex(%x).",&y) ) {
+            croak(line);
+        }
+
+        /* Fetch parents */
+        JLG(pxedge,rulledge,y);
+        if ( pxedge ) {
+
+            /* For each parent, find the best */
+            best_x_arity = -1;
+            best_x = -1;
+            x = 0;
+            J1F(found_x,*pxedge,x);
+            while ( found_x ) {
+
+                /* Fetch parent's arity */
+                JLG(pxarity,arity,x);
+                if ( pxarity ) {
+                    /* Choose best parent */
+                    if ( -1 == best_x
+                         || best_x_arity < *pxarity
+                         || ( best_x_arity == *pxarity && x < best_x ) ) {
+                        best_x = x;
+                        best_x_arity = *pxarity;
+                    }
+                }
+
+                J1N(found_x,*pxedge,x);
+            }
+
+            /* Write best parent */
+            PerlIO_printf(ofh,"edge(%x,%x).\n",best_x,y);
+        }
+        else {
+            PerlIO_printf(ofh,"edge(0,%x).\n",y);
+        }
+
+    }
+    SvREFCNT_dec(line_sv);
+}

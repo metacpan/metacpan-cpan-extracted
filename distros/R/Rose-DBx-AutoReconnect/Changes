@@ -1,0 +1,14 @@
+Revision history for Rose-DBx-AutoReconnect
+
+0.01    01 Aug 2008
+        First version, released on an unsuspecting world.
+
+0.02    01 Aug 2008
+        * add missing Anywhere.pm to MANIFEST
+
+0.03    18 Aug 2009
+        * if $db->host not set, default to 'localhost' in logger
+
+0.04    18 Aug 2012
+        * improve error message when ping() fails
+

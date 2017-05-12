@@ -1,0 +1,16 @@
+Revision history for RDF-KV
+
+0.05    2016-05-26
+        Fixed failure due to changes in Moose.
+
+0.04    2013-11-03
+        Added dependency for XML::RegExp, as well as macro generators.
+
+0.03    2013-11-03
+        Removed taint check in t/00-load.t which breaks loading of RDF::Trine.
+
+0.02    2013-11-03
+        Fleshed out documentation.
+
+0.01    2013-11-03
+        Initial release of RDF-KV protocol reference implementation.

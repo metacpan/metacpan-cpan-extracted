@@ -1,0 +1,7 @@
+BEGIN:VCARD
+fn:Toby Inkster
+note;lang=en:This is a test.
+END:VCARD
+BEGIN:VCARD
+fn:Test 2
+END:VCARD

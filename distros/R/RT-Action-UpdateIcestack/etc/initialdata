@@ -1,0 +1,10 @@
+# Copyright (c) 2013 Experieco Ltd. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+@ScripActions = (
+	{ Name => 'Update Icestack',
+	  Description => 'This RT Scrip is invoked when a request is updated and sends the update through to Icestack.',
+	  ExecModule  => 'UpdateIcestack'
+	},
+);

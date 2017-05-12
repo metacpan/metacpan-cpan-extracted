@@ -1,0 +1,13 @@
+Revision history for Readonly-BeginLift
+
+0.03    February 13, 2010
+        - Lift Readonly::Scalar and friends at compile time. Thanks to
+          ELLIOTJS (clonezone) for the suggestion.  This allows
+          Readonly::Scalar to use Readonly::XS if it's installed.
+
+0.02    February 11, 2010
+        - Include the dependency on parent.pm and Readonly
+
+0.01    February 11, 2010
+        - Allow Readonly to execute at BEGIN time.
+

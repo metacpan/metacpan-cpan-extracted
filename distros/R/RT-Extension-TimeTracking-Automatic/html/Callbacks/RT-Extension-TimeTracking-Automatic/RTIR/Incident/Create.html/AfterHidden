@@ -1,0 +1,5 @@
+<%ARGS>
+</%ARGS>
+<%INIT>
+</%INIT>
+<input type="hidden" class="hidden" name="TimeTrackingAutomatic" value="<% time %>" /> <!-- time that this update was started -->

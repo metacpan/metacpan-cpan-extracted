@@ -1,0 +1,2 @@
+#!/bin/sh
+ffmpeg -qscale 5 -r 20 -b 9600 -i frame-%04d.png movie.avi5B5B5B5B5B5B5B

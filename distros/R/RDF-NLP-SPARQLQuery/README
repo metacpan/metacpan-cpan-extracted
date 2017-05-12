@@ -1,0 +1,60 @@
+RDF-NLP-SPARQLQuery
+================================
+
+This module aims at querying RDF knowledge base with questions
+expressed in Natural language. Natural language questions are
+converted in SPARQL queries. 
+
+Contains this script:
+
+    nlquestion2sparqlquery
+
+INSTALLATION
+
+It requires Mdoule::Build version 0.28 (at least) and File::chmod
+
+To install this module type the following:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+Or if you like better the "make" program:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Config::General
+ Data::Dumper
+ Storable
+ Mouse
+ HTTP::Request
+ LWP::UserAgent
+ URL::Encode
+ Test::More
+ Test::Pod
+ Pod::Usage
+ Test::Pod::Coverage
+ Getopt::Long
+
+FILE FORMAT AND CONFIGURATION
+
+See the documentation in the module (man RDF::NLP::SPARQLQuery)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Thierry Hamon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+

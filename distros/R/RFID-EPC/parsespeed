@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+use strict;
+use RFID::EPC::Tag;
+use Benchmark;
+
+use constant COUNT => 10_000;
+our @ids;
+our @epc;
+foreach my $i (1..COUNT)
+{
+    my $id = <>;
+    chomp($id);
+    push(@ids,$id);
+}
+
+warn "Read in IDs.\n";
+
+timethese(COUNT, {
+  'Parsing' => sub { 
+                          my $tag = RFID::EPC::Tag->new(id => shift(@ids));
+                          push(@epc,$tag->_epc_parse);
+                        },
+  }
+);
+
+timethese(COUNT, {
+  'Building' => sub { 
+                          my $epc = shift @epc;
+                          my $tag = RFID::EPC::Tag->new(%$epc);
+                        },
+  }
+);

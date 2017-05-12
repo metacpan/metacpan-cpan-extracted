@@ -1,0 +1,88 @@
+TYPEMAP
+uint64_t							T_UV
+std::string							T_STD_STRING
+rocksdb::SequenceNumber				T_UV
+rocksdb::Slice						T_ROCKSDB_SLICE
+RocksDB::DB*						T_OBJECT
+RocksDB::Comparator *				T_OBJECT
+RocksDB::CompactionFilter *		    T_OBJECT
+RocksDB::TransactionLogIterator *	T_OBJECT
+RocksDB::Cache *					T_OBJECT
+RocksDB::BatchResult *				T_OBJECT
+RocksDB::MergeOperator *			T_OBJECT
+RocksDB::Statistics*				T_OBJECT
+RocksDB::WriteBatchHandler*			T_OBJECT
+RocksDB::SliceTransform *			T_OBJECT
+RocksDB::FilterPolicy *				T_OBJECT
+rocksdb::WriteBatch *				T_OBJECT
+rocksdb::LDBTool *					T_OBJECT
+rocksdb::Iterator *					T_ROCKSDB_OBJECT
+rocksdb::Snapshot *					T_ROCKSDB_OBJECT
+const rocksdb::Snapshot *			T_ROCKSDB_OBJECT
+
+OUTPUT
+
+T_STD_STRING
+	$arg = newSVpvn($var.data(), $var.size());
+
+T_ROCKSDB_SLICE
+	$arg = newSVpvn($var.data(), $var.size());
+
+T_OBJECT
+	if ($var == NULL) {
+		SvOK_off($arg);
+	} else {
+		HV *self = newHV();
+		sv_setsv($arg, sv_2mortal(newRV_noinc((SV*) self)));
+		sv_bless($arg, gv_stashpv(CLASS, 1));
+		MAGIC *mg = sv_magicext((SV*) self, NULL, PERL_MAGIC_ext, NULL, NULL, 0);
+		mg->mg_obj = (SV*) $var;
+		mg->mg_private = TYPE_${(my $t = uc $subtype) =~ s/^.* //; $t =~ s/::/_/g; \$t};
+	}
+
+T_ROCKSDB_OBJECT
+	if ($var == NULL) {
+		SvOK_off($arg);
+	} else {
+		HV *self = newHV();
+		sv_setsv($arg, sv_2mortal(newRV_noinc((SV*) self)));
+		sv_bless($arg, gv_stashpv(CLASS, 1));
+		MAGIC *mg = sv_magicext(SvRV($arg), NULL, PERL_MAGIC_ext, NULL, (char*) SvRV(SELF), HEf_SVKEY);
+		mg->mg_obj = (SV*) $var;
+		mg->mg_private = TYPE_${(my $t = uc $subtype) =~ s/^.* //; $t =~ s/::/_/g; \$t};
+	}
+
+INPUT
+
+T_ROCKSDB_SLICE
+	SV2SLICE($arg, $var);
+
+T_OBJECT
+	${$argoff == 0 ? \'SV* SELF = ST(0);' : \''}
+	if (sv_isobject($arg) && sv_derived_from($arg, \"${(my $t = $subtype) =~ s/^(.* )?rocksdb/RocksDB/; $t =~ s/::DB$//; \$t}\")) {
+		MAGIC* magic = mg_find(SvRV($arg), PERL_MAGIC_ext);
+		if (magic != NULL && magic->mg_private == TYPE_${(my $t = uc $subtype) =~ s/^.* //; $t =~ s/::/_/g; \$t} && magic->mg_obj != NULL) {
+			$var = ($type) magic->mg_obj;
+		} else {
+			Perl_croak(aTHX_ \"$var: invalid object\");
+		}
+	} else {
+		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"${(my $t = $subtype) =~ s/^(.* )?rocksdb/RocksDB/i; $t =~ s/::DB$//; \$t}\");
+	}
+
+T_ROCKSDB_OBJECT
+	${$argoff == 0 ? \'SV* SELF = ST(0);' : \''}
+	if (sv_isobject($arg) && sv_derived_from($arg, \"${(my $t = $subtype) =~ s/^(.* )?rocksdb/RocksDB/; $t =~ s/::DB$//; \$t}\")) {
+		MAGIC* magic = mg_find(SvRV($arg), PERL_MAGIC_ext);
+		if (magic != NULL && magic->mg_private == TYPE_${(my $t = uc $subtype) =~ s/^.* //; $t =~ s/::/_/g; \$t} && magic->mg_obj != NULL) {
+			$var = ($type) magic->mg_obj;
+		} else {
+			Perl_croak(aTHX_ \"$var: invalid object\");
+		}
+	} else {
+		Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"${(my $t = $subtype) =~ s/^(.* )?rocksdb/RocksDB/i; $t =~ s/::DB$//; \$t}\");
+	}

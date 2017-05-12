@@ -1,0 +1,71 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDF-RDB2RDF
+Upstream-Contact: TOBYINK <tobyink@cpan.org> and Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/RDF-RDB2RDF
+
+Files: Changes
+ META.json
+ META.yml
+ Makefile.PL
+ dist.ini
+ doap.ttl
+ t/02library.t
+ t/03nulls.t
+ t/04column-not-urlencoded.t
+ t/05langcol.t
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ TODO
+ examples/directmapping.pl
+ examples/directmapping_store.pl
+ examples/directmapping_store_library.pl
+ t/library.sqlite
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/RDF/RDB2RDF.pm
+ lib/RDF/RDB2RDF/DatatypeMapper.pm
+ lib/RDF/RDB2RDF/DirectMapping.pm
+ lib/RDF/RDB2RDF/DirectMapping/Store.pm
+ lib/RDF/RDB2RDF/R2RML.pm
+ lib/RDF/RDB2RDF/Simple.pm
+Copyright: Copyright 2011-2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: t/01basic.t
+Copyright: Copyright 2011 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/RDF/RDB2RDF/DirectMapping/Store/Mixin/SuperGetPattern.pm
+Copyright: Copyright 2006-2012 Gregory Todd Williams.
+ Copyright 2012-2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/URI/Escape/Optimistic.pm
+Copyright: Copyright 2012-2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

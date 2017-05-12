@@ -1,0 +1,14 @@
+
+@ScripActions = (
+
+    {  Name        => 'Link to old resolved ticket',    # loc
+       Description => 'Use the X-RT-Was-Reply-To header to create a link' ,   # loc
+       ExecModule  => 'LinkWasReplyTo' },
+);
+
+@Scrips = (
+    { Description    => 'On Create, Link To Resolved Tickets',
+      ScripCondition => 'On Create',
+      ScripAction    => 'Link to old resolved ticket',
+      Template       => 'Blank' },
+);

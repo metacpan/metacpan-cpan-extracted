@@ -1,0 +1,50 @@
+%# Make a HTML link and an Atom link
+<link rel="<% $Relation %>" type="<% $Type %>" href="<% $URI %>" title="<% $Id || $Title %>" />
+% return if $session{AtomClient};
+% $URI =~ s/\?$/?rows=10/g;
+% $Title = loc($Class) . ' - ' . loc($Title);
+<html:link rel="<% $Relation %>" type="<% $Type %>" href="<% $URI %>" title="<% $Title %>" />
+% return unless length $Text;
+<html:a accesskey="<% $accesskey %>" class="<% $class %>" rel="<% $Relation %>" type="<% $Type %>" href="<% $URI %>" title="<% $Title %>"><% $Text %></html:a>
+<%INIT>
+my %TextMap = (
+    'alternate'	    => 'HTML',	# loc
+    'service.post'  => 'Add',	# loc
+    'service.feed'  => 'Index',	# loc
+    'service.edit'  => 'Show',	# loc
+);
+my $class = lc($Class ||= $TextMap{$Relation} || 'nav');
+my %KeyMap = (
+    'alternate'	    => 'h',
+    'next'	    => 'n',
+    'prev'	    => 'p',
+    'service.post'  => 'a',
+    'service.feed'  => 'i',
+    'service.edit'  => 's',
+);
+my $accesskey = $KeyMap{$Relation};
+
+$Text = ($Class || $TextMap{$Relation} || $Title) unless defined $Text;
+
+if ($IsChild) {
+    $accesskey = $m->notes('EntryAccessKey');
+    if ($accesskey eq '0') {
+	undef $accesskey;
+    }
+    else {
+	$accesskey = ($accesskey + 1) % 10;
+	$m->notes(EntryAccessKey => int($accesskey));
+    }
+}
+
+</%INIT>
+<%ARGS>
+$Relation => "alternate"
+$Type => "application/atom+xml"
+$URI => "#"
+$Id => ""
+$Title => ""
+$Text => undef
+$IsChild => 0
+$Class => ""
+</%ARGS>

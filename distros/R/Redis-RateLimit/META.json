@@ -1,0 +1,74 @@
+{
+   "abstract" : "Sliding window rate limiting with Redis",
+   "author" : [
+      "Marc Mims <marc@questright.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Redis-RateLimit",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA1" : "0",
+            "File::Share" : "0",
+            "File::Slurp::Tiny" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::Util" : "0",
+            "Moo" : "0",
+            "Redis" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.14.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mock::Time" : "0",
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/semifor/Redis-RateLimit/issues"
+      },
+      "homepage" : "https://github.com/semifor/Redis-RateLimit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/semifor/Redis-RateLimit.git",
+         "web" : "https://github.com/semifor/Redis-RateLimit"
+      }
+   },
+   "version" : "1.0001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -1,0 +1,14 @@
+Revision history for Rapi::Demo::Chinook
+
+1.03 2015-04-30
+    - Require RapidApp 1.0303 (needed for change in Catalyst 5.90090)
+
+1.02 2015-04-14
+    - Fix bug that left the initialized db read-only
+
+1.01 2015-03-29
+    - Add command-line example to SYNOPSIS
+    - Remove rouge debug die that made it through by accident
+
+1.0 2015-03-28
+    - First CPAN release

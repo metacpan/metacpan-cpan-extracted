@@ -1,0 +1,11 @@
+<%perl>
+return unless $session{'CurrentUser'}->UserObj->HasRight(
+    Right => 'SuperUser',
+    Object => $RT::System,
+);
+
+Menu()->child('tools')->child('config')->child('tools')->child( perldoc => 
+    title => loc("API Docs"),
+    path  => "/Developer/Perldoc",
+);
+</%perl>

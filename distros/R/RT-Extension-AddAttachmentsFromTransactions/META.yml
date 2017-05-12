@@ -1,0 +1,35 @@
+---
+abstract: 'Add Attachments From Transactions'
+author:
+  - 'Christian Loos <cloos@netsandbox.de>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.15'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-AddAttachmentsFromTransactions
+no_index:
+  directory:
+    - html
+    - inc
+    - xt
+  package:
+    - RT::Action::SendEmail
+    - RT::Attachment
+    - RT::Ticket
+requires:
+  List::MoreUtils: 0
+  perl: 5.8.3
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://github.com/cloos/RT-Extension-AddAttachmentsFromTransactions
+version: '2.10'
+x_module_install_rtx_version: '0.37'
+x_requires_rt: 4.0.8
+x_rt_too_new: 4.4.0

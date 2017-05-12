@@ -1,0 +1,45 @@
+---
+abstract: 'A RRDtool command wrapper with rawish interface'
+author:
+  - 'Yuuki Tsubouchi  C<< <yuuki@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::Fatal: '0'
+  Test::Mock::ExternalCommand: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RRDTool-Rawish
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  RRDTool::Rawish:
+    file: lib/RRDTool/Rawish.pm
+    version: '0.040'
+requires:
+  Capture::Tiny: '0'
+  File::Which: '1.09'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/yuuki/p5-RRD-Rawish/issues
+  homepage: https://github.com/yuuki/p5-RRD-Rawish
+  repository: git://github.com/yuuki/p5-RRD-Rawish.git
+version: '0.040'
+x_authority: cpan:YUUKI
+x_contributors:
+  - 'Ulrich Habel <rhaen@pkgbox.de>'
+  - 'y_uuki <yuki.tsubo@gmail.com>'

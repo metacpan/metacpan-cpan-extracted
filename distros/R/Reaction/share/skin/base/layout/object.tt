@@ -1,0 +1,10 @@
+=for layout widget
+
+[% container_list %]
+
+=for layout container
+
+[% call_next %]
+[% actions %]
+
+=cut

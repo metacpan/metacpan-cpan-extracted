@@ -1,0 +1,44 @@
+
+
+@CustomFields = (
+    {
+        Name        => 'Age',
+        Type        => 'SelectSingle',
+        Queue       => 0,
+        Disabled    => 0,
+        Description => 'Ticket Age',
+        Values      => [
+            { Name => "Active",     SortOrder => 1 },
+            { Name => "Finished",   SortOrder => 2 },
+            { Name => "Dead",       SortOrder => 3 },
+            { Name => "Extinct",    SortOrder => 4 },
+            { Name => "Destroyed",  SortOrder => 5 },
+        ],
+    },
+);
+
+@ScripActions = (
+    { Name        => 'TicketAging - Activate',                    # loc
+      Description => 'Set age to active on the ticket and all its dependencies',    # loc
+      ExecModule  => 'TicketAgingActivate',
+      Argument    => 'Requestor' },
+);
+
+@Scrips = (
+    {   Description    => 'Set the Age to active',
+        ScripCondition => 'On Reopen',
+        ScripAction    => 'TicketAging - Activate',
+        Template       => 'Blank'
+    },
+);
+
+@ACL = (
+    { GroupDomain => 'SystemInternal',
+      GroupType   => 'Privileged',
+      CF          => 'Age',
+      Right       => 'SeeCustomField', },
+
+);
+
+
+1;

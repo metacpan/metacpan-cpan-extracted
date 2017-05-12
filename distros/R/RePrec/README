@@ -1,0 +1,95 @@
+NAME
+    reprec - calculate recall precision curves for TREC style retrieval
+    results
+
+SYNOPSIS
+    reprec -numdocs *numdocs* -collection *collection* -searchresult
+    *searchresult* -maxdocs *maxdocs* [-output *output*] [-(no)single]
+    [-(no)average] [-recall *recall-points*] [-(no)gnuplot] reprec [-help]
+    [-version]
+
+DESCRIPTION
+    With reprec one can calculate recall precision curves using TREC style
+    result and relevance judgements files. The judgements file (option
+    -collection) must be in the following format: each line represents the
+    relevance judgement for a single document w. r. t. a single query:
+    column 1 holds the query id, column 3 the document id and column 4 the
+    relevance judgement (1 if relevant, 0 else). Column 2 is not used, the
+    columns are seperatet by blanks or tabs.
+
+    In the search result files again each line represents the rank of a
+    single document w. r. t. a single query. Column 1 holds the query id,
+    column 2 is unused, column 3 the document id, column 4 the rank
+    (unused), column 5 the retrieval status value (rsv), column 6 the run
+    identifier (used in the output files if present). The file must be
+    sorted by query id, i. e. lines representing the results for a given
+    query must be blcked together. For each query the results must be sorted
+    by decreasing RSVs.
+
+OPTIONS
+    Option names may be abbreviated to uniqueness.
+
+    -numdocs *numdocs*
+        Give number of documents in collection. Needed to compute the very
+        last rank.
+
+    -collection *collection*
+        Specify file with collection relevance judgements.
+
+    -searchresult *searchresult*
+        Specify file with search results.
+
+    -maxdocs maxdocs
+        consider the top *maxdocs* result documents for each query only in
+        order to derive recall precision curves.
+
+    -output *output*
+        Specify prefix for output files. Defaults to /tmp/RP.
+
+    -single
+        Compute recall-precision graphs for individula results (default is
+        not to do that, equivalent to -nosingle).
+
+    -gnuplot
+        Tells reprec to show the calculated RP graph(s) with gnuplot
+        (default). This may not be desirable when e.g. the computation is
+        done remotely. Use -nognuplot to turn this off and only write the
+        gnuplot data files.
+
+    -average
+        Compute recall-precision graph by averaging individual results. This
+        is the default, use -noaverage in order to avoid averaging.
+
+    -recall *recall-points*
+        Specify number of recall points for which precision is to be
+        computed. Default is 100.
+
+    -help
+        Show this manual.
+
+    -version
+        Show program version.
+
+EXAMPLES
+            % reprec -collection t/data/collection_girt \
+                -searchresult t/data/searchresult_girt \
+                -numdocs 76128
+
+    computes recall precision curve for the averaged individual results in
+    /tmp/RP*.
+
+BUGS
+    Yes. Please let me know!
+
+SEE ALSO
+    RePrec(3), RePrec::PRR(3), RePrec::Searchresult(3),
+    RePrec::Collection(3), RePrec::Average(3), perl(1).
+
+AUTHOR
+    Norbert Gövert <goevert@ls6.cs.uni-dortmund.de>
+
+COPYRIGHT
+    Copyright (c) 2003 Norbert Gövert. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

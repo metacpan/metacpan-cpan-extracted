@@ -1,0 +1,12 @@
+23:15 [freenode] <obra:#svk> oh. clkao: patch integration.
+23:15 [freenode] <obra:#svk> with RT
+23:15 [freenode] <obra:#svk> if you send me a wishlist, I may be encouraged to 
+          haxx0r on it
+23:22 [freenode] <clkao:#svk> the most thing i want is probably auto update 
+          unapplied patches to apply cleanly for latest trunk. and send 
+          notification to originator when it's causing conflicts.
+23:23 [freenode] <obra:#svk> what's the svk magic from that side?
+23:23 [freenode] <clkao:#svk> if it's already svk patch format, you can just 
+          ->update for it
+23:24 [freenode] <clkao:#svk> and we want unidiff -> svk patch convertor
+

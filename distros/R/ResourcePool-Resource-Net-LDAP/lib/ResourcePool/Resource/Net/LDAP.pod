@@ -1,0 +1,50 @@
+=head1 NAME
+
+ResourcePool::Resource::Net::LDAP - A L<ResourcePool|ResourcePool> wrapper for L<Net::LDAP|Net::LDAP>
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Resource::Net::LDAP;
+ 
+ my $resource = ResourcePool::Resource::Net::LDAP->new(
+                   $factory,
+                   $hostname,
+                   [@NamedBindOptions],
+                   [@NamedNewOptions]);
+
+=head1 DESCRIPTION
+
+
+This class is used by the L<ResourcePool|ResourcePool> internally to create L<Net::LDAP|Net::LDAP> connections. Its called by the corresponding L<ResourcePool::Factory::Net::LDAP|ResourcePool::Factory::Net::LDAP> object which passes the parameters needed to establish the L<Net::LDAP|Net::LDAP> connection.
+
+The only thing which has to been known by an application developer about this class is the implementation of the L<precheck()|/precheck> and L<postcheck()|/postcheck> methods:
+
+=head2 S<$resource-E<gt>precheck>
+
+Performs a bind(), either anonymous or with dn and password (depends on the arguments to L<ResourcePool::Factory::Net::LDAP|ResourcePool::Factory::Net::LDAP>).
+
+B<Returns:> Returns true on success and false if the bind failed (regardless of the reason)
+
+=head2 S<$resource-E<gt>postcheck>
+
+Does not implement any postcheck().
+
+B<Returns:> always true
+
+=head1 SEE ALSO
+
+L<Net::LDAP|Net::LDAP>,
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Resource|ResourcePool::Resource>,
+L<ResourcePool::Factory::Net::LDAP|ResourcePool::Factory::Net::LDAP>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2003 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

@@ -1,0 +1,59 @@
+1.07
+ - Re-release with proper Changes update
+
+1.06
+ - Mark as deprecated
+
+1.05 2013-08-13T11:04:53Z
+ - Re-release 1.04 with a proper Changes section for 1.04
+
+1.04
+ - Backport May 2013 security patches from 4.0 versions
+ - Document that clearing the Mason cache is necessary
+
+1.03
+ - whitelist /m/tickets/search from RT's CSRF protection in case someone
+   bookmarks a search from their mobile device and wants to rerun it.
+
+1.02
+ - Apply a number of XSS security fixes from 4.0-trunk, which resolve
+   CVE-2012-2769.
+
+1.01
+ - Corrected the "Reply" link to default to reply rather than comment
+
+1.00
+ - Fixed redirection from mobile UI to normal ticket display
+
+0.99
+ - Fixed redirection from normal ticket display to mobile ticket display
+
+0.98
+ - Avoid a double slash after the $WebURL when redirecting to some mobile
+   pages
+
+0.97
+ - Added S60 as a mobile user agent. Thanks to Kristian Rikvold-Jess.
+
+0.96
+ - Added WebOS as a valid mobile user agent. Thanks to Jason Smith.
+
+0.95
+ - Additional fixes for RT instances running at subpaths, rather than the
+   root ofa server.
+
+0.94
+ - Handle RT not located at / when redirecting from a ticket URL
+
+0.93
+ - Avoid redirect loops with /m/ and dhandler
+
+0.92
+ - an attempt at a fix for the homepage title
+
+0.91
+ - Minor CSS styling, an attempt at a fix for the homepage title
+
+0.9
+ - Initial release
+

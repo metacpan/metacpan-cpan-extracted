@@ -1,0 +1,36 @@
+Changes
+lib/Role/Tiny.pm
+lib/Role/Tiny/With.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/concrete-methods.t
+t/create-hook.t
+t/does.t
+t/lib/BrokenModule.pm
+t/lib/FalseModule.pm
+t/lib/TrackLoad.pm
+t/load-module.t
+t/method-conflicts.t
+t/overload.t
+t/role-basic-basic.t
+t/role-basic-bugs.t
+t/role-basic-composition.t
+t/role-basic-exceptions.t
+t/role-duplication.t
+t/role-long-package-name.t
+t/role-tiny-composition.t
+t/role-tiny-with.t
+t/role-tiny.t
+t/role-with-inheritance.t
+t/subclass.t
+xt/around-does.t
+xt/compose-modifiers.t
+xt/dependents.t
+xt/does-Moo.t
+xt/modifiers.t
+xt/namespace-clean.t
+xt/recompose-modifier.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

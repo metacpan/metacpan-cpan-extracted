@@ -1,0 +1,22 @@
+This is the README file for Rodney::XML::QuickStruct.
+
+
+===> To install
+
+See INSTALL file.
+
+
+===> Examples
+
+In this directory you should have a program named "example.pl", and several
+example XML files. Run the program like this:
+
+  % ./example.pl ex1.xml
+
+This program is a simple and useful example of API usage, and the XML samples
+should be good theory for those who need it. Of coarse, make sure to read the
+docs that are in the POD of this package.
+
+Note, you don't have to install this package to make the example program work,
+but you will have to run the make to build the lib directory needed.
+

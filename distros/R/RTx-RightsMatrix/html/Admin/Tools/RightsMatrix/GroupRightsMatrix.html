@@ -1,0 +1,12 @@
+% my $Title = loc("Group Rights for [_1]: [_2]", $principal->IsUser ? loc('User') : loc('Group'), $principal->Object->Name ? $principal->Object->Name : $principal->Object->Type);
+<& /Elements/Header, Title=>$Title &>
+<& /Admin/Elements/ToolTabs,
+    current_tab => 'Admin/Tools/RightsMatrix/',
+    current_subtab => 'Admin/Tools/RightsMatrix/GroupRightsMatrix.html',
+    Title=>$Title &>
+
+<& /Admin/Tools/RightsMatrix/Elements/GroupRightsMatrix, %ARGS  &>
+<%INIT>
+use RTx::RightsMatrix::Util;
+my ($principal) = RTx::RightsMatrix::Util::get_principal( Principal => $ARGS{Principal}, User => $ARGS{User}, CurrentUser => $session{CurrentUser} );
+</%INIT>

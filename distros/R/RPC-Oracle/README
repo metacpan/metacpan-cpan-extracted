@@ -1,0 +1,111 @@
+NAME
+    RPC::Oracle - Provide seemless interface into Oracle procedures and
+    functions.
+
+SYNOPSIS
+            use RPC::Oracle;
+            my $oracle = RPC::Oracle->new($dbh);
+
+            $oracle->call('package.procedure', 'arg1', 'arg2');
+            my $return = $oracle->call('function', 'arg1', 'arg2');
+
+            $oracle->schema('SCOTT');
+            $oracle->my_procedure('arg1', 'arg2'); # calls procedure scott.my_procedure
+
+            # call myschema.mypackage.my_function()
+            $oracle->schema('myschema.mypackage');
+            my $return = $oracle->my_function();
+
+            # binds $arg2 as an "IN OUT" parameter
+            $oracle->call("myproc", $arg1, \$arg2);
+            print "I got $arg2!\n";
+
+            # get the value of my_package.my_constant
+            $oracle->schema("my_package");
+            print $oracle->constant("my_constant");
+
+            # call procedure with long form
+            $oracle->my_procedure({
+                    var1 => 'value of var1',
+                    var2 => 'value of var2',
+                    var3 => \$outbound_variable
+            });
+
+      # get package variable
+      $oracle->schema("dbms_stats");
+      my $auto_sample_size = $oracle->auto_sample_size;
+
+DESCRIPTION
+  Class Methods
+    "new"
+                use RPC::Oracle;
+                my $oracle = new RPC::Oracle($dbh, [$schema]);
+
+        Instantiates RPC::Oracle object with the given database handle. $dbh
+        should be a valid DBI::db object, but no type checking is done.
+
+    "dbh"
+                $oracle->dbh($dbh);
+
+        Set the internal database handle. $dbh should be a vaild DBI::db
+        object, but no type checking is done. A database handle is required
+        to make use of this tool.
+
+    "schema"
+                $oracle->schema("myschema");
+                $oracle->schema("myschema.mypackage");
+
+        Set the prefix for calling functions or procedures. Handy for saving
+        typing.
+
+    "call"
+                $oracle->call("myprocedure", $arg1, $arg2);
+                my $return = $oracle->call("myschema.myfunction", $arg1, $arg2);
+
+                # binds $arg2 as an "IN OUT" parameter
+                $oracle->call("myproc", $arg1, \$arg2);
+                print "I got $arg2!\n";
+
+                # call procedure with long form
+                $oracle->my_procedure({
+                        var1 => 'value of var1',
+                        var2 => 'value of var2',
+                        var3 => \$outbound_variable
+                });
+
+        Translates the requested function/procedure name into a PL/SQL block
+        and executes it. If called in void context, RPC::Oracle assumes you
+        are calling a procedure. In scalar/array context, RPC::Oracle
+        assumes you want a function.
+
+        If any parameters are references, RPC::Oracle will bind them as "IN
+        OUT" parameters. Oracle treats "IN OUT" parameters and "OUT"
+        parameters the same.
+
+    "AUTOLOAD"
+                $oracle->my_procedure($arg1, $arg2);
+                my $return = $oracle->my_function($arg1, $arg2);
+
+        The AUTOLOAD method treats the sub name as the target
+        procedure/function name. Note, that since perl disallows periods (.)
+        in function names, you should use schema to set the schema
+        beforehand.
+
+    "constant"
+                $oracle->schema("my_package");
+                my $var = $oracle->constant("my_constant");
+
+        Retrieves the PL/SQL constant from a package.
+
+CAVEATS
+    This package does not correctly handle outbound cursor refs. Doing such
+    would require foreknowledge that a cursor object was coming back so the
+    call to bind_param_inout() can be adjusted accordingly.
+
+    In addition, the AUTOLOAD method will not be called if the target
+    procedure is named new, dbh, schema, call, constant or autoload, since
+    these are class methods.
+
+AUTHOR
+    Warren Smith wsmith@cpan.org
+

@@ -1,0 +1,88 @@
+=head1 DESCRIPTION
+
+This document outlines the C functionality within the XS file that the Perl
+module uses as its backend. It is a reference only, and none of the information
+included here is required for non-developmental use/work.
+
+=head1 C TYPEDEFS
+
+=head2 EnvData
+
+Stores the temperature and humidity float values.
+
+    typedef struct env_data {
+        int temp;
+        int humidity;
+    } EnvData;
+
+=head1 C FUNCTIONS
+
+C<pin> arguments must always be in their C<BCM GPIO> number scheme format.
+
+=head2 c_temp
+
+    int c_temp(int pin);
+
+Called by the C<temp()> method. Returns the temperature in Celcius.
+
+=head2 c_humidity
+
+    int c_humidity(int pin);
+
+Called by the C<humidity()> method. Returns the humidity as an integer.
+
+=head2 c_cleanup
+
+    int c_cleanup(int pin);
+
+Called by the C<cleanup()> method, and is always called upon C<DESTROY()>.
+
+=head2 read_env()
+
+    EnvData read_env(int pin);
+
+Not available to Perl.
+
+Polls the pin in a loop until valid data is fetched, then  returns an C<EnvData>
+struct containing the temp and humidity float values.
+
+If for any reason the poll of the DHT11 sensor fails (eg: the CRC is incorrect
+for either temp or humidity), we will loop and block until valid data is
+retrieved.
+
+=head2 noboard_test()
+
+    bool noboard_test();
+
+Checks whether the C<RDE_NOBOARD_TEST> environment variable is set to a true
+value. Returns true if so, and false if not. This bool is used for testing
+purposes only.
+
+Not available to Perl.
+
+=head2 setup()
+
+    void setup();
+
+If we're on a system that isn't a Raspberry Pi, things break. We call this in
+C<new()>, and if setup checks fail, we exit (unless in RDE_NOBOARD_TEST
+environment variable is set to true).
+
+This function has been configured to call C<wiringPi>'s C<wiringPiSetupGpio()>
+function.
+
+Called only from the C<new()> method.
+
+=head1 AUTHOR
+
+Steve Bertrand, E<lt>steveb@cpan.org<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

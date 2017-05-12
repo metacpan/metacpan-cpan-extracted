@@ -1,0 +1,20 @@
+=head1 NAME
+
+RocksDB::FilterPolicy - rocksdb::FilterPolicy object
+
+=head1 DESCRIPTION
+
+B<RocksDB::FilterPolicy> is a rocksdb::FilterPolicy object.
+
+Do not use this class directly. Use the subclass of this class.
+(L<RocksDB::BloomFilterPolicy> is only subclass for now.)
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::BloomFilterPolicy>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,1159 @@
+DEFAULT_ROOT="http://www4.wiwiss.fu-berlin.de"
+
+<RESOURCE disease/diseasome>
+    ROOT = "http://www4.wiwiss.fu-berlin.de"
+    <CORRESP>
+        name="diseasome/resource/diseases"
+    </CORRESP>
+</RESOURCE>
+
+<RESOURCE gene/diseasome>
+    ROOT = "http://www4.wiwiss.fu-berlin.de"
+    <CORRESP>
+        name="diseasome/resource/genes"
+    </CORRESP>
+</RESOURCE>
+
+<RESOURCE drug/drugbank>
+    ROOT = "http://www4.wiwiss.fu-berlin.de"
+    <CORRESP>
+        drug="drugbank/resource/drugs"
+        syno="drugbank/resource/drugs"
+        brand="drugbank/resource/drugs"
+#        drugcat="drugbank/resource/drugs"
+        gen="drugbank/resource/drugs"
+#        name="drugbank/resource/targets"
+        target="drugbank/resource/targets"
+# probably to remove
+        experimental="drugbank/resource/drugtype/experimental"
+    </CORRESP>
+</RESOURCE>
+
+<RESOURCE sideeffect/sider>
+    ROOT = "http://www4.wiwiss.fu-berlin.de"
+    <CORRESP>
+        ae="sider/resource/side_effects"
+        drugname="sider/resource/drugs"
+    </CORRESP>
+</RESOURCE>
+
+# <PREDICATE sideEffect>
+#     NAME = "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
+#     SUBJECT_TYPE = "sider/resource/drugs"
+#     OBJECT_TYPE = "sider/resource/side_effects"
+# </PREDICATE>
+
+# <PREDICATE target>
+#     NAME = "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target"
+#     SUBJECT_TYPE = "drugbank/resource/drugs"
+#     OBJECT_TYPE = "drugbank/resource/targets"
+# </PREDICATE>
+
+# <PREDICATE foodInteraction>
+#     NAME = "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/foodInteraction"
+#     SUBJECT_TYPE = "drugbank/resource/drugs"
+#     OBJECT_TYPE = "STRING"
+# </PREDICATE>
+
+# <PREDICATE associatedGene>
+#     NAME = "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/associatedGene"
+#     SUBJECT_TYPE = "diseasome/resource/diseases"
+#     OBJECT_TYPE = "diseasome/resource/genes"
+# </PREDICATE>
+
+# <PREDICATE possibleDrug>
+#     NAME = "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug"
+#     SUBJECT_TYPE = "diseasome/resource/diseases"
+#     OBJECT_TYPE = "drugbank/resource/drugs"
+# </PREDICATE>
+
+# <PREDICATE drugReference>
+#     NAME = "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugReference"
+#     SUBJECT_TYPE = "drugbank/resource/targets"
+#     OBJECT_TYPE = "drugbank/resource/references"
+# </PREDICATE>
+
+# <PREDICATE enzyme>
+#     NAME = "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/enzyme"
+#     SUBJECT_TYPE = "drugbank/resource/drugs"
+#     OBJECT_TYPE = "drugbank/resource/enzymes"
+# </PREDICATE>
+
+# <PREDICATE interactionDrug1>
+#     NAME = "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/interactionDrug1"
+#     SUBJECT_TYPE = "drugbank/resource/drug_interactions"
+#     OBJECT_TYPE = "drugbank/resource/drugs"
+# </PREDICATE>
+
+
+# <PREDICATE geneName>
+#     NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/geneName"
+#     SUBJECT_TYPE="drugbank/resource/targets"
+#     OBJECT_TYPE="STRING"
+# </PREDICATE>
+
+
+# <PREDICATE >
+#     NAME = ""
+#     SUBJECT_TYPE = ""
+#     OBJECT_TYPE = ""
+# </PREDICATE>
+
+<PREDICATE geneSequence>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/geneSequence"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE massSpecFile>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/massSpecFile"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE chemicalStructure>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/chemicalStructure"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE halfLife>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/halfLife"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE associatedGene>
+    NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/associatedGene"
+    SUBJECT_TYPE="diseasome/resource/diseases"
+    OBJECT_TYPE="diseasome/resource/genes"
+</PREDICATE>
+<PREDICATE geneName>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/geneName"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE goClassificationComponent>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/goClassificationComponent"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE molecularWeight>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/molecularWeight"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE predictedWaterSolubility>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/predictedWaterSolubility"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE mechanismOfAction>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/mechanismOfAction"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE classDegree>
+    NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/classDegree"
+    SUBJECT_TYPE="diseasome/resource/diseases"
+    OBJECT_TYPE="INT"
+</PREDICATE>
+<PREDICATE interactionDrug1>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/interactionDrug1"
+    SUBJECT_TYPE="drugbank/resource/drug_interactions"
+    OBJECT_TYPE="drugbank/resource/drugs"
+</PREDICATE>
+<PREDICATE geneNameEnzyme>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/geneName"
+    SUBJECT_TYPE="drugbank/resource/enzymes"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE signal>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/signal"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE synthesisReference>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synthesisReference"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE smilesStringIsomeric>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/smilesStringIsomeric"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE genericName>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genericName"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE absorption>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/absorption"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE target>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="drugbank/resource/targets"
+</PREDICATE>
+<PREDICATE drugReference>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugReference"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="drugbank/resource/references"
+</PREDICATE>
+<PREDICATE synonymTarget>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE theoreticalPi>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/theoreticalPi"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE predictedLogpHydrophobicity>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/predictedLogpHydrophobicity"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE updateDate>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/updateDate"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE molecularWeightMono>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/molecularWeightMono"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE fdaLabelFiles>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/fdaLabelFiles"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE experimentalLogpHydrophobicity>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/experimentalLogpHydrophobicity"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE atcCode>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/atcCode"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+# <PREDICATE possibleDrug>
+#     NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug"
+#     SUBJECT_TYPE="diseasome/resource/diseases"
+#     OBJECT_TYPE="dailymed/resource/drugs"
+# </PREDICATE>
+<PREDICATE secondaryAccessionNumber>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/secondaryAccessionNumber"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE experimentalCaco2Permeability>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/experimentalCaco2Permeability"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE state>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/state"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE brandName>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE limsDrugId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/limsDrugId"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+# <PREDICATE name>
+#     NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/name"
+#     SUBJECT_TYPE="drugbank/resource/enzymes"
+#     OBJECT_TYPE="STRING"
+# </PREDICATE>
+<PREDICATE description>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE biotransformation>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/biotransformation"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE smilesStringCanonical>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/smilesStringCanonical"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE experimentalWaterSolubility>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/experimentalWaterSolubility"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE genecardId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genecardId"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE swissprotNameDrug>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/swissprotName"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE hetId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/hetId"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE genatlasId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genatlasId"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+# <PREDICATE drugCategory>
+#     NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugCategory"
+#     SUBJECT_TYPE="drugbank/resource/drugs"
+#     OBJECT_TYPE="drugbank/resource/drugcategory/vitamins"
+# </PREDICATE>
+<PREDICATE size>
+    NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/size"
+    SUBJECT_TYPE="diseasome/resource/diseases"
+    OBJECT_TYPE="INT"
+</PREDICATE>
+<PREDICATE numberOfResidues>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/numberOfResidues"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE chromosomeLocation>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/chromosomeLocation"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE dosageForm>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="drugbank/resource/dosageforms"
+</PREDICATE>
+# <PREDICATE name>
+#     NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/name"
+#     SUBJECT_TYPE="drugbank/resource/targets"
+#     OBJECT_TYPE="STRING"
+# </PREDICATE>
+<PREDICATE indication>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/indication"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE goClassificationFunction>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/goClassificationFunction"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE msdsFiles>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/msdsFiles"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE pubchemCompoundId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pubchemCompoundId"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE proteinBinding>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/proteinBinding"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE pharmgkbId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pharmgkbId"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE generalFunction>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/generalFunction"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE genbankIdGene>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genbankIdGene"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE text>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/text"
+    SUBJECT_TYPE="drugbank/resource/drug_interactions"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE proteinSequenceTarget>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/proteinSequence"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE inchiIdentifier>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/inchiIdentifier"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE interactionDrug2>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/interactionDrug2"
+    SUBJECT_TYPE="drugbank/resource/drug_interactions"
+    OBJECT_TYPE="drugbank/resource/drugs"
+</PREDICATE>
+<PREDICATE drugName>
+    NAME="http://www4.wiwiss.fu-berlin.de/sider/resource/sider/drugName"
+    SUBJECT_TYPE="sider/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE locus>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/locus"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE predictedLogs>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/predictedLogs"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE cellularLocation>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/cellularLocation"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE pathway>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pathway"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE diseaseSubtypeOf>
+    NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/diseaseSubtypeOf"
+    SUBJECT_TYPE="diseasome/resource/diseases"
+    OBJECT_TYPE="diseasome/resource/diseases"
+</PREDICATE>
+<PREDICATE generalReference>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/generalReference"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="drugbank/resource/references"
+</PREDICATE>
+<PREDICATE pubchemSubstanceId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pubchemSubstanceId"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE ahfsCode>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/ahfsCode"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE goClassificationProcess>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/goClassificationProcess"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE inchiKey>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/inchiKey"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE affectedOrganism>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/affectedOrganism"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+# <PREDICATE brandedDrug>
+#     NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandedDrug"
+#     SUBJECT_TYPE="drugbank/resource/drugs"
+#     OBJECT_TYPE="dailymed/resource/drugs"
+# </PREDICATE>
+<PREDICATE chromosomalLocation>
+    NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/chromosomalLocation"
+    SUBJECT_TYPE="diseasome/resource/diseases"
+    OBJECT_TYPE="diseasome/resource/chromosomalLocation"
+</PREDICATE>
+<PREDICATE transmembraneRegions>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/transmembraneRegions"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE drugType>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugType"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="drugbank/resource/drugtype"
+</PREDICATE>
+<PREDICATE drugCategory>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugCategory"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="drugbank/resource/drugcategory"
+</PREDICATE>
+<PREDICATE stitchId>
+    NAME="http://www4.wiwiss.fu-berlin.de/sider/resource/sider/stitchId"
+    SUBJECT_TYPE="sider/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE molecularWeightAverage>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/molecularWeightAverage"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE enzyme>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/enzyme"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="drugbank/resource/enzymes"
+</PREDICATE>
+<PREDICATE meltingPoint>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/meltingPoint"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE swissprotNameTarget>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/swissprotName"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE sideEffectName>
+    NAME="http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffectName"
+    SUBJECT_TYPE="sider/resource/side_effects"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE possibleDrug>
+    NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug"
+    SUBJECT_TYPE="diseasome/resource/diseases"
+    OBJECT_TYPE="drugbank/resource/drugs"
+</PREDICATE>
+<PREDICATE creationDate>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/creationDate"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE synonymDrug>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE essentiality>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/essentiality"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE siderDrugId>
+    NAME="http://www4.wiwiss.fu-berlin.de/sider/resource/sider/siderDrugId"
+    SUBJECT_TYPE="sider/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+# <PREDICATE name>
+#     NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/name"
+#     SUBJECT_TYPE="diseasome/resource/diseases"
+#     OBJECT_TYPE="STRING"
+# </PREDICATE>
+<PREDICATE degree>
+    NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/degree"
+    SUBJECT_TYPE="diseasome/resource/diseases"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE proteinSequenceEnzyme>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/proteinSequence"
+    SUBJECT_TYPE="drugbank/resource/enzymes"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE possibleDiseaseTarget>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="diseasome/resource/diseases"
+</PREDICATE>
+<PREDICATE class>
+    NAME="http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/class"
+    SUBJECT_TYPE="diseasome/resource/diseases"
+    OBJECT_TYPE="diseasome/resource/diseaseClass"
+</PREDICATE>
+<PREDICATE reference>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/reference"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE chemicalFormula>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/chemicalFormula"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE hprdId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/hprdId"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE genbankIdProtein>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genbankIdProtein"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE reaction>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/reaction"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE pharmacology>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pharmacology"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE toxicity>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE brandMixture>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE dpdDrugIdNumber>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dpdDrugIdNumber"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE experimentalLogs>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/experimentalLogs"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE patientInformationInsert>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/patientInformationInsert"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE structure>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/structure"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE sideEffectId>
+    NAME="http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffectId"
+    SUBJECT_TYPE="sider/resource/side_effects"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE pdrhealthLink>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pdrhealthLink"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE pkaIsoelectricPoint>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pkaIsoelectricPoint"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE sideEffect>
+    NAME="http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
+    SUBJECT_TYPE="sider/resource/drugs"
+    OBJECT_TYPE="sider/resource/side_effects"
+</PREDICATE>
+<PREDICATE chemicalIupacName>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/chemicalIupacName"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE pdbHomologyId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pdbHomologyId"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE foodInteraction>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/foodInteraction"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE genbankId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genbankId"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE specificFunction>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/specificFunction"
+    SUBJECT_TYPE="drugbank/resource/targets"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE primaryAccessionNo>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/primaryAccessionNo"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+<PREDICATE pdbExperimentalId>
+    NAME="http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pdbExperimentalId"
+    SUBJECT_TYPE="drugbank/resource/drugs"
+    OBJECT_TYPE="STRING"
+</PREDICATE>
+
+<PREDICATE rdf:type>
+    NAME="rdf:type"
+    SUBJECT_TYPE="VARIABLE"
+    OBJECT_TYPE="RDFTYPE"
+</PREDICATE>
+
+
+<OPERATION count>
+    NAME = "count"
+</OPERATION>
+
+<OPERATION max>
+    NAME = "max"
+</OPERATION>
+
+<OPERATION min>
+    NAME = "min"
+</OPERATION>
+
+# <RELATION >
+#     NAME = ""
+#     SUBJECT_TYPE = ""
+#     OBJECT_TYPE = ""
+# </RELATION>
+
+<VARIABLE>
+# OBJECTS
+    target = "drugbank/resource/targets"
+    sideEffect = "sider/resource/side_effects"
+    drugReference = "drugbank/resource/references"
+    possibleDrug = "drugbank/resource/drugs"
+    geneName = "STRING"
+    foodInteraction = "STRING"
+    associatedGene = "diseasome/resource/genes"
+    enzyme = "drugbank/resource/enzymes"
+
+    absorption = "STRING"
+    affectedOrganism = "STRING"
+    ahfsCode = "STRING"
+#    associatedGene = "diseasome/resource/genes"
+    atcCode = "STRING"
+    biotransformation = "STRING"
+    brandMixture = "STRING"
+    brandName = "STRING"
+    cellularLocation = "STRING"
+    chemicalFormula = "STRING"
+    chemicalIupacName = "STRING"
+    chemicalStructure = "STRING"
+    chromosomalLocation = "diseasome/resource/chromosomalLocation"
+    chromosomeLocation = "STRING"
+    classDegree = "INT"
+    class = "diseasome/resource/diseaseClass"
+    creationDate = "STRING"
+    degree = "STRING"
+    description = "STRING"
+    diseaseSubtypeOf = "diseasome/resource/diseases"
+    dosageForm = "drugbank/resource/dosageforms"
+    # dosageForm = "drugbank/resource/dosageforms/solution"
+    # dosageForm = "drugbank/resource/dosageforms/suspension"
+    dpdDrugIdNumber = "STRING"
+    # drugCategory = "drugbank/resource/drugbank"
+    drugCategory = "drugbank/resource/drugcategory"
+    # drugCategory = "drugbank/resource/drugcategory/vitamins"
+    drugName = "STRING"
+    # drugReference = "drugbank/resource/references"
+    drugType = "drugbank/resource/drugtype"
+#    enzyme = "drugbank/resource/enzymes"
+    essentiality = "STRING"
+    experimentalCaco2Permeability = "STRING"
+    experimentalLogpHydrophobicity = "STRING"
+    experimentalLogs = "STRING"
+    experimentalWaterSolubility = "STRING"
+    fdaLabelFiles = "STRING"
+    # foodInteraction = "sider/resource/drugs"
+#    foodInteraction = "STRING"
+    genatlasId = "STRING"
+    genbankIdGene = "STRING"
+    genbankIdProtein = "STRING"
+    genbankId = "STRING"
+    genecardId = "STRING"
+#    geneName = "STRING"
+    generalFunction = "STRING"
+    generalReference = "drugbank/resource/references"
+    genericName = "STRING"
+    geneSequence = "STRING"
+    goClassificationComponent = "STRING"
+    goClassificationFunction = "STRING"
+    goClassificationProcess = "STRING"
+    halfLife = "STRING"
+    hetId = "STRING"
+    hprdId = "STRING"
+    inchiIdentifier = "STRING"
+    inchiKey = "STRING"
+    # indication = "drugbank/resource/drugs"
+    indication = "STRING"
+    # interactionDrug1 = "drugbank/resource/drugs"
+    # interactionDrug2 = "drugbank/resource/drugs"
+    limsDrugId = "STRING"
+    locus = "STRING"
+    # massSpecFile = "sider/resource/side_effects"
+    massSpecFile = "STRING"
+    mechanismOfAction = "STRING"
+    meltingPoint = "STRING"
+    molecularWeightAverage = "STRING"
+    molecularWeightMono = "STRING"
+    molecularWeight = "STRING"
+    msdsFiles = "STRING"
+    # name = "diseasome/resource/diseases"
+    name = "STRING"
+    numberOfResidues = "STRING"
+    pathway = "STRING"
+    patientInformationInsert = "STRING"
+    pdbExperimentalId = "STRING"
+    pdbHomologyId = "STRING"
+    # pdrhealthLink = "stitch/resource/chemicals"
+    pdrhealthLink = "STRING"
+    pharmacology = "STRING"
+    pharmgkbId = "STRING"
+    pkaIsoelectricPoint = "STRING"
+    possibleDiseaseTarget = "diseasome/resource/diseases"
+#     possibleDrug = "drugbank/resource/drugs"
+    predictedLogpHydrophobicity = "STRING"
+    predictedLogs = "STRING"
+    predictedWaterSolubility = "STRING"
+    primaryAccessionNo = "STRING"
+    proteinBinding = "STRING"
+    proteinSequence = "STRING"
+    pubchemCompoundId = "STRING"
+    pubchemSubstanceId = "STRING"
+    reaction = "STRING"
+    reference = "STRING"
+    secondaryAccessionNumber = "STRING"
+    sideEffectId = "STRING"
+    sideEffectName = "STRING"
+    # sideEffect = "sider/resource/side_effects"
+    siderDrugId = "STRING"
+    signal = "STRING"
+    size = "INT"
+    smilesStringCanonical = "STRING"
+    smilesStringIsomeric = "STRING"
+    specificFunction = "STRING"
+    state = "STRING"
+    # stitchId = "diseasome/resource/diseasome"
+    stitchId = "STRING"
+    structure = "STRING"
+    swissprotName = "STRING"
+    swissprotNameDrug = "STRING"
+    swissprotNameTarget = "STRING"
+    synonym = "STRING"
+    synthesisReference = "STRING"
+#    target = "drugbank/resource/targets"
+    text = "STRING"
+    theoreticalPi = "STRING"
+    toxicity = "STRING"
+    transmembraneRegions = "STRING"
+    updateDate = "STRING"
+
+# SUBJECTS
+    # interactionDrug1 = "drugbank/resource/drug_interactions"
+
+    interactionDrug1 = "drugbank/resource/drug_interactions"
+    interactionDrug2 = "drugbank/resource/drug_interactions"
+
+# OTHERS
+    drugs = "drugbank/resource/drugs"
+    disease = "diseasome/resource/diseases"
+    drug = "sider/resource/drugs"
+
+#    drugbank/resource/drugtype/experimental="drugbank/resource/drugtype/experimental"
+
+
+</VARIABLE>
+
+<SAMEAS>
+    ROOT = "http://www.w3.org/2002/07/owl\#sameAs"
+    <CORRESP>
+    drugbank/resource/drugs = "sider/resource/drugs"
+    diseasome/resource/diseases = "sider/resource/side_effects"
+    sider/resource/drugs = "drugbank/resource/drugs"
+    sider/resource/side_effects = "diseasome/resource/diseases"
+    </CORRESP>
+</SAMEAS>
+
+<CTXTL_REWRITE>
+    <RULE drug>
+       SF = "drug"
+       CTXT = "interaction"
+       NEWSF = "drugbank/resource/drug_interactions"
+       NEWCTXT = "interactionDrug1"
+    </RULE>
+    <RULE drug>
+       SF = "drug"
+       CTXT = "target"
+       NEWSF = "drugs"
+       NEWCTXT = "-"
+    </RULE>
+    <RULE food>
+       SF = "food"
+       CTXT = "interaction"
+       NEWSF = "foodInteraction"
+       NEWCTXT = ""
+    </RULE>
+    <RULE interaction>
+       SF = "interaction"
+       CTXT = "food"
+       NEWSF = "foodInteraction"
+       NEWCTXT = ""
+    </RULE>
+    <RULE interaction>
+       SF = "interaction"
+       CTXT = "drug"
+       NEWSF = "interactionDrug1"
+       NEWCTXT = ""
+    </RULE>
+    <RULE interactionDrug1>
+       SF = "interactionDrug1"
+       CTXT = "food"
+       NEWSF = "foodInteraction"
+       NEWCTXT = ""
+    </RULE>
+    <RULE associate>
+       SF = "associate"
+       CTXT = "disease"
+       NEWSF = "associatedGene"
+       NEWCTXT = "-"
+    </RULE>
+    <RULE associate>
+       SF = "associate"
+       CTXT = "gene"
+       NEWSF = "associatedGene"
+       NEWCTXT = "-"
+    </RULE>
+    <RULE gene>
+       SF = "gene"
+       CTXT = "associate"
+       NEWSF = "associatedGene"
+       NEWCTXT = ""
+    </RULE>
+
+    <RULE associate>
+       SF = "associate"
+       CTXT = "drug/drugbank/target"
+       NEWSF = "geneName"
+       NEWCTXT = "-"
+    </RULE>
+    <RULE experimental>
+       SF = "experimental"
+       CTXT = "drug"
+       NEWSF = "drugs;drugbank/resource/drugtype/experimental"
+       NEWCTXT = "drugType"
+    </RULE>
+    <RULE approved>
+       SF = "approved"
+       CTXT = "drug"
+       NEWSF = "drugs;drugbank/resource/drugtype/approved"
+       NEWCTXT = "drugType"
+    </RULE>
+    <RULE drugType>
+       SF = "drugType"
+       CTXT = "interaction"
+       NEWSF = "-"
+       NEWCTXT = "foodInteraction"
+    </RULE>
+#       NEWCTXT = "foodInteraction;interactionDrug1"
+
+
+    <RULE nutraceutical>
+       SF = "nutraceutical"
+       CTXT = "drug"
+       NEWSF = "drugs;drugbank/resource/drugtype/nutraceutical"
+       NEWCTXT = "drugType"
+    </RULE>
+    <RULE illicit>
+       SF = "illicit"
+       CTXT = "drug"
+       NEWSF = "drugs;drugbank/resource/drugtype/illicit"
+       NEWCTXT = "drugType"
+    </RULE>
+    <RULE withdrawn>
+       SF = "withdrawn"
+       CTXT = "drug"
+       NEWSF = "drugs;drugbank/resource/drugtype/withdrawn"
+       NEWCTXT = "drugType"
+    </RULE>
+    <RULE class>
+       SF = "class"
+       CTXT = "degree"
+       NEWSF = "classDegree"
+       NEWCTXT = ""
+    </RULE>
+    # <RULE Connective_tissue_disorder>
+    #    SF = "Connective_tissue_disorder"
+    #    CTXT = "class"
+    #    NEWSF = "diseasome/resource/diseaseClass/Connective_tissue_disorder"
+    #    NEWCTXT = "class"
+    # </RULE>
+
+    <RULE Bone>
+        SF = "Bone"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Bone"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Cancer>
+        SF = "Cancer"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Cancer"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Cardiovascular>
+        SF = "Cardiovascular"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Cardiovascular"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Connective_tissue_disorder>
+        SF = "Connective_tissue_disorder"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Connective_tissue_disorder"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Connective_tissue>
+        SF = "Connective_tissue"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Connective_tissue"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Dermatological>
+        SF = "Dermatological"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Dermatological"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Developmental>
+        SF = "Developmental"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Developmental"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Ear%5FNose%5FThroat>
+        SF = "Ear%5FNose%5FThroat"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Ear%5FNose%5FThroat"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Ear%5FNose%5FThroat>
+        SF = "Ear%5FNose%5FThroat"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Ear%5FNose%5FThroat"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Ear,Nose,Throat>
+        SF = "Ear,Nose,Throat"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Ear,Nose,Throat"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Endocrine>
+        SF = "Endocrine"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Endocrine"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Gastrointestinal>
+        SF = "Gastrointestinal"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Gastrointestinal"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Hematological>
+        SF = "Hematological"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Hematological"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Immunological>
+        SF = "Immunological"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Immunological"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Metabolic>
+        SF = "Metabolic"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Metabolic"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE multiple>
+        SF = "multiple"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/multiple"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Muscular>
+        SF = "Muscular"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Muscular"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Neurological>
+        SF = "Neurological"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Neurological"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Nutritional>
+        SF = "Nutritional"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Nutritional"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Ophthamological>
+        SF = "Ophthamological"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Ophthamological"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Psychiatric>
+        SF = "Psychiatric"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Psychiatric"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Renal>
+        SF = "Renal"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Renal"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Respiratory>
+        SF = "Respiratory"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Respiratory"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Skeletal>
+        SF = "Skeletal"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Skeletal"
+        NEWCTXT = "class"
+    </RULE>
+    <RULE Unclassified>
+        SF = "Unclassified"
+        CTXT = "class"
+        NEWSF = "diseasome/resource/diseaseClass/Unclassified"
+        NEWCTXT = "class"
+    </RULE>
+
+    # <RULE target>
+    #    SF = "target"
+    #    CTXT = "gene"
+    #    NEWSF = "target"
+    #    NEWCTXT = ""
+    # </RULE>
+
+    <RULE mechanismOfAction>
+       SF = "mechanismOfAction"
+       CTXT = "generalFunction"
+       NEWSF = "mechanismOfAction"
+       NEWCTXT = ""
+    </RULE>
+
+</CTXTL_REWRITE>
+
+<CONST>
+    INT="http://www.w3.org/2001/XMLSchema\#int"
+</CONST>
+
+<RDFTYPE>
+    sider/resource/drugs = "sider/resource/sider/drugs"
+    sider/resource/side_effects = "sider/resource/siders/side_effects"
+</RDFTYPE>

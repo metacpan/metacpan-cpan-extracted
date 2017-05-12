@@ -1,0 +1,12 @@
+    <groceries crackers=1>
+        <soup>2</soup>
+        <milk value="1"/>
+        <vegitables value="brocoli"/>
+        <vegitables>
+            <lit>corn</lit>
+            <lit>carrots</lit>
+            <lit>okra</lit>
+        </vegitables>
+        <vegitables value="peas"/>
+    </groceries>
+

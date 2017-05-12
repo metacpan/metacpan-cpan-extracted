@@ -1,0 +1,50 @@
+RT-Extension-WatchedQueue - List queues the user is a watcher of
+
+This RT Extension allow to display the list of queues the user is watcher, in
+the user configuration tab.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Then, to make it active, add it to @Plugins in RT site configuration file
+(RT_SiteConfig.pm), example:
+
+    Set(@Plugins,(qw(RT::Extension::WatchedQueues)));
+
+SUPPORT AND DOCUMENTATION
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc RT::Extension::WatchedQueues
+
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=RT-Extension-WatchedQueues
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/RT-Extension-WatchedQueues
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/RT-Extension-WatchedQueues
+
+    Search CPAN
+        http://search.cpan.org/dist/RT-Extension-WatchedQueues
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Emmanuel Lacour
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+

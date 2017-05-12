@@ -1,0 +1,50 @@
+{
+   "abstract" : "General client for interacting with json data in HTTP Restful services",
+   "author" : [
+      "Chris Becker <cbecker@shutterstock.com>, Travis Beck <travis@shutterstock.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132620",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "REST-Consumer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "1.08",
+            "HTTP::Request" : "0",
+            "JSON::XS" : "0",
+            "LWP" : "0",
+            "LWP::UserAgent::Paranoid" : "0.94",
+            "Test::CheckManifest" : "0.9",
+            "Test::More" : "0",
+            "Test::Resub" : "2.01",
+            "Time::HiRes" : "1.9726",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.02"
+}

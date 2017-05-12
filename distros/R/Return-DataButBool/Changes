@@ -1,0 +1,13 @@
+Revision history for Return-DataButBool
+
+0.0.3  Thu Jan  8 21:27:56 2009
+        fixed zero but true
+        made string logic better
+        tests!
+        
+0.0.2  Sat Sep 29 15:33:24 2007
+		Made perlcritic test optional as per http://rt.cpan.org/Ticket/Display.html?id=29554#txn-364766'
+
+0.0.1  Fri Jul 27 21:06:23 2007
+       Initial release.
+

@@ -1,0 +1,43 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/RDF-KML-Exporter/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project
+	a               :Project ;
+	:name           "RDF-KML-Exporter" ;
+	:shortdesc      "export RDF geo data to KML (Google Earth)"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/RDF-KML-Exporter> ;
+	:download-page  <https://metacpan.org/release/RDF-KML-Exporter> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=RDF-KML-Exporter> ;
+	:repository     [ a :SVNRepository ; :browse <http://goddamn.co.uk/svn-web/perlmods/browse/RDF-KML-Exporter/> ] ;
+	:maintainer     toby:i ;
+	:developer      toby:i ;
+	:documenter     toby:i ;
+	:tester         toby:i ;
+	:created        "2011-01-14"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> ;
+	:category
+		[ rdfs:label "Geo"@en ] ,
+		[ rdfs:label "Geographic"@en ] ,
+		[ rdfs:label "Geography"@en ] ,
+		[ rdfs:label "WGS84"@en ] ,
+		[ rdfs:label "RDF"@en ] ,
+		[ rdfs:label "Semantic Web"@en ] ,
+		[ rdfs:label "Google Earth"@en ] ,
+		[ rdfs:label "KML"@en ] ,
+		[ rdfs:label "XML"@en ] ,
+		[ rdfs:label "convert"@en ] .
+
+toby:i
+	a               foaf:Person ;
+	foaf:name       "Toby Inkster" ;
+	foaf:homepage   <http://tobyinkster.co.uk/> ;
+	foaf:page       <https://metacpan.org/author/TOBYINK> ;
+	foaf:mbox       <mailto:tobyink@cpan.org> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://purl.org/NET/cpan-uri/person/tobyink> .

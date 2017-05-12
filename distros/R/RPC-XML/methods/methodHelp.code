@@ -1,0 +1,44 @@
+###############################################################################
+#
+#   Sub Name:       methodHelp
+#
+#   Description:    Retrieve any help text for the specified methods.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   $srv      in      ref       Server object instance
+#                   $arg      in      ref/sc    Listref or scalar specification
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    string or listref
+#                   Failure:    fault object
+#
+###############################################################################
+sub methodHelp
+{
+    use strict;
+
+    my $srv = shift;
+    my $arg = shift;
+
+    my $name = $srv->{method_name};
+    my @list = (ref $arg) ? @$arg : ($arg);
+    my @results = ();
+    my $method;
+
+    for (@list)
+    {
+        if (ref($method = $srv->get_method($_)) and (! $method->hidden))
+        {
+            push(@results, $method->help() || '');
+        }
+        else
+        {
+            return RPC::XML::fault->new(302, "$name: Method $_ unknown");
+        }
+    }
+
+    return (ref $arg) ? \@results : $results[0];
+}

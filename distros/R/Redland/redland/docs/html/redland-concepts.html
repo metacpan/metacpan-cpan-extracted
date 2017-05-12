@@ -1,0 +1,1060 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Concepts</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Redland RDF Application Framework Manual">
+<link rel="up" href="pt02.html" title="Part&#160;II.&#160;Reference Manual">
+<link rel="prev" href="redland-world.html" title="World">
+<link rel="next" href="redland-digest.html" title="Digests">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="redland.html" title="Redland Overview">
+<link rel="chapter" href="introduction.html" title="Introduction">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Tutorial">
+<link rel="part" href="pt02.html" title="Part&#160;II.&#160;Reference Manual">
+<link rel="chapter" href="objects.html" title="Objects in C">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="redland-world.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt02.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Redland RDF Application Framework Manual</th>
+<td><a accesskey="n" href="redland-digest.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2585382" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2603708" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="redland-concepts"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2585382"></a><span class="refentrytitle">Concepts</span>
+</h2>
+<p>Concepts &#8212; Pre-defined URIS and Nodes in the RDF namespaces.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+#define     <a href="redland-concepts.html#LIBRDF-MS-Alt">LIBRDF_MS_Alt</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Alt-URI">LIBRDF_MS_Alt_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Bag">LIBRDF_MS_Bag</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Bag-URI">LIBRDF_MS_Bag_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Description">LIBRDF_MS_Description</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Description-URI">LIBRDF_MS_Description_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Property">LIBRDF_MS_Property</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Property-URI">LIBRDF_MS_Property_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-RDF:CAPS">LIBRDF_MS_RDF</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-RDF-URI:CAPS">LIBRDF_MS_RDF_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Seq">LIBRDF_MS_Seq</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Seq-URI">LIBRDF_MS_Seq_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Statement">LIBRDF_MS_Statement</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-Statement-URI">LIBRDF_MS_Statement_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-aboutEach">LIBRDF_MS_aboutEach</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-aboutEachPrefix">LIBRDF_MS_aboutEachPrefix</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-aboutEachPrefix-URI">LIBRDF_MS_aboutEachPrefix_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-aboutEach-URI">LIBRDF_MS_aboutEach_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-li">LIBRDF_MS_li</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-li-URI">LIBRDF_MS_li_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-object">LIBRDF_MS_object</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-object-URI">LIBRDF_MS_object_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-predicate">LIBRDF_MS_predicate</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-predicate-URI">LIBRDF_MS_predicate_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-subject">LIBRDF_MS_subject</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-subject-URI">LIBRDF_MS_subject_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-type">LIBRDF_MS_type</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-type-URI">LIBRDF_MS_type_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-value">LIBRDF_MS_value</a>
+#define     <a href="redland-concepts.html#LIBRDF-MS-value-URI">LIBRDF_MS_value_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-List">LIBRDF_RS_List</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-List-URI">LIBRDF_RS_List_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-XMLLiteral">LIBRDF_RS_XMLLiteral</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-XMLLiteral-URI">LIBRDF_RS_XMLLiteral_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-first">LIBRDF_RS_first</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-first-URI">LIBRDF_RS_first_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-nil">LIBRDF_RS_nil</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-nil-URI">LIBRDF_RS_nil_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-nodeID">LIBRDF_RS_nodeID</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-nodeID-URI">LIBRDF_RS_nodeID_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-rest">LIBRDF_RS_rest</a>
+#define     <a href="redland-concepts.html#LIBRDF-RS-rest-URI">LIBRDF_RS_rest_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-Class">LIBRDF_S_Class</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-Class-URI">LIBRDF_S_Class_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-ConstraintProperty">LIBRDF_S_ConstraintProperty</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-ConstraintProperty-URI">LIBRDF_S_ConstraintProperty_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-ConstraintResource">LIBRDF_S_ConstraintResource</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-ConstraintResource-URI">LIBRDF_S_ConstraintResource_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-Container">LIBRDF_S_Container</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-ContainerMembershipProperty">LIBRDF_S_ContainerMembershipProperty</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-ContainerMembershipProperty-URI">LIBRDF_S_ContainerMembershipProperty_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-Container-URI">LIBRDF_S_Container_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-Literal">LIBRDF_S_Literal</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-Literal-URI">LIBRDF_S_Literal_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-Resource">LIBRDF_S_Resource</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-Resource-URI">LIBRDF_S_Resource_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-comment">LIBRDF_S_comment</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-comment-URI">LIBRDF_S_comment_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-domain">LIBRDF_S_domain</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-domain-URI">LIBRDF_S_domain_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-isDefinedBy">LIBRDF_S_isDefinedBy</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-isDefinedBy-URI">LIBRDF_S_isDefinedBy_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-label">LIBRDF_S_label</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-label-URI">LIBRDF_S_label_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-range">LIBRDF_S_range</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-range-URI">LIBRDF_S_range_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-seeAlso">LIBRDF_S_seeAlso</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-seeAlso-URI">LIBRDF_S_seeAlso_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-subClassOf">LIBRDF_S_subClassOf</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-subClassOf-URI">LIBRDF_S_subClassOf_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-subPropertyOf">LIBRDF_S_subPropertyOf</a>
+#define     <a href="redland-concepts.html#LIBRDF-S-subPropertyOf-URI">LIBRDF_S_subPropertyOf_URI</a>
+#define     <a href="redland-concepts.html#LIBRDF-URI-RDF-MS:CAPS">LIBRDF_URI_RDF_MS</a>
+#define     <a href="redland-concepts.html#LIBRDF-URI-RDF-SCHEMA:CAPS">LIBRDF_URI_RDF_SCHEMA</a>
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2603708"></a><h2>Description</h2>
+<p>
+This module presents RDF concepts from either the RDF namespace
+<a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#" target="_top">http://www.w3.org/1999/02/22-rdf-syntax-ns#</a>
+or the RDF Schema namespace
+<a href="http://www.w3.org/2000/01/rdf-schema#" target="_top">http://www.w3.org/2000/01/rdf-schema#</a>
+</p>
+<p>
+This list includes both syntax terms such as
+<code class="literal">rdf:li</code> as well as model concepts (RDF
+properties or classes) such as <code class="literal">rdf:Seq</code>
+</p>
+<p>
+These are used in code using two lists of macros to get fast
+pointers to <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> or <a href="redland-uri.html#librdf-uri"><span class="type">librdf_uri</span></a> objects for the concept.
+These should be copied with the appropriate <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a>
+or <a href="redland-uri.html#librdf-uri"><span class="type">librdf_uri</span></a> class copy constructors before use.
+</p>
+<div class="example">
+<a name="id2603788"></a><p class="title"><b>Example&#160;1.&#160;Using macros to get a node and URI for an RDF concept</b></p>
+<div class="example-contents"><pre class="programlisting">
+  <span class="type">include</span> &lt;redland.h&gt;
+  ...
+
+  librdf_node* n=librdf_new_node_from_node(LIBRDF_MS_value);
+
+  librdf_uri* u=librdf_new_uri_from_uri(LIBRDF_MS_value_URI);
+</pre></div>
+</div>
+<br class="example-break">
+</div>
+<div class="refsect1" lang="en">
+<a name="id2603813"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2603823"></a><h3>
+<a name="LIBRDF-MS-Alt"></a>LIBRDF_MS_Alt</h3>
+<a class="indexterm" name="id2603836"></a><pre class="programlisting">#define LIBRDF_MS_Alt
+</pre>
+<p>
+RDF namespace concept librdf_node Alt</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588522"></a><h3>
+<a name="LIBRDF-MS-Alt-URI"></a>LIBRDF_MS_Alt_URI</h3>
+<a class="indexterm" name="id2588534"></a><pre class="programlisting">#define LIBRDF_MS_Alt_URI
+</pre>
+<p>
+RDF namespace concept URI Alt</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588553"></a><h3>
+<a name="LIBRDF-MS-Bag"></a>LIBRDF_MS_Bag</h3>
+<a class="indexterm" name="id2588565"></a><pre class="programlisting">#define LIBRDF_MS_Bag
+</pre>
+<p>
+RDF namespace concept librdf_node Bag</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588585"></a><h3>
+<a name="LIBRDF-MS-Bag-URI"></a>LIBRDF_MS_Bag_URI</h3>
+<a class="indexterm" name="id2588598"></a><pre class="programlisting">#define LIBRDF_MS_Bag_URI
+</pre>
+<p>
+RDF namespace concept URI Bag</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588616"></a><h3>
+<a name="LIBRDF-MS-Description"></a>LIBRDF_MS_Description</h3>
+<a class="indexterm" name="id2588628"></a><pre class="programlisting">#define LIBRDF_MS_Description
+</pre>
+<p>
+RDF namespace concept librdf_node Description</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588647"></a><h3>
+<a name="LIBRDF-MS-Description-URI"></a>LIBRDF_MS_Description_URI</h3>
+<a class="indexterm" name="id2588658"></a><pre class="programlisting">#define LIBRDF_MS_Description_URI
+</pre>
+<p>
+RDF namespace concept URI Description</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588678"></a><h3>
+<a name="LIBRDF-MS-Property"></a>LIBRDF_MS_Property</h3>
+<a class="indexterm" name="id2588690"></a><pre class="programlisting">#define LIBRDF_MS_Property
+</pre>
+<p>
+RDF namespace concept librdf_node Property</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588710"></a><h3>
+<a name="LIBRDF-MS-Property-URI"></a>LIBRDF_MS_Property_URI</h3>
+<a class="indexterm" name="id2588721"></a><pre class="programlisting">#define LIBRDF_MS_Property_URI
+</pre>
+<p>
+RDF namespace concept URI Property</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588740"></a><h3>
+<a name="LIBRDF-MS-RDF:CAPS"></a>LIBRDF_MS_RDF</h3>
+<a class="indexterm" name="id2588752"></a><pre class="programlisting">#define LIBRDF_MS_RDF
+</pre>
+<p>
+RDF namespace concept librdf_node RDF</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2588772"></a><h3>
+<a name="LIBRDF-MS-RDF-URI:CAPS"></a>LIBRDF_MS_RDF_URI</h3>
+<a class="indexterm" name="id2588783"></a><pre class="programlisting">#define LIBRDF_MS_RDF_URI
+</pre>
+<p>
+RDF namespace concept URI RDF</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594661"></a><h3>
+<a name="LIBRDF-MS-Seq"></a>LIBRDF_MS_Seq</h3>
+<a class="indexterm" name="id2594674"></a><pre class="programlisting">#define LIBRDF_MS_Seq
+</pre>
+<p>
+RDF namespace concept librdf_node Seq</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594694"></a><h3>
+<a name="LIBRDF-MS-Seq-URI"></a>LIBRDF_MS_Seq_URI</h3>
+<a class="indexterm" name="id2594706"></a><pre class="programlisting">#define LIBRDF_MS_Seq_URI
+</pre>
+<p>
+RDF namespace concept URI Seq</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594726"></a><h3>
+<a name="LIBRDF-MS-Statement"></a>LIBRDF_MS_Statement</h3>
+<a class="indexterm" name="id2594738"></a><pre class="programlisting">#define LIBRDF_MS_Statement
+</pre>
+<p>
+RDF namespace concept librdf_node Statement</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594758"></a><h3>
+<a name="LIBRDF-MS-Statement-URI"></a>LIBRDF_MS_Statement_URI</h3>
+<a class="indexterm" name="id2594770"></a><pre class="programlisting">#define LIBRDF_MS_Statement_URI
+</pre>
+<p>
+RDF namespace concept URI Statement</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594790"></a><h3>
+<a name="LIBRDF-MS-aboutEach"></a>LIBRDF_MS_aboutEach</h3>
+<a class="indexterm" name="id2594802"></a><pre class="programlisting">#define LIBRDF_MS_aboutEach
+</pre>
+<p>
+RDF namespace concept librdf_node aboutEach</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594823"></a><h3>
+<a name="LIBRDF-MS-aboutEachPrefix"></a>LIBRDF_MS_aboutEachPrefix</h3>
+<a class="indexterm" name="id2594834"></a><pre class="programlisting">#define LIBRDF_MS_aboutEachPrefix
+</pre>
+<p>
+RDF namespace concept librdf_node aboutEachPrefix</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594854"></a><h3>
+<a name="LIBRDF-MS-aboutEachPrefix-URI"></a>LIBRDF_MS_aboutEachPrefix_URI</h3>
+<a class="indexterm" name="id2594867"></a><pre class="programlisting">#define LIBRDF_MS_aboutEachPrefix_URI
+</pre>
+<p>
+RDF namespace concept URI aboutEachPrefix</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594888"></a><h3>
+<a name="LIBRDF-MS-aboutEach-URI"></a>LIBRDF_MS_aboutEach_URI</h3>
+<a class="indexterm" name="id2594899"></a><pre class="programlisting">#define LIBRDF_MS_aboutEach_URI
+</pre>
+<p>
+RDF namespace concept URI aboutEach</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594919"></a><h3>
+<a name="LIBRDF-MS-li"></a>LIBRDF_MS_li</h3>
+<a class="indexterm" name="id2594932"></a><pre class="programlisting">#define LIBRDF_MS_li
+</pre>
+<p>
+RDF namespace concept librdf_node li</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2594951"></a><h3>
+<a name="LIBRDF-MS-li-URI"></a>LIBRDF_MS_li_URI</h3>
+<a class="indexterm" name="id2594964"></a><pre class="programlisting">#define LIBRDF_MS_li_URI
+</pre>
+<p>
+RDF namespace concept URI li</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608111"></a><h3>
+<a name="LIBRDF-MS-object"></a>LIBRDF_MS_object</h3>
+<a class="indexterm" name="id2608122"></a><pre class="programlisting">#define LIBRDF_MS_object
+</pre>
+<p>
+RDF namespace concept librdf_node object</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608139"></a><h3>
+<a name="LIBRDF-MS-object-URI"></a>LIBRDF_MS_object_URI</h3>
+<a class="indexterm" name="id2608150"></a><pre class="programlisting">#define LIBRDF_MS_object_URI
+</pre>
+<p>
+RDF namespace concept URI object</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608168"></a><h3>
+<a name="LIBRDF-MS-predicate"></a>LIBRDF_MS_predicate</h3>
+<a class="indexterm" name="id2608178"></a><pre class="programlisting">#define LIBRDF_MS_predicate
+</pre>
+<p>
+RDF namespace concept librdf_node predicate</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608196"></a><h3>
+<a name="LIBRDF-MS-predicate-URI"></a>LIBRDF_MS_predicate_URI</h3>
+<a class="indexterm" name="id2608207"></a><pre class="programlisting">#define LIBRDF_MS_predicate_URI
+</pre>
+<p>
+RDF namespace concept URI predicate</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608227"></a><h3>
+<a name="LIBRDF-MS-subject"></a>LIBRDF_MS_subject</h3>
+<a class="indexterm" name="id2608239"></a><pre class="programlisting">#define LIBRDF_MS_subject
+</pre>
+<p>
+RDF namespace concept librdf_node subject</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608259"></a><h3>
+<a name="LIBRDF-MS-subject-URI"></a>LIBRDF_MS_subject_URI</h3>
+<a class="indexterm" name="id2608270"></a><pre class="programlisting">#define LIBRDF_MS_subject_URI
+</pre>
+<p>
+RDF namespace concept URI subject</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608290"></a><h3>
+<a name="LIBRDF-MS-type"></a>LIBRDF_MS_type</h3>
+<a class="indexterm" name="id2608302"></a><pre class="programlisting">#define LIBRDF_MS_type
+</pre>
+<p>
+RDF namespace concept librdf_node type</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608322"></a><h3>
+<a name="LIBRDF-MS-type-URI"></a>LIBRDF_MS_type_URI</h3>
+<a class="indexterm" name="id2608334"></a><pre class="programlisting">#define LIBRDF_MS_type_URI
+</pre>
+<p>
+RDF namespace concept URI type</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608354"></a><h3>
+<a name="LIBRDF-MS-value"></a>LIBRDF_MS_value</h3>
+<a class="indexterm" name="id2608366"></a><pre class="programlisting">#define LIBRDF_MS_value
+</pre>
+<p>
+RDF namespace concept librdf_node value</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608386"></a><h3>
+<a name="LIBRDF-MS-value-URI"></a>LIBRDF_MS_value_URI</h3>
+<a class="indexterm" name="id2608398"></a><pre class="programlisting">#define LIBRDF_MS_value_URI
+</pre>
+<p>
+RDF namespace concept URI value</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608419"></a><h3>
+<a name="LIBRDF-RS-List"></a>LIBRDF_RS_List</h3>
+<a class="indexterm" name="id2608431"></a><pre class="programlisting">#define LIBRDF_RS_List
+</pre>
+<p>
+RDF namespace concept librdf_node List</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608451"></a><h3>
+<a name="LIBRDF-RS-List-URI"></a>LIBRDF_RS_List_URI</h3>
+<a class="indexterm" name="id2608463"></a><pre class="programlisting">#define LIBRDF_RS_List_URI
+</pre>
+<p>
+RDF namespace concept URI List</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608483"></a><h3>
+<a name="LIBRDF-RS-XMLLiteral"></a>LIBRDF_RS_XMLLiteral</h3>
+<a class="indexterm" name="id2608494"></a><pre class="programlisting">#define LIBRDF_RS_XMLLiteral
+</pre>
+<p>
+RDF namespace concept librdf_node XMLLiteral</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608514"></a><h3>
+<a name="LIBRDF-RS-XMLLiteral-URI"></a>LIBRDF_RS_XMLLiteral_URI</h3>
+<a class="indexterm" name="id2608525"></a><pre class="programlisting">#define LIBRDF_RS_XMLLiteral_URI
+</pre>
+<p>
+RDF namespace concept URI XMLLiteral</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608545"></a><h3>
+<a name="LIBRDF-RS-first"></a>LIBRDF_RS_first</h3>
+<a class="indexterm" name="id2608558"></a><pre class="programlisting">#define LIBRDF_RS_first
+</pre>
+<p>
+RDF namespace concept librdf_node first</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608578"></a><h3>
+<a name="LIBRDF-RS-first-URI"></a>LIBRDF_RS_first_URI</h3>
+<a class="indexterm" name="id2608590"></a><pre class="programlisting">#define LIBRDF_RS_first_URI
+</pre>
+<p>
+RDF namespace concept URI first</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608610"></a><h3>
+<a name="LIBRDF-RS-nil"></a>LIBRDF_RS_nil</h3>
+<a class="indexterm" name="id2608623"></a><pre class="programlisting">#define LIBRDF_RS_nil
+</pre>
+<p>
+RDF namespace concept librdf_node nil</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608642"></a><h3>
+<a name="LIBRDF-RS-nil-URI"></a>LIBRDF_RS_nil_URI</h3>
+<a class="indexterm" name="id2608655"></a><pre class="programlisting">#define LIBRDF_RS_nil_URI
+</pre>
+<p>
+RDF namespace concept URI nil</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608674"></a><h3>
+<a name="LIBRDF-RS-nodeID"></a>LIBRDF_RS_nodeID</h3>
+<a class="indexterm" name="id2608687"></a><pre class="programlisting">#define LIBRDF_RS_nodeID
+</pre>
+<p>
+RDF namespace concept librdf_node nodeID</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608706"></a><h3>
+<a name="LIBRDF-RS-nodeID-URI"></a>LIBRDF_RS_nodeID_URI</h3>
+<a class="indexterm" name="id2608718"></a><pre class="programlisting">#define LIBRDF_RS_nodeID_URI
+</pre>
+<p>
+RDF namespace concept URI nodeID</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608738"></a><h3>
+<a name="LIBRDF-RS-rest"></a>LIBRDF_RS_rest</h3>
+<a class="indexterm" name="id2608750"></a><pre class="programlisting">#define LIBRDF_RS_rest
+</pre>
+<p>
+RDF namespace concept librdf_node rest</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608770"></a><h3>
+<a name="LIBRDF-RS-rest-URI"></a>LIBRDF_RS_rest_URI</h3>
+<a class="indexterm" name="id2608782"></a><pre class="programlisting">#define LIBRDF_RS_rest_URI
+</pre>
+<p>
+RDF namespace concept URI rest</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608802"></a><h3>
+<a name="LIBRDF-S-Class"></a>LIBRDF_S_Class</h3>
+<a class="indexterm" name="id2608814"></a><pre class="programlisting">#define LIBRDF_S_Class
+</pre>
+<p>
+RDFS namespace concept Class</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608834"></a><h3>
+<a name="LIBRDF-S-Class-URI"></a>LIBRDF_S_Class_URI</h3>
+<a class="indexterm" name="id2608846"></a><pre class="programlisting">#define LIBRDF_S_Class_URI
+</pre>
+<p>
+RDFS namespace concept URI Class</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608866"></a><h3>
+<a name="LIBRDF-S-ConstraintProperty"></a>LIBRDF_S_ConstraintProperty</h3>
+<a class="indexterm" name="id2608877"></a><pre class="programlisting">#define LIBRDF_S_ConstraintProperty
+</pre>
+<p>
+RDFS namespace concept ConstraintProperty</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608897"></a><h3>
+<a name="LIBRDF-S-ConstraintProperty-URI"></a>LIBRDF_S_ConstraintProperty_URI</h3>
+<a class="indexterm" name="id2608910"></a><pre class="programlisting">#define LIBRDF_S_ConstraintProperty_URI
+</pre>
+<p>
+RDFS namespace concept URI ConstraintProperty</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608931"></a><h3>
+<a name="LIBRDF-S-ConstraintResource"></a>LIBRDF_S_ConstraintResource</h3>
+<a class="indexterm" name="id2608942"></a><pre class="programlisting">#define LIBRDF_S_ConstraintResource
+</pre>
+<p>
+RDFS namespace concept ConstraintResource</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608962"></a><h3>
+<a name="LIBRDF-S-ConstraintResource-URI"></a>LIBRDF_S_ConstraintResource_URI</h3>
+<a class="indexterm" name="id2608976"></a><pre class="programlisting">#define LIBRDF_S_ConstraintResource_URI
+</pre>
+<p>
+RDFS namespace concept URI ConstraintResource</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2608997"></a><h3>
+<a name="LIBRDF-S-Container"></a>LIBRDF_S_Container</h3>
+<a class="indexterm" name="id2609009"></a><pre class="programlisting">#define LIBRDF_S_Container
+</pre>
+<p>
+RDFS namespace concept Container</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609029"></a><h3>
+<a name="LIBRDF-S-ContainerMembershipProperty"></a>LIBRDF_S_ContainerMembershipProperty</h3>
+<a class="indexterm" name="id2609042"></a><pre class="programlisting">#define LIBRDF_S_ContainerMembershipProperty
+</pre>
+<p>
+RDFS namespace concept ContainerMembershipProperty</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609063"></a><h3>
+<a name="LIBRDF-S-ContainerMembershipProperty-URI"></a>LIBRDF_S_ContainerMembershipProperty_URI</h3>
+<a class="indexterm" name="id2609077"></a><pre class="programlisting">#define LIBRDF_S_ContainerMembershipProperty_URI
+</pre>
+<p>
+RDFS namespace concept URI ContainerMembershipProperty</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609098"></a><h3>
+<a name="LIBRDF-S-Container-URI"></a>LIBRDF_S_Container_URI</h3>
+<a class="indexterm" name="id2609110"></a><pre class="programlisting">#define LIBRDF_S_Container_URI
+</pre>
+<p>
+RDFS namespace concept URI Container</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609130"></a><h3>
+<a name="LIBRDF-S-Literal"></a>LIBRDF_S_Literal</h3>
+<a class="indexterm" name="id2609142"></a><pre class="programlisting">#define LIBRDF_S_Literal
+</pre>
+<p>
+RDFS namespace concept Literal</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609162"></a><h3>
+<a name="LIBRDF-S-Literal-URI"></a>LIBRDF_S_Literal_URI</h3>
+<a class="indexterm" name="id2609173"></a><pre class="programlisting">#define LIBRDF_S_Literal_URI
+</pre>
+<p>
+RDFS namespace concept URI Literal</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609193"></a><h3>
+<a name="LIBRDF-S-Resource"></a>LIBRDF_S_Resource</h3>
+<a class="indexterm" name="id2609205"></a><pre class="programlisting">#define LIBRDF_S_Resource
+</pre>
+<p>
+RDFS namespace concept Resource</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609225"></a><h3>
+<a name="LIBRDF-S-Resource-URI"></a>LIBRDF_S_Resource_URI</h3>
+<a class="indexterm" name="id2609236"></a><pre class="programlisting">#define LIBRDF_S_Resource_URI
+</pre>
+<p>
+RDFS namespace concept URI Resource</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609256"></a><h3>
+<a name="LIBRDF-S-comment"></a>LIBRDF_S_comment</h3>
+<a class="indexterm" name="id2609268"></a><pre class="programlisting">#define LIBRDF_S_comment
+</pre>
+<p>
+RDFS namespace concept comment</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609288"></a><h3>
+<a name="LIBRDF-S-comment-URI"></a>LIBRDF_S_comment_URI</h3>
+<a class="indexterm" name="id2609299"></a><pre class="programlisting">#define LIBRDF_S_comment_URI
+</pre>
+<p>
+RDFS namespace concept URI comment</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609319"></a><h3>
+<a name="LIBRDF-S-domain"></a>LIBRDF_S_domain</h3>
+<a class="indexterm" name="id2609331"></a><pre class="programlisting">#define LIBRDF_S_domain
+</pre>
+<p>
+RDFS namespace concept domain</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609351"></a><h3>
+<a name="LIBRDF-S-domain-URI"></a>LIBRDF_S_domain_URI</h3>
+<a class="indexterm" name="id2609363"></a><pre class="programlisting">#define LIBRDF_S_domain_URI
+</pre>
+<p>
+RDFS namespace concept URI domain</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609384"></a><h3>
+<a name="LIBRDF-S-isDefinedBy"></a>LIBRDF_S_isDefinedBy</h3>
+<a class="indexterm" name="id2609395"></a><pre class="programlisting">#define LIBRDF_S_isDefinedBy
+</pre>
+<p>
+RDFS namespace concept isDefinedBy</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609415"></a><h3>
+<a name="LIBRDF-S-isDefinedBy-URI"></a>LIBRDF_S_isDefinedBy_URI</h3>
+<a class="indexterm" name="id2609426"></a><pre class="programlisting">#define LIBRDF_S_isDefinedBy_URI
+</pre>
+<p>
+RDFS namespace concept URI isDefinedBy</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609446"></a><h3>
+<a name="LIBRDF-S-label"></a>LIBRDF_S_label</h3>
+<a class="indexterm" name="id2609458"></a><pre class="programlisting">#define LIBRDF_S_label
+</pre>
+<p>
+RDFS namespace concept label</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609478"></a><h3>
+<a name="LIBRDF-S-label-URI"></a>LIBRDF_S_label_URI</h3>
+<a class="indexterm" name="id2609490"></a><pre class="programlisting">#define LIBRDF_S_label_URI
+</pre>
+<p>
+RDFS namespace concept URI label</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609510"></a><h3>
+<a name="LIBRDF-S-range"></a>LIBRDF_S_range</h3>
+<a class="indexterm" name="id2609522"></a><pre class="programlisting">#define LIBRDF_S_range
+</pre>
+<p>
+RDFS namespace concept range</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609542"></a><h3>
+<a name="LIBRDF-S-range-URI"></a>LIBRDF_S_range_URI</h3>
+<a class="indexterm" name="id2609554"></a><pre class="programlisting">#define LIBRDF_S_range_URI
+</pre>
+<p>
+RDFS namespace concept URI range</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609574"></a><h3>
+<a name="LIBRDF-S-seeAlso"></a>LIBRDF_S_seeAlso</h3>
+<a class="indexterm" name="id2609586"></a><pre class="programlisting">#define LIBRDF_S_seeAlso
+</pre>
+<p>
+RDFS namespace concept seeAlso</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609606"></a><h3>
+<a name="LIBRDF-S-seeAlso-URI"></a>LIBRDF_S_seeAlso_URI</h3>
+<a class="indexterm" name="id2609617"></a><pre class="programlisting">#define LIBRDF_S_seeAlso_URI
+</pre>
+<p>
+RDFS namespace concept URI seeAlso</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609637"></a><h3>
+<a name="LIBRDF-S-subClassOf"></a>LIBRDF_S_subClassOf</h3>
+<a class="indexterm" name="id2609649"></a><pre class="programlisting">#define LIBRDF_S_subClassOf
+</pre>
+<p>
+RDFS namespace concept subClassOf</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609670"></a><h3>
+<a name="LIBRDF-S-subClassOf-URI"></a>LIBRDF_S_subClassOf_URI</h3>
+<a class="indexterm" name="id2609681"></a><pre class="programlisting">#define LIBRDF_S_subClassOf_URI
+</pre>
+<p>
+RDFS namespace concept URI subClassOf</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609701"></a><h3>
+<a name="LIBRDF-S-subPropertyOf"></a>LIBRDF_S_subPropertyOf</h3>
+<a class="indexterm" name="id2609712"></a><pre class="programlisting">#define     LIBRDF_S_subPropertyOf</pre>
+<p>
+RDFS namespace concept subPropertyOf</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609732"></a><h3>
+<a name="LIBRDF-S-subPropertyOf-URI"></a>LIBRDF_S_subPropertyOf_URI</h3>
+<a class="indexterm" name="id2609743"></a><pre class="programlisting">#define LIBRDF_S_subPropertyOf_URI
+</pre>
+<p>
+RDFS namespace concept URI subPropertyOf</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609763"></a><h3>
+<a name="LIBRDF-URI-RDF-MS:CAPS"></a>LIBRDF_URI_RDF_MS</h3>
+<a class="indexterm" name="id2609775"></a><pre class="programlisting">#define LIBRDF_URI_RDF_MS
+</pre>
+<p>
+<a href="redland-uri.html#librdf-uri"><span class="type">librdf_uri</span></a> for <code class="literal">rdf:</code> namespace.  Copy with
+<a href="redland-uri.html#librdf-new-uri-from-uri"><code class="function">librdf_new_uri_from_uri()</code></a> before using.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2609816"></a><h3>
+<a name="LIBRDF-URI-RDF-SCHEMA:CAPS"></a>LIBRDF_URI_RDF_SCHEMA</h3>
+<a class="indexterm" name="id2609827"></a><pre class="programlisting">#define LIBRDF_URI_RDF_SCHEMA
+</pre>
+<p>
+<a href="redland-uri.html#librdf-uri"><span class="type">librdf_uri</span></a> for <code class="literal">rdfs:</code> namespace.  Copy with
+<a href="redland-uri.html#librdf-new-uri-from-uri"><code class="function">librdf_new_uri_from_uri()</code></a> before using.</p>
+<p>
+
+</p>
+</div>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2609845"></a><h2>See Also</h2>
+<p>
+<a href="http://www.w3.org/TR/2004/REC-rdf-schema-20040210/" target="_top">RDF Vocabulary Description Language 1.0: RDF Schema</a>, Graham Klyne and Jeremy J. Carroll, Editors, W3C Recommendation, 10 February 2004.
+</p>
+<p>
+<a href="http://www.w3.org/TR/2004/REC-rdf-concepts-20040210/" target="_top">Resource Description Framework (RDF): Concepts and Abstract Syntax</a>, Dan Brickley and R. V. Guha, Editors, W3C Recommendation, 10 February 2004.
+</p>
+</div>
+</div>
+</body>
+</html>

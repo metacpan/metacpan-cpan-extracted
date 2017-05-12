@@ -1,0 +1,11 @@
+TODO 
+
+ * parameter to show other fields than email in autocompletion list (Name, Address, ...)
+ * add other auto completion fields (link ticket with completion on subject)
+ * add a context menu in tickets list to link directly to ticket subsections
+
+DONE
+
+ * enable/disable Completion for SelfService
+ * add completion against LDAP
+ * optimisation to match privileged/unprivileged criteria (faster than the if ... elsif ... else inside the loop)

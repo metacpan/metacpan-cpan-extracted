@@ -1,0 +1,38 @@
+---
+abstract: 'Parse a Perl regexp into a Tree'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-Parsertron
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Section::Simple: '0.07'
+  File::Slurper: '0.008'
+  Marpa::R2: '3'
+  Moo: '2.001001'
+  Scalar::Does: '0.202'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Tree: '1.07'
+  Try::Tiny: '0.24'
+  Types::Standard: '1.000005'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/Regexp-Parsertron.git
+version: '0.51'
+

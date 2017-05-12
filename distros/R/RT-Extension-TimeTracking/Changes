@@ -1,0 +1,35 @@
+Revision history for RT-Extension-TimeTracking
+
+0.08 2016-03-21
+ - Add github URL and sign
+
+0.07 2016-03-11
+ - Update image size in documentation.
+
+0.06 2016-03-11
+ - Public release to CPAN.
+ - Documentation updates.
+
+0.05 2015-04-15
+ - Updated layout for "My Week" page
+ - Stop grouping "My Week" results by ticket id
+ - Prefix results on "My Week" with ticket id
+ - Prevent spurious "That is already the current value" messages on Basics
+ - Packaging updates
+
+0.04 2014-03-13
+ - Add $TimeTrackingDisplayCF feature
+
+0.03 2014-03-12
+ - Fix daylight savings time issue
+ - Fix week end offset
+ - Fix weekday name in timesheet when custom first day of week selected
+
+0.02 2014-03-07
+ - Use the user's timezone to set the default date for entering time
+ - Refactor first day of week handling to avoid flipping to the next week
+   on the last day of the week
+
+0.01 2013-12-19
+ - Initial release.
+

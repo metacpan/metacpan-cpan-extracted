@@ -1,0 +1,508 @@
+NAME
+    RRD::Simple - Simple interface to create and store data in RRD files
+
+SYNOPSIS
+     use strict;
+     use RRD::Simple ();
+ 
+     # Create an interface object
+     my $rrd = RRD::Simple->new( file => "myfile.rrd" );
+ 
+     # Create a new RRD file with 3 data sources called
+     # bytesIn, bytesOut and faultsPerSec.
+     $rrd->create(
+                 bytesIn => "GAUGE",
+                 bytesOut => "GAUGE",
+                 faultsPerSec => "COUNTER"
+             );
+ 
+     # Put some arbitary data values in the RRD file for the same
+     # 3 data sources called bytesIn, bytesOut and faultsPerSec.
+     $rrd->update(
+                 bytesIn => 10039,
+                 bytesOut => 389,
+                 faultsPerSec => 0.4
+             );
+ 
+     # Generate graphs:
+     # /var/tmp/myfile-daily.png, /var/tmp/myfile-weekly.png
+     # /var/tmp/myfile-monthly.png, /var/tmp/myfile-annual.png
+     my %rtn = $rrd->graph(
+                 destination => "/var/tmp",
+                 title => "Network Interface eth0",
+                 vertical_label => "Bytes/Faults",
+                 interlaced => ""
+             );
+     printf("Created %s\n",join(", ",map { $rtn{$_}->[0] } keys %rtn));
+
+     # Return information about an RRD file
+     my $info = $rrd->info;
+     require Data::Dumper;
+     print Data::Dumper::Dumper($info);
+
+     # Get unixtime of when RRD file was last updated
+     my $lastUpdated = $rrd->last;
+     print "myfile.rrd was last updated at " .
+           scalar(localtime($lastUpdated)) . "\n";
+ 
+     # Get list of data source names from an RRD file
+     my @dsnames = $rrd->sources;
+     print "Available data sources: " . join(", ", @dsnames) . "\n";
+ 
+     # And for the ultimately lazy, you could create and update
+     # an RRD in one go using a one-liner like this:
+     perl -MRRD::Simple=:all -e"update(@ARGV)" myfile.rrd bytesIn 99999 
+
+DESCRIPTION
+    RRD::Simple provides a simple interface to RRDTool's RRDs module. This
+    module does not currently offer a "fetch" method that is available in
+    the RRDs module.
+
+    It does however create RRD files with a sensible set of default RRA
+    (Round Robin Archive) definitions, and can dynamically add new data
+    source names to an existing RRD file.
+
+    This module is ideal for quick and simple storage of data within an RRD
+    file if you do not need to, nor want to, bother defining custom RRA
+    definitions.
+
+METHODS
+  new
+     my $rrd = RRD::Simple->new(
+             file => "myfile.rrd",
+             rrdtool => "/usr/local/rrdtool-1.2.11/bin/rrdtool",
+             tmpdir => "/var/tmp",
+             cf => [ qw(AVERAGE MAX) ],
+             default_dstype => "GAUGE",
+             on_missing_ds => "add",
+         );
+
+    The "file" parameter is currently optional but will become mandatory in
+    future releases, replacing the optional $rrdfile parameters on
+    subsequent methods. This parameter specifies the RRD filename to be
+    used.
+
+    The "rrdtool" parameter is optional. It specifically defines where the
+    "rrdtool" binary can be found. If not specified, the module will search
+    for the "rrdtool" binary in your path, an additional location relative
+    to where the "RRDs" module was loaded from, and in /usr/local/rrdtool*.
+
+    The "tmpdir" parameter is option and is only used what automatically
+    adding a new data source to an existing RRD file. By default any
+    temporary files will be placed in your default system temp directory
+    (typically /tmp on Linux, or whatever your TMPDIR environment variable
+    is set to). This parameter can be used for force any temporary files to
+    be created in a specific directory.
+
+    The "rrdtool" binary is only used by the "add_source" method, and only
+    under certain circumstances. The "add_source" method may also be called
+    automatically by the "update" method, if data point values for a
+    previously undefined data source are provided for insertion.
+
+    The "cf" parameter is optional, but when specified expects an array
+    reference. The "cf" parameter defines which consolidation functions are
+    used in round robin archives (RRAs) when creating new RRD files. Valid
+    values are AVERAGE, MIN, MAX and LAST. The default value is AVERAGE and
+    MAX.
+
+    The "default_dstype" parameter is optional. Specifying the default data
+    source type (DST) through the new() method allows the DST to be
+    localised to the $rrd object instance rather than be global to the
+    RRD::Simple package. See $RRD::Simple::DEFAULT_DSTYPE.
+
+    The "on_missing_ds" parameter is optional and will default to "add" when
+    not defined. This parameter will determine what will happen if you try
+    to insert or update data for a data source name that does not exist in
+    the RRD file. Valid values are "add", "ignore" and "die".
+
+  create
+     $rrd->create($rrdfile, $period,
+             source_name => "TYPE",
+             source_name => "TYPE",
+             source_name => "TYPE"
+         );
+
+    This method will create a new RRD file on disk.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+    $period is optional and will default to "year". Valid options are
+    "hour", "6hour"/"quarterday", "12hour"/"halfday", "day", "week",
+    "month", "year", "3years" and "mrtg". Specifying a data retention period
+    value will change how long data will be retained for within the RRD
+    file. The "mrtg" scheme will try and mimic the data retention period
+    used by MRTG v2.13.2
+    (<http://people.ee.ethz.ch/~oetiker/webtools/mrtg/>.
+
+    The "mrtg" data retention period uses a data stepping resolution of 300
+    seconds (5 minutes) and heartbeat of 600 seconds (10 minutes), whereas
+    all the other data retention periods use a data stepping resolution of
+    60 seconds (1 minute) and heartbeat of 120 seconds (2 minutes).
+
+    Each data source name should specify the data source type. Valid data
+    source types (DSTs) are GAUGE, COUNTER, DERIVE and ABSOLUTE. See the
+    section regrading DSTs at
+    <http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html> for further
+    information.
+
+    RRD::Simple will croak and die if you try to create an RRD file that
+    already exists.
+
+  update
+     $rrd->update($rrdfile, $unixtime,
+             source_name => "VALUE",
+             source_name => "VALUE",
+             source_name => "VALUE"
+         );
+
+    This method will update an RRD file by inserting new data point values
+    in to the RRD file.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+    $unixtime is optional and will default to "time()" (the current
+    unixtime). Specifying this value will determine the date and time that
+    your data point values will be stored against in the RRD file.
+
+    If you try to update a value for a data source that does not exist, it
+    will automatically be added for you. The data source type will be set to
+    whatever is contained in the $RRD::Simple::DEFAULT_DSTYPE variable. (See
+    the VARIABLES section below).
+
+    If you explicitly do not want this to happen, then you should check that
+    you are only updating pre-existing data source names using the "sources"
+    method. You can manually add new data sources to an RRD file by using
+    the "add_source" method, which requires you to explicitly set the data
+    source type.
+
+    If you try to update an RRD file that does not exist, it will attept to
+    create the RRD file for you using the same behaviour as described above.
+    A warning message will be displayed indicating that the RRD file is
+    being created for you if have perl warnings turned on.
+
+  last
+     my $unixtime = $rrd->last($rrdfile);
+
+    This method returns the last (most recent) data point entry time in the
+    RRD file in UNIX time (seconds since the epoch; Jan 1st 1970). This
+    value should not be confused with the last modified time of the RRD
+    file.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+  sources
+     my @sources = $rrd->sources($rrdfile);
+
+    This method returns a list of all of the data source names contained
+    within the RRD file.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+  add_source
+     $rrd->add_source($rrdfile,
+             source_name => "TYPE"
+         );
+
+    You may add a new data source to an existing RRD file using this method.
+    Only one data source name can be added at a time. You must also specify
+    the data source type.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+    This method can be called internally by the "update" method to
+    automatically add missing data sources.
+
+  rename_source
+     $rrd->rename_source($rrdfile, "old_datasource", "new_datasource");
+
+    You may rename a data source in an existing RRD file using this method.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+  graph
+     my %rtn = $rrd->graph($rrdfile,
+             destination => "/path/to/write/graph/images",
+             basename => "graph_basename",
+             timestamp => "both", # graph, rrd, both or none
+             periods => [ qw(week month) ], # omit to generate all graphs
+             sources => [ qw(source_name1 source_name2 source_name3) ],
+             source_colors => [ qw(ff0000 aa3333 000000) ],
+             source_labels => [ ("My Source 1", "My Source Two", "Source 3") ],
+             source_drawtypes => [ qw(LINE1 AREA LINE) ],
+             line_thickness => 2,
+             extended_legend => 1,
+             rrd_graph_option => "value",
+             rrd_graph_option => "value",
+             rrd_graph_option => "value"
+         );
+
+    This method will render one or more graph images that show the data in
+    the RRD file.
+
+    The number of image files that are created depends on the retention
+    period of the RRD file. Hourly, 6 hourly, 12 hourly, daily, weekly,
+    monthly, annual and 3year graphs will be created if there is enough data
+    in the RRD file to accomodate them.
+
+    The image filenames will start with either the basename of the RRD file,
+    or whatever is specified by the "basename" parameter. The second part of
+    the filename will be "-hourly", "-6hourly", "-12hourly", "-daily",
+    "-weekly", "-monthly", "-annual" or "-3year" depending on the period
+    that is being graphed.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+    Graph options specific to RRD::Simple are:
+
+    destination
+        The "destination" parameter is optional, and it will default to the
+        same path location as that of the RRD file specified by $rrdfile.
+        Specifying this value will force the resulting graph images to be
+        written to this path location. (The specified path must be a valid
+        directory with the sufficient permissions to write the graph
+        images).
+
+    basename
+        The "basename" parameter is optional. This parameter specifies the
+        basename of the graph image files that will be created. If not
+        specified, it will default to the name of the RRD file. For example,
+        if you specify a basename name of "mygraph", the following graph
+        image files will be created in the "destination" directory:
+
+         mygraph-daily.png
+         mygraph-weekly.png
+         mygraph-monthly.png
+         mygraph-annual.png
+
+        The default file format is "png", but this can be explicitly
+        specified using the standard RRDs options. (See below).
+
+    timestamp
+         my %rtn = $rrd->graph($rrdfile,
+                 timestamp => "graph", # graph, rrd, both or none
+             );
+
+        The "timestamp" parameter is optional, but will default to "graph".
+        This parameter specifies which "last updated" timestamps should be
+        added to the bottom right hand corner of the graph.
+
+        Valid values are: "graph" - the timestamp of when the graph was last
+        rendered will be used, "rrd" - the timestamp of when the RRD file
+        was last updated will be used, "both" - both the timestamps of when
+        the graph and RRD file were last updated will be used, "none" - no
+        timestamp will be used.
+
+    periods
+        The "periods" parameter is an optional list of periods that graphs
+        should be generated for. If omitted, all possible graphs will be
+        generated and not restricted to any specific subset. See the create
+        method for a list of valid time periods.
+
+    sources
+        The "sources" parameter is optional. This parameter should be an
+        array of data source names that you want to be plotted. All data
+        sources will be plotted by default.
+
+    source_colors
+         my %rtn = $rrd->graph($rrdfile,
+                 source_colors => [ qw(ff3333 ff00ff ffcc99) ],
+             );
+ 
+         %rtn = $rrd->graph($rrdfile,
+                 source_colors => { source_name1 => "ff3333",
+                                    source_name2 => "ff00ff",
+                                    source_name3 => "ffcc99", },
+             );
+
+        The "source_colors" parameter is optional. This parameter should be
+        an array or hash of hex triplet colors to be used for the plotted
+        data source lines. A selection of vivid primary colors will be set
+        by default.
+
+    source_labels
+         my %rtn = $rrd->graph($rrdfile,
+                 sources => [ qw(source_name1 source_name2 source_name3) ],
+                 source_labels => [ ("My Source 1","My Source Two","Source 3") ],
+             );
+ 
+         %rtn = $rrd->graph($rrdfile,
+                 source_labels => { source_name1 => "My Source 1",
+                                    source_name2 => "My Source Two",
+                                    source_name3 => "Source 3", },
+             );
+
+        The "source_labels" parameter is optional. The parameter should be
+        an array or hash of labels to be placed in the legend/key underneath
+        the graph. An array can only be used if the "sources" parameter is
+        also specified, since the label index position in the array will
+        directly relate to the data source index position in the "sources"
+        array.
+
+        The data source names will be used in the legend/key by default if
+        no "source_labels" parameter is specified.
+
+    source_drawtypes
+         my %rtn = $rrd->graph($rrdfile,
+                 source_drawtypes => [ qw(LINE1 AREA LINE) ],
+             );
+ 
+         %rtn = $rrd->graph($rrdfile,
+                 source_colors => { source_name1 => "LINE1",
+                                    source_name2 => "AREA",
+                                    source_name3 => "LINE", },
+             );
+ 
+         %rtn = $rrd->graph($rrdfile,
+                 sources => [ qw(system user iowait idle) ]
+                 source_colors => [ qw(AREA STACK STACK STACK) ],
+             );
+
+        The "source_drawtypes" parameter is optional. This parameter should
+        be an array or hash of drawing/plotting types to be used for the
+        plotted data source lines. By default all data sources are drawn as
+        lines (LINE), but data sources may also be drawn as filled areas
+        (AREA). Valid values are, LINE, LINE*n* (where *n* represents the
+        thickness of the line in pixels), AREA or STACK.
+
+    line_thickness
+        Specifies the thickness of the data lines drawn on the graphs for
+        any data sources that have not had a specific line thickness already
+        specified using the "source_drawtypes" option. Valid values are 1, 2
+        and 3 (pixels).
+
+    extended_legend
+        If set to boolean true, prints more detailed information in the
+        graph legend by adding the minimum, maximum and last values recorded
+        on the graph for each data source.
+
+    Common RRD graph options are:
+
+    title
+        A horizontal string at the top of the graph.
+
+    vertical_label
+        A vertically placed string at the left hand side of the graph.
+
+    width
+        The width of the canvas (the part of the graph with the actual data
+        and such). This defaults to 400 pixels.
+
+    height
+        The height of the canvas (the part of the graph with the actual data
+        and such). This defaults to 100 pixels.
+
+    For examples on how to best use the "graph" method, refer to the example
+    scripts that are bundled with this module in the examples/ directory. A
+    complete list of parameters can be found at
+    <http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/doc/index.en.html>.
+
+  retention_period
+     my $seconds = $rrd->retention_period($rrdfile);
+
+    This method will return the maximum period of time (in seconds) that the
+    RRD file will store data for.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+  info
+     my $info = $rrd->info($rrdfile);
+
+    This method will return a complex data structure containing details
+    about the RRD file, including RRA and data source information.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+  heartbeat
+     my $heartbeat = $rrd->heartbeat($rrdfile, "dsname");
+     my @rtn = $rrd->heartbeat($rrdfile, "dsname", 600);
+
+    This method will return the current heartbeat of a data source, or set a
+    new heartbeat of a data source.
+
+    $rrdfile is optional and will default to using the RRD filename
+    specified by the "new" constructor method, or "$0.rrd". (Script basename
+    with the file extension of .rrd).
+
+VARIABLES
+  $RRD::Simple::DEBUG
+    Debug and trace information will be printed to STDERR if this variable
+    is set to 1 (boolean true).
+
+    This variable will take its value from $ENV{DEBUG}, if it exists,
+    otherwise it will default to 0 (boolean false). This is a normal package
+    variable and may be safely modified at any time.
+
+  $RRD::Simple::DEFAULT_DSTYPE
+    This variable is used as the default data source type when creating or
+    adding new data sources, when no other data source type is explicitly
+    specified.
+
+    This variable will take its value from $ENV{DEFAULT_DSTYPE}, if it
+    exists, otherwise it will default to "GAUGE". This is a normal package
+    variable and may be safely modified at any time.
+
+EXPORTS
+    You can export the following functions if you do not wish to go through
+    the extra effort of using the OO interface:
+
+     create
+     update
+     last_update (synonym for the last() method)
+     sources
+     add_source
+     rename_source
+     graph
+     retention_period
+     info
+     heartbeat
+
+    The tag "all" is available to easily export everything:
+
+     use RRD::Simple qw(:all);
+
+    See the examples and unit tests in this distribution for more details.
+
+SEE ALSO
+    RRD::Simple::Examples, RRDTool::OO, RRDs, <http://www.rrdtool.org>,
+    examples/*.pl,
+    <http://search.cpan.org/src/NICOLAW/RRD-Simple-1.44/examples/>,
+    <http://rrd.me.uk>
+
+VERSION
+    $Id: Simple.pm 1100 2008-01-24 17:39:35Z nicolaw $
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+    If you like this software, why not show your appreciation by sending the
+    author something nice from her Amazon wishlist? (
+    http://www.amazon.co.uk/gp/registry/1VZXC59ESWYK0?sort=priority )
+
+COPYRIGHT
+    Copyright 2005,2006,2007,2008 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

@@ -1,0 +1,41 @@
+Redis-RdbParser version 0.05
+============================
+
+Redis::RdbParser is a parser for Redis' rdb dump files. 
+The parser generates events similar to an xml sax parser. 
+
+The dump file is parsed sequentially. As and when
+objects are discovered, appropriate callbacks 
+would be invoked. You can set the callback item `undef`
+if you don't care it.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+LIMITS
+
+Redis::RdbParser can ONLY run at 64bit platforms.
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by FengGu (flygoast@126.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

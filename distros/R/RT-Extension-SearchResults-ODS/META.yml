@@ -1,0 +1,27 @@
+---
+abstract: 'Add Excel format export to RT search results'
+author:
+  - 'Emmanuel Lacour, C<< <elacour at home-dn.net> >>'
+  - 'Emmanuel Lacour <elacour@home-dn.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-SearchResults-ODS
+no_index:
+  directory:
+    - html
+    - inc
+    - t
+requires:
+  OpenOffice::OODoc: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.home-dn.net/manu/RT-Extension-SearchResults-ODS.git
+version: 0.05

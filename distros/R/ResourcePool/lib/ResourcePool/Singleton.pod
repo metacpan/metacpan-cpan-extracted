@@ -1,0 +1,101 @@
+=head1 NAME
+
+ResourcePool::Singleton - A class which can instantiated only once.
+
+=head1 SYNOPSIS
+
+
+ 
+ package Testme;
+ use ResourcePool::Singleton;
+ use Data::Dumper;
+ 
+ push @ISA, "ResourcePool::Singleton";
+ 
+ sub new($@) {
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my $d = Data::Dumper->new([@_]);
+    $d->Indent(0);
+    my $key = $d->Dump();
+    my $self;
+ 
+    $self = $class->SUPER::new("Testme". $key);
+    if (!exists($self->{CNT})) {
+       $self->{CNT} = $_[0];
+       bless($self, $class);
+    }
+    return $self;
+ }      
+ 
+ sub next($) {
+     my ($self) = @_;
+     return $self->{CNT}++;
+ }
+
+=head1 DESCRIPTION
+
+
+The ResourcePool::Singleton class, or classes derived from this class, can be instantiated only once. If you call the constructor of this class the first time, it will perform an normal object construction and return a reference to a blessed value. But it will also store this reference in a global hash.
+
+On further calls of this constructor the ResourcePool::Singleton class will just return the stored reference instead of creating a new one.
+
+This is very useful if the construction of an object is very expansive but it is required to be constructed at different places in your program. A special application for this feature is a Apache/mod_perl environment.
+
+The ResourcePool::Singleton class can not check if the stored object references are still valid, therefore it might return references to objects which have already been destroyed. If you need a persistent object which gets recreated on failure you should consider to use the L<ResourcePool|ResourcePool> and/or the L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> modules.
+
+=head2 S<ResourcePool::Singleton-E<gt>new($key)>
+
+The constructor takes one argument which is a key to the object which will be created. You have to build a key which is unique for your needs. In most cases it's most appropriate to use the Data::Dumper like shown above to construct such a key.
+
+=over 4
+
+=item $key
+
+Identifies the created object.
+
+=back
+
+=head2 S<$singleton-E<gt>is_created($key)>
+
+This returns true if a singleton object has been created with the given key. The actual object may be retrieved with the new method.
+
+
+=head1 Why not Class::Singleton?
+
+
+
+=over 4
+
+=item Lack of argument consideration
+
+The main reason for not using L<Class::Singleton|Class::Singleton> for this packages is it's lack of support for different instances depending on the arguments to the constructor.
+
+The L<ResourcePool|ResourcePool> needs the singleton behavior only if the arguments to the constructor are the same.
+
+ 
+ my ($factory1, $factory2); # suppose we have two different
+                            # factories to two different servers
+ my $pool1 = ResourcePool->new($factory1);
+ my $pool2 = ResourcePool->new($factory2);
+
+In the example above we have two factories to two different servers (construction not shown). Then we create two pools from this factories. If L<ResourcePool's|ResourcePool> singleton behavior would have been implemented with the L<Class::Singleton|Class::Singleton> package $pool1 and $pool2 would be the same (not what we want). The ResourcePool::Singleton implementation takes the arguments of the constructor also into account when looking if this class has already been instantiated.
+
+=item No namespace pollution
+
+This is mostly a question of taste, but i like my implementation more then the L<Class::Singleton|Class::Singleton> since it does hide its internal data unaccessible from outside. But anyway, a question of taste...
+
+=back
+
+=head1 SEE ALSO
+
+L<Class::Singleton|Class::Singleton>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

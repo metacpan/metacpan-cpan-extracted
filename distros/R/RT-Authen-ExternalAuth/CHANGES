@@ -1,0 +1,237 @@
+0.26 2016-08-02
+ - Document and enforce against installing under RT 4.4, as this module's
+   features were made part of core
+
+0.25 2014-10-16
+ - Fix a regression causing Charts and Custom Logos to not render properly
+
+0.24 2014-10-09
+ - No changes since 0.23_01
+
+0.23_01 2014-09-30
+ - Call core's autohandler/SuccessfulLogin callback after logging in a
+   user.  Now code written to run after a core login also runs for
+   external logins.
+ - Convert to UNIX line endings
+ - Fix typos and errors in debug messages
+ - Fix ExternalInfoPriority variable name in example
+ - Check configs at PostLoadCheck time, instead of every auth
+ - Support verifying LDAPS connections
+ - Respect 4.0 "AutoCreate" as well as 4.2
+   "UserAutocreateDefaultsOnLogin" configs
+ - Packaging updates
+
+0.23 2014-08-14
+ - Packaging changes only
+
+0.22_01 2014-08-13
+ - Move main configuration documentation into RT::Authen::ExternalAuth
+ - Remove unnecessary $ExternalServiceUsesSSLorTLS option
+ - Prevent segfaults during server startup when using a LDAPS connection
+   under mod_perl + mod_ssl
+
+0.21 2014-07-01 Kevin Falcone
+ - Fix another bad attr_match_list example
+ - Better documentation about anonymous binds
+
+0.20 2014-04-09 Kevin Falcone
+ - Fix bad attr_match_list example in the synopsis
+
+0.19 2014-04-04 Kevin Falcone
+ - Fix a bug in the ExternalSettings doc example in RT_SiteConfig.pm
+
+0.18 2014-03-07 Kevin Falcone
+ - Remove docs that reference unmerged features (multiple emails)
+
+0.17 2013-07-10 Thomas Sibley
+ - Forbid using RT's internal Users table as an auth service
+
+0.16 2013-06-27 Thomas Sibley
+ - Add new p_check option to DBI authentication module
+
+0.15 2013-05-22 Thomas Sibley
+ - Minor documentation updates to add NAME sections for MetaCPAN
+
+0.14 2013-05-22 Thomas Sibley
+ - Prevent potential session reuse when Apache::Session::File is RT's
+   $WebSessionClass.  This is also resolved by RT versions 4.0.13 and
+   3.8.17 and by the May 2013 security patches.  Changes here are purely
+   for correctness/bulletproofing down the road.
+ - Moved much documentation from comments into POD; cleanups are still
+   needed, but this is a good start.
+
+0.13 2013-01-31 Thomas Sibley
+ - Cut down on code by using the core RT::Record->Update method
+
+0.12 2012-10-26 Thomas Sibley
+ - Redirect correctly after login on RT 4.0.8, 3.8.15, and the 2012-10-25
+   security patches
+ - Added "group_scope" as a configurable option.
+ - Tests: Add to LDAP the base DN under which we search for users/groups
+
+0.11 2012-07-03 Alex Vandiver
+ - Obfuscate passwords in RT's System Configuration page
+ - Set an empty CurrentUser on failure, instead of removing it entirely
+
+0.10_01 2012-02-23 Thomas Sibley
+ - Escape usernames in filter values so special characters don't die
+
+0.10 2012-02-17 Thomas Sibley
+ - Silence confusing log messages when $ExternalInfoPriority is empty
+
+0.09_03 2012-01-27 Thomas Sibley
+ - Fetch the necessary attributes when group_attr_value is used
+ - Test escaping of commas during the group check
+
+0.09_02 2012-01-26 Thomas Sibley
+ - Improved logging inside the LDAP group membership check
+
+0.09_01 2012-01-23 Thomas Sibley
+ - Improved logic when dealing with Disabled/disabling users
+ - Configurable group membership attribute values
+ - Group membership tests
+
+0.09 2011-05-06 Kevin Falcone
+ - compatibility fixes for 3.8.10 and 4.0.0
+ - author testsuite
+ - updated README
+
+0.08_01 2009-01-20 Mike Peachey <zordrak@cpan.org>
+ - DoAuth method created to inherit the work that used to be performed by
+   the Auth callback for autohandler.
+ - GetAuth reduced to an interface. Its purpose is now just to check what
+   type of service was passed and then call the GetAuth method from the
+   right package.
+ - Authentication now halts and returns with error if ExternalAuthPriority
+   is not set. This prevents a fairly useless compile error and logs an
+   explanation instead.
+ - Information lookup is now bypassed and logged if ExternalInfoPriority is
+   not set, preventing another useless compile error and replacing it with
+   an explanation.
+ - SSO Cookie authentication now available following the integration of
+   RT::Authen::CookieAuth. Methods updated to reflect the availability of
+   this service.
+ - File added to house the cookie grab. While SSO cookies are a function of
+   DBI authentication (at the moment at least) there is no need for DBI.pm
+   to use CGI::Cookie for this one purpose. With the future possibility of
+   futher cookie functions as well, I decided it deserved its own module.
+ - Changed an unless($base) to unless(defined($base)) to allow for the use
+   of a defined, but empty, baseDN so that an LDAP directory may be
+   searched from the root.
+ - CookieAuth settings have been merged into the ExternalAuth settings
+   hash. Example from CookieAuth has been merged in.
+ - 'auth' and 'info' settings have been deprecated and so have been removed
+   from the examples. The function they served has been replaced by the
+   ExternalAuthPriority and ExternalInfoPriority variables.
+ - The override for the IsPassword method has been deprecated and deleted.
+   It is no longer necessary to do password tests as a call to the User
+   object. The equivalent function is now provided by GetAuth in
+   ExternalAuth.pm and is called with an ExternalAuth service name,
+   username and password. Currently, this only needs to be called by DoAuth
+   in ExternalAuth.pm
+ - While RT::Authen::ExternalAuth used to be used to integrate internal RT
+   authentication with an external method as a single operation, this
+   causes a lack of modularity. Now ExternalAuth is only concerned with its
+   own authentication methods and if they fail then RT will decide to do
+   fallback to internal authentication on its own.
+ - Workaround for RT versions 3.8.0 and 3.8.1 removed.
+   RT::Authen::ExternalAuth v0.08 will be officially compatible only with
+   versions 3.8.2 and up.
+ - README: Updated to include basic information on SSO cookies.
+ - Makefile.PL: Updated to reflect the integration of
+   RT::Authen::CookieAuth.
+
+0.08 2009-01-24 Mike Peachey <zordrak@cpan.org>
+ - Added ssl_version to example LDAP config as it is used by the code, but
+   had not been demonstrated.
+ - s/Crypt::MD5::md5_hex/Digest::MD5::md5_hex/ in example DBI config.
+ - Added the ability to provide a static salt to the p_enc_sub however this
+   behavious may be reviewed in future releases to allow integration with
+   better encryption methods.
+ - s/userSupportAccess/disabled/ in example DBI config.
+ - Modified the log message regarding the RT-3.8.[01] plugin bug from error
+   level to debug level and modified the text of the message to be more
+   clear for RT-3.8.2+ users.
+
+0.07_02 2008-12-22 Kevin Falcone <falcone@cpan.org>
+ - Make the workaround needed for 3.8.1 work on 3.8.2
+
+0.07_01 2008-11-06 Mike Peachey <zordrak@cpan.org>, Kevin Falcone <falcone@cpan.org>
+ - Complete code refactoring and updates for RT-3.8.x compatability.
+
+0.06_03 2008-10-31 Mike Peachey <zordrak@cpan.org>, Kevin Falcone <falcone@cpan.org>
+ - Add fix to work around a plugin bug in RT-3.8.0 & RT-3.8.1 preventing
+   User_Vendor.pm overlay being required before RT::User is loaded.
+ - Check the return value from calling RT::User::Create.
+ - Check the return value when loading an autocreated user.
+ - README: Updated to talk about removing old files in local/.
+ - Added error-checking to complain if a an LDAP configuration is in use,
+   but no d_filter has been specified.
+
+0.06_02 2008-10-01 Kevin Falcone <falcone@cpan.org>
+ - ChangeLog: Updates to previous release.
+
+0.06_01 2008-10-17 Kevin Falcone <falcone@cpan.org>
+ - Add a patch to be compatible with 3.8
+ - Upgrade Module::Install::RTx to work better with RT-3.8.x
+
+0.06 2008-11-01 Mike Peachey <zordrak@cpan.org>
+ - A number of clarifications added to the example config comments such as
+   making clear the fact that a valid d_filter is required.
+
+0.05 2008-04-09 Mike Peachey <zordrak@cpan.org>
+ - Typo on line 962 of User_Vendor.pm: s/servicen/service/
+ - Deprecated $user_autocreated. It was being used to prevent a call to
+   RT::User::UpdateFromExternal in User_Vendor.pm because it was deemed an
+   unecessary expense to set the user's info and then look it up again
+   straight after. However, I have since realised that UpdateFromExternal
+   is the only code doing a check to see if the user has been disabled in
+   the external source and so bypassing it when users are created allows
+   new users to log in once even if they have not been "enabled". I will be
+   doing a small rewrite of this code in the future to abstract the
+   External disable-lookup code from UpdateFromExternal and perhaps remove
+   the function altogether, but for now everything will work fine.
+
+0.04 2008-04-03 Mike Peachey <zordrak@cpan.org>
+ - The example LDAP ExternalSettings configuration did not contain example
+   values for user and pass for RT's connection to an LDAP server. These
+   have now been added. Thanks to Andrew Fay <andrew.fay@hotmail.com> for
+   noticing this one.
+
+0.03 2008-03-31 Mike Peachey <zordrak@cpan.org>
+ - Bug found on lines 94-100 in Auth callback in autohandler.
+
+   The ELSE block starting on line 95 was assigned to the IF starting
+   on 85 instead of the IF block starting on line 86. This meant that
+   if the user entered at the login screen exists no password would
+   be checked.
+
+   It was doing this:
+
+   If session has current user who has an ID
+       If password has already been validated
+           SUCCESS
+       Else
+           Return to autohandler with valid session & implicit auth
+   Else delete session
+
+   This has now been corrected to this:
+
+   If session has current user who has an ID
+       If password has already been validated
+           SUCCESS
+       Else
+           Delete session
+   Else return to autohandler with whatever we had before the block
+
+0.02 2008-03-17 Mike Peachey <zordrak@cpan.org>
+ - Bug #1 found on line 446 of User_Vendor.pm; CanonicalizeUserInfo was
+   being called directly, instead of being called on the $self user object.
+   This was causing CanonicalizeUserInfo to shift the e-mail address it was
+   passed into the $self var instead of the $email var. It was therefore
+   returning a blank e-mail address regardless of the input.
+ - User_Vendor.pm: Header comments altered to reflect that the file is part
+   of the RT::Authen::ExternalAuth extension.
+
+0.01 2008-03-13 Mike Peachey <zordrak@cpan.org>
+ - Initial Release

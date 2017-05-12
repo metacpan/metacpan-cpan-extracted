@@ -1,0 +1,55 @@
+% if ($Debug) {
+<pre><% RTx::RightsMatrix::showme($Groups) %></pre>
+% }
+% foreach my $group_list ( @$Groups ) {
+%     my $label = 'group';
+%     my $top = shift @$group_list;
+%     if (ref($top) eq 'RT::User') {
+%         my $group = RT::Group->new($RT::SystemUser);
+%         $group->LoadByCols(Type => 'UserEquiv', Instance => $top->id);
+%         $top = $group;
+%     }
+%     if ($top->Type eq 'UserEquiv') {
+%         my $user = RT::User->new($RT::SystemUser);
+%         $user->Load($top->Instance);
+%         $top = $user;
+%         $label = 'user';
+%     }
+The right '<% $ACEObj->RightName %>' has been granted <%$object_string%> to <%$label%>: <% $top->Name ? $top->Name : $top->Domain . " " . $top->Type %>
+% if ( ref($top) eq 'RT::Group' and $top->HasMember($PrincipalObj) and $PrincipalObj->IsUser ) {
+  which <% $PrincipalObj->Object->Name %> is a member of.
+% }
+<br>
+%    foreach my $group (@$group_list) {
+which contains group: <% $group->Name ? $group->Name : $group->Domain . " " . $group->Type %>
+% if ( $group->HasMember($PrincipalObj) and $PrincipalObj->IsUser ) {
+  that <% $PrincipalObj->Object->Name %> is a member of.
+% }
+<br>
+% }
+<p>
+% }
+(ACE id: <% $ACEObj->id %>)
+
+
+<%INIT>
+my $object_string;
+if    ($ACEObj->ObjectType =~ /^RTx::AssetTracker::System$/) {
+    $object_string = 'asset tracker wide';
+}
+elsif ($ACEObj->ObjectType =~ /^RTx?.*::System$/) {
+    $object_string = 'system wide';
+}
+else {
+    my $object = $ACEObj->ObjectType->new($RT::SystemUser);
+    $object->Load($ACEObj->ObjectId);
+    $ACEObj->ObjectType =~ /.*::(.*)$/;
+    $object_string = "on $1 '" . $object->Name . "'";
+}
+</%INIT>
+<%ARGS>
+$ACEObj
+$Groups
+$PrincipalObj
+$Debug => 0
+</%ARGS>

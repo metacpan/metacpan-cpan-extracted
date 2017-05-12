@@ -1,0 +1,30 @@
+Some general purpose demo/sample routines.
+
+README
+	This file
+
+rdf.pl
+	parses and stores:
+	perl rdf.pl -output_dir /tmp/rdf -storename sample \
+		-stuff ../samples/rdf/example1.xml
+
+rdfquery.pl
+	Queries a store (see rdf.pl above for creating one):
+	perl rdfquery.pl -input_dir /tmp/rdf -storename sample \
+		-query 'SELECT ...'
+
+vocabulary-generator.pl
+	Generates perl package for a give RDF/XML source e.g. RDFStore::Vocabualry:DC
+	for DublinCore http://purl.org/dc/elements/1.1/
+
+db_stats
+	Prints out compressions statistics for rdfstore database 
+
+	to compile use Makefile and type 'make db_stats'
+
+Makefile
+	To compile C utilities
+
+Not documented:
+
+rdfingest.pl

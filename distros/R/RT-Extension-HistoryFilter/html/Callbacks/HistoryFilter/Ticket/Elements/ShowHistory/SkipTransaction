@@ -1,0 +1,2 @@
+%# RT 4.0
+<& /Callbacks/HistoryFilter/Elements/ShowHistoryPage/SkipTransaction, %ARGS &>

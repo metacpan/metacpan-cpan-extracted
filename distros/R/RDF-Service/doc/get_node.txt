@@ -1,0 +1,109 @@
+$Id: get_node.txt,v 1.2 2000/10/22 10:59:00 aigan Exp $
+
+I have thought about how to create the resource objects.  There are
+many variants.
+
+
+This is the terms:
+
+ * Make sure we have collected data from all interfaces before
+   returning data about a property.
+
+ * Do not collect more data than neded if thats going to cost us time.
+
+ * Do not try to find data in interfaces if we know that nonbydy could
+   have said anything about it. For example for new literals.  But
+   consider distributed properties encompassing the new URI.
+
+ * Do not try to fetch data from other interfaces if we know that this
+   resource is unknown to the outside or private. But still consider
+   distributed properties.
+
+
+This is what clients want to do:
+
+ * find_node($uri) to retrieve a node from the model (or interface or
+   service).  Return undef if the node is not mentioned in the model.
+   (Do we only want to return the actual atributes contained as
+   statements within the model?)
+
+ * get_node($uri) gives us the node. If no information about the node
+   is found in the service (or interface or model), the returned node
+   will have no properties.
+
+ * create_node($uri, \%properties) will add statements about the node
+   in the calling model. The node object will first be found.
+
+
+This is wat interfaces want to do. (The interfaces are the modules
+implementing the methods.):
+
+ * find_node()
+
+ * get_node()
+
+ * declare_node($uri, \%properties) will construct the node object and
+   add the properties to this object.  A client create_node() call
+   will be handled by the interface by the apropriate calls to the
+   source storage/interface followed by this declare_node() call.
+
+
+
+ find_node() pseudocode
+
+ * get_cached_node() -> return $obj
+ * get_exisitng_node() -> return $obj
+ * return undf
+
+
+ get_node() pseudocode
+
+ * get_cached_node() -> return $obj
+ * return new Resource
+
+
+ declare_node() pseudocode
+
+ * get_cached_node() -> $obj->set(), return $obj
+ * get_exisitng_node() -> $obj->set(), return $obj
+ * new Resource, $obj->set(), return $obj
+
+
+
+Optimized functions:
+
+ * declare_unique_node(), create_unique_node() and get_unique_node()
+   will not look in the cache and will flag in the object that it do
+   know that it doesn't have any properties. Future calls to the
+   object will not trigger the retrieval of data. But we have to call
+   another function that finds ditributed properties.
+
+
+
+Implementation:
+
+ * The interfaces implement the methods get_existing_node(),
+   create_node() and more.  These will be registred for specific URI
+   prefixes and types and compiled into a custom jumptable. This means
+   that searching and constructing only will be handled by the
+   apropriate interfaces.
+
+ * What will happen if a declared object already exist? Will the
+   information be updated, replaced or remain along with the new
+   information?  I think that the semantics would be that this is the
+   enire information from the present model. That is: that the new
+   data will replace all previous data from the same model.
+
+ * Any thoughts about how the properties will be stored in the object?
+   The object will have to registre the data it contains so that
+   interfaces know what objects has been affected by change in
+   specific data.  All data will have to be marked with the
+   originating interface and model.
+
+ * Once more: What do we do about filters?  I could suggest that a
+   filtred object is a small wrapper around an existing object (with
+   the same IDS). The model will contain filter data and pointers to
+   other models and objects. A retrieved object from such a model
+   would get the filter-object pointing to a real object. These
+   filterobjects would not be cached. Are there other ways of dealing
+   with this?

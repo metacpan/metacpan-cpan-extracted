@@ -1,0 +1,68 @@
+#!perl
+use strict;
+use warnings;
+use 5.010_000;
+use feature ':5.10';
+use File::Basename qw( dirname );
+use lib dirname(__FILE__);
+use TM qw( size );
+use Getopt::Long qw( GetOptions );
+
+GetOptions(
+    help => sub { die 'pod2usage( -verbose => 2 )' },
+    
+    
+my $in_edge  = "$ARGV[0].fulledge";
+my $out_edge = "$ARGV[0].edge";
+
+say "Read $in_edge (@{[ size( -s $in_edge ) ]})";
+my $edge = retrieve( $in_edge );
+
+# Find the shortest paths to each node except the ones that go directly from 'root'. I want at least a /little/ indirection.
+my %paths;
+our %WALK;
+walk( 'root' );
+undef %WALK;
+
+# Compute all the parent -> @children paths
+my %edges;
+for my $child ( keys %paths ) {
+    my $path = delete $paths{$child};
+    
+    my $parent = $path->[1]; # $path->[0] eq $child
+    next if ! defined $parent;
+    
+    push @{ $edges{$parent} }, $child;
+}
+
+store( \ %edges, $out_edge );
+say "Wrote $out_edge (@{[ size( -s $out_edge ) ]})";
+
+sub walk {
+    my $node = $_[-0];
+
+    # Do not recurse infinitely.
+    return if $WALK{$node};
+    local $WALK{$node} = 1;
+
+    # Process this path.
+    my $prev = $paths{$node};
+    if ( ! $prev ) {
+        $paths{$node} = [ @_ ];
+    }
+    elsif ( @$prev <= 1 ) {
+        # say "Preferring [@_] to [@$prev] because \@\$prev <= 1";
+        $paths{$node} = [ @_ ];
+    }
+    elsif ( @_ > 2 && @$prev > @_ ) {
+        # say "Preferring [@_] to [@$prev] because \@_ > 2 && \@\$prev > \@_";
+        $paths{$node} = [ @_ ];
+    }
+
+    # Find children to recurse into.
+    my $children = $edge->{$node};
+    return if ! $children;
+
+    # Recurse into children.
+    walk( $_, @_ ) for keys %$children;
+}

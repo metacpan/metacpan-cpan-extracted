@@ -1,0 +1,15 @@
+=for layout widget
+
+[% header %]
+[% body %]
+[% footer %]
+
+=for layout body
+
+[% members %]
+
+=for layout footer
+
+[% actions %]
+
+=cut

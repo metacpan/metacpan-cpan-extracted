@@ -1,0 +1,179 @@
+=head1 NAME
+
+Ref::Store::PROTOSPEC - Protocol specification for Ref::Store
+
+=head1 DESCRIPTION
+
+This document is as much for my own sanity as it is for other readers. This
+describes the protocol used by Ref::Store to map objects to other objects.
+
+Features and code are not necessarily symmetric because of the asymmetric
+nature of the module and for performance reasons.
+
+This document describes the lower level methods, API, and protocol behavior.
+For a slightly higher level description, see L<Ref::Store::Guts>
+
+=head2 MASTER INDEXES
+
+The C<Ref::Store> object should provide the following methods, each of which
+should return a reference to a hash
+
+=over
+
+=item C<scalar_lookup>
+
+This maps user key input to a lookup object, and is specifically for one-to-one
+key lookups. Its keys are user input (in the code, this is often seen as C<ukey>),
+and its values are lookup objects. Lookup objects in this index are always weak.
+
+=item C<attr_lookup>
+
+The same as C<scalar_lookup>, but implemented for attributes. The reason being
+that it is permissible to use the same object as both a key and an attribute (
+but it is not possible to use the same object for multiple keys).
+
+=item C<forward>
+
+For one-to-one lookups. Its keys are user input keys, like C<scalar_lookup>,
+but its values are lookup targets, or 'user values'. The value may be strong
+or weak, depending on what was specified in the store function
+
+=item C<reverse>
+
+This is the reverse by-value lookup. Key is stringified reference address.
+Value is a hash reference known as a C<vhash>.
+
+The vhash's keys are lookup identifiers, of the same type as the keys of
+C<scalar_lookup>, C<attr_lookup> and C<forward>.
+
+The values are B<strong> references to key objects.
+
+Whenever a value is added to the store, a C<dref> is added for its vhash. When
+the value is destroyed or otherwise removed from the store, its vhash is deleted,
+and all of its associated lookups are destroyed as well, since there would be
+no more references to it.
+
+=back
+
+=head2 LOOKUP OBJECTS
+
+A lookup object represents a lookup type. It is the layer which maps user input
+keys to actual stored object mappings.
+
+A lookup can represent either a string key (simple lookup), or a user-provided
+opaque object (encapsulated lookup).
+
+
+All lookup objects implement the following methods
+
+=over
+
+=item C<kstring()>
+
+This is a simple scalar string. This should return the lookup's key entry for
+C<scalar_lookup> and the like.
+
+This value may change on thread cloning if the lookup object correlates to a
+user-provided object reference.
+
+=item C<link_value($value)>
+
+This method will do any extra initialization necessary to properly map the lookup
+to the value, and to possibly add extra C<dref>s in the case of encapsulating
+lookups
+
+=item C<unlink_value($value)>
+
+This method will do any deinitialization to dissociate the value from the lookup;
+this usually means deleting added C<drefs>.
+
+=item ukey
+
+This should return the actual user key used to create the lookup object. This can
+be a stub function, in which case C<kstring> is used
+
+=item prefix_len
+
+If this lookup is prefixed, this is the length of the prefix. This is used to
+divide C<kstring> output into user-defined and internal portions.
+
+
+=back
+
+The following methods are for the handling of thread cloning and object duplication
+A master hash is provided for all objects to store data needed for proper handling
+of duplication (for example, old addresses for various hash keys).
+
+The table itself will traverse all the indexes scanning for publicly accessible
+objects and will store a weak reference to each of those objects keyed under
+its current (parent thread) reference address.
+
+The table also has an implementation-specific C<ithread_store_lookup_info>
+which will store copies of the standard indexes in the master hash.
+
+Lookup objects are free to store any data they wish. The master hash is deleted
+after C<CLONE> has returned.
+
+=over
+
+=item C<ithread_predup($table,\%ptr_map, $arg)>
+
+This is called from the table's C<CLONE_SKIP> handler, and is used for the lookup
+object to perform any form of preparation for cloning. C<%ptr_map> is a hash
+whose data is persistent and will also be accessible in the soon-to-be-created
+thread. Keys are free
+
+If the lookup object is a key, C<$arg> will be the value it stores, otherwise it
+is undefined.
+
+=item C<ithread_postdup($new_table,\%ptr_map,$arg)>
+
+This is called from the table's C<CLONE> method, after objects have been duplicated.
+
+If the lookup object is stored in C<scalar_lookup> (i.e. it is a key), then
+C<$arg> is the old reference address of the parent table.
+
+=back
+
+=head3 ATTRIBUTES
+
+Attributes require more complex handling than keys because multiple attributes
+can exist for the same object (as encapsulated), and multiple values can be stored
+inside an attribute.
+
+Attributes conform to the lookup specification, and also implement one more method
+
+=over
+
+=item C<get_hash>
+
+This returns a hash reference known as an C<attrhash>.
+
+The attrhash stores each mapped value by its reference address. The values may
+be strong or weak references, depending on what was specified during storage.
+
+All mapped values have C<drefs> which will delete their reference address mapping
+from the attrhash when they are destroyed; and this is done manually during
+the C<dissoc>, C<unlink> and C<purge> operations.
+
+The attribute object itself is stored multiple times as strong references in
+each of its values' C<vhash>es. When the last strong reference is deleted,
+the attribute
+
+=back
+
+=head2 CLEANUP AND DESTROY METHODS
+
+While this module is intended to solve the nasty problem of manual cleanup for
+dependent data, the implementation itself is full of it. This means lots of
+manual bookkeeping to remember, and many mines to step on if things go wrong.
+
+The general policy is to prefer C<drefs> over DESTROY methods, if a complex
+destructor is not needed. If one is needed, however, then the DESTROY method
+in pure perl has less overhead than going in several layers via svt_free.
+
+For C, a callback is often the best way to go about things as well.
+
+There is a certain aim to maintain a parity of implementation detail between the
+C and pure perl versions.
+

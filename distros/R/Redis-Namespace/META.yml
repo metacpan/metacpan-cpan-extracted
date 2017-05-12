@@ -1,0 +1,50 @@
+---
+abstract: 'a wrapper of Redis.pm that namespaces all Redis calls'
+author:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Furl: '0'
+  JSON: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::Fatal: '0'
+  Test::Kwalitee: '0'
+  Test::Kwalitee::Extra: '0'
+  Test::More: '0'
+  Test::RedisServer: '0'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-Namespace
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Redis::Namespace:
+    file: lib/Redis/Namespace.pm
+    version: '0.07'
+requires:
+  Redis: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/shogo82148/Redis-Namespace/issues
+  homepage: https://github.com/shogo82148/Redis-Namespace
+  repository: git://github.com/shogo82148/Redis-Namespace.git
+version: '0.07'
+x_contributors:
+  - 'karupanerura <karupa@cpan.org>'
+  - 'Mihyaeru <mihyaeru21@gmail.com>'

@@ -1,0 +1,10 @@
+Revision history for Rose-DBx-Role-NestTransaction
+
+0.01
+        First version, released on an unsuspecting world.
+
+0.02
+        Added missed dependency
+
+0.03
+        Nest transaction always returns $self on success

@@ -1,0 +1,75 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDF-DOAP
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/RDF-DOAP
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/RDF/DOAP/Change.pm
+ lib/RDF/DOAP/Change/Addition.pm
+ lib/RDF/DOAP/Change/BackCompat.pm
+ lib/RDF/DOAP/Change/Bugfix.pm
+ lib/RDF/DOAP/Change/Documentation.pm
+ lib/RDF/DOAP/Change/Packaging.pm
+ lib/RDF/DOAP/Change/Regression.pm
+ lib/RDF/DOAP/Change/Removal.pm
+ lib/RDF/DOAP/Change/SecurityFix.pm
+ lib/RDF/DOAP/Change/SecurityRegression.pm
+ lib/RDF/DOAP/Change/Tests.pm
+ lib/RDF/DOAP/Change/Update.pm
+ lib/RDF/DOAP/ChangeSet.pm
+ lib/RDF/DOAP/Issue.pm
+ lib/RDF/DOAP/Person.pm
+ lib/RDF/DOAP/Project.pm
+ lib/RDF/DOAP/Repository.pm
+ lib/RDF/DOAP/Resource.pm
+ lib/RDF/DOAP/Types.pm
+ lib/RDF/DOAP/Utils.pm
+ lib/RDF/DOAP/Version.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ examples/changelog.pl
+ examples/credits.pl
+ examples/gnome-data.pl
+ examples/moose-data.pl
+ examples/simple.pl
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/RDF/DOAP.pm
+ t/01basic.t
+ t/02changelog.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+ dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

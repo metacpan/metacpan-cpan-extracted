@@ -1,0 +1,22 @@
+Redis-Term version 0.12
+=======================
+
+Small redis client in perl.
+Execute 'redist', then input any redis command you want.
+
+INSTALLATION
+
+Recommended to install using cpanm, like this.
+  curl -L -k http://cpanmin.us | perl - Redis::Term
+
+DEPENDENCIES
+
+  no dependencies
+
+Copyright (C) 2014 by Chen Gang
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

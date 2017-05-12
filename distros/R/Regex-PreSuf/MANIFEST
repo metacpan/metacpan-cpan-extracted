@@ -1,0 +1,10 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+PreSuf.pm
+README
+t/length.t
+t/presuf.t
+t/words.t
+t/words.txt
+META.yml                                Module meta-data (added by MakeMaker)

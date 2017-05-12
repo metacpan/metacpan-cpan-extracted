@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+use RT;
+RT::LoadConfig();
+RT::Init();
+
+my $Attributes = RT::Attributes->new($RT::SystemUser);
+$Attributes->Limit( FIELD => 'Name', VALUE => 'EffectiveId' );
+$Attributes->Limit( FIELD => 'ObjectType', VALUE => 'RT::User' );
+
+my $primary_user = RT::User->new($RT::SystemUser);
+
+while ( my $Attr = $Attributes->Next ) {
+    $primary_user->LoadById($Attr->Content);
+    my $merged_users = $primary_user->GetMergedUsers;
+    if ( grep { $_ == $Attr->ObjectId } @{$merged_users->Content} ) {
+        print $Attr->Content." already has ".$Attr->ObjectId." in the merge list\n";
+    } else {
+        print "Adding ".$Attr->ObjectId." to the merged user list for ".$Attr->Content."\n";
+        $merged_users->SetContent([ $Attr->ObjectId, @{$merged_users->Content} ]);
+    }
+}
+
+print "DONE.\n";
+exit 0;

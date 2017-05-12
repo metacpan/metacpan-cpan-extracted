@@ -1,0 +1,75 @@
+{
+   "abstract" : "give feature of nest to other router module",
+   "author" : [
+      "tokubass <tokubass@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Route-Switcher",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Amon2::Web::Dispatcher::RouterBoom" : "0",
+            "Router::Boom" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Route::Switcher" : {
+         "file" : "lib/Route/Switcher.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokubass/p5-Route-Switcher/issues"
+      },
+      "homepage" : "https://github.com/tokubass/p5-Route-Switcher",
+      "repository" : {
+         "url" : "git://github.com/tokubass/p5-Route-Switcher.git",
+         "web" : "https://github.com/tokubass/p5-Route-Switcher"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:TOKUBASS"
+}

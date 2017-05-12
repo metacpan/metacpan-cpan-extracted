@@ -1,0 +1,23 @@
+要加快 Perl 應用程式的執行效能，除了 mod_perl 之外，FastCGI 也是個不錯的選擇。
+
+請先將 Apache 伺服器與 FastCGI 以及 mod_fastcgi 編譯在一起。這方面的資訊，請參考 http://www.fastcgi.com/。
+
+然後按照一般的[安裝快紀]步驟來安裝。
+
+最後在 Apache 組態設定檔裡加上這些東西 (以具名虛擬伺服器來達成)：
+
+  <VirtualHost *>
+    ServerName kwiki.yourhost.name
+    DocumentRoot /usr/local/www/data/kwiki
+  
+    AddHandler fastcgi-script cgi
+    DirectoryIndex index.cgi
+  
+    <Location />
+      Options ExecCGI
+    </Location>
+  </VirtualHost>
+
+這樣就行了！妳馬上就可以體會到 *效能暴增* 的快感。
+
+你可以在任何時候把標準的 CGI 安裝轉移到 FastCGI。

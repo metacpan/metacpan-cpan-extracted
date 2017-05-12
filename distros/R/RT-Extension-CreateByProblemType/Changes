@@ -1,0 +1,11 @@
+1.01 2014-07-14
+ - Updated changelog
+ - cpansign
+
+1.00 2014-07-14
+ - Add a callback inside the form tag, to match QuickCreate
+ - Packaging updates
+
+0.03 2014-02-07
+ - Updates for 4.2 compatibility and first public release
+

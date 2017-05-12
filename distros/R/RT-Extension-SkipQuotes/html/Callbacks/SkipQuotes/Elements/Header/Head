@@ -1,0 +1,6 @@
+<script type="text/javascript"
+src="<%RT->Config->Get('WebPath')%>/NoAuth/SkipQuotes/js/SkipQuotes.js"></script>
+<script type="text/javascript"><!--
+    doOnLoad(skipQuotes);
+--></script>
+

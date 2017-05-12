@@ -1,0 +1,14 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+README
+Simple.pm
+example/config/example.conf
+example/config/example.ini
+example/docs/example.txt
+example/scripts/example.pl
+t/1.t
+t/20basic.t
+t/91pod.t
+t/92podcover.t
+META.yml                                 Module meta-data (added by MakeMaker)

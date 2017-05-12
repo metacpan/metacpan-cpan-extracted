@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel::Document;
+
+our $random;
+
+my $res = Ravenel::Document->render( {
+	'data'         => qq(
+	<r:switch depth="1" format>
+		<r:{func} depth="2">this should be upper case!</r:{func}>
+	</r:switch>
+	<r:random depth="0"/>
+	), 
+	'dynamic'      => 1,
+	'prefix'       => 'r:',
+	'functions' => {
+		'switch' => sub {
+                        my Ravenel::Block $block_obj = shift;
+			my $t = ( $random ? 'upper' : 'reverse' );
+			return $block_obj->format( { 'func' => $t } );
+		},
+		'upper' => sub {
+                        my Ravenel::Block $block_obj = shift;
+			return uc($block_obj->get_block());
+		},
+		'reverse' => sub {
+                        my Ravenel::Block $block_obj = shift;
+			return reverse($block_obj->get_block());
+		},
+		'random' => sub {
+                        my Ravenel::Block $block_obj = shift;
+			$random = int(rand(2));
+			return;
+		},
+	},
+} );
+
+print $res . "\n";

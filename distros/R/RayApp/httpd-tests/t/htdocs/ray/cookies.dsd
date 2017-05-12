@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<cookies>
+	<_param name="login"/>
+	<_param name="logout"/>
+
+	<_param name="welcome"/>
+	<_param name="logged_out"/>
+
+	<login/>
+	<session/>
+</cookies>

@@ -1,0 +1,4 @@
+<& /Elements/ShowUserDetails, id => $User->Id &>
+<%args>
+$User => undef
+</%args>

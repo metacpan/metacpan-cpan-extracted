@@ -1,0 +1,23 @@
+<%args>
+$ARGSRef => undef
+$RecordObj => undef
+$results => undef
+
+</%args>
+<%init>
+return unless ($RecordObj and $RecordObj->id);
+return unless (defined $ARGSRef->{'BrandedSubjectTag'});
+unless ($RecordObj->CurrentUserHasRight('AdminQueue')) {
+    push @$results, loc('Permission Denied');
+    return;
+}
+my $current_tag = $RecordObj->FirstAttribute('BrandedSubjectTag');
+my $current_value = $current_tag ? $current_tag->Content : "";
+
+unless ($ARGSRef->{'BrandedSubjectTag'} eq $current_value) {
+    $RecordObj->SetAttribute(Name    => 'BrandedSubjectTag',
+                             Content => $ARGSRef->{'BrandedSubjectTag'});
+}
+
+
+</%init>

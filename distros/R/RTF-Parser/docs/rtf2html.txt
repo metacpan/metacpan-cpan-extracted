@@ -1,0 +1,135 @@
+
+*************** IMPORTANT ******************
+
+These are rough notes of mine on what happens
+when you run rtf2html. They're not yet ready
+for human consumption. Please ignore lack of
+continuity and sanity.
+
+*************** IMPORTANT ******************
+
+
+
+rtf2html - takes the options and the filenames, and then
+loads RTF::HTML::Convertor. It sets the output channel to
+STDOUT (which it claims to default to anyway), and then
+loops over the filenames it was given and invokes
+the 'parse_stream( $filename )' method on each file...
+
+RTF::HTML::Convertor is a subclass of RTF::Control which
+is a subclass of RTF::Parser, which is a wrapper around
+RTF::Tokenizer. :-)
+
+RTF::HTML::Convertor sets definitions for the basic RTF::Parser
+API - overriding some subs. Specifically, it over-rides:
+
+	text()
+	
+	symbol()
+	
+	%symbol -- defines a lot of this
+	
+	%do_on_control{'ansi'}
+	
+	%do_on_event -- lots of this
+	
+RTF::Control, as previously mentioned, is a subclass of
+RTF::Parser, and as such, provides a number of default
+over-rides for RTF::Parser's API, specifically to help
+people building modules like RTF::HTML::Convertor.
+
+It exports:
+
+	new() - a wrapper of RTF::Parser's new, with some extra option handling
+	output - a function to output text to the right place
+	%symbol - a symbol transliteration hash: e.g. $symbol{'~'} = '&nbsp;';
+	%info - meta-data about the document that it parses out for you
+	%do_on_event - things to do when certain abstract things happen (we encounter a table)
+	%do_on_control - what to do when we encounter a specific control word
+	%par_props - properties set for the current paragraph
+	$style - the style we're currently using
+	$newstyle - the style we're changing into, if we're about to change
+	$event - current event
+	$text - pending text to print
+	
+as well as all the things that RTF::Parser exports, so,
+essentially:
+
+	parse_start()
+	parse_end()
+	group_end()
+	group_start()
+	text()
+	char()
+	symbol()
+	
+So now we're going to follow exactly what happens when we
+step through a really simple RTF document and convert it to
+HTML using the rtf2html tool.
+
+rtf2html reads in the filename, selects STDOUT as the default
+output mode, and creates a new RTF::HTML::Converter object.
+
+RTF::HTML::Converter doesn't define a new() method, so RTF::Control's
+one is used. RTF::Control's constructor method is simple - it invokes
+RTF::Parser's constructor method, and then invokes the _configure method
+(in RTF::Control) on this object. RTF::Parser::new() is also pretty
+simple - it sets some options depending on if RTF::Control is being
+used, and returns an object.
+
+It's on this object then that RTF::Parser::_configure() is called. 
+_configure() reads in options the user passed to the constructor -
+at the moment, the only one recognised is 'output', which, if set,
+passes the value of 'output' to RTF::Control::set_top_output_to().
+
+RTF::Control::set_top_output_to() checks to see if it's been passed
+a filehandle or a reference to a scalar. Depending on which it's been passed, it
+over-rides the behaviour of the sub RTF::Control::flush_top_output
+to either print the top item of @RTF::Control::output_stack to said
+filehandle, or add it to the scalar referenced.
+
+rtf2html then runs the parse_stream method on our RTF::HTML::Converter
+object.
+
+This creates an RTF::Tokenizer object from our filehandle, and executes
+RTF::Parser::_parse(). parse_start() is called, which, in this case,
+is RTF::Control::parse_start(). This executes RTF::Control::push_output(),
+which adds a new and empty element to our output stack. This in turn 
+executes the code reference in $RTF::HTML::Converter::do_on_event{'document'},
+which, as we've passed a 'start' event to it, calls RTF::Control::output() with
+a doctype to print. This adds that doctype to the current element at the end
+of our output stack. RTF::Control::flush_top_output() is then called, which
+prints the doctype to STDOUT. We call push_output again to add another blank
+element to our output stack, and return to RTF::Parser::_parse().
+
+We then enter the loop around all the tokens. The first token we come across
+opens a group, so $self->group_start is called, which in this case is
+RTF::Control::group_start(). Here we add paragraph properties, and character
+properties currently in force (although because we're just starting, there
+are none) to their respective stacks, and add a holder to @control to keep
+track of any controls we're going to open.
+
+The next token is a control word, 'rtf', with the argument 1. There's a
+%do_on_control entry defined in RTF::Control for 'rtf', so we execute that.
+It calls RTF::Control::push_output with 'nul', which over-rides our output()
+function to not do anything. It then sets 'rtf' to be an open control in
+@control (so that when we leave this group, it executes the %do_on_control
+entry for 'rtf', only with 'end' rather than 'start').
+
+	\ansi
+	
+	This is defined in do_on_control in RTF::HTML::Converter. It does a lot
+	of scary character-set stuff. Wibble.
+	
+	\deff0
+	
+	Ignored, because we don't have a handler
+	
+	\fonttbl
+	
+	
+
+
+
+
+

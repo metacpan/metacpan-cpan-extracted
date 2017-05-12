@@ -1,0 +1,8 @@
+<%args>
+$id
+</%args>
+<%init>
+$m->comp('Toggle', id => $id, toggle => 1);
+$m->abort();
+</%init>
+

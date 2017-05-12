@@ -1,0 +1,101 @@
+This is the README file for RPC::Simple::* , a bunch of Perl classes
+to perform simple asynchronous remote procedure calls in an object
+oriented way.
+
+This module uses an IO::Select based control loop on the server side.
+
+On the local side, the user can use Tk's control loop or provide it's
+own control loop using the socket provided by this module.
+
+To use this set of classes, the user will have to create a set of twin 
+classes. One will run on the local side, the other on the remote side.
+Each twin class will inherit a RPC::Simple::Any[Local|Remote] class.
+
+When done you'll be able to invoke a method from the remote class on the
+local object and vice versa. (like $localObj->remotePrint). 
+
+When calling the remote method from the local side, you may pass a
+method name which will be stored by the RPC::Simple objects. This
+method will be called back when the remote function is over. Note
+that the remote calls are not blocking, all feedback from the remote
+side is performed through asynchronous call-back. 
+
+Note that simultaneous remote calls on the same object (or on 
+different objects) are supported, you'll get the relevant call-back 
+as usual.
+
+On the other hand (or side ...), the callback mechanism does not work 
+when calling a method from the remote side to the local side. 
+Only a simple method call (albeit with optionnal parameters) is allowed 
+from the remote side.
+
+Note that the attribute of the twin objects are not automagically
+copied or updated on the other side. You will have to explicitely 
+pass the necessary data from one side to the other if you need it.
+
+See the man pages or the t/connection.t script to get further details.  
+
+About security: When running the server, only a localhost (127.0.0.1)
+connection is allowed by default. You may call a server method to allow
+connections from other IP (either numeric or name) addresses. Once this is
+done, the declared address is considered as a "buddy" and the data
+sent to the server are not checked for security (i.e. the Taint mechanism
+is defeated). Consider yourself warned.
+
+Note that if security is a real problem for you, you should consider
+using penguin (see CPAN) or use SSH tunneling. Note also that I always
+opened to comments and suggestion to improve the security aspects.
+
+All in all, I've tried to keep things simple.
+
+So this module should be :
+ - quite simple to use (thanks to autoload mechanisms)
+ - lightweight
+
+It sure is not :
+ - DCE
+ - CORBA (which is blocking)
+ - bulletproof
+ - foolproof
+
+But it works. (Although I'm opened to suggestion regarging the "un-
+proof" areas)
+
+
+This module was written with perl5.004. 
+
+See the embedded documentation in the module for more details.
+
+Comments and suggestions are always welcome.
+
+Legal mumbo jumbo:
+
+ Copyright (c) 2006 Clint Edwards. Copyright (c) 1995,1998,2004 
+ Dominique Dumont. All rights reserved. This program is free 
+ software; you can redistribute it and/or modify it under the 
+ same terms as Perl itself.  
+ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ 
+ - Clint Edwards
+   cedwards@mcclatchyinteractive.com
+
+ - Dominique Dumont
+   dominique_dumont@grenoble.hp.com
+
+---------------------------------------------------------------------
+INSTALLATION
+
+   	 gunzip -c <dist_file>.tar.gz | tar xvf -
+   	 cd <dist_directory>
+   	 perl Makefile.PL
+   	 make test          
+   	 make install
+
+
+
+
+
+
+

@@ -1,0 +1,3 @@
+<http://example.com/subject1> <http://example.com/predicate1> "Bar"^^<http://example.com/datatype1> .
+<http://example.com/subject1> <http://example.com/predicate1> "Foo"@en .
+_:g2 <http://example.com/predicate2> _:g1 .

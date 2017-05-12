@@ -1,0 +1,97 @@
+Consider:
+"You're evil! Remove the phone home code from this module
+ immediately unless you want to rot in hell for all
+ eternity!"
+
+I get fed up having to respond to this when people come out
+with such unreasonable statements like this, so here is my
+stock response to each of the arguments to why I should not
+include phone home code in my distribution:
+
+
+1) It's rude.
+
+   No. The user is asked if they want to send any
+   information. Their response is honored. The default
+   value is "no" (do not phone home), and there is a
+   timeout that also defaults to "no".
+
+
+2) It's still rude.
+
+   It's no more rude than the dozens of other distributions
+   on CPAN that run unit tests that make network connections
+   over the Internet without asking first. At least in my
+   case the user is asked if they want to phone home first.
+
+
+3) It will screw up automated stuff.
+
+   No. It honors the AUTOMATED_TESTING environment
+   variable, and also has a timeout that defaults to "no".
+
+
+4) Build.PL and Makefile.PL shouldn't be scripts.
+
+   What do you expect people to put in them other than a
+   script? A pretty ASCII art picture maybe?
+
+
+5) I don't want you to know my IP address.
+
+   Then don't respond "yes" when asked if it's okay to send
+   the information then.
+
+
+6) I'll have to check the code to be sure it's safe.
+
+   Why should you trust this code less than any other code
+   written by other people just because it asks you if you
+   would like to send some basic information to the author
+   using an HTTP GET (the URL of which it clearly displays
+   in the question/message)?
+
+
+7) You can't possibly code defensively enough to make it
+   always default to "no" and not phoning home.
+
+   It is impossible to account for people overloading any
+   or all parts modules that are used in the phone home,
+   in the same way that it is impossible for me to know if
+   someone has replaced the perl binary with a copy of lua
+   or patched it to unlink random files from the file
+   system, or overloaded ever core operator. I have
+   however written the code to cope with all reasonable
+   situations.
+
+
+8) I bet people have only said you should remove the phone
+   home code, and none said to keep it. You should therefore
+   remove it.
+
+   When council tax bands are reevaluated you only hear about
+   the people who are not happy because they will have to
+   pay more. That's because the people who benefit or don't
+   mind usually don't feel the need to make their opinions
+   known. Likewise in this situation. Plenty of people
+   happily answer "yes" to allow phoning home. Do hear from
+   them to tell me I should keep the phone home code? No,
+   of course not.
+
+
+9) I still don't agree. Phone home code is bad!
+
+   Don't use this module and/or run the Build.PL script
+   then.
+
+
+10) I still don't agree. Phone home code is bad!
+
+   Stop complaining. Other consenting adults make the
+   decision to allow Build.PL to phone home, or not to
+   phone home, and are able to do so without complaining.
+   More over they're able to do this without trying to
+   restrict how the author writes the software (which is
+   free) or distributes it.
+
+

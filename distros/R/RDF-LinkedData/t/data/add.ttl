@@ -1,0 +1,7 @@
+@base <http://localhost/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+</#dataset-0> rdfs:label "This is a test too"@en ;
+	      dc:modified "2012-06-30"^^xsd:date .

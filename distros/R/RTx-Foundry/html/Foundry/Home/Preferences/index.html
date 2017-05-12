@@ -1,0 +1,55 @@
+%# Never call a man a fool; borrow from him.
+
+<& /Foundry/Elements/Header, Title => 'My Page', Method => 'Post' &>
+<br>
+<table width="97%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td><& /Foundry/Elements/Tabs, Text => 'Preferences' &></td>
+  </tr>
+  <tr> 
+    <td valign="top"> 
+      <table border="0" cellspacing="0" cellpadding="4" class="poptable" width="100%">
+        <tr> 
+          <td valign="top"> 
+% if ($Error) {
+<font color="red">* <% $Error %></font><br>
+% }
+% $m->print($rv);
+	  </td>
+	</tr>
+      </table>
+<br>
+<& /Foundry/Elements/Footer &>
+
+<%INIT>
+my $Error;
+if (my $Email = $ARGS{EmailAddress}) {
+    require Email::Valid;
+    if ( $session{CurrentUser}->Name ne 'root' and !Email::Valid->address( -address => $Email ) ) {
+	delete $ARGS{EmailAddress};
+	$Error = loc('Invalid email address') . ": $Email";
+    }
+    elsif ($Email ne $session{CurrentUser}->EmailAddress) {
+	my $user = RT::User->new($session{CurrentUser});
+	$user->LoadByEmail($Email);
+	if ($user->Id) {
+	    delete $ARGS{EmailAddress};
+	    $Error = loc('This email address already exists');
+	}
+    }
+}
+elsif ($ARGS{Name}) {
+    delete $ARGS{EmailAddress};
+    $Error = loc('Invalid email address');
+}
+my $rv = $m->scomp( '/Work/Preferences/index.html', %ARGS, NoUI => 1 );
+
+if ((defined $Pass1) and ($Pass1 ne '') and ($Pass1 eq $Pass2)) {
+    my $obj = $session{CurrentUser}->UserObj->OriginObj;
+    $obj->SetCustomFieldValue( Password => $Pass1 ) if $obj;
+}
+</%INIT>
+<%ARGS>
+$Pass1	=> ''
+$Pass2	=> ''
+</%ARGS>

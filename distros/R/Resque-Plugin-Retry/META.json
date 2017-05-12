@@ -1,0 +1,81 @@
+{
+   "abstract" : "Retry the fail job",
+   "author" : [
+      "meru_akimbo <merukatoruayu0@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Resque-Plugin-Retry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Resque" : "0.31",
+            "Try::Lite" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::RedisServer" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Resque::Plugin::Retry" : {
+         "file" : "lib/Resque/Plugin/Retry.pm",
+         "version" : "0.01"
+      },
+      "Resque::Plugin::Retry::Job" : {
+         "file" : "lib/Resque/Plugin/Retry/Job.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/meru-akimbo/resque-retry-perl/issues"
+      },
+      "homepage" : "https://github.com/meru-akimbo/resque-retry-perl",
+      "repository" : {
+         "url" : "git://github.com/meru-akimbo/resque-retry-perl.git",
+         "web" : "https://github.com/meru-akimbo/resque-retry-perl"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:MERU",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

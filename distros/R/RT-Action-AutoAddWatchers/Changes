@@ -1,0 +1,7 @@
+Changelog for RT-Action-AutoAddWatchers
+
+0.02    2014-08-08
+    - Add `make initdb` to installation doc (thanks Wallace Reis!)
+
+0.01
+    - Initial release

@@ -1,0 +1,9 @@
+Revision history for Perl extension RINO::Client.
+
+0.03  2011-06-09
+    - fixed some issues with AdditionaData and the JSON plugin
+
+0.00_01  Fri May 13 18:16:07 2011
+	- original version; created by h2xs 1.23 with options
+		-ABXb 5.8.8 RINO::Client
+

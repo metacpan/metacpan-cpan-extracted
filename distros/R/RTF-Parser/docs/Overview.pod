@@ -1,0 +1,58 @@
+
+=head1 RTF Overview
+
+RTF is a format that can express complex formatted documents in ASCII.
+This document expects that you have some familiarity with it, and are
+familiar with the terms 'text field', 'control word', and 'group' as
+they apply to RTF.
+
+Sean Burke has very usefully written:
+
+An online introduction to RTF
+
+L<http://search.cpan.org/~sburke/RTF-Writer/lib/RTF/Cookbook.pod>
+
+The RTF Pocket Guide
+
+L<http://www.oreilly.com/catalog/rtfpg/>
+
+=head1 What the different modules do
+
+=head2 RTF::Parser
+
+L<RTF::Parser> is the foundation class. It's essentially a wrapper
+for <RTF::Tokenizer> that executes events that you define as it comes
+across different parts of the RTF document - it has handlers for
+when groups open, when they close, when we come across a control word,
+and so on.
+
+=head2 RTF::Control
+
+L<RTF::Control> sub-classes L<RTF::Parser>. It defines a number of events
+for which you can write handlers that are specifically geared towards
+people who want to write converters - where RTF::Parser things in terms
+of control words and groups, RTF::Control thinks in terms of paragraphs,
+and formatting properties for text.
+
+=head2 RTF::TEXT::Converter, RTF::HTML::Converter
+
+L<RTF::TEXT::Converter> and L<RTF::HTML::Converter> sub-class L<RTF::Control>,
+and are essentially documents that specify how to react to RTF::Control's
+events to spit RTF out as text and HTML respectively. You can also use them
+to inline RTF conversion to text or HTML in your documents.
+
+=head1 AUTHOR
+
+Peter Sergeant C<pete@clueball.com>
+
+=head1 COPYRIGHT
+
+Copyright 2004 B<Pete Sergeant>.
+
+This documentation is free documentation; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 CREDITS
+
+This work was carried out under a grant generously provided by The Perl Foundation -
+give them money!

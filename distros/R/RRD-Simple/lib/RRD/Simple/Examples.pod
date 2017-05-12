@@ -1,0 +1,227 @@
+############################################################
+#
+#   $Id: Examples.pm 756 2006-08-24 22:30:54Z nicolaw $
+#   RRD::Simple::Examples - Examples POD for RRD::Simple
+#
+#   Copyright 2005,2006,2007 Nicola Worthington
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+############################################################
+# vim:ts=4:sw=4:tw=78
+
+=pod
+
+=head1 NAME
+
+RRD::Simple::Examples - Examples using RRD::Simple
+
+=head1 EXAMPLES
+
+=head2 Example 1: Basic Data Gathering Using vmstat
+
+ use strict;
+ use RRD::Simple;
+ 
+ my $cmd = "/usr/bin/vmstat 2 3";
+ my $rrdfile = "vmstat-cpu.rrd";
+ my $rrd = RRD::Simple->new( file => $rrdfile );
+ 
+ my @keys = ();
+ my %update = ();
+ open(PH,"-|",$cmd) or die qq{Unable to open file handle PH for command "$cmd": $!};
+ while (local $_ = <PH>) {
+     next if /---/;
+     s/^\s+|\s+$//g;
+     if (/\d+/ && @keys) {
+         @update{@keys} = split(/\s+/,$_);
+     } else { @keys = split(/\s+/,$_); }
+ }
+ close(PH) or die qq{Unable to close file handle PH for command "$cmd": $!};
+ 
+ my @cpukeys = splice(@keys,-4,4);
+ my %labels = (wa => "IO wait", id => "Idle", sy => "System", us => "User");
+ 
+ $rrd->create(map { ($_ => "GAUGE") } @cpukeys) unless -f $rrdfile;
+ $rrd->update(map { ($_ => $update{$_}) } @cpukeys);
+
+=head2 Example 2: Setting Minimum and Maximum Value Limits
+
+This example shows how to set the minimum value to zero on a datasource using
+the RRDs::tune function. Use C<-i> or C<--minimum> to set the minimum value,
+and C<-a> or C<--maximum> to set the maximum value.
+
+See L<http://www.rrdtool.org/rrdtool/doc/rrdtune.en.html>.
+
+ use strict;
+ use RRD::Simple;
+ use RRDs;
+
+ my %update = ();
+ my $cmd = "/usr/bin/iostat -k";
+ 
+ open(PH,"-|",$cmd) or die qq{Unable to open file handle PH for command "$cmd": $!};
+ while (local $_ = <PH>) {
+     if (my ($dev,$r,$w) = $_ =~ /^([\w\d]+)\s+\S+\s+\S+\s+\S+\s+(\d+)\s+(\d+)$/) {
+         $update{$dev} = { "read" => $r, "write" => $w };
+     }
+ }
+ close(PH) or die qq{Unable to close file handle PH for command "$cmd": $!};
+
+ for my $dev (keys %update) {
+     my $rrdfile = "iostat-$dev.rrd";
+     my $rrd = RRD::Simple->new( file => $rrdfile );
+ 
+     unless (-f $rrdfile) {
+         $rrd->create(
+                 map { ($_ => "DERIVE") } sort keys %{$update{$dev}}
+             );
+         RRDs::tune($rrdfile, "-i", "$_:0") for keys %{$update{$dev}};
+     }
+ 
+     $rrd->update(%{$update{$dev}});
+ }
+
+=head2 Example 3: Creating RRDs with Different Data Retention Periods
+
+The second (optional) parameter to the I<create> method is the data retention
+period. Valid values are "day", "week", "month", "year", "3years" and "mrtg".
+The default value is "mrtg".
+
+The "mrtg" data retention period uses a data stepping resolution of 300 seconds
+(5 minutes) and heartbeat of 600 seconds (10 minutes), whereas all the other
+data retention periods use a data stepping resolution of 60 seconds (1 minute)
+and heartbeat of 120 seconds (2 minutes).
+
+ use strict;
+ use RRD::Simple;
+ 
+ my $rrd = RRD::Simple->new( file => "myfile.rrd" );
+ my @period = qw(day week month year 3years mrtg);
+ $rrd->create($period[1],
+         datasource1 => "GAUGE",
+         datasource2 => "GAUGE",
+         datasource3 => "GAUGE",
+     );
+
+=head2 Example 4: Drawing an Average Value Horizonal Rule on a Graph
+
+Graph parameters are preserved and should be passed through to RRDs correctly:
+VDEF, CDEF, DEF, GPRINT, PRINT, COMMENT, HRULE, VRULE, LINE, AREA, TICK, SHIFT
+and STACK. Use the VDEF and HRULE parameters to draw a horizontal rule on your
+graph.
+
+ use strict;
+ use RRD::Simple;
+ 
+ my $rrd = RRD::Simple->new( file => "frequency.rrd" );
+ $rrd->create("day",
+         Frequency => "GAUGE",
+     );
+ 
+ my $end = time();
+ my $start = $end - (60 * 60 * 24);
+ my $i = 0;
+ my $rand = int(rand(100));
+ 
+ for (my $t = $start; $t <= $end; $t += 60) {
+     $rrd->update($t,
+             Frequency => ( cos($i += 0.01) * 100 ) + $rand,
+         );
+ }
+ 
+ $rrd->graph(
+         sources => [ qw(Frequency) ],
+         "VDEF:FrequencyAVERAGE=Frequency,AVERAGE" => "",
+         "HRULE:FrequencyAVERAGE#00ff77:Average" => "",
+     );
+
+=head2 Example 5: Drawing a Fixed Height Stacked Graph
+
+ use strict;
+ use RRD::Simple;
+ 
+ my $rrdfile = "vmstat-cpu.rrd";
+ my $rrd = RRD::Simple->new( file => $rrdfile );
+ 
+ $rrd->graph(
+         title => "CPU Utilisation",
+         vertical_label => "% percent",
+         upper_limit => 100,
+         lower_limit => 0,
+         rigid => "",
+         sources => [ qw(sy us wa id) ],
+         source_drawtypes => [ qw(AREA STACK STACK STACK) ],
+         extended_legend => 1,
+     );
+
+=head2 Example 6: Setting Custom Graph Colours
+
+The C<color> parameter can be used to override the default colours
+for standard elements of the graph. Valid elements are: BACK, CANVAS,
+SHADEA, SHADEB, GRID, MGRID, FONT, AXIS, FRAME and ARROW. See
+L<http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html> for further
+information.
+
+ use strict;
+ use RRD::Simple;
+ 
+ my $rrd = RRD::Simple->new( file => "vmstat-cpu.rrd" );
+ 
+ $rrd->graph(
+         title => "CPU Utilisation",
+         source_colors => {
+                 sy => "ff0000",
+                 us => "00ff00",
+                 wa => "0000ff",
+                 id => "ffffff",
+             },
+         color => [ ( "BACK#F5F5FF", "SHADEA#C8C8FF",
+                      "SHADEB#9696BE", "ARROW#61B51B",
+                      "GRID#404852", "MGRID#67C6DE" ) ],
+     );
+
+=head2 Example 7: Capacity Planning Predictions
+
+ use strict;
+ use RRD::Simple 1.44;
+ 
+ my $rrd = RRD::Simple->new( file => "memory_usage.rrd" );
+ 
+ $rrd->graph(
+         periods => [ qw(week month) ],
+         title => "Memory Utilisation",
+         base => 1024,
+         vertical_label => "bytes",
+         sources => [ qw(Total Used) ],
+         source_drawtypes => [ qw(AREA LINE) ],
+         source_colors => [ qw(dddddd 0000dd) ],
+         lower_limit => 0,
+         rigid => "",
+         "VDEF:D=Used,LSLSLOPE" => "",
+         "VDEF:H=Used,LSLINT" => "",
+         "VDEF:F=Used,LSLCORREL" => "",
+         "CDEF:Proj=Used,POP,D,COUNT,*,H,+" => "",
+         "LINE2:Proj#800000: Projection" => "",
+     );
+
+=head1 COPYRIGHT
+
+Copyright 2005,2006,2007,2008 Nicola Worthington.
+
+This software is licensed under The Apache Software License, Version 2.0.
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
+
+=cut
+

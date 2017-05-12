@@ -1,0 +1,61 @@
+
+Resources-1.03
+===============
+
+
+INTRODUCTION
+
+Resources.pm is Perl package used to specify configuration (defaults, ...)
+parameters for Perl applications, pretty much in the same way as XWindows
+does.  It implements dynamical inheritance of defaults (both values and names)
+through subclassing, parameter loading from files, runtime parameter viewing
+and editing. The package contains an extensive documentation in POD format, to
+which you are kindly referred.
+
+SYSTEM REQUIREMENTS
+
+The package has been succesfully tested with both perl-5.002_01 and
+perl-5.001. It will not work at all with perl4.
+
+INSTALLATION
+
+To install in your standard site_local perl lib tree, just do
+the following
+
+	% tar zxvf Resources-1.02.tar.gz
+	% cd Resources-1.02
+	% perl Makefile.PL
+	% make test
+	% make install
+
+See the ExtUtils::MakeMaker manpage for custom installation.
+
+BUG REPORTS
+
+The package is currently in beta version. Please send bug reports (including
+a snippet of the code that evidentiated the bug) to
+
+	franco@cim.mcgill.ca
+
+
+COPYRIGHT -- LICENSING INFORMATION
+
+Copyright 1995 Francesco Callari, McGill University
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose without fee is hereby granted without fee,
+provided that the above copyright notice appear in all copies and that both
+that copyright notice and this permission notice appear in supporting
+documentation, and that the name of McGill not be used in advertising or
+publicity pertaining to distribution of the software without specific,
+written prior permission.  McGill makes no representations about the
+suitability of this software for any purpose.  It is provided "as is"
+without express or implied warranty.
+
+MCGILL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL
+MCGILL BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+

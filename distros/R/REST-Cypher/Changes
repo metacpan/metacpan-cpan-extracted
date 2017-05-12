@@ -1,0 +1,19 @@
+Revision history for REST-Cypher
+
+0.0.4     2015-10-29 19:27:48+00:00 Europe/London
+ - stop using package{..} syntax
+   - in principle there's nothing wrong with it; until you hit the hateful
+     'find-provides' during RPM packaging. It doesn't recognise this syntax
+     and you end up missing these 'Provides' in the generated RPM.
+
+0.0.3     2015-10-22 15:12:04+01:00 Europe/London
+
+ - add exception throwing for some of the more common silly mistakes made
+
+0.0.2     2015-09-29 10:21:52+01:00 Europe/London (TRIAL RELEASE)
+
+ - Minor tweaks and improvements
+
+0.0.1     2015-07-16 13:47:38+00:00 UTC (TRIAL RELEASE)
+
+ - Initial release of rough round the edges prototype

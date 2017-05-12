@@ -1,0 +1,19 @@
+Revision history for Rose-DBx-TestDB
+
+0.01    7 Oct 2007
+        First version, released on an unsuspecting world.
+
+0.02    11 Oct 2007
+        Updated Makefile.PL to list all reqs
+
+0.03    14 Oct 2007
+        No function changes. Just gave credit to jrockway's DBIC package.
+
+0.04    14 Oct 2007
+        cpan-upload failed on osx ftp badness. No diff from 0.03.
+
+0.05    06 Jan 2010
+        * use sigtrap so that clean up happens if script dies or ^C
+        * register defaults so that RDBO::Loader->make_classes works.
+
+

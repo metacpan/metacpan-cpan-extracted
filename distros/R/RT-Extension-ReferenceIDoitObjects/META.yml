@@ -1,0 +1,44 @@
+--- #YAML:1.0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-ReferenceIDoitObjects
+version: 1.00
+abstract: 'Create a ticket in relation to one or more i-doit objects'
+author:
+  - 'Benjamin Heisig <bheisig@i-doit.com>'
+  - 'Leonard Fischer <lfischer@i-doit.com>'
+  - 'Van Quyen Hoang <qhoang@i-doit.com>'
+license: perl
+distribution_type: module
+requires:
+  perl: 5.10.0
+  rt: 4.4.0
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+no_index:
+  file:
+    - Changelog.md
+    - README.md
+    - TODO.md
+  directory:
+    - etc
+    - html
+    - inc
+    - po
+    - static
+    - t
+keywords:
+  - RT
+  - Request Tracker
+  - i-doit
+  - IT documentation
+  - CMDB
+resources:
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/bheisig/rt-extension-referenceidoitobjects
+  bugtracker: https://github.com/bheisig/rt-extension-referenceidoitobjects/issues
+  homepage: https://i-doit.com/
+generated_by: Benjamin Heisig <bheisig@i-doit.com>

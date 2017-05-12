@@ -1,0 +1,18 @@
+Changes
+html/NoAuth/ShiftPlanning/refresh_onnow.html
+html/NoAuth/ShiftPlanning/refresh_schedules.html
+html/ShiftPlanning/create_schema.html
+lib/RT/Extension/ShiftPlanning.pm
+lib/RT/Extension/ShiftPlanning/Location.pm
+lib/RT/Extension/ShiftPlanning/Locations.pm
+lib/RT/Extension/ShiftPlanning/Onnow.pm
+lib/RT/Extension/ShiftPlanning/Onnows.pm
+lib/RT/Extension/ShiftPlanning/Schedule.pm
+lib/RT/Extension/ShiftPlanning/Schedules.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

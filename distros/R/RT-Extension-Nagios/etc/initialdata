@@ -1,0 +1,22 @@
+# -*- perl -*-
+
+@Scrips = (
+    {
+        Description    => 'Update Nagios Tickets', # loc
+        ScripCondition => 'On Create', # loc
+        ScripAction    => 'Update Nagios Tickets', # loc
+        Template       => 'Blank',
+    },
+
+);
+
+@ScripActions = (
+    {
+        Name        => 'Update Nagios Tickets',    # loc
+        Description => 'Merge or Resolve Nagios Tickets',    # loc
+        ExecModule  => 'UpdateNagiosTickets',
+    }
+
+);
+
+1;

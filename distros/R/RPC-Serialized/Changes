@@ -1,0 +1,136 @@
+1.123630  2012-12-28 19:15:50 Europe/London
+
+  * Add callbacks support and pre_handler_argument_filter callback (E. Wasser)
+
+1.112530  2011-09-10 13:52:25 Europe/London
+
+  * Fix dependencies to remove NegKrb5 and DBM Files
+
+1.110470  2011-02-16 22:19:07 Europe/London
+
+  * Port to Dist::Zilla
+  * New config param args_suppress_log (D. Hargreaves rp.cpan #65527)
+
+librpc-serialized-perl (1.0801-1) unstable; urgency=low
+
+  * Add a Single personality as alternative to PreFork
+  
+librpc-serialized-perl (1.0701-1) unstable; urgency=low
+
+  * Small fixes to the distribution
+  * Get a grown up version number
+  * Fix some tests for 64bit platforms
+  
+librpc-serialized-perl (0.0702-1) unstable; urgency=low
+
+  * Fix dependencies and move to Module::Install to allow build/test dependencies
+  
+librpc-serialized-perl (0.0701-1) unstable; urgency=low
+
+  * Added IO::Socket::SSL client and server (Oleg A. Mamontov)
+  
+librpc-serialized-perl (0.0605-1) unstable; urgency=low
+
+  * Missed a path fix for previous.
+  
+librpc-serialized-perl (0.0604-1) unstable; urgency=low
+
+  *  Further loosen regex on $! in tests - filesystem issues
+  
+librpc-serialized-perl (0.0603-1) unstable; urgency=low
+
+  * Loosen test check for $! - some localized err msgs don't match test
+
+librpc-serialized-perl (0.0602-1) unstable; urgency=low
+
+  * Bug in t/45-gdbm, GDBM_File is not always available
+
+librpc-serialized-perl (0.0601-1) unstable; urgency=low
+
+  * Remove prod of Carp package, to appease the CPAN indexer
+
+librpc-serialized-perl (0.0600-1) unstable; urgency=low
+
+  * Bug fixes in tests
+  * Version bump for CPAN stable release
+
+librpc-serialized-perl (0.0599_05-1) unstable; urgency=low
+
+  * Bug fixes in Server.pm
+
+librpc-serialized-perl (0.0599_04-1) unstable; urgency=low
+
+  * Refactor between Serialized.pm and Serialized/Server.pm to remove server
+    specific bits from the general base package
+  * Add population of the handlers lookup table into Server::new
+
+librpc-serialized-perl (0.0599_03-1) unstable; urgency=low
+
+  * Quiesce the Carp::carp noise from inside Data::Serializer by turning them
+    into exceptions (Carp::croak) which are caught by this module
+  * Add better logging via the trace config option and Log::Dispatch::Syslog
+  * Support legacy YAML::RPC2 wire protocol via debug flag (i.e. it is
+    intended this is just for you to debug and then flip to full Serialization)
+  * Rename run() to process() to avoid clash with Net::Server->run()
+  * Add timeout alarms to process() around send, recv and dispatch
+  * Allow the server to respond with all settings (not just serializer) used
+    in the request
+  * Change to use Module::MultiConf to configure each module used, and
+    also RPC::Serialized itself
+  * Allow handlers to be 'autoloaded' by using handler_namespaces arrayref
+    option, and some handler call naming magic
+  * Add new Server using Net::Server in PreFork mode
+  * Debug mode is a bit smarter about adding trailing newlines
+  * Rename exceptions into the RPC::Serialized::X namespace
+  * Added documentation
+
+librpc-serialized-perl (0.0599_02-1) unstable; urgency=low
+
+  * Alter default on-the-wire protocol to not need a record separator
+    (records are now all each one line)
+  * Allow the server to respond with Serializer which is not that set in the
+    current Data::Serializer object.
+
+librpc-serialized-perl (0.0599_01-1) unstable; urgency=low
+
+  * Use Data::Serializer as a replacement for YAML
+  * Ported all modules to the RPC::Serialized namespace
+  * Ported all tests to use this new namespace
+  * Alter Exception::Class exceptions to use namespace-imported aliases
+  * Some small tweaks here and there for coding style
+  * Use Class::Accessor::Fast::Contained instead of Class::Accessor
+  * Use Config::Any for config instead of YAML
+
+libyaml-rpc2-perl (0.05-1) unstable; urgency=low
+
+  * Switched all usage of the YAML module with YAML::Syck
+
+libyaml-rpc2-perl (0.04-1) unstable; urgency=low
+
+  * Set "local $YAML::UseBlock = 1;" before all calls to YAML::Dump. This
+    fixes problems with dumping some large blocks of text.
+
+libyaml-rpc2-perl (0.03-2) unstable; urgency=low
+
+  * Really add dependency on libclass-accessor-perl.
+
+libyaml-rpc2-perl (0.03-1) unstable; urgency=low
+
+  * Update Server.pm to dereference $args array in call to target(); this
+    makes it consistent with invoke().
+
+libyaml-rpc2-perl (0.02-1) unstable; urgency=low
+
+  * Added dependency and build dependency on liburi-perl and 
+    libclass-accessor-perl.
+  * Removed dependency on libio-string-perl.
+  * Added build dependency on libyaml-perl.
+  * Added configuration module, YAML::RPC2::Config and tests.
+  * Added (highly-configurable) yaml-rpc2-server.
+  * Updated examples.
+  * Made bin/mkgdbm_group more general and renamed to sbin/mkgdbm.
+  
+libyaml-rpc2-perl (0.01-1) unstable; urgency=low
+
+  * Initial Release.
+

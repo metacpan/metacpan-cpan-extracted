@@ -1,0 +1,9 @@
+@ScripActions = (
+    {
+      Name        => 'Set Priority from Header',
+      Description => 'Sets the ticket priority from a configured email header',
+      ExecModule  => 'SetPriorityFromHeader',
+    },
+);
+
+1;

@@ -1,0 +1,17 @@
+Revision history for RT-Extension-MandatorySubject
+0.05    Mon, 12 Dec 2011 14:11:11 +0100
+        Upgrade build and install framework for RT4
+
+0.04    Wed, 11 May 2011 17:30:46 +0200
+        Add a callback to check subject in QuickCreate
+        Fix Plugins option example in doc (two many "()")
+
+0.03    Mon, 03 Aug 2009 09:04:48 +0200
+        Fix bad module name in tests
+
+0.02    Fri, 03 Jul 2009 11:56:02 +0200
+        Do the check also for SelfService (require RT 3.8.3 at least)
+
+0.01    Mon, 03 Nov 2008 19:27:48 +0100
+        Initial release.
+

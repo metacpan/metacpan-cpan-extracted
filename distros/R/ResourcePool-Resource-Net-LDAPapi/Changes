@@ -1,0 +1,5 @@
+Revision history for Perl extension ResourcePool::Resource::Net::LDAPapi.
+
+1.00  - Fri Apr 10 02:42:20 2015
+	- Initial version based on ResourcePool::Resource::Net::LDAP
+

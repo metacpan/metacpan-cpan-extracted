@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<application>
+	<_param name="id" type="int" />
+	<_param name="action" />
+	<_param name="ns" multiple="yes">
+		<id type="int"/>
+		<_param name="name"/>
+		<_param name="ip" multiple="yes">
+			<type/>
+			<_param name="value"/>
+		</_param>
+	</_param>
+
+	<name />
+	<result type="int" />
+</application>
+

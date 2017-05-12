@@ -1,0 +1,12 @@
+Revision history for Rose-ObjectX-CAF
+
+0.01    28 Sep 2009
+        First version, released on an unsuspecting world.
+
+0.02    29 Sept 2009
+    * doc fixes
+
+0.03    13 Oct 2009
+    * check for method via can() in base init() before setting
+      in object hash ref.
+

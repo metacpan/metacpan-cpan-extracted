@@ -1,0 +1,45 @@
+=head1 NAME
+
+ResourcePool::Factory::SOAP::Lite - A L<ResourcePool|ResourcePool>. Factory for L<SOAP::Lites|SOAP::Lite>
+
+=head1 SYNOPSIS
+
+
+ 
+ use ResourcePool::Factory::SOAP::Lite;
+ 
+ my $factory = ResourcePool::Factory::SOAP::Lite->new(
+   "http://www.fatalmind.com/projects/ResourcePool/SOAPtest/" 
+ );
+
+=head1 DESCRIPTION
+
+
+This factory can be used by L<ResourcePool|ResourcePool> to create L<SOAP::Lite|SOAP::Lite> objects which use the specified proxy for SOAP RPC invocations.
+
+This resource binding is thought to be used for the L<ResourcePool::Command::SOAP::Lite::Call|ResourcePool::Command::SOAP::Lite::Call> command. Please have a look at the L<ResourcePool::Command::SOAP::Lite::Call|ResourcePool::Command::SOAP::Lite::Call> documentation for an example.
+
+=head2 S<ResourcePool::Factory::SOAP::Lite-E<gt>new($proxy)>
+
+Constructs an object which can be used as factory for a L<ResourcePool|ResourcePool>.
+
+=over 4
+
+=item $proxy
+
+Identifies the URL which will be invoked in order to process the SOAP operation. This is the physical location of a server capable of providing the service.
+
+=back
+
+=head1 SEE ALSO
+
+L<ResourcePool::Command::SOAP::Lite::Call|ResourcePool::Command::SOAP::Lite::Call>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

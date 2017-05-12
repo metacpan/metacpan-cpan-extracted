@@ -1,0 +1,97 @@
+Religion-Bible-Regex-Config
+
+    * NAME
+    * VERSION
+    * SYNOPSIS
+    * INTERFACE
+          o new
+          o get
+          o gethash
+          o get_formatting_configurations
+          o get_search_configurations
+          o get_versification_configurations
+          o get_bookname_configurations
+          o get_or_undef 
+    * DIAGNOSTICS
+    * CONFIGURATION AND ENVIRONMENT
+    * DEPENDENCIES
+    * BUGS AND LIMITATIONS
+    * AUTHOR
+    * LICENCE AND COPYRIGHT 
+
+NAME
+
+Religion::Bible::Regex::Config - Creates a configuration object for the Religion::Bible::Regex objects from a YAML file.
+
+SYNOPSIS 
+
+    use Religion::Bible::Regex::Config;
+
+    # Initialize with a YAML file or a string containing YAML
+    my $c = new Religion::Bible::Regex::Config("config.yml");
+
+    # Retrieve configurations in YAML format    
+    my $regex_configurations = $c->get_regex_configs;
+    my $reference_configurations = $c->get_reference_configs;
+    
+    # Initialize other Religion::Bible::Regex objects
+    my $r   = new Religion::Bible::Regex::Regex($c);
+    my $v   = new Religion::Bible::Regex::Versification($r, $c);
+    my $ref = new Religion::Bible::Regex::Reference($r, $c);
+
+INTERFACE 
+new
+
+Creates a configuration object from a YAML file or string
+get
+
+Returns a configuration string
+gethash
+
+Returns a hash of all configurations
+get_formatting_configurations
+
+Returns a hash of the reference configurations
+get_search_configurations
+
+Returns a hash of the regex configurations
+get_versification_configurations
+
+Returns a hash of the versification configurations
+get_bookname_configurations
+
+Returns a hash of the bookname configurations
+get_or_undef
+
+
+DIAGNOSTICS 
+
+If you do not pass a YAML file or string when creating a new instance then your program will croak.
+If you pass in invalid YAML then expect your program to stop and dump the errors to the STDOUT.
+
+    See the YAML module for more details.
+
+CONFIGURATION AND ENVIRONMENT
+
+Religion::Bible::Regex::Config requires no configuration files or environment variables.
+
+
+DEPENDENCIES 
+
+YAML
+Test::Base
+Test::Critic::Perl
+
+
+BUGS AND LIMITATIONS 
+
+Please report any bugs or feature requests to bug-religion-bible-regex-config@rt.cpan.org, or through the web interface at http://rt.cpan.org.
+AUTHOR
+
+Daniel Holmlund <holmlund.dev@gmail.com>
+
+
+LICENCE AND COPYRIGHT
+Copyright (c) 2009, Daniel Holmlund <holmlund.dev@gmail.com>. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See perlartistic.

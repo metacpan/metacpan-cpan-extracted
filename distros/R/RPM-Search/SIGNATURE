@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7584f4935d3ee1977f75d95d075355dd54c8d748 Changes
+SHA1 53161d88ad0ceefd38428753d014343c2e17cf33 MANIFEST
+SHA1 d4cb458c87bd73b5bd24695543cccbd777ef85e9 MANIFEST.SKIP
+SHA1 cc9c966d9b0291e4c50567580532f5ceb321fdf3 META.yml
+SHA1 3950179951348b23bd5cbd925669f030a0d25475 Makefile.PL
+SHA1 e902018ff6c21f4872b55d3190fa743e21932a76 README
+SHA1 604e6752c17a59c54011103f35632b546af81890 ignore.txt
+SHA1 fbdceda8a943261d945cb7e48ca1d499cb0506f7 lib/RPM/Search.pm
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/0-signature.t
+SHA1 4f2a6f2b6f96bd431bc3fe03343594557cc81ac4 t/00-load.t
+SHA1 e6d9b5d8ee6acffa52aa9f8648453bcd59b93cd2 t/01-basic.t
+SHA1 0e1c671134b9405b438dd6b1eae5097cb5ae233d t/manifest.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/test/bar.sqlite
+SHA1 cbaf68585fa1d3be6f1c8df4ca64db2a90cd8208 t/test/db/0A6358CF-0BEC-46A8-B3D5-8D5CE49C28F7primary.sqlite
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iQEcBAEBAgAGBQJOxURLAAoJEKS+8b7gqELLr78H/j25SptnhASLF7elHrTt+/fS
+luDJeI/nLP8yspGueGqsJQy1ofKy8/WO8DHBWKOU2jw7rdlzlkBpuYmuQ8kYb1Sz
+fTjjz2S2jofL8bQZZDY0T/4W6t/BJj629l19WZbJ8Oa0ROUXPG8AuESUaIpE1Vxn
+KcExCWNr8PsOp5RtfyBsT1Y4sJwBnNiVdHmhJTwyXT6eCFhmYkNkPK1oNoVEfeIR
+Xgg0lalPtJKb1tUrQx7QilfNQuuJOVs5z6tJt4lVUhAVGYHLgS8hIqHME8R7rxA/
+VmOmqaAM7/p06HY4l/tcEw648Dwv28Bqv1365f8lDNuiBpVRub6ZAZjgXmLDASg=
+=y7Oq
+-----END PGP SIGNATURE-----

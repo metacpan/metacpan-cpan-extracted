@@ -1,0 +1,10 @@
+This is the Reaction MVC Platform.
+
+How to get to playing fast:
+
+perl Makefile.PL
+make installdeps
+make test                    # we're pre-0.01, some may fail
+script/componentui_server.pl
+
+This library is free software under the same terms as perl itself.

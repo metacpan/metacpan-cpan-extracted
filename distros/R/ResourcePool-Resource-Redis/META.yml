@@ -1,0 +1,31 @@
+---
+abstract: 'Provides a ResourcePool wrapper for Redis.'
+author:
+  - 'Sebastian Nowicki <sebnow@gmail.com>'
+build_requires:
+  Test::MockModule: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ResourcePool-Resource-Redis
+provides:
+  ResourcePool::Factory::Redis:
+    file: lib/ResourcePool/Factory/Redis.pm
+    version: 1
+  ResourcePool::Resource::Redis:
+    file: lib/ResourcePool/Resource/Redis.pm
+    version: 1
+requires:
+  Redis: 0
+  ResourcePool::Factory: 0
+  ResourcePool::Resource: 0
+  perl: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 1

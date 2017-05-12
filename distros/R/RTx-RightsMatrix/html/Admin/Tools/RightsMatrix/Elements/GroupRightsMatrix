@@ -1,0 +1,31 @@
+<& /Elements/ListActions, actions => \@results &>
+
+<& /Admin/Tools/RightsMatrix/Elements/ObjectRightsMatrix, ObjectType => 'RT::Group', PrincipalObj => $principal, FilterField => 'Domain', FilterValue => 'UserDefined', SystemRights => {}, %ARGS  &>
+
+<%INIT>
+my @results;
+
+if ( $ARGS{WhereFrom} ) {
+        $m->comp("../WhereRightComesFrom.html", %ARGS);
+        $m->abort;
+}
+
+if ( $ARGS{Principal} and $ARGS{User} ) {
+        $m->comp("/Elements/Error", Why => loc("You can't select a user and enter one manually."));
+        $m->abort;
+}
+
+my ($principal, $msg) = RTx::RightsMatrix::Util::get_principal( Principal => $ARGS{Principal}, User => $ARGS{User}, CurrentUser => $session{CurrentUser} );
+unless (ref $principal) {
+        $m->comp("/Elements/Error", Why => loc($msg));
+        $m->abort;
+}
+
+</%INIT>
+<%ARGS>
+$User => undef
+$Edit => 0
+</%ARGS>
+<%ONCE>
+use RTx::RightsMatrix::Util;
+</%ONCE>

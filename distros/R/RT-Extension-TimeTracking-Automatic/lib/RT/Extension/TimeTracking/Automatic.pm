@@ -1,0 +1,92 @@
+use strict;
+use warnings;
+package RT::Extension::TimeTracking::Automatic;
+
+our $VERSION = '0.02';
+
+=pod
+
+=head1 NAME
+
+RT-Extension-TimeTracking-Automatic
+
+=head1 RT VERISION
+
+Works with RT 4.2 and RT 4.4, as well as RTIR
+
+=head1 INSTALLATION
+
+=over
+
+=item C<perl Makefile.PL>
+
+=item C<make>
+
+=item C<make install>
+
+May require root permissions to install
+
+=item Edit F</opt/rt4/etc/RT_SiteConfig.pm>
+
+To enable the extension add the following line to the F<RT_SiteConfig.pm> file:
+
+    Plugin('RT::Extension::TimeTracking::Automatic');
+
+If you would like to set a default amount of time to account for basic overhead
+you can set a config value to the number of minutes to add by default:
+
+    Set($TimeTrackingAdjustment, 10);	# automatically add 10 minutes to each update
+
+This setting is optional and will default to 0 additional minutes.
+
+=item Patching RTIR
+
+If you are using RTIR-3.2.0 apply the following patches:
+
+    patch -d /path/to/rtir -p1 < patches/patch-rtir-3.2.patch
+    patch -d /path/to/rtir -p1 < patches/incident_create_callback.patch
+    cd /path/to/rtir && make install
+
+These add callbacks and it is safe to leave them in place
+should you disable automatic time tracking.
+
+=item Clear the mason cache
+
+To clear your cache run the following command:
+
+    rm -rf /opt/rt4/var/mason_data/obj/*
+
+=item Restart the webserver
+
+Restart the websever to have the extension take affect.
+
+=back
+
+=head1 DESCRIPTION
+
+RT::Extension::TimeTracking::Automatic automatically tracks time when creating,
+commenting on, or replying to a ticket.  The time spent editing the ticket
+will update the TimeWorked on the Ticket itself, and create a transaction
+logging how long the user took to comment on or reply to the ticket.
+
+=head1 AUTHOR
+
+Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
+
+=head1 BUGS
+
+All bugs should be reported via email to: L<bug-RT-Extension-TimeTracking-Automatic@rt.cpan.org|mailto:bug-RT-Extension-TimeTracking-Automatic@rt.cpan.org>
+
+Or via the web at: L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-TimeTracking-Automatic>.
+
+=head1 COPYRIGHT
+
+This extension is Copyright (C) 2016 Best Practical Solutions, LLC.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut
+
+1;

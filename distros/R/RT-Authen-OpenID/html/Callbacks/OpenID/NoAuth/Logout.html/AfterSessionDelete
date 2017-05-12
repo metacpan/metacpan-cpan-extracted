@@ -1,0 +1,16 @@
+<%INIT>
+  use Authen::Bitcard;
+
+  if ($m->notes('isBitcardUser')) {
+      my $bc = Authen::Bitcard->new;
+      
+      die 'No Bitcard auth token provided as $BitcardToken in the RT configuration file.'
+            unless $RT::BitcardToken;
+      
+      $bc->token($RT::BitcardToken);
+      my $return_url = $RT::WebURL;
+      
+      $m->redirect( $bc->logout_url( r => $return_url ) );
+      $m->abort();
+  }
+</%INIT>

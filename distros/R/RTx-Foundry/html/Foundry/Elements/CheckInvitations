@@ -1,0 +1,34 @@
+%# A little inaccuracy sometimes saves tons of explanation.
+%#                 -- H. H. Munroe
+<%INIT>
+my $UserObj = RT::User->new($RT::SystemUser);
+$UserObj->Load($User) or return;
+
+my $email = eval {
+    $UserObj->OriginObj->CustomFieldValue('Email')
+} or return;
+
+my $OldObj = RT::User->new($RT::SystemUser);
+$OldObj->LoadByCols( Name => $email );
+return unless $OldObj->Name eq $email;
+
+my $Tickets = RT::Tickets->new($RT::SystemUser);
+my $Date = RT::Date->new($RT::SystemUser);
+$Date->Set(Format => 'unix', Value => time - (14 * 86400) );
+$Tickets->LimitCreated( OPERATOR => '>', VALUE => $Date->ISO );
+$Tickets->LimitQueue( VALUE => RT::Queue->NameToId('MemberChange') );
+$Tickets->LimitOwner( OPERATOR => '=', VALUE => $OldObj->Id );
+
+while (my $Ticket = $Tickets->Next) {
+    my ($Type, $Role, $QueueId) = split(/\s+/, $Ticket->Subject, 4) or next;
+    my $QueueObj = RT::Queue->new($RT::SystemUser);
+    $QueueObj->Load($QueueId) or next;
+    $QueueObj->AddWatcher(
+	Type => $Role,
+	PrincipalId => $UserObj->PrincipalId,
+    );
+}
+</%INIT>
+<%ARGS>
+$User
+</%ARGS>

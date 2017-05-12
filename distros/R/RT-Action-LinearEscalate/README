@@ -1,0 +1,45 @@
+RT::Action::LinearEscalate(3)
+
+
+
+NAME
+         RT::Action::LinearEscalate
+
+DESCRIPTION
+       LinearEscalate is a ScripAction which is NOT intended to be called per
+       transaction. It's intended to be called by an RT escalation tool.  One
+       such tool is called rt-crontool and is located in $RTHOME/bin (see
+       "rt-crontool -h" for more details)
+
+       This ScripAction will move a ticket's priority from its initial prior-
+       ity to its final priority linearly as the ticket approaches its due
+       date.
+
+       This ScripAction uses RT's internal Ticket::_Set call to set ticket
+       priority without running scrips or recording a transaction on each
+       update.
+
+       To install this package:
+
+        # perl Makefile.PL
+        # make install
+
+       Once the ScripAction is installed, the following script in "cron" will
+       get tickets to where they need to be:
+
+        rt-crontool --search RT::Search::FromSQL --search-arg \
+           "(Status='new' OR Status='open' OR Status = 'stalled')" \
+           --action RT::Action::LinearEscalate
+
+       LinearEscalate's behavior can be controlled by two configuration
+       options set in RT_SiteConfig.pm -- LinearEscalate_RecordTransaction,
+       which defaults to false and causes the tool to create a transaction on
+       the ticket when it is escalated, and LinearEscalate_UpdateLastUpdated,
+       which defaults to true and updates the LastUpdated field when the
+       ticket is escalated.  You cannot set LinearEscalate_UpdateLastUpdated
+       to false unless LinearEscalate_RecordTransaction is also false.  (Well,
+       you can, but we'll just ignore you.)
+
+
+
+perl v5.8.7                       2006-04-20     RT::Action::LinearEscalate(3)

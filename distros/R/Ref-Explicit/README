@@ -1,0 +1,76 @@
+NAME
+    Ref::Explicit - Keywords to create arrayrefs and hashrefs
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+      use Ref::Explicit qw(arrayref hashref);
+
+      my $arrayref = arrayref map { ... } @values;
+      my @array_of_hashrefs = map { hashref $key => $value, ... } @values;
+
+DESCRIPTION
+    This module exports keywords that provide an explicit syntax for
+    creation of arrayrefs and hashrefs in contexts where the ordinary perl
+    syntax leads to a punctuation overdose.
+
+FUNCTIONS
+  "arrayref" (@VALUES)
+    Return an array reference containing the values passed as arguments.
+    Useful if you have long "map"-like expressions whose result you need as
+    am array reference rather than as an ordinary list. Consider the
+    following example:
+
+      sub search {
+        ...
+        my @result = grep {
+          ... # complex multiline
+          ... # calculations
+        } @values;
+
+        return \@result;
+      }
+
+    You need to introduce an extra variable (@result) in order to return a
+    reference. This is a very common scenario, e.g. in Moose attribute
+    builders. You could avoid the extra variable by using square brackets:
+
+      return [ grep {
+        ...
+      } @values ];
+
+    But this makes the syntax ugly and the intent unclear. With "arrayref"
+    the above code becomes:
+
+      return arrayref grep {
+        ...
+      } @values;
+
+  "hashref" (@VALUES)
+    Return a hash reference containing the values passed as arguments.
+    Useful within "map"-like expressions that return a list of hashrefs.
+    Consider the following example:
+
+      my @names = ("Steven Spielberg", "George Lucas");
+      my @persons = map { +{ name => $_, industry => 'Movies'  } } @names;
+
+    The "+" (plus) sign tells the parser to evaluate the code in curly
+    brackets as an anonymous hashref rather than as a block. With "hashref"
+    this can be written more elegantly as:
+
+      my @persons = map { hashref name => $_, industry => 'Movies' } @names;
+
+CAVEATS
+    These functions provide clarity, not speed. Use the core syntax if speed
+    is of the essence.
+
+AUTHOR
+    Peter Shangov <pshangov@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Peter Shangov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

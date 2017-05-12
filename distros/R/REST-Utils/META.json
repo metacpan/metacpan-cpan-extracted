@@ -1,0 +1,51 @@
+{
+   "abstract" : "Utility functions for REST applications",
+   "author" : [
+      "Jaldhar H. Vyas <jaldhar@braincells.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "REST-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0,
+            "Test::WWW::Mechanize::CGI" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "REST::Utils" : {
+         "file" : "lib/REST/Utils.pm",
+         "version" : "0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://jaldhar.github.com/REST-Utils",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jaldhar/REST-Utils"
+      }
+   },
+   "version" : "0.6"
+}

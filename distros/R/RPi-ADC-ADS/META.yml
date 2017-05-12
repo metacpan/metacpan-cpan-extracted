@@ -1,0 +1,25 @@
+---
+abstract: 'Interface to ADS 1xxx series analog to digital converters (ADC) on Raspberry Pi'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RPi-ADC-ADS
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/stevieb9/rpi-adc-ads/issues
+  repository: https://github.com/stevieb9/rpi-adc-ads.git
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

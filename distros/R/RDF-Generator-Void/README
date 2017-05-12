@@ -1,0 +1,163 @@
+NAME
+    RDF::Generator::Void - Generate VoID descriptions based on data in an RDF
+    model
+
+VERSION
+    Version 0.16
+
+SYNOPSIS
+      use RDF::Generator::Void;
+      use RDF::Trine::Model;
+      my $mymodel   = RDF::Trine::Model->temporary_model;
+      [add some data to $mymodel here]
+      my $generator = RDF::Generator::Void->new(inmodel => $mymodel);
+      $generator->urispace('http://example.org');
+      $generator->add_endpoints('http://example.org/sparql');
+      my $voidmodel = $generator->generate;
+
+DESCRIPTION
+    This module takes a RDF::Trine::Model object as input to the constructor,
+    and based on the data in that model as well as data supplied by the user,
+    it creates a new model with a VoID description of the data in the model.
+
+    For a description of VoID, see <http://www.w3.org/TR/void/>.
+
+METHODS
+  new(inmodel => $mymodel, dataset_uri => URI->new($dataset_uri), level => 1);
+    The constructor. It can be called with two parameters, namely, `inmodel`
+    which is a model we want to describe and `dataset_uri`, which is the URI
+    we want to use for the description. Users should make sure it is possible
+    to get this with HTTP. If this is not possible, you may leave this field
+    empty so that a simple URN can be created for you as a default.
+
+  `inmodel`
+    Read-only accessor for the model used in description creation.
+
+  `dataset_uri`
+    Read-only accessor for the URI to the dataset.
+
+  Property Attributes
+    The below attributes concern some essential properties in the VoID
+    vocabulary. They are mostly arrays, and can be manipulated using array
+    methods. Methods starting with `all_` will return an array of unique
+    values. Methods starting with `add_` takes a list of values to add, and
+    those starting with `has_no_` return a boolean value, false if the array
+    is empty.
+
+   `all_vocabularies`, `add_vocabularies`, `has_no_vocabularies`
+    Methods to manipulate a list of vocabularies used in the dataset. The
+    values should be a string that represents the URI of a vocabulary.
+
+   `all_endpoints`, `add_endpoints`, `has_no_endpoints`
+    Methods to manipulate a list of SPARQL endpoints that can be used to query
+    the dataset. The values should be a string that represents the URI of a
+    SPARQL endpoint.
+
+   `all_titles`, `add_titles`, `has_no_titles`
+    Methods to manipulate the titles of the datasets. The values should be
+    RDF::Trine::Node::Literal objects, and should be set with language.
+    Typically, you would have a value per language.
+
+   `all_licenses`, `add_licenses`, `has_no_licenses`
+    Methods to manipulate a list of licenses that regulates the use of the
+    dataset. The values should be a string that represents the URI of a
+    license.
+
+   `urispace`, `has_urispace`
+    This method is used to set the URI prefix string that will match the
+    entities in your dataset. The computation of the number of entities
+    depends on this being set. `has_urispace` can be used to check if it is
+    set.
+
+  Running this stuff
+   `level`, `has_level`
+    Set the level of detail. 0 doesn't do any statistics or heuristics, 1 has
+    some statistics for the dataset as a whole, 2 will give some partition
+    statistics and 3 will give subject and object counts for property
+    partitions. Setting no level will give everything.
+
+   `stats`, `clear_stats`, `has_stats`
+    Method to compute a statistical summary for the data in the dataset, such
+    as the number of entities, predicates, etc. `clear_stats` will clear the
+    statistics and `has_stats` will return true if exists.
+
+   generate( [ $model ] )
+    Returns the VoID as an RDF::Trine::Model. You may pass a model with
+    statements as argument to this method. This model may then contain
+    arbitrary RDF that will be added to the RDF model. If you do not send a
+    model, one will be created for you.
+
+AUTHORS
+    Kjetil Kjernsmo `<kjetilk@cpan.org>` Toby Inkster `<tobyink@cpan.org>`
+
+TODO
+    *   URI regexps support.
+
+    *   Technical features (esp. serializations).
+
+    *   Example resources and root resources.
+
+    *   Data dumps.
+
+    *   Subject classification.
+
+    *   Method to disable heuristics.
+
+    *   More heuristics.
+
+    *   Linkset descriptions.
+
+    *   Set URI space on partitions.
+
+    *   Use CHI to cache?
+
+    *   Use schema introspection to generate property attributes with
+        MooseX::Semantic.
+
+BUGS
+    Please report any bugs you find to
+    <https://github.com/kjetilk/RDF-Generator-Void/issues>
+
+    Note that any claim that this module will generate a void in spacetime, a
+    wormhole, black hole, or funny philosophy is totally bogus and without any
+    scientific merit whatsoever. The lead author has made elaborate
+    precautions to avoid any such issues, and expects everyone to take his
+    word for it. Oh, BTW, should it just happen anyway, it won't hurt much
+    <http://news.sciencemag.org/sciencenow/2012/03/scienceshot-one-black-hole-
+    wont-.html>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc RDF::Generator::Void
+
+    The Perl and RDF community website is at <http://www.perlrdf.org/> where
+    you can also find a mailing list to direct questions to.
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/RDF-Generator-Void>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/RDF-Generator-Void>
+
+    *   MetaCPAN
+
+        <https://metacpan.org/module/RDF::Generator::Void>
+
+ACKNOWLEDGEMENTS
+    Many thanks to Konstantin Baierer for help with
+    RDF::Generator::Void::Meta::Attribute::ObjectList.
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Toby Inkster. Copyright 2012,2013,2016 Kjetil Kjernsmo.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published by
+    the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

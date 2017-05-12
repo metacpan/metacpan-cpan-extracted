@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.39.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 00538f6acc35a01b8a136ce4c2887419db50f349 Build.PL
+SHA1 0321478ea68113afe4d0a45e8138063c0687927a Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 84f7278bc85ecee15fafec0a194ac3a9f15aefc0 MANIFEST
+SHA1 42553de8a2748e3f6cd1af93b0104fa04946ce30 MANIFEST.SKIP
+SHA1 79ce9dc6aa66301906dde22a8bd6d1584930cf57 META.yml
+SHA1 66af45a67b6cf5776c67174177599433b160126b Makefile.PL
+SHA1 adf122d066f77725a89f31e22b838beea4fa300b README
+SHA1 5b0dbda20a59989d5a5a9c9f1d107f9df130416f TODO
+SHA1 7691a48a714fe59d54c3b06d661e69036e5da29a htdocs/default/admin/autohandler
+SHA1 4cd1775247f5eeacadabf3931cccaa9af430dbde htdocs/default/admin/edit_caption.html
+SHA1 897724d039962d9b11f75cf6723deefd6c95b9ba htdocs/default/admin/login.html
+SHA1 e4a036b34128380e28561cb947cf13d093b44f4a htdocs/default/autohandler
+SHA1 8eb9516a9064e2f5d31069310352c911082e9b61 htdocs/default/dhandler
+SHA1 58609f87ab01ca773ca63438affdd2b083d33f70 htdocs/default/footer.mas
+SHA1 fbae71d17f47c0c86e5e9139e791f5ab6b885548 htdocs/default/gallery.mas
+SHA1 2b8fe9f92b530c6d4a3e50b549c00cd112db66b2 htdocs/default/header.mas
+SHA1 41ca7e663bc63e1eb1e7c51d73d8b488e0494a93 htdocs/default/image.mas
+SHA1 9cf13ffaf2eba3416278660859dc29517650a0e0 htdocs/default/plain/default.css
+SHA1 268c745a0dce233d996a4241a65b20a4984805e1 htdocs/default/thumbnail_table.mas
+SHA1 8492328d13a8b1400306329b1fb0686a1b41f97f htdocs/default/wiki.html
+SHA1 4f7f1fd3011724380f02fbf7f6cdab9831ac7e6e inc/Rudesind/Build.pm
+SHA1 c5ed14ca96b19d37eebb76a2313ecaae8d5ce5ff lib/Rudesind.pm
+SHA1 3a385199f8c2793dd5f25791e21d2c894d082ee4 lib/Rudesind/Captioned.pm
+SHA1 339cd250ac50f08854b7b817b04b17f4662d54e4 lib/Rudesind/Config.pm
+SHA1 097ef005d2354ec7488f787aaed4e861c489f096 lib/Rudesind/Gallery.pm
+SHA1 57b234c8a7d23a4e843736f9159ffd55ed68919e lib/Rudesind/Handler.pm
+SHA1 f5aeabcd37c3349fafcd3863c2bcff02958700c1 lib/Rudesind/Image.pm
+SHA1 be9896b2f73430acc2dc8772967f1884945fb585 lib/Rudesind/UI.pm
+SHA1 28ea63ca72828d2ff636b55d998334376c375855 lib/Rudesind/WebApp.pm
+SHA1 26a11f213e678d0686536848c08abfef1ebb0adb test-httpd.conf
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFB3sHV3Or3ZzQuifMRAr7eAKC6ct9dBMt0L9ZRePVYaKswR5snvwCcD+bR
+cX6ZDJsAQkQQadFtxjAqEBc=
+=YIqx
+-----END PGP SIGNATURE-----

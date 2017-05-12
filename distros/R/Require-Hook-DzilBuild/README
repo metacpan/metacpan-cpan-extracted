@@ -1,0 +1,40 @@
+SYNOPSIS
+
+    In your Dist::Zilla plugin, e.g. in munge_files():
+
+     sub munge_files {
+         my $self = shift;
+    
+         local @INC = (Require::Hook::DzilBuild->new(zilla => $self->zilla), @INC);
+         require Foo::Bar; # will be searched from build files, if exist
+    
+         ...
+     }
+
+DESCRIPTION
+
+    This is the Require::Hook version of the same functionality found in
+    Dist::Zilla::Role::RequireFromBuild.
+
+    It looks for files from lib/ and . of Dist::Zilla build files.
+
+METHODS
+
+ new(%args) => obj
+
+    Constructor. Known arguments:
+
+      * die => bool (default: 0)
+
+      If set to 1, will die if filename to be require()-d does not exist in
+      build files. Otherwise if set to false (the default) will simply
+      decline if file is not found in build files.
+
+      * debug => bool
+
+      If set to 1, will print more debug stuffs to STDERR.
+
+SEE ALSO
+
+    Dist::Zilla::Role::RequireFromBuild
+

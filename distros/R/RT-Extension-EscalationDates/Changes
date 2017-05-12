@@ -1,0 +1,15 @@
+Revision history for RT-Extension-EscalationDates
+
+0.4     Thu, 09 Feb 2012 14:01:41 +0100
+        set default priority in web UI
+        fixing broken installation by CPAN
+
+0.3     Tue, 13 Dec 2011 11:54:01 +0100
+        handling with time zones
+        localization
+
+0.2     Fri, 02 Dec 2011 10:18:40 +0100
+        added RT::Action::EscalationDates
+
+0.1     Di 15 Nov 2011 10:07:47 CET
+        Initial release.

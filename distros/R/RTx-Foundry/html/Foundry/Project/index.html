@@ -1,0 +1,42 @@
+%# Never call a man a fool; borrow from him.
+
+% return unless $QueueObj->OriginObj;
+<table cellspacing=0 cellpadding=0 border=0 width="100%">
+<tr valign="top"><td width="100"><table cellspacing=0 cellpadding=0 border=0>
+
+<& /Work/Tickets/Elements/ShowCustomFields, Ticket => $QueueObj->OriginObj, ReadOnly => 1, Loc => 1 &>
+
+</table></td><td width="50">&nbsp;</td><td><table cellspacing=0 cellpadding=0 border=0>
+
+<&|/Work/Elements/Row, Title => loc('Latest Release')&>
+% my $Tickets = RT::Tickets->new( $session{'CurrentUser'} );
+% $Tickets->LimitQueue( VALUE => $QueueObj->Id );
+% $Tickets->LimitType( VALUE => 'release' );
+% $Tickets->LimitStatus( VALUE => 'resolved' );
+% $Tickets->OrderBy( FIELD => 'Starts', ORDER => 'DESC' );
+% if (my $Ticket = $Tickets->First) {
+<a href="Download/?Queue=<% $QueueObj->Id %>"><% $Ticket->Subject %></a>
+% } else {
+(<&|/l&>none</&>)
+% }
+</&>
+
+<&|/Work/Elements/Row, Title => loc('Project Staff')&>
+% my $Members = $QueueObj->AdminCc->MembersObj;
+% while (my $watcher = $Members->Next) {
+<nobr><a href="/Foundry/User/?User=<% $watcher->MemberObj->Object->Id %>"><% $watcher->MemberObj->Object->Name %></a> (<&|/l&>Admin</&>)</nobr><br>
+% }
+% $Members = $QueueObj->Cc->MembersObj;
+% while (my $watcher = $Members->Next) {
+<nobr><a href="/Foundry/User/?User=<% $watcher->MemberObj->Object->Id %>"><% $watcher->MemberObj->Object->Name %></a> (<&|/l&>Member</&>)</nobr><br>
+% }
+</&>
+
+</table></td></tr></table>
+
+<%ATTR>
+Tab2	=> 'Summary'
+</%ATTR>
+<%ARGS>
+$QueueObj
+</%ARGS>

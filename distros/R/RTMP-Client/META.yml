@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                RTMP-Client
+version:             0.04
+abstract:            A Simple RTMP client
+license:             ~
+author:              
+    - ChenGang <yikuyiku.com@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Time::HiRes:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

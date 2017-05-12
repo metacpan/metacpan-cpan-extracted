@@ -1,0 +1,28 @@
+<%ARGS>
+$ARGSRef => {}
+$Ticket
+$results => undef
+</%ARGS>
+<%INIT>
+return if $Ticket->CurrentUserHasRight('NoCaptchaOnUpdate');
+
+unless ( $results ) {
+    $results = $session{"Actions"}->{''} ||= [];
+}
+
+my ($captcha) = ($ARGSRef->{'CaptchaString'});
+unless ( $captcha ) {
+    push @$results, loc("You have to solve CAPTCHA");
+    delete $ARGSRef->{'SubmitTicket'};
+}
+elsif ( !$session{'Captcha'}{'String'} ) {
+    push @$results, loc("Don't play with me. You must solve CAPTCHA");
+    delete $ARGSRef->{'SubmitTicket'};
+}
+elsif ( lc($captcha) ne lc $session{'Captcha'}{'String'} ) {
+    delete $session{'Captcha'};
+    push @$results, loc("Not equal. Give you another CAPTCHA");
+    delete $ARGSRef->{'SubmitTicket'};
+}
+return;
+</%INIT>

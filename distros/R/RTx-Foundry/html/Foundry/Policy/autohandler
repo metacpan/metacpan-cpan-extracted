@@ -1,0 +1,35 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link type="text/css" href="/stylesheet/style.css" rel="stylesheet">
+  <title>RT Foundry - <&|/l&>Site Policy</&></title>
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(221, 238, 255);"
+ leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="0"
+ height="24">
+  <tbody>
+    <tr bgcolor="#207aaa">
+      <td class="poptable" bgcolor="#207aaa" height="24">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0"
+ height="24">
+        <tbody>
+          <tr>
+            <td> &nbsp;<font color="white" size="2">RT Foundry</font> </td>
+            <td align="center" style="color: white;"> <br>
+            </td>
+            <td align="right" style="color: white;"> <a href="/Foundry/" style="color: white;"><img src="/img/home.png" width="15" height="15"
+ align="middle" border="0" alt="[^]">Home</a> | <a style="color: white;" href="/Foundry/Help/">Help index</a> &nbsp; </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+% my $out = $m->scomp($m->fetch_next, %ARGS);
+% $m->print(Encode::decode_utf8($out) || $out);
+<br>
+</body>
+</html>
+% $m->abort;

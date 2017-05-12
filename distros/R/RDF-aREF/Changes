@@ -1,0 +1,108 @@
+# Changelog for RDF-aREF
+
+0.27  2016-04-13 10:13:27 CEST
+  - Fix test failure caused by RDF::NS (#20)
+
+0.26  2016-03-01 10:14:22 CET
+  - encode literal with datatype xsd:string as plain literal (#19)
+
+0.25  2015-03-03 12:33:40 CET
+  - support aref_query on property maps
+  - support aREF query expression with multiple items
+  - support encoding RDF from file
+  - support Unicode normalization
+
+0.23  2014-12-11 16:40:30 CET
+  - new decoder option keep_bnode_map
+
+0.22  2014-12-11 14:57:01 CET
+  - modified encoder, added subject and triple method
+  - remove or hide some exerimental methods
+  - avoid malformed bnode identifiers
+
+0.21  2014-10-28 14:08:40 CET
+  - allow 'a' in aREF query expressions
+  - experimental support to encode from URL
+  - support multiple queries in aref_query
+
+0.20  2014-10-16 12:09:05 CEST
+  - support empty queries
+  - fix bug for literal nodes without language tags in encoder
+  - new encoder method add_hashref
+
+0.19  2014-10-15 14:56:18 CEST
+  - added encoding methods
+  - removed internal method aref_to_trine_statement (issue #6)
+
+0.18  2014-10-14 10:35:56 CEST
+  - implement aref_query_map (issue #7)
+  - adjust subjects to aREF spec (more strict)
+
+0.17  2014-10-07 13:30:47 CEST
+  - fix failure on Perl 5.10
+  - more cleanup and tests
+
+0.16  2014-10-07 10:50:16 CEST
+  - cleanup
+  - only require Perl 5.10 (issue #5)
+
+0.15  2014-10-05 15:16:09 CEST
+  - better support RDF::Trine in Encoder
+  - introduced RDF::aREF::Query (experimental)
+
+0.14  2014-10-02 14:14:09 CEST
+  - adjust with aREF 0.19
+  - added aref_query (experimental)
+
+0.13  2014-10-01 16:09:44 CEST
+  - improveded Encoder
+
+0.12  2014-10-01 14:45:09 CEST
+  - migrated to Dist::Zilla
+  - added methods aref_get_literal and aref_get_resource
+  - disallow ':' in predicates
+  - added partial Encoder
+
+0.11 2014-04-09T12:56:37
+ - don't die on malformed IRIs
+
+0.10 2014-01-22T11:11:50
+ - fixed bnode collision bug
+ - new option: bnode_prefix
+ - show how to serialize with RDF::Trine
+ - more test cases
+
+0.09 2014-01-21T13:11:32
+ - better error message when expecting an URI (close #3)
+ - Avoid numeric blank node identifiers.
+   Although it's legal, some parsers don't like them.
+ - Show how to decode into RDF::Trine::Model
+
+0.08 2014-01-15T11:08:31
+ - facilitate use of this module together with RDF::Trine
+
+0.07 2013-12-18T08:21:41
+ - increased error detection
+ - fixed test_requires
+
+0.06 2013-12-14T20:15:38
+ - extended test suite
+ - test-cases with errors
+
+0.05 2013-12-04T20:01:53
+ - improved handling of undefined/null
+ - use warnings; list provides
+
+0.04 2013-12-03T08:51:00
+ - improved error handling, fixed bug in subject-maps
+
+0.03 2013-12-02T13:47:26
+ - release
+ - avoid lexical $_
+ - added error test
+ - run coverage test with RDF::Trine
+ - fixed links
+ - improved unit tests
+ - rewrote aREF decoder
+ - split RDF::aREF from Catmandu-RDF
+

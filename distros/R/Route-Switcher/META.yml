@@ -1,0 +1,39 @@
+---
+abstract: 'give feature of nest to other router module'
+author:
+  - 'tokubass <tokubass@cpan.org>'
+build_requires:
+  Amon2::Web::Dispatcher::RouterBoom: '0'
+  Router::Boom: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Route-Switcher
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Route::Switcher:
+    file: lib/Route/Switcher.pm
+    version: '0.02'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokubass/p5-Route-Switcher/issues
+  homepage: https://github.com/tokubass/p5-Route-Switcher
+  repository: git://github.com/tokubass/p5-Route-Switcher.git
+version: '0.02'
+x_authority: cpan:TOKUBASS

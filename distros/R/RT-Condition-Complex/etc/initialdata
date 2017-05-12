@@ -1,0 +1,11 @@
+
+@ScripConditions = (
+    {
+        Name                 => 'Complex',                                  # loc
+        Description          => 'Complex condition using other conditions', # loc
+        ApplicableTransTypes => 'Any',
+        ExecModule           => 'Complex',
+    },
+);
+
+

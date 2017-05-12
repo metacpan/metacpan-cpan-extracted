@@ -1,0 +1,71 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 83fb737ab229043203ceaad67f389beda96dd8ee Changes
+SHA1 dd9a8b7bfddf7833dcc25689d58f70d1e6d6a067 MANIFEST
+SHA1 f32387e1e74e3a8c133254eda0b6ba77d6897089 MANIFEST.SKIP
+SHA1 0063ad648b3d94605d4f216ce005a0c71aa0a572 META.yml
+SHA1 816cfede6a496f8b4d296664ebf145fdfbf94991 Makefile.PL
+SHA1 18668b724eda0ce5b3ef9a50df878d4bda36b745 README
+SHA1 d1889a2937aed0dab86eb372fc47d945242e686c html/Callbacks/RT-Extension-MandatoryOnTransition/Elements/EditCustomFields/BeforeCustomFields
+SHA1 cfc49e70a2f8a1391ba276a8d72a1c97612c6b12 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Create.html/BeforeCreate
+SHA1 be02381aad0e01c49ed054803664f24e533f0901 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Elements/EditCustomFields/MassageCustomFields
+SHA1 b0bd329d5fd4b41e30bdca4c13a1f222bdef6187 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Modify.html/Default
+SHA1 05b6ad39ec823a4f6e3ee13910dc370537fe03ee html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/ModifyAll.html/Default
+SHA1 3567d968ecc6b89cc0d37065da94c2299429181d html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/AfterWorked
+SHA1 ff1c9ac58e468e981e6bca17a5c1096059044d6d html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/BeforeUpdate
+SHA1 cfc49e70a2f8a1391ba276a8d72a1c97612c6b12 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/create/BeforeCreate
+SHA1 4bc234489b00486c5fc5467641aa2cb4dbdda9e5 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/reply/AfterWorked
+SHA1 ff1c9ac58e468e981e6bca17a5c1096059044d6d html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/reply/BeforeUpdate
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 d960ada9763be967cc6ba753e58f23df482e41c2 lib/RT/Extension/MandatoryOnTransition.pm
+SHA1 3f36d691e24551127844397a509fe545eee23e45 lib/RT/Extension/MandatoryOnTransition/Test.pm
+SHA1 3f36d691e24551127844397a509fe545eee23e45 lib/RT/Extension/MandatoryOnTransition/Test.pm.in
+SHA1 b2d7eac4bf94f6d88a8dd4fa42c88681e40be160 po/fr.po
+SHA1 4d14c8da67066c90931d1753949d5a6a8b9e4256 po/mandatoryontransition.pot
+SHA1 89108b4d2e50757012526954472fabf47473cb55 xt/basic.t
+SHA1 1b7bd9dea11a9dbe0ae9461779b83a1977f07606 xt/mandatory_on_create.t
+SHA1 0ec692d89fd6e83edea3bfb87da360364966b4e0 xt/required_fields.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXh0JtAAoJEJHs6NvKxcMFHE8P/R2N+tF6o/W9M65gsb/XOThv
+NGuDapYPYzHEbYo5IB3CnCq6My0B+oI9eE8/0z23pJOajD3U8oVZVjLeApEDcSER
+mfqe26PR2JsoBzk8uy20/sCUOYh1F6L6rPbp/96QUaclgMAC+BkYxPivVO49yZKl
+xon56y4qVhm7yAGmmLyLOZeCrCilw4vv/Whf/z04QpTvcNnBBsxpNfJgzufjj2aZ
+hkL7kXlPBGmFIefQDFkMSku5XiQWV7US6hUkt19wgf0DZ+lfKdrOciBAax8Q5Xin
+K8MyiKOQ1/0NzMmMs70xKhFuaDVSCbePGLtGo82RQJPkff3unSPzlED2KLNP1wka
+rHKnIfcz6N1FIt6ckz2ycMAiF8rCCf51Dqhpl3EnZ+Btq0cSNA4J63C4IYZNlqOs
+cvVjTWaw072wiVZMlk8xxVN3mKnCxP0H04EsX+I/LmIEKsH8HnlVwhjNeQ8lYdRZ
+mXDw1r5f63y1VTvaqfNwKW6a+fsKtwayUeipu8ELWDHiKXOcJGDKdnp/2dGsFNyF
+GIuVPNN6KyjKaYB6IlBKBuVZ/ve7sip/tm2DN2Dr3RExMBhzdDircV/EeNxnp3HO
+xthcqNmi5cDNdvsO9RpF70HRhKeOeQ6IgIgIj5toHMwHVGZTqUhcztCsoLeqCm6y
+/pc61gJ1O673OfZ76vYW
+=32X7
+-----END PGP SIGNATURE-----

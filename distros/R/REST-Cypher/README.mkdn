@@ -1,0 +1,79 @@
+# NAME
+
+REST::Cypher - Experimental client for using neo4j's REST/Cypher interface
+
+# VERSION
+
+version 0.0.4
+
+# SYNOPSIS
+
+    use Rest::Cypher::Agent;
+    use Data::UUID;
+
+    my $neo = REST::Cypher::Agent->new({
+      base_url => 'http://example.com:7474',
+    });
+
+    my ($response, $nodeType);
+
+    # let's create a GUID for a node
+    my $guid = Data::UUID->new->to_string(Data::UUID->new->create);
+
+    $nodeType = 'MyNodeType';
+    $response = $neo->POST(
+      query_string => "MERGE (a:${nodeType} {guid: {newGUID}}) RETURN a",
+      query_params => {
+        newGUID => $guid,
+      }
+    );
+
+# DESCRIPTION
+
+Interact with a neo4j Cypher API.
+
+# ATTRIBUTES
+
+## agent
+
+## server
+
+## server\_port
+
+## rest\_base\_url
+
+## debug
+
+# METHODS
+
+## query($self, %params)
+
+Send a Cypher query to the server,
+
+# ACKNOWLEDGMENTS
+
+This module was written to scratch an itch after using [REST::Neo4p](https://metacpan.org/pod/REST::Neo4p); I liked
+the [REST::Neo4p::Query](https://metacpan.org/pod/REST::Neo4p::Query) and wanted to attempt to implement something that
+felt like it was Cypher driven, and less about specific nodes and indexes.
+
+I may be way off the mark, but this module is currently useful for throwing
+hand-written Cypher at a neo4j server.
+
+Over time it may even implement more interesting features.
+
+# SEE ALSO
+
+- [REST::Cypher::Agent](https://metacpan.org/pod/REST::Cypher::Agent)
+- [neo4j](http://neo4j.org)
+- [REST::Neo4p](https://metacpan.org/pod/REST::Neo4p)
+
+# AUTHOR
+
+Chisel <chisel@chizography.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Chisel Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

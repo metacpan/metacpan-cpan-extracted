@@ -1,0 +1,160 @@
+/* block */
+body {
+    color: #070707;
+    background-color: #ccc;
+    margin: 10px; padding: 0;
+}
+
+div#banner {
+}
+
+.description {
+    padding-left: 30px;
+}
+
+div#content {
+    margin: 0px;
+    border-top: 2px solid #666;
+    border-left: 1px solid #666; 
+    border-right: 1px solid #666;
+    background: #fffff7;
+}
+
+h2.title {
+    padding: 10px;
+}
+
+div.upper-nav {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ddd;
+    margin: 0; 
+    padding: 0 20px;
+    background: #eee;
+}
+
+.edit {
+    display: block;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ddd;
+    margin: 0; 
+    padding: 5px 20px;
+    background: #eee;
+}
+
+.sidetitle, .side {
+    display: none;
+}
+
+.powered {
+    border: 1px solid #666;
+    padding: 5px;
+    background: #eee;
+}
+
+h2.comments-head {
+    width: 5em;
+    border-right: 1px inset #666;
+    border-top: 1px groove #fff;
+    border-bottom: 1px inset #666;
+    background: #eef;
+}
+
+.comments-post {
+    padding: 0 20px 20px 20px;
+}
+
+/* basic text style */
+body {
+    font-family: "Palatino Linotype", Georgia, "Times New Roman", Times, serif;
+}
+
+div#content {
+    line-height: 180%;
+}
+
+h2.title {
+    font-size: xx-large;
+    margin: 0;
+    border: 0;
+}
+
+.powered {
+    font-size: x-small;
+    text-align: center;
+}
+
+div a:link {
+    text-decoration: none;
+    color: #993300; }
+
+div a:visited {
+    text-decoration: none;
+    color: #660000;}
+    
+div a:hover {
+    text-decoration: underline;
+    color: #cc0000;}
+    
+div a:active {
+    text-decoration: none;
+    color: #cc0000;}
+
+/* content style */
+div p { 
+    margin: 15px; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #333;
+    margin: 0 10% 0 0;
+    padding: 0 10px;
+    border-bottom: 1px solid #666;
+    text-decoration: none;
+}
+
+li { 
+    color: black;
+    margin-bottom: 0.2em;
+    margin-right: 5%;
+}
+    
+ul {
+    color: black;
+}
+
+/* this reverses the 2nd and 3rd level list item bullets */
+ul>li>ul {list-style-type: square;}
+ul>li>ul>li>ul {list-style-type: circle;}
+
+/* latex style list item */
+ol li ol li { list-style-type: lower-alpha; }
+ol li ol li ol li { list-style-type: lower-roman; }
+
+blockquote pre {
+    font-family: courier, "courier new", monaco, monospace;
+    color: #000;
+    background: #f0f0f0; 
+    margin: 0.5em;
+}
+
+code, pre, tt {
+    font-family: courier, "courier new", monaco, monospace;
+    color:#333333;
+}
+
+div#content div.blog div.upper-nav {
+    display: inline;
+}
+
+a.empty:before {
+    vertical-align: top;
+    font-size: xx-small;
+    content: '?'
+}
+
+a.empty:after {
+    vertical-align: top;
+    font-size: xx-small;
+    content: '?'
+}
+a.private {color: black}

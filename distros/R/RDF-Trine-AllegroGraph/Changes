@@ -1,0 +1,6 @@
+Revision history for RDF-Trine-AllegroGraph
+
+0.01    Sun Apr  3 10:17:11 CEST 2011
+	- add: RDF::Trine::Store::AllegroGraph, very basic
+	- add: FAQ
+

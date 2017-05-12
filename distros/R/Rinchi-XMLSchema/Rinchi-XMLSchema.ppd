@@ -1,0 +1,12 @@
+<SOFTPKG NAME="Rinchi-XMLSchema" VERSION="0,02,0,0">
+    <TITLE>Rinchi-XMLSchema</TITLE>
+    <ABSTRACT>Module for creating XML Schema objects from XSD files.</ABSTRACT>
+    <AUTHOR>Brian M. Ames &lt;bmames@apk.net&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Carp" VERSION="1,0,0,0" />
+        <DEPENDENCY NAME="XML-Parser" VERSION="2,0,0,0" />
+        <OS NAME="linux" />
+        <ARCHITECTURE NAME="i386-linux-thread-multi" />
+        <CODEBASE HREF="" />
+    </IMPLEMENTATION>
+</SOFTPKG>

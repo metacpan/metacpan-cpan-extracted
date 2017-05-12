@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e001781032f695decf27252c4dca0164360f8335 CHANGES
+SHA1 426515031fc01c6d7814127fb9f57908fa5f8433 MANIFEST
+SHA1 14252dab2ee59ac737d4cdd05fb468caeb93192b META.yml
+SHA1 f2ea1a263dca6655e9adecfb9d291f6ce139c7fa Makefile.PL
+SHA1 150359393d4c0057f9459248d0e19567ab800545 README
+SHA1 bb9cf31b2b3c44943eb4d6f46053cd238b8df534 html/Callbacks/PriorityAsString/Elements/RT__Ticket/ColumnMap/Once
+SHA1 362ff9aa44a8b450432cb737080d68a736a3b289 html/Callbacks/PriorityAsString/Search/Elements/PickBasics/Default
+SHA1 a980322cb2f049c04f6e7d226544796bad674871 html/Callbacks/PriorityAsString/Ticket/Elements/EditBasics/MassageFields
+SHA1 4515aa3e875bb19f37b6be1f6855c8ba2093921b html/Elements/SelectPriority
+SHA1 200ae85d70e8d19aecae7043fc3617481b0441c7 html/Elements/SelectPriorityAsString
+SHA1 9aa8bf20126e0a2817275c320797f0ec8aed2208 html/Ticket/Elements/ShowPriority
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
+SHA1 d4f169809d6fda9788fe1cabed33627b894e2506 lib/RT/Extension/PriorityAsString.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJW/woYAAoJEBzhxDIRelfSmXkQAJuLED28cTxaTYprGCOeFZQ6
+C8lRwFuJaq28H5wsMX/RBI8stX4tWXHNm/E84vG/PtjLLNFwbqnHXWVzHy4UCVJd
+00bN08Rh9j+LZHGgXCQFGAyE0cf0FjHdGQCO3pQnyHbON1Ci/RMGwRWX+8hjwPGV
+6dU/SPKUPK4ieobHDlTqFs/7MyzUyZerAy8wZbsKhVGk7x2eB9ldR8CB8zg8FsV4
+tCr2KYn47IblxCuw5RMe6/nTEsaEMAk28o7ncKPfZTifCdMZnjZ+8rVe3/gzjBCS
+BwNUbeKdhQV8ibbIdU31o0UmvRpoOR+XH/hCeXq2AjoSOfT++HIQQ2GFlu9vdT1S
+mdHB3/FFX7EdgOfDa+lq/fB4nmpbWBrOf+2G4s5mYthlHcHJS+YutOZ66W6PYpSG
+RWVrrV7KT4ZTdJMrPckGk6P0F4vkuE74yZJOyfGKG/87vnyyWapZqiCqGNfMPwEp
+Ka5ul2l2gp9+o3Y+/XPH/8lOdd+UTfO1x5BxDreoNk8ApOEFSpmPI8un6wsH+91k
+2sEedLTfqvMyfcxRWXMXTpATff8YH+IUv9caJlIvsiM0mBKQ67y2IwajzRsfbszp
+m41Yyqa0nJtT2rVhZIyYcH4A3+HAYar7g4IWhf4vTs9dLnpn2tvhqKygKczzQlnY
+w5tK5z9K6rTf029gFTgp
+=jhW0
+-----END PGP SIGNATURE-----

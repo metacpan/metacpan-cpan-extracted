@@ -1,0 +1,13 @@
+<TMPL_INCLUDE header.tmpl>
+<h1><a href="<TMPL_VAR self_url>">Index</a> &gt; <TMPL_VAR title></h1>
+
+<div class="contents">
+  <ul>
+<TMPL_LOOP graphs>
+    <li><a href="<TMPL_VAR self_url>?template=by_graph.tmpl&GRAPH=<TMPL_VAR graph>"><TMPL_VAR graph_title></a>
+      - <TMPL_VAR total_hosts> hosts</li>
+</TMPL_LOOP>
+  </ul>
+</div>
+
+<TMPL_INCLUDE footer.tmpl>

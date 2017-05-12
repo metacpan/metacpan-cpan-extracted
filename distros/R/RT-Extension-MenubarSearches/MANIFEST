@@ -1,0 +1,20 @@
+Changes
+html/Callbacks/RT-Extension-MenubarSearches/Elements/Tabs/Default
+html/Callbacks/RT-Extension-MenubarSearches/NoAuth/css/web2/main.css/End
+html/RT-Extension-MenubarSearches/List
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/RT/Extension/MenubarSearches.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE

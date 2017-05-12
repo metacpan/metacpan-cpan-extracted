@@ -1,0 +1,9 @@
+[% subj = s.get_node("${NS_LD}#S1") %]
+
+<h1>And here is [% subj.desig %]</h1>
+
+<ul>
+[% FOREACH prop = subj.get_props_list %]
+  <li>[% prop.desig %]: [% subj.get_objects_list(prop).0.desig %]
+[% END %]
+</ul>

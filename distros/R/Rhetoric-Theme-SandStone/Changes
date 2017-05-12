@@ -1,0 +1,27 @@
+Revision history for Perl extension Rhetoric::Theme::Sandstone
+
+0.08 Fri May 27 19:23:05 PDT 2011
+  - got rid of dependency on Data::Dump
+  - added a tiny bit of documentation
+
+0.07 Fri May 27 18:37:41 PDT 2011
+  - css fixes
+
+0.06 Wed May 25 22:22:03 PDT 2011
+  - hopefully fixed the ExtUtils::MakeMaker issue
+
+0.05 Thu May  5 10:47:32 PDT 2011
+  - delegated search to google
+  - added link to atom feed for posts
+
+0.04 Wed Apr 27 17:21:29 PDT 2011
+  - case insensitive filesystems deceived me
+
+0.03 Wed Apr 27 17:13:19 PDT 2011
+  - comment formatting
+
+0.02 Wed Apr 27 15:19:28 PDT 2011
+  - added a form for creating posts (temporary)
+
+0.01 Tue Apr 26 03:10:43 2011
+  - original version

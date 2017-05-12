@@ -1,0 +1,11 @@
+<%INIT>
+my $path = $m->base_comp->path;
+$r->content_type('text/css') if $path =~ /\.css$/i;
+$r->content_type('text/xml') if $path =~ /\.xsl$/i;
+$r->content_type('text/html') if $path =~ /\.html$/i;
+$r->content_type('text/png') if $path =~ /\.png$/i;
+$m->call_next;
+</%INIT>
+<%FLAGS>
+inherit	=> undef
+</%FLAGS>

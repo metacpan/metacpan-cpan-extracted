@@ -1,0 +1,8 @@
+Revision history for Perl extension Regexp::HTMLify
+
+0.001  Wed Aug 6 23:00 2008
+	- Initial version
+
+0.002  Tue Dec 26 02:38 2011
+	- Perl 5.14.x compatibility (test)
+

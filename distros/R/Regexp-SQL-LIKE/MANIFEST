@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Regexp/SQL/LIKE.pm
+perlcritic.rc
+t/00-compile.t
+t/like.t
+xt/author/critic.t
+xt/release/distmeta.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t
+xt/release/portability.t

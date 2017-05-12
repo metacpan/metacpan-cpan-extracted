@@ -1,0 +1,97 @@
+
+Installation instructions:
+
+Make a copy of the most recent bleedperl.
+You can find that at:
+        rsync://ftp.linux.activestate.com/perl-current/ 
+Apply the enlosed patch file on it.  If the patch doesn't apply, let
+me know at once.
+
+Unpack the Rx-0.50.tar.gz distribution.  
+
+Run the Makefile.PL.  This will set up the symlinks for you.
+
+cd into RxPerl and apply the patch.  Do 'make perl'.  If Perl doesn't
+build, let me know at once.
+
+cd back to Rx-0.50 and run 
+        make
+If this fails, let me know at once.  Ignore the following warnings:
+        Dump.c: In function `start':
+        Dump.c:162: warning: assignment from incompatible pointer type
+        Dump.c: In function `dump_compiled_regex':
+        Dump.c:372: warning: passing arg 1 of `Perl_newSVpv' from incompatible pointer type
+
+Now try the test program.  Run
+
+        ./rxperl  -I RxPerl/lib ./test.pl
+
+Other utilities to try: try.pl dump_regexes.pl bytecode.pl annotate.pl
+
+----------------------------------------------------------------
+
+How to interpret offset and length information:
+
+The dumped regex structure is a hash.  Hash keys are node ID numbers;
+each corresponds to a node in the original compiled regex.  If the
+hash key is an ordinary number (like '3') then the node was present in
+the original regex; if it contains letters also (like '3e' or '3n')
+then it was added as part of the instrumentation process, somewhere
+after the real node 3 and before whatever node followed the real node
+3.
+
+The offset and length information tells you what part of the original
+regex each node corresponds to.  What part of the regex corresponded
+to node 3?  Look at $regex->{OFFSETS}[3].  The is the offset into the
+original regex string at which the node starts.  If it's a 17, it
+means that node 3 corresponds to part of the regex starting at
+character #17.  Where does the corresponding part of the regex end?
+Look at $regex->{LENGTHS}[3].  If it's a 12, that means that the part
+of the regex that corresponds to node 3 is 12 characters long.  Node 3
+is derived from the partof the regex at characters 17-28, inclusive.
+
+Example:  The original regex is /abc*defg[hijk]lmnop/
+
+The contains the following nodes:
+
+        Node  0: EXACT "ab"
+        Node  2: STAR
+        Node  3: EXACT "c"
+        Node  5: EXACT "defg"
+        Node  7: ANYOF "hijk"
+        Node 18: EXACT "lmnop"
+        Node 21: END
+
+Here is the OFFSETS array:
+
+          'OFFSETS' => [ 1, undef, 4, 3, undef, 5, undef, 9, undef,
+                         undef, undef, undef, undef, undef, undef,
+                         undef, undef, undef, 15, undef, undef, 20 ],
+
+
+Element #7 has the value 9; this is because the part of the regex that
+corresponds to the ANYOF node begins at character position 9.
+That's the '[' character.
+
+Here is the LENGTHS array:
+
+          'LENGTHS' => [ 2, undef, 1, 1, undef, 4, undef, 6, undef,
+                         undef, undef, undef, undef, undef, undef,
+                         undef, undef, undef, 5, undef, undef, 0 ],
+
+
+Element #7 has the value 6; that's because the part of the regex that
+corresponds to the ANYOF node is 6 characters long.  ("[hijk]")
+
+Element #8 of both arrays is undef.  That is because there is no node 8.
+
+Element #21 of the offsets array is 20, even though the regex is only
+19 characters long.  That's because node 21 is the END node.
+Similarly, element #21 of the lengths array is 0.
+
+If you don't like the arrays, it is easy for me to write a little bit
+of Perl code that reorganizes them in whatever way you would prefer.
+For exmaple, rather than two seprate arrays, you might like the offset
+and length data to be incorporated directly into the node structures
+themselves.  Let me know.
+

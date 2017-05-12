@@ -1,0 +1,29 @@
+Revision history for Perl extension ReleaseAction.
+
+0.01  Mon Apr 16 13:00:00 EDT 2001
+	- Original version; posted to PerlMonks
+
+0.02  Sun Apr 22 17:00:00 EDT 2001
+	- Added VERSION, on_release, etc
+	- Posted to CPAN.
+
+0.03  Sat Mar 9 15:00:00 EDT 2002
+	- Added cancel method.
+
+0.04  Fri Sep 26 21:00:00 PDT 2003
+	- Converted over to Module::Build.
+
+0.05  Sat Sep 27 22:00:00 PDT 2003
+	- Renamed Build.pl to Build.PL.  The other
+	  caused install problems.  Doing nothing at
+	  the moment about Module::Build making
+	  everything read-only - hopefully that is
+	  harmless.
+
+0.06  Sat Nov  1 19:10:00 PDT 2003
+        - Fixed alignment issue in pod.  Thanks to
+          Elizabeth Mattijsen for noticing it.
+
+0.07  Sat Apr  9 23:25 PDT 2003
+        - Changed email.
+	- Switched Module::Build from passthrough to traditional.

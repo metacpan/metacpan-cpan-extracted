@@ -1,0 +1,62 @@
+NAME
+    RT-Extension-AssetSQL - SQL search builder for Assets
+
+INSTALLATION
+    RT-Extension-AssetSQL requires version RT 4.4.0 or later. Note that
+    AssetSQL is incompatible with RT 4.2 running RT::Extension::Assets.
+
+    perl Makefile.PL
+    make
+    make install
+        This step may require root permissions.
+
+    Patch your RT
+        AssetSQL requires a patch for your RT instance. The specific patch
+        to apply depends on which version of RT you're running.
+
+        If you're on RT 4.4.0, use rt-4.4.0.patch:
+
+            patch -d /opt/rt4 -p1 < patches/rt-4.4.0.patch
+
+        If you're on RT 4.4.1, use rt-4.4.1.patch:
+
+            patch -d /opt/rt4 -p1 < patches/rt-4.4.1.patch
+
+        If you're on RT 4.4.2 or later, use rt-4.4.2-later.patch:
+
+            patch -d /opt/rt4 -p1 < patches/rt-4.4.2-later.patch
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin( "RT::Extension::AssetSQL" );
+
+        If you wish to hide the legacy Asset Simple Search, add the
+        following line as well:
+
+            Set($AssetSQL_HideSimpleSearch, 1);
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-AssetSQL@rt.cpan.org|mailto:bug-RT-Extension-AssetSQL@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AssetSQL>.
+
+COPYRIGHT
+    This extension is Copyright (C) 2016 Best Practical Solutions, LLC.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

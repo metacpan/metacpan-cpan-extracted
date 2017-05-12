@@ -1,0 +1,20 @@
+Revision history for RPM-Spec
+
+0.05 Fri Feb 19 2010
+- Switch to native traits, rather than MX::AH
+
+0.04    Wed Feb 17 2010
+- filter "magical" RPM requires by default
+
+0.03    Tue Feb 16 08:43:16 PST 2010
+- fix broken helper functions; these were breaking attribute builders that
+  required finding certain chunks of the spec before or after given strings
+
+0.02    Mon Feb 15 21:20:31 PST 2010
+- additional (build) requires methods
+- rework how we extract the changelog
+- add a "middle" attribute, to get at the body of the spec easily
+
+0.01    Sun Jun 14 18:38:48 PDT 2009
+- First version, released on an unsuspecting world.
+

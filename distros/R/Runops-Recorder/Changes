@@ -1,0 +1,58 @@
+Revision history for Perl extension Runops::Recorder.
+
+0.09  Sun Nov 13
+    - Fixed a warning in the viewer if we haven't seen a TZ yet
+    - Added dump() function to dump the buffer to disk
+    - Added missing dependencies to Makefile.PL
+    
+0.08  Sat Nov 12
+    - Added an exception viewer which dumps where die was called
+    - Timestamp events are now splitted in two - one with seconds and one with
+      miliseconds
+    - A keyframe is now followed with an switch_file event if we have a file
+    - Added -nostore option which prevents continous store to disk. This should 
+      be used in combination with -die to only dump snapshots on exceptions
+    - Buffer size is configureable via -bs option
+    
+0.07  Wed Aug 17
+    - Keyframes now also record a timestamp so we can search thru our recording
+      easier
+    - Only the initial keyframe was ever written as I forgot to increment the keyframe
+      counter
+      
+0.06  Wed Aug 17
+    - Silence warning 'Use of uninitialized value $opts[0]' when loading without arguments
+    - RR_AUTORUN and RR_SKIP_INC are now available as -a <delay> and -s arguments to rr-viewer
+    - When done viewing the recording show the last place we were at
+    
+0.05  Wed Jun 29
+    - Improved documentation on how to use this
+    - 'die' is now recorded
+    - Events are now written to a buffer before being written down to disk
+      to reduce the I/O
+    - Subroutine names are now fully qualified
+    
+0.04  Mon Jun 27
+    - The format of recordings has changed and is now a directory with a bunch
+      of files instead.
+    - Added a Runops::Recorder::Reader class that can read recordings and
+      callback on different events
+    - Now also records when you enter a sub and the name of it
+    - A new rr-diff tool that shows two recordings side by side
+    
+0.03  Sun Jun 19
+    - Adjust number of lines shown to fill the screen if possible
+    - Added help page 'h'
+    - Viewer now support RR_AUTORUN and RR_SKIP_INC environment variables
+      which sets how fast it should autorun and if it should skip @INC
+      
+0.02  Sun Jun 19 11:53 2011
+    - Added possibility to skip viewing of a the current file with 's'
+    - Viewer adapts to the number of lines your terminal
+    - Record when OP_DIE happens
+    - Make it possible to skip installed (ie, what's in @INC when we load)
+    
+0.01  Sat Jun 18 16:07:57 2011
+	- original version; created by h2xs 1.23 with options
+		-n Runops::Recorder
+

@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 90d11569fc752b1acb92740d7a2c5b0b8771f9c7 Changes
+SHA1 c64eff44bad216ab6d4c783a67db54084b379708 INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 97a1e377443199f3617a96701ebe08384fa8a9bf MANIFEST
+SHA1 ad7baba0ce8990e319aa07b1edee6593c54860a1 META.json
+SHA1 0d5998d6055fbc3a5dfc5c6c5e1109ff7614d9ca META.yml
+SHA1 279c22bec2d56b1a25edb8035494fd53bed8d8ac Makefile.PL
+SHA1 778a168c480b8b542751a8ea26a334e3b1325e13 README
+SHA1 c5633d6cd86fe8cf8ebe0fdd24c3c8ef81eda867 cpanfile
+SHA1 8b8b2f440dd295950d2e42600fc26972b01c3108 dist.ini
+SHA1 e493509c79c9c72ff3aef8cb697cdccc138e70c3 examples/synopsis.pl
+SHA1 354ca7a850c3d2b9d7a8af916a76ef0098dcbf0e examples/timer.pl
+SHA1 80b9ba9a07e02c6542368cd13841d1fb510ebb4e lib/Ryu/Async.pm
+SHA1 74fcb3b1cde83560261368e08a60123659128786 lib/Ryu/Async.pod
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 6a21ad764efa431affee444a6a15a066ec8e1c08 t/00-compile.t
+SHA1 4a4c22f098bfbd43d696b4f9411e63e3ad26703a t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 dfeb4b405c43e6a35d95b9637b5702f76f72eadb t/stream.t
+SHA1 67cc82259bab61ebcafc9d3fdc7fbed0344f8e27 t/timer.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJY1zq0AAoJEG2WkcbynxAlsvwP/3RX2jlmYebG2WAtN0BsiCLK
+eFuUWZAkCA8C8qVIDpvtYWvKVrlzlQqNRkeHaXDr2Led8nizQTeDzffUkt5Bf4Zc
+QhWg4HwIn+BHiV4X7K0MGWlU0BovxnuhNn75z7Y+SyQ/FFbxhp9qHP2fYe3Meqqh
+tP6CkbuJywneqZguiHSo31Fm7WNOew2dB+tcxYUVlqF5dxgngScWk3moei6axCHq
+qTRn7pkTJDxiIfJoe+wmEXuQQfmtjx2bvO80+0zMEchRWMVUhgQ8X+FSguk+22Xg
+jHy3Ab37qr/J0/gbWtGDeba1zi9JuHoLWS3BZ1JkY4x/x62rD+TsEI0x0oGf+66X
+7FtiGi29Ba5vRHLxgzkAZsMjUNBiQlyLTEs6oWj34xWseLBiJ5gGUAIv0KpJmMXv
+pTb0skedcuck9e7RKMLcocU6oekYnMhDEPMd42h2DF/Ee6EdIeIxh1nzdo8b4enJ
+vKlXo9qC6MBUf7UmQl8iKf3sGL37TvWUvnJUxM2HhiRGgatq3GcjLraVKThtuybf
+S1LWM4xjmlAcA30nzLxXqoStVUrAFsUplT0lQD/YENsMT5S364cyziKXjFGx4JjZ
+0UDflb6Bu/gjw3gqu9yuU3JDFCkiFqgArDvj8vES6z6ZJd0ZAc1t5I4DxfIF7vEl
+fYmHQUf0Fu4gqrh8P7be
+=en65
+-----END PGP SIGNATURE-----

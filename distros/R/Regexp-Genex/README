@@ -1,0 +1,157 @@
+
+INSTALLATION
+
+perl Makefile.PL;
+make;
+make test;
+make install;
+
+NAME
+    Regexp::Genex - get the strings a regex will match, with a regex
+
+SYNPOSIS
+     # first try:
+     $ perl -MRegexp::Genex=:all -le 'print for strings(qr/a(b|c)d{2,3}e*/)'
+
+     $ perl -x `pmpath Regexp::Genex`
+    #!/usr/bin/perl -l
+
+     use Regexp::Genex qw(:all);
+
+     $regex = shift || "a(b|c)d{2,4}?";
+
+     print "Trying: $regex";
+     print for strings($regex);
+     # abdd
+     # abddd
+     # abdddd
+     # acdd
+     # acddd
+     # acdddd
+
+     print "\nThe regex code for that was:\nqr/";
+     print strings_rx($regex);
+     print "/x\n";
+
+     my $generator = generator($regex);
+     print "Taking first two using generator";
+     print $generator->() for 1..2;
+
+     my $big_rx = 'b*?c*?d*?';   # * becomes {0,20}
+
+     my $big = generator($big_rx, ($max_length = 100) );
+
+     print "Taking string 100 of $big_rx";
+     print $big->(100); # (caveats below)
+     # ccccdddddddddddddddd   NOT 'd'x100 as you may expect
+
+    __END__
+
+HALF-BAKED ALPHA CODE
+    This is alpha code that relies on experimental features of perl (regex
+    (?{ }) and friends) and avoiding optimizations in the regex engine. New
+    optimizations could break this module.
+
+    The interface is also quite likely to change.
+
+DESCRIPTION
+    This module uses the regex engine to generate the strings that a given
+    regex would match.
+
+    Some ideas for uses:
+
+      Test and debug your regex.
+      Generate test data.
+      Generate combinations.
+      Generate data according to a lexical pattern (urls, etc)
+      Edit the regex code to do your things (eg. add assertions)
+      Generate strings, reverse & alternate for pseudo-variable look behind
+
+EXPORT
+    Nothing by default, everything with the ":all" tag.
+
+    @list = strings( $regex, [ $max_length = 10 ] )
+        Produce a list of strings that would match the regex.
+
+    $regex_string = strings_rx( $regex )
+        Returns the regex string used to implement the above. You'll need to
+        "use re 'eval'" for this and maybe "no warnings 'regexp'"
+
+    $generator = generator( $regex, [ $max_length = 10 ] )
+        Return a closure to access the strings one at a time.
+
+        Calling $generator->() will return the next string (starting from
+        0). Calling $generator->($n) will reset the iterator to string $n
+        and return it.
+
+    $regex_string = generator_rx( $regex )
+        Returns the regex string used to implement the above. You'll need to
+        "use re 'eval'" for this and maybe "no warnings 'regexp'"
+
+  Gx Package
+    Small package which is not installed by default, nor officially approved
+    as a namespace. It's not part of the public interface, don't use it in
+    modules. Gx.pm is just a short cut to import Regexp::Genex qw(:all)
+    mainly useful from the command line:
+
+     perl -MGx -le 'print for strings(qr/a(b|c){2,4}/);'
+
+LIMITATIONS
+    Many regex elements such as anchors (^ $ \A \G), look ahead,
+    look-behind, code elements and conditionals are not implemented. Some
+    may be in the future. I'm considering making a pattern not wrapped in ^
+    $ generate leading and trailing junk. Look-ahead inparticular, is
+    unlikely to ever get implemented. Perhaps for finite languages.
+
+    Regex elements which could match a number of things such as . [class] \w
+    \s \D currently select a few items from the set of possibilities and the
+    randomly select one at runtime. So . may become
+    "("~","`","\307","9","\266")[rand 5]". The rand call is only repeat if
+    the element is backtracked over. Try these a few times:
+
+     perl -MRegexp::Genex=:all -e 'print strings_rx(qr/\d\w/);'
+     perl -MRegexp::Genex=:all -le 'print for strings(qr/\d\w/);'
+     perl -MRegexp::Genex=:all -le 'print for strings(qr/\d{1,2}\t\w{1,2}/);'
+
+    If you pick apart the generated expression you'll note that the
+    quantifier * translates to {0,20} (+ to {1,20}). This can be set (but
+    don't tell ayone it was me that told you) with
+    $Regexp::Genex::MAX_QUANTIFIER. 32767 is what perl uses. MAX_QUANTIFIER
+    keeps string generation to smaller sizes.
+
+    The generator actually has to replay the match up to where it was in
+    order to get the next one. Pretty inefficient but I can't suspend/yield
+    from within the regex. Best way forward might be to fork and use pipes
+    for lazy generation.
+
+    The /ismx mode handling is probably not all it could be, 'x' isn't very
+    relevant, 'm' relates to unimplemented anchors, 'i' will mess with the
+    case of you text items and 's' mean dot might produce newlines.
+
+    Try:
+
+     perl -MRegexp::Genex=:all -e 'print strings_rx(qr/aBc/i);'
+     perl -MRegexp::Genex=:all -le 'print for strings(qr/aBc/i);'
+
+    Currently, a small patch is required to YAPE::Regex to get this module
+    to work correctly, see the end of this file. Hopefully it will be fixed
+    soon (vers currently 3.01)
+
+TODO
+      keep funky state in %_
+      work out a good max_length
+      dynamically select chars in classes
+      unimplemented: anchors, lookbehind, code
+
+      testing code
+      packaging
+      could upload with patch
+      note modifiers in effect in comment
+
+AUTHOR
+    Brad Bowman, <genex@bowman.bs>
+
+SEE ALSO
+    YAPE::Regex String::Random
+    http://www.perlmonks.org/index.pl?node_id=284513
+

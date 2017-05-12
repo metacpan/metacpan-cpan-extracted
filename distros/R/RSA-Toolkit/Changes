@@ -1,0 +1,9 @@
+Revision history for Perl extension RSA::Toolkit.
+
+0.02  Mon Apr  4 14:56:14 2011
+	- original version; created by h2xs 1.23 with options
+	-A -n RSA::Toolkit
+
+0.03  Sat Apr  16 10:25:16 2011
+	- Bugs fixed
+	- 2 new functions are available

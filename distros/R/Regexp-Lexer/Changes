@@ -1,0 +1,23 @@
+Revision history for Perl extension Regexp-Lexer
+
+0.05 2015-02-07T06:53:44Z
+
+    - Suppress warnings which occur on comparing undefined characters
+
+0.04 2014-11-19T03:06:07Z
+
+    - Discontinue supporting perl-5.8 or earlier
+
+0.03 2014-11-17T15:40:53Z
+
+    - Fix tests
+    - Fix documentations
+
+0.02 2014-11-16T15:23:33Z
+
+    - Fix handling for not escaped double quote
+
+0.01 2014-11-16T06:02:33Z
+
+    - original version
+

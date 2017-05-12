@@ -1,0 +1,6 @@
+Revision history for Perl extension RPM::VersionSort.
+
+0.01  Wed Feb  5 12:31:02 2003
+	- original version; created by h2xs 1.19
+1.0   Thu Feb  6 13:04:04 EST 2003
+        - Initial Release.

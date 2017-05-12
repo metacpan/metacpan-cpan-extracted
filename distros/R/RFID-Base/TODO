@@ -1,0 +1,8 @@
+* Provide emulation for Mask.
+* Provide emulation for deleting tags that are the same, but on different antennas.
+* Fix timeouts with TCP.
+* Write a command-line test program that will work across readers.
+* Write a shell program that will work across readers.
+* Write a network-based client and server that speak some made-up protocol, to provide
+  wire-protocol compatibility for different readers.
+

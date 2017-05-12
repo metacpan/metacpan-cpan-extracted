@@ -1,0 +1,23 @@
+TYPEMAP
+	VALUE          T_RUBY_VALUE
+	volatile VALUE T_RUBY_VALUE
+	ID             T_RUBY_ID
+
+
+INPUT
+
+T_RUBY_VALUE
+	$var = SV2VALUE($arg);
+
+
+T_RUBY_ID
+	$var = sv2id(aTHX_ $arg)
+
+
+OUTPUT
+
+T_RUBY_VALUE
+	if(GIMME_V != G_VOID){
+		sv_set_value($arg, $var);
+	}
+

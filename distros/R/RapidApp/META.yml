@@ -1,0 +1,179 @@
+---
+abstract: 'Turnkey ajaxy webapps'
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Runtime: 5.90114
+  HTTP::Headers::Util: 6.03
+  HTTP::Request::Common: 6.04
+  LWP::UserAgent: 6.02
+  Module::Install::Catalyst: 0
+  MooseX::MarkAsMethods: 0.15
+  Test::HTML::Content: 0.09
+  Test::More: 1.001002
+  inc::Module::Install: 1.08
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RapidApp
+requires:
+  Alien::Web::ExtJS::V3: v3.4.11
+  Attribute::Handlers: 0.96
+  B::Deparse: 0
+  CHI: 0.59
+  Carp: 1.32
+  Carp::Clan: 6.04
+  Catalyst::Action::RenderView: 0.16
+  Catalyst::Authentication::Store::DBIx::Class: 0.1506
+  Catalyst::Component::ApplicationAttribute: 0
+  Catalyst::Controller: 0
+  Catalyst::Controller::AutoAssets: 0.40
+  Catalyst::Controller::SimpleCAS: 1.000
+  Catalyst::Devel: 1.39
+  Catalyst::Helper: 0
+  Catalyst::Helper::Model::DBIC::Schema: 0
+  Catalyst::Model: 0
+  Catalyst::Model::DBIC::Schema: 0.65
+  Catalyst::Plugin::Authorization::Roles: 0.09
+  Catalyst::Plugin::AutoAssets: 0
+  Catalyst::Plugin::Session::State::Cookie: 0.17
+  Catalyst::Plugin::Session::Store::DBIC: 0.14
+  Catalyst::Plugin::SimpleCAS: 1.000
+  Catalyst::Runtime: 5.90114
+  Catalyst::ScriptRunner: 0
+  Catalyst::Test: 0
+  Catalyst::Utils: 0
+  Catalyst::View: 0
+  Catalyst::View::TT: 0.42
+  CatalystX::AppBuilder: 0.00009
+  CatalystX::InjectComponent: 0.025
+  Class::Load: 0.22
+  Class::MOP::Class: 0
+  Clone: 0.37
+  DBD::SQLite: 1.42
+  DBI::Const::GetInfoType: 0
+  DBIx::Class: 0.082840
+  DBIx::Class::Core: 0
+  DBIx::Class::Optional::Dependencies: 0
+  DBIx::Class::PassphraseColumn: 0.02
+  DBIx::Class::ResultSet: 0
+  DBIx::Class::Schema: 0
+  DBIx::Class::Schema::Diff: 1.03
+  DBIx::Class::Schema::Loader: 0.07045
+  DBIx::Class::Schema::Loader::DBI: 0
+  DBIx::Class::Schema::Loader::Table: 0
+  Data::Dumper: 2.131
+  Data::Dumper::Concise: 2.020
+  Data::Printer: 0
+  DateTime: 1.10
+  DateTime::Format::SQLite: 0.11
+  Digest::MD5: 2.51
+  Digest::SHA1: 2.13
+  Excel::Writer::XLSX: 0.81
+  Exporter: 5.70
+  File::ShareDir: 1.102
+  File::Spec: 3.47
+  File::Temp: 0.2304
+  FindBin: 0
+  Getopt::Long: 2.43
+  HTML::Entities: 0
+  HTML::Parser: 3.71
+  HTML::TokeParser::Simple: 3.16
+  HTTP::Request::Common: 6.04
+  Hash::Merge: 0.12
+  IPC::Cmd: 0.94
+  Import::Into: 1.002004
+  JSON: 2.90
+  JSON::PP: 2.27400
+  LWP::UserAgent: 6.02
+  List::MoreUtils: 0.33
+  List::Util: 1.38
+  MIME::Base64: 3.13
+  Module::Locate: 1.79
+  Module::Runtime: 0.014
+  Moo: 2.000001
+  Moo::Role: 0
+  Moose: 2.1404
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::MarkAsMethods: 0.15
+  MooseX::NonMoose: 0.26
+  MooseX::Traits: 0.12
+  PPI: 1.220
+  Path::Class: 0.37
+  Perl::Tidy: 20160302
+  Plack: 1.0042
+  Plack::Builder: 0
+  Plack::Component: 0
+  Plack::Middleware: 0
+  Plack::Runner: 0
+  Pod::Find: 0
+  Pod::Parser: 1.63
+  Pod::Usage: 1.64
+  SQL::Abstract: 1.81
+  SQL::Translator: 0.11021
+  Scalar::Util: 1.38
+  Spreadsheet::ParseExcel: 0.65
+  Spreadsheet::ParseExcel::Utility: 0
+  Storable: 2.51
+  String::CamelCase: 0.02
+  String::Random: 0.26
+  Sub::Name: 0.12
+  Template: 2.26
+  Template::Context: 0
+  Template::Provider: 0
+  Term::ANSIColor: 4.03
+  Text::CSV: 1.32
+  Text::Glob: 0.09
+  Text::Markdown: 1.000031
+  Text::SimpleTable::AutoWidth: 0.04
+  Text::TabularDisplay: 1.28
+  Text::WagnerFischer: 0.04
+  Tie::IxHash: 1.23
+  Time::HiRes: 1.9724
+  Try::Tiny: 0.22
+  Type::Tiny: 1.000005
+  Types::Standard: 0
+  URI::Escape: 3.31
+  autodie: 0
+  base: 2.18
+  bytes: 0
+  curry: 1.000000
+  integer: 0
+  lib: 0
+  mro: 0
+  namespace::autoclean: 0.28
+  namespace::clean: 0
+  overload: 0
+  parent: 0.232
+  perl: 5.010
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  IRC: irc://irc.perl.org/#rapidapp
+  bugtracker: https://github.com/vanstyn/RapidApp/issues
+  homepage: http://www.rapidapp.info
+  repository: https://github.com/vanstyn/RapidApp.git
+version: 1.2111
+x_contributors:
+  - 'Michael Conrad <mconrad@intellitree.com>'
+  - 'Torsten Raudssus <torsten@raudss.us>'
+  - 'Peter Rabbitson <ribasushi@cpan.org>'
+  - 'Deven T. Corzine <deven@ties.org>'
+  - 'Roy Tate <roy.l.tate@gmail.com>'
+  - 'Nicholas Foos <nfoos@rm-f.me>'
+  - 'Michael Lackhoff <michael@lackhoff.de>'
+  - 'Tom Bloor <tom.bloor@googlemail.com>'
+  - 'Matt S. Trout <mst@shadowcat.co.uk>'
+  - 'Scott Walters <scott@slowass.net>'
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'

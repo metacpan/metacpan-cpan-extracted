@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Reflexive-ZmqSocket,
+version 1.130710:
+
+  Provides a reflexy way to talk over ZeroMQ sockets
+
+This software is copyright (c) 2012 by Nicholas R. Perez <nperez@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

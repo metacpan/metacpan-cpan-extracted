@@ -1,0 +1,40 @@
+<& /Elements/Header, Title => loc('Modify recurrence for #[_1]', $TicketObj->Id) &>
+<& /Elements/Tabs &>
+
+<& /Elements/ListActions, actions => \@results &>
+
+% unless ( $skip ) {
+<form method="post" name="ModifyRecurrence" action="ModifyRecurrence.html">
+<input type="hidden" class="hidden" name="id" value="<%$TicketObj->Id%>" />
+<&| /Widgets/TitleBox,title => loc('Modify recurrence for ticket # [_1]', $TicketObj->Id), class=> 'ticket-info-repeat' &>
+<& Elements/EditRecurrence, Ticket => $TicketObj, ARGSRef => $ARGSRef &>
+</&>
+<& /Elements/Submit, Name => 'SubmitTicket', Label => loc('Save Changes') &>
+</form>
+% }
+
+<%INIT>
+
+my $TicketObj = LoadTicket($id);
+my @results;
+
+my $skip;
+my $cf = RT::CustomField->new($session{CurrentUser});
+$cf->Load('Original Ticket');
+unless( $cf->id && ( $cf->can('IsAdded') ? ( $cf->IsAdded(0) || $cf->IsAdded($TicketObj->Queue) ) : ( $cf->IsApplied(0) || $cf->IsApplied($TicketObj->Queue)) ) ) {
+    push @results, loc('RepeatTicket is not enabled in this Queue');
+    $skip = 1;
+}
+
+if ( $ARGS{SubmitTicket} ) {
+    my ( $ret, $message ) = RT::Extension::RepeatTicket::SetRepeatAttribute( $TicketObj, %ARGS );
+    $ARGSRef = \%ARGS if not $ret; # Save params on failure
+    push @results, $message;
+}
+
+</%INIT>
+
+<%ARGS>
+$id => undef
+$ARGSRef => undef
+</%ARGS>

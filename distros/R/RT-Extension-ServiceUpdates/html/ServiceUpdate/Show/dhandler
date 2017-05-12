@@ -1,0 +1,35 @@
+<%init>
+my $ticket_id = $m->dhandler_arg();
+
+unless ($m->dhandler_arg =~ /^\d+$/) {
+    Abort(loc("The link you followed doesn't seem to be an outage id"));
+    $m->abort();
+}
+my $ticket =RT::Ticket->new($session{'CurrentUser'});
+$ticket->Load($ticket_id);
+my $history = $ticket->Transactions();
+
+
+</%init>
+<& /ServiceUpdate/Elements/Header, Title => $ticket->Subject &>
+<div class="serviceupdate">
+<h1><%$ticket->Subject%></h1>
+<div class="actions">
+<a href="<%$RT::WebPath%>/ServiceUpdate/Edit/<%$ticket->id%>"><&|/l&>edit</&></a>
+</div>
+<div class="serviceupdate-history">
+% while (my $txn = $history->Next) {
+<div class="serviceupdate-history-entry">
+<%$txn->CreatedObj->AgeAsString%>:
+<%$txn->Description%>
+<div class="serviceupdate-history-date">
+<%$txn->CreatedObj->AsString%>
+</div>
+% if ($txn->ContentObj) {
+<div class="serviceupdate-history-content">
+<%$txn->Content%>
+</div>
+% }
+</div>
+% }
+</div>

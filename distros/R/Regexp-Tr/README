@@ -1,0 +1,26 @@
+Regexp::Tr version 0.02
+======================
+
+Regexp::Tr provides a lightweight object-oriented way to create and store run-time tr/// operators.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Robert Fischer
+
+This library is free software under the GNU public liscense; you can redistribute it and/or modify it under the same terms as Perl itself. 
+

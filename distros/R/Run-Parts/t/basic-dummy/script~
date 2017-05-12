@@ -1,0 +1,3 @@
+#!perl
+
+print "Should not be executed!\n";

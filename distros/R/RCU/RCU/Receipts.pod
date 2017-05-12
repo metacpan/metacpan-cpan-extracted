@@ -1,0 +1,114 @@
+=head1 RCU::Receipts
+
+This manpage contains some examples that should help you getting started
+with the module and solving common problems.
+
+=head2 THE BASICS
+
+=over 4
+
+=item Debugging The Connection
+
+To find out wether the connection actually works, you can try this very simple program:
+
+ use RCU;
+
+ $rcu = new RCU "RCU:Lirc";
+
+ # endless loop
+ while () {
+    my ($key, $repeat) = $rcu->get;
+    print "EVENT $key (= $repeat)\n";
+ }
+
+If you do not use the lirc interface you would have to specify another
+one on the call to C<new>, like C<RCU:Irman> for your irman (very nice)
+or C<RCU:Irman:/dev/ttyS1> if you know that your irman is connected to
+C</dev/ttyS1>.
+
+Here is some example output:
+
+ EVENT sony-cd-next (= 0)
+ EVENT sony-cd-next (= 1)
+ EVENT sony-cd-next (= 0)
+ EVENT sony-cd-next (= 1)
+ EVENT sony-cd-next (= 2)
+ EVENT sony-cd-fwd (= 0)
+ EVENT sony-cd-fwd (= 1)
+ EVENT sony-cd-4 (= 0)
+ EVENT sony-cd-4 (= 1)
+
+... correspong to two times "sony-cd-next", and one press for
+"sony-cd-fwd" and "sony-cd-4".
+
+=item Using Event
+
+If you don't know how the Event module works you should read about that
+one first and come back.
+
+In general, the Event-API is easy to use. The only (seeming) complication
+is that you have to think a bit about your setup. The reason you should
+use this API is that using repeated keypresses has one major drawback: It
+does not let you know when the user stopped pressing the key (the events
+just do not occur) and different remotes repeat their pulses with
+different frequency. The only thing that you should use to measure the
+duration of a keypress is therefore wallclock time.
+
+This is what the Event-API does: It translates normal key-events into
+key-down/key-up pairs, on which you can bind any action you want (See
+L<RCU::Context>). Since keypresses usually do not happen in some
+informational void but depend on previous keys and e.g. the mode of the
+application, you have to put all your events into some context (actually,
+into some L<RCU::Context>-object), like this:
+
+ use Event;
+ use RCU::Event;
+ use RCU::Context;
+
+ # create a new context
+ $ctx = new RCU::Context;
+
+ # and bind some actions to some events
+ $ctx->bind(
+       "sony-cd-stop" => sub { print "T$_[1]: STOP pressed\n" },
+       "~sony-cd-1"   => sub { print "T$_[1]: 'one' key released\n" },
+       "=.*"          => sub { print "T$_[1]: unknown event '$_[0]'\n" },
+ );
+
+ # connect to the RCU
+ $rcu = new RCU::Event "RCU:Irman";
+ $rcu->set_context($ctx);
+
+ # jump into the main event loop
+ Event::loop;
+
+Here is some sample output:
+
+ T965403699.132146: STOP pressed
+ T965403703.059969: unknown event 'sony-cd-stop:=sony-cd-1'
+ T965403703.621847: 'one' key released
+
+As you can see, I first pressed the STOP button, followed by a press of
+the "1" button, for which the default handler was used, since we haven't
+bound "STOP followed by 1" to any event, followed by the button-release
+event.
+
+
+
+=back
+
+=head2 RECEIPTS
+
+... not written yet ...
+
+=over 4
+
+=item A Volume Slider
+
+=item Digit Input
+
+=back
+
+=head1 AUTHOR
+
+This document was wirtten by Marc Lehmann <schmorp@schmorp.de>

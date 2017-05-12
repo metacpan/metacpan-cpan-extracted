@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RDF::Core::Function - a package of functions for query language.</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#interface">Interface</a></li>
+		<li><a href="#functions_implemented">Functions implemented</a></li>
+	</ul>
+
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>RDF::Core::Function - a package of functions for query language.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>When there is a function found while evaluating query, its parameters are evaluated and passed to RDF::Core::Function apropriate piece of code. The code reference is obtained in a hash returned by <a href="#item_getfunctions"><code>getFunctions()</code></a> call. Each function accepts RDF::Core::Literal or RDF::Core::Resource objects as paramaters and returns a tuple of arrays (array of two array references). The first references to an array of function results - Resource or Literal objects, the second one references to an array of predicates that could be used instead of the function. This is not always applicable, so the second array can be empty.
+For example, a function call:</p>
+<pre>
+  someBag.member()</pre>
+<p>returns ([uri://uri-of-the-first-member,....],[rdf:_1,...]).</p>
+<p>There is a special parameter - a subject parameter, which says that a function is at position of property. For example:</p>
+<pre>
+  subproperty(schema:SomeProperty)</pre>
+<p>has no subject parameter defined and returns property <strong>names</strong> that are subproperties of given schema:SomeProperty.</p>
+<pre>
+  data:SomeObject.subproperty(schema:SomeProperty)</pre>
+<p>has subject parameter data:SomeObject and return <strong>values</strong> of subproperties for subject.</p>
+<p>
+</p>
+<h2><a name="interface">Interface</a></h2>
+<ul>
+<li><strong><a name="item_new"><code>new(%options)</code></a></strong><br />
+</li>
+Available options are:
+<ul>
+<li><strong><a name="item_data">Data</a></strong><br />
+</li>
+RDF::Core::Model object that contains data to be queried.
+<p></p>
+<li><strong><a name="item_schema">Schema</a></strong><br />
+</li>
+RDF::Core::Model object that contains RDF schema.
+<p></p>
+<li><strong><a name="item_factory">Factory</a></strong><br />
+</li>
+RDF::Core::NodeFactory object, that produces resource and literal objects.
+<p></p></ul>
+<li><strong><a name="item_getfunctions">getFunctions</a></strong><br />
+</li>
+Returns a hash reference where each key is a name of a functions and value is a reference to an implementation code.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="functions_implemented">Functions implemented</a></h2>
+<ul>
+<li><strong><a name="item_subclass"><code>subclass(X)</code></a></strong><br />
+</li>
+Not defined subject parameter:
+<p>Find all subclasses of X in Schema and return them if they have an instance in Data.</p>
+<p>Defined subject parameter:</p>
+<p>Result is not defined, dies.</p>
+<p></p>
+<li><strong><a name="item_subproperty"><code>subproperty(X)</code></a></strong><br />
+</li>
+Not defined subject parameter:
+<p>Find all subproperties of X in Schema and return them if they occur in Data.</p>
+<p>Defined subject parameter:</p>
+<p>Find all subproperties of X in Schema and return their values for subject, if found.</p>
+<p></p>
+<li><strong><a name="item_member"><code>member()</code></a></strong><br />
+</li>
+Not defined subject parameter:
+<p>Result is not defined, dies.</p>
+<p>Defined subject parameter:</p>
+<p>Find all container members of subject.</p>
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is subject to the MPL (or the GPL alternatively).
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ginger Alliance, <a href="mailto:rdf@gingerall.cz">rdf@gingerall.cz</a>
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>RDF::Core::Query
+
+</p>
+
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+Revision history for Router-Dumb
+
+0.005     2013-07-28 21:53:59 America/New_York
+          only test fixes: should now pass on Win32
+
+0.004     2013-04-13 16:15:51 Europe/London
+          doc fixes - thanks, Karen Etheridge!
+
+          fixed tests for hash randomization
+
+0.003     2012-09-24 08:40:39 America/New_York
+          let the helpers use add_route_unless_exists if requested
+
+0.002     2012-09-21 13:40:54 America/New_York
+          add_route_unless_exists
+
+0.001     2011-11-10 15:51:40 America/New_York
+          first release!

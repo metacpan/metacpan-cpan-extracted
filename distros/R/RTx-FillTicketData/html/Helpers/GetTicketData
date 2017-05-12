@@ -1,0 +1,12 @@
+<%perl>
+$m->out(
+    RT::Interface::Web::EncodeJSON(
+        RTx::FillTicketData::get_data({ %ARGS })
+    )
+);
+$m->abort;
+</%perl>
+<%init>
+use RT::Interface::Web;
+$r->content_type('application/json');
+</%init>

@@ -1,0 +1,52 @@
+1.04 2014-12-18
+ - Add no_index for core RT packages
+
+1.03 2014-12-10
+ - Add a configuration option, AssumeOutsideActor, which causes the
+   Response SLA to assume only replies from Owner and AdminCCs meet SLA
+
+1.02 2014-12-02
+ - Reduce severity of "no SLA CF applied to this ticket" logging to
+   debug, as it is a valid configuration.
+
+1.01 2014-07-01
+ - Documentation and packaging updates; no code changes
+
+1.00 2014-06-19
+ - Packaging updates; no code changes
+
+0.08 2014-06-11
+ - Compatibility with RT 4.2
+ - Skip setting date if it is already the current value
+
+0.07 2012-06-29
+ - Fix accidentally committed local paths in Test.pm
+ - Break out the Test.pm template into Test.pm.in
+
+0.06 2012-06-29
+ - UPGRADING: There are database changes to make, please see the README.
+ - IgnoreOnStatuses agreement modifier
+
+0.05_02 2012-06-27
+ - Make sure timezone change is seen by system functions
+ - CalculateTime: Optionally accept a provided Agreement
+
+0.05_01 2012-06-27
+ - Per-queue timezone support
+
+0.05 2011-07-31
+ - don't set default SLA for reminders
+ - switch over RT::Test in tests
+
+0.04 2011-06-03
+ - RT 4.0 compatibility fix
+
+0.03 2009-04-20
+ - Add KeepInLoop option
+
+0.02 2008-05-06
+ - POD cleanup
+
+0.01 2008-02-14
+ - initial release
+

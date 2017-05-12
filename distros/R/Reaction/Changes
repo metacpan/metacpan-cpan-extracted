@@ -1,0 +1,55 @@
+Revision history for Reaction
+0.002005 - 8 Mar 2011
+        - use JSON instead of JSON::Any
+
+0.002004 - 5 Mar 2011
+        - add a warning for people not using Reaction::Role(::Parameterized)
+        - silence m2m warnings during tests
+
+0.002003 - 4 Mar 2011
+        - fixes for Moose 2
+
+0.002002 - 5 Nov 2010
+        - use JSON::Any instead of JSON
+
+0.002001 - 2 Nov 2010
+        - Fix some POD and tests
+        - Fix Order role to allow for exclusions (for non-indexed columns) and
+          coerceion of the column name to allow proper ORDER BY generation in
+          belongs_to rels and fields that do not map directly to columns.
+        - Fix Package names in POD for various files. this was causing some
+          weirdness in CPAN.
+        - All Reaction::UI::ViewPort::* now uses MooseX::Types
+        - Add 'action' attribute to Action viewport
+          - Adapt widget and layout to changes
+          - Add example of explicitly stating action to ComponentUI
+        - Don't override custom location in push_viewport
+        - Wire layout_args, which was forgotten + example of how to use it
+        - CRUD functionality is now implemented as roles, so it can be used 
+          without needing to use Controller::Collection::CRUD
+        - Deprecate redirect_to and move it to an external role
+        - Controllers no longer 'use Reaction::Class' which was causing 
+          problems with metaclass compatibility. 'use Moose' is now the
+          preferred approach.
+0.002000 - 29 Apr 2008
+        - Update CheckUniques role to use around instead of overrides
+        - Stop using ACCEPT_CONTEXT, use InstancePerContext instead
+        - Added an error_message attribute to IM::Action
+        - Updated ViewPort::Action to support action-wide messages and error
+          messages via attribute message and model's error_message attribute.
+          - Updated templates and widget to match this
+          - Added an example to ComponentUI
+        - Add support for the external MooseX::Types::Common and 
+          MooseX::Types::DateTime type libraries in the VPs
+        - Eliminate memory leak related to InstancePerContext
+        - Move the short-cut code from flush_view to flush to prevent events
+          from happening if serving a static file
+        - lots more documentation
+        - dependencies all updated for Catalyst 5.80
+
+0.001002 - 28 Apr 2008
+        - the 002 changes is the real thing but mst shipped a broken dist
+          with this version :(
+
+0.001001 - 12 Aug 2008
+        - Initital public release

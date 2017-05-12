@@ -1,0 +1,115 @@
+#!perl
+#
+# $Id$
+
+use 5.010;
+use strict;
+use warnings;
+
+package Rose::DBx::CannedQuery;
+
+our ($VERSION) = '0.01';
+our ($REVISION) = '$Revision$' =~ /: (\d+)/ ? $1 : 0;
+
+1;
+
+__END__
+
+=head1 NAME
+
+Rose::DBx::CannedQuery - blah blah blah
+
+=head1 SYNOPSIS
+
+  use Rose::DBx::CannedQuery;
+  blah blah blah
+
+=head1 DESCRIPTION
+
+Blah blah blah.
+
+The following command line options are available:
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Output a brief help message, then exit.
+
+=item B<--man>
+
+Output this documentation, then exit.
+
+=item B<--version>
+
+Output the program version, then exit.
+
+=back
+
+=head1 USE AS A MODULE
+
+Is encouraged.  This file can be included in a larger program using
+Perl's L<require> function.  It provides the following functions in the
+package B<Foo>:
+
+=head2 FUNCTIONS
+
+It helps to document these if you encourage use as a module.
+
+=over 4
+
+=back
+
+=head2 EXPORT
+
+None by default.
+
+=head1 SEE ALSO
+
+Mention other useful documentation such as the documentation of
+related modules or operating system documentation (such as man pages
+in UNIX), or any relevant external documentation such as RFCs or
+standards.
+
+If you have a mailing list set up for your module, mention it here.
+
+If you have a web site set up for your module, mention it here.
+
+=head1 DIAGNOSTICS
+
+Any message produced by an included package, as well as
+
+=over 4
+
+=item B<EANY>
+
+Anything went wrong.
+
+=item B<Something to say here>
+
+A warning that something newsworthy happened.
+
+=back
+
+=head1 BUGS AND CAVEATS
+
+Are there, for certain, but have yet to be cataloged.
+
+=head1 VERSION
+
+version 0.01
+
+=head1 AUTHOR
+
+Charles Bailey <cbail@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Charles Bailey
+
+This software may be used under the terms of the Artistic License or
+the GNU General Public License, as the user prefers.
+
+=cut

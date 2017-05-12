@@ -1,0 +1,33 @@
+---
+abstract: 'Generate W3C Evaluation and Report Language (EARL) test reports.'
+author:
+  - 'Gregory Todd Williams <gwilliams@cpan.org>'
+  - 'Gregory Todd Williams <gwilliams@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RDF-EARL
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  RDF::Trine: 1
+  Scalar::Util: 0
+  perl: 5.8.3
+resources:
+  bugtracker: https://github.com/kasei/perlrdf/issues
+  homepage: http://search.cpan.org/dist/RDF-EARL/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/kasei/perlrdf/
+version: 0.001

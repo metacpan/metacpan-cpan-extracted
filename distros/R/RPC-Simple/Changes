@@ -1,0 +1,67 @@
+2006-05-22  Clint Edwards <cedwards@mcclatchyinteractive.com>
+
+        * Server.pm (writeSock): Added an eval around the socket
+        send call.  If the client disconnects before we send then
+        we were dying.
+
+        * Server.pm (new): Added two optional arguments (socket, and
+        manual_accept) in that order.  These arguments can be used to 
+        disable the accept, and to use the socket that is passed in.
+
+        * Server.pm (goodGuy): Fixed a bug when specifying host names
+        and not IP addresses, we called gethostbyname expecting it to
+        return the ip address, but we need to unpack the raw address.
+
+        * Agent.pm (destroy): Fixed a circular reference in agent to
+        the factory object and the client object.
+
+        * Factory.pm (readSock): Changed readSock, we no longer close
+        the socket within readSock, we allow DESTROY to do this.  We
+        were getting a warning from DESTROY because it was trying to
+        close the socket, and it had already been closed.
+
+        * ObjectHandle.pm (new): Changed the way ObjectHandler loads
+        the remote class.  We now allow our remote class to be in a
+        namespace like: 'Some::Object'.  We still allow a file name
+        to be passed in (ie. Object.pm).
+
+        * Removed the dependancy on Tk, this package is no longer 
+        needed or required.  The test cases have been rewritten
+        without using Tk.
+        
+2004-10-18  Dominique Dumont  <domi@komarr.grenoble.hp.com>
+
+	* AnyWhere.pm (AUTOLOAD): Removed possibilty to use AutoLoader in
+	classes communicating over network. User complained that using
+	AutoLoading made debugging much harder. 
+
+	* Factory.pm (new): changed API to use named parameters. Old API
+	is still suported (although obsolete)
+	(new): tk_top parameter is optional. So user can use its own event
+	loop. *Using TK control loop is no longer mandatory*
+	(DESTROY): new method to clean up socket during destruction.
+	(getSocket): new method to get the socket created by factory. This
+	socket must be used in user event loop when Tk is not used.
+
+
+0.5 98/2/17
+        - better $VERSION handling
+        - some more explanation on interaction with AutoLoader (in AnyLocal
+        man page).
+
+0.4 97/12/31
+        - added RPC_SUB arrays to avoid infinite loop between local and 
+        remote when a function is unknown.
+        - remote the 'callback' string. Now when the first parameter is a
+        subroutine reference, Agent store the reference and the subroutine
+        will be called when the remote call is over.
+
+0.3 97/12/2
+        - Simplified AnyRemote. Fixed some bugs, better tests
+ 
+0.2 97/11/5
+        - Fixed problem with directory layout. It should install properly
+        with make install.
+
+0.1  Thu May 15 13:39:29 1997
+	- original version; created by h2xs 1.16

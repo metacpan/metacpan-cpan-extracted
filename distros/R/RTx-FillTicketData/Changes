@@ -1,0 +1,10 @@
+0.03 2015-11-26
+    - Upgraded build tools
+    - Added META.yml
+    - Upgraded required Perl version to 5.10.1
+0.02 2014-11-30
+    - Minor documentation fixes
+    - Added repository URL
+    - Added this file
+0.01 2014-11-14
+    - Initial release

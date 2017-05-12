@@ -1,0 +1,11 @@
+Revision history for RT-Extension-BounceEmail
+
+0.01 [Release Date]
+ - Initial version
+
+0.02 [first working release]
+ - prepare for cpan release
+
+0.03 [fixin]
+ - RFC compliant bounces
+ - fixes

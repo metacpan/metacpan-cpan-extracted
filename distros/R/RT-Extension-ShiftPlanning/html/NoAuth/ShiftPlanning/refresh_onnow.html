@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+% print("<b>On-now data refreshed</b>");
+<%init>
+use strict;
+use warnings;
+use 5.10.1;
+use RT::Extension::2ndQuadrantSupport::ShiftPlanning;
+RT::Extension::2ndQuadrantSupport::ShiftPlanning::RefreshOnnowData();
+</%init>

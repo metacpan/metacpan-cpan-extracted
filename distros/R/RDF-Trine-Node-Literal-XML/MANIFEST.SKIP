@@ -1,0 +1,16 @@
+#defaults
+^Makefile$
+^Makefile.old$
+^blib/
+^blibdirs$
+^pm_to_blib$
+~$
+tar.gz$
+.bak$
+.tmp$
+.old$
+^.git/
+^.svn/
+/.svn/
+.patch$
+^svn-ignores$

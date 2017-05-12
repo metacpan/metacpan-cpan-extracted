@@ -1,0 +1,1267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>RDF term (librdf_node)</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Redland RDF Application Framework Manual">
+<link rel="up" href="pt02.html" title="Part&#160;II.&#160;Reference Manual">
+<link rel="prev" href="redland-model.html" title="RDF Graph (librdf_model)">
+<link rel="next" href="redland-parser.html" title="Parsers">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="redland.html" title="Redland Overview">
+<link rel="chapter" href="introduction.html" title="Introduction">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Tutorial">
+<link rel="part" href="pt02.html" title="Part&#160;II.&#160;Reference Manual">
+<link rel="chapter" href="objects.html" title="Objects in C">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="redland-model.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt02.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Redland RDF Application Framework Manual</th>
+<td><a accesskey="n" href="redland-parser.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2616307" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2621874" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="redland-node"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2616307"></a><span class="refentrytitle">RDF term (librdf_node)</span>
+</h2>
+<p>RDF term (librdf_node) &#8212; RDF triple component</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="redland-node.html#librdf-node">librdf_node</a>;
+enum        <a href="redland-node.html#librdf-node-type">librdf_node_type</a>;
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node">librdf_new_node</a>                (<a href="redland-world.html#librdf-world">librdf_world</a> *world);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-uri-string">librdf_new_node_from_uri_string</a>
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *uri_string);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-uri">librdf_new_node_from_uri</a>       (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *uri);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-uri-local-name">librdf_new_node_from_uri_local_name</a>
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *uri,
+                                             unsigned char *local_name);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-normalised-uri-string">librdf_new_node_from_normalised_uri_string</a>
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *uri_string,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *source_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-literal">librdf_new_node_from_literal</a>   (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *string,
+                                             const char *xml_language,
+                                             int is_wf_xml);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-typed-literal">librdf_new_node_from_typed_literal</a>
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *value,
+                                             const char *xml_language,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *datatype_uri);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-typed-counted-literal">librdf_new_node_from_typed_counted_literal</a>
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *value,
+                                             size_t value_len,
+                                             const char *xml_language,
+                                             size_t xml_language_len,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *datatype_uri);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-blank-identifier">librdf_new_node_from_blank_identifier</a>
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *identifier);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-new-node-from-node">librdf_new_node_from_node</a>      (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+void        <a href="redland-node.html#librdf-free-node">librdf_free_node</a>                (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+<a href="redland-uri.html#librdf-uri">librdf_uri</a>* <a href="redland-node.html#librdf-node-get-uri">librdf_node_get_uri</a>             (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+<a href="redland-node.html#librdf-node-type">librdf_node_type</a> <a href="redland-node.html#librdf-node-get-type">librdf_node_get_type</a>       (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+unsigned char* <a href="redland-node.html#librdf-node-get-literal-value">librdf_node_get_literal_value</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+unsigned char* <a href="redland-node.html#librdf-node-get-literal-value-as-counted-string">librdf_node_get_literal_value_as_counted_string</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node,
+                                             size_t *len_p);
+char*       <a href="redland-node.html#librdf-node-get-literal-value-as-latin1">librdf_node_get_literal_value_as_latin1</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+char*       <a href="redland-node.html#librdf-node-get-literal-value-language">librdf_node_get_literal_value_language</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+int         <a href="redland-node.html#librdf-node-get-literal-value-is-wf-xml">librdf_node_get_literal_value_is_wf_xml</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+<a href="redland-uri.html#librdf-uri">librdf_uri</a>* <a href="redland-node.html#librdf-node-get-literal-value-datatype-uri">librdf_node_get_literal_value_datatype_uri</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+int         <a href="redland-node.html#librdf-node-get-li-ordinal">librdf_node_get_li_ordinal</a>      (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+unsigned char* <a href="redland-node.html#librdf-node-get-blank-identifier">librdf_node_get_blank_identifier</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+int         <a href="redland-node.html#librdf-node-is-resource">librdf_node_is_resource</a>         (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+int         <a href="redland-node.html#librdf-node-is-literal">librdf_node_is_literal</a>          (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+int         <a href="redland-node.html#librdf-node-is-blank">librdf_node_is_blank</a>            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+size_t      <a href="redland-node.html#librdf-node-encode">librdf_node_encode</a>              (<a href="redland-node.html#librdf-node">librdf_node</a> *node,
+                                             unsigned char *buffer,
+                                             size_t length);
+<a href="redland-node.html#librdf-node">librdf_node</a>* <a href="redland-node.html#librdf-node-decode">librdf_node_decode</a>             (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             size_t *size_p,
+                                             unsigned char *buffer,
+                                             size_t length);
+unsigned char* <a href="redland-node.html#librdf-node-to-string">librdf_node_to_string</a>        (<a href="redland-node.html#librdf-node">librdf_node</a> *node);
+unsigned char* <a href="redland-node.html#librdf-node-to-counted-string">librdf_node_to_counted_string</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node,
+                                             size_t *len_p);
+void        <a href="redland-node.html#librdf-node-print">librdf_node_print</a>               (<a href="redland-node.html#librdf-node">librdf_node</a> *node,
+                                             FILE *fh);
+int         <a href="redland-node.html#librdf-node-equals">librdf_node_equals</a>              (<a href="redland-node.html#librdf-node">librdf_node</a> *first_node,
+                                             <a href="redland-node.html#librdf-node">librdf_node</a> *second_node);
+<a href="redland-iterator.html#librdf-iterator">librdf_iterator</a>* <a href="redland-node.html#librdf-node-static-iterator-create">librdf_node_static_iterator_create</a>
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> **nodes,
+                                             int size);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2621874"></a><h2>Description</h2>
+<p>
+The (subject, predicate, object) parts of an RDF triple.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2621891"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2621902"></a><h3>
+<a name="librdf-node"></a>librdf_node</h3>
+<a class="indexterm" name="id2621914"></a><pre class="programlisting">typedef struct librdf_node_s librdf_node;
+</pre>
+<p>
+Redland node class.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621933"></a><h3>
+<a name="librdf-node-type"></a>enum librdf_node_type</h3>
+<a class="indexterm" name="id2621946"></a><pre class="programlisting">typedef enum {
+  LIBRDF_NODE_TYPE_UNKNOWN   = 0,  /* To catch uninitialised nodes */
+  LIBRDF_NODE_TYPE_RESOURCE  = 1,  /* rdf:Resource (&amp; rdf:Property) - has a URI */
+  LIBRDF_NODE_TYPE_LITERAL   = 2,  /* rdf:Literal - has an XML string, language, XML space */
+  /* node type 3 is unused at present. Do not renumber this list. */
+  LIBRDF_NODE_TYPE_BLANK     = 4,  /* blank node has an identifier string */
+  LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_BLANK
+} librdf_node_type;
+</pre>
+<p>
+Type of a redland node.
+</p>
+<p>
+Better to check this with functions <a href="redland-node.html#librdf-node-is-resource"><code class="function">librdf_node_is_resource()</code></a>,
+<a href="redland-node.html#librdf-node-is-literal"><code class="function">librdf_node_is_literal()</code></a> or <a href="redland-node.html#librdf-node-is-blank"><code class="function">librdf_node_is_blank()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a name="LIBRDF-NODE-TYPE-UNKNOWN:CAPS"></a><code class="literal">LIBRDF_NODE_TYPE_UNKNOWN</code></span></td>
+<td> Internal
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="LIBRDF-NODE-TYPE-RESOURCE:CAPS"></a><code class="literal">LIBRDF_NODE_TYPE_RESOURCE</code></span></td>
+<td> rdf:Resource (&amp; rdf:Property) - has a URI
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="LIBRDF-NODE-TYPE-LITERAL:CAPS"></a><code class="literal">LIBRDF_NODE_TYPE_LITERAL</code></span></td>
+<td> rdf:Literal - has an XML string, language,
+  XML space
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="LIBRDF-NODE-TYPE-BLANK:CAPS"></a><code class="literal">LIBRDF_NODE_TYPE_BLANK</code></span></td>
+<td> blank node has an identifier string.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="LIBRDF-NODE-TYPE-LAST:CAPS"></a><code class="literal">LIBRDF_NODE_TYPE_LAST</code></span></td>
+<td> Internal
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622113"></a><h3>
+<a name="librdf-new-node"></a>librdf_new_node ()</h3>
+<a class="indexterm" name="id2622125"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node                (<a href="redland-world.html#librdf-world">librdf_world</a> *world);</pre>
+<p>
+Constructor - create a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object with a private identifier.
+</p>
+<p>
+Calls librdf_new_node_from_blank_identifier(world, NULL) to
+construct a new redland blank node identifier and make a
+new librdf_node object for it.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2622205"></a><h3>
+<a name="librdf-new-node-from-uri-string"></a>librdf_new_node_from_uri_string ()</h3>
+<a class="indexterm" name="id2622218"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_uri_string
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *uri_string);</pre>
+<p>
+Constructor - create a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object from a URI string.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri_string</code></em>&#160;:</span></td>
+<td> string representing a URI
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619611"></a><h3>
+<a name="librdf-new-node-from-uri"></a>librdf_new_node_from_uri ()</h3>
+<a class="indexterm" name="id2619623"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_uri       (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *uri);</pre>
+<p>
+Constructor - create a new resource <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object with a given URI.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> <a href="redland-uri.html#librdf-uri"><span class="type">librdf_uri</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619725"></a><h3>
+<a name="librdf-new-node-from-uri-local-name"></a>librdf_new_node_from_uri_local_name ()</h3>
+<a class="indexterm" name="id2619739"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_uri_local_name
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *uri,
+                                             unsigned char *local_name);</pre>
+<p>
+Constructor - create a new resource <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object with a given URI and local name.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> <a href="redland-uri.html#librdf-uri"><span class="type">librdf_uri</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>local_name</code></em>&#160;:</span></td>
+<td> local name to append to URI
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2619864"></a><h3>
+<a name="librdf-new-node-from-normalised-uri-string"></a>librdf_new_node_from_normalised_uri_string ()</h3>
+<a class="indexterm" name="id2619878"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_normalised_uri_string
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *uri_string,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *source_uri,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *base_uri);</pre>
+<p>
+Constructor - create a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object from a URI string normalised to a new base URI.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri_string</code></em>&#160;:</span></td>
+<td> string representing a URI
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>source_uri</code></em>&#160;:</span></td>
+<td> source URI
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>base_uri</code></em>&#160;:</span></td>
+<td> base URI
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620018"></a><h3>
+<a name="librdf-new-node-from-literal"></a>librdf_new_node_from_literal ()</h3>
+<a class="indexterm" name="id2620031"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_literal   (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *string,
+                                             const char *xml_language,
+                                             int is_wf_xml);</pre>
+<p>
+Constructor - create a new literal <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object.
+</p>
+<p>
+0.9.12: xml_space argument deleted
+</p>
+<p>
+An <em class="parameter"><code>xml_language</code></em> cannot be used when <em class="parameter"><code>is_wf_xml</code></em> is non-0. If both
+are given, NULL is returned.  If <em class="parameter"><code>xml_language</code></em> is the empty string,
+it is the equivalent to NULL.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>string</code></em>&#160;:</span></td>
+<td> literal string value
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>xml_language</code></em>&#160;:</span></td>
+<td> literal XML language (or NULL, empty string)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>is_wf_xml</code></em>&#160;:</span></td>
+<td> non 0 if literal is XML
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620197"></a><h3>
+<a name="librdf-new-node-from-typed-literal"></a>librdf_new_node_from_typed_literal ()</h3>
+<a class="indexterm" name="id2620211"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_typed_literal
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *value,
+                                             const char *xml_language,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *datatype_uri);</pre>
+<p>
+Constructor - create a new typed literal <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object.
+</p>
+<p>
+Only one of <em class="parameter"><code>xml_language</code></em> or <em class="parameter"><code>datatype_uri</code></em> may be given.  If both
+are given, NULL is returned.  If <em class="parameter"><code>xml_language</code></em> is the empty string,
+it is the equivalent to NULL.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>value</code></em>&#160;:</span></td>
+<td> literal string value
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>xml_language</code></em>&#160;:</span></td>
+<td> literal XML language (or NULL, empty string)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>datatype_uri</code></em>&#160;:</span></td>
+<td> URI of typed literal datatype or NULL
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620375"></a><h3>
+<a name="librdf-new-node-from-typed-counted-literal"></a>librdf_new_node_from_typed_counted_literal ()</h3>
+<a class="indexterm" name="id2620389"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_typed_counted_literal
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *value,
+                                             size_t value_len,
+                                             const char *xml_language,
+                                             size_t xml_language_len,
+                                             <a href="redland-uri.html#librdf-uri">librdf_uri</a> *datatype_uri);</pre>
+<p>
+Constructor - create a new typed literal <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object.
+</p>
+<p>
+Only one of <em class="parameter"><code>xml_language</code></em> or <em class="parameter"><code>datatype_uri</code></em> may be given.  If both
+are given, NULL is returned.  If <em class="parameter"><code>xml_language</code></em> is the empty string,
+it is the equivalent to NULL.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>value</code></em>&#160;:</span></td>
+<td> literal string value
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>value_len</code></em>&#160;:</span></td>
+<td> literal string value length
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>xml_language</code></em>&#160;:</span></td>
+<td> literal XML language (or NULL, empty string)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>xml_language_len</code></em>&#160;:</span></td>
+<td> literal XML language length (not used if <em class="parameter"><code>xml_language</code></em> is NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>datatype_uri</code></em>&#160;:</span></td>
+<td> URI of typed literal datatype or NULL
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620602"></a><h3>
+<a name="librdf-new-node-from-blank-identifier"></a>librdf_new_node_from_blank_identifier ()</h3>
+<a class="indexterm" name="id2620616"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_blank_identifier
+                                            (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             unsigned char *identifier);</pre>
+<p>
+Constructor - create a new blank node <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object from a blank node identifier.
+</p>
+<p>
+If no identifier string is given, creates a new internal identifier
+and assigns it.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>identifier</code></em>&#160;:</span></td>
+<td> blank node identifier or NULL
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620719"></a><h3>
+<a name="librdf-new-node-from-node"></a>librdf_new_node_from_node ()</h3>
+<a class="indexterm" name="id2620731"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_new_node_from_node      (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Copy constructor - create a new librdf_node object from an existing librdf_node object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object to copy
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620806"></a><h3>
+<a name="librdf-free-node"></a>librdf_free_node ()</h3>
+<a class="indexterm" name="id2620818"></a><pre class="programlisting">void        librdf_free_node                (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Destructor - destroy an <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620882"></a><h3>
+<a name="librdf-node-get-uri"></a>librdf_node_get_uri ()</h3>
+<a class="indexterm" name="id2620894"></a><pre class="programlisting"><a href="redland-uri.html#librdf-uri">librdf_uri</a>* librdf_node_get_uri             (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the URI for a node object.
+</p>
+<p>
+Returns a pointer to the URI object held by the node, it must be
+copied if it is wanted to be used by the caller.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> URI object or NULL if node has no URI.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2620961"></a><h3>
+<a name="librdf-node-get-type"></a>librdf_node_get_type ()</h3>
+<a class="indexterm" name="id2620972"></a><pre class="programlisting"><a href="redland-node.html#librdf-node-type">librdf_node_type</a> librdf_node_get_type       (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the type of the node.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the node type
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621032"></a><h3>
+<a name="librdf-node-get-literal-value"></a>librdf_node_get_literal_value ()</h3>
+<a class="indexterm" name="id2621045"></a><pre class="programlisting">unsigned char* librdf_node_get_literal_value
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the string literal value of the node.
+</p>
+<p>
+Returns a pointer to the literal value held by the node, it must be
+copied if it is wanted to be used by the caller.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the literal string or NULL if node is not a literal
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621115"></a><h3>
+<a name="librdf-node-get-literal-value-as-counted-string"></a>librdf_node_get_literal_value_as_counted_string ()</h3>
+<a class="indexterm" name="id2621129"></a><pre class="programlisting">unsigned char* librdf_node_get_literal_value_as_counted_string
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node,
+                                             size_t *len_p);</pre>
+<p>
+Get the string literal value of the node as a counted string.
+</p>
+<p>
+Returns a pointer to the literal value held by the node, it must be
+copied if it is wanted to be used by the caller.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len_p</code></em>&#160;:</span></td>
+<td> pointer to location to store length (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the literal string or NULL if node is not a literal
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621221"></a><h3>
+<a name="librdf-node-get-literal-value-as-latin1"></a>librdf_node_get_literal_value_as_latin1 ()</h3>
+<a class="indexterm" name="id2621234"></a><pre class="programlisting">char*       librdf_node_get_literal_value_as_latin1
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the string literal value of the node as ISO Latin-1.
+</p>
+<p>
+Returns a newly allocated string containing the conversion of the
+UTF-8 literal value held by the node.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the literal string or NULL if node is not a literal
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621303"></a><h3>
+<a name="librdf-node-get-literal-value-language"></a>librdf_node_get_literal_value_language ()</h3>
+<a class="indexterm" name="id2621317"></a><pre class="programlisting">char*       librdf_node_get_literal_value_language
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the XML language of the node.
+</p>
+<p>
+Returns a pointer to the literal language value held by the node, it must
+be copied if it is wanted to be used by the caller.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the XML language string or NULL if node is not a literal
+or there is no XML language defined.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2621386"></a><h3>
+<a name="librdf-node-get-literal-value-is-wf-xml"></a>librdf_node_get_literal_value_is_wf_xml ()</h3>
+<a class="indexterm" name="id2621400"></a><pre class="programlisting">int         librdf_node_get_literal_value_is_wf_xml
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the XML well-formness property of the node.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> 0 if the XML literal is NOT well formed XML content, or the node is not a literal
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2631797"></a><h3>
+<a name="librdf-node-get-literal-value-datatype-uri"></a>librdf_node_get_literal_value_datatype_uri ()</h3>
+<a class="indexterm" name="id2631811"></a><pre class="programlisting"><a href="redland-uri.html#librdf-uri">librdf_uri</a>* librdf_node_get_literal_value_datatype_uri
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the typed literal datatype URI of the literal node.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> shared URI of the datatyped literal or NULL if the node is not a literal, or has no datatype URI
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2631868"></a><h3>
+<a name="librdf-node-get-li-ordinal"></a>librdf_node_get_li_ordinal ()</h3>
+<a class="indexterm" name="id2631879"></a><pre class="programlisting">int         librdf_node_get_li_ordinal      (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the node li object ordinal value.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the li ordinal value or &lt; 1 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2631935"></a><h3>
+<a name="librdf-node-get-blank-identifier"></a>librdf_node_get_blank_identifier ()</h3>
+<a class="indexterm" name="id2631948"></a><pre class="programlisting">unsigned char* librdf_node_get_blank_identifier
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Get the blank node identifier.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the identifier value
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632011"></a><h3>
+<a name="librdf-node-is-resource"></a>librdf_node_is_resource ()</h3>
+<a class="indexterm" name="id2632022"></a><pre class="programlisting">int         librdf_node_is_resource         (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Check node is a resource.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-zero if the node is a resource (URI)
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632082"></a><h3>
+<a name="librdf-node-is-literal"></a>librdf_node_is_literal ()</h3>
+<a class="indexterm" name="id2632094"></a><pre class="programlisting">int         librdf_node_is_literal          (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Check node is a literal.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-zero if the node is a literal
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632154"></a><h3>
+<a name="librdf-node-is-blank"></a>librdf_node_is_blank ()</h3>
+<a class="indexterm" name="id2632165"></a><pre class="programlisting">int         librdf_node_is_blank            (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Check node is a blank nodeID.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non-zero if the node is a blank nodeID
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632226"></a><h3>
+<a name="librdf-node-encode"></a>librdf_node_encode ()</h3>
+<a class="indexterm" name="id2632238"></a><pre class="programlisting">size_t      librdf_node_encode              (<a href="redland-node.html#librdf-node">librdf_node</a> *node,
+                                             unsigned char *buffer,
+                                             size_t length);</pre>
+<p>
+Serialise a node into a buffer.
+</p>
+<p>
+Encodes the given node in the buffer, which must be of sufficient
+size.  If buffer is NULL, no work is done but the size of buffer
+required is returned.
+</p>
+<p>
+If the node cannot be encoded due to restrictions of the encoding
+format, a redland error is generated</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node to serialise
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>buffer</code></em>&#160;:</span></td>
+<td> the buffer to use
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>length</code></em>&#160;:</span></td>
+<td> buffer size
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the number of bytes written or 0 on failure.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632353"></a><h3>
+<a name="librdf-node-decode"></a>librdf_node_decode ()</h3>
+<a class="indexterm" name="id2632365"></a><pre class="programlisting"><a href="redland-node.html#librdf-node">librdf_node</a>* librdf_node_decode             (<a href="redland-world.html#librdf-world">librdf_world</a> *world,
+                                             size_t *size_p,
+                                             unsigned char *buffer,
+                                             size_t length);</pre>
+<p>
+Deserialise a node from a buffer.
+</p>
+<p>
+Decodes the serialised node (as created by <a href="redland-node.html#librdf-node-encode"><code class="function">librdf_node_encode()</code></a> )
+from the given buffer.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> librdf_world
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>size_p</code></em>&#160;:</span></td>
+<td> pointer to bytes used or NULL
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>buffer</code></em>&#160;:</span></td>
+<td> the buffer to use
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>length</code></em>&#160;:</span></td>
+<td> buffer size
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> new node or NULL on failure (bad encoding, allocation failure)
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632472"></a><h3>
+<a name="librdf-node-to-string"></a>librdf_node_to_string ()</h3>
+<a class="indexterm" name="id2632482"></a><pre class="programlisting">unsigned char* librdf_node_to_string        (<a href="redland-node.html#librdf-node">librdf_node</a> *node);</pre>
+<p>
+Format the node as a string.
+</p>
+<p>
+Note a new string is allocated which must be freed by the caller.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a string value representing the node or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632543"></a><h3>
+<a name="librdf-node-to-counted-string"></a>librdf_node_to_counted_string ()</h3>
+<a class="indexterm" name="id2632555"></a><pre class="programlisting">unsigned char* librdf_node_to_counted_string
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> *node,
+                                             size_t *len_p);</pre>
+<p>
+Format the node as a counted string.
+</p>
+<p>
+Note a new string is allocated which must be freed by the caller.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len_p</code></em>&#160;:</span></td>
+<td> pointer to location to store length
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a string value representing the node or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632637"></a><h3>
+<a name="librdf-node-print"></a>librdf_node_print ()</h3>
+<a class="indexterm" name="id2632647"></a><pre class="programlisting">void        librdf_node_print               (<a href="redland-node.html#librdf-node">librdf_node</a> *node,
+                                             FILE *fh);</pre>
+<p>
+Pretty print the node to a file descriptor.
+</p>
+<p>
+This method is for debugging and the format of the output should
+not be relied on.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>node</code></em>&#160;:</span></td>
+<td> the node
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fh</code></em>&#160;:</span></td>
+<td> file handle
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632715"></a><h3>
+<a name="librdf-node-equals"></a>librdf_node_equals ()</h3>
+<a class="indexterm" name="id2632726"></a><pre class="programlisting">int         librdf_node_equals              (<a href="redland-node.html#librdf-node">librdf_node</a> *first_node,
+                                             <a href="redland-node.html#librdf-node">librdf_node</a> *second_node);</pre>
+<p>
+Compare two librdf_node objects for equality.
+</p>
+<p>
+Note - for literal nodes, XML language, XML space and well-formness are 
+presently ignored in the comparison.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>first_node</code></em>&#160;:</span></td>
+<td> first <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> node
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>second_node</code></em>&#160;:</span></td>
+<td> second <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> node
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 if nodes are equal.  0 if not-equal or failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2632818"></a><h3>
+<a name="librdf-node-static-iterator-create"></a>librdf_node_static_iterator_create ()</h3>
+<a class="indexterm" name="id2632831"></a><pre class="programlisting"><a href="redland-iterator.html#librdf-iterator">librdf_iterator</a>* librdf_node_static_iterator_create
+                                            (<a href="redland-node.html#librdf-node">librdf_node</a> **nodes,
+                                             int size);</pre>
+<p>
+Create an iterator over an array of nodes.
+</p>
+<p>
+This creates an iterator for an existing static array of librdf_node
+objects.  It is mostly intended for testing iterator code.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>nodes</code></em>&#160;:</span></td>
+<td> static array of <a href="redland-node.html#librdf-node"><span class="type">librdf_node</span></a> objects
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>size</code></em>&#160;:</span></td>
+<td> size of array
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a <a href="redland-iterator.html#librdf-iterator"><span class="type">librdf_iterator</span></a> serialization of the nodes or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

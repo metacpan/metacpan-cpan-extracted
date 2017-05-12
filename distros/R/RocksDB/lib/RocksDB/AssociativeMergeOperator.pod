@@ -1,0 +1,55 @@
+=head1 NAME
+
+RocksDB::AssociativeMergeOperator - rocksdb::AssociativeMergeOperator object
+
+=head1 SYNOPSIS
+
+  use RocksDB;
+
+  my $handler = MyAssociativeMergeOperator->new;
+  my $db = RocksDB->new('/path/to/db', {
+      merge_operator => RocksDB::AssociativeMergeOperator->new($handler),
+  });
+
+=head1 DESCRIPTION
+
+B<RocksDB::AssociativeMergeOperator> is a utility class to make a rocksdb::AssociativeMergeOperator object.
+
+=head1 CONSTRUCTOR
+
+=head2 C<< RocksDB::AssociativeMergeOperator->new($handler :Object) :RocksDB::AssociativeMergeOperator >>
+
+Create and return a new RocksDB::AssociativeMergeOperator object.
+
+The $handler must respond to 'merge'.
+
+See 'HANDLER METHODS' section for more details.
+
+=head1 HANDLER METHODS
+
+=head2 C<< $handler->merge($key :Str, $existing_value :Maybe[Str], $value :Str) :Str >>
+
+Gives the client a way to express the read -> modify -> write semantics
+
+$key: The key that's associated with this merge operation.
+
+$existing_value: undef indicates the key does not exist before this op
+
+$value: the value to update/merge the existing_value with
+
+Client is responsible for returning the merge result here.
+
+All values passed in will be client-specific values. So if this method
+raises an error, it is because client specified bad data or there was
+internal corruption. The client should assume that this will be treated
+as an error by the library.
+
+=head1 SEE ALSO
+
+L<RocksDB>, L<RocksDB::MergeOperator>
+
+=head1 AUTHOR
+
+Jiro Nishiguchi E<lt>jiro@cpan.orgE<gt>
+
+=cut

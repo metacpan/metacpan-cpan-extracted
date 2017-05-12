@@ -1,0 +1,93 @@
+---
+abstract: 'Simple, git based blog tool'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  File::pushd: '0'
+  Scope::Guard: '0'
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+  Test::Output: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Riji
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Riji:
+    file: lib/Riji.pm
+    version: v0.9.8
+  Riji::CLI:
+    file: lib/Riji/CLI.pm
+  Riji::CLI::Help:
+    file: lib/Riji/CLI/Help.pm
+  Riji::CLI::NewEntry:
+    file: lib/Riji/CLI/NewEntry.pm
+  Riji::CLI::Publish:
+    file: lib/Riji/CLI/Publish.pm
+  Riji::CLI::Setup:
+    file: lib/Riji/CLI/Setup.pm
+  Riji::Model::Article:
+    file: lib/Riji/Model/Article.pm
+  Riji::Model::Atom:
+    file: lib/Riji/Model/Atom.pm
+  Riji::Model::Blog:
+    file: lib/Riji/Model/Blog.pm
+  Riji::Model::Entry:
+    file: lib/Riji/Model/Entry.pm
+  Riji::Model::Tag:
+    file: lib/Riji/Model/Tag.pm
+  Riji::Models:
+    file: lib/Riji/Models.pm
+requires:
+  App::Wallflower: '1.005'
+  File::Copy::Recursive: '0'
+  Git::Repository: '0'
+  Git::Repository::FileHistory: '0.03'
+  HTTP::Date: '0'
+  IPC::Cmd: '0'
+  List::UtilsBy: '0'
+  MIME::Base32: '1.301'
+  Module::Functions: '0'
+  Mouse: '0'
+  Object::Container: '0'
+  Path::Tiny: '0.061'
+  Plack: '0'
+  Puncheur: v0.3.0
+  Router::Boom: '1.00'
+  String::CamelCase: '0'
+  Text::Markdown::Discount: '0.10'
+  Text::Markup::Any: '0'
+  Text::Xslate: '0'
+  Time::Piece: '0'
+  URI: '0'
+  URI::tag: '0'
+  XML::FeedPP: '0'
+  YAML::Tiny: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/Songmu/p5-Riji/issues
+  homepage: https://github.com/Songmu/p5-Riji
+  repository: git://github.com/Songmu/p5-Riji.git
+version: v0.9.8
+x_contributors:
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+  - 'karupanerura <karupa@cpan.org>'
+  - 'monmon <lesamoureuses@gmail.com>'
+  - 'trapple <trapplejp@gmail.com>'
+  - 'hitode909 <hitode909@gmail.com>'

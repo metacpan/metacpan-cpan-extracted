@@ -1,0 +1,41 @@
+NAME
+    RDF::RDFa::Linter - find common mistakes in RDFa files
+
+SYNOPSIS
+     my $parser = RDF::RDFa::Parser->new_from_url($input_url);
+     my $linter = RDF::RDFa::Linter->new('Facebook', $input_url, $parser);
+     my $model  = $linter->filtered_graph;
+     my @errors = $linter->find_errors;
+
+DESCRIPTION
+    In the above example, $model is an RDF::Trine::Model containing just the
+    statements from $input_url that the service (in this case, Facebook's
+    Open Graph) understands.
+
+    @errors is a list of RDF::RDFa::Linter::Error objects.
+    RDF::RDFa::Linter::Error is a subclass of
+    RDF::RDFa::Generator::HTML::Pretty::Note, which comes in handy if you
+    want to generate a report of the errors and filtered graph together.
+
+    TODO: proper documentation!!
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    XML::LibXML, RDF::RDFa::Parser, RDF::RDFa::Generator.
+
+    <http://www.perlrdf.org/>.
+
+    <http://check.rdfa.info/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2010 by Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8 or, at your
+    option, any later version of Perl 5 you may have available.
+

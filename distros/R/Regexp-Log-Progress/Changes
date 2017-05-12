@@ -1,0 +1,11 @@
+Revision history for Regexp-Log-Progress
+
+0.01    26-Feb-2014 K.Esteb
+        First version, released on an unsuspecting world.
+
+0.02    02-May-2014 K.Esteb
+        Updated documentation, released to CPAN.
+
+0.03    16-Mar-2015 K.Esteb
+        Fixed a regex problem, released to CPAN.
+

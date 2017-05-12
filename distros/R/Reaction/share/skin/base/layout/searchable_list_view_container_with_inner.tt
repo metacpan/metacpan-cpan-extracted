@@ -1,0 +1,14 @@
+=extends searchable_list_view_container
+
+=widget SearchableListViewContainer
+
+=for layout widget
+
+<!-- FOO -->
+
+[% call_next %]
+
+[% inner %]
+
+=cut
+

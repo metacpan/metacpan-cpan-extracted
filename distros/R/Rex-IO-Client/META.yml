@@ -1,0 +1,39 @@
+---
+abstract: 'Client Library for Rex::IO::Server'
+author:
+  - 'Jan Gehring <jfried@rexify.org>'
+build_requires:
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Rex-IO-Client
+provides:
+  Rex::IO::Client:
+    file: lib/Rex/IO/Client.pm
+    version: '0.6'
+  Rex::IO::Client::Protocol::V1:
+    file: lib/Rex/IO/Client/Protocol/V1.pm
+    version: '0.6'
+requires:
+  Data::Dumper: '0'
+  JSON::XS: '0'
+  Mojo::JSON: '0'
+  Mojo::UserAgent: '0'
+  attributes: '0'
+  perl: '5.010000'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://irc.freenode.net/rex
+  Twitter: https://twitter.com/RexOps
+  bugtracker: https://github.com/RexIO/rex-io-client/issues
+  homepage: http://www.rexify.org
+  repository: https://github.com/RexIO/rex-io-client.git
+version: '0.6'

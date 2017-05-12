@@ -1,0 +1,7 @@
+<%ARGS>
+$queue_id
+$page_menu
+</%ARGS>
+<%INIT>
+$page_menu->child( 'automaticassignment' => title => loc('Automatic Assignment'), path => "/Admin/Queues/AutomaticAssignment.html?id=" . $queue_id );
+</%INIT>

@@ -1,0 +1,24 @@
+ReadDir version 0.02
+====================
+
+ReadDir gives you a `readdir_inode' function, which is much like
+readdir, except that it doesn't require an opendir, and returns the
+inode numbers of the directory entries too.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 Sam Vilain.  All Rights Reserved.  This module is
+free software. It may be used, redistributed and/or modified under the
+terms of the Perl Artistic License
+
+Copyright (C) 2001 Sam Vilain, sam@vilain.net
+

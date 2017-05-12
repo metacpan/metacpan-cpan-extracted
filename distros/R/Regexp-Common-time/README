@@ -1,0 +1,72 @@
+Regexp::Common::time v0.04
+==========================
+
+This is a Regexp::Common plugin that provides regular expressions for
+parsing dates and times.  It can handle most date formats, such as:
+
+      y/m/d               m/d/y               d/m/y
+    2005/04/02          4/2/2005            2/4/05
+    05.04.02            04.02.05            02.04.2005
+    2005 April 2        April 2, 2005       2 APR 05
+    05APRIL02           APR022005           02 April 2005
+    20050402            040205              02042005
+
+      ISO 8601            RFC 2822
+  2008-05-24T21:46:01   25 May 2008 21:46:01 +0500
+
+
+It can also handle time formats like:
+
+    9:03:27pm
+    21:03:27
+    9:03 p.m.
+    21:03
+    9:03a
+
+Furthermore, you can easily piece together time and date component
+patterns (in the style of Time::Format or POSIX's strftime) to build
+arbitrarily complex custom regexes that can parse just about any time
+or date pattern imaginable.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you do not have Module::Build, you can use the older steps:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On Windows, you will need to use nmake instead of make.
+
+
+DEPENDENCIES
+
+This module requires this other modules and libraries:
+
+  Regexp::Common
+  POSIX
+  I18N::Langinfo (optional, but needed for internationalization)
+
+Also, Time::Normalize is likely to be useful to you.
+
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode, roode @ cpan . org
+
+Copyright (c) 2005-2008 by Eric J. Roode. All Rights Reserved.
+This module is free software; See the copyright notice in the
+module source code for full details.
+
+To avoid my spam filter, please include "Perl", "module", or this
+module's name in the message's subject line, and/or GPG-sign your
+message.

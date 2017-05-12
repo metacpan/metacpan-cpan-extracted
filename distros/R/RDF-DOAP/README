@@ -1,0 +1,111 @@
+NAME
+    RDF::DOAP - an object-oriented interface for DOAP (Description of a
+    Project) data
+
+SYNOPSIS
+       use feature 'say';
+       use RDF::DOAP;
+   
+       my $url  = 'http://api.metacpan.org/source/DOY/Moose-2.0604/doap.rdf';
+       my $doap = 'RDF::DOAP'->from_url($url);
+       my $proj = $doap->project;
+   
+       say $proj->name;       # "Moose"
+   
+       say $_->name
+          for @{ $proj->maintainer };
+
+DESCRIPTION
+    A little sparsely documented right now.
+
+    The RDF::DOAP class itself is mostly a wrapper for parsing RDF and
+    building objects. Most of the interesting stuff is in the "Bundled
+    Classes".
+
+  Constructors
+    `new(%attrs)`
+        You don't want to use this.
+
+    `from_url($url)`
+        Parse the RDF at the given URL and construct an RDF::DOAP object.
+
+    `from_file($fh, $base)`
+        Parse a file handle or file name. A base URL may be provided for
+        resolving relative URI references; if omitted the base is assumed to
+        be `http://localhost/` which is almost certainly wrong.
+
+    `from_model($model)`
+        Read DOAP from an existing RDF::Trine::Model.
+
+  Attributes
+    `projects`
+        An arrayref; the list of software projects found in the input data.
+        This cannot be provided in the constructor.
+
+  Methods
+    `project`
+        If `projects` contains only one project, returns it.
+
+        Otherwise, tries to guess which of the projects the input data was
+        mostly trying to describe.
+
+  Bundled Classes
+    Within each of these classes, the attributes correspond roughly to the
+    properties defined for them in the DOAP schema; however hyphens in
+    property URIs become underscores in attribute names.
+
+    RDF::DOAP::Resource
+        Correponds roughly to the *rdfs:Resource* class, excluding literals.
+
+    RDF::DOAP::Project
+        Correponds to *doap:Project*.
+
+    RDF::DOAP::Repository
+        Correponds to *doap:Repository*.
+
+    RDF::DOAP::Person
+        Correponds to *foaf:Person*.
+
+    RDF::DOAP::Version
+        Correponds to *doap:Version*.
+
+    RDF::DOAP::ChangeSet
+        Correponds to *dcs:ChangeSet*.
+
+    RDF::DOAP::Change
+        Correponds to *dcs:Change*.
+
+    RDF::DOAP::Issue
+        Correponds to *dbug:Issue*.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-DOAP>.
+
+SEE ALSO
+    *   Edd Dumbill's series of articles on DOAP's design: part 1
+        <http://www.ibm.com/developerworks/xml/library/x-osproj/>, part 2
+        <http://www.ibm.com/developerworks/xml/library/x-osproj2/>, part 3
+        <http://www.ibm.com/developerworks/xml/library/x-osproj4/> and part 4
+        <http://www.ibm.com/developerworks/xml/library/x-osproj3/>
+
+    *   The DOAP Schema <http://usefulinc.com/ns/doap#>.
+
+    *   The DOAP Change Sets Schema <http://ontologi.es/doap-changeset#>.
+
+    *   The DOAP Bugs Schema <http://ontologi.es/doap-bugs#>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

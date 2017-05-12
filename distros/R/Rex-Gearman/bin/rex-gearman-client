@@ -1,0 +1,34 @@
+#!perl -w
+
+#
+# (c) Jan Gehring <jan.gehring@gmail.com>
+# 
+# vim: set ts=3 sw=3 tw=0:
+# vim: set expandtab:
+   
+use strict;
+use warnings;
+
+use Rex::Config;
+use Rex -base;
+
+Rex::Config->set_distributor("Gearman");
+
+if(! -f "client.conf") {
+   say "You have to create a file called client.conf to define the gearmand servers.";
+   say "Example:";
+   say "{";
+   say "   job_servers => [";
+   say "                     '127.0.0.1:4730',";
+   say "                     '192.168.7.2:4730',";
+   say "                  ],";
+   say "};";
+
+   CORE::exit 1;
+}
+
+require Rex::CLI;
+my $rex = Rex::CLI->new;
+$rex->__run__;
+
+

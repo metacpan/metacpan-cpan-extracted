@@ -1,0 +1,694 @@
+<HTML>
+<HEAD>
+<TITLE>Relations::Display - DBI/DBD::mysql Query Graphing Module</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#abstract">ABSTRACT</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#what it does">WHAT IT DOES</A></LI>
+		<LI><A HREF="#calling relations::display routines">CALLING RELATIONS::DISPLAY ROUTINES</A></LI>
+		<LI><A HREF="#query arguments">QUERY ARGUMENTS</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::display functions">LIST OF RELATIONS::DISPLAY FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#add">add</A></LI>
+		<LI><A HREF="#set">set</A></LI>
+		<LI><A HREF="#clone">clone</A></LI>
+		<LI><A HREF="#get_matrix">get_matrix</A></LI>
+		<LI><A HREF="#get_table">get_table</A></LI>
+		<LI><A HREF="#get_graph">get_graph</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::display properties">LIST OF RELATIONS::DISPLAY PROPERTIES</A></LI>
+	<LI><A HREF="#list of relations::display::table functions">LIST OF RELATIONS::DISPLAY::TABLE FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+	</UL>
+
+	<LI><A HREF="#list of relations::display::table properties">LIST OF RELATIONS::DISPLAY::TABLE PROPERTIES</A></LI>
+	<LI><A HREF="#change log">CHANGE LOG</A></LI>
+	<UL>
+
+		<LI><A HREF="#relationsdisplay0.92">Relations-Display-0.92</A></LI>
+		<LI><A HREF="#relationsdisplay0.91">Relations-Display-0.91</A></LI>
+	</UL>
+
+	<LI><A HREF="#to do">TO DO</A></LI>
+	<LI><A HREF="#other related work">OTHER RELATED WORK</A></LI>
+	<UL>
+
+		<LI><A HREF="#relations (perl)">Relations (Perl)</A></LI>
+		<LI><A HREF="#relationsquery (perl)">Relations-Query (Perl)</A></LI>
+		<LI><A HREF="#relationsabstract (perl)">Relations-Abstract (Perl)</A></LI>
+		<LI><A HREF="#relationsadmin (php)">Relations-Admin (PHP)</A></LI>
+		<LI><A HREF="#relationsfamily (perl)">Relations-Family (Perl)</A></LI>
+		<LI><A HREF="#relationsdisplay (perl)">Relations-Display (Perl)</A></LI>
+		<LI><A HREF="#relationsreport (perl)">Relations-Report (Perl)</A></LI>
+		<LI><A HREF="#relationsstructure (xml)">Relations-Structure (XML)</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Relations::Display - DBI/DBD::mysql Query Graphing Module</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  # DBI, Relations::Display Script that creates a 
+  # matrix, table, and graph from a query.</PRE>
+<PRE>
+  use DBI;
+  use Relations;
+  use Relations::Query;
+  use Relations::Abstract;
+  use Relations::Display;</PRE>
+<PRE>
+  $dsn = &quot;DBI:mysql:watcher&quot;;</PRE>
+<PRE>
+  $username = &quot;root&quot;;
+  $password = '';</PRE>
+<PRE>
+  $dbh = DBI-&gt;connect($dsn,$username,$password,{PrintError =&gt; 1, RaiseError =&gt; 0});</PRE>
+<PRE>
+  $abstract = new Relations::Abstract($dbh);</PRE>
+<PRE>
+  $display = new Relations::Display(-abstract   =&gt; $abstract,
+                                    -query      =&gt; {-select   =&gt; {total  =&gt; &quot;count(*)&quot;,
+                                                                  first  =&gt; &quot;'Bird'&quot;,
+                                                                  second =&gt; &quot;'Count'&quot;,
+                                                                  third  =&gt; &quot;if(gender='Male','Boy','Girl')&quot;,
+                                                                  tao    =&gt; &quot;if(gender='Male','Yang','Yin')&quot;,
+                                                                  sex    =&gt; &quot;gender&quot;,
+                                                                  kind   =&gt; &quot;sp_name&quot;,
+                                                                  id     =&gt; &quot;species.sp_id&quot;,
+                                                                  fourth =&gt; &quot;(species.sp_id+50)&quot;,
+                                                                  vert   =&gt; &quot;2&quot;,
+                                                                  horiz  =&gt; &quot;1.5&quot;},
+                                                    -from     =&gt; ['bird','species'],
+                                                    -where    =&gt; ['species.sp_id=bird.sp_id',
+                                                                  'species.sp_id &lt; 4'],
+                                                    -group_by =&gt; ['sp_name','gender','first','second'],
+                                                    -order_by =&gt; ['gender','sp_name']},
+                                    -x_axis     =&gt; 'first,kind,id,fourth',
+                                    -legend     =&gt; 'second,third,tao,sex,vert,horiz',
+                                    -y_axis     =&gt; 'total',
+                                    -hide       =&gt; 'fourth,third,vert,horiz',
+                                    -vertical   =&gt; 'vert',
+                                    -horizontal =&gt; 'horiz');</PRE>
+<PRE>
+  $matrix = $display-&gt;get_matrix();</PRE>
+<PRE>
+  $table = $display-&gt;get_table();</PRE>
+<PRE>
+  $display-&gt;set(-chart  =&gt; 'bars',
+                -width  =&gt; 400,
+                -height =&gt; 400,
+                -settings =&gt; {y_min_value =&gt; 0,
+                              y_max_value =&gt; 3,
+                              y_tick_number =&gt; 3,
+                              transparent =&gt; 0}
+                );</PRE>
+<PRE>
+  $gph = $display-&gt;get_graph();</PRE>
+<PRE>
+  $gd = $gph-&gt;gd();</PRE>
+<PRE>
+  open(IMG, '&gt;test.png') or die $!;
+  binmode IMG;
+  print IMG $gd-&gt;png;</PRE>
+<PRE>
+  $dbh-&gt;disconnect();</PRE>
+<P>
+<HR>
+<H1><A NAME="abstract">ABSTRACT</A></H1>
+<P>This perl library uses perl5 objects to simplify creating graphs
+from MySQL queries.</P>
+<P>The current version of Relations::Display is available at</P>
+<PRE>
+  <A HREF="http://relations.sourceforge.net">http://relations.sourceforge.net</A></PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="what it does">WHAT IT DOES</A></H2>
+<P>The Relations::Display object takes in your query, along with information 
+pertaining to which field values from the query results are to be used in 
+creating the graph title, x axis label and titles, legend label (not used 
+on the graph) and titles, and y axis data.</P>
+<P>It does this by looping through the query while taking into account which 
+fields you want to use for the x axis and legend. While looping, it 
+figures out which of these fields have all the same value throughout the 
+query and which have different values. The fields with the same value 
+throughout the query results have their value placed in the title of the 
+graph, while the fields with different values throughout have their 
+value placed in either the x axis or legend, which is set by the user.</P>
+<P>Relations::Display can return either the raw query results in the form of 
+a Relations <CODE>select_matrix()</CODE> return value, a Relations::Display::Table 
+object, or a GD::Graph object. It obtains this data in stages. 
+Relations::Display gets its matrix data from the query object, the 
+Relations::Display::Table data from the matrix data, and the GD::Graph 
+data from the Relations::Display::Table data.</P>
+<P>
+<H2><A NAME="calling relations::display routines">CALLING RELATIONS::DISPLAY ROUTINES</A></H2>
+<P>All standard Relations::Display routines use both an ordered, named and
+hashed argument calling style. This is because some routines have as many 
+as fifteen arguments, and the code is easier to understand given a named 
+argument style, but since some people, however, prefer the ordered 
+argument style because its smaller, I'm glad to do that too.</P>
+<P>If you use the ordered argument calling style, such as</P>
+<PRE>
+  $display-&gt;add('Book,ISBN','Publisher,Category,Discount',{interlaced =&gt; 0},'ISBN');</PRE>
+<P>the order matters, and you should consult the function defintions 
+later in this document to determine the order to use.</P>
+<P>If you use the named argument calling style, such as</P>
+<PRE>
+  $display-&gt;add(-x_axis   =&gt; 'Book,ISBN',
+                -legend   =&gt; 'Publisher,Category,Discount',
+                -settings =&gt; {interlaced =&gt; 0},
+                -hide     =&gt; 'ISBN');</PRE>
+<P>the order does not matter, but the names, and minus signs preceeding them, do.
+You should consult the function defintions later in this document to determine 
+the names to use.</P>
+<P>In the named arugment style, each argument name is preceded by a dash.  
+Neither case nor order matters in the argument list.  -name, -Name, and 
+-NAME are all acceptable.  In fact, only the first argument needs to begin with 
+a dash.  If a dash is present in the first argument, Relations::Display assumes
+dashes for the subsequent ones.</P>
+<P>If you use the hashed argument calling style, such as</P>
+<PRE>
+  $display-&gt;add({x_axis   =&gt; 'Book,ISBN',
+                 legend   =&gt; 'Publisher,Category,Discount',
+                 settings =&gt; {interlaced =&gt; 0},
+                 hide     =&gt; 'ISBN'});</PRE>
+<P>or</P>
+<PRE>
+  $display-&gt;add({-x_axis   =&gt; 'Book,ISBN',
+                 -legend   =&gt; 'Publisher,Category,Discount',
+                 -settings =&gt; {interlaced =&gt; 0},
+                 -hide     =&gt; 'ISBN'});</PRE>
+<P>the order does not matter, but the names, and curly braces do, (minus signs are
+optional). You should consult the function defintions later in this document to 
+determine the names to use.</P>
+<P>In the hashed arugment style, no dashes are needed, but they won't cause problems
+if you put them in. Neither case nor order matters in the argument list. 
+settings, Settings, SETTINGS are all acceptable. If a hash is the first 
+argument, Relations::Display assumes that is the only argument that matters, and 
+ignores any other arguments after the {}'s.</P>
+<P>
+<H2><A NAME="query arguments">QUERY ARGUMENTS</A></H2>
+<P>Some of the Relations functions recognize an argument named query. This
+argument can either be a hash or a Relations::Query object.</P>
+<P>The following calls are all equivalent for $object-&gt;function($query).</P>
+<PRE>
+  $object-&gt;function({select =&gt; 'nothing',
+                     from   =&gt; 'void'});</PRE>
+<PRE>
+  $object-&gt;function(Relations::Query-&gt;new(-select =&gt; 'nothing',
+                                          -from   =&gt; 'void'));</PRE>
+<P>
+<HR>
+<H1><A NAME="list of relations::display functions">LIST OF RELATIONS::DISPLAY FUNCTIONS</A></H1>
+<P>An example of each function is provided in 'test.pl'.</P>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+  $display = new Relations::Display($abstract,
+                                    $query,
+                                    $chart,
+                                    $width,
+                                    $height,
+                                    $prefix,
+                                    $x_axis,
+                                    $y_axis,
+                                    $legend,
+                                    $aggregate,
+                                    $settings,
+                                    $hide,
+                                    $vertical,
+                                    $horizontal,
+                                    $matrix,
+                                    $table);</PRE>
+<PRE>
+  $display = new Relations::Display(-abstract   =&gt; $abstract,
+                                    -query      =&gt; $query,
+                                    -chart      =&gt; $chart,
+                                    -width      =&gt; $width,
+                                    -height     =&gt; $height,
+                                    -prefix     =&gt; $prefix,
+                                    -x_axis     =&gt; $x_axis,
+                                    -y_axis     =&gt; $y_axis,
+                                    -legend     =&gt; $legend,
+                                    -aggregate  =&gt; $aggregate,
+                                    -settings   =&gt; $settings,
+                                    -hide       =&gt; $hide,
+                                    -vertical   =&gt; $vertical,
+                                    -horizontal =&gt; $horizontal,
+                                    -matrix     =&gt; $matrix,
+                                    -table      =&gt; $table);</PRE>
+<P>Creates creates a new Relations::Display object.</P>
+<P><STRONG>$abstract</STRONG> - 
+The Relations::Abstract object to use. This must be sent because 
+Relations::Display uses the $abstract object to report errors. 
+If this is not sent, the program will die.</P>
+<P><STRONG>$query</STRONG> - 
+The Relations::Query object to run to get the display data. This 
+is unneccesary if you supply a $matrix or $table value.</P>
+<P><STRONG>$chart</STRONG>, <STRONG>$width</STRONG> and <STRONG>$height</STRONG> - 
+The GD::Graph chart type to use, and the width and height
+of the GD::Graph. All three of these must be set. There are no
+defaults.</P>
+<P><STRONG>$prefix</STRONG> - 
+The prefix to put before the auto generated label.</P>
+<P><STRONG>$x_axis</STRONG> and <STRONG>$legend</STRONG> - 
+The fields to use for the x axis and legend values. Can be 
+either a comma delimmitted string, or an array. The names
+sent must exactly match the field names in the query.</P>
+<P><STRONG>$y_axis</STRONG> and <STRONG>$aggregate</STRONG>- 
+The field to use for the y axis values of the graph and how those
+values are to be stored. If you using a GD:Graph module that 
+requires aggregate data, like boxplot, then set $aggregate to 1.
+Else, forget about it.</P>
+<P><STRONG>$settings</STRONG> - 
+GD::Graph settings to set on the graph object. Must be a
+hash of settings to set keyed by the setting name. Use this 
+to set the title, x_label, y_label, and legend_label (table 
+only) of the Relations::Display::Table and GD::Graph.</P>
+<P><STRONG>$hide</STRONG> - 
+The fields to use for the x axis and legend values but to 
+hide on the actual display. Can be either a comma delimmitted 
+string, an array, or a hash with true values keyed by the 
+field names. The names sent must exactly match the field names 
+in the query.</P>
+<P><STRONG>$vertical</STRONG> and <STRONG>$horizontal</STRONG> - 
+The fields to use for drawing vertical and horizontal lines on 
+the graph. These fields must also be in the legend settings, 
+since the color of the lines drawn on the graph will be the color 
+of the legend thay are connected to. If the x axis min and max 
+is not set, the vertical lines values indicate on which x axis 
+titles to drawn lines on (fractions work I think), ie 0=first x 
+axis title, 1-scound, etc. If the x axis min and max is set, the 
+vertical lines values indicate the numeric graph value on which 
+to drawn lines.</P>
+<P><STRONG>$matrix</STRONG> - 
+Matrix value to use to create the Relations::Display::Table object value
+and or GD::Graph value. Uneccessary if is you supply a table 
+argument.</P>
+<P><STRONG>$table</STRONG> - 
+Relations::Display::Table value to use to create the GD::Graph object.</P>
+<P>
+<H2><A NAME="add">add</A></H2>
+<PRE>
+  $display-&gt;add($x_axis,
+                $legend,
+                $settings,
+                $hide,
+                $vertical,
+                $horizontal);</PRE>
+<PRE>
+  $display-&gt;add(-x_axis     =&gt; $x_axis,
+                -legend     =&gt; $legend,
+                -settings   =&gt; $settings,
+                -hide       =&gt; $hide,
+                -vertical   =&gt; $vertical,
+                -horizontal =&gt; $horizontal);</PRE>
+<P>Adds additional settings to a Relations::Display object. It does not 
+override of the values already set.</P>
+<P><STRONG>$x_axis</STRONG> and <STRONG>$legend</STRONG> - 
+The fields to use for the x axis and legend values. Can be 
+either a comma delimmitted string, or an array. The names
+sent must exactly match the field names in the query.</P>
+<P><STRONG>$settings</STRONG> - 
+GD::Graph settings to set on the graph object. Must be a
+hash of settings to set keyed by the setting name. Use this 
+to set the title, x_label, y_label, and legend_label (table 
+only) of the Relations::Display::Table and GD::Graph.</P>
+<P><STRONG>$hide</STRONG> - 
+The fields to use for the x axis and legend values but to 
+hide on the actual display. Can be either a comma delimmitted 
+string, an array, or a hash with true values keyed by the 
+field names. The names sent must exactly match the field names 
+in the query.</P>
+<P><STRONG>$vertical</STRONG> and <STRONG>$horizontal</STRONG> - 
+The fields to use for drawing vertical and horizontal lines on 
+the graph. These fields must also be in the legend settings, 
+since the color of the lines drawn on the graph will be the color 
+of the legend thay are connected to. If the x axis min and max 
+is not set, the vertical lines values indicate on which x axis 
+titles to drawn lines on (fractions work I think), ie 0=first x 
+axis title, 1-scound, etc. If the x axis min and max is set, the 
+vertical lines values indicate the numeric graph value on which 
+to drawn lines.</P>
+<P>
+<H2><A NAME="set">set</A></H2>
+<PRE>
+  $display-&gt;set($abstract,
+                $query,
+                $chart,
+                $width,
+                $height,
+                $prefix,
+                $x_axis,
+                $y_axis,
+                $legend,
+                $aggregate,
+                $settings,
+                $hide,
+                $vertical,
+                $horizontal,
+                $matrix,
+                $table);</PRE>
+<PRE>
+  $display-&gt;set(-abstract   =&gt; $abstract,
+                -query      =&gt; $query,
+                -chart      =&gt; $chart,
+                -width      =&gt; $width,
+                -height     =&gt; $height,
+                -prefix     =&gt; $prefix,
+                -x_axis     =&gt; $x_axis,
+                -y_axis     =&gt; $y_axis,
+                -legend     =&gt; $legend,
+                -aggregate  =&gt; $aggregate,
+                -settings   =&gt; $settings,
+                -hide       =&gt; $hide,
+                -vertical   =&gt; $vertical,
+                -horizontal =&gt; $horizontal,
+                -matrix     =&gt; $matrix,
+                -table      =&gt; $table);</PRE>
+<P>Overrides any current setttings of the Relations::Display
+object. It does not add to any of the values.</P>
+<P><STRONG>$abstract</STRONG> - 
+The Relations::Abstract object to use.</P>
+<P><STRONG>$query</STRONG> - 
+The Relations::Query object to run to get the display data. This 
+is unneccesary if you supply a $matrix or $table value.</P>
+<P><STRONG>$chart</STRONG>, <STRONG>$width</STRONG> and <STRONG>$height</STRONG> - 
+The GD::Graph chart type to use, and the width and height
+of the GD::Graph. All three of these must be set. There are no
+defaults.</P>
+<P><STRONG>$prefix</STRONG> - 
+The prefix to put before the auto generated label.</P>
+<P><STRONG>$x_axis</STRONG> and <STRONG>$legend</STRONG> - 
+The fields to use for the x axis and legend values. Can be 
+either a comma delimmitted string, or an array. The names
+sent must exactly match the field names in the query.</P>
+<P><STRONG>$y_axis</STRONG> and <STRONG>$aggregate</STRONG>- 
+The field to use for the y axis values of the graph and how those
+values are to be stored. If you using a GD:Graph module that 
+requires aggregate data, like boxplot, then set $aggregate to 1.
+Else, forget about it.</P>
+<P><STRONG>$settings</STRONG> - 
+GD::Graph settings to set on the graph object. Must be a
+hash of settings to set keyed by the setting name. Use this 
+to set the title, x_label, y_label, and legend_label (table 
+only) of the Relations::Display::Table and GD::Graph.</P>
+<P><STRONG>$hide</STRONG> - 
+The fields to use for the x axis and legend values but to 
+hide on the actual display. Can be either a comma delimmitted 
+string, an array, or a hash with true values keyed by the 
+field names. The names sent must exactly match the field names 
+in the query.</P>
+<P><STRONG>$vertical</STRONG> and <STRONG>$horizontal</STRONG> - 
+The fields to use for drawing vertical and horizontal lines on 
+the graph. These fields must also be in the legend settings, 
+since the color of the lines drawn on the graph will be the color 
+of the legend thay are connected to. If the x axis min and max 
+is not set, the vertical lines values indicate on which x axis 
+titles to drawn lines on (fractions work I think), ie 0=first x 
+axis title, 1-scound, etc. If the x axis min and max is set, the 
+vertical lines values indicate the numeric graph value on which 
+to drawn lines.</P>
+<P><STRONG>$matrix</STRONG> - 
+Matrix value to use to create the Relations::Display::Table object value
+and or GD::Graph value. Uneccessary if is you supply a table 
+argument.</P>
+<P><STRONG>$table</STRONG> - 
+Relations::Display::Table value to use to create the GD::Graph object.</P>
+<P>
+<H2><A NAME="clone">clone</A></H2>
+<PRE>
+  $clone = $display-&gt;clone();</PRE>
+<P>Creates a copy of a Relations::Display object and returns it.</P>
+<P>
+<H2><A NAME="get_matrix">get_matrix</A></H2>
+<PRE>
+  $matrix = $display-&gt;get_matrix();</PRE>
+<P>Returns the matrix value for a Relations::Display object. If the
+matrix value is already set in the display object, it returns that. 
+If the matrix value is not set, it attempts to run the query 
+with the abstract. If successful, it returns a matrix created from the 
+query, and set the matrix value for the display object. If that fails, 
+it returns nothing and calls the Relations::Abstract object's
+<CODE>report_error()</CODE> function. So, if you create the display object with only 
+$table set, this function will fail because neither the query nor 
+matrix value will be set.</P>
+<P>
+<H2><A NAME="get_table">get_table</A></H2>
+<PRE>
+  $table = $display-&gt;get_table();</PRE>
+<P>Returns the Relations::Display::Table value for a Relations::Display 
+object. If the table value is already set in the display object, it 
+returns that. If the table value is not set, it calls its own 
+get_matrix, and tries to create the table from the returned matrix. 
+It'll return the new table object if successful. If that fails, it 
+returns nothing and calls the Relations::Abstract object's 
+<CODE>report_error()</CODE> function.</P>
+<P>
+<H2><A NAME="get_graph">get_graph</A></H2>
+<PRE>
+  $graph = $display-&gt;get_graph();</PRE>
+<P>Returns the graph value for Relations::Display object. If the
+graph value is already set in the display object, it returns that. 
+If the graph value is not set, it calls its own get_table, and
+tries to create the graph from the returned table. It'll return 
+the new graph object if successful. If that fails, it returns nothing 
+and calls the Relations::Abstract object's <CODE>report_error()</CODE> function.</P>
+<P>
+<HR>
+<H1><A NAME="list of relations::display properties">LIST OF RELATIONS::DISPLAY PROPERTIES</A></H1>
+<P><STRONG>abstract</STRONG> - 
+The Relations::Abstract object</P>
+<P><STRONG>query</STRONG> - 
+The Relations::Query object</P>
+<P><STRONG>chart</STRONG> - 
+The name of the GD::Graph module</P>
+<P><STRONG>width</STRONG> - 
+The width of the GD::Graph in pixels</P>
+<P><STRONG>height</STRONG> - 
+The width of the GD::Graph in pixels</P>
+<P><STRONG>prefix</STRONG> - 
+The prefix put before the autogenerated title</P>
+<P><STRONG>x_axis</STRONG> - 
+Array ref of all the x axis fields</P>
+<P><STRONG>y_axis</STRONG> - 
+The y axis field</P>
+<P><STRONG>legend</STRONG> - 
+Array ref of all the legend fields</P>
+<P><STRONG>aggregate</STRONG> - 
+Whether to store the data in aggregate format.</P>
+<P><STRONG>settings</STRONG> - 
+Hash of settings to send to the GD:Graph object, keyed on 
+each property's name.</P>
+<P><STRONG>hide</STRONG> - 
+Hash ref of all the fields to hide. Keyed by field name, 
+with a value of 1.</P>
+<P><STRONG>vertical</STRONG> - 
+Array ref of all the vertical line fields. Display will
+drawn a vertical line on the graph for value of these fields.</P>
+<P><STRONG>horizontal</STRONG> - 
+Array ref of all the horizontal line fields. Display will
+drawn a horizontal line on the graph for value of these fields.</P>
+<P><STRONG>matrix</STRONG> - 
+The matrix object. This is returned from the Relations::Abstract's
+<CODE>select_matrix()</CODE> function. Array ref of rows of data, which are
+hash ref keyed by field name.</P>
+<P><STRONG>table</STRONG> - 
+The table object. See Relations::Display::Table for more info.</P>
+<P>
+<HR>
+<H1><A NAME="list of relations::display::table functions">LIST OF RELATIONS::DISPLAY::TABLE FUNCTIONS</A></H1>
+<P>An example of each function is provided in either 'test.pl' and 'demo.pl'.</P>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+  $table = new Relations::Display::Table($title,
+                                         $x_label,
+                                         $y_label,
+                                         $legend_label,
+                                         $x_axis_values,
+                                         $legend_values,
+                                         $x_axis_titles,
+                                         $legend_titles,
+                                         $y_axis_values);</PRE>
+<PRE>
+  $table = new Relations::Display::Table(-title         =&gt; $title,
+                                         -x_label       =&gt; $x_label,
+                                         -y_label       =&gt; $y_label,
+                                         -legend_label  =&gt; $legend_label,
+                                         -x_axis_values =&gt; $x_axis_values,
+                                         -legend_values =&gt; $legend_values,
+                                         -x_axis_titles =&gt; $x_axis_titles,
+                                         -legend_titles =&gt; $legend_titles,
+                                         -y_axis_values =&gt; $y_axis_values);</PRE>
+<P>Creates creates a new Relations::Display::Table object.</P>
+<P><STRONG>$title</STRONG> - 
+The main label for the table. String.</P>
+<P><STRONG>$x_label</STRONG>, <STRONG>$y_label</STRONG> and <STRONG>$legend_label</STRONG> - 
+The labels to use for x axis, y axis and legend. Strings.</P>
+<P><STRONG>$x_axis_values</STRONG> and <STRONG>$legend_values</STRONG> - 
+The values for the x axis and legend. Array refs.</P>
+<P><STRONG>$x_axis_titles</STRONG> and <STRONG>$legend_titles</STRONG> - 
+The titles (what's to be displayed) for the x axis and legend. 
+Used if there are fields to be hidden. Hash refs keyed
+by values arrays.</P>
+<P><STRONG>$y_axis_values</STRONG> - 
+The y axis data for the table. 2D hash ref keyed off the x axis and
+legend arrays in that order.</P>
+<P>
+<HR>
+<H1><A NAME="list of relations::display::table properties">LIST OF RELATIONS::DISPLAY::TABLE PROPERTIES</A></H1>
+<P><STRONG>title</STRONG> - 
+The title.</P>
+<P><STRONG>x_label</STRONG> - 
+The x axis label.</P>
+<P><STRONG>y_label</STRONG> - 
+The y axis label.</P>
+<P><STRONG>legend_label</STRONG> - 
+The legend label.</P>
+<P><STRONG>x_axis_values</STRONG> - 
+Array ref of actual x_axis values to key the 
+y_axis_values with.</P>
+<P><STRONG>legend_values</STRONG> - 
+Array ref of actual legend values to key the 
+y_axis_values with.</P>
+<P><STRONG>x_axis_titles</STRONG> - 
+Hash ref of displayed x_axis values. What's left
+after the fields specified by hide are removed.
+Keyed by the the x axis values.
+$table-&gt;{x_axis_titles}-&gt;{$x_axis_value}</P>
+<P><STRONG>legend_titles</STRONG> - 
+Hash ref of displayed legend values. What's left
+after the fields specified by hide are removed.
+Keyed by the the legend values.
+$table-&gt;{legend_titles}-&gt;{$legend_value}</P>
+<P><STRONG>y_axis_values</STRONG> - 
+Hash ref of displayed legend values. What's left
+Teh data of the table. A hash ref of data keyed 
+by the x_axis and legend values in that order. 
+$table-&gt;{y_axis_values}-&gt;{$x_axis_value}{$legend_value}</P>
+<P>
+<HR>
+<H1><A NAME="change log">CHANGE LOG</A></H1>
+<P>
+<H2><A NAME="relationsdisplay0.92">Relations-Display-0.92</A></H2>
+<P><STRONG>Fixed X Axis and Legend Evals</STRONG></P>
+<P>Fixed a problem with x axis and legend field values. Any field
+names that contained spaces would have their values show up as 
+blank in the Graph and Table. That's fixed now.</P>
+<P>
+<H2><A NAME="relationsdisplay0.91">Relations-Display-0.91</A></H2>
+<P><STRONG>Added Argument Cloning</STRONG></P>
+<P>Instead of just grabbing sent array refs, hash refs, queries and such,
+Relations::Display now makes complete copies of all these objects. 
+This was done because Relations::Report was messing up the Display's 
+settings when it passed them to Report.</P>
+<P><STRONG>Added Object Cloning</STRONG></P>
+<P>Both Relations::Display and Relations::Display::Table now have <CODE>clone()</CODE>
+functions to create copies of themselves. This will be very useful for
+Relations::Report's iterate functionality.</P>
+<P><STRONG>Arguments and Properties Renamed</STRONG></P>
+<P>Many of the argument and property names were changed to be more 
+consistent with GD::Graph. This may be annoying to deal with, but 
+better to do it now rather than later.</P>
+<P>
+<HR>
+<H1><A NAME="to do">TO DO</A></H1>
+<P><STRONG>Improve Error Checking</STRONG></P>
+<P>Add some warnings if fields specified in various arguments are not
+present in the matrix data returned from the query. 
+<STRONG>Add To Text Functionality</STRONG></P>
+<P>Add a <CODE>to_text()</CODE> function to both Relations::Display and 
+Relations::Display::Table. This will make it easier to debug.</P>
+<P><STRONG>Pass -w</STRONG></P>
+<P>Clean up the code so it pass 'perl -w'. I completely forgot about 
+making sure everything did that.</P>
+<P>
+<HR>
+<H1><A NAME="other related work">OTHER RELATED WORK</A></H1>
+<P>
+<H2><A NAME="relations (perl)">Relations (Perl)</A></H2>
+<P>Contains functions for dealing with databases. It's mainly used as 
+the foundation for the other Relations modules. It may be useful for 
+people that deal with databases as well.</P>
+<P>
+<H2><A NAME="relationsquery (perl)">Relations-Query (Perl)</A></H2>
+<P>An object oriented form of a SQL select query. Takes hashes.
+arrays, or strings for different clauses (select,where,limit)
+and creates a string for each clause. Also allows users to add to
+existing clauses. Returns a string which can then be sent to a 
+database.</P>
+<P>
+<H2><A NAME="relationsabstract (perl)">Relations-Abstract (Perl)</A></H2>
+<P>Meant to save development time and code space. It takes the most common 
+(in my experience) collection of calls to a MySQL database, and changes 
+them to one liner calls to an object.</P>
+<P>
+<H2><A NAME="relationsadmin (php)">Relations-Admin (PHP)</A></H2>
+<P>Some generalized objects for creating Web interfaces to relational 
+databases. Allows users to insert, select, update, and delete records from 
+different tables. It has functionality to use tables as lookup values 
+for records in other tables.</P>
+<P>
+<H2><A NAME="relationsfamily (perl)">Relations-Family (Perl)</A></H2>
+<P>Query engine for relational databases.  It queries members from 
+any table in a relational database using members selected from any 
+other tables in the relational database. This is especially useful with 
+complex databases: databases with many tables and many connections 
+between tables.</P>
+<P>
+<H2><A NAME="relationsdisplay (perl)">Relations-Display (Perl)</A></H2>
+<P>Module creating graphs from database queries. It takes in a query through a 
+Relations-Query object, along with information pertaining to which field 
+values from the query results are to be used in creating the graph title, 
+x axis label and titles, legend label (not used on the graph) and titles, 
+and y axis data. Returns a graph and/or table built from from the query.</P>
+<P>
+<H2><A NAME="relationsreport (perl)">Relations-Report (Perl)</A></H2>
+<P>A Web interface for Relations-Family, Reations-Query, and Relations-Display. 
+It creates complex (too complex?) web pages for selecting from the different 
+tables in a Relations-Family object. It also has controls for specifying the 
+grouping and ordering of data with a Relations-Query object, which is also 
+based on selections in the Relations-Family object. That Relations-Query can 
+then be passed to a Relations-Display object, and a graph and/or table will 
+be displayed.</P>
+<P>
+<H2><A NAME="relationsstructure (xml)">Relations-Structure (XML)</A></H2>
+<P>An XML standard for Relations configuration data. With future goals being 
+implmentations of Relations in different languages (current targets are 
+Perl, PHP and Java), there should be some way of sharing configuration data
+so that one can switch application languages seamlessly. That's the goal
+of Relations-Structure A standard so that Relations objects can 
+export/import their configuration through XML.</P>
+
+</BODY>
+
+</HTML>

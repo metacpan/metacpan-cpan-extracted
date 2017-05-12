@@ -1,0 +1,50 @@
+%# Never call a man a fool; borrow from him.
+
+% if ($Action =~ /^(?:New|Create)$/ or $ARGS{AddMoreAttach} or $ARGS{Attach}) {
+</form><form action="index.html" method="post" enctype='multipart/form-data' >
+<!--	    <input type="hidden" name="Action-New" value="1"> -->
+	    <& Display.html,
+		url => '/Work/Tickets/Create.html',
+		"CustomField-$TypeCF-Values" => $Type,
+		Queue => $QueueObj->Id, NoUI => 1, NoCF => {'Resolution'=>1,'TargetVersion'=>1}, Loc => 1, %ARGS &>
+% } elsif ($Action =~ /Comment|Respond|Open|Resolve/) {
+	    <& Update.html, %ARGS, NoUI => 1 &>
+% } elsif ($ARGS{id}) {
+	    <& Display.html,
+		url => '/Work/Tickets/Create.html',
+		Queue => $QueueObj->Id, NoUI => 1, NoCF => {'Resolution'=>1,'TargetVersion'=>1}, Loc => 1, %ARGS &>
+% } else {
+	    <& SelectSearch, Category => $Category, %ARGS &>
+	    <& List, List => $List, Begin => $Begin, URL => '/Foundry/Project/Tracker/Display.html', ARGS => \%ARGS &>
+% }
+
+<%INIT>
+$session{'WorkPage'} = '/Foundry/Project/Tracker/?Queue=' . $QueueObj->Id;
+my $List = [];
+
+my $TypeCF = RT::CustomField->NameToId( 'Type' );
+
+if ($Action ne 'New') {
+    my $MyTickets = RT::Tickets->new($session{'CurrentUser'});
+    $MyTickets->LimitQueue(VALUE => $QueueObj->Id);
+    if ($Type or !$Action or $Action eq 'Search') {
+	$m->comp('DoSearch', MyTickets => $MyTickets, %ARGS);
+	$MyTickets->LimitCustomField(
+	    CUSTOMFIELD	=> $TypeCF,
+	    VALUE	=> $Type
+	) if $Type;
+	$MyTickets->OrderBy( FIELD => 'LastUpdated', ORDER => 'DESC' )
+	    if $session{CurrentUser}->UserObj->Name eq 'clkao';
+	$List = $MyTickets->ItemsArrayRef;
+    }
+}
+
+</%INIT>
+<%ARGS>
+$QueueObj
+$Begin	    => 0
+$Category   => ''
+$Action	    => ''
+$Type	    => ''
+$Subject    => ''
+</%ARGS>

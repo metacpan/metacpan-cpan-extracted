@@ -1,0 +1,86 @@
+{
+   "abstract" : "Redis::JobQueue simple job queue with Redis server capabilities.",
+   "author" : [
+      "TrackingSoft LLC <sgladkov@trackingsoft.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-JobQueue",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt",
+         "ex"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::UUID" : "1.217",
+            "Digest::SHA1" : "2.13",
+            "List::MoreUtils" : "0.33",
+            "Mouse" : "0",
+            "Params::Util" : "1.07",
+            "Redis" : "1.976",
+            "Storable" : "2.18",
+            "Try::Tiny" : "0.18",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0.109",
+            "Test::Exception" : "0.31",
+            "Test::NoWarnings" : "1.04",
+            "Test::RedisServer" : "0.04",
+            "Test::TCP" : "2.11"
+         }
+      }
+   },
+   "provides" : {
+      "Redis::JobQueue" : {
+         "file" : "lib/Redis/JobQueue.pm",
+         "version" : "1.19"
+      },
+      "Redis::JobQueue::Job" : {
+         "file" : "lib/Redis/JobQueue/Job.pm",
+         "version" : "1.19"
+      },
+      "Redis::JobQueue::Util" : {
+         "file" : "lib/Redis/JobQueue/Util.pm",
+         "version" : "1.19"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/TrackingSoft/Redis-JobQueue/issues"
+      },
+      "homepage" : "https://github.com/TrackingSoft/Redis-JobQueue",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/TrackingSoft/Redis-JobQueue.git",
+         "web" : "http://github.com/TrackingSoft/Redis-JobQueue"
+      }
+   },
+   "version" : "1.19",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

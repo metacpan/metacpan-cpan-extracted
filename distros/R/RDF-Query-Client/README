@@ -1,0 +1,135 @@
+NAME
+    RDF::Query::Client - get data from W3C SPARQL Protocol 1.0 servers
+
+SYNOPSIS
+     use RDF::Query::Client;
+ 
+     my $query = RDF::Query::Client
+                   ->new('SELECT DISTINCT ?s WHERE { ?s ?p ?o . }');
+ 
+     my $iterator = $query->execute('http://example.com/sparql');
+ 
+     while (my $row = $iterator->next) {
+        print $row->{s}->as_string;
+     }
+
+DESCRIPTION
+  Constructor
+    `new ( $sparql, \%opts )`
+        Returns a new RDF::Query::Client object for the specified $sparql. The
+        object's interface is designed to be roughly compatible with
+        RDF::Query objects, though RDF::Query is not required by this module.
+
+        Options include:
+
+        UserAgent - an LWP::UserAgent to handle HTTP requests.
+
+        Unlike RDF::Query, where you get a choice of query language, the query
+        language for RDF::Query::Client is always 'sparql'.
+        RDF::TrineShortcuts offers a way to perform RDQL queries on remote
+        SPARQL stores though (by transforming RDQL to SPARQL).
+
+  Public Methods
+    `execute ( $endpoint, \%opts )`
+        $endpoint is a URI object or string containing the endpoint URI to be
+        queried.
+
+        Options include:
+
+        *   UserAgent - an LWP::UserAgent to handle HTTP requests.
+
+        *   QueryMethod - 'GET', 'POST', 'PATCH' or undef (automatic).
+
+        *   QueryParameter - defaults to 'query'.
+
+        *   AuthUsername - HTTP Basic authorization.
+
+        *   AuthPassword - HTTP Basic authorization.
+
+        *   Headers - additional headers to include (hashref).
+
+        *   Parameters - additional GET/POST fields to include (hashref).
+
+        *   ContentType - 'application/sparql-query',
+            'application/sparql-update' or 'application/x-www-form-urlencoded'
+            (default).
+
+        Returns undef on error; an RDF::Trine::Iterator if called in a scalar
+        context; an array obtained by calling `get_all` on the iterator if
+        called in list context.
+
+    `discover_execute( $resource_uri, \%opts )`
+        Experimental feature. Discovers a SPARQL endpoint relevant to
+        $resource_uri and then calls `$query->execute` against that. Uses an
+        LRDD-like method to discover the endpoint. If you're publishing data
+        and want people to be able to find your SPARQL endpoint automatically,
+        the easiest way is to include an Link header in HTTP responses:
+
+         Link: </my/endpoint>; rel="http://ontologi.es/sparql#endpoint"
+
+        Change the URL in the angled brackets, but not the URL in the rel
+        string.
+
+        This feature requires the HTTP::LRDD package to be installed.
+
+    `get ( $endpoint, \%opts )`
+        Executes the query using the specified endpoint, and returns the first
+        matching row as a LIST of values. Takes the same arguments as
+        `execute`.
+
+    `as_sparql`
+        Returns the query as a string in the SPARQL syntax.
+
+    `useragent`
+        Returns the LWP::UserAgent object used for retrieving web content.
+
+    `http_response`
+        Returns the last HTTP Response the client experienced.
+
+    `error`
+        Returns the last error the client experienced.
+
+  Security
+    The `execute` and `get` methods allow AuthUsername and AuthPassword
+    options to be passed to them for HTTP Basic authentication. For more
+    complicated authentication (Digest, OAuth, Windows, etc), it is also
+    possible to pass these methods a customised LWP::UserAgent.
+
+    If you have the Crypt::SSLeay package installed, requests to HTTPS
+    endpoints should work. It's possible to specify a client X.509 certificate
+    (e.g. for WebID authentication) by setting particular environment
+    variables. See Crypt::SSLeay documentation for details.
+
+BUGS
+    Probably.
+
+    Please report any you find here:
+    <https://rt.cpan.org/Dist/Display.html?Queue=RDF-Query-Client>.
+
+SEE ALSO
+    *   RDF::Trine, RDF::Trine::Iterator
+
+    *   RDF::Query
+
+    *   LWP::UserAgent
+
+    *   <http://www.w3.org/TR/rdf-sparql-protocol/>
+
+    *   <http://www.w3.org/TR/rdf-sparql-query/>
+
+    *   <http://www.perlrdf.org/>
+
+AUTHOR
+    Toby Inkster, <tobyink@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009-2013 by Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

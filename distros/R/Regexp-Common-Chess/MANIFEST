@@ -1,0 +1,13 @@
+Changes
+lib/Regexp/Common/Chess.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.release
+t/00-dist.t
+t/01-san.t
+t/02-real_games.t
+t/03-capture.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

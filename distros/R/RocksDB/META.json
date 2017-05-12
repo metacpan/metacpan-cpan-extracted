@@ -1,0 +1,82 @@
+{
+   "abstract" : "Perl extension for RocksDB",
+   "author" : [
+      "Jiro Nishiguchi <jiro@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RocksDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder",
+         "vendor"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::ParseXS" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Devel::LeakTrace" : "0"
+         },
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "RocksDB" : {
+         "file" : "lib/RocksDB.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/spiritloose/RocksDB/issues"
+      },
+      "homepage" : "https://github.com/spiritloose/RocksDB",
+      "repository" : {
+         "url" : "git://github.com/spiritloose/RocksDB.git",
+         "web" : "https://github.com/spiritloose/RocksDB"
+      }
+   },
+   "version" : "0.04"
+}

@@ -1,0 +1,216 @@
+
+0.73 Fixes
+    * Takes only last part of URI after full stop (#14);
+    * Makes tests use Test::More::note instead of printing to STDERR;
+
+0.71 identical to 0.70
+
+0.70 Formatters
+    * Introduces a Formatters middleware and Encoder/Decoder modules;
+    * Removes Raisin::Response;
+    * Simplifies Raisin::Request;
+    * Drops x-www-form-urlencoded support;
+
+0.69 Documented responses
+    * Fixes
+    * Plack::Middleware::CrossOrigin has been removed from Swagger plugin;
+    * Improvements for raisin script to make it generate clean OpenAPI spec;
+    * Documented responses via entity keyword;
+    * Limited support of OpenAPI security (basic & apiKey);
+
+0.68 Nested parameters
+    * Nested parameters:
+        - Parameters by itself;
+        - Swagger/OpenAPI support;
+    * Syntax sugar: requires and optional keywords to declare parameters;
+    * Logging support in Routes;
+
+0.67 Broken test
+    * Fix broken tests
+
+0.66 Delayed response
+    * Merge pull request by `kimcognito` fixes delayed responses;
+    * Adds a location option to parameter description for OpenAPI specification;
+    * Adds an `openapi` key to the raisin script to show OpenAPI specification;
+
+0.65 Fixes
+    * Update ROADMAP section;
+    * Depends on Perl 5.10.0;
+
+0.64 Fixes
+    * Process body parameters for PATCH requests;
+
+0.63 Fixes
+    * Support for parameters in Content-Type header according to RFC1341;
+
+0.62 Fixes
+    * Fix accept header;
+    * Use `while` instead of `List::Util::pairs`;
+    * Fix a `format` capturing (GitHub issue #14);
+
+0.61 Fixes
+    * Fix an accept header's bevahiour (RFC7231);
+    * Fix `param` method;
+    * Fix & improve Swagger plugin;
+    * Minor fixes;
+
+0.60 OPTIONS
+    * Add support for a HTTP OPTIONS verb;
+    * Add new intergration tests;
+
+0.59 Include missing
+    * Fix examples;
+    * Fix a `t/unit/plugin/format/text.t` test;
+    * Add an `include_missing` function;
+
+0.58 Swagger 2.0
+    * Add support for a Swagger 2.0;
+    * Minor fixes;
+    * Improve a coverage;
+
+0.57 Fix
+    * Fix `t/unit/plugin/format/*` tests;
+    * A new `t/unit/api.t` test;
+    * New `t/unit/integration` tests;
+    * Small fixes in `API`, `Entity` & `Param`;
+
+0.56 Fix
+    * Skip a `t/unit/plugin/logger.t` test;
+
+0.55 Tests & Fixes
+    - Drop support for old routes syntax;
+    - Add support for nested entities;
+    - Fix "wide character" in the terminal output & in the POD;
+    - Supplement unit tests;
+    - Many fixes in Param:
+        * fetch all params and apply precedence rules;
+        * delete an obsolete syntax support [array];
+        * update errors format;
+    - Util:
+        * fix & supplement `detect_serializer`;
+    - Fix Routes::Endpoint;
+    - Fix Routes;
+    - Cleanup Attributes;
+    - Return to X.XX version format;
+
+0.5200 Fixes & Improvments
+    - Update documentation;
+    - New way of rendering data:
+        * store user's endpoint into response body if any;
+        * add format method to the Raisin::Response;
+    - Rework `raisin` utility script:
+        * add colors;
+        * reformat an output;
+        * remove `routes` param;
+        * code clean up;
+    - Refactor `Raisin`;
+
+0.5101 Fixes
+    - POD add AUTHOR section;
+    - Fix `t/unit/entity.t`;
+
+0.5100 Entities
+    - Entities;
+    - Entities example with DBIx::Class, Rose::DB::Object;
+
+0.5000 New API syntax
+    - New API syntax;
+    - Rename 'APIDocs' plugin to 'Swagger';
+    - Some minor changes/fixes;
+
+0.4003 Fixes
+    - `use base` -> `use parent`;
+    - Don't print debug messages in deployment environment;
+    - Don't encode JSON to utf8;
+
+0.4002 Fixes
+    - Update dependencies:
+        * include: Hash::MultiValue, List::Util;
+
+0.4001 Bug fixes
+    - Delete DDP dependency;
+
+0.4000 Description and strict format
+    - Description for resources, operations and parameters;
+    - Rename `namespace` to `resource` and make an alias for `namespace`;
+    - Able to setup strict API formatter via `api_format`;
+    - Able to setup default API formatter via `api_default_format`;
+    - Many internal refactoring:
+        * Routes, Endpoint, API, Raisin, Plugins, Utils;
+    - Delete `Log::Dispatch` from dependency list;
+
+0.36 Bug fixes
+    - Fix broken `basePath` in `APIDocs` plugin;
+
+0.35 Type::Tiny
+    - NEW Migrate to `Type::Tiny`, `Moo`, `Moose` compatible type contraint;
+    - Some code cleanup & refactoring;
+    - NEW example application (see examples/sample);
+    - FIX cut path extensions;
+
+0.30 Logger
+    - Default logger;
+    - NEW more complex tests;
+    - Small fixes:
+        * Plugin cleanup;
+        * Response cleanup;
+        * Request cleanup;
+
+0.29 Bug fixes
+    - Clean up `psgi' subroutine in Raisin;
+    - FIX #1
+        * fix examples;
+        * fix namespace subroutine;
+    - FIX #2
+        * update docs;
+
+0.28 refactoring
+    - Refactor format detection mechanism;
+    - Update format plugins;
+    - Detect input data by `content-type` header;
+    - Detect output data by `content-type` or `path extension`;
+
+0.27 Path extension
+    - Detect format by path extenstion;
+
+0.26 raisin script
+    - Raisin script: show application API;
+    - Detect format by `Accept' header;
+    - Fix path crop regex;
+
+0.25 Fixes
+    - Fix named route params;
+    - New keyword params (similar to Grape);
+    - Rename params to param and change behaviour;
+
+0.24 Refactor params
+    - Refactor types and routes;
+    - Update types;
+    - Fix version numbering;
+
+0.22 Refactor params & types
+    - Update params to match *Refactor Types* TODO section;
+
+0.21 Refactor params
+    - Refactor types and routes;
+
+0.20 Fixes & Improvments
+    - Accept both keywords `required` and `requires` in Param.pm;
+    - `populate_params` now populates all declared params;
+
+0.13 Fixes
+    - More functional `raisin` script;
+    - Update dependencies;
+    - Update POD;
+    - Needs Perl 5.10 at least;
+
+0.12 Fixes
+    - Fix cpantesters.org failes;
+    - Remove Perl 5.12 dependency;
+    - Update dependency in cpanfile;
+
+0.11 Swagger support
+    - Basic Swagger support;
+
+0.1 Initial release
+    - Adding base functionality;

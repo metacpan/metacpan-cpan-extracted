@@ -1,0 +1,57 @@
+NAME
+    RTx::Tags - Tag Cloud support for RT with simple-searchable custom
+    fields.
+
+DESCRIPTION
+    This module uses portions of HTML::TagCloud to provide a tag cloud on
+    Search/Simple.html The cloud consists of the values (split on commas,
+    semi-colons and whitespace) for all objects with the `Tags' custom
+    field.
+
+    In addition to the cloud, this module provides support for Simple
+    Searchable Custom Fields witha Local overlay. An explanation of this
+    feature is also shown on Search/Simple.html
+
+INSTALL
+    #   Install HTML::TagCloud
+
+    #   Install this module i.e; extract to local/plugins/RTx-Tags & amend
+        RT_SiteConfig.pm to include *RTx::Tags* to `@Plugins'.
+
+        These first steps may be accomplished via CPAN(PLUS) with
+        auto-dependencies.
+
+    #   No patching necessary! If you've previously applied
+        SearchCustomField from the wiki or email list, or installed version
+        0.021 of this module, it is recomended that you revert the patch. No
+        harm will come from not doing so, but it's best to keep RT core
+        files vanilla where possible.
+
+    #   Create a custom field named `Tags'. The recommended type is *Enter
+        one value* with *Applies to Tickets*. The recommended Description is
+        *Freeform annotation for ready searching*.
+
+    #   Apply the Custom Field to the desired queue(s).
+
+    #   Optionally add *TagCloud* to `$HomepageComponents' in
+        RT_SiteConfig.pm if you would like users to have the ability to
+        display a Tag Cloud on the front page, and not just the Simple
+        Search page.
+
+CAVEATS
+    *   Due to limitations in the available callbacks, the CF search blurb
+        and tags cloud are output before the core search mechanism blurbs on
+        Simple Search; postform is ugly.
+
+    *   Due to limitations in the available callbacks, every page links to
+        cloud.css, which has also been hard-coded to 26 levels.
+
+    *   Due to the mechanism used to implement the CF search, the presence
+        of another Search/Googleish_Local.pm will likely not result in
+        behavior you desire. Should you wish to make further local
+        customizations, either modify this module's code, or use
+        Googleish_Vendor.pm
+
+LICENSE
+    The same terms as perl itself.
+

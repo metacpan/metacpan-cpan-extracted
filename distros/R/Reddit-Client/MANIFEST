@@ -1,0 +1,26 @@
+lib/Reddit/Client.pm
+lib/Reddit/Client/Account.pm
+lib/Reddit/Client/Comment.pm
+lib/Reddit/Client/Link.pm
+lib/Reddit/Client/Request.pm
+lib/Reddit/Client/SubReddit.pm
+lib/Reddit/Client/Thing.pm
+lib/Reddit/Client/VotableThing.pm
+lib/Reddit/Client/Message.pm
+
+ignore.txt
+Makefile.PL
+MANIFEST
+Changes
+README
+
+t/00-load.t
+t/boilerplate.t
+t/client.t
+t/helpers.t
+t/manifest.t
+t/models.t
+t/pod.t
+t/request.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

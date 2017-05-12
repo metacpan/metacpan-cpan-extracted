@@ -1,0 +1,670 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Triples</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Raptor RDF Syntax Parsing and Serializing Library Manual">
+<link rel="up" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="prev" href="raptor-section-stringbuffer.html" title="String buffer">
+<link rel="next" href="raptor-section-unicode.html" title="Unicode">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="introduction.html" title="Raptor Overview">
+<link rel="part" href="tutorial.html" title="Part&#160;I.&#160;Raptor Tutorial">
+<link rel="chapter" href="tutorial-initialising-finishing.html" title="Initialising and Finishing using the Library">
+<link rel="chapter" href="tutorial-querying-functionality.html" title="Listing built-in functionality">
+<link rel="chapter" href="tutorial-parsing.html" title="Parsing syntaxes to RDF Triples">
+<link rel="chapter" href="tutorial-serializing.html" title="Serializing RDF triples to a syntax">
+<link rel="part" href="reference-manual.html" title="Part&#160;II.&#160;Raptor Reference Manual">
+<link rel="chapter" href="raptor-parsers.html" title="Parsers in Raptor (syntax to triples)">
+<link rel="chapter" href="raptor-serializers.html" title="Serializers in Raptor (triples to syntax)">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="raptor-section-stringbuffer.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference-manual.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Raptor RDF Syntax Parsing and Serializing Library Manual</th>
+<td><a accesskey="n" href="raptor-section-unicode.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2574052" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2626547" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="raptor-section-triples"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2574052"></a><span class="refentrytitle">Triples</span>
+</h2>
+<p>Triples &#8212; RDF Triples</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+enum        <a href="raptor-section-triples.html#raptor-genid-type">raptor_genid_type</a>;
+enum        <a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a>;
+            <a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a>;
+<a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a>* <a href="raptor-section-triples.html#raptor-new-identifier">raptor_new_identifier</a>    (<a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a> type,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             raptor_uri_source uri_source,
+                                             unsigned char *id,
+                                             unsigned char *literal,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *literal_datatype,
+                                             unsigned char *literal_language);
+int         <a href="raptor-section-triples.html#raptor-copy-identifier">raptor_copy_identifier</a>          (<a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a> *dest,
+                                             <a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a> *src);
+void        <a href="raptor-section-triples.html#raptor-free-identifier">raptor_free_identifier</a>          (<a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a> *identifier);
+            <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a>;
+void        <a href="raptor-section-triples.html#raptor-print-statement">raptor_print_statement</a>          (const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement,
+                                             FILE *stream);
+void        <a href="raptor-section-triples.html#raptor-print-statement-as-ntriples">raptor_print_statement_as_ntriples</a>
+                                            (const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement,
+                                             FILE *stream);
+void        <a href="raptor-section-triples.html#raptor-print-statement-detailed">raptor_print_statement_detailed</a> (const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement,
+                                             int detailed,
+                                             FILE *stream);
+unsigned char* <a href="raptor-section-triples.html#raptor-statement-part-as-counted-string">raptor_statement_part_as_counted_string</a>
+                                            (const void *term,
+                                             <a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a> type,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *literal_datatype,
+                                             unsigned char *literal_language,
+                                             size_t *len_p);
+unsigned char* <a href="raptor-section-triples.html#raptor-statement-part-as-string">raptor_statement_part_as_string</a>
+                                            (const void *term,
+                                             <a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a> type,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *literal_datatype,
+                                             unsigned char *literal_language);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2626547"></a><h2>Description</h2>
+<p>
+Representation of RDF triples inside Raptor.  They are a sequence
+of three <a href="raptor-section-triples.html#raptor-identifier"><span class="type">raptor_identifier</span></a> which cover the RDF terms of
+URI (<a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-RESOURCE:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_RESOURCE</code></a>),
+Literal (<a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-LITERAL:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_LITERAL</code></a>) and
+Blank Node (<a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-ANONYMOUS:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_ANONYMOUS</code></a>).
+Some other <span class="type">raptor_identifer_type</span> forms exist but are deprecated.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2624705"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2624716"></a><h3>
+<a name="raptor-genid-type"></a>enum raptor_genid_type</h3>
+<a class="indexterm" name="id2624729"></a><pre class="programlisting">typedef enum {
+  RAPTOR_GENID_TYPE_BNODEID,
+  RAPTOR_GENID_TYPE_BAGID
+} raptor_genid_type;
+</pre>
+<p>
+Intended type for a generated identifier asked for by the handler
+registered with <a href="raptor-section-parser.html#raptor-set-generate-id-handler"><code class="function">raptor_set_generate_id_handler()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a name="RAPTOR-GENID-TYPE-BNODEID:CAPS"></a><code class="literal">RAPTOR_GENID_TYPE_BNODEID</code></span></td>
+<td> Generated ID is for a blank node
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-GENID-TYPE-BAGID:CAPS"></a><code class="literal">RAPTOR_GENID_TYPE_BAGID</code></span></td>
+<td> Generated ID is for rdf:bagID
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2624807"></a><h3>
+<a name="raptor-identifier-type"></a>enum raptor_identifier_type</h3>
+<a class="indexterm" name="id2624818"></a><pre class="programlisting">typedef enum {
+  RAPTOR_IDENTIFIER_TYPE_UNKNOWN,
+  RAPTOR_IDENTIFIER_TYPE_RESOURCE,
+  RAPTOR_IDENTIFIER_TYPE_ANONYMOUS,
+  RAPTOR_IDENTIFIER_TYPE_PREDICATE,
+  RAPTOR_IDENTIFIER_TYPE_ORDINAL,
+  RAPTOR_IDENTIFIER_TYPE_LITERAL,
+  RAPTOR_IDENTIFIER_TYPE_XML_LITERAL
+} raptor_identifier_type;
+</pre>
+<p>
+Type of identifier in a <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a></p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a name="RAPTOR-IDENTIFIER-TYPE-UNKNOWN:CAPS"></a><code class="literal">RAPTOR_IDENTIFIER_TYPE_UNKNOWN</code></span></td>
+<td>     Internal
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-IDENTIFIER-TYPE-RESOURCE:CAPS"></a><code class="literal">RAPTOR_IDENTIFIER_TYPE_RESOURCE</code></span></td>
+<td>    Resource URI (e.g. <code class="literal">rdf:about</code>)
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-IDENTIFIER-TYPE-ANONYMOUS:CAPS"></a><code class="literal">RAPTOR_IDENTIFIER_TYPE_ANONYMOUS</code></span></td>
+<td>   <code class="literal">_:foo</code> N-Triples, or generated
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-IDENTIFIER-TYPE-PREDICATE:CAPS"></a><code class="literal">RAPTOR_IDENTIFIER_TYPE_PREDICATE</code></span></td>
+<td>   predicate URI.  WARNING: Will not be generated in in Raptor 1.4.9 or newer.  Instead a <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-RESOURCE:CAPS"><span class="type">RAPTOR_IDENTIFIER_TYPE_RESOURCE</span></a> will be returned.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-IDENTIFIER-TYPE-ORDINAL:CAPS"></a><code class="literal">RAPTOR_IDENTIFIER_TYPE_ORDINAL</code></span></td>
+<td>     <code class="literal">rdf:li</code>, <code class="literal">rdf:_</code><span class="emphasis"><em>n</em></span>.  No longer generated in any parser in Raptor 1.4.10+, instead a <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-RESOURCE:CAPS"><span class="type">RAPTOR_IDENTIFIER_TYPE_RESOURCE</span></a> is returned.
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-IDENTIFIER-TYPE-LITERAL:CAPS"></a><code class="literal">RAPTOR_IDENTIFIER_TYPE_LITERAL</code></span></td>
+<td>     regular literal
+</td>
+</tr>
+<tr>
+<td><span class="term"><a name="RAPTOR-IDENTIFIER-TYPE-XML-LITERAL:CAPS"></a><code class="literal">RAPTOR_IDENTIFIER_TYPE_XML_LITERAL</code></span></td>
+<td> <code class="literal">rdf:parseType="Literal"</code>.  No longer generated by any parser in Raptor 1.4.8+, instead a <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-LITERAL:CAPS"><span class="type">RAPTOR_IDENTIFIER_TYPE_LITERAL</span></a> is returned with a datatype of <code class="literal">rdf:XMLLiteral</code>.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2613282"></a><h3>
+<a name="raptor-identifier"></a>raptor_identifier</h3>
+<a class="indexterm" name="id2613295"></a><pre class="programlisting">typedef struct {
+  raptor_identifier_type type;
+  raptor_uri *uri;
+  raptor_uri_source uri_source;
+  const unsigned char *id;
+  int ordinal;
+  int is_malloced;
+  const unsigned char *literal;
+  raptor_uri *literal_datatype;
+  const unsigned char *literal_language;
+} raptor_identifier;
+</pre>
+<p>
+Raptor RDF term identifier.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a>&#160;<em class="structfield"><code>type</code></em>;</span></td>
+<td> Type of identifier
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-uri.html#raptor-uri">raptor_uri</a>&#160;*<em class="structfield"><code>uri</code></em>;</span></td>
+<td> URI of identifier for types <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-RESOURCE:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_RESOURCE</code></a> and
+  <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-PREDICATE:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_PREDICATE</code></a>
+</td>
+</tr>
+<tr>
+<td><span class="term">raptor_uri_source&#160;<em class="structfield"><code>uri_source</code></em>;</span></td>
+<td> where the identifier (URI or blank node) came from
+</td>
+</tr>
+<tr>
+<td><span class="term">const&#160;unsigned&#160;char&#160;*<em class="structfield"><code>id</code></em>;</span></td>
+<td> blank node identifier for type <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-ANONYMOUS:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_ANONYMOUS</code></a>
+</td>
+</tr>
+<tr>
+<td><span class="term">int&#160;<em class="structfield"><code>ordinal</code></em>;</span></td>
+<td> integer ordinal for type <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-ORDINAL:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_ORDINAL</code></a>
+</td>
+</tr>
+<tr>
+<td><span class="term">int&#160;<em class="structfield"><code>is_malloced</code></em>;</span></td>
+<td> internal
+</td>
+</tr>
+<tr>
+<td><span class="term">const&#160;unsigned&#160;char&#160;*<em class="structfield"><code>literal</code></em>;</span></td>
+<td> literal string for types <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-LITERAL:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_LITERAL</code></a> and
+   <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-XML-LITERAL:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_XML_LITERAL</code></a>
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-uri.html#raptor-uri">raptor_uri</a>&#160;*<em class="structfield"><code>literal_datatype</code></em>;</span></td>
+<td> RDF literal datatype URI for types
+  <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-LITERAL:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_LITERAL</code></a> and <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-XML-LITERAL:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_XML_LITERAL</code></a>
+</td>
+</tr>
+<tr>
+<td><span class="term">const&#160;unsigned&#160;char&#160;*<em class="structfield"><code>literal_language</code></em>;</span></td>
+<td> RDF literal language for type
+  <a href="raptor-section-triples.html#RAPTOR-IDENTIFIER-TYPE-LITERAL:CAPS"><code class="literal">RAPTOR_IDENTIFIER_TYPE_LITERAL</code></a>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612100"></a><h3>
+<a name="raptor-new-identifier"></a>raptor_new_identifier ()</h3>
+<a class="indexterm" name="id2612111"></a><pre class="programlisting"><a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a>* raptor_new_identifier    (<a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a> type,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *uri,
+                                             raptor_uri_source uri_source,
+                                             unsigned char *id,
+                                             unsigned char *literal,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *literal_datatype,
+                                             unsigned char *literal_language);</pre>
+<p>
+Constructor - create a raptor_identifier.
+</p>
+<p>
+Constructs a new identifier copying the URI, ID fields.
+SHARED means raptor_new_identifier owns this argument after calling.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>type</code></em>&#160;:</span></td>
+<td> raptor_identifier_type of identifier
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-uri.html#raptor-uri"><span class="type">raptor_uri</span></a> of identifier (if relevant) (SHARED)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>uri_source</code></em>&#160;:</span></td>
+<td> raptor_uri_source of URI (if relevant)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>id</code></em>&#160;:</span></td>
+<td> string for ID or genid (if relevant) (SHARED)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>literal</code></em>&#160;:</span></td>
+<td> string for literal (SHARED)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>literal_datatype</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-uri.html#raptor-uri"><span class="type">raptor_uri</span></a> of identifier (SHARED)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>literal_language</code></em>&#160;:</span></td>
+<td> literal language (SHARED)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new raptor_identifier object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2629380"></a><h3>
+<a name="raptor-copy-identifier"></a>raptor_copy_identifier ()</h3>
+<a class="indexterm" name="id2629391"></a><pre class="programlisting">int         raptor_copy_identifier          (<a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a> *dest,
+                                             <a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a> *src);</pre>
+<p>
+Copy raptor_identifiers.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>dest</code></em>&#160;:</span></td>
+<td> destination <a href="raptor-section-triples.html#raptor-identifier"><span class="type">raptor_identifier</span></a> (previously created)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>src</code></em>&#160;:</span></td>
+<td>  source <a href="raptor-section-triples.html#raptor-identifier"><span class="type">raptor_identifier</span></a>
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> Non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2629481"></a><h3>
+<a name="raptor-free-identifier"></a>raptor_free_identifier ()</h3>
+<a class="indexterm" name="id2629492"></a><pre class="programlisting">void        raptor_free_identifier          (<a href="raptor-section-triples.html#raptor-identifier">raptor_identifier</a> *identifier);</pre>
+<p>
+Destructor - destroy a raptor_identifier object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>identifier</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-identifier"><span class="type">raptor_identifier</span></a> object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2629550"></a><h3>
+<a name="raptor-statement"></a>raptor_statement</h3>
+<a class="indexterm" name="id2629562"></a><pre class="programlisting">typedef struct {
+  const void *subject;
+  raptor_identifier_type subject_type;
+  const void *predicate;
+  raptor_identifier_type predicate_type;
+  const void *object;
+  raptor_identifier_type object_type;
+  raptor_uri *object_literal_datatype;
+  const unsigned char *object_literal_language;
+} raptor_statement;
+</pre>
+<p>
+An RDF triple
+</p>
+<p>
+See <a href="raptor-section-triples.html#raptor-identifier"><span class="type">raptor_identifier</span></a> for a description of how the fields may be used.
+As returned by a parser statement_handler.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term">const&#160;void&#160;*<em class="structfield"><code>subject</code></em>;</span></td>
+<td> triple subject data
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a>&#160;<em class="structfield"><code>subject_type</code></em>;</span></td>
+<td> triple subject type
+</td>
+</tr>
+<tr>
+<td><span class="term">const&#160;void&#160;*<em class="structfield"><code>predicate</code></em>;</span></td>
+<td> triple predicate data
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a>&#160;<em class="structfield"><code>predicate_type</code></em>;</span></td>
+<td> triple predicate type
+</td>
+</tr>
+<tr>
+<td><span class="term">const&#160;void&#160;*<em class="structfield"><code>object</code></em>;</span></td>
+<td> triple object literal string
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a>&#160;<em class="structfield"><code>object_type</code></em>;</span></td>
+<td> triple object type
+</td>
+</tr>
+<tr>
+<td><span class="term"><a href="raptor-section-uri.html#raptor-uri">raptor_uri</a>&#160;*<em class="structfield"><code>object_literal_datatype</code></em>;</span></td>
+<td> triple object literal datatype URI (or NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term">const&#160;unsigned&#160;char&#160;*<em class="structfield"><code>object_literal_language</code></em>;</span></td>
+<td> triple object literal language string (or NULL)
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2629773"></a><h3>
+<a name="raptor-print-statement"></a>raptor_print_statement ()</h3>
+<a class="indexterm" name="id2629784"></a><pre class="programlisting">void        raptor_print_statement          (const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement,
+                                             FILE *stream);</pre>
+<p>
+Print a raptor_statement to a stream.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>statement</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> object to print
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>stream</code></em>&#160;:</span></td>
+<td> <span class="type">FILE</span>* stream
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2629870"></a><h3>
+<a name="raptor-print-statement-as-ntriples"></a>raptor_print_statement_as_ntriples ()</h3>
+<a class="indexterm" name="id2629884"></a><pre class="programlisting">void        raptor_print_statement_as_ntriples
+                                            (const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement,
+                                             FILE *stream);</pre>
+<p>
+Print a raptor_statement in N-Triples form.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>statement</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> to print
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>stream</code></em>&#160;:</span></td>
+<td> <span class="type">FILE</span>* stream
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2629971"></a><h3>
+<a name="raptor-print-statement-detailed"></a>raptor_print_statement_detailed ()</h3>
+<a class="indexterm" name="id2629984"></a><pre class="programlisting">void        raptor_print_statement_detailed (const <a href="raptor-section-triples.html#raptor-statement">raptor_statement</a> *statement,
+                                             int detailed,
+                                             FILE *stream);</pre>
+<p>
+Print a raptor_statement to a stream in a detailed fashion.
+</p>
+<p>
+No current difference from calling <a href="raptor-section-triples.html#raptor-print-statement"><code class="function">raptor_print_statement()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>statement</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> object to print
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>detailed</code></em>&#160;:</span></td>
+<td> unused
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>stream</code></em>&#160;:</span></td>
+<td> <span class="type">FILE</span>* stream
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2630068"></a><h3>
+<a name="raptor-statement-part-as-counted-string"></a>raptor_statement_part_as_counted_string ()</h3>
+<a class="indexterm" name="id2630080"></a><pre class="programlisting">unsigned char* raptor_statement_part_as_counted_string
+                                            (const void *term,
+                                             <a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a> type,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *literal_datatype,
+                                             unsigned char *literal_language,
+                                             size_t *len_p);</pre>
+<p>
+Turns part of raptor statement into a N-Triples format counted string.
+</p>
+<p>
+Turns the given <em class="parameter"><code>term</code></em> into an N-Triples escaped string using all the
+escapes as defined in http://www.w3.org/TR/rdf-testcases/<span class="type">ntriples</span>
+</p>
+<p>
+The part (subject, predicate, object) of the raptor_statement is
+typically passed in as <em class="parameter"><code>term</code></em>, the part type (subject_type,
+predicate_type, object_type) is passed in as <em class="parameter"><code>type</code></em>.  When the part
+is a literal, the <em class="parameter"><code>literal_datatype</code></em> and <em class="parameter"><code>literal_language</code></em> fields
+are set, otherwise NULL (usually object_datatype,
+object_literal_language).</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>term</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> part (subject, predicate, object)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>type</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> part type
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>literal_datatype</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> part datatype
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>literal_language</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> part language
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>len_p</code></em>&#160;:</span></td>
+<td> Pointer to location to store length of new string (if not NULL)
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the new string or NULL on failure.  The length of
+the new string is returned in *<em class="parameter"><code>len_p</code></em> if len_p is not NULL.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2630293"></a><h3>
+<a name="raptor-statement-part-as-string"></a>raptor_statement_part_as_string ()</h3>
+<a class="indexterm" name="id2630306"></a><pre class="programlisting">unsigned char* raptor_statement_part_as_string
+                                            (const void *term,
+                                             <a href="raptor-section-triples.html#raptor-identifier-type">raptor_identifier_type</a> type,
+                                             <a href="raptor-section-uri.html#raptor-uri">raptor_uri</a> *literal_datatype,
+                                             unsigned char *literal_language);</pre>
+<p>
+Turns part of raptor statement into a N-Triples format string.
+</p>
+<p>
+Turns the given <em class="parameter"><code>term</code></em> into an N-Triples escaped string using all the
+escapes as defined in http://www.w3.org/TR/rdf-testcases/<span class="type">ntriples</span>
+</p>
+<p>
+The part (subject, predicate, object) of the raptor_statement is
+typically passed in as <em class="parameter"><code>term</code></em>, the part type (subject_type,
+predicate_type, object_type) is passed in as <em class="parameter"><code>type</code></em>.  When the part
+is a literal, the <em class="parameter"><code>literal_datatype</code></em> and <em class="parameter"><code>literal_language</code></em> fields
+are set, otherwise NULL (usually object_datatype,
+object_literal_language).</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>term</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> part (subject, predicate, object)
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>type</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> part type
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>literal_datatype</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> part datatype
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>literal_language</code></em>&#160;:</span></td>
+<td> <a href="raptor-section-triples.html#raptor-statement"><span class="type">raptor_statement</span></a> part language
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the new string or NULL on failure.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

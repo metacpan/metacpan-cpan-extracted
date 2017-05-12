@@ -1,0 +1,123 @@
+##############################################################################
+# 	Copyright (c) 2000-2006 All rights reserved
+# 	Alberto Reggiori <areggiori@webweaving.org>
+#	Dirk-Willem van Gulik <dirkx@webweaving.org>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer. 
+#
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in
+#    the documentation and/or other materials provided with the
+#    distribution.
+#
+# 3. The end-user documentation included with the redistribution,
+#    if any, must include the following acknowledgment:
+#       "This product includes software developed by 
+#        Alberto Reggiori <areggiori@webweaving.org> and
+#        Dirk-Willem van Gulik <dirkx@webweaving.org>."
+#    Alternately, this acknowledgment may appear in the software itself,
+#    if and wherever such third-party acknowledgments normally appear.
+#
+# 4. All advertising materials mentioning features or use of this software
+#    must display the following acknowledgement:
+#    This product includes software developed by the University of
+#    California, Berkeley and its contributors. 
+#
+# 5. Neither the name of the University nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# 6. Products derived from this software may not be called "RDFStore"
+#    nor may "RDFStore" appear in their names without prior written
+#    permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# ====================================================================
+#
+# This software consists of work developed by Alberto Reggiori and 
+# Dirk-Willem van Gulik. The RDF specific part is based on public 
+# domain software written at the Stanford University Database Group by 
+# Sergey Melnik. For more information on the RDF API Draft work, 
+# please see <http://www-db.stanford.edu/~melnik/rdf/api.html>
+# The DBMS TCP/IP server part is based on software originally written
+# by Dirk-Willem van Gulik for Web Weaving Internet Engineering m/v Arnhem,
+# The Netherlands.
+#
+##############################################################################
+
+# 1. Where is the file db.h?
+#
+#    Change the path below to point to the directory where db.h is
+#    installed on your system.
+
+INCLUDE	= /usr/local/BerkeleyDB/include
+#INCLUDE	= /usr/local/include
+#INCLUDE	= /usr/include
+
+# 2. Where is libdb?
+#
+#    Change the path below to point to the directory where libdb is
+#    installed on your system.
+
+LIB	= /usr/local/BerkeleyDB/lib
+#LIB	= /usr/local/lib
+#LIB	= /usr/lib
+
+# 3. Is the library called libdb?
+#
+#    If you have copies of both 1.x and 2.x Berkeley DB installed on
+#    your system it can sometimes be tricky to make sure you are using
+#    the correct one. Renaming one (or creating a symbolic link) to
+#    include the version number of the library can help.
+#
+#    For example, if you have both Berkeley DB 2.3.12 and 1.85 on your
+#    system and you want to use the Berkeley DB version 2 library you
+#    could rename the version 2 library from libdb.a to libdb-2.3.12.a and
+#    change the DBNAME line below to look like this:
+#
+#        DBNAME = -ldb-2.3.12
+#
+#    That will ensure you are linking the correct version of the DB
+#    library.
+#
+#    Note: If you are building this module with Win32, -llibdb will be
+#    used by default. For all the other platforms it will default to -ldb .
+#
+#    If you have changed the name of the library, uncomment the line
+#    below (by removing the leading #) and edit the line to use the name
+#    you have picked.
+ 
+#DBNAME = -ldb-4.0
+
+# 4. DBMSD installation directory
+#
+#    See dbms/deamon/dbmsd.8
+
+DBMS_INSTDIR = /RDFStore
+
+# 5. RDF storage specific parameters
+#
+#    See include/rdfstore.h
+
+RDFSTORE_WORD_STEMMING = 5
+
+# max number of statements/triples allowed into storage - an integer in the range of 128 <= X <= 60000000
+RDFSTORE_MAXRECORDS = 2097152
+

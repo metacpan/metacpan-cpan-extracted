@@ -1,0 +1,43 @@
+# NAME
+
+    RT::Interface::Email::TakeByMail - Change ownership via email response.
+
+# SYNOPSIS
+
+    AdminCcs can reply 'Mine' or 'Take' via email and they will be assigned the
+    ticket.
+
+# INSTALL
+
+    1. etc/RT_SiteConfig.pm
+
+        # note: TakeByMail must precede TakeAction if TakeAction is installed.
+        Set(@MailPlugins, qw/Auth::MailFrom  RT::Extension::TakeByMail/);
+        Set(@Plugins,     qw/RT::Interface::Email::TakeByMail/         );
+
+    2. Setup watchers for a queue as AdminCcs.
+
+    3. Web config - add "as Comment" to global scrip "On Create notify AdminCcs"
+
+        - Description => "On Create Notify AdminCcs as Comment".
+        - Action      => "Notify AdminCcs as Comment"
+        - Template    => "Global: Admin Comment"
+
+# AUTHOR
+
+    Alister West - http://alisterwest.com/
+
+# LICENCE AND COPYRIGHT
+
+    Copyright 2013, Alister West
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See http://dev.perl.org/licenses/.
+
+## GetCurrentUser
+
+    Returns a tupple of (CurrentUser, $AuthStat).
+    (see RT::Interface::Email::GetAuthenticationLevel for docs on $AuthStat values)
+
+    Checks incoming mail for the first non-blank =~ /Take|Mine/.
+    If so and $user is AdminCC it will SetOwner($user) and SetStatus($active).

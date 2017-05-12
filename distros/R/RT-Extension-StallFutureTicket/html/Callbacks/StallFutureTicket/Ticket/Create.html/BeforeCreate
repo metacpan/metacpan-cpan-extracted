@@ -1,0 +1,51 @@
+%# RT::Extension::StallFutureTicket
+%#
+%# Copyright 2011 synetics GmbH, http://i-doit.org/
+%#
+%# This program is free software; you can redistribute it and/or modify it under
+%# the same terms as Perl itself.
+%#
+%# Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
+
+<%INIT>
+use Date::Manip::Date;
+
+use strict;
+
+## Client data
+my $ARGSRef = $ARGS{'ARGSRef'};
+
+## Call only after POSTing formular:
+if (!exists $$ARGSRef{'AddMoreAttach'} && defined($$ARGSRef{'id'}) &&
+    $$ARGSRef{'id'} == 'new') {
+    my $date = new Date::Manip::Date;
+
+    ## Check wether 'Starts' is set:
+    if ((!$$ARGSRef{'Starts'}) || ($$ARGSRef{'Starts'} =~ /^[ \t]*$/)) {
+        $$skip_create = 1;
+        push @{$results}, loc('Empty start date');
+    } else {
+        ## Parse start date:
+        my $starts = $$ARGSRef{'Starts'};
+        $date->parse($starts);
+
+        ## Parse actual time:
+        my $now = $date->new_date;
+        $now->parse('now');
+
+        ## Compare booth times:
+        my $cmp = $date->cmp($now);
+
+        ## Make a decision:
+        if ($cmp > 0) {
+            ## Update status:
+            $$ARGSRef{'Status'} = 'stalled';
+        }
+    }
+}
+</%INIT>
+
+<%ARGS>
+$skip_create => undef
+$results => undef
+</%ARGS>

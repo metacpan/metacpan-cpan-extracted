@@ -1,0 +1,22 @@
+    <project name="REST-Resource">
+        <listeners>
+            <currentbuildstatuslistener file="logs/${project.name}/status.txt"/>
+        </listeners>
+        <bootstrappers>
+            <svnbootstrapper localWorkingCopy="projects/${project.name}" />
+        </bootstrappers>
+        <modificationset quietperiod="30">
+            <svn localWorkingCopy="projects/${project.name}"/>
+        </modificationset>
+        <schedule interval="86400">
+            <ant anthome="apache-ant-1.6.5" buildfile="projects/${project.name}/build.xml"/>
+        </schedule>
+        <log>
+            <merge dir="projects/${project.name}/target/test-results"/>
+        </log>
+        <publishers>
+            <onsuccess>
+                <artifactspublisher dest="artifacts/${project.name}" file="projects/${project.name}/${project.name}*.tar.gz"/>
+            </onsuccess>
+        </publishers>
+    </project>

@@ -1,0 +1,9 @@
+RMI
+
+To install this module set, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+

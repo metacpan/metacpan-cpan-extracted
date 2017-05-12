@@ -1,0 +1,47 @@
+{
+   "abstract" : "RTG Reporting and data processing",
+   "author" : [
+      "Matt Simerson (msimerson@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RTG-Report",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Std" : "v0.0.4",
+            "DBIx::Simple" : "1.26",
+            "Date::Calc" : "5.4",
+            "MIME::Lite" : "3",
+            "Net::SMTP" : "0.5",
+            "Text::CSV" : "0.5",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.17"
+}

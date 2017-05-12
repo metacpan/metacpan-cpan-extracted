@@ -1,0 +1,7 @@
+<%ARGS>
+$Ticket
+</%ARGS>
+
+<%INIT>
+$Ticket->Lock();
+</%INIT>

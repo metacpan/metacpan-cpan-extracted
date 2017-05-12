@@ -1,0 +1,107 @@
+.\"\*
+.\"\*     Copyright (c) 2000-2006 Alberto Reggiori <areggiori@webweaving.org>
+.\"\*			     Dirk-Willem van Gulik <dirkx@webweaving.org>	
+.\"\*
+.\"\* NOTICE
+.\"\*
+.\"\* This product is distributed under a BSD/ASF like license as described in the 'LICENSE'
+.\"\* file you should have received together with this source code. If you did not get a
+.\"\* a copy of such a license agreement you can pick up one at:
+.\"\*
+.\"\*     http://rdfstore.sourceforge.net/LICENSE
+.\"\*
+.\"\* Perl 'tie' interface to a socket connection. Possibly to
+.\"\* the a server which runs a thin feneer to the Berkely DB.
+.\"\*
+.\"\* Based on DB_File, which came with perl and UKD which
+.\"\* came with CILS.
+.\"\*/
+.\"
+.Dd November, 2000
+.Dt DBMSD 8
+.Os
+.Sh NAME
+.Nm dbmsd
+.Nd remote
+.Tn DB
+server
+.Sh SYNOPSIS
+.Nm dbmsd
+.Op Fl x
+.Op Fl v
+.Op Fl t
+.Op Fl d
+.Op Fl d Arg dbase directory
+.Op Fl p Arg port number
+.Op Fl p Arg address to bind to
+.Op Fl c configfile
+.Op Fl C configfile
+.Op Fl U
+.Op Fl u userid or username
+.Sh DESCRIPTION
+.Nm dbmsd
+runs on a server machine to service
+.Tn DB
+requests from client machines. Mainly a perl library
+.Pp
+.Pp
+The following options are available:
+.Bl -tag -width Ds
+.It Fl v
+Just print the version number, and exit.
+.It Fl X
+Run in debug mode, does not fork, does not detatch.
+.It Fl t
+Simple command tracing; to stdout
+.It Fl d directory
+Specifies the prefix for the directory to create the *.db files in. When compiled
+with HASHING set; the
+.Nm dbmsd
+will in fact create another level of directories below this.
+.It Fl p Arg port
+Specifies the port number.
+.It Fl b addresss
+Specifies the address to bind the server to. If none is specified the server will listen on
+all addresses (INADDR_ANY).
+.It Fl c configfile
+Use spefified config file (use the -v flag to see default config file). Or use '-' for stdin.
+.It Fl C configfile
+Check the specified config file and exit immediately with ok/not-ok. See also 
+,Xref 8 dbmscheckconf
+.It Fl u userid or username.
+Specifies as which user the dbm(s) will be accesses. For sanity
+and security reasons, the server
+uses
+.Xr setuid 2
+to change to that userid (or username) as soon as the relevant
+ports are opened, the loggin is startend and, for forking servers,
+the dbmsd.pid file is writen. If not specified the default
+.Dq nobdoy
+is used.
+.It Fl U
+Specifies no user ID change; the server will run from the user ID
+is was started from (usually root). This counters the
+.Dq -u
+flag above.
+.El
+.Pp
+For example, 
+.Dq Li "dbmsd -p 1234 -d /tmp"
+Caused the server to listen to port 1234 (the default) and create
+its Berkely DB files in /tmp (the default).
+.Pp
+The
+.Nm dbmsd
+utility exits 0 on success, and >0 if an error occurs.
+.Sh SEE ALSO
+.Xr DB 3 ,
+.Xr Perl 1 
+and
+.Xr perltie 1
+.Sh Author
+Dirk-Willem van Gulik, Alberto Reggiori at STA/ISIS, Joint Research Center Ispra 
+for the ParlEuNet project.
+.Sh HISTORY
+The
+.Nm dbmsd
+Started live with the ParlEuNet project.

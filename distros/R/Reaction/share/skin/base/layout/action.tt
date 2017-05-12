@@ -1,0 +1,56 @@
+=for layout widget
+
+<form action="[% action %]" id="[% form_id %]" method="[% method %]" enctype="multipart/form-data">
+  [% header  %]
+  [% container_list %]
+  [% buttons %]
+  [% footer  %]
+</form>
+
+=for layout header
+
+[% error_message %]
+
+=for layout container_list
+
+[% call_next %]
+
+=for layout container
+
+[% call_next %]
+
+=for layout buttons
+  [% message %]
+  [% ok_button_fragment %]
+  [% apply_button_fragment %]
+  [% cancel_button_fragment %]
+
+=for layout message_layout
+
+<span class="action_message">[% message_string %]</span>
+
+=for layout error_message_layout
+
+<span class="action_error_message">[% message_string %]</span>
+
+=for layout standard_button
+
+<span class="action_button">
+  <input type="submit" class="button" name="[% event_id %]" value="[% label %]" />
+</span>
+
+=for layout ok_button
+
+[% standard_button %]
+
+=for layout apply_button
+
+[% standard_button %]
+
+=for layout cancel_button
+
+[% standard_button %]
+
+=for layout footer
+
+=cut

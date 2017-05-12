@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<findpeople>
+	<_param name="q" />
+	<_param name="submit" />
+	<_param name="id" type="int" />
+
+	<people multiple="listelement">
+		<person>
+			<id type="int" />
+			<fullname />
+			<affiliation id="affiliation" multiple="list">
+				<id type="int" />
+				<deptname />
+				<function />
+			</affiliation>
+		</person>
+	</people>
+
+	<person if="id">
+		<id type="int" />
+		<fullname />
+		<major_affiliation typeref="#affiliation" />
+		<studies multiple="list">
+			<id type="int" />
+			<deptid type="int" />
+			<_data name="deptname" />
+			<programid type="int" />
+			<programcode />
+			<programname />
+		</studies>
+	</person>
+</findpeople>

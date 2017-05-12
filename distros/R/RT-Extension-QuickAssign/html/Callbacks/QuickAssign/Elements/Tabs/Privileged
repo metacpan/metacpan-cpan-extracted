@@ -1,0 +1,44 @@
+<%args>
+$Path
+</%args>
+<%init>
+return unless $Path =~ m{^/Ticket/};
+return unless $DECODED_ARGS->{id} and $DECODED_ARGS->{id} =~ /^(\d+)$/;
+
+my $id = $1;
+my $obj = RT::Ticket->new( $session{CurrentUser} );
+$obj->Load( $id );
+return unless $obj;
+
+return unless $obj->OwnerObj->id == RT->Nobody->id;
+
+my ($can_set) = $obj->CurrentUserCanSetOwner;
+return unless $can_set;
+
+my %owners;
+my $isSU = $session{CurrentUser}->HasRight( Right => 'SuperUser', Object => $RT::System );
+my $Users = RT::Users->new( $session{CurrentUser} );
+$Users->LimitToPrivileged;
+$Users->WhoHaveRight(
+    Right               => 'OwnTicket',
+    Object              => $obj,
+    IncludeSystemRights => 1,
+    IncludeSuperusers   => $isSU
+);
+while ( my $User = $Users->Next() ) {
+    $owners{ $User->Id() } = $User;
+}
+
+return unless keys %owners;
+
+my @formatednames = sort {lc $a->[1] cmp lc $b->[1]}
+                     map {[$_, $_->Format]}
+                  values %owners;
+
+my $actions = PageMenu()->child( 'actions' );
+my $assign = $actions->child( assign => title => loc('Assign to...') );
+for my $v (@formatednames) {
+    my ($user, $formatted) = @{$v};
+    $assign->child( $user->id, title => $formatted, path => "/Ticket/Display.html?Owner=".$user->id.";id=" . $id );
+}
+</%init>

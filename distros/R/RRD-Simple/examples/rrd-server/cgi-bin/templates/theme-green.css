@@ -1,0 +1,18 @@
+h1 {
+  background-color: #ccffcc;
+  border-bottom: 2px solid #99ff99;
+}
+
+h2, h3 {
+  background-color: #ddffdd;
+}
+
+a {
+  color: #007700;
+}
+
+div.footer {
+  background-color: #ccffcc;
+  border-top: 1px solid #99ff99;
+}
+

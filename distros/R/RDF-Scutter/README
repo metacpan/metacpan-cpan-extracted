@@ -1,0 +1,53 @@
+RDF-Scutter version 0.1
+=======================
+
+As the name implies, this is an RDF Scutter. A scutter is a web robot
+that follows C<seeAlso>-links, retrieves the content it finds at those
+URLs, and adds the RDF statements it finds there to its own store of
+RDF statements.
+
+It is a LWP::RobotUA, inheriting all the abilities of that class,
+including the ability to be nice to remote servers, heeding robots.txt
+and so on. Also, it uses the excellent and widespread RDF::Redland
+library and builds a Model, which again can be used by other tools. It
+can store the retrieved data in any store that can do contexts that is
+supported by Redland, file, memory, Berkeley DB, MySQL, etc.
+
+It supports most of http://rdfweb.org/topic/ScutterVocab and adds such
+statements to the model. For now, it is pretty much a single-run
+robot, as a second run will just start over.
+
+
+INSTALLATION
+
+To install this module use the CPAN or CPANPLUS tools or type the
+following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module depends on RDF::Redland. Note that RDF in general is in
+development and changes rapidly. It currently depends on at least
+1.0.2.1 (at present not available at CPAN, but from
+http://download.librdf.org/ 
+and may become incompatible with future versions.
+
+It also depends on LWP, but it is not known to the author if it has
+version-specific dependencies.
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Kjetil Kjernsmo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

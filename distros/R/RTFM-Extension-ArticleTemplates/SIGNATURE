@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 498ac4b4748582bc9d23f52aa2ec99bacaf753de Changes
+SHA1 e1795f24d9aeb68e954970599396bdb719574d4b MANIFEST
+SHA1 88dee5ca4e18c5c0be71e9188d926899d668e13b META.yml
+SHA1 742f44a27f702bb089ea498026d4108de98bb08b Makefile.PL
+SHA1 b6c5548d8de071dff9f4ce43c85fd7149a187de3 README
+SHA1 b1030d4339400819cf7217f2a9bf3ffac7eb5670 html/Callbacks/RTFM-Extension-ArticleTemplates/RTFM/Article/Elements/Preformatted/ProcessContent
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 43b47fb3c5ec06b71bb175258c8c1b2aaf8a10ab inc/Module/Install/RTx.pm
+SHA1 dc94326a076aca41452c1d65bf52a255feeb9ef7 inc/Module/Install/ReadmeFromPod.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 5b71ea556882c000f4b1a1d2e825a9a72b616d0a lib/RT/FM/Article_Local.pm
+SHA1 e8f23e6b1c0796c4f50209604e0b15c038ba57ba lib/RTFM/Extension/ArticleTemplates.pm
+SHA1 52133cba7e7418ff5a2797614321a9fdae999bd6 t/00.load.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlDBUC0ACgkQ0+gKWp5CJQpPCgCeNVjM67b2rPtY+CkkeQ+Vdpoq
+X6UAnj75FIWV9vcQDTwpjXYtVLmTuRS4
+=G1Qq
+-----END PGP SIGNATURE-----

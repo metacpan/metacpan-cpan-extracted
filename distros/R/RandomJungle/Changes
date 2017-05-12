@@ -1,0 +1,67 @@
+Revision history for Perl distribution RandomJungle
+Latest version of this distribution:
+$VERSION = 0.05
+
+0.05 Fri Nov 30 00:30:00 2012
+    - Updated RandomJungle::File::DB to improve performance.  Retrieval of large
+      arrays from DBM::Deep is slow.  The lists of variable labels, sample labels,
+      and tree IDs are now stored internally as a concatenated string rather than
+      as an array of individual elements.  No change to the respective accessor
+      methods or their return values.
+    - Updated RandomJungle::Tree to improve performance.  Added the skip_validation
+      parameter to classify_data() to avoid an unnecessary performance hit when
+      using data known to be valid.
+    - Updated Tree_01.t to reflect the addition to classify_data().
+    - The versions of the files contained in this release are as follows:
+        lib/Jungle.pm           0.05
+        lib/Tree.pm             0.05
+        lib/TestData.pm         0.01
+        lib/Tree/Node.pm        0.02
+        lib/File/DB.pm          0.06
+        lib/File/OOB.pm         0.05
+        lib/File/RAW.pm         0.03
+        lib/File/XML.pm         0.06
+        t/DB_01.t               0.01
+        t/Jungle_01.t           0.01
+        t/OOB_01.t              0.01
+        t/RAW_01.t              0.01
+        t/Tree_01.t             0.02
+        t/Tree_02.t             0.01
+        t/Tree_Node_01.t        0.01
+        t/XML_01.t              0.01
+        scripts/RJ_example.pl   0.01
+
+0.04 Sat Apr 28 19:20:00 2012
+    - Added 2 dependencies to Makefile.PL
+    - The versions of the files contained in this release are the same as for 0.01
+
+0.03 Sat Apr 28 12:45:00 2012
+    - Fixed the structure of /lib
+    - The versions of the files contained in this release are the same as for 0.01
+
+0.02 Fri Apr 27 22:00:00 2012
+    - Added meta.yml to the distribution
+    - The versions of the files contained in this release are the same as for 0.01
+
+0.01 Thu Apr 26 17:19:44 2012
+    - original version; created by ExtUtils::ModuleMaker 0.51
+    - The versions of the files contained in this release are as follows:
+        lib/Jungle.pm           0.05
+        lib/Tree.pm             0.04
+        lib/TestData.pm         0.01
+        lib/Tree/Node.pm        0.02
+        lib/File/DB.pm          0.05
+        lib/File/OOB.pm         0.05
+        lib/File/RAW.pm         0.03
+        lib/File/XML.pm         0.06
+        t/DB_01.t               0.01
+        t/Jungle_01.t           0.01
+        t/OOB_01.t              0.01
+        t/RAW_01.t              0.01
+        t/Tree_01.t             0.01
+        t/Tree_02.t             0.01
+        t/Tree_Node_01.t        0.01
+        t/XML_01.t              0.01
+        scripts/RJ_example.pl   0.01
+
+

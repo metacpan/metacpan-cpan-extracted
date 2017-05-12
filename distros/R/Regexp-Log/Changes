@@ -1,0 +1,26 @@
+Revision history for Perl extension Regexp::Log
+
+0.06 Thu Nov 10 20:44:20 CET 2011
+        - Steffen Mueller fixed tests for compatibility with recent Perls
+
+0.05 Sun Oct  3 18:31:22 CEST 2010
+        - new options added by Solli Moreira Honorio:
+          + anchor_line: optionaly anchors the regexp with ^ and $
+          + modifiers: allow the use of modifiers (m, s, i and friends)
+
+0.04  Thu Aug 11 22:03:39 CEST 2005
+        - Perl 5.6 and Perl 5.8 backtrack differently, which
+          broke the tests for the debug option
+        - now support Module::Build
+        - 100% test coverage
+
+0.03  Mon Mar 28 02:20:56 CEST 2005
+        - added t/pod.t and t/pod-coverage.t (for Kwalitee)
+
+0.02  Wed Jan 21 12:39:34 CET 2004
+        - removed a useless /c in a s///
+        - small fix in a test
+
+0.01  Fri Jan 17 16:21:04 CET 2003
+        - original version
+        - this module is used as a base class for Regexp::Log::BlueCoat

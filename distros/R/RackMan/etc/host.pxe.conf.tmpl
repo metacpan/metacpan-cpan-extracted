@@ -1,0 +1,5 @@
+DEFAULT install
+LABEL install
+	KERNEL images/centos/6.2/vmlinuz
+	MENU LABEL ^CentOS 6.2
+	APPEND initrd=images/centos/6.2/initrd.img ramdisk_size=10000 text ks=http://install.infra/kickstart/[% fqdn %].ks

@@ -1,0 +1,13 @@
+$Id$
+REST::Neo4p - Perl bindings for a Neo4j database via REST
+
+Mark A. Jensen, SRA International
+
+See LICENSE for copyright and license info.
+
+To install, from the installation directory do:
+perl Build.PL
+./Build
+./Build test
+./Build install
+

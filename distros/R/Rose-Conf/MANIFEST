@@ -1,0 +1,12 @@
+Changes
+lib/Rose/Conf.pm
+lib/Rose/Conf/FileBased.pm
+lib/Rose/Conf/Root.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/conf-filebased.t
+t/conf-root.t
+t/conf.t
+t/local.conf
+t/My-Class-Conf.conf

@@ -1,0 +1,73 @@
+%#Hartley's First Law:
+%#        You can lead a horse to water, but if you can get him to float
+%#	on his back, you've got something.
+<%INIT>
+my $basepath = $m->fetch_comp("/Foundry/Project/Wiki/index.html")->source_dir;
+my $pwd = "$RT::VarPath/Foundry/kwiki/$Repository";
+my $tag = $session{CurrentUser}->LanguageHandle->language_tag;
+
+local $ENV{REMOTE_USER} = $session{CurrentUser}->UserObj->Name;
+local $CGI::Kwiki::ADMIN = $IsAdmin;
+local $CGI::Kwiki::page_id = $PageId;
+
+require lib;
+lib->import("$basepath/lib");
+require CGI::Kwiki;
+require CGI::Kwiki::I18N;
+
+*CGI::Kwiki::I18N::loc = sub {
+    my $self = shift;
+    $self->initialize($] >= 5.008);
+    CGI::Kwiki::I18N::gettext_lang($tag);
+    return CGI::Kwiki::I18N::gettext(@_);
+};
+
+unless (-d $pwd) {
+    require File::Copy;
+    require File::Basename;
+
+    mkdir $pwd or die "Cannot make $pwd: $!";
+    chdir $pwd;
+    symlink("../.default/$_", $_) for qw(config.yaml template);
+    mkdir "metabase";
+    chmod 0777, "metabase";
+    foreach (qw( blog lock metadata private protected public )) {
+	mkdir "metabase/$_";
+	chmod 0777, "metabase/$_";
+    }
+    mkdir "database";
+    chmod 0777, "database";
+
+    foreach (glob('../.default/database/*')) {
+	File::Copy::copy($_ => "database/" . File::Basename::basename($_));
+    }
+    foreach (glob('../.default/metabase/metadata/*')) {
+	File::Copy::copy($_ => "metabase/metadata/" . File::Basename::basename($_));
+    }
+}
+
+require Cwd;
+my $save_pwd = Cwd::getcwd();
+
+chdir $pwd;
+
+if ($Script) {
+    local $0 = $Script;
+    local $CGI::Kwiki::script = $Script;
+    local $CGI::Kwiki::index = "index.html";
+    my $mod = $Class;
+    $mod =~ s{::}{/}g;
+    require "$mod.pm";
+    $Class->can('handler')->($r, $pwd);
+}
+
+chdir $save_pwd;
+
+</%INIT>
+<%ARGS>
+$Repository
+$IsAdmin    => 0
+$Script	    => undef
+$PageId	    => undef
+$Class	    => 'CGI::Kwiki'
+</%ARGS>

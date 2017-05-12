@@ -1,0 +1,138 @@
+<h3>
+%# <% $Principal->IsUser ? loc('User') : loc('Group') %> '<% $Principal->Object->Name ? $Principal->Object->Name : $Principal->Object->Type %>' has right '<%$Right%>'
+% my $PrincipalObj = $Principal->Object();
+% if ( $Principal->IsUser ) {
+<% loc('User') . $PrincipalObj->Name %>
+% }
+% else {
+%     if ( $PrincipalObj->Name ) {
+<% loc('Group') %> <%$PrincipalObj->Name%>
+%     }
+%     elsif ( $PrincipalObj->Domain =~ /::(.*)-Role$/ ) {
+<% loc('Role') %> <% $PrincipalObj->Type %>
+%     }
+%     else {
+ <%$PrincipalObj->Name ? $PrincipalObj->Name : $PrincipalObj->Type%>
+%     }
+% }
+ has right '<%$Right%>'
+
+% if ( $ObjectType =~ /RT.*::System$/ ) {
+globally
+% }
+% elsif ( $ObjectType =~ /RTx?.*::(.*)$/ ) {
+ on <%$1%> '<%$Object->Name ? $Object->Name : $Object->id %>'
+% }
+% else {
+ on <%$ObjectType%> '<%$Object->Name ? $Object->Name : $Object->id %>'
+% }
+ the following ways:<p></h3>
+
+% foreach my $ace_id (keys %acl_map) {
+<hr>
+%#<pre><%Data::Dumper::Dumper($acl_map{$ace_id})%></pre>
+<& /Admin/Tools/RightsMatrix/Elements/IllustrateACE, ACEObj => $acl_map{$ace_id}{ace}, Groups => $acl_map{$ace_id}{groups}, PrincipalObj => $Principal &>
+% }
+
+<%INIT>
+
+# In order to determine how a user, group or role has a right on an object,
+# find all the Access Control Entries of that object and right (and on
+# RT::System) for that right and SuperUser.
+
+my $Object = $ObjectType->new($RT::SystemUser);
+$Object->Load($ObjectId);
+
+my $Principal;
+if ($PrincipalId =~ /^\d+$/) {
+    $Principal = RT::Principal->new($RT::SystemUser);
+    $Principal->Load($PrincipalId);
+}
+elsif ( $PrincipalId =~ /^(.*)-Role$/ ) {
+    # load the principal that represents the role for the Object
+    my $role = $1;
+    $Principal = RTx::RightsMatrix::RolePrincipal->new($role)->_RealPrincipal(Object => $Object);
+}
+
+my @acl = RTx::RightsMatrix::Util::acl_for_object_right_and_principal(Principal => $Principal, RightName => $Right,
+                                                               ObjectType => $ObjectType, ObjectId => $ObjectId);;
+
+# And now for each ACE we build list of lists to represent the group the ACE
+# is granted on, and an members of the group that are also groups (recursively)
+my %acl_map;
+
+$RT::Logger->debug("Number of ACEs is now: " . scalar(@acl));
+foreach my $ace (@acl) {
+
+    my $ace_group = RT::Group->new($session{CurrentUser});
+    my ($rv, $msg) = $ace_group->Load($ace->PrincipalId);
+    $rv or $RT::Logger->debug("principal group didn't load: " . $ace->PrincipalId);
+
+    my $members = RTx::RightsMatrix::Util::build_group_lists($ace_group, ref($Object), $Object->Id);
+    $acl_map{$ace->id}{ace} = $ace;
+    $acl_map{$ace->id}{groups} = $members;
+$RT::Logger->debug("For ace " . $ace->id);
+}
+
+# Some of the lists of nested groups my not have as a member the user/group/role we are interested in
+# so filter those out
+foreach my $ace (keys %acl_map) {
+    my $lol = $acl_map{$ace}{groups};
+    foreach my $list (@$lol) {
+        unless (RTx::RightsMatrix::Util::list_has_member($list, $Principal)) {
+            $list = [()];
+        }
+    }
+    @$lol = grep { scalar(@$_) } @$lol; #elimate the empties
+}
+
+# If the ace has no group lists now, eliminate it because the ace in no way applied
+# to the user/group/role we are interested in
+foreach my $ace (keys %acl_map) {
+    my $lol = $acl_map{$ace}{groups};
+    delete $acl_map{$ace} unless scalar(@$lol);
+}
+
+#$m->out("<pre>".Data::Dumper::Dumper(\%acl_map)."</pre>");
+# This next step could be combined with the previous steps, but let's keep it easy
+# to understand. Now we want to truncate each group list so that the last group
+# has the principal as a member. This saves work in IllustrateACE.
+foreach my $ace (keys %acl_map) {
+    my $lol = $acl_map{$ace}{groups};
+    foreach my $list (@$lol) {
+        $list = RTx::RightsMatrix::Util::reduce_list($list, $Principal);
+    }
+}
+
+
+# And now, with the lists truncated we need to check them to make sure they are
+# not the same.
+foreach my $ace (keys %acl_map) {
+    my $lol = $acl_map{$ace}{groups};
+    my %compared;
+    foreach my $a (0..$#$lol) {
+        foreach my $b (0..$#$lol) {
+            next if $a == $b;
+            next if $compared{"$a$b"};
+            $lol->[$a] = [()] if RTx::RightsMatrix::Util::same($lol->[$a], $lol->[$b]);
+            $compared{"$a$b"} = 1;
+            $compared{"$b$a"} = 1;
+        }
+    }
+    @$lol = grep { scalar(@$_) } @$lol; #elimate the empties
+}
+
+
+</%INIT>
+<%ARGS>
+$PrincipalId
+$ObjectId
+$ObjectType
+$Right
+</%ARGS>
+<%ONCE>
+use RTx::RightsMatrix::RolePrincipal;
+use RTx::RightsMatrix::Util;
+use Data::Dumper;
+
+</%ONCE>

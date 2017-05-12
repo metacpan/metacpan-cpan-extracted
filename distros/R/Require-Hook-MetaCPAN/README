@@ -1,0 +1,27 @@
+SYNOPSIS
+
+     {
+         local @INC = (@INC, Require::Hook::MetaCPAN->new);
+         require Foo::Bar; # will be searched from MetaCPAN
+         # ...
+     }
+
+DESCRIPTION
+
+METHODS
+
+ new([ %args ]) => obj
+
+    Constructor. Known arguments:
+
+      * die => bool (default: 1)
+
+      If set to 1 (the default) will die if module source code can't be
+      fetched (e.g. the module does not exist on CPAN, or there is network
+      error). If set to 0, will simply decline so require() will try the
+      next entry in @INC.
+
+SEE ALSO
+
+    Other Require::Hook::* modules.
+

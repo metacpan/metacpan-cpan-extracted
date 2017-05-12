@@ -1,0 +1,15 @@
+\.bs$
+\.o$
+\.bak$
+\.old$
+\.tar\.gz$
+\.core$
+~$
+
+(^|/)\.svn($|/)
+(^|/)\.hg(|ignore|tags)($|/)
+^blib($|/)
+(^|/)Makefile$
+
+^XS\.c$
+^pm_to_blib$

@@ -1,0 +1,18 @@
+<config
+  protocol="HTTP"
+  interface="REST"
+  semantic="RDF"
+  address="127.0.0.1"
+  port="2080"
+  pidfile="/tmp/rdf-server.pid"
+  default_renderer="RDF"
+  foreground="1"
+>
+  <renderers json="JSON" rdf="RDF" xml="Atom" />
+  <handler path_prefix="bar">
+    <model class="RDFCore" namespace="http://www.example.com/ns/bar/" />
+  </handler>
+  <handler path_prefix="foo">
+    <model class="RDFCore" namespace="http://www.example.com/ns/foo/" />
+  </handler>
+</config>

@@ -1,0 +1,9 @@
+=for layout widget
+
+[% hidden_list %]
+
+=for layout hidden_field
+
+<input type="hidden" name="[% field_name %]" value="[% field_value %]" />
+
+=cut

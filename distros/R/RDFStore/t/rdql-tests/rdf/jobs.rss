@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:job="http://ilrt.org/discovery/2000/11/rss-query/jobvocab.rdf#" 
+ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+ xmlns:wn="http://xmlns.com/wordnet/1.6/"
+ xmlns="http://purl.org/rss/1.0/" >
+
+<channel rdf:about="http://ilrt.org/discovery/2000/11/rss-query/jobs.rss">
+ <title>JOBS!</title>
+ <link>http://www.lotsofjobs.com</link>
+ <description>
+ Lots of fantastic jobs!
+ </description>
+
+ <image rdf:resource="http://ilrt.org/discovery/2000/11/rss-query/joblogo.gif"/>
+
+    <items>
+      <rdf:Seq>
+        <rdf:li rdf:resource="http://www.lotsofjobs.com/job1" />
+        <rdf:li rdf:resource="http://www.lotsofjobs.com/job2"/>
+        <rdf:li rdf:resource="http://www.lotsofjobs.com/job3" />
+      </rdf:Seq>
+    </items>          
+
+</channel>
+
+
+<image rdf:about="http://ilrt.org/discovery/2000/11/rss-query/joblogo.gif"> 
+ <title>Jobs! logo</title> 
+ <link>http://www.lotsofjobs.com</link> 
+ <url>http://ilrt.org/discovery/2000/11/rss-query/joblogo.gif</url>
+</image>
+
+
+<item rdf:about="http://www.lotsofjobs.com/job1">
+ <title>Job 1</title>
+ <link>http://www.lotsofjobs.com/job1</link>
+
+ <job:advertises>
+   <wn:Job job:title="Job title for job11 goes here" 
+			job:salary="50000" 
+			job:currency="UKP" 
+			>
+   <job:orgHomepage rdf:resource="http://www.nothing.com/"/>
+   </wn:Job>
+</job:advertises>
+
+</item>
+
+<item rdf:about="http://www.lotsofjobs.com/job2">
+ <title>Job 2</title>
+ <link>http://www.lotsofjobs.com/job2</link>
+ <job:advertises>
+
+    <wn:Job job:title="Job title for job22 goes here" 
+			job:salary="100000" 
+			job:currency="USD" 
+			>
+
+    <job:orgHomepage rdf:resource="http://www.nothing.com/"/>
+    </wn:Job>
+</job:advertises>
+
+</item>
+
+
+<item rdf:about="http://www.lotsofjobs.com/job3">
+ <title>Job 3</title>
+ <link>http://www.lotsofjobs.com/job3</link>
+ <job:advertises>
+    <wn:Job job:title="Job title for job33 goes here" 
+			job:salary="60000" 
+			job:currency="USD" 
+			>
+
+     <job:orgHomepage rdf:resource="http://www.nothing.com/"/>
+ </wn:Job>
+</job:advertises>
+
+</item>
+
+</rdf:RDF>
+

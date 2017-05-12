@@ -1,0 +1,33 @@
+---
+abstract: "It's a simple way to dump and backup data from redis-server"
+author:
+  - 'Thiago Rondon <thiago@nsms.com.br>'
+build_requires:
+  English: 0
+  Exporter: 0
+  File::Find: 0
+  File::Temp: 0
+  IO::String: 0
+  POSIX: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Redis-Dump
+requires:
+  JSON: 0
+  Moose: 0
+  MooseX::Getopt: 0
+  MooseX::Types::Path::Class: 0
+  Redis: 1.904
+resources:
+  bugtracker: http://github.com/maluco/Redis-Dump/issues
+  repository: git://github.com/maluco/Redis-Dump
+version: 0.016

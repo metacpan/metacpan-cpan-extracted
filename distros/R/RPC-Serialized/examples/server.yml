@@ -1,0 +1,15 @@
+--- #YAML:1.0
+#
+# Example configuration for rpc-serialized-server
+#
+# $HeadURL: https://svn.oucs.ox.ac.uk/people/oliver/pub/librpc-serialized-perl/trunk/examples/server.yml $
+# $LastChangedRevision: 1338 $
+# $LastChangedDate: 2008-10-01 16:16:56 +0100 (Wed, 01 Oct 2008) $
+# $LastChangedBy: oliver $
+#
+rpc_serialized:
+  server_class: "RPC::Serialized::Server::UCSPI::IPC"
+  acl_path: ~
+  handlers:
+    echo: "RPC::Serialized::Handler::Echo"
+    localtime: "RPC::Serialized::Handler::Localtime"

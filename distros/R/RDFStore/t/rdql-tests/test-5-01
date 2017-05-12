@@ -1,0 +1,7 @@
+/*
+ * Test 5-01 : Anonymous nodes
+ */
+
+SELECT *
+SOURCE <model3.nt>
+WHERE  (?x, ?y, ?z)

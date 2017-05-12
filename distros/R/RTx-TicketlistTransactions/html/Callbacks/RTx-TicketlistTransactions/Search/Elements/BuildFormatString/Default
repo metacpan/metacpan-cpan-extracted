@@ -1,0 +1,6 @@
+<%args>
+$Fields
+</%args>
+<%init>
+push @$Fields, 'LastTransactionContent';
+</%init>

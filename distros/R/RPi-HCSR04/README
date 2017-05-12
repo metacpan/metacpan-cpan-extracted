@@ -1,0 +1,35 @@
+NAME
+    RPi::HCSR04 - Interface to the HC-SR04 ultrasonic distance measurement
+    sensor on the Raspberry Pi
+
+SYNOPSIS
+        use RPi::HCSR04;
+
+        my $trig_pin = 23;
+        my $echo_pin = 24;
+
+        my $sensor = RPi::HCSR04->new($trig_pin, $echo_pin);
+
+        my $inches = $sensor->inch;
+        my $cm     = $sensor->cm;
+        my $raw    = $sensor->raw;
+
+        ...
+
+DESCRIPTION
+    Easy to use interface to retrieve distance measurements from the HC-SR04
+    ultrasonic distance measurement sensor.
+
+    Requires wiringPi to be installed.
+
+VOLTAGE DIVIDER
+    The HC-SR04 sensor requires 5V input, and that is returned back to a Pi
+    GPIO pin from the `ECHO' output on the sensor. The GPIO on the Pi can
+    only handle a maximum of 3.3V in, so either a voltage regulator or a
+    voltage divider must be used to ensure you don't damage the Pi.
+
+    Here's a diagram showing how to create a voltage divider with a 1k and a
+    2k Ohm resistor to lower the `ECHO' voltage output down to a safe
+    ~3.29V. In this case, `TRIG' is connected to GPIO 18, and `ECHO' is
+    connected to GPIO 23.
+

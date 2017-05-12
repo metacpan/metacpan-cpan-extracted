@@ -1,0 +1,17 @@
+=== Warnings and Contact Information
+* *Do Not Use Sensitive Password to test yet*! It shows up in logs.
+* User password *will* affect your PAM password (including ssh, lists, cvs)
+* Send your Feedbacks and Comments to ossf-test@foundry.iis.sinica.edu.tw
+* View [ossf-test Mailing-List Archives http://foundry.iis.sinica.edu.tw:8080/pipermail/ossf-test/]
+* Developers usually chat on [ircnet http://irc.elixus.org/], #ossf channel
+
+=== Available Operations
+* New User / Overview / Preference / New Project / Upload / Download / Version Control done
+* New Project is now autoapproved.
+* For upload, goto My Page, Project Name, Admin, Release Files
+* Before upload files, make sure that the projects own the existing releases
+* For download, goto Trove, Project Name, Downloads
+
+=== Features
+* Lynx / w3m should be usable but not very pretty
+* Currently supported languages: zh_tw, zh_cn, en (change your browser's Accept-Language; need logout before taking effect)

@@ -1,0 +1,16 @@
+This simple extension for RT 3.x (Tested on 3.4 & 3.6) adds a dropdown
+of all users into RT's menubar. Using a tiny bit of javascript,
+selecting one of these users will automatically jump to a search showing
+new, open and tickets for that user.
+
+To install:
+
+    perl Makefile.PL
+    make install
+
+Copyright 2009 Dumb Terminal Creations
+dumb@cpan.org
+
+Originally based on RT::Extension::MenubarSearches:
+
+http://search.cpan.org/~jesse/RT-Extension-MenubarSearches-0.04/

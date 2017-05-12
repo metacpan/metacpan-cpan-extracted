@@ -1,0 +1,52 @@
+Description.
+------------
+This is an attempt to write a converter from Rich Text
+Format (RTF) to a HyperText Markup Language (HTML).
+
+Supported specifications:
+   - RTF 1.7
+   - HTML 4.01
+   - CSS2
+
+The following modules are included:
+  RTF::Lexer - low-level parsing of RTF-stream into tokens.
+  RTF::HTMLConverter - this actually does the main job.
+For more details see corresponding pod.
+
+This is alpha software. Use it for your own risk. The author
+will be grateful for your feedback.
+
+Prerequisites.
+--------------
+  1. Perl 5.8.0 or higher
+  2. Perl modules:
+    2.1 Error
+    2.2 Encode
+    2.3 Any W3C DOM implementation (XML::GDOME or XML::DOM)
+
+  For the image support the following required:
+    2.4 File::Spec
+    2.5 File::Temp
+    2.6 Image::Info
+  3. Image Magick (http://www.imagemagick.org/)
+       You will need the 'convert' and 'mogrify' utilities.
+  4. libwmf (http://sourceforge.net/projects/wvware/)
+       You will need the 'wmf2eps' utility.
+
+Installation.
+-------------
+After installing all prerequisites do the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Acknowledgments.
+-----------------
+I would like to thank Dr. P.Yu.Pletchov who asked me to write
+a RTF to HTML converter and helped me in doing that.
+
+Author.
+-------
+Vadim O. Ustiansky
+ustiansky@cpan.org

@@ -1,0 +1,177 @@
+=head1 NAME
+
+ResourcePool::ExtensionGuide - How to write extensions for L<ResourcePool|ResourcePool>
+
+=head1 DESCRIPTION
+
+
+This document describes how to build extensions for L<ResourcePool|ResourcePool>. As you will see you need only a few lines of code to create your own resource type. Afterwards you will be able to use this resource for L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer>.
+
+A resource by means of L<ResourcePool|ResourcePool> is some perl object which could benefit from the feature set provided by L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer>. The reason why I use such a meaningless sentence to describe is what a resource is, is that there is no other clear separation which could be used. In many cases a resource is something which has a connection to a server like a database connection. But L<ResourcePool|ResourcePool> is not limited to such resources, to be honest I have some plans for L<ResourcePool|ResourcePool> which will result in the ability to use L<ResourcePool|ResourcePool> for LWP requests (including load balancing and fail over) and so on. But that's not finished yet. If it is easier for you, think of a resource as a connection to a server.
+
+Every L<ResourcePool|ResourcePool> resource consists of two major parts:
+
+
+=over 4
+
+=item a resource adapter
+
+Is a adapter which gives each resource a common interface. This interface covers basic requirements such as closing a resource. L<ResourcePool::Resource|ResourcePool::Resource> acts as a base class for all resources.
+
+=item a factory
+
+Is used to construct resources on demand. Is usually not more than a storage of the required information to create a resource. L<ResourcePool::Factory|ResourcePool::Factory> acts as a base class for all factories.
+
+=back
+
+If you have implemented this two packages you are nearly done. The only missing parts are: documentation, tests and uploading your extension to CPAN.
+
+=head1 Resource adapter
+
+
+A resource adapter has to provide a generic interface to L<ResourcePool|ResourcePool> for your resource. This interface is used to interact with the resource. Some of the methods are optional, you can just skip them if you have carefully derived your own resource adapter from L<ResourcePool::Resource|ResourcePool::Resource> which will provide some defaults for you.
+
+Each resource adapter manages exactly one resource. This means for example one database connection or whatever your resource might be. The pooling and management of more resources is done by L<ResourcePool|ResourcePool> and does not require any attention of your resource adapter.
+
+I will describe the methods of this class in the order in which they are used by L<ResourcePool|ResourcePool>.
+
+
+=over 4
+
+=item Constructor
+
+The constructor of a resource adapter will only be used from the according factory. You have all the freedom you can imagine for the prototype of the constructor (as you have it in every derived class in every programming language). I suggest to name your constructor new() (a perl convention, not a language requirement).
+
+The actual work the constructor has to do is to create the resource (e.g. database connection) and storing it in its private data. If everything went fine the constructor must return its bless()ed reference. Otherwise you have the option to return undef to indicate that the creation of a resource failed.
+
+If your constructor returns an object, L<ResourcePool|ResourcePool> will add this resource to its internal pool of available resources.
+
+=item precheck
+
+This method is used to check the vitality of this resource. L<ResourcePool|ResourcePool> calls this method before it uses the resource to check it's validity. L<ResourcePool|ResourcePool> will not use this resource any more if this method returns a false value.
+
+The precheck() method is very important to the high availability functionality of L<ResourcePool|ResourcePool> and L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer>. This method, together with >, builds the backbone of the fault detection mechanism. If you want L<ResourcePool|ResourcePool> to detect broken resources you need to carefully implement this method to return a false value if the resource is not longer valid.
+
+This method is most probably implemented by doing so nop (no operation) with the resource. Choose the cheapest non modifying operation possible and analyze it's result. If everything is as expected return true otherwise false. (The L<DBI extension|ResourcePool::Resource::DBI/precheck> does a ping() to detect broken connections)
+
+This method can also be used to implement some code which restores a state for this resource. This way you can guarantee a common state of the resources you obtain from L<ResourcePool|ResourcePool>. Imagine a database connection pool which guarantees you that AutoCommit is off on the handles you get from the pool, even if you have returned a connection where you manually changed the AutoCommit setting.
+
+If your precheck() method returns a true value, L<ResourcePool|ResourcePool> will go on and supply the resource to the client code. Otherwise it will throw this resource away and performing the recovery as described in the L<ResourcePool|ResourcePool> documentation.
+
+=item get_plain_resource
+
+This method just returns the internally stored resource. You have to return the actual resource you are implementing the adapter for. E.g. the DBI handle or whatever your extension manages. The return value of this method will be passed to the client code as return value of the L<get()|ResourcePool/get> method.
+
+L<ResourcePool|ResourcePool> will than remove this resource from it's list of available resources (so that a used resource can not be used simultaneously).
+
+From the moment on where this method returns you lose control over this resource. Later, when you get back the resource from the client (which has called the L<free() method of ResourcePool|ResourcePool/free>) you can not make any assumptions of the state of the resource. The client could have done everything which can be done with this resource, including closing it (e.g. disconnecting from the database).
+
+=item postcheck
+
+The postcheck() method is very similar to the previously described > method. The only difference is that the postcheck() method is called after the client has returned a resource to the pool.
+
+As mentioned above, you can not make any assumptions of the state of the resource. The client could have done everything. As for the > method you can use this method also to place some code which restores the original state or doing some cleanup (e.g. a rollback() on a database connection).
+
+L<ResourcePool|ResourcePool> will throw this resource away if this method returns a false value, otherwise L<ResourcePool|ResourcePool> will add this resource to it's list of available resources and use it again if required (the cycle starts again with the precheck() method).
+
+=item close
+
+This method is used (surprise surprise) to close the resource. It's called immediately before the resource adapter itself gets destroyed.
+
+=back
+
+The normal life cycle of a resource adapter ends here. The remaining method are used to handle failure...
+
+
+=over 4
+
+=item fail_close
+
+This method is used to close a resource which is known to be broken (either because one of > or > failed or the client used the L<fail() method of ResourcePool|ResourcePool/fail> to hand it back to the pool.
+
+The difference to the > method is very subtle. For many resource there is no difference anyway. For some others you might want to skip some cleanup operations which will fail anyway if the resource is broken.
+
+=back
+
+The following simplified call-graph tries to demonstrate the most important important processes which take place with your resource. Please note that this is reduced to the processes relevant to the resource adapter class.
+
+ 
+ Client  .  ResourcePool and           .  resource adapter
+ code    .  LoadBalancer               .
+         .                             . 
+ --------> get() ----------------------> precheck() -----------+
+         .                             .                       |
+         .    +------------------------<-----------------------+
+         .    | on failure             .
+         .    +------------------------> fail_close() ---------+
+         .    | tries another          .                       | 
+         .    | available resource <---------------------------+
+         .    |                        .
+         .    | on success             .
+         .    +------------------------> get_plain_resource() -+
+         .                             .                       |
+ --------<-----------------------------<-----------------------+
+         .                             .
+         .                             .
+ --------> free() ---------------------> postcheck() ----------+
+         .                             .                       |
+         .    +------------------------<-----------------------+
+         .    | on failure             .
+         .    +------------------------> fail_close() ---------|
+         .    | on success             .
+         .    +--> Add back to pool    .
+         .                             .
+         .                             .
+ --------> fail() ---------------------> fail_close() ---------|
+         .                             .
+
+(the free() and fail() methods do return meaningful values which are in not directly related to the resource adapter implementation.)
+
+The diagram is separated into three sections: the leftmost section represents the user code, this is the software which uses L<ResourcePool|ResourcePool>; the middle one represents the L<ResourcePool|ResourcePool> core. For this diagram it makes no difference if you are using L<ResourcePool::LoadBalancer|ResourcePool::LoadBalancer> as well; the right most section represents the resource adapter of the extension.
+
+=head1 Factories
+
+
+The purpose of a factory is to store information which is required to create a resource. The factory is constructed and configured by the user code and then passed to the L<ResourcePool|ResourcePool> on construction.
+
+The L<ResourcePool::Factory|ResourcePool::Factory> class acts as base for all factories. Besides the constructor the L<ResourcePool::Factory|ResourcePool::Factory> defines only two methods which should be overloaded.
+
+
+=over 4
+
+=item create_resource
+
+Returns a resource adapter (a L<ResourcePool::Resource|ResourcePool::Resource> derived class). L<ResourcePool|ResourcePool> uses this method to create new resources as required. As a result of the fact the the constructor of a resource adapter may fail and return undef, the create_resource method is also allowed to return undef. In that case L<ResourcePool|ResourcePool> would apply the error handling as configured.
+
+=item info
+
+This method is used if L<ResourcePool|ResourcePool> does some error reporting. You should return a human readable string which describes the resources which are created through this factory. For a database resource this could be the data-source name.
+
+=back
+
+=head1 Naming conventions
+
+
+As you have learned every L<ResourcePool|ResourcePool> consists of two parts. The namespace where you should place this two packages are L<ResourcePool::Factory|ResourcePool::Factory> and L<ResourcePool::Resource|ResourcePool::Resource>. Below this two namespaces you should add the complete perl-class name for which resource your extension is. E.g. The L<Net::LDAP|Net::LDAP> factory and resource adapter are called L<ResourcePool::Factory::Net::LDAP|ResourcePool::Factory::Net::LDAP> and L<ResourcePool::Resource::Net::LDAP|ResourcePool::Resource::Net::LDAP>.
+
+If you upload you extension to CPAN you should name the package according to your resource adapter name.
+
+=head1 EXAMPLES
+
+
+The reality delivers the best examples. Please have a look into the implementation of the already existing extensions like DBI or Net::LDAP.
+
+=head1 SEE ALSO
+
+L<ResourcePool|ResourcePool>,
+L<ResourcePool::Resource|ResourcePool::Resource>,
+L<ResourcePool::Factory|ResourcePool::Factory>
+
+=head1 AUTHOR
+
+    Copyright (C) 2001-2009 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+		

@@ -1,0 +1,41 @@
+<div id="delayed_ticket_history_<% $Ticket->id %>">
+    <& /Widgets/TitleBoxStart, title_raw => $title_raw &>
+        <&|/l&>Loading...</&>
+    <& /Widgets/TitleBoxEnd &>
+</div>
+<script type="text/javascript">
+jQuery(function(){
+    jQuery('#delayed_ticket_history_<% $Ticket->id %>').load(<% $url |n %>, null, function() {
+        var parent = jQuery(this);
+      
+        parent.find('div.titlebox-title span.left').html(<% $title_raw |n,j %>);
+        parent.find('.titlebox-content').addClass('hidden');
+        parent.find('div.titlebox').addClass('rolled-up');
+        parent.find('div.titlebox-title span.widget a').removeAttr('onclick').click( function() {
+            if ( parent.find('div.titlebox-content').hasClass('hidden') ) {
+                parent.find('div.titlebox-content').removeClass('hidden');
+                parent.find('div.titlebox').removeClass('rolled-up');
+            }
+            else {
+                parent.find('div.titlebox-content').addClass('hidden');
+                parent.find('div.titlebox').addClass('rolled-up');
+            }
+            return false;
+        });
+    });
+});
+</script>
+<%ARGS>
+$Ticket
+</%ARGS>
+<%INIT>
+my %params = %ARGS;
+delete $params{Ticket};
+
+my $title_raw = q{<a href="} . RT->Config->Get('WebPath') . q{/Ticket/Display.html?id=} . $Ticket->id . q{">Linked Ticket } . $Ticket->id . ': ' . $Ticket->Subject . q{</a>};
+
+my $url = JSON(
+    RT->Config->Get('WebPath') . "/Helpers/TicketHistory?".
+        $m->comp('/Elements/QueryString', %params, id => $Ticket->id )
+);
+</%INIT>

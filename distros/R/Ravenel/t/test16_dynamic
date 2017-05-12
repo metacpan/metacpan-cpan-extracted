@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use lib ( "../lib", $FindBin::Bin, "$FindBin::Bin/../lib" );
+
+use Ravenel::Document;
+
+sub droid {
+	my Ravenel::Block $block_obj = shift;
+	my $block                    = $block_obj->get_block();
+	$block =~ s/o/0/g;
+	return $block;
+}
+
+my $res = Ravenel::Document->render( {
+	'data'      => qq(
+		<r:droid>motorola</r:droid>
+		<r:nexus>nexus one</r:nexus>
+	), 
+	'functions' => { 
+		'droid' => \&droid, 
+		'nexus' => sub { 
+			my Ravenel::Block $block_obj = shift;
+			my $block                    = $block_obj->get_block();
+			$block =~ s/e/1/g;
+			return $block;
+		}
+	},
+	'dynamic'   => 1,
+} );
+
+print $res . "\n";

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Data, client and server classes for XML-RPC",
+   "author" : [
+      "Randy J. Ray"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RPC-XML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Compress::Raw::Zlib" : "2.063",
+            "DateTime" : "0.70",
+            "DateTime::Format::ISO8601" : "0.07",
+            "XML::LibXML" : "1.85"
+         },
+         "requires" : {
+            "File::Spec" : "0.8",
+            "LWP" : "5.834",
+            "Module::Load" : "0.24",
+            "Scalar::Util" : "1.33",
+            "Test::More" : "0.94",
+            "XML::Parser" : "2.31",
+            "constant" : "1.03",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=RPC-XML"
+      },
+      "homepage" : "http://search.cpan.org/dist/RPC-XML",
+      "repository" : {
+         "url" : "http://github.com/rjray/rpc-xml"
+      }
+   },
+   "version" : "0.80",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

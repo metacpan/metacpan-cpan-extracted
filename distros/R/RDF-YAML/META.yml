@@ -1,0 +1,20 @@
+name: RDF-YAML
+module_name: RDF::YAML
+version: 0.11
+abstract: RDF YAML parser and dumper
+author: Autrijus Tang (autrijus@autrijus.org)
+license: unknown
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  YAML: 0.30
+  RDF::Simple: 0.04
+  Class::MethodMaker: 1.00
+no_index:
+  directory:
+    - inc
+private:
+  directory:
+    - inc
+generated_by: Module::Install version 0.26

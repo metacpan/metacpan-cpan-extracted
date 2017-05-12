@@ -1,0 +1,139 @@
+
+<IfModule !mod_rewrite.c>
+    LoadModule rewrite_module "/etc/httpd/modules/mod_rewrite.so"
+</IfModule>
+
+
+PerlSwitches -Mblib=@ServerRoot@
+
+SetEnv PERL5LIB @ServerRoot@/../../lib
+
+DirectoryIndex index.html
+
+ScriptAliasMatch ^/cgi1(/(.+\.(html|txt|xml|xsl|\/))?)?$ @ServerRoot@/../../bin/rayapp_cgi_wrapper/$1
+<Location /cgi1>
+	# RAYAPP_DIRECTORY is necessary to achieve the reverse
+	# mapping, it is here instead of Alias
+	SetEnv RAYAPP_DIRECTORY @DocumentRoot@/ray
+	SetEnv RAYAPP_ERRORS_IN_BROWSER 1
+	SetEnv RAYAPP_ENV_DATA mono1
+	SetEnv RAYAPP_DIRECTORY_INDEX app3.html
+	# We need the @ServerRoot@ here for RayAppTestInput,
+	# and the ../lib to run correct CGI versions
+	SetEnv PERL5LIB @ServerRoot@:@ServerRoot@/../../lib
+	SetEnv RAYAPP_INPUT_MODULE RayAppTestInput
+	SetEnv RAYAPP_STYLE_PARAM_MODULE RayAppStyleParams
+	SetEnv RAYAPP_ENV_STYLE_DATA datel
+</Location>
+
+ScriptAlias /cgi2 @ServerRoot@/../../bin/rayapp_cgi_wrapper
+<LocationMatch ^/cgi2(/(.+\.(html|txt|xml|xsl|\/))?)?$>
+	SetEnv RAYAPP_DIRECTORY @DocumentRoot@/ray
+	SetEnv RAYAPP_ENV_DATA mono2
+	SetEnv RAYAPP_DIRECTORY_INDEX app3.html
+	SetEnv PERL5LIB @ServerRoot@:@ServerRoot@/../../lib
+	SetEnv RAYAPP_INPUT_MODULE RayAppTestInput
+	SetEnv RAYAPP_STYLE_PARAM_MODULE RayAppStyleParams
+	SetEnv RAYAPP_ENV_STYLE_DATA jezevec
+</LocationMatch>
+
+Alias /cgi2_storable @DocumentRoot@/ray
+<Location /cgi2_storable/>
+	PerlSetEnv RAYAPP_ENV_DATA earth2
+	SetHandler perl-script
+	PerlResponseHandler RayApp::mod_perl_Storable
+	SetEnv RAYAPP_DIRECTORY_INDEX app3.html
+	# We need the @ServerRoot@ here for RayAppTestInput,
+	# and the ../lib to run correct CGIStorable versions
+	SetEnv PERL5LIB @ServerRoot@:@ServerRoot@/../lib
+	SetEnv RAYAPP_INPUT_MODULE RayAppTestInput
+</Location>
+
+<Location /cgi3_storable>
+	# RAYAPP_DIRECTORY is an alternative to Alias
+	SetEnv RAYAPP_DIRECTORY @DocumentRoot@/ray
+	PerlSetEnv RAYAPP_ENV_DATA earth2.6
+	SetHandler perl-script
+	PerlResponseHandler RayApp::mod_perl_Storable
+	SetEnv RAYAPP_DIRECTORY_INDEX app3.html
+	# We need the @ServerRoot@ here for RayAppTestInput,
+	# and the ../lib to run correct CGIStorable versions
+	SetEnv PERL5LIB @ServerRoot@:@ServerRoot@/../lib
+	SetEnv RAYAPP_INPUT_MODULE RayAppTestInput
+</Location>
+
+Alias /mod_perl1 @DocumentRoot@/ray
+<Location /mod_perl1/>
+	SetEnv RAYAPP_ENV_DATA man5
+	PerlSetEnv RAYAPP_ENV_STYLE_DATA zirafa
+	SetHandler perl-script
+	PerlResponseHandler RayApp::mod_perl
+	# SetEnv RAYAPP_DIRECTORY_INDEX app3.html
+	# SetEnv RAYAPP_INPUT_MODULE RayAppTestInput
+	PerlSetVar RayAppDirectoryIndex app3.html
+	PerlSetVar RayAppInputModule RayAppTestInput
+	PerlSetVar RayAppStyleParamModule RayAppStyleParams
+</Location>
+
+Alias /mod_perl2 @DocumentRoot@/ray
+<Location /mod_perl2/>
+	PerlSetEnv RAYAPP_ENV_DATA mono45
+	PerlSetEnv RAYAPP_ENV_STYLE_DATA slon
+	SetHandler modperl
+	PerlResponseHandler RayApp::mod_perl
+	PerlSetVar RayAppDirectoryIndex app3.html
+	PerlSetVar RayAppInputModule RayAppTestInput
+	PerlSetVar RayAppStyleParamModule RayAppStyleParams
+</Location>
+
+Alias /mod_perl3 @DocumentRoot@/ray1
+<Directory @DocumentRoot@/ray1>
+	SetEnv RAYAPP_ENV_DATA man53
+	PerlSetEnv RAYAPP_ENV_STYLE_DATA pes
+	SetHandler perl-script
+	PerlResponseHandler RayApp::mod_perl
+	# SetEnv RAYAPP_DIRECTORY_INDEX app3.html
+	# SetEnv RAYAPP_INPUT_MODULE RayAppTestInput
+	PerlSetVar RayAppDirectoryIndex app3.html
+	PerlSetVar RayAppInputModule RayAppTestInput
+	PerlSetVar RayAppStyleParamModule RayAppStyleParams
+</Directory>
+
+Alias /mod_perl4 @DocumentRoot@/ray2
+<Directory @DocumentRoot@/ray2>
+	PerlSetEnv RAYAPP_ENV_DATA mono_lake
+	PerlSetEnv RAYAPP_ENV_STYLE_DATA krtek
+	SetHandler modperl
+	PerlResponseHandler RayApp::mod_perl
+	PerlSetVar RayAppDirectoryIndex app3.html
+	PerlSetVar RayAppInputModule RayAppTestInput
+	PerlSetVar RayAppStyleParamModule RayAppStyleParams
+</Directory>
+
+Alias /mod_perl_proxy1 @DocumentRoot@/pdir
+<Location /mod_perl_proxy1>
+	PerlSetVar RayAppURIProxy '^/mod_perl_proxy1/(.+)\.(pdf|html|txt|xml)$ /mod_perl4/$1.xml'
+	PerlSetVar RayAppDirectoryIndex app3.html
+	SetHandler modperl
+	PerlResponseHandler RayApp::mod_perl
+</Location>
+
+<Location /mod_perl_proxy2/>
+	PerlSetVar RayAppPathInfoProxy '(.+)\.(pdf|html|txt|xml) http://@ServerName@:@Port@/mod_perl3$1.xml'
+	PerlSetVar RayAppDirectoryIndex app3.html
+	SetHandler perl-script
+	PerlResponseHandler RayApp::mod_perl
+</Location>
+<LocationMatch ^/mod_perl_proxy2$>
+	RewriteEngine On
+	RewriteRule .* /mod_perl_proxy2/
+</LocationMatch>
+
+Alias /mod_perl_proxy3_cgi @DocumentRoot@/pdir
+<Location /mod_perl_proxy3_cgi>
+	PerlSetVar RayAppURIProxy '^/mod_perl_proxy3_cgi/(.+)\.(pdf|html|txt|xml)$ /cgi1/$1.xml'
+	PerlSetVar RayAppDirectoryIndex app3.html
+	SetHandler modperl
+	PerlResponseHandler RayApp::mod_perl
+</Location>
+

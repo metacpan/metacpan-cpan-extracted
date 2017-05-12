@@ -1,0 +1,22 @@
+<%init>
+
+foreach my $file_name ( keys %{$session{Attachments}{$$ARGSRef{'Token'}}} ) {
+    my ($val, $result) = CheckAttachmentFilter(
+        Queue => $TicketObj->QueueObj,
+        FileName => $file_name,
+    );
+
+    if ( $val ) {
+        delete $session{Attachments}{$$ARGSRef{'Token'}}{$file_name};
+        push @$results, $result;
+        $$skip_update = 1;
+    }
+}
+
+</%init>
+<%args>
+$ARGSRef => undef
+$results => undef
+$skip_update => undef
+$TicketObj => undef
+</%args>

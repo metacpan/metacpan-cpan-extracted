@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RDF::Core::NodeFactory - produces literals and resources, generates labels for anonymous resources</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#interface">Interface</a></li>
+	</ul>
+
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>RDF::Core::NodeFactory - produces literals and resources, generates labels for anonymous resources</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  require RDF::Core::NodeFactory;
+  my $factory = new RDF::Core::NodeFactory(BaseURI=&gt;'<a href="http://www.foo.org/">http://www.foo.org/</a>');
+  my $resource = $factory-&gt;newResource('<a href="http://www.foo.org/pages">http://www.foo.org/pages</a>');</pre>
+<pre>
+  #get the same uri:
+  my $absolutizedResource = $factory-&gt;newResource('/pages');</pre>
+<pre>
+  #anonymous resource
+  my $generatedResource = $factory-&gt;newResource;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>NodeFactory generates RDF graph nodes - literals and resources. The resources' URIs are expanded against base uri (BaseURI option) to their absolute forms using URI module. NodeFactory can generate unique 'anonymous' resources.</p>
+<p>
+</p>
+<h2><a name="interface">Interface</a></h2>
+<ul>
+<li><strong><a name="item_new"><code>new(%options)</code></a></strong><br />
+</li>
+Available options are:
+<ul>
+<li><strong><a name="item_baseuri">BaseURI</a></strong><br />
+</li>
+When NodeFactory generates a resource from relative URI, BaseURI is used to obtain absolute URI. BaseURI must be absolute. Default value is 'uri:'.
+<p></p>
+<li><strong><a name="item_genprefix_2c_gencounter">GenPrefix, GenCounter</a></strong><br />
+</li>
+Is used to generate bNode label (an anonymous resource). Default values are '_:a' for GenPrefix and 0 for GenCounter. Resulting label is concatenation of GenPrefix and GenCounter.
+<p></p></ul>
+<li><strong><a name="item_getoptions">getOptions</a></strong><br />
+</li>
+<li><strong><a name="item_setoptions"><code>setOptions(\%options)</code></a></strong><br />
+</li>
+<li><strong><a name="item_newliteral"><code>newLiteral($value)</code></a></strong><br />
+</li>
+<li><strong><a name="item_newresource">newResource($namespace, $localValue)</a></strong><br />
+</li>
+<li><strong><code>newResource($uri)</code></strong><br />
+</li>
+<li><strong>newResource</strong><br />
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is subject to the MPL (or the GPL alternatively).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ginger Alliance, <a href="mailto:rdf@gingerall.cz">rdf@gingerall.cz</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>URI, RDF::Core::Resource, RDF::Core::Literal</p>
+
+</body>
+
+</html>

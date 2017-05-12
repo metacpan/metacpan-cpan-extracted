@@ -1,0 +1,10 @@
+@CustomFields = (
+    {
+        Name        => 'Tag',
+        Type        => 'TagsMultiple',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        Disabled    => 0,
+        Description => 'Tags for tickets',
+        MaxValues   => '0',
+    },
+);

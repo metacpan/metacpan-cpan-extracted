@@ -1,0 +1,1876 @@
+---
+match_source_1_0:
+  -
+    - a0_0_all.deb
+    - '-'
+  -
+    - a0_0-1.diff.gz
+    - '-'
+  -
+    - a0_0.debian.tar.gz
+    - '-'
+  -
+    - a0_0.orig-abc.tar.gz
+    - +
+    - a0_0.orig-abc.tar.gz
+    - a0
+    - 0.orig-abc
+    - tar
+  -
+    - a0_0.dsc
+    - '-'
+  -
+    - a0_0_all.changes
+    - '-'
+  -
+    - ''
+    - '-'
+  -
+    - tar.gz
+    - '-'
+  -
+    - orig.tar.gz
+    - '-'
+  -
+    - 0.tar.gz
+    - '-'
+  -
+    - 0.orig.tar.gz
+    - '-'
+  -
+    - _0.tar.gz
+    - '-'
+  -
+    - a0_0.tar.gz
+    - +
+    - a0_0.tar.gz
+    - a0
+    - 0
+    - tar
+  -
+    - a0_a.tar.gz
+    - +
+    - a0_a.tar.gz
+    - a0
+    - a
+    - tar
+  -
+    - a0_tar.tar.gz
+    - +
+    - a0_tar.tar.gz
+    - a0
+    - tar
+    - tar
+  -
+    - a0_orig.tar.tar.gz
+    - +
+    - a0_orig.tar.tar.gz
+    - a0
+    - orig.tar
+    - tar
+  -
+    - a0_a.orig.tar.tar.gz
+    - +
+    - a0_a.orig.tar.tar.gz
+    - a0
+    - a.orig.tar
+    - tar
+  -
+    - a0_0.tar.gzfoo.bar
+    - '-'
+  -
+    - _a0_0.tar.gz
+    - '-'
+    - a0_0.tar.gz
+    - a0
+    - 0
+    - tar
+  -
+    - a0_0.tgz
+    - '-'
+  -
+    - a0_0-tar.gz
+    - '-'
+  -
+    - a0_0_tar.gz
+    - '-'
+  -
+    - a0_0.orig.tar.gz
+    - +
+    - a0_0.orig.tar.gz
+    - a0
+    - 0
+    - orig.tar
+  -
+    - a0_a.orig.tar.gz
+    - +
+    - a0_a.orig.tar.gz
+    - a0
+    - a
+    - orig.tar
+  -
+    - a0_tar.orig.tar.gz
+    - +
+    - a0_tar.orig.tar.gz
+    - a0
+    - tar
+    - orig.tar
+  -
+    - a0_orig.tar.orig.tar.gz
+    - +
+    - a0_orig.tar.orig.tar.gz
+    - a0
+    - orig.tar
+    - orig.tar
+  -
+    - a0_orig.tar.gz.orig.tar.gz
+    - +
+    - a0_orig.tar.gz.orig.tar.gz
+    - a0
+    - orig.tar.gz
+    - orig.tar
+  -
+    - a0_a.orig.tar.gz.orig.tar.gz
+    - +
+    - a0_a.orig.tar.gz.orig.tar.gz
+    - a0
+    - a.orig.tar.gz
+    - orig.tar
+  -
+    - a0_0.orig.tar.gzfoo.bar
+    - '-'
+  -
+    - _a0_0.orig.tar.gz
+    - '-'
+    - a0_0.orig.tar.gz
+    - a0
+    - 0
+    - orig.tar
+  -
+    - a0_0-orig.tar.gz
+    - +
+    - a0_0-orig.tar.gz
+    - a0
+    - 0-orig
+    - tar
+  -
+    - a0_0.orig.tgz
+    - '-'
+  -
+    - a0_0.gz.tar.gz
+    - +
+    - a0_0.gz.tar.gz
+    - a0
+    - 0.gz
+    - tar
+  -
+    - a0_0.tar.gz.tar.gz
+    - +
+    - a0_0.tar.gz.tar.gz
+    - a0
+    - 0.tar.gz
+    - tar
+  -
+    - a0_0.gz.orig.tar.gz
+    - +
+    - a0_0.gz.orig.tar.gz
+    - a0
+    - 0.gz
+    - orig.tar
+  -
+    - a0_0.tar.gz.orig.tar.gz
+    - +
+    - a0_0.tar.gz.orig.tar.gz
+    - a0
+    - 0.tar.gz
+    - orig.tar
+  -
+    - a0_0.orig.tar.gz.tar.gz
+    - +
+    - a0_0.orig.tar.gz.tar.gz
+    - a0
+    - 0.orig.tar.gz
+    - tar
+  -
+    - a0_0.orig.tar.gz.orig.tar.gz
+    - +
+    - a0_0.orig.tar.gz.orig.tar.gz
+    - a0
+    - 0.orig.tar.gz
+    - orig.tar
+  -
+    - a0_0.orig.tar.gz.orig.tar.gz.orig.tar.gz
+    - +
+    - a0_0.orig.tar.gz.orig.tar.gz.orig.tar.gz
+    - a0
+    - 0.orig.tar.gz.orig.tar.gz
+    - orig.tar
+  -
+    - a0_0:1.tar.gz
+    - '-'
+  -
+    - a0_0%1.tar.gz
+    - '-'
+  -
+    - a0_0%3a1.tar.gz
+    - '-'
+  -
+    - a0_0123456789.tar.gz
+    - +
+    - a0_0123456789.tar.gz
+    - a0
+    - 0123456789
+    - tar
+  -
+    - a0_0abcdefghijklmnopqrstuvwxyz.tar.gz
+    - +
+    - a0_0abcdefghijklmnopqrstuvwxyz.tar.gz
+    - a0
+    - 0abcdefghijklmnopqrstuvwxyz
+    - tar
+  -
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ.tar.gz
+    - +
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ.tar.gz
+    - a0
+    - 0ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    - tar
+  -
+    - a0_0-1.tar.gz
+    - +
+    - a0_0-1.tar.gz
+    - a0
+    - 0-1
+    - tar
+  -
+    - a0_0~1.tar.gz
+    - +
+    - a0_0~1.tar.gz
+    - a0
+    - 0~1
+    - tar
+  -
+    - a0_0.1.tar.gz
+    - +
+    - a0_0.1.tar.gz
+    - a0
+    - 0.1
+    - tar
+  -
+    - a0_0+1.tar.gz
+    - +
+    - a0_0+1.tar.gz
+    - a0
+    - 0+1
+    - tar
+  -
+    - a_0.tar.gz
+    - '-'
+  -
+    - abcdefghijklmnopqrstuvwxyz_0.tar.gz
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0.tar.gz
+    - abcdefghijklmnopqrstuvwxyz
+    - 0
+    - tar
+  -
+    - 0123456789_0.tar.gz
+    - +
+    - 0123456789_0.tar.gz
+    - 0123456789
+    - 0
+    - tar
+  -
+    - a-0_0.tar.gz
+    - +
+    - a-0_0.tar.gz
+    - a-0
+    - 0
+    - tar
+  -
+    - a-_0.tar.gz
+    - +
+    - a-_0.tar.gz
+    - a-
+    - 0
+    - tar
+  -
+    - a+0_0.tar.gz
+    - +
+    - a+0_0.tar.gz
+    - a+0
+    - 0
+    - tar
+  -
+    - a+_0.tar.gz
+    - +
+    - a+_0.tar.gz
+    - a+
+    - 0
+    - tar
+  -
+    - a.0_0.tar.gz
+    - +
+    - a.0_0.tar.gz
+    - a.0
+    - 0
+    - tar
+  -
+    - a._0.tar.gz
+    - +
+    - a._0.tar.gz
+    - a.
+    - 0
+    - tar
+  -
+    - francine_0.99.8orig-6.tar.gz
+    - +
+    - francine_0.99.8orig-6.tar.gz
+    - francine
+    - 0.99.8orig-6
+    - tar
+match_source_3_0_native:
+  -
+    - a0_0_all.deb
+    - '-'
+  -
+    - a0_0.orig.tar.gz
+    - +
+    - a0_0.orig.tar.gz
+    - a0
+    - 0.orig
+    - gz
+  -
+    - a0_0-1.diff.gz
+    - '-'
+  -
+    - a0_0.debian.tar.gz
+    - '-'
+  -
+    - a0_0.orig-abc.tar.gz
+    - +
+    - a0_0.orig-abc.tar.gz
+    - a0
+    - 0.orig-abc
+    - gz
+  -
+    - a0_0.dsc
+    - '-'
+  -
+    - a0_0_all.changes
+    - '-'
+  -
+    - ''
+    - '-'
+  -
+    - foo
+    - '-'
+  -
+    - gz
+    - '-'
+  -
+    - .gz
+    - '-'
+  -
+    - tar
+    - '-'
+  -
+    - tar.foo
+    - '-'
+  -
+    - tar.gz
+    - '-'
+  -
+    - 0.gz
+    - '-'
+  -
+    - 0.tar
+    - '-'
+  -
+    - 0.tar.
+    - '-'
+  -
+    - 0.tar.gz
+    - '-'
+  -
+    - 0.orig.tar.gz
+    - '-'
+  -
+    - _0.gz
+    - '-'
+  -
+    - _0.tar
+    - '-'
+  -
+    - _0.tar.
+    - '-'
+  -
+    - _0.tar.gz
+    - '-'
+  -
+    - _0.orig.tar.gz
+    - '-'
+  -
+    - a_0.gz
+    - '-'
+  -
+    - a_0.tar
+    - '-'
+  -
+    - a_0.tar.
+    - '-'
+  -
+    - a_0.tar.gz
+    - '-'
+  -
+    - a_0.orig.tar.gz
+    - '-'
+  -
+    - ab_0.gz
+    - '-'
+  -
+    - ab_0.tar
+    - '-'
+  -
+    - ab_0.tar.
+    - '-'
+  -
+    - ab_0.tar.foo
+    - '-'
+  -
+    - ab_0.tar.gz
+    - +
+    - ab_0.tar.gz
+    - ab
+    - 0
+    - gz
+  -
+    - ab_0.tar.bz2
+    - +
+    - ab_0.tar.bz2
+    - ab
+    - 0
+    - bz2
+  -
+    - ab_0.tar.lzma
+    - +
+    - ab_0.tar.lzma
+    - ab
+    - 0
+    - lzma
+  -
+    - ab_0.tar.xz
+    - +
+    - ab_0.tar.xz
+    - ab
+    - 0
+    - xz
+  -
+    - ab_0.tar.gzfoo
+    - '-'
+  -
+    - ab_0-orig.tar.gz
+    - +
+    - ab_0-orig.tar.gz
+    - ab
+    - 0-orig
+    - gz
+  -
+    - a0_orig.tar.gz
+    - +
+    - a0_orig.tar.gz
+    - a0
+    - orig
+    - gz
+  -
+    - ab_0.orig-tar.gz
+    - '-'
+  -
+    - ab_0-orig-tar.gz
+    - '-'
+  -
+    - ab_0.gz.tar.gz
+    - +
+    - ab_0.gz.tar.gz
+    - ab
+    - 0.gz
+    - gz
+  -
+    - ab_0-gz.tar.gz
+    - +
+    - ab_0-gz.tar.gz
+    - ab
+    - 0-gz
+    - gz
+  -
+    - ab_0.bz2.tar.gz
+    - +
+    - ab_0.bz2.tar.gz
+    - ab
+    - 0.bz2
+    - gz
+  -
+    - ab_0-bz2.tar.gz
+    - +
+    - ab_0-bz2.tar.gz
+    - ab
+    - 0-bz2
+    - gz
+  -
+    - ab_0.lzma.tar.gz
+    - +
+    - ab_0.lzma.tar.gz
+    - ab
+    - 0.lzma
+    - gz
+  -
+    - ab_0-lzma.tar.gz
+    - +
+    - ab_0-lzma.tar.gz
+    - ab
+    - 0-lzma
+    - gz
+  -
+    - ab_0.xz.tar.gz
+    - +
+    - ab_0.xz.tar.gz
+    - ab
+    - 0.xz
+    - gz
+  -
+    - ab_0-xz.tar.gz
+    - +
+    - ab_0-xz.tar.gz
+    - ab
+    - 0-xz
+    - gz
+  -
+    - ab_0.tar.gz.tar.gz
+    - +
+    - ab_0.tar.gz.tar.gz
+    - ab
+    - 0.tar.gz
+    - gz
+  -
+    - ab_0-tar.gz.tar.gz
+    - +
+    - ab_0-tar.gz.tar.gz
+    - ab
+    - 0-tar.gz
+    - gz
+  -
+    - ab_0.tar-gz.tar.gz
+    - +
+    - ab_0.tar-gz.tar.gz
+    - ab
+    - 0.tar-gz
+    - gz
+  -
+    - ab_0.tar.gz-tar.gz
+    - '-'
+  -
+    - ab_0123456789.tar.gz
+    - +
+    - ab_0123456789.tar.gz
+    - ab
+    - 0123456789
+    - gz
+  -
+    - ab_abcdefghijklmnopqrstuvwxyz.tar.gz
+    - +
+    - ab_abcdefghijklmnopqrstuvwxyz.tar.gz
+    - ab
+    - abcdefghijklmnopqrstuvwxyz
+    - gz
+  -
+    - ab_ABCDEFGHIJKLMNOPQRSTUVWXYZ.tar.gz
+    - +
+    - ab_ABCDEFGHIJKLMNOPQRSTUVWXYZ.tar.gz
+    - ab
+    - ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    - gz
+  -
+    - ab_+~.tar.gz
+    - +
+    - ab_+~.tar.gz
+    - ab
+    - +~
+    - gz
+  -
+    - ab_0-.tar.gz
+    - +
+    - ab_0-.tar.gz
+    - ab
+    - 0-
+    - gz
+  -
+    - ab_-0.tar.gz
+    - +
+    - ab_-0.tar.gz
+    - ab
+    - -0
+    - gz
+  -
+    - 0123456789_0.tar.gz
+    - +
+    - 0123456789_0.tar.gz
+    - 0123456789
+    - 0
+    - gz
+  -
+    - abcdefghijklmnopqrstuvwxyz_0.tar.gz
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0.tar.gz
+    - abcdefghijklmnopqrstuvwxyz
+    - 0
+    - gz
+  -
+    - ABC_0.tar.gz
+    - '-'
+  -
+    - a+_0.tar.gz
+    - +
+    - a+_0.tar.gz
+    - a+
+    - 0
+    - gz
+  -
+    - a-_0.tar.gz
+    - +
+    - a-_0.tar.gz
+    - a-
+    - 0
+    - gz
+  -
+    - francine_0.99.8orig-6.tar.gz
+    - +
+    - francine_0.99.8orig-6.tar.gz
+    - francine
+    - 0.99.8orig-6
+    - gz
+match_source_3_0_quilt:
+  -
+    - a0_0_all.deb
+    - '-'
+  -
+    - a0_0.tar.gz
+    - '-'
+  -
+    - a0_0-1.diff.gz
+    - '-'
+  -
+    - a0_0.debian.tar.gz
+    - '-'
+  -
+    - a0_0.dsc
+    - '-'
+  -
+    - a0_0_all.changes
+    - '-'
+  -
+    - ''
+    - '-'
+  -
+    - tar
+    - '-'
+  -
+    - tar.
+    - '-'
+  -
+    - tar.gz
+    - '-'
+  -
+    - orig.tar
+    - '-'
+  -
+    - orig.tar.
+    - '-'
+  -
+    - orig.tar.gz
+    - '-'
+  -
+    - orig-tar.gz
+    - '-'
+  -
+    - orig-.tar.gz
+    - '-'
+  -
+    - orig-abc.tar.gz
+    - '-'
+  -
+    - 0.tar.gz
+    - '-'
+  -
+    - 0.orig.tar
+    - '-'
+  -
+    - 0.orig.tar.
+    - '-'
+  -
+    - 0.orig.tar.gz
+    - '-'
+  -
+    - 0.orig-tar.gz
+    - '-'
+  -
+    - 0.orig-.tar.gz
+    - '-'
+  -
+    - 0.orig-abc.tar.gz
+    - '-'
+  -
+    - _0.tar.gz
+    - '-'
+  -
+    - _0.orig.tar
+    - '-'
+  -
+    - _0.orig.tar.
+    - '-'
+  -
+    - _0.orig.tar.gz
+    - '-'
+  -
+    - _0.orig-tar.gz
+    - '-'
+  -
+    - _0.orig-.tar.gz
+    - '-'
+  -
+    - _0.orig-abc.tar.gz
+    - '-'
+  -
+    - a0_0.tar.gz
+    - '-'
+  -
+    - a0_0.orig.tar
+    - '-'
+  -
+    - a0_0.orig.tar.
+    - '-'
+  -
+    - a0_0.orig.tar.gz
+    - +
+    - a0_0.orig.tar.gz
+    - a0
+    - 0
+    - ~
+    - gz
+  -
+    - a0_0.orig.tar.bz2
+    - +
+    - a0_0.orig.tar.bz2
+    - a0
+    - 0
+    - ~
+    - bz2
+  -
+    - a0_0.orig.tar.lzma
+    - +
+    - a0_0.orig.tar.lzma
+    - a0
+    - 0
+    - ~
+    - lzma
+  -
+    - ab_0.orig.tar.xz
+    - +
+    - ab_0.orig.tar.xz
+    - ab
+    - 0
+    - ~
+    - xz
+  -
+    - orig_0.orig.tar.gz
+    - +
+    - orig_0.orig.tar.gz
+    - orig
+    - 0
+    - ~
+    - gz
+  -
+    - tar_0.orig.tar.gz
+    - +
+    - tar_0.orig.tar.gz
+    - tar
+    - 0
+    - ~
+    - gz
+  -
+    - gz_0.orig.tar.gz
+    - +
+    - gz_0.orig.tar.gz
+    - gz
+    - 0
+    - ~
+    - gz
+  -
+    - a0_0.orig.tar.zip
+    - '-'
+  -
+    - a0_0.orig.tar.rar
+    - '-'
+  -
+    - a0_0.orig-tar.gz
+    - '-'
+  -
+    - a0_0.orig+tar.gz
+    - '-'
+  -
+    - a0_0.orig-.tar.gz
+    - '-'
+  -
+    - a0_0.orig--.tar.gz
+    - +
+    - a0_0.orig--.tar.gz
+    - a0
+    - 0
+    - '-'
+    - gz
+  -
+    - a0_0.orig-abc.tar.gz
+    - +
+    - a0_0.orig-abc.tar.gz
+    - a0
+    - 0
+    - abc
+    - gz
+  -
+    - a0_0.orig-abcdefghijklmnopqrstuvwxyz.tar.gz
+    - +
+    - a0_0.orig-abcdefghijklmnopqrstuvwxyz.tar.gz
+    - a0
+    - 0
+    - abcdefghijklmnopqrstuvwxyz
+    - gz
+  -
+    - a0_0.orig-0123456789.tar.gz
+    - +
+    - a0_0.orig-0123456789.tar.gz
+    - a0
+    - 0
+    - 0123456789
+    - gz
+  -
+    - a0_0.orig-ABC.tar.gz
+    - '-'
+  -
+    - a0_0.orig+abc.tar.gz
+    - '-'
+  -
+    - a0_0.orig-tar.tar.gz
+    - +
+    - a0_0.orig-tar.tar.gz
+    - a0
+    - 0
+    - tar
+    - gz
+  -
+    - a0_0.orig-tar.gz.tar.gz
+    - '-'
+  -
+    - a0_0.orig-tar.gz.tar.bz2
+    - '-'
+  -
+    - a0_0.orig-orig.tar.gz
+    - +
+    - a0_0.orig-orig.tar.gz
+    - a0
+    - 0
+    - orig
+    - gz
+  -
+    - a0_0.orig-orig.tar.tar.gz
+    - '-'
+  -
+    - a0_0.orig-orig.orig.tar.gz
+    - +
+    - a0_0.orig-orig.orig.tar.gz
+    - a0
+    - 0.orig-orig
+    - ~
+    - gz
+  -
+    - a0_0.orig-orig.tar.orig.tar.gz
+    - +
+    - a0_0.orig-orig.tar.orig.tar.gz
+    - a0
+    - 0.orig-orig.tar
+    - ~
+    - gz
+  -
+    - a0_0.orig-orig.tar.orig-.tar.gz
+    - '-'
+  -
+    - a0_0.orig-orig.tar.orig--.tar.gz
+    - +
+    - a0_0.orig-orig.tar.orig--.tar.gz
+    - a0
+    - 0.orig-orig.tar
+    - '-'
+    - gz
+  -
+    - a0_0.orig-orig-tar.gz
+    - '-'
+  -
+    - a0_0.orig-orig-.tar.gz
+    - +
+    - a0_0.orig-orig-.tar.gz
+    - a0
+    - 0
+    - orig-
+    - gz
+  -
+    - a0_0-orig.tar.gz
+    - '-'
+  -
+    - a0_0-.orig.tar.gz
+    - +
+    - a0_0-.orig.tar.gz
+    - a0
+    - 0-
+    - ~
+    - gz
+  -
+    - a0_0-orig.orig.tar.gz
+    - +
+    - a0_0-orig.orig.tar.gz
+    - a0
+    - 0-orig
+    - ~
+    - gz
+  -
+    - a0_0-orig.orig-tar.gz
+    - '-'
+  -
+    - a0_0.orig
+    - '-'
+  -
+    - a0_0.orig.gz
+    - '-'
+  -
+    - a0_orig.tar.tar.gz
+    - '-'
+  -
+    - a0_a.orig.tar.gz
+    - +
+    - a0_a.orig.tar.gz
+    - a0
+    - a
+    - ~
+    - gz
+  -
+    - a0_a-orig.tar.gz
+    - '-'
+  -
+    - a0_a.orig.tar.tar.gz
+    - '-'
+  -
+    - a0_tar.orig.tar.gz
+    - +
+    - a0_tar.orig.tar.gz
+    - a0
+    - tar
+    - ~
+    - gz
+  -
+    - a0_orig.tar.orig.tar.gz
+    - +
+    - a0_orig.tar.orig.tar.gz
+    - a0
+    - orig.tar
+    - ~
+    - gz
+  -
+    - a0_orig-tar.orig.tar.gz
+    - +
+    - a0_orig-tar.orig.tar.gz
+    - a0
+    - orig-tar
+    - ~
+    - gz
+  -
+    - a0_orig.tar.orig-tar.gz
+    - '-'
+  -
+    - a0_orig.tar.gz.orig.tar.gz
+    - +
+    - a0_orig.tar.gz.orig.tar.gz
+    - a0
+    - orig.tar.gz
+    - ~
+    - gz
+  -
+    - a0_orig.tar.bz2.orig.tar.lzma
+    - +
+    - a0_orig.tar.bz2.orig.tar.lzma
+    - a0
+    - orig.tar.bz2
+    - ~
+    - lzma
+  -
+    - a0_0.orig.tar.gzfoo.bar
+    - '-'
+  -
+    - a0_0.orig.tgz
+    - '-'
+  -
+    - a0_0.gz.orig.tar.gz
+    - +
+    - a0_0.gz.orig.tar.gz
+    - a0
+    - 0.gz
+    - ~
+    - gz
+  -
+    - a0_0.bz2.orig.tar.gz
+    - +
+    - a0_0.bz2.orig.tar.gz
+    - a0
+    - 0.bz2
+    - ~
+    - gz
+  -
+    - a0_0.tar.gz.orig.tar.gz
+    - +
+    - a0_0.tar.gz.orig.tar.gz
+    - a0
+    - 0.tar.gz
+    - ~
+    - gz
+  -
+    - a0_0.tar.lzma.orig.tar.gz
+    - +
+    - a0_0.tar.lzma.orig.tar.gz
+    - a0
+    - 0.tar.lzma
+    - ~
+    - gz
+  -
+    - a0_0.orig.tar.gz.orig.tar.gz
+    - +
+    - a0_0.orig.tar.gz.orig.tar.gz
+    - a0
+    - 0.orig.tar.gz
+    - ~
+    - gz
+  -
+    - a0_0.orig.tar.lzma.orig.tar.gz
+    - +
+    - a0_0.orig.tar.lzma.orig.tar.gz
+    - a0
+    - 0.orig.tar.lzma
+    - ~
+    - gz
+  -
+    - a0_0.orig.tar.gz.tar.gz
+    - '-'
+  -
+    - a0_0.orig.tar.gz.tar.bz2
+    - '-'
+  -
+    - a0_0.orig.tar.gz.orig.tar.gz
+    - +
+    - a0_0.orig.tar.gz.orig.tar.gz
+    - a0
+    - 0.orig.tar.gz
+    - ~
+    - gz
+  -
+    - a0_0.orig.tar.gz.orig.tar.lzma
+    - +
+    - a0_0.orig.tar.gz.orig.tar.lzma
+    - a0
+    - 0.orig.tar.gz
+    - ~
+    - lzma
+  -
+    - a0_0.orig.tar.gz.orig.tar.gz.orig.tar.gz
+    - +
+    - a0_0.orig.tar.gz.orig.tar.gz.orig.tar.gz
+    - a0
+    - 0.orig.tar.gz.orig.tar.gz
+    - ~
+    - gz
+  -
+    - a0_0.orig.tar.gz.orig.tar.bz2.orig.tar.lzma
+    - +
+    - a0_0.orig.tar.gz.orig.tar.bz2.orig.tar.lzma
+    - a0
+    - 0.orig.tar.gz.orig.tar.bz2
+    - ~
+    - lzma
+  -
+    - a0_0:1.orig.tar.gz
+    - '-'
+  -
+    - a0_0%1.orig.tar.gz
+    - '-'
+  -
+    - a0_0%3a1.orig.tar.gz
+    - '-'
+  -
+    - a0_0123456789.orig.tar.gz
+    - +
+    - a0_0123456789.orig.tar.gz
+    - a0
+    - 0123456789
+    - ~
+    - gz
+  -
+    - a0_0abcdefghijklmnopqrstuvwxyz.orig.tar.gz
+    - +
+    - a0_0abcdefghijklmnopqrstuvwxyz.orig.tar.gz
+    - a0
+    - 0abcdefghijklmnopqrstuvwxyz
+    - ~
+    - gz
+  -
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ.orig.tar.gz
+    - +
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ.orig.tar.gz
+    - a0
+    - 0ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    - ~
+    - gz
+  -
+    - a0_0-1.orig.tar.gz
+    - +
+    - a0_0-1.orig.tar.gz
+    - a0
+    - 0-1
+    - ~
+    - gz
+  -
+    - a0_0~1.orig.tar.gz
+    - +
+    - a0_0~1.orig.tar.gz
+    - a0
+    - 0~1
+    - ~
+    - gz
+  -
+    - a0_0.1.orig.tar.gz
+    - +
+    - a0_0.1.orig.tar.gz
+    - a0
+    - 0.1
+    - ~
+    - gz
+  -
+    - a0_0+1.orig.tar.gz
+    - +
+    - a0_0+1.orig.tar.gz
+    - a0
+    - 0+1
+    - ~
+    - gz
+  -
+    - a_0.tar.gz
+    - '-'
+  -
+    - abcdefghijklmnopqrstuvwxyz_0.orig.tar.gz
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0.orig.tar.gz
+    - abcdefghijklmnopqrstuvwxyz
+    - 0
+    - ~
+    - gz
+  -
+    - 0123456789_0.orig.tar.gz
+    - +
+    - 0123456789_0.orig.tar.gz
+    - 0123456789
+    - 0
+    - ~
+    - gz
+  -
+    - a-0_0.orig.tar.gz
+    - +
+    - a-0_0.orig.tar.gz
+    - a-0
+    - 0
+    - ~
+    - gz
+  -
+    - a-_0.orig.tar.gz
+    - +
+    - a-_0.orig.tar.gz
+    - a-
+    - 0
+    - ~
+    - gz
+  -
+    - a+0_0.orig.tar.gz
+    - +
+    - a+0_0.orig.tar.gz
+    - a+0
+    - 0
+    - ~
+    - gz
+  -
+    - a+_0.orig.tar.gz
+    - +
+    - a+_0.orig.tar.gz
+    - a+
+    - 0
+    - ~
+    - gz
+  -
+    - a.0_0.orig.tar.gz
+    - +
+    - a.0_0.orig.tar.gz
+    - a.0
+    - 0
+    - ~
+    - gz
+  -
+    - a._0.orig.tar.gz
+    - +
+    - a._0.orig.tar.gz
+    - a.
+    - 0
+    - ~
+    - gz
+match_patch_1_0:
+  -
+    - a0_0_all.deb
+    - '-'
+  -
+    - a0_0.tar.gz
+    - '-'
+  -
+    - a0_0.orig.tar.gz
+    - '-'
+  -
+    - a0_0.debian.tar.gz
+    - '-'
+  -
+    - a0_0.orig-abc.tar.gz
+    - '-'
+  -
+    - a0_0.dsc
+    - '-'
+  -
+    - a0_0_all.changes
+    - '-'
+  -
+    - ''
+    - '-'
+  -
+    - diff.gz
+    - '-'
+  -
+    - 0.diff.gz
+    - '-'
+  -
+    - 0-1.diff.gz
+    - '-'
+  -
+    - _0.diff.gz
+    - '-'
+  -
+    - _0-1.diff.gz
+    - '-'
+  -
+    - a0_0-1.diff.gz
+    - +
+    - a0_0-1.diff.gz
+    - a0
+    - 0-1
+  -
+    - a0_a-1.diff.gz
+    - +
+    - a0_a-1.diff.gz
+    - a0
+    - a-1
+  -
+    - a0_0.diff.gz
+    - +
+    - a0_0.diff.gz
+    - a0
+    - 0
+  -
+    - a0_a.diff.gz
+    - +
+    - a0_a.diff.gz
+    - a0
+    - a
+  -
+    - a0_diff.diff.gz
+    - +
+    - a0_diff.diff.gz
+    - a0
+    - diff
+  -
+    - a0_a.diff.diff.gz
+    - +
+    - a0_a.diff.diff.gz
+    - a0
+    - a.diff
+  -
+    - a0_diff.gz.diff.gz
+    - +
+    - a0_diff.gz.diff.gz
+    - a0
+    - diff.gz
+  -
+    - a0_a.diff.gz.diff.gz
+    - +
+    - a0_a.diff.gz.diff.gz
+    - a0
+    - a.diff.gz
+  -
+    - a0_0.diff.gzfoo.bar
+    - '-'
+  -
+    - _a0_0.diff.gz
+    - '-'
+    - a0_0.diff.gz
+    - a0
+    - 0
+  -
+    - a0_0-diff.gz
+    - '-'
+  -
+    - a0_0_diff.gz
+    - '-'
+  -
+    - a0_0-1_diff.gz
+    - '-'
+  -
+    - a0_0-1.gz.diff.gz
+    - +
+    - a0_0-1.gz.diff.gz
+    - a0
+    - 0-1.gz
+  -
+    - a0_0.gz.diff.gz
+    - +
+    - a0_0.gz.diff.gz
+    - a0
+    - 0.gz
+  -
+    - a0_0-1.diff.gz.diff.gz
+    - +
+    - a0_0-1.diff.gz.diff.gz
+    - a0
+    - 0-1.diff.gz
+  -
+    - a0_0.diff.gz.diff.gz
+    - +
+    - a0_0.diff.gz.diff.gz
+    - a0
+    - 0.diff.gz
+  -
+    - a0_0-1.diff.gz.diff.gz.diff.gz
+    - +
+    - a0_0-1.diff.gz.diff.gz.diff.gz
+    - a0
+    - 0-1.diff.gz.diff.gz
+  -
+    - a0_0.diff.gz.diff.gz.diff.gz
+    - +
+    - a0_0.diff.gz.diff.gz.diff.gz
+    - a0
+    - 0.diff.gz.diff.gz
+  -
+    - a0_0:1.diff.gz
+    - '-'
+  -
+    - a0_0%1.diff.gz
+    - '-'
+  -
+    - a0_0%3a1.diff.gz
+    - '-'
+  -
+    - a0_0123456789-1.diff.gz
+    - +
+    - a0_0123456789-1.diff.gz
+    - a0
+    - 0123456789-1
+  -
+    - a0_0123456789.diff.gz
+    - +
+    - a0_0123456789.diff.gz
+    - a0
+    - 0123456789
+  -
+    - a0_0abcdefghijklmnopqrstuvwxyz-1.diff.gz
+    - +
+    - a0_0abcdefghijklmnopqrstuvwxyz-1.diff.gz
+    - a0
+    - 0abcdefghijklmnopqrstuvwxyz-1
+  -
+    - a0_0abcdefghijklmnopqrstuvwxyz.diff.gz
+    - +
+    - a0_0abcdefghijklmnopqrstuvwxyz.diff.gz
+    - a0
+    - 0abcdefghijklmnopqrstuvwxyz
+  -
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ-1.diff.gz
+    - +
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ-1.diff.gz
+    - a0
+    - 0ABCDEFGHIJKLMNOPQRSTUVWXYZ-1
+  -
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ.diff.gz
+    - +
+    - a0_0ABCDEFGHIJKLMNOPQRSTUVWXYZ.diff.gz
+    - a0
+    - 0ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  -
+    - a0_0~1-2.diff.gz
+    - +
+    - a0_0~1-2.diff.gz
+    - a0
+    - 0~1-2
+  -
+    - a0_0~1.diff.gz
+    - +
+    - a0_0~1.diff.gz
+    - a0
+    - 0~1
+  -
+    - a0_0.1-2.diff.gz
+    - +
+    - a0_0.1-2.diff.gz
+    - a0
+    - 0.1-2
+  -
+    - a0_0.1.diff.gz
+    - +
+    - a0_0.1.diff.gz
+    - a0
+    - 0.1
+  -
+    - a0_0+1-2.diff.gz
+    - +
+    - a0_0+1-2.diff.gz
+    - a0
+    - 0+1-2
+  -
+    - a0_0+1.diff.gz
+    - +
+    - a0_0+1.diff.gz
+    - a0
+    - 0+1
+  -
+    - a_0-1.diff.gz
+    - '-'
+  -
+    - a_0.diff.gz
+    - '-'
+  -
+    - abcdefghijklmnopqrstuvwxyz_0-1.diff.gz
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0-1.diff.gz
+    - abcdefghijklmnopqrstuvwxyz
+    - 0-1
+  -
+    - abcdefghijklmnopqrstuvwxyz_0.diff.gz
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0.diff.gz
+    - abcdefghijklmnopqrstuvwxyz
+    - 0
+  -
+    - 0123456789_0-1.diff.gz
+    - +
+    - 0123456789_0-1.diff.gz
+    - 0123456789
+    - 0-1
+  -
+    - 0123456789_0.diff.gz
+    - +
+    - 0123456789_0.diff.gz
+    - 0123456789
+    - 0
+  -
+    - a-0_0-1.diff.gz
+    - +
+    - a-0_0-1.diff.gz
+    - a-0
+    - 0-1
+  -
+    - a-0_0.diff.gz
+    - +
+    - a-0_0.diff.gz
+    - a-0
+    - 0
+  -
+    - a-_0-1.diff.gz
+    - +
+    - a-_0-1.diff.gz
+    - a-
+    - 0-1
+  -
+    - a-_0.diff.gz
+    - +
+    - a-_0.diff.gz
+    - a-
+    - 0
+  -
+    - a+0_0-1.diff.gz
+    - +
+    - a+0_0-1.diff.gz
+    - a+0
+    - 0-1
+  -
+    - a+0_0.diff.gz
+    - +
+    - a+0_0.diff.gz
+    - a+0
+    - 0
+  -
+    - a+_0-1.diff.gz
+    - +
+    - a+_0-1.diff.gz
+    - a+
+    - 0-1
+  -
+    - a+_0.diff.gz
+    - +
+    - a+_0.diff.gz
+    - a+
+    - 0
+  -
+    - a.0_1-2.diff.gz
+    - +
+    - a.0_1-2.diff.gz
+    - a.0
+    - 1-2
+  -
+    - a.0_1.diff.gz
+    - +
+    - a.0_1.diff.gz
+    - a.0
+    - 1
+  -
+    - a._0-1.diff.gz
+    - +
+    - a._0-1.diff.gz
+    - a.
+    - 0-1
+  -
+    - a._0.diff.gz
+    - +
+    - a._0.diff.gz
+    - a.
+    - 0
+match_patch_3_0_quilt:
+  -
+    - a0_0_all.deb
+    - '-'
+  -
+    - a0_0.orig.tar.gz
+    - '-'
+  -
+    - a0_0-1.diff.gz
+    - '-'
+  -
+    - a0_0.tar.gz
+    - '-'
+  -
+    - a0_0.orig-abc.tar.gz
+    - '-'
+  -
+    - a0_0.dsc
+    - '-'
+  -
+    - a0_0_all.changes
+    - '-'
+  -
+    - ''
+    - '-'
+  -
+    - foo
+    - '-'
+  -
+    - gz
+    - '-'
+  -
+    - .gz
+    - '-'
+  -
+    - tar
+    - '-'
+  -
+    - tar.
+    - '-'
+  -
+    - tar.gz
+    - '-'
+  -
+    - debian
+    - '-'
+  -
+    - debian.
+    - '-'
+  -
+    - debian.tar
+    - '-'
+  -
+    - debian.tar.
+    - '-'
+  -
+    - debian.tar.gz
+    - '-'
+  -
+    - 0
+    - '-'
+  -
+    - 0.
+    - '-'
+  -
+    - 0.debian
+    - '-'
+  -
+    - 0.debian.
+    - '-'
+  -
+    - 0.debian.tar
+    - '-'
+  -
+    - 0.debian.tar.
+    - '-'
+  -
+    - 0.debian.tar.gz
+    - '-'
+  -
+    - _
+    - '-'
+  -
+    - _0
+    - '-'
+  -
+    - _0.
+    - '-'
+  -
+    - _0.debian
+    - '-'
+  -
+    - _0.debian.
+    - '-'
+  -
+    - _0.debian.tar
+    - '-'
+  -
+    - _0.debian.tar.
+    - '-'
+  -
+    - _0.debian.tar.gz
+    - '-'
+  -
+    - a0_
+    - '-'
+  -
+    - a0_0
+    - '-'
+  -
+    - a0_0.
+    - '-'
+  -
+    - a0_0.debian
+    - '-'
+  -
+    - a0_0.debian.
+    - '-'
+  -
+    - a0_0.debian.tar
+    - '-'
+  -
+    - a0_0.debian.tar.
+    - '-'
+  -
+    - "[]_0.debian.tar.gz"
+    - '-'
+  -
+    - a0_0.debian.tar.gz
+    - +
+    - a0_0.debian.tar.gz
+    - a0
+    - 0
+    - gz
+  -
+    - a0_0.debian.tar.bz2
+    - +
+    - a0_0.debian.tar.bz2
+    - a0
+    - 0
+    - bz2
+  -
+    - a0_0.debian.tar.lzma
+    - +
+    - a0_0.debian.tar.lzma
+    - a0
+    - 0
+    - lzma
+  -
+    - a0_0.debian.tar.xz
+    - +
+    - a0_0.debian.tar.xz
+    - a0
+    - 0
+    - xz
+  -
+    - a0_a.debian.tar.gz
+    - +
+    - a0_a.debian.tar.gz
+    - a0
+    - a
+    - gz
+  -
+    - a0_debian.tar.gz
+    - '-'
+  -
+    - a0_tar.debian.tar.gz
+    - +
+    - a0_tar.debian.tar.gz
+    - a0
+    - tar
+    - gz
+  -
+    - a0_gz.debian.tar.gz
+    - +
+    - a0_gz.debian.tar.gz
+    - a0
+    - gz
+    - gz
+  -
+    - a0_bz2.debian.tar.gz
+    - +
+    - a0_bz2.debian.tar.gz
+    - a0
+    - bz2
+    - gz
+  -
+    - a0_lzma.debian.tar.gz
+    - +
+    - a0_lzma.debian.tar.gz
+    - a0
+    - lzma
+    - gz
+  -
+    - a0_debian.debian.tar.gz
+    - +
+    - a0_debian.debian.tar.gz
+    - a0
+    - debian
+    - gz
+  -
+    - a0_debian.tar.debian.tar.gz
+    - +
+    - a0_debian.tar.debian.tar.gz
+    - a0
+    - debian.tar
+    - gz
+  -
+    - a0_debian.tar.gz.debian.tar.gz
+    - +
+    - a0_debian.tar.gz.debian.tar.gz
+    - a0
+    - debian.tar.gz
+    - gz
+  -
+    - a0_debian.tar.bz2.debian.tar.gz
+    - +
+    - a0_debian.tar.bz2.debian.tar.gz
+    - a0
+    - debian.tar.bz2
+    - gz
+  -
+    - a0_debian.tar.lzma.debian.tar.gz
+    - +
+    - a0_debian.tar.lzma.debian.tar.gz
+    - a0
+    - debian.tar.lzma
+    - gz
+  -
+    - a0_debian-tar.gz.debian.tar.gz
+    - +
+    - a0_debian-tar.gz.debian.tar.gz
+    - a0
+    - debian-tar.gz
+    - gz
+  -
+    - a0_debian.tar-gz.debian.tar.gz
+    - +
+    - a0_debian.tar-gz.debian.tar.gz
+    - a0
+    - debian.tar-gz
+    - gz
+  -
+    - a0_debian.tar.gz-debian.tar.gz
+    - '-'
+  -
+    - a0_debian.tar.gz.debian-tar.gz
+    - '-'
+  -
+    - a0_debian.tar.gz.debian.tar-gz
+    - '-'
+  -
+    - a0_abcdefghijklmnopqrstuvwxyz.debian.tar.gz
+    - +
+    - a0_abcdefghijklmnopqrstuvwxyz.debian.tar.gz
+    - a0
+    - abcdefghijklmnopqrstuvwxyz
+    - gz
+  -
+    - a0_ABCDEFGHIJKLMNOPQRSTUVWXYZ.debian.tar.gz
+    - +
+    - a0_ABCDEFGHIJKLMNOPQRSTUVWXYZ.debian.tar.gz
+    - a0
+    - ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    - gz
+  -
+    - a0_0123456789.debian.tar.gz
+    - +
+    - a0_0123456789.debian.tar.gz
+    - a0
+    - 0123456789
+    - gz
+  -
+    - a0_+~.debian.tar.gz
+    - +
+    - a0_+~.debian.tar.gz
+    - a0
+    - +~
+    - gz
+  -
+    - abcdefghijklmnopqrstuvwxyz_0.debian.tar.gz
+    - +
+    - abcdefghijklmnopqrstuvwxyz_0.debian.tar.gz
+    - abcdefghijklmnopqrstuvwxyz
+    - 0
+    - gz
+  -
+    - ABC_0.debian.tar.gz
+    - '-'
+  -
+    - 0123456789_0.debian.tar.gz
+    - +
+    - 0123456789_0.debian.tar.gz
+    - 0123456789
+    - 0
+    - gz
+  -
+    - debian_0.debian.tar.gz
+    - +
+    - debian_0.debian.tar.gz
+    - debian
+    - 0
+    - gz
+  -
+    - debian.tar_0.debian.tar.gz
+    - +
+    - debian.tar_0.debian.tar.gz
+    - debian.tar
+    - 0
+    - gz
+  -
+    - debian.tar.gz_0.debian.tar.gz
+    - +
+    - debian.tar.gz_0.debian.tar.gz
+    - debian.tar.gz
+    - 0
+    - gz

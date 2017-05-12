@@ -1,0 +1,9 @@
+\.bak$
+\.sw[a-z]$
+\.tar\.gz$
+^tmp/
+^foo
+^blib/
+^Makefile$
+^Makefile\.[a-z]+$
+^pm_to_blib$

@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Regexp/Wildcards.pm
+samples/wc2re.pl
+t/00-load.t
+t/02-can.t
+t/10-obj.t
+t/11-opts.t
+t/20-jokers.t
+t/21-commas.t
+t/22-brackets.t
+t/23-groups.t
+t/24-anchors.t

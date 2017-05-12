@@ -1,0 +1,39 @@
+Revision history for RRD-Tweak
+
+1.00    2012-08-06
+        First production release
+
+0.11    2012-07-23
+27b27b3 added sponsors in Acknowledgements
+88a10ac _populate_rra(): do not populate Holt-Winters arrays
+
+0.10    2012-07-22
+b11aebc _populate_rra(): populate only NaN rows
+fa4e30e when an RRA grows, try to derive the data from other RRAs
+
+0.09    2012-07-19
+76a0045 New method: has_hwpredict()
+8c2375c strict and warnings in test files
+682438e del_rra() now handles Holt-Winters arrays
+a36d932 deleted t/05-boilerplate.t
+
+0.08    2012-07-10
+5b2cc36 added debugging information
+6030cd4 Replaced random() with rand() because of issues in RHEL4
+
+0.07    2012-07-09
+2a3907d Build.PL: create_makefile_pl => small
+263b4a7 README updated
+
+0.05    2012-07-02
+afa5bc0 added rra_descr(), ds_descr(); prohibited del_rra() for HW files
+
+0.04    2012-06-27
+f6c47d6 Bugfix: modify_rra incorrectly reduced RRA size
+
+0.03    2012-06-26
+Documentation update
+Build.PL uses pkg-config
+
+0.01    2012-06-22
+First release

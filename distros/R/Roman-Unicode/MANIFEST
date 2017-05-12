@@ -1,0 +1,19 @@
+Changes
+INSTALL.SKIP
+lib/Roman/Unicode.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/ascii.t
+t/load.t
+t/lowercase.t
+t/numbers.t
+t/pod.t
+t/pod_coverage.t
+t/properties.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

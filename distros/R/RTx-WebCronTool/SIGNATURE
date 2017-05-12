@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9876929d1bbb6b79ae435e2b032e65f7b97943f8 Changes
+SHA1 c617489ed634038ebe4542d7f7f17f763ebc6605 MANIFEST
+SHA1 9233097768f2f833d0b0850bd9d3101d58ea1a2b META.yml
+SHA1 245dd44b2d9e2d1a9c78f9ff69e95b0c62c81384 Makefile.PL
+SHA1 d4e6ca50d2a02d962cdeaf0a66e9e626562668bf README
+SHA1 51d0e4cc377cbdb470f5e99c3882048bd0f25115 html/Callbacks/RT-WebCronTool/Elements/Tabs/Default
+SHA1 17abf23b6eaef0d92dc0086ee3d30dcffa8c51b0 html/Developer/CronTool/autohandler
+SHA1 1a473ccfb93e99adea00695a5ae2970a4b807a6e html/Developer/CronTool/index.html
+SHA1 ea9999ac72a980cf10c363cf64b378a6c855670b inc/Module/Install.pm
+SHA1 9d41715775aa35fbcfbc6ad8f7c81440c68d0735 inc/Module/Install/Base.pm
+SHA1 1b3efbda40910ec7ab2e9844d2e1f786c64fceb6 inc/Module/Install/Can.pm
+SHA1 709ebc88119051c8461aa84de1e9f9221fee6983 inc/Module/Install/Fetch.pm
+SHA1 32de4a74656b100616deab16263586b6a30cec78 inc/Module/Install/Makefile.pm
+SHA1 df8993682527b258b0ea5207d9c07fc1d0711d02 inc/Module/Install/Metadata.pm
+SHA1 4f70d24af5cee311a7fc9be046c859ace5fb4b13 inc/Module/Install/RTx.pm
+SHA1 03ed16ad240be579c5bdc5f256880dcd0281605f inc/Module/Install/Win32.pm
+SHA1 7df2c4d3a7d71f9d5732898ed5f932c7e063b91a inc/Module/Install/WriteAll.pm
+SHA1 8e40df33fdc6c4bce6833dafac3932e4d090ea4d lib/RTx/WebCronTool.pm
+SHA1 13d93b1618d5f923c7c94bc5dd7152cdb16fa124 po/zh_cn.po
+SHA1 eb80eafe239b94cd7f7c97530ff3fb77dbf06480 po/zh_tw.po
+SHA1 96d1e63bc12f1384dccf6eb2c0b4a231c776eb58 t/0-signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (FreeBSD)
+
+iD8DBQFA8at2tLPdNzw1AaARAhrNAJ9vxHOGMdbG838ncz1E3eWCzaU9NwCfeLz6
+Kizq90ZIsFYUZmHoY6zAQ+I=
+=6AEl
+-----END PGP SIGNATURE-----

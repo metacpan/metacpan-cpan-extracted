@@ -1,0 +1,168 @@
+---
+match_architecture:
+  -
+    - all
+    - +
+    - all
+    - all
+    - ~
+    - ~
+  -
+    - all-arm64
+    - '-'
+  -
+    - armeb-all
+    - '-'
+  -
+    - all-freebsd
+    - '-'
+  -
+    - hurd-all
+    - '-'
+  -
+    - source
+    - +
+    - source
+    - source
+    - ~
+    - ~
+  -
+    - source-armel
+    - '-'
+  -
+    - armhf-source
+    - '-'
+  -
+    - source-kfreebsd
+    - '-'
+  -
+    - knetbsd-source
+    - '-'
+  -
+    - any
+    - +
+    - any
+    - any
+    - ~
+    - ~
+  -
+    - any-avr32
+    - +
+    - any-avr32
+    - ~
+    - any
+    - avr32
+  -
+    - hppa-any
+    - '-'
+  -
+    - any-kopensolaris
+    - '-'
+  -
+    - mint-any
+    - +
+    - mint-any
+    - ~
+    - mint
+    - any
+  -
+    - all-all
+    - '-'
+  -
+    - all-any
+    - '-'
+  -
+    - all-source
+    - '-'
+  -
+    - any-all
+    - '-'
+  -
+    - any-any
+    - +
+    - any-any
+    - ~
+    - any
+    - any
+  -
+    - any-source
+    - '-'
+  -
+    - source-all
+    - '-'
+  -
+    - source-any
+    - '-'
+  -
+    - source-source
+    - '-'
+  -
+    - amd64
+    - +
+    - amd64
+    - ~
+    - ~
+    - amd64
+  -
+    - hurd-hppa
+    - +
+    - hurd-hppa
+    - ~
+    - hurd
+    - hppa
+  -
+    - i386-ia64
+    - '-'
+  -
+    - netbsd-openbsd
+    - '-'
+  -
+    - lpia-solaris
+    - '-'
+  -
+    - ''
+    - '-'
+  -
+    - a0
+    - '-'
+  -
+    - xall
+    - '-'
+  -
+    - allx
+    - '-'
+  -
+    - +all
+    - '-'
+    - all
+    - all
+    - ~
+    - ~
+  -
+    - source+
+    - '-'
+    - source
+    - source
+    - ~
+    - ~
+  -
+    - source-kopensolaris-sparc
+    - '-'
+  -
+    - darwins390x
+    - '-'
+  -
+    - -darwin-s390x
+    - '-'
+  -
+    - darwin--s390x
+    - '-'
+  -
+    - darwin-s390x-
+    - '-'
+  -
+    - freebsd-sh3e
+    - '-'
+  -
+    - fhurd-sh3eb
+    - '-'

@@ -1,0 +1,27 @@
+# $File: //member/autrijus/RTx-Workflow/README $ $Author: autrijus $
+# $Revision: #1 $ $Change: 7970 $ $DateTime: 2003/09/08 00:44:20 $
+
+This is the README file for RTx::MD5Auth, an extension to RT3
+that allows javascript-based login over an unsecure http connection.
+
+Please type "perldoc RTx::MD5Auth" after installation to see
+the module usage information.
+
+* Installation
+
+RTx::MD5Auth the standard perl module install process:
+
+cpansign -v		# see SIGNATURE for details
+perl Makefile.PL
+make			# or 'nmake' on Win32
+make test
+make install
+
+* Copyright
+
+Copyright 2004 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

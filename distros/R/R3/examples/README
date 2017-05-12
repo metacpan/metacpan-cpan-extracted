@@ -1,0 +1,21 @@
+R3.pm examples
+
+Copyright (c) 1999 Johan Schoen
+The R3.pm examples are free software; you my use, modify and
+redistribute them under the same terms as Perl itself.
+
+You will most probably need to change the logon parameters
+in each script for them to work on your system.
+
+list_usr.pl:
+List all users currently logged on to the same application server 
+as the script.
+
+popup.pl:
+Sends a popup message to a logged on R/3 user.
+
+ccbapi.pl
+Displays company codes, using BAPI interface.
+
+
+

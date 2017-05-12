@@ -1,0 +1,199 @@
+---
+match_sourceslist:
+  -
+    - ''
+    - '-'
+  -
+    - deb
+    - '-'
+  -
+    - 'deb ftp:'
+    - '-'
+  -
+    - deb ftp://
+    - '-'
+  -
+    - deb ftp://something
+    - '-'
+  -
+    - deb bwahaha://something alpha
+    - '-'
+  -
+    - deb ftp://something alpha
+    - +
+    - deb ftp://something alpha
+    - deb
+    - ftp://something
+    - ftp
+    - //something
+    - alpha
+    - ~
+  -
+    - xdeb ftp://something alpha
+    - '-'
+  -
+    - =deb ftp://something alpha
+    - '-'
+    - deb ftp://something alpha
+    - deb
+    - ftp://something
+    - ftp
+    - //something
+    - alpha
+    - ~
+  -
+    - "deb\nftp://something alpha"
+    - '-'
+  -
+    - "deb ftp://something\nalpha"
+    - '-'
+  -
+    - "deb ftp://something alpha\n"
+    - +
+    - deb ftp://something alpha
+    - deb
+    - ftp://something
+    - ftp
+    - //something
+    - alpha
+    - ~
+  -
+    - 'deb ftp://something alpha '
+    - '-'
+    - deb ftp://something alpha
+    - deb
+    - ftp://something
+    - ftp
+    - //something
+    - alpha
+    - ~
+  -
+    - deb ftp::/something alpha
+    - +
+    - deb ftp::/something alpha
+    - deb
+    - ftp::/something
+    - ftp
+    - :/something
+    - alpha
+    - ~
+  -
+    - 'deb ftp:{}()[]*?.,: alpha'
+    - +
+    - 'deb ftp:{}()[]*?.,: alpha'
+    - deb
+    - 'ftp:{}()[]*?.,:'
+    - ftp
+    - '{}()[]*?.,:'
+    - alpha
+    - ~
+  -
+    - 'deb ftp://something {}[]()'
+    - +
+    - 'deb ftp://something {}[]()'
+    - deb
+    - ftp://something
+    - ftp
+    - //something
+    - '{}[]()'
+    - ~
+  -
+    - deb-src ftp://something alpha
+    - +
+    - deb-src ftp://something alpha
+    - deb-src
+    - ftp://something
+    - ftp
+    - //something
+    - alpha
+    - ~
+  -
+    - deb ftp://something alpha bravo
+    - +
+    - deb ftp://something alpha bravo
+    - deb
+    - ftp://something
+    - ftp
+    - //something
+    - alpha
+    - bravo
+  -
+    - deb ftp://something alpha bravo charlie
+    - +
+    - deb ftp://something alpha bravo charlie
+    - deb
+    - ftp://something
+    - ftp
+    - //something
+    - alpha
+    - bravo charlie
+  -
+    - deb ftp://something alpha bravo charlie delta
+    - +
+    - deb ftp://something alpha bravo charlie delta
+    - deb
+    - ftp://something
+    - ftp
+    - //something
+    - alpha
+    - bravo charlie delta
+  -
+    - deb http://something alpha
+    - +
+    - deb http://something alpha
+    - deb
+    - http://something
+    - http
+    - //something
+    - alpha
+    - ~
+  -
+    - deb file:/something alpha
+    - +
+    - deb file:/something alpha
+    - deb
+    - file:/something
+    - file
+    - /something
+    - alpha
+    - ~
+  -
+    - deb copy:/something alpha
+    - +
+    - deb copy:/something alpha
+    - deb
+    - copy:/something
+    - copy
+    - /something
+    - alpha
+    - ~
+  -
+    - deb cdrom:/something alpha
+    - +
+    - deb cdrom:/something alpha
+    - deb
+    - cdrom:/something
+    - cdrom
+    - /something
+    - alpha
+    - ~
+  -
+    - deb rsh://something alpha
+    - +
+    - deb rsh://something alpha
+    - deb
+    - rsh://something
+    - rsh
+    - //something
+    - alpha
+    - ~
+  -
+    - deb ssh://something alpha
+    - +
+    - deb ssh://something alpha
+    - deb
+    - ssh://something
+    - ssh
+    - //something
+    - alpha
+    - ~

@@ -1,0 +1,83 @@
+1.04 2016-04-08
+ - Hide link to Gantt chart on simple search page when there's no query
+ - Fix Gantt chart page from throwing error when there's no search results
+
+1.03 2014-12-18
+ - Packaging updates
+
+1.02 2014-10-29
+ - remove DateDayBeforeMonth config option made redundant by v1.01
+
+1.01 2014-10-29
+ - Provide RT configuration options for JSGantt's options
+
+1.00 2014-07-01
+ - Fixed incorrect MANIFEST in 0.21
+ - Tidy Changelog
+ - Packaging updates; no code changes.
+
+0.21 2014-06-16
+ - Packaging updates; no code change.  This includes serving the CSS from
+   static/ under RT 4.2
+
+0.20 2014-02-10
+ - show Gantt link on more /Search/ pages
+ - drop RT 3 support
+
+0.19 2012-10-20
+ - bump m:i to avoid it's bug in 1.04
+
+0.18 2012-02-07
+ - fix the double-encode bug in page menu links below /Search
+
+0.17 2011-12-15
+ - fix a bug of config
+
+0.16 2011-10-27
+ - tweak parent selection process
+
+0.15 2011-10-27
+ - make ColorSchemeByOwner true by default
+ - fix the situation where number of owners are more than colors by
+   recycling the color scheme
+
+0.14 2011-10-26
+ - add ColorSchemeByOwner option to use one color for each user.
+ - improve the way we sort related tickets so children can appear just
+   after their parents.
+ - has_members now is true only if the ticket is the first parent of some
+   of its children
+
+0.13 2011-10-08
+ - fix the alignment bug in chrome/safari/ie8
+
+0.12 2011-05-07
+ - respect DateDayBeforeMonth config
+
+0.10 2011-03-31
+ - use a generic JSGanttOptions config, see README for example
+ - make it work with RT 4
+
+0.04 2010-09-23
+ - in case there are remote links
+
+0.03 2010-06-30
+ - tweak the way we figure out Start/End Dates:
+       Start: Starts or Started field
+       End: Due Field
+
+   If one exists but not the other, first try to caculate by the time
+   estimated (or TimeLeft + TimeWorked) and the config
+   $JSGanttWorkingHoursPerDay; if fails, use config $JSGanttDefaultDays.
+
+   If both are not defined, find the minimal start date of the whole
+   result, use it for both start and end dates, and use config
+   $JSGanttNullDatesColor to draw
+
+0.02 2010-06-25
+ - use TimeWorked + TimeLeft for progress, use TimeEstimated instead if
+   TimeLeft is not defined.
+
+0.01 2010-06-23
+ - Initial release.
+

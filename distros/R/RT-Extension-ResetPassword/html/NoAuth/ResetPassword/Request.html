@@ -1,0 +1,107 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%# 
+%# COPYRIGHT:
+%#  
+%# This software is Copyright (c) 1996-2005 Best Practical Solutions, LLC 
+%#                                          <jesse@bestpractical.com>
+%# 
+%# (Except where explicitly superseded by other copyright notices)
+%# 
+%# 
+%# LICENSE:
+%# 
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%# 
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%# 
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+%# 
+%# 
+%# CONTRIBUTION SUBMISSION POLICY:
+%# 
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%# 
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%# 
+%# END BPS TAGGED BLOCK }}}
+<& /Elements/Header, Title => $title &>
+<div id="body" class="login-body">
+
+<h1><%$title%></h1>
+<& /Elements/ListActions, actions => \@actions  &>
+<p>
+<&|/l&>RT can send you an email message with a link that will allow you to reset your password.</&>
+<form method="post" action="Request.html">
+    <&|/l&>Email address</&>:<input name="Email" value="" />
+    <input type="submit" class="button" value="<%loc('Send it!')%>" />
+</form>
+</div>
+
+<%INIT>
+my @actions;
+
+my $title = loc("Reset your password");
+
+if ($ARGS{'Email'}) {
+    my $u = RT::User->new($RT::SystemUser);
+    $u->LoadByCols(EmailAddress => $ARGS{'Email'});
+    if ($u->id and $u->HasPassword and not $u->Disabled) {
+        my $token = Digest::MD5->new()->add(
+            $u->id,
+            $u->__Value('Password'),
+            $RT::DatabasePassword,
+            $u->LastUpdated,
+            @{[$RT::WebPath]} . '/NoAuth/ResetPassword/Reset'
+        )->hexdigest();
+
+        my ($status, $msg) = RT::Interface::Email::SendEmailUsingTemplate(
+            To        => $u->EmailAddress,
+            Template  => 'PasswordReset',
+            Arguments => {
+                Token => $token,
+                User  => $u,
+            },
+        );
+
+        if ($status) {
+            push @actions, loc("RT has sent you an email message with instructions about how to reset your password");
+            RT->Logger->info("Password reset token send to " . $u->EmailAddress);
+        } else {
+            push @actions, loc("Failed to send password reset token, please contact your RT administrator.");
+            RT->Logger->error("Failed to send password reset token to " . $u->EmailAddress . ": $msg");
+        }
+    } elsif ($u->id and $u->Disabled) {
+        push @actions, loc("You can't reset your password because your user is disabled.");
+        RT->Logger->warning("Disabled user " . $u->Name . " attempted to reset password");
+    } elsif ($u->id) {
+        push @actions, loc("You can't reset your password as you don't already have one.");
+        RT->Logger->warning("User " . $u->Name . " with no password attempted a password reset")
+    } else {
+        push @actions, loc("RT couldn't find a user with that email address. Give it another try?");
+        RT->Logger->warning("Password reset attempted for non-existent user " . $ARGS{'Email'});
+    }
+    if(RT->Config->Get("HidePasswordResetErrors")) {
+        pop @actions;
+        push @actions, loc("RT has sent you an email message with instructions about how to reset your password");
+    }
+}
+</%INIT>

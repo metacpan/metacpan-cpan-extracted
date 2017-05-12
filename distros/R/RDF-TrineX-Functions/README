@@ -1,0 +1,232 @@
+NAME
+    RDF::TrineX::Functions - some shortcut functions for RDF::Trine's
+    object-oriented interface
+
+SYNOPSIS
+      use RDF::TrineX::Functions -all;
+  
+      my $model = model();
+      parse('/tmp/mydata.rdf', into => $model);
+  
+      $model->add_statement(statement(
+          iri('http://example.com/'),
+          iri('http://purl.org/dc/terms/title'),
+          "An Example",
+      ));
+  
+      print RDF::Trine::Serializer
+          -> new('Turtle')
+          -> serialize_model_to_string($model);
+
+DESCRIPTION
+    This is a replacement for the venerable RDF::TrineShortcuts. Not a drop-in
+    replacement. It has fewer features, fewer dependencies, less hackishness,
+    less magic and fewer places it can go wrong.
+
+    It uses Sub::Exporter, which allows exported functions to be renamed
+    easily:
+
+      use RDF::TrineX::Functions
+        parse => { -as => 'parse_rdf' };
+
+  Functions
+    `iri`, `literal`, `blank`, `variable`
+        As per the similarly named functions exported by RDF::Trine itself.
+
+        These are wrapped with a very tiny bit of DWIMmery. A blessed URI
+        object passed to `iri` will be handled properly; a blessed URI object
+        passed to `literal` will default the datatype to xsd:anyURI. A string
+        starting with "_:" passed to either `iri` or `blank` will correctly
+        create a blank node. A string starting with "?" passed to either
+        `blank` or `variable` will correctly create a variable. If any of them
+        are passed an existing RDF::Trine::Node, it will be passed through
+        untouched.
+
+        Other than that, no magic.
+
+    `curie`
+        Like `iri` but passes strings through RDF::NS::Trine.
+
+    `statement(@nodes)`
+        As per the similarly named function exported by RDF::Trine itself.
+
+        Again, a tiny bit of DWIMmery: blessed URI objects are passed through
+        `iri` and unblessed scalars (i.e. strings) are assumed to be literals.
+
+    `store`
+        As per the similarly named function exported by RDF::Trine itself.
+
+    `model`
+        Returns a new RDF::Trine::Model. May be passed a store as a parameter.
+
+    `parse($source, %options)`
+        Parses the source and returns an RDF::Trine::Model. The source may be:
+
+        *   a URI
+
+            A string URI, blessed URI object or RDF::Trine::Node::Resource,
+            which will be retrieved and parsed.
+
+        *   a file
+
+            A filehandle, Path::Class::File, IO::All, IO::Handle object, or
+            the name of an existing file (i.e. a scalar string). The file will
+            be read and parsed.
+
+            Except in the case of Path::Class::File, IO::All and strings, you
+            need to tell the `parse` function what parser to use, and what
+            base URI to use.
+
+        *   a string
+
+            You need to tell the `parse` function what parser to use, and what
+            base URI to use.
+
+        *   a model or store
+
+            An existing model or store, which will just be returned as-is.
+
+        *   undef
+
+            Returns an empty model.
+
+        The `parser` option can be used to provide a blessed
+        RDF::Trine::Parser object to use; the `type` option can be used
+        instead to provide a media type hint. The `base` option provides the
+        base URI. The `model` option can be used to tell this function to
+        parse into an existing model rather than returning a new one. The
+        `graph` option may be used to provide a graph URI.
+
+        `into` is an alias for `model`; `type`, `using` and `as` are aliases
+        for `parser`; `context` is an alias for `graph`.
+
+        Examples:
+
+          my $model = parse('/tmp/data.ttl', as => 'Turtle');
+
+          my $data   = iri('http://example.com/data.nt');
+          my $parser = RDF::Trine::Parser::NTriples->new;
+          my $model  = model();
+  
+          parse($data, using => $parser, into => $model);
+
+    `serialize($data, %options)`
+        Serializes the data (which can be an RDF::Trine::Model or an
+        RDF::Trine::Iterator) and returns it as a string.
+
+        The `serializer` option can be used to provide a blessed
+        RDF::Trine::Serializer object to use; the `type` option can be used
+        instead to provide a type hint. The `output` option can be used to
+        provide a filehandle, IO::All, Path::Class::File or file name to write
+        to instead of returning the results as a string.
+
+        `to` and `file` are aliases for `output`; `type`, `using` and `as` are
+        aliases for `serializer`.
+
+        Examples:
+
+          print serialize($model, as => 'Turtle');
+
+          my $file = Path::Class::File->new('/tmp/data.nt');
+          serialize($iterator, to => $file, as => 'NTriples');
+
+  Array References
+    In addition to the above interface, each function supports being called
+    with a single arrayref argument. In those cases, the arrayref is
+    dereferenced into an array, and treated as a list of arguments. That is,
+    the following are equivalent:
+
+      foo($bar, $baz);
+      foo([$bar, $baz]);
+
+    This is handy if you're writing a module of your own and wish to accept
+    some RDF data:
+
+      sub my_method {
+        my ($self, $rdf, $foo) = @_;
+        $rdf = parse($rdf);
+    
+        ....
+      }
+
+    Your method can now be called like this:
+
+      $object->my_method($model, 'foo');
+  
+      $object->my_method($url, 'foo');
+  
+      $object->my_method(
+          [ $filehandle, as => 'Turtle', base => $uri ],
+          'foo',
+      );
+
+  Export
+    By default, nothing is exported. You need to request things:
+
+      use RDF::TrineX::Functions qw< iri literal blank statement model >;
+
+    Thanks to Sub::Exporter, you can rename functions:
+
+      use RDF::TrineX::Functions
+        qw< literal statement model >,
+        blank => { -as => 'bnode' },
+        iri   => { -as => 'resource' };
+
+    If you want to export everything, you can do:
+
+      use RDF::TrineX::Functions -all;
+
+    To export just the functions which generate RDF::Trine::Node objects:
+
+      use RDF::TrineX::Functions -nodes;
+
+    Or maybe even:
+
+      use RDF::TrineX::Functions -nodes => { -suffix => '_node' };
+
+    If you want to export something roughly compatible with the old
+    RDF::TrineShortcuts, then there's:
+
+      use RDF::TrineX::Functions -shortcuts;
+
+    When exporting the `serialize` function you may set a default format:
+
+      use RDF::TrineX::Functions
+          serialize => { -type => 'NTriples' };
+
+    This will be used when `serialize` is called with no explicit type given.
+
+  Pseudo-OO interface
+    `new`
+        This acts as a constructor, returning a new RDF::TrineX::Functions
+        object.
+
+    All the normal functions can be called as methods:
+
+     my $R = RDF::TrineX::Functions->new;
+     my $model = $R->model;
+
+    There's no real advantage to using this module as an object, but it can
+    help you avoid namespace pollution.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-TrineX-Functions>.
+
+SEE ALSO
+    RDF::Trine, RDF::QueryX::Lazy, RDF::NS.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

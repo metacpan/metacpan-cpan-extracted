@@ -1,0 +1,25 @@
+@ScripConditions = (
+    {
+        Name                 => 'On ACNS message',                                # loc
+        Description          => 'When create, correspond or comment contains an ACNS message',                 # loc
+        ApplicableTransTypes => 'Create,Correspond,Comment',
+        ExecModule           => 'ACNSMessage',
+    },
+);
+
+@ScripActions = (
+    {
+        Name        => 'Extract info from ACNS',    # loc
+        Description => '' ,                      # loc
+        ExecModule  => 'ParseACNS',
+    },
+);
+
+@Scrips = (
+    {
+        Description    => 'On ACNS notification extract data',
+        ScripCondition => 'On ACNS message',
+        ScripAction    => 'Extract info from ACNS',
+        Template       => 'Blank',
+    },
+);

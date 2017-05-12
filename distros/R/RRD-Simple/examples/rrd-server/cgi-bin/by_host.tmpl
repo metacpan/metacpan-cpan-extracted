@@ -1,0 +1,46 @@
+<TMPL_INCLUDE header.tmpl>
+<h1><a href="<TMPL_VAR self_url>">Index</a> &gt;
+<TMPL_IF EXPR="HOST || LIKE">
+  <a href="<TMPL_VAR self_url>?template=<TMPL_VAR template>&PERIOD=<TMPL_VAR PERIOD>"><TMPL_VAR title></a> &gt;
+  <TMPL_IF HOST><TMPL_VAR HOST><TMPL_ELSE>Like <TMPL_VAR LIKE></TMPL_IF>
+<TMPL_ELSE>
+  <TMPL_VAR title>
+</TMPL_IF>
+</h1>
+
+<div class="contents">
+  <h3>
+    [ <TMPL_IF EXPR="PERIOD eq 'daily'">Daily<TMPL_ELSE><a href="<TMPL_VAR self_url>?template=<TMPL_VAR template><TMPL_IF HOST>&HOST=<TMPL_VAR HOST></TMPL_IF><TMPL_IF LIKE>&LIKE=<TMPL_VAR LIKE></TMPL_IF><TMPL_IF GRAPH>&GRAPH=<TMPL_VAR GRAPH></TMPL_IF>&PERIOD=daily">Daily</a></TMPL_IF>
+    | <TMPL_IF EXPR="PERIOD eq 'weekly'">Weekly<TMPL_ELSE><a href="<TMPL_VAR self_url>?template=<TMPL_VAR template><TMPL_IF HOST>&HOST=<TMPL_VAR HOST></TMPL_IF><TMPL_IF LIKE>&LIKE=<TMPL_VAR LIKE></TMPL_IF><TMPL_IF GRAPH>&GRAPH=<TMPL_VAR GRAPH></TMPL_IF>&PERIOD=weekly">Weekly</a></TMPL_IF>
+    | <TMPL_IF EXPR="PERIOD eq 'monthly'">Monthly<TMPL_ELSE><a href="<TMPL_VAR self_url>?template=<TMPL_VAR template><TMPL_IF HOST>&HOST=<TMPL_VAR HOST></TMPL_IF><TMPL_IF LIKE>&LIKE=<TMPL_VAR LIKE></TMPL_IF><TMPL_IF GRAPH>&GRAPH=<TMPL_VAR GRAPH></TMPL_IF>&PERIOD=monthly">Monthly</a></TMPL_IF>
+    | <TMPL_IF EXPR="PERIOD eq 'annual'">Annual<TMPL_ELSE><a href="<TMPL_VAR self_url>?template=<TMPL_VAR template><TMPL_IF HOST>&HOST=<TMPL_VAR HOST></TMPL_IF><TMPL_IF LIKE>&LIKE=<TMPL_VAR LIKE></TMPL_IF><TMPL_IF GRAPH>&GRAPH=<TMPL_VAR GRAPH></TMPL_IF>&PERIOD=annual">Annual</a></TMPL_IF> ]
+  </h3>
+
+<TMPL_LOOP hosts>
+  <TMPL_IF EXPR="equal_or_like(host,HOST,LIKE)">
+<div class="host"><div class="<TMPL_VAR host2>">
+<h2<TMPL_IF stale> class="stale"</TMPL_IF>><a href="<TMPL_VAR self_url>?template=host.tmpl&HOST=<TMPL_VAR host>&PERIOD=<TMPL_VAR PERIOD>"><TMPL_VAR host></a><TMPL_IF include_summary_txt> - <TMPL_VAR EXPR="slurp(include_summary_txt)"></TMPL_IF></h2>
+  <TMPL_IF include_overview_html>
+    <!-- BEGIN INCLUDE_OVERVIEW_HTML -->
+    <TMPL_VAR EXPR="slurp(include_overview_html)">
+    <!-- END INLUDE_OVERVIEW_HTML -->
+  </TMPL_IF>
+  <TMPL_LOOP thumbnails>
+    <TMPL_IF EXPR="period eq PERIOD">
+<div class="<TMPL_IF stale>stale_</TMPL_IF>thumbnail"><a href="<TMPL_VAR self_url>?template=host.tmpl&HOST=<TMPL_VAR host>&GRAPH=<TMPL_VAR graph>&PERIOD=<TMPL_VAR PERIOD>"><img src="<TMPL_VAR src>" class="thumbnail" /></a><br /><TMPL_VAR title></div>
+    </TMPL_IF>
+  </TMPL_LOOP>
+  <TMPL_IF no_graphs>
+    <i>No graphs available yet - please wait a few minutes.</i>
+  <TMPL_ELSE>
+    <TMPL_UNLESS thumbnails>
+      <i>No thumbnails available yet - please wait a few minutes.</i>
+    </TMPL_UNLESS>
+  </TMPL_IF>
+</div></div>
+<div class="vertspace">&nbsp;</div>
+  </TMPL_IF>
+</TMPL_LOOP>
+</div>
+
+<TMPL_INCLUDE footer.tmpl>

@@ -1,0 +1,11 @@
+abstract: List queues the user is a watcher of
+author: 'Emmanuel Lacour <elacour@home-dn.net>'
+distribution_type: module
+generated_by: Module::Install version 0.71
+license: perl
+name: RT-Extension-WatchedQueue
+no_index:
+  directory:
+    - html
+    - inc
+version: 0.03

@@ -1,0 +1,27 @@
+---
+abstract: 'RRD file manipulation'
+author:
+  - 'Stanislav Sinyagin <ssinyagin@k-open.com>'
+build_requires:
+  Data::Compare: 0
+  Data::Dumper: 0
+  ExtUtils::CBuilder: 0
+  RRDs: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RRD-Tweak
+provides:
+  RRD::Tweak:
+    file: lib/RRD/Tweak.pm
+    version: 1.00
+requires:
+  perl: v5.8.8
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 1.00

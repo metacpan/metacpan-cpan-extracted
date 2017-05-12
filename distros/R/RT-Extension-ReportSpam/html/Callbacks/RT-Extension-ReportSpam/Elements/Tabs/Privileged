@@ -1,0 +1,39 @@
+<%init>
+sub build_spam_menu {
+    my $menu = shift;
+    $menu->child(
+        "recent",
+        title => loc('Recent'),
+        path  => '/Tools/Spam/Recent.html',
+    );
+    $menu->child(
+        "reported",
+        title => loc('Reported'),
+        path  => '/Tools/Spam/Reported.html',
+    );
+    return $menu;
+}
+
+if (my $tools = Menu->child("tools")) {
+    my $spam = $tools->child(
+        "spam",
+        title   => loc("Spam"),
+        path    => "/Tools/Spam/",
+    );
+    build_spam_menu($spam);
+}
+
+my $request_path = $HTML::Mason::Commands::r->path_info;
+   $request_path =~ s!/{2,}!/!g;
+
+if ($request_path =~ m{^/Ticket/} and my $id = $DECODED_ARGS->{id}) {
+    PageMenu->child(
+        "report-spam",
+        title   => "Spam",
+        raw_html => $m->scomp("/Ticket/Elements/ReportSpam", id => $id),
+    );
+}
+elsif ($request_path =~ m{^/Tools/Spam/}) {
+    build_spam_menu( PageMenu() );
+}
+</%init>

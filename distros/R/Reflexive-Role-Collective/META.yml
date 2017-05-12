@@ -1,0 +1,30 @@
+---
+abstract: 'Provides a composable behavior for containers watching contained events'
+author:
+  - 'Nicholas R. Perez <nperez@cpan.org>'
+build_requires:
+  Moose: 0
+  Reflex::Role::Collectible: 0
+  Reflex::Role::Reactive: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Reflexive-Role-Collective
+requires:
+  Moose::Util::TypeConstraints: 0
+  MooseX::Params::Validate: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Structured: 0
+  Reflex::Callbacks: 0
+  Reflex::Role: 0
+resources:
+  repository: git://nickandperla.net/reflexive-role-collective.git
+version: 1.113340

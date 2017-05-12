@@ -1,0 +1,13 @@
+Changes
+bin/rpm_packager.pl
+lib/RPM/Packager.pm
+lib/RPM/Packager/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_packager.t
+t/02_utils.t
+t/test_data/test_file
+t/test_data/test_yaml.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

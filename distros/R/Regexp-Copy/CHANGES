@@ -1,0 +1,22 @@
+0.06 -
+	+ made it work with Perl 5.8.1
+0.05 -
+	+ okay, so maybe I didn't fix it. But I did this time m'kay.
+0.04 -
+	+ we were getting a strange warning that was fixed by ensuring
+	  Regexp::Storable created an empty regexp if there wasn't one
+          present in $thaw.
+0.03 -
+	+ fixed bug that meant the magic data structures were getting
+	  longer and longer.  We mg_free all of that data away now
+	  *before* assigning the new re.
+	+ made mention of storable qr// freezing in main docs.
+
+0.02 -
+	+ fixed bug that caused segfaults with large
+	  data structures.  This was a piece of bizarre
+	  behavior on Perl's part, which I can't explain
+	  or reduce to a simple test case.
+	+ Updated documentation
+
+0.01 - Initial idea

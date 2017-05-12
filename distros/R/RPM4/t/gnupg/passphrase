@@ -1,0 +1,6 @@
+RPM4
+
+# $Id$
+# This is key passphrase, this key is here only for testing.
+# Do not use it for signing/crypting.
+# Do not trust it.

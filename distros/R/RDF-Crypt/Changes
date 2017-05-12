@@ -1,0 +1,19 @@
+RDF-Crypt
+=========
+
+Created:      2010-09-21
+Home page:    <https://metacpan.org/release/RDF-Crypt>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Crypt>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.002  2012-06-25
+
+ - (Packaging) Module::Package::RDF
+ - Integration with Web::ID.
+ - Major refactoring, using Any::Moose and a role-based architecture.
+ - More comprehensive test suite.
+ - verify_manifest now returns a list of objects; not a list of hashrefs.
+
+0.001  2010-09-23
+
+

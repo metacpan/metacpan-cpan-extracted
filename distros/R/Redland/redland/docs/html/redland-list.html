@@ -1,0 +1,474 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>List</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.71.0">
+<link rel="start" href="index.html" title="Redland RDF Application Framework Manual">
+<link rel="up" href="pt02.html" title="Part&#160;II.&#160;Reference Manual">
+<link rel="prev" href="redland-iterator.html" title="Iterator">
+<link rel="next" href="redland-log.html" title="Logging.">
+<meta name="generator" content="GTK-Doc V1.7 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="chapter" href="redland.html" title="Redland Overview">
+<link rel="chapter" href="introduction.html" title="Introduction">
+<link rel="part" href="pt01.html" title="Part&#160;I.&#160;Tutorial">
+<link rel="part" href="pt02.html" title="Part&#160;II.&#160;Reference Manual">
+<link rel="chapter" href="objects.html" title="Objects in C">
+<link rel="index" href="ix01.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
+<tr valign="middle">
+<td><a accesskey="p" href="redland-iterator.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="pt02.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">Redland RDF Application Framework Manual</th>
+<td><a accesskey="n" href="redland-log.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr>
+<tr><td colspan="5" class="shortcuts"><nobr><a href="#id2596024" class="shortcut">Top</a>
+                  &#160;|&#160;
+                  <a href="#id2579907" class="shortcut">Description</a></nobr></td></tr>
+</table>
+<div class="refentry" lang="en">
+<a name="redland-list"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2>
+<a name="id2596024"></a><span class="refentrytitle">List</span>
+</h2>
+<p>List &#8212; Simple list class.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+
+
+typedef     <a href="redland-list.html#librdf-list">librdf_list</a>;
+<a href="redland-list.html#librdf-list">librdf_list</a>* <a href="redland-list.html#librdf-new-list">librdf_new_list</a>                (<a href="redland-world.html#librdf-world">librdf_world</a> *world);
+void        <a href="redland-list.html#librdf-free-list">librdf_free_list</a>                (<a href="redland-list.html#librdf-list">librdf_list</a> *list);
+void        <a href="redland-list.html#librdf-list-clear">librdf_list_clear</a>               (<a href="redland-list.html#librdf-list">librdf_list</a> *list);
+int         <a href="redland-list.html#librdf-list-add">librdf_list_add</a>                 (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void *data);
+int         <a href="redland-list.html#librdf-list-unshift">librdf_list_unshift</a>             (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void *data);
+void*       <a href="redland-list.html#librdf-list-shift">librdf_list_shift</a>               (<a href="redland-list.html#librdf-list">librdf_list</a> *list);
+void*       <a href="redland-list.html#librdf-list-pop">librdf_list_pop</a>                 (<a href="redland-list.html#librdf-list">librdf_list</a> *list);
+void*       <a href="redland-list.html#librdf-list-remove">librdf_list_remove</a>              (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void *data);
+int         <a href="redland-list.html#librdf-list-contains">librdf_list_contains</a>            (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void *data);
+int         <a href="redland-list.html#librdf-list-size">librdf_list_size</a>                (<a href="redland-list.html#librdf-list">librdf_list</a> *list);
+void        <a href="redland-list.html#librdf-list-set-equals">librdf_list_set_equals</a>          (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             int (*equals) (void* data1, void *data2));
+<a href="redland-iterator.html#librdf-iterator">librdf_iterator</a>* <a href="redland-list.html#librdf-list-get-iterator">librdf_list_get_iterator</a>   (<a href="redland-list.html#librdf-list">librdf_list</a> *list);
+void        <a href="redland-list.html#librdf-list-foreach">librdf_list_foreach</a>             (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void (*fn) (void *, void *),
+                                             void *user_data);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2579907"></a><h2>Description</h2>
+<p>
+A simple list class used internally.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2579923"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2579934"></a><h3>
+<a name="librdf-list"></a>librdf_list</h3>
+<a class="indexterm" name="id2579946"></a><pre class="programlisting">typedef struct librdf_list_s librdf_list;
+</pre>
+<p>
+Redland list class.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2604411"></a><h3>
+<a name="librdf-new-list"></a>librdf_new_list ()</h3>
+<a class="indexterm" name="id2604423"></a><pre class="programlisting"><a href="redland-list.html#librdf-list">librdf_list</a>* librdf_new_list                (<a href="redland-world.html#librdf-world">librdf_world</a> *world);</pre>
+<p>
+Constructor - create a new <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>world</code></em>&#160;:</span></td>
+<td> redland world object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2604496"></a><h3>
+<a name="librdf-free-list"></a>librdf_free_list ()</h3>
+<a class="indexterm" name="id2604508"></a><pre class="programlisting">void        librdf_free_list                (<a href="redland-list.html#librdf-list">librdf_list</a> *list);</pre>
+<p>
+Destructor - destroy a <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2604571"></a><h3>
+<a name="librdf-list-clear"></a>librdf_list_clear ()</h3>
+<a class="indexterm" name="id2604584"></a><pre class="programlisting">void        librdf_list_clear               (<a href="redland-list.html#librdf-list">librdf_list</a> *list);</pre>
+<p>
+Empty an librdf_list.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2604639"></a><h3>
+<a name="librdf-list-add"></a>librdf_list_add ()</h3>
+<a class="indexterm" name="id2604651"></a><pre class="programlisting">int         librdf_list_add                 (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void *data);</pre>
+<p>
+Add a data item to the end of a librdf_list.
+</p>
+<p>
+Equivalent to the list 'push' notion, thus if <a href="redland-list.html#librdf-list-pop"><code class="function">librdf_list_pop()</code></a>
+is called after this, it will return the value added here.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> the data value
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2570258"></a><h3>
+<a name="librdf-list-unshift"></a>librdf_list_unshift ()</h3>
+<a class="indexterm" name="id2570271"></a><pre class="programlisting">int         librdf_list_unshift             (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void *data);</pre>
+<p>
+Add a data item to the start of a librdf_list.
+</p>
+<p>
+if <a href="redland-list.html#librdf-list-shift"><code class="function">librdf_list_shift()</code></a> is called after this, it will return the value
+added here.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> the data value
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2570373"></a><h3>
+<a name="librdf-list-shift"></a>librdf_list_shift ()</h3>
+<a class="indexterm" name="id2570385"></a><pre class="programlisting">void*       librdf_list_shift               (<a href="redland-list.html#librdf-list">librdf_list</a> *list);</pre>
+<p>
+Remove and return the data at the start of the list.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the data object or NULL if the list is empty
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612172"></a><h3>
+<a name="librdf-list-pop"></a>librdf_list_pop ()</h3>
+<a class="indexterm" name="id2612184"></a><pre class="programlisting">void*       librdf_list_pop                 (<a href="redland-list.html#librdf-list">librdf_list</a> *list);</pre>
+<p>
+Remove and return the data at the end of the list.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the data object or NULL if the list is empty
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612253"></a><h3>
+<a name="librdf-list-remove"></a>librdf_list_remove ()</h3>
+<a class="indexterm" name="id2612265"></a><pre class="programlisting">void*       librdf_list_remove              (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void *data);</pre>
+<p>
+Remove a data item from an librdf_list.
+</p>
+<p>
+The search is done using the 'equals' function which may be set
+by <a href="redland-list.html#librdf-list-set-equals"><code class="function">librdf_list_set_equals()</code></a> or by straight comparison of pointers
+if not set.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> the data item
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the data stored or NULL on failure (not found or list empty)
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2612369"></a><h3>
+<a name="librdf-list-contains"></a>librdf_list_contains ()</h3>
+<a class="indexterm" name="id2612380"></a><pre class="programlisting">int         librdf_list_contains            (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void *data);</pre>
+<p>
+Check for presence of data item in list.
+</p>
+<p>
+The search is done using the 'equals' function which may be set
+by <a href="redland-list.html#librdf-list-set-equals"><code class="function">librdf_list_set_equals()</code></a> or by straight comparison of pointers
+if not set.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> the data value
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> non 0 if item was found
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615457"></a><h3>
+<a name="librdf-list-size"></a>librdf_list_size ()</h3>
+<a class="indexterm" name="id2615468"></a><pre class="programlisting">int         librdf_list_size                (<a href="redland-list.html#librdf-list">librdf_list</a> *list);</pre>
+<p>
+Return the length of the list.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> length of the list
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615527"></a><h3>
+<a name="librdf-list-set-equals"></a>librdf_list_set_equals ()</h3>
+<a class="indexterm" name="id2615538"></a><pre class="programlisting">void        librdf_list_set_equals          (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             int (*equals) (void* data1, void *data2));</pre>
+<p>
+Set the equals function for the list.
+</p>
+<p>
+The function given is used when comparing items in the list
+during searches such as those done in <a href="redland-list.html#librdf-list-remove"><code class="function">librdf_list_remove()</code></a> or
+<a href="redland-list.html#librdf-list-contains"><code class="function">librdf_list_contains()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>equals</code></em>&#160;:</span></td>
+<td> the equals function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615632"></a><h3>
+<a name="librdf-list-get-iterator"></a>librdf_list_get_iterator ()</h3>
+<a class="indexterm" name="id2615643"></a><pre class="programlisting"><a href="redland-iterator.html#librdf-iterator">librdf_iterator</a>* librdf_list_get_iterator   (<a href="redland-list.html#librdf-list">librdf_list</a> *list);</pre>
+<p>
+Get an iterator for the list.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="redland-iterator.html#librdf-iterator"><span class="type">librdf_iterator</span></a> object or NULL on failure
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2615716"></a><h3>
+<a name="librdf-list-foreach"></a>librdf_list_foreach ()</h3>
+<a class="indexterm" name="id2615729"></a><pre class="programlisting">void        librdf_list_foreach             (<a href="redland-list.html#librdf-list">librdf_list</a> *list,
+                                             void (*fn) (void *, void *),
+                                             void *user_data);</pre>
+<p>
+Apply a function for each data item in a librdf_list.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><span class="term"><em class="parameter"><code>list</code></em>&#160;:</span></td>
+<td> <a href="redland-list.html#librdf-list"><span class="type">librdf_list</span></a> object
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>fn</code></em>&#160;:</span></td>
+<td> pointer to function to apply that takes data pointer and user data parameters
+</td>
+</tr>
+<tr>
+<td><span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> user data for applied function 
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

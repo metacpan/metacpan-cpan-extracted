@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Roguelike-Utils
+version:             0.5.259
+abstract:            Roguelike Utilities for Perl
+license:             ~
+author:              
+    - Erik Aronesty <earonesty@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Term::ReadKey:                 0
+    Test::Simple:                  0.44
+    Time::HiRes:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,30 @@
+<form action="index.html" method="GET">
+Query:
+<textarea name="Query" rows="5" cols="80"><% $Query %></textarea><br />
+
+Report type: <select name="ReportType">
+<option value="ActivityDetail" <% $ReportType =~ /ActivityDetail/ ? 'selected' : '' %>>Activity detail</option>
+<option value="ActivitySummary" <% $ReportType =~ /ActivitySummary/ ? 'selected' : '' %>>Activity summary</option>
+% $m->callback( %ARGS, CallbackName => 'AddReports' );
+<option value="ResolutionComments" <% $ReportType =~ /ResolutionComments/ ? 'selected' : '' %>>Resolution comments</option>
+<option value="ResolutionStatistics" <% $ReportType =~ /ResolutionStatistics/ ? 'selected' : '' %>>Resolution statistics</option>
+<option value="WorkedStatistics" <% $ReportType =~ /WorkedStatistics/ ? 'selected' : '' %>>Time worked statistics</option>
+</select><br />
+
+Start date: <input type="text" name="Start" value="<% $Start %>" /><br />
+End date:   <input type="text" name="End"   value="<% $End   %>" /><br />
+Limit to user: <& /Elements/SelectOwner, Name => "Actor", ValueAttribute => 'Name', Default => $actor_obj->Id||0 &>
+% $m->callback( %ARGS, CallbackName => 'AddOptions' );
+<& /Elements/Submit, Label => loc('Report') &>
+</form>
+<%args>
+$ReportType  => ''
+$Start => undef
+$End   => undef
+$Query => ''
+$Actor => undef
+</%args>
+<%init>
+my $actor_obj = RT::User->new($session{CurrentUser});
+$actor_obj->LoadByCol( Name => $Actor );
+</%init>

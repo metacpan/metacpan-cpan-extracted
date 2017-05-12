@@ -1,0 +1,14 @@
+Debian
+======
+
+apt-get install libjson-perl
+apt-get install liblwp-perl
+apt-get install libwww-perl
+apt-get install liburi-perl
+apt-get install libregexp-common-perl
+apt-get install libtest-pod-coverage-perl
+apt-get install libtest-exception-perl
+
+start the server:
+
+/usr/lib/agraph-fse-3.3/AllegroGraphServer --user agraph --config-file /usr/lib/agraph-fse-3.3/agraph.cfg --new-http-port 8080 --new-http-catalog /tmp/scratch

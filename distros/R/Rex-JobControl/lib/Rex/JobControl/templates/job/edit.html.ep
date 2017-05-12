@@ -1,0 +1,142 @@
+% layout 'job';
+% title 'Edit Job';
+<h2>Edit <%= $job->name %></h2>
+
+<form action="/project/<%= $project->directory %>/job/<%= $job->directory %>/edit" method="post">
+
+  <div class="panel panel-default">
+
+    <div class="panel-heading">Basic Settings</div>
+    <div class="panel-body">
+
+      <div class="form-group">
+        <label for="job_name">Job Name</label>
+        <input type="text" class="form-control" id="job_name" name="job_name" placeholder="My new job" value="<%= $job->name %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="job_description">Job Description</label>
+        <textarea class="form-control" id="job_description" name="job_description"><%= $job->description %></textarea>
+      </div>
+
+
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">Options</div>
+    <div class="panel-body">
+      <div>
+        <div class="col-xs-2">
+          Environment
+        </div>
+        <div class="col-xs-10">
+          <div class="checkbox" style="display: inline;">
+            <select name="environment" id="environment">
+              <option value="">default</option>
+% for my $rexfile (@{ $project->rexfiles }) {
+  % for my $env (@{ $rexfile->environments }) {
+  <option value="" <% if($env eq $job->environment) { %>selected="selected"<% } %>><%= $env %></option>
+  % }
+% }
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading">Workflow</div>
+    <div class="panel-body">
+
+      <div>
+        <div class="col-xs-2">
+          If a step fails
+        </div>
+        <div class="col-xs-10">
+          <div class="checkbox" style="display: inline;">
+            <label>
+              <input type="radio" name="fail_strategy" value="terminate" <% if($job->fail_strategy eq "terminate") { %>checked="checked"<% } %>> Terminate execution
+            </label>
+          </div>
+
+          <div class="checkbox" style="display: inline;">
+            <label>
+              <input type="radio" name="fail_strategy" value="continue" <% if($job->fail_strategy eq "continue") { %>checked="checked"<% } %>> Continue execution
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="col-xs-2">
+          Execute strategy
+        </div>
+        <div class="col-xs-10">
+          <div class="checkbox" style="display: inline;">
+            <label>
+              <input type="radio" name="execute_strategy" value="node" <% if($job->execute_strategy eq "node") { %>checked="checked"<% } %>> Node
+            </label>
+          </div>
+
+          <div class="checkbox" style="display: inline;">
+            <label>
+              <input type="radio" name="execute_strategy" value="step" <% if($job->execute_strategy eq "step") { %>checked="checked"<% } %>> Step
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+ 
+  <div class="panel panel-default">
+    <div class="panel-heading">Steps</div>
+    <div class="panel-body">
+
+      <div class="col-xs-3">
+        <ul id="workflow_steps" class="connectedSortable">
+% for my $step (@{ $job->steps }) {
+% my ($rexfile, $task) = split(/\//, $step);
+          <li class="sortable-target-item" rexfile="<%= $rexfile %>" task="<%= $task %>"><%= $rexfile %> / <%= $task %></li>
+% }
+ 
+        </ul>
+      </div>
+
+      <div class="col-xs-3">
+        <ul id="available_steps" class="connectedSortable">
+% for my $rexfile (@{ $project->rexfiles }) {
+  % for my $task (@{ $rexfile->tasks }) {
+          <li class="sortable-source-item" rexfile="<%= $rexfile->directory %>" task="<%= $task %>"><%= $rexfile->name %> / <%= $task %></li>
+  % }
+% }
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    $(function() {
+      $( "#workflow_steps, #available_steps" ).sortable({
+        connectWith: ".connectedSortable",
+        update: function(event, ui) {
+          var x = new Array();
+          $("#workflow_steps").find("li").each(function(idx, itm) {
+            x.push($(itm).attr("rexfile") + "/" + $(itm).attr("task"));
+          });
+
+          $("#hdn_workflow_steps").val(x.join(","));
+        }
+      }).disableSelection();
+    });
+  </script>
+
+  <input type="hidden" id="hdn_workflow_steps" name="hdn_workflow_steps" value="<%= join(",", @{ $job->steps }) %>" />
+
+  <button type="submit" class="btn btn-warning">Save Job</button>
+</form>

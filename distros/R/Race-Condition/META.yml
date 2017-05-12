@@ -1,0 +1,22 @@
+---
+abstract: 'Mark and make testable/debuggable known race conditions'
+author:
+  - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Race-Condition
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+version: 0.01

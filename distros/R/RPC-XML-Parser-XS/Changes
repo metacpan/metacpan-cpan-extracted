@@ -1,0 +1,21 @@
+Revision history for Perl extension RPC::XML::Parser::XS.
+
+-.--  --- --- -- --:--:-- ----
+0.04  Mon Jul 27 18:57:47 2009
+    - Bugfix: empty string values were incorrectly parsed when they are
+      implicitly typed.
+
+0.03  Mon Jul 27 16:48:18 2009
+    - Bugfix: string values were incorrectly parsed when they are implicitly
+      typed.
+
+0.02  Mon Mar 17 17:22:17 2008
+    - Bugfix: errors occured outside the XML reader context (such as
+      "encoder error") weren't properly handled.
+    - Bugfix: IPC::Run was required to run Makefile.PL correctly
+    - Bugfix: compat for old libxml2 (2.6.20).
+
+0.01  Thu Apr 26 11:23:29 2007
+	- original version; created by h2xs 1.23 with options
+		-A -n RPC::XML::Parser::XS
+

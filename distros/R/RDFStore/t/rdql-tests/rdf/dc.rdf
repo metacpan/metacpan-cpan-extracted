@@ -1,0 +1,3354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:dctype="http://purl.org/dc/dcmitype/">
+ 
+  <rdf:Description rdf:about="http://testers.mkdoc.com/">
+
+    <dc:identifier rdf:resource="http://testers.mkdoc.com/" />
+
+    <dc:language>
+      <dcterms:RFC1766>
+        <rdf:value>en-gb</rdf:value>
+        <rdfs:label>English (United Kingdom)</rdfs:label>
+      </dcterms:RFC1766>
+    </dc:language>
+
+    <dc:title xml:lang="en-gb">MKDoc Testers</dc:title>
+
+    <dcterms:abstract xml:lang="en-gb">This particular MKDoc site is for testing MKDoc - sign up for an account and have a play!</dcterms:abstract>
+
+    <dc:creator>
+      Bruno Postle, bruno@mkdoc.com
+    </dc:creator>
+
+
+  
+    <dc:contributor>
+      Chris Croome, chris@mkdoc.com 
+    </dc:contributor>
+  
+    <dc:contributor>
+      Adam Moran, adam@webarchitects.co.uk 
+    </dc:contributor>
+  
+
+
+
+    <dc:publisher xml:lang="en-gb">MKDoc Ltd.</dc:publisher>
+
+
+
+    <dc:subject xml:lang="en-gb">MKDoc</dc:subject>
+
+    <dc:subject xml:lang="en-gb">information architecture</dc:subject>
+
+    <dc:subject xml:lang="en-gb">content management system</dc:subject>
+
+    <dc:subject xml:lang="en-gb">useability</dc:subject>
+
+    <dc:subject xml:lang="en-gb">metadata</dc:subject>
+
+    <dc:subject xml:lang="en-gb">editor</dc:subject>
+
+
+
+
+
+    <dcterms:hasPart>
+      <rdf:Seq>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-shore-3/">
+            <dc:title xml:lang="en">A Test  Page</dc:title>
+            <dcterms:abstract xml:lang="en">A test page to find out what this is all about.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/aaron-claypoole/">
+            <dc:title xml:lang="en">Aaron Claypoole</dc:title>
+            <dcterms:abstract xml:lang="en">Aaron's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/aaron-cure/">
+            <dc:title xml:lang="en">Aaron Cure</dc:title>
+            <dcterms:abstract xml:lang="en">Aaron's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/aaron-greenspan/">
+            <dc:title xml:lang="en">Aaron Greenspan</dc:title>
+            <dcterms:abstract xml:lang="en">Aaron's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/accessibility-statement/">
+            <dc:title xml:lang="en">Accessibility Statement</dc:title>
+            <dcterms:abstract xml:lang="en">Accessibility Statement</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/adam-moran/">
+            <dc:title xml:lang="en">adam moran</dc:title>
+            <dcterms:abstract xml:lang="en">adam's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/agendas/">
+            <dc:title xml:lang="en">Agendas</dc:title>
+            <dcterms:abstract xml:lang="en">Agendas</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ajit-chanmugam/">
+            <dc:title xml:lang="en">Ajit Chanmugam</dc:title>
+            <dcterms:abstract xml:lang="en">Ajit's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/akm/">
+            <dc:title xml:lang="sr">AKM</dc:title>
+            <dcterms:abstract xml:lang="sr">AKM stranica</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/alain-reinhardt/">
+            <dc:title xml:lang="en">Alain Reinhardt</dc:title>
+            <dcterms:abstract xml:lang="en">Alain's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/alan-ratcliffe/">
+            <dc:title xml:lang="en">Alan ratcliffe</dc:title>
+            <dcterms:abstract xml:lang="en">Alan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ali-grant/">
+            <dc:title xml:lang="en">Ali Grant</dc:title>
+            <dcterms:abstract xml:lang="en">Ali's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/allan-johns/">
+            <dc:title xml:lang="en">Allan Johns</dc:title>
+            <dcterms:abstract xml:lang="en">Allan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/amanda-croome/">
+            <dc:title xml:lang="en">Amanda Croome</dc:title>
+            <dcterms:abstract xml:lang="en">This is a web page set up by Amanda to test this soft ware.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/andras-micsik/">
+            <dc:title xml:lang="en">Andras Micsik</dc:title>
+            <dcterms:abstract xml:lang="en">Andras's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/andrew-bruce/">
+            <dc:title xml:lang="en">Andrew Bruce</dc:title>
+            <dcterms:abstract xml:lang="en">Andrew's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/andy/">
+            <dc:title xml:lang="en-gb">Andy</dc:title>
+            <dcterms:abstract xml:lang="en-gb">Somewhere for Andy to have a play with MKDoc.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/andy-hewitson/">
+            <dc:title xml:lang="en">Andy Hewitson</dc:title>
+            <dcterms:abstract xml:lang="en">Andy's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/anita-coleman/">
+            <dc:title xml:lang="en">Anita Coleman</dc:title>
+            <dcterms:abstract xml:lang="en">Anita's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/anonymous/">
+            <dc:title xml:lang="en">Anonymous</dc:title>
+            <dcterms:abstract xml:lang="en">Poems and narative written between 1984 and 1990 </dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/antony-chan-2/">
+            <dc:title xml:lang="en">Antony Chan</dc:title>
+            <dcterms:abstract xml:lang="en">Antony's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ard-ligthart/">
+            <dc:title xml:lang="en">ard ligthart</dc:title>
+            <dcterms:abstract xml:lang="en">ard's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/arman/">
+            <dc:title xml:lang="en-gb">Arman</dc:title>
+            <dcterms:abstract xml:lang="en-gb">a test area for arman</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/arthur-leon/">
+            <dc:title xml:lang="en">arthur leon</dc:title>
+            <dcterms:abstract xml:lang="en">arthur's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/asd-asd/">
+            <dc:title xml:lang="en">asd asd</dc:title>
+            <dcterms:abstract xml:lang="en">asd's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/barry-graves/">
+            <dc:title xml:lang="en">Barry Graves</dc:title>
+            <dcterms:abstract xml:lang="en">Barry's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/brian-cooper/">
+            <dc:title xml:lang="en">BC MKDoc Test Site</dc:title>
+            <dcterms:abstract xml:lang="en">BRIAN's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bc/">
+            <dc:title xml:lang="en-gb">BCIS News Release</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A test document for Jonathan Argue.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/beep-beep/">
+            <dc:title xml:lang="en">beep beep</dc:title>
+            <dcterms:abstract xml:lang="en">beep's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ben/">
+            <dc:title xml:lang="en-gb">Ben</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A page for ben</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ben-wimpenny/">
+            <dc:title xml:lang="en">Ben Wimpenny</dc:title>
+            <dcterms:abstract xml:lang="en">Ben's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/berdt-vdl/">
+            <dc:title xml:lang="en">berdt vdl</dc:title>
+            <dcterms:abstract xml:lang="en">berdt's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bo-overby/">
+            <dc:title xml:lang="en">Bo</dc:title>
+            <dcterms:abstract xml:lang="en">Bo's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bob/">
+            <dc:title xml:lang="pl">bob</dc:title>
+            <dcterms:abstract xml:lang="pl">bob</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bob-roebuck/">
+            <dc:title xml:lang="en">bob roebuck</dc:title>
+            <dcterms:abstract xml:lang="en">bob's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bobby-auriemma/">
+            <dc:title xml:lang="en">Bobby Auriemma</dc:title>
+            <dcterms:abstract xml:lang="en">Bobby's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bogdan-duchnowski/">
+            <dc:title xml:lang="en">Bogdan Duchnowski</dc:title>
+            <dcterms:abstract xml:lang="en">Bogdan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bookyung-kang/">
+            <dc:title xml:lang="en">bookyung kang</dc:title>
+            <dcterms:abstract xml:lang="en">bookyung's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/brian-fredette/">
+            <dc:title xml:lang="en">brian fredette</dc:title>
+            <dcterms:abstract xml:lang="en">brian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/brian-lauer/">
+            <dc:title xml:lang="en">Brian Lauer</dc:title>
+            <dcterms:abstract xml:lang="en">Brian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/brooks-chang/">
+            <dc:title xml:lang="en">Brooks Chang</dc:title>
+            <dcterms:abstract xml:lang="en">Brooks's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bruno/">
+            <dc:title xml:lang="en-gb">Bruno</dc:title>
+            <dcterms:abstract xml:lang="en-gb">Just a bunch of test documents setup for playing around with.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bruno-postle/">
+            <dc:title xml:lang="en">Bruno Postle</dc:title>
+            <dcterms:abstract xml:lang="en">Bruno's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bruno-postle-2/">
+            <dc:title xml:lang="en">Bruno Postle</dc:title>
+            <dcterms:abstract xml:lang="en">Bruno's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bruno-postle-3/">
+            <dc:title xml:lang="en">Bruno Postle</dc:title>
+            <dcterms:abstract xml:lang="en">Bruno's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bruno-postle-4/">
+            <dc:title xml:lang="en">Bruno Postle</dc:title>
+            <dcterms:abstract xml:lang="en">Bruno's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bruno-postle-5/">
+            <dc:title xml:lang="en">Bruno Postle</dc:title>
+            <dcterms:abstract xml:lang="en">Bruno's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/bud/">
+            <dc:title xml:lang="en-us">Bud</dc:title>
+            <dcterms:abstract xml:lang="en-us">A test document for Bud to play with.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/c-s/">
+            <dc:title xml:lang="en">c s</dc:title>
+            <dcterms:abstract xml:lang="en">c's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/carlos-araya/">
+            <dc:title xml:lang="en">Carlos Araya</dc:title>
+            <dcterms:abstract xml:lang="en">Carlos's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/carlos-martinez/">
+            <dc:title xml:lang="en">carlos martinez</dc:title>
+            <dcterms:abstract xml:lang="en">carlos's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/cascadenet-quiz/">
+            <dc:title xml:lang="en">Cascadenet Quiz</dc:title>
+            <dcterms:abstract xml:lang="en">A test page </dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/cedric-parent/">
+            <dc:title xml:lang="en">Cedric Parent</dc:title>
+            <dcterms:abstract xml:lang="en">Cedric's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/charles-mccathienevile/">
+            <dc:title xml:lang="en">charles mccathienevile</dc:title>
+            <dcterms:abstract xml:lang="en">charles's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/chris-croome/">
+            <dc:title xml:lang="en">Chris Croome</dc:title>
+            <dcterms:abstract xml:lang="en">Chris's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/chris-croome-2/">
+            <dc:title xml:lang="en">Chris Croome</dc:title>
+            <dcterms:abstract xml:lang="en">Chris's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/chris-croome-3/">
+            <dc:title xml:lang="en">Chris Croome</dc:title>
+            <dcterms:abstract xml:lang="en">Chris's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/chris-vaughan/">
+            <dc:title xml:lang="en">chris vaughan</dc:title>
+            <dcterms:abstract xml:lang="en">chris's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/christian-forfang/">
+            <dc:title xml:lang="en">christian forfang</dc:title>
+            <dcterms:abstract xml:lang="en">christian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/christian-hansen/">
+            <dc:title xml:lang="en">Christian Hansen</dc:title>
+            <dcterms:abstract xml:lang="en">Christian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/christine-watson/">
+            <dc:title xml:lang="en">christine watson</dc:title>
+            <dcterms:abstract xml:lang="en">christine's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/chu-zion/">
+            <dc:title xml:lang="en">chu zion</dc:title>
+            <dcterms:abstract xml:lang="en">chu's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/claude-aubrie/">
+            <dc:title xml:lang="en">claude aubrie</dc:title>
+            <dcterms:abstract xml:lang="en">claude's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/cliff-faurer/">
+            <dc:title xml:lang="en">Cliff Faurer</dc:title>
+            <dcterms:abstract xml:lang="en">Cliff's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/clinton-nixon/">
+            <dc:title xml:lang="en">Clinton Nixon</dc:title>
+            <dcterms:abstract xml:lang="en">Clinton's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/good-thinking/">
+            <dc:title xml:lang="en">CMG</dc:title>
+            <dcterms:abstract xml:lang="en">CMG</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/colin-rainsforth/">
+            <dc:title xml:lang="en">Colin Rainsforth</dc:title>
+            <dcterms:abstract xml:lang="en">Colin's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/collectable-anorak/">
+            <dc:title xml:lang="en">Collectable Anorak</dc:title>
+            <dcterms:abstract xml:lang="en">A test page for Collectable Anorak.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/cma/">
+            <dc:title xml:lang="en-gb">Community Media Association</dc:title>
+            <dcterms:abstract xml:lang="en-gb">Community Media Association test page for MKDoc</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/connect-nk/">
+            <dc:title xml:lang="en">Connect NK</dc:title>
+            <dcterms:abstract xml:lang="en">a temporary area </dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/counterpoint/">
+            <dc:title xml:lang="en">Counterpoint</dc:title>
+            <dcterms:abstract xml:lang="en">Rafael's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dan-billingsley/">
+            <dc:title xml:lang="en">Dan Billingsley</dc:title>
+            <dcterms:abstract xml:lang="en">Dan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dan-koening/">
+            <dc:title xml:lang="en">dan koening</dc:title>
+            <dcterms:abstract xml:lang="en">dan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dan-koening-2/">
+            <dc:title xml:lang="de">dan koening</dc:title>
+            <dcterms:abstract xml:lang="de">dan's test mkdoc page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dan-schnaidt/">
+            <dc:title xml:lang="en">dan schnaidt</dc:title>
+            <dcterms:abstract xml:lang="en">dan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/daniel-camara/">
+            <dc:title xml:lang="en">Daniel Camara</dc:title>
+            <dcterms:abstract xml:lang="en">Daniel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/daniel-delattre/">
+            <dc:title xml:lang="en">Daniel Delattre</dc:title>
+            <dcterms:abstract xml:lang="en">Daniel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/daniel-knutson-bradac/">
+            <dc:title xml:lang="en">Daniel Knutson-Bradac</dc:title>
+            <dcterms:abstract xml:lang="en">Daniel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/danny/">
+            <dc:title xml:lang="en-gb">Danny</dc:title>
+            <dcterms:abstract xml:lang="en-gb">a test area for Danny Budzak</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/danny-sofer/">
+            <dc:title xml:lang="en">danny sofer</dc:title>
+            <dcterms:abstract xml:lang="en">danny's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/darryn-capes-davis/">
+            <dc:title xml:lang="en">Darryn Capes-Davis</dc:title>
+            <dcterms:abstract xml:lang="en">Darryn's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/davey-leslie/">
+            <dc:title xml:lang="en">Davey Leslie</dc:title>
+            <dcterms:abstract xml:lang="en">Davey's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/david/">
+            <dc:title xml:lang="en">David</dc:title>
+            <dcterms:abstract xml:lang="en">A test document for David.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/david-dennial/">
+            <dc:title xml:lang="en">david dennial</dc:title>
+            <dcterms:abstract xml:lang="en">david's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/david-nunez/">
+            <dc:title xml:lang="en">david nunez</dc:title>
+            <dcterms:abstract xml:lang="en">david's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dawn-matthews/">
+            <dc:title xml:lang="en">dawn matthews Title</dc:title>
+            <dcterms:abstract xml:lang="en">dawn's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dchant/">
+            <dc:title xml:lang="en-gb">dchant</dc:title>
+            <dcterms:abstract xml:lang="en-gb">dchant's testing area</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/demodude-demodude/">
+            <dc:title xml:lang="en">demodude demodude</dc:title>
+            <dcterms:abstract xml:lang="en">demodude's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/denis-kapetanovic/">
+            <dc:title xml:lang="en">denis kapetanovic</dc:title>
+            <dcterms:abstract xml:lang="en">denis's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/denis-postle/">
+            <dc:title xml:lang="en">Denis Postle</dc:title>
+            <dcterms:abstract xml:lang="en">Denis's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dickey-lai/">
+            <dc:title xml:lang="en">dickey Lai</dc:title>
+            <dcterms:abstract xml:lang="en">dickey's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dieo-password/">
+            <dc:title xml:lang="en">dieo password</dc:title>
+            <dcterms:abstract xml:lang="en">dieo's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/dink-zelsyus/">
+            <dc:title xml:lang="en">dink zelsyus</dc:title>
+            <dcterms:abstract xml:lang="en">dink's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/djweird-1234/">
+            <dc:title xml:lang="en">djweird 1234</dc:title>
+            <dcterms:abstract xml:lang="en">djweird's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/donald-blackstock/">
+            <dc:title xml:lang="en">donald blackstock</dc:title>
+            <dcterms:abstract xml:lang="en">donald's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/doug-hudgeon/">
+            <dc:title xml:lang="en">doug hudgeon</dc:title>
+            <dcterms:abstract xml:lang="en">doug's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/duane-champion/">
+            <dc:title xml:lang="en">duane champion</dc:title>
+            <dcterms:abstract xml:lang="en">duane's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/duane-champion-2/">
+            <dc:title xml:lang="en">duane champion</dc:title>
+            <dcterms:abstract xml:lang="en">duane's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ed-hamilton/">
+            <dc:title xml:lang="en">ed hamilton</dc:title>
+            <dcterms:abstract xml:lang="en">ed's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/edward-taaffe/">
+            <dc:title xml:lang="en">edward Taaffe</dc:title>
+            <dcterms:abstract xml:lang="en">edward's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ellen-hoffenberg-serfaty/">
+            <dc:title xml:lang="en">Ellen Hoffenberg-Serfaty</dc:title>
+            <dcterms:abstract xml:lang="en">Ellen's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/emmanuelle-gutierrez-y-restrepo/">
+            <dc:title xml:lang="es">Emmanuelle Gutiérrez y Restrepo</dc:title>
+            <dcterms:abstract xml:lang="es">Emmanuelle's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/eric-smith/">
+            <dc:title xml:lang="en">eric smith</dc:title>
+            <dcterms:abstract xml:lang="en">eric's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/eric-vervoort/">
+            <dc:title xml:lang="en">eric vervoort</dc:title>
+            <dcterms:abstract xml:lang="en">eric's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/erika-kohagura/">
+            <dc:title xml:lang="en">Erika Kohagura</dc:title>
+            <dcterms:abstract xml:lang="en">Erika's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/eva/">
+            <dc:title xml:lang="es">Eva</dc:title>
+            <dcterms:abstract xml:lang="es">a test area for Eva Méndez</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/evgeny-evgeny/">
+            <dc:title xml:lang="en">evgeny evgeny</dc:title>
+            <dcterms:abstract xml:lang="en">evgeny's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/evgeny-kagan/">
+            <dc:title xml:lang="en">evgeny kagan</dc:title>
+            <dcterms:abstract xml:lang="en">evgeny's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/fabian-hartling/">
+            <dc:title xml:lang="de">Fabian Hartling</dc:title>
+            <dcterms:abstract xml:lang="de">Fabian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/feng-lai/">
+            <dc:title xml:lang="en">feng lai</dc:title>
+            <dcterms:abstract xml:lang="en">feng's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/fff-fff/">
+            <dc:title xml:lang="en">fff fff</dc:title>
+            <dcterms:abstract xml:lang="en">fff's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/fff-fff-2/">
+            <dc:title xml:lang="en">fff fff</dc:title>
+            <dcterms:abstract xml:lang="en">fff's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/fiontan-o-comain/">
+            <dc:title xml:lang="en">Fiontan O Comain</dc:title>
+            <dcterms:abstract xml:lang="en">Fiontan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/florentino-durazo/">
+            <dc:title xml:lang="en">FLORENTINO DURAZO</dc:title>
+            <dcterms:abstract xml:lang="en">FLORENTINO's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/francesco-centrone/">
+            <dc:title xml:lang="it">francesco centrone</dc:title>
+            <dcterms:abstract xml:lang="it">francesco's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/frank-kuhn/">
+            <dc:title xml:lang="en">Frank Kuhn</dc:title>
+            <dcterms:abstract xml:lang="en">Frank's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/frans-bridie/">
+            <dc:title xml:lang="nl">Frans Bridié</dc:title>
+            <dcterms:abstract xml:lang="nl">Frans's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ideas/">
+            <dc:title xml:lang="en-gb">Future Development Ideas</dc:title>
+            <dcterms:abstract xml:lang="en-gb">Some thoughts on how future versions of MKDoc should allow documents to be created.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/g-k/">
+            <dc:title xml:lang="en">G K</dc:title>
+            <dcterms:abstract xml:lang="en">G's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gary-ashton-jones/">
+            <dc:title xml:lang="en">Gary Ashton-Jones</dc:title>
+            <dcterms:abstract xml:lang="en">Gary's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gary-conroy/">
+            <dc:title xml:lang="en">Gary Conroy</dc:title>
+            <dcterms:abstract xml:lang="en">Gary's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gauri-salokhe/">
+            <dc:title xml:lang="en">gauri salokhe</dc:title>
+            <dcterms:abstract xml:lang="en">gauri's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gerard/">
+            <dc:title xml:lang="fr">Gérard</dc:title>
+            <dcterms:abstract xml:lang="fr">a test area for Gérard Chauvin</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gert-johansson/">
+            <dc:title xml:lang="en">Gert Johansson</dc:title>
+            <dcterms:abstract xml:lang="en">Gert's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/geter-gunderson/">
+            <dc:title xml:lang="en">Geter Gunderson</dc:title>
+            <dcterms:abstract xml:lang="en">Geter's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gill/">
+            <dc:title xml:lang="en-gb">Gill</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A test site for Gill</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gilw/">
+            <dc:title xml:lang="en-gb">GILW</dc:title>
+            <dcterms:abstract xml:lang="en-gb">a test area for Barbara Richards</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/glk-glk/">
+            <dc:title xml:lang="en">glk glk</dc:title>
+            <dcterms:abstract xml:lang="en">glk's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/glk-glk-2/">
+            <dc:title xml:lang="en">glk glk</dc:title>
+            <dcterms:abstract xml:lang="en">glk's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/golborne-road/">
+            <dc:title xml:lang="en-gb">Golborne Road</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A brief history of the Golborne Road in Norh Kensington, London.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gotzespace/">
+            <dc:title xml:lang="en-gb">Gotzespace</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A page for John to have a play with MKDoc. </dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/graham-oliver-graham-oliver/">
+            <dc:title xml:lang="en">Graham Oliver Graham Oliver</dc:title>
+            <dcterms:abstract xml:lang="en">Graham Oliver's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/grant-simmons/">
+            <dc:title xml:lang="en">Grant Simmons</dc:title>
+            <dcterms:abstract xml:lang="en">Grant's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/greg-farries/">
+            <dc:title xml:lang="en">Greg Farries</dc:title>
+            <dcterms:abstract xml:lang="en">Greg's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/grgrgr-ggggg/">
+            <dc:title xml:lang="en">grgrgr ggggg</dc:title>
+            <dcterms:abstract xml:lang="en">grgrgr's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/guillaume-gerbaud/">
+            <dc:title xml:lang="en">guillaume gerbaud</dc:title>
+            <dcterms:abstract xml:lang="en">guillaume's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/hakan-ohman/">
+            <dc:title xml:lang="en">Hakan Ohman</dc:title>
+            <dcterms:abstract xml:lang="en">Hakan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/harry/">
+            <dc:title xml:lang="en-us">Harry</dc:title>
+            <dcterms:abstract xml:lang="en-us">A test area for Harry Wagner</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/haru-umino/">
+            <dc:title xml:lang="en">haru umino</dc:title>
+            <dcterms:abstract xml:lang="en">haru's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/harvey-bingham/">
+            <dc:title xml:lang="en">Harvey Bingham</dc:title>
+            <dcterms:abstract xml:lang="en">Harvey's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/heiner-stuckenschmidt/">
+            <dc:title xml:lang="en">Heiner Stuckenschmidt</dc:title>
+            <dcterms:abstract xml:lang="en">Heiner's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/henk-vantyenmkdoc/">
+            <dc:title xml:lang="en">henk vantyenmkdoc</dc:title>
+            <dcterms:abstract xml:lang="en">henk's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/henry/">
+            <dc:title xml:lang="en">Henry Bones</dc:title>
+            <dcterms:abstract xml:lang="en">Henry's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/herve-rodes/">
+            <dc:title xml:lang="en">Herve RODES</dc:title>
+            <dcterms:abstract xml:lang="en">Herve's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/howard-crow/">
+            <dc:title xml:lang="en">Howard Crow</dc:title>
+            <dcterms:abstract xml:lang="en">Howard's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/howard-ti/">
+            <dc:title xml:lang="en">howard ti</dc:title>
+            <dcterms:abstract xml:lang="en">howard's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/hurra-gutt/">
+            <dc:title xml:lang="en">Hurra Gutt</dc:title>
+            <dcterms:abstract xml:lang="en">Hurra's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/huseyin-kemal/">
+            <dc:title xml:lang="en">Huseyin Kemal</dc:title>
+            <dcterms:abstract xml:lang="en">Huseyin's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ian-parkin/">
+            <dc:title xml:lang="en">Ian Parkin</dc:title>
+            <dcterms:abstract xml:lang="en">Ian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ida-hoglund/">
+            <dc:title xml:lang="en">ida hoglund</dc:title>
+            <dcterms:abstract xml:lang="en">ida's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/iman-eid/">
+            <dc:title xml:lang="en">Iman Eid</dc:title>
+            <dcterms:abstract xml:lang="en">Iman's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/indy-rak/">
+            <dc:title xml:lang="en">indy rak</dc:title>
+            <dcterms:abstract xml:lang="en">indy's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/arun-kundnani/">
+            <dc:title xml:lang="en">Institute of Race Relations</dc:title>
+            <dcterms:abstract xml:lang="en">Arun's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/isto-vatanen/">
+            <dc:title xml:lang="en">Isto Vatanen</dc:title>
+            <dcterms:abstract xml:lang="en">Isto's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ivan-likhachov/">
+            <dc:title xml:lang="en">Ivan Likhachov</dc:title>
+            <dcterms:abstract xml:lang="en">Ivan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jack-smith/">
+            <dc:title xml:lang="en">Jack Smith</dc:title>
+            <dcterms:abstract xml:lang="en">Jack's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jaime-nunez/">
+            <dc:title xml:lang="en">Jaime Nunez</dc:title>
+            <dcterms:abstract xml:lang="en">Jaime's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/james-allenspach/">
+            <dc:title xml:lang="en">James Allenspach</dc:title>
+            <dcterms:abstract xml:lang="en">James's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jay-chowdhury/">
+            <dc:title xml:lang="en">Jay Chowdhury</dc:title>
+            <dcterms:abstract xml:lang="en">Jay's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jean-michel-hiver/">
+            <dc:title xml:lang="en">Jean-Michel Hiver</dc:title>
+            <dcterms:abstract xml:lang="en">Jean-Michel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jenna/">
+            <dc:title xml:lang="en">jenna</dc:title>
+            <dcterms:abstract xml:lang="en">this is a a temporary page </dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jennifer-evenson/">
+            <dc:title xml:lang="en">Jennifer Evenson</dc:title>
+            <dcterms:abstract xml:lang="en">Jennifer's test page
+</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jessie-dorsch/">
+            <dc:title xml:lang="en">Jessie Dorsch</dc:title>
+            <dcterms:abstract xml:lang="en">Jessie's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jewel-ward/">
+            <dc:title xml:lang="en">Jewel Ward</dc:title>
+            <dcterms:abstract xml:lang="en">Jewel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jhjhjh-hjhjhjh/">
+            <dc:title xml:lang="en">jhjhjh hjhjhjh</dc:title>
+            <dcterms:abstract xml:lang="en">jhjhjh's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jin-lg/">
+            <dc:title xml:lang="en">jin lg</dc:title>
+            <dcterms:abstract xml:lang="en">jin's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jiri-trunecek/">
+            <dc:title xml:lang="en">Jiri Trunecek</dc:title>
+            <dcterms:abstract xml:lang="en">Jiri's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jj-jenq/">
+            <dc:title xml:lang="en">JJ Jenq</dc:title>
+            <dcterms:abstract xml:lang="en">JJ's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/joe-russell/">
+            <dc:title xml:lang="en">Joe Russell</dc:title>
+            <dcterms:abstract xml:lang="en">Joe's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/joe-schmoo/">
+            <dc:title xml:lang="en">joe schmoo</dc:title>
+            <dcterms:abstract xml:lang="en">joe's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/joel-ward/">
+            <dc:title xml:lang="en">Joel Ward</dc:title>
+            <dcterms:abstract xml:lang="en">Joel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-doe/">
+            <dc:title xml:lang="en">John Doe</dc:title>
+            <dcterms:abstract xml:lang="en">John's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-does/">
+            <dc:title xml:lang="en">John Does</dc:title>
+            <dcterms:abstract xml:lang="en">John's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-fitzpatrick/">
+            <dc:title xml:lang="en">John Fitzpatrick</dc:title>
+            <dcterms:abstract xml:lang="en">John's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-fracasso/">
+            <dc:title xml:lang="en">John Fracasso</dc:title>
+            <dcterms:abstract xml:lang="en">John's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-shore/">
+            <dc:title xml:lang="en">John Shore</dc:title>
+            <dcterms:abstract xml:lang="en">John's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-shore-2/">
+            <dc:title xml:lang="en">John Shore</dc:title>
+            <dcterms:abstract xml:lang="en">John's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-telford/">
+            <dc:title xml:lang="en">John Telford</dc:title>
+            <dcterms:abstract xml:lang="en">John's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/john-travolta/">
+            <dc:title xml:lang="en">John Travolta</dc:title>
+            <dcterms:abstract xml:lang="en">John's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jonas-heylen/">
+            <dc:title xml:lang="nl">Jonas Heylen</dc:title>
+            <dcterms:abstract xml:lang="nl">Jonas's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jonathan/">
+            <dc:title xml:lang="en-gb">Jonathan</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A test area</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jonathan-feldman/">
+            <dc:title xml:lang="en">Jonathan Feldman</dc:title>
+            <dcterms:abstract xml:lang="en">Jonathan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jorge-becerra/">
+            <dc:title xml:lang="en">jorge becerra</dc:title>
+            <dcterms:abstract xml:lang="en">jorge's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/joshua-wolcott/">
+            <dc:title xml:lang="en">joshua wolcott</dc:title>
+            <dcterms:abstract xml:lang="en">joshua's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/judge-dredd/">
+            <dc:title xml:lang="en">Judge Dredd</dc:title>
+            <dcterms:abstract xml:lang="en">Judge's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/judy-schultz/">
+            <dc:title xml:lang="en">Judy Schultz</dc:title>
+            <dcterms:abstract xml:lang="en">Judy's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/juergen-henkel/">
+            <dc:title xml:lang="en">Juergen Henkel</dc:title>
+            <dcterms:abstract xml:lang="en">Juergen's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/julian-frech/">
+            <dc:title xml:lang="en">Julian Frech</dc:title>
+            <dcterms:abstract xml:lang="en">Julian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/julian-frech-2/">
+            <dc:title xml:lang="en">Julian Frech</dc:title>
+            <dcterms:abstract xml:lang="en">Julian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/julian-scarlett/">
+            <dc:title xml:lang="en">Julian Scarlett</dc:title>
+            <dcterms:abstract xml:lang="en">Julian's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jun-mao/">
+            <dc:title xml:lang="en">Jun Mao</dc:title>
+            <dcterms:abstract xml:lang="en">Jun's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/jung-chang/">
+            <dc:title xml:lang="en">jung chang</dc:title>
+            <dcterms:abstract xml:lang="en">jung's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/justine-sanderson/">
+            <dc:title xml:lang="en">Justine Sanderson</dc:title>
+            <dcterms:abstract xml:lang="en">Justine's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/karin-lamptey/">
+            <dc:title xml:lang="en">Karin Lamptey</dc:title>
+            <dcterms:abstract xml:lang="en">Karin's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/karl-hebenstreit-jr/">
+            <dc:title xml:lang="en">Karl Hebenstreit, Jr.</dc:title>
+            <dcterms:abstract xml:lang="en">Karl's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/kevin-morris/">
+            <dc:title xml:lang="en">Kevin Morris</dc:title>
+            <dcterms:abstract xml:lang="en">Kevin's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/klkljkj-kjkllljk/">
+            <dc:title xml:lang="en">klkljkj kjkllljk</dc:title>
+            <dcterms:abstract xml:lang="en">klkljkj's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/labourstart/">
+            <dc:title xml:lang="en-gb">LabourStart</dc:title>
+            <dcterms:abstract xml:lang="en-gb">Labour and trade union movement news.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/my-test/">
+            <dc:title xml:lang="en-gb">Laurent</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A small test</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/gerald/">
+            <dc:title xml:lang="fr">Le Petit Conservatoire du Brabant wallon</dc:title>
+            <dcterms:abstract xml:lang="fr">Le Petit Conservatoire du Brabant wallon, ecole de musique &amp;agrave; Wavre</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/lee-gibson/">
+            <dc:title xml:lang="en">Lee Gibson</dc:title>
+            <dcterms:abstract xml:lang="en">Lee's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/leon-brocard/">
+            <dc:title xml:lang="en">Leon Brocard</dc:title>
+            <dcterms:abstract xml:lang="en">Leon's test page. I love it, it's great.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/libor-novacek/">
+            <dc:title xml:lang="en">Libor Nováček</dc:title>
+            <dcterms:abstract xml:lang="en">Libor's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/lionel-farago/">
+            <dc:title xml:lang="en">Lionel Farago</dc:title>
+            <dcterms:abstract xml:lang="en">Lionel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/lynn-herbert/">
+            <dc:title xml:lang="en">Lynn Herbert</dc:title>
+            <dcterms:abstract xml:lang="en">Lynn's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/maarten-de-vries/">
+            <dc:title xml:lang="nl">maarten de Vries</dc:title>
+            <dcterms:abstract xml:lang="nl">maarten's test page.
+So yeah, srry, i'm testing?!!?!
+&lt;a href=&quot;http://www.hotmailen.com/&quot;&gt;www.hotmailen.com&lt;/a&gt;</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/malabika-das/">
+            <dc:title xml:lang="en">Malabika Das</dc:title>
+            <dcterms:abstract xml:lang="en">Malabika's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/malte-rudolf/">
+            <dc:title xml:lang="en">Malte Rudolf</dc:title>
+            <dcterms:abstract xml:lang="en">Malte's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/manmeet-singh/">
+            <dc:title xml:lang="en">MANMEET SINGH</dc:title>
+            <dcterms:abstract xml:lang="en">MANMEET's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/manuel-regalado/">
+            <dc:title xml:lang="en">manuel regalado</dc:title>
+            <dcterms:abstract xml:lang="en">manuel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/marajo-pawling/">
+            <dc:title xml:lang="en">Marajo Pawling</dc:title>
+            <dcterms:abstract xml:lang="en">Marajo's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/marc-lemaire/">
+            <dc:title xml:lang="fr">Marc LeMaire</dc:title>
+            <dcterms:abstract xml:lang="fr">Marc's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/marc-wagner/">
+            <dc:title xml:lang="en">marc wagner</dc:title>
+            <dcterms:abstract xml:lang="en">marc's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/marcia-brady/">
+            <dc:title xml:lang="en">Marcia Brady</dc:title>
+            <dcterms:abstract xml:lang="en">Marcia's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/maria-pereira/">
+            <dc:title xml:lang="en">Maria Pereira</dc:title>
+            <dcterms:abstract xml:lang="en">Maria's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/marielle-gg/">
+            <dc:title xml:lang="en">marielle gg</dc:title>
+            <dcterms:abstract xml:lang="en">marielle's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/marielle-sss/">
+            <dc:title xml:lang="en">marielle sss</dc:title>
+            <dcterms:abstract xml:lang="en">marielle's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/guest/">
+            <dc:title xml:lang="en">Mark</dc:title>
+            <dcterms:abstract xml:lang="en">An area where everyone can come and have a play
+with MKDoc.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mark-ayad/">
+            <dc:title xml:lang="en">Mark Ayad</dc:title>
+            <dcterms:abstract xml:lang="en">Mark's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mark-bakker/">
+            <dc:title xml:lang="en">Mark Bakker</dc:title>
+            <dcterms:abstract xml:lang="en">Mark's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mark-reeves/">
+            <dc:title xml:lang="en">Mark Reeves</dc:title>
+            <dcterms:abstract xml:lang="en">Mark's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/martin-peters/">
+            <dc:title xml:lang="en">Martin Peters</dc:title>
+            <dcterms:abstract xml:lang="en">Martin's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/matt-petrie/">
+            <dc:title xml:lang="en">matt petrie</dc:title>
+            <dcterms:abstract xml:lang="en">matt's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/matthias/">
+            <dc:title xml:lang="de">Matthias</dc:title>
+            <dcterms:abstract xml:lang="de">Die IconScreen GmbH entwickelt redaktionell betreubare Internet Anwendungen - von der Konzeption ueber das Design bis zum Redaktionssystem</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/max-bodriyenko/">
+            <dc:title xml:lang="en">Max Bodriyenko</dc:title>
+            <dcterms:abstract xml:lang="en">Max's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mel-pedley/">
+            <dc:title xml:lang="en-gb">Mel Pedley</dc:title>
+            <dcterms:abstract xml:lang="en-gb">Mel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/michael-payne/">
+            <dc:title xml:lang="en">Michael Payne</dc:title>
+            <dcterms:abstract xml:lang="en">This Is a test</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/michael-ziegler/">
+            <dc:title xml:lang="en">Michael Ziegler</dc:title>
+            <dcterms:abstract xml:lang="en">Michael's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mick/">
+            <dc:title xml:lang="en-gb">Mick</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A test site for Mick Rice</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mihai-bazon/">
+            <dc:title xml:lang="en">Mihai Bazon</dc:title>
+            <dcterms:abstract xml:lang="en">Mihai's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mistral-bah/">
+            <dc:title xml:lang="en">Mistral Bah</dc:title>
+            <dcterms:abstract xml:lang="en">Mistral's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mitch-saba/">
+            <dc:title xml:lang="en">Mitch Saba - WEBLOG</dc:title>
+            <dcterms:abstract xml:lang="en">Mitch's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/httpbmjcomcgicontentfull3237315706/">
+            <dc:title xml:lang="en">Monitoring the safety of over the counter drugs</dc:title>
+            <dcterms:abstract xml:lang="en">stella's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/mozaz-wallis/">
+            <dc:title xml:lang="en">mozaz wallis</dc:title>
+            <dcterms:abstract xml:lang="en">welcome to the playground</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/n-herrera/">
+            <dc:title xml:lang="en">N Herrera</dc:title>
+            <dcterms:abstract xml:lang="en">N's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/newton-calvin/">
+            <dc:title xml:lang="en">newton calvin</dc:title>
+            <dcterms:abstract xml:lang="en">newton's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/nick-maspoli/">
+            <dc:title xml:lang="en">nick maspoli</dc:title>
+            <dcterms:abstract xml:lang="en">nick's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/nickolay-romensky/">
+            <dc:title xml:lang="en">Nickolay Romensky</dc:title>
+            <dcterms:abstract xml:lang="en">Nickolay's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/niels-bohr/">
+            <dc:title xml:lang="en">Niels Bohr</dc:title>
+            <dcterms:abstract xml:lang="en">Niels' test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/nikhil-mehta/">
+            <dc:title xml:lang="en">Nikhil Mehta</dc:title>
+            <dcterms:abstract xml:lang="en">Nikhil's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/nikhil-mehta-2/">
+            <dc:title xml:lang="en">Nikhil Mehta</dc:title>
+            <dcterms:abstract xml:lang="en">Nikhil's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/nikkel-doo/">
+            <dc:title xml:lang="en">Nikkel Doo</dc:title>
+            <dcterms:abstract xml:lang="en">Nikkel's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/niko-nikovic/">
+            <dc:title xml:lang="en">niko nikovic</dc:title>
+            <dcterms:abstract xml:lang="en">niko's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/nisha-lall/">
+            <dc:title xml:lang="en">nisha lall</dc:title>
+            <dcterms:abstract xml:lang="en">nisha's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/nobody-special/">
+            <dc:title xml:lang="en">Nobody Special</dc:title>
+            <dcterms:abstract xml:lang="en">Nobody's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/none-none/">
+            <dc:title xml:lang="en">none none</dc:title>
+            <dcterms:abstract xml:lang="en">none's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/none-none-2/">
+            <dc:title xml:lang="en">none none</dc:title>
+            <dcterms:abstract xml:lang="en">none's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/norm-hamilton/">
+            <dc:title xml:lang="en">Norm Hamilton</dc:title>
+            <dcterms:abstract xml:lang="en">Norm's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/oleg-kolobov/">
+            <dc:title xml:lang="en">Oleg Kolobov</dc:title>
+            <dcterms:abstract xml:lang="en">Oleg's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/oli/">
+            <dc:title xml:lang="en">oli ---</dc:title>
+            <dcterms:abstract xml:lang="en">oli's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/owen-tribe/">
+            <dc:title xml:lang="en">Owen Tribe</dc:title>
+            <dcterms:abstract xml:lang="en">Owen's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/patricia-williams/">
+            <dc:title xml:lang="en">patricia williams</dc:title>
+            <dcterms:abstract xml:lang="en">patricia's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/paul-arzul/">
+            <dc:title xml:lang="en">Paul Arzul</dc:title>
+            <dcterms:abstract xml:lang="en">Paul's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/paul-gorton/">
+            <dc:title xml:lang="en">Paul Gorton</dc:title>
+            <dcterms:abstract xml:lang="en">Paul's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/paul-king/">
+            <dc:title xml:lang="en">Paul King</dc:title>
+            <dcterms:abstract xml:lang="en">Paul's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/paul-wareing/">
+            <dc:title xml:lang="en">Paul Wareing - a page</dc:title>
+            <dcterms:abstract xml:lang="en">Paul's test page, that has been changed.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/pep-pla/">
+            <dc:title xml:lang="en">Pep Pla</dc:title>
+            <dcterms:abstract xml:lang="en">Pep's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/peter/">
+            <dc:title xml:lang="en-gb">Peter</dc:title>
+            <dcterms:abstract xml:lang="en-gb">Westminster Adult Education Services</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/peter-jordan/">
+            <dc:title xml:lang="en">Peter Jordan</dc:title>
+            <dcterms:abstract xml:lang="en">Peter's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/peter-marelas/">
+            <dc:title xml:lang="en">peter marelas</dc:title>
+            <dcterms:abstract xml:lang="en">peter's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/petrasco-cetera/">
+            <dc:title xml:lang="en">Petrasco Cetera</dc:title>
+            <dcterms:abstract xml:lang="en">Petrasco's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/phil-cartmell/">
+            <dc:title xml:lang="en">phil cartmell</dc:title>
+            <dcterms:abstract xml:lang="en">phil's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/phil-phil/">
+            <dc:title xml:lang="en">Phil PHIL</dc:title>
+            <dcterms:abstract xml:lang="en">Phil's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/phil-shaw/">
+            <dc:title xml:lang="en-gb">Phil Shaw</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A document for Phil to have a play with.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/philippe-back/">
+            <dc:title xml:lang="en">Philippe Back</dc:title>
+            <dcterms:abstract xml:lang="en">Philippe's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/philippe-bechamp/">
+            <dc:title xml:lang="en">Philippe Bechamp</dc:title>
+            <dcterms:abstract xml:lang="en">Philippe's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/phyllis-chang/">
+            <dc:title xml:lang="en">phyllis chang</dc:title>
+            <dcterms:abstract xml:lang="en">phyllis's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/pietje-puk/">
+            <dc:title xml:lang="en">Pietje Puk</dc:title>
+            <dcterms:abstract xml:lang="en">Pietje's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/pietro-boido/">
+            <dc:title xml:lang="en">Pietro Boido</dc:title>
+            <dcterms:abstract xml:lang="en">Pietro's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/pinky-pan/">
+            <dc:title xml:lang="en">Pinky Pan</dc:title>
+            <dcterms:abstract xml:lang="en">Pinky's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ppp-fffk/">
+            <dc:title xml:lang="en">ppp FFFK</dc:title>
+            <dcterms:abstract xml:lang="en">ppp's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ppp-ppp/">
+            <dc:title xml:lang="en">ppp ppp</dc:title>
+            <dcterms:abstract xml:lang="en">ppp's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/preety-kumar/">
+            <dc:title xml:lang="en">Preety Kumar</dc:title>
+            <dcterms:abstract xml:lang="en">Preety's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/privacy-policy/">
+            <dc:title xml:lang="en-gb">Privacy Policy</dc:title>
+            <dcterms:abstract xml:lang="en-gb">the privacy policy of the MKDoc testers site</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/privacy-statement/">
+            <dc:title xml:lang="en">Privacy Statement</dc:title>
+            <dcterms:abstract xml:lang="en">Privacy and data-monitoring policy </dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/rahmatollah-fattahi/">
+            <dc:title xml:lang="en">Rahmatollah Fattahi</dc:title>
+            <dcterms:abstract xml:lang="en">Rahmatollah's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/rahul-jindal/">
+            <dc:title xml:lang="en">rahul jindal</dc:title>
+            <dcterms:abstract xml:lang="en">rahul's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/randy/">
+            <dc:title xml:lang="en-us">Randy</dc:title>
+            <dcterms:abstract xml:lang="en-us">A test directory for Randy Norwood</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/raphael-balimann/">
+            <dc:title xml:lang="en">Raphael Balimann</dc:title>
+            <dcterms:abstract xml:lang="en">Raphael's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/rebecca-clark/">
+            <dc:title xml:lang="en">rebecca clark</dc:title>
+            <dcterms:abstract xml:lang="en">rebecca's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/reinhard-spisser/">
+            <dc:title xml:lang="en">Reinhard Spisser</dc:title>
+            <dcterms:abstract xml:lang="en">Reinhard's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/reinhold-viehoff/">
+            <dc:title xml:lang="en">reinhold viehoff</dc:title>
+            <dcterms:abstract xml:lang="en">reinhold's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/reinhold-viehoff-2/">
+            <dc:title xml:lang="en">reinhold viehoff</dc:title>
+            <dcterms:abstract xml:lang="en">reinhold's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/renato-feijo/">
+            <dc:title xml:lang="en">Renato Feijo</dc:title>
+            <dcterms:abstract xml:lang="en">Renato's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/richard-bartholomew/">
+            <dc:title xml:lang="en">richard bartholomew</dc:title>
+            <dcterms:abstract xml:lang="en">richard's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/richard-friedman/">
+            <dc:title xml:lang="en">richard friedman</dc:title>
+            <dcterms:abstract xml:lang="en">richard's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/richard-padwick/">
+            <dc:title xml:lang="en">Richard Padwick</dc:title>
+            <dcterms:abstract xml:lang="en">Richard's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/rick-hill/">
+            <dc:title xml:lang="en">Rick Hill</dc:title>
+            <dcterms:abstract xml:lang="en">Rick's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ricky-chan/">
+            <dc:title xml:lang="en">Ricky Chan</dc:title>
+            <dcterms:abstract xml:lang="en">Ricky's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/robert-hoffman/">
+            <dc:title xml:lang="en">Robert Hoffman</dc:title>
+            <dcterms:abstract xml:lang="en">Robert's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/robert-hoffman-2/">
+            <dc:title xml:lang="en">Robert Hoffman</dc:title>
+            <dcterms:abstract xml:lang="en">Robert's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/robert-zaar/">
+            <dc:title xml:lang="en">Robert Zaar</dc:title>
+            <dcterms:abstract xml:lang="en">Robert's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/first-test/">
+            <dc:title xml:lang="en">Robin Ferraby</dc:title>
+            <dcterms:abstract xml:lang="en">Robin's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/roman-dvoran/">
+            <dc:title xml:lang="en">roman dvoran</dc:title>
+            <dcterms:abstract xml:lang="en">roman's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/rosa/">
+            <dc:title xml:lang="en-gb">Rosa</dc:title>
+            <dcterms:abstract xml:lang="en-gb">rosa</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/rr-r/">
+            <dc:title xml:lang="en">rr r</dc:title>
+            <dcterms:abstract xml:lang="en">rr's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ryan-shepard/">
+            <dc:title xml:lang="en">Ryan Shepard</dc:title>
+            <dcterms:abstract xml:lang="en">Ryan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/s-s/">
+            <dc:title xml:lang="en">s s</dc:title>
+            <dcterms:abstract xml:lang="en">s's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/s-ss/">
+            <dc:title xml:lang="en">s ss</dc:title>
+            <dcterms:abstract xml:lang="en">s's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/sample-materials/">
+            <dc:title xml:lang="en-gb">Sample Materials</dc:title>
+            <dcterms:abstract xml:lang="en-gb">Sample Materials: The Non-Fiction Personal Writing Coursework Assignment</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/sander-verhagen/">
+            <dc:title xml:lang="da">Sander Verhagen</dc:title>
+            <dcterms:abstract xml:lang="da">Sander's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/sebastien/">
+            <dc:title xml:lang="fr">Sébastien</dc:title>
+            <dcterms:abstract xml:lang="fr">une zone d'essai pour Sébastien Tremblay</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/sebastian-barthelmess/">
+            <dc:title xml:lang="en">Sebastian Barthelmess</dc:title>
+            <dcterms:abstract xml:lang="en">Just a descriptive document about timezone testing.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/shaina-fearman/">
+            <dc:title xml:lang="en">Shaina Fearman</dc:title>
+            <dcterms:abstract xml:lang="en">Shaina's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/sharon-taylor/">
+            <dc:title xml:lang="en">Sharon Taylor</dc:title>
+            <dcterms:abstract xml:lang="en">Sharon's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/shaun-moran/">
+            <dc:title xml:lang="en">shaun moran</dc:title>
+            <dcterms:abstract xml:lang="en">shaun's test page for fatdad web site</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/shelley-powers/">
+            <dc:title xml:lang="en">Shelley Powers</dc:title>
+            <dcterms:abstract xml:lang="en">Shelley's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/shirley-quintero/">
+            <dc:title xml:lang="en">Shirley Quintero</dc:title>
+            <dcterms:abstract xml:lang="en">Shirley's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/siegfried-schmidt/">
+            <dc:title xml:lang="en">Siegfried Schmidt</dc:title>
+            <dcterms:abstract xml:lang="en">Siegfried's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/signup/">
+            <dc:title xml:lang="en-gb">Signup for a MKDoc testers account</dc:title>
+            <dcterms:abstract xml:lang="en-gb">You can use this form to sign up for a test accont on this site.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/simon-flack/">
+            <dc:title xml:lang="en">simon flack</dc:title>
+            <dcterms:abstract xml:lang="en">simon's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/simon-white/">
+            <dc:title xml:lang="en">simon white</dc:title>
+            <dcterms:abstract xml:lang="en">simon's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/sion-mamane/">
+            <dc:title xml:lang="fr">Sion Mamane</dc:title>
+            <dcterms:abstract xml:lang="fr">Sion's test page.
+C'est un test réalisé par Sion Mamane</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/smithy/">
+            <dc:title xml:lang="en-gb">Smithy</dc:title>
+            <dcterms:abstract xml:lang="en-gb">a test page for smithy</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/somnath-banerjee/">
+            <dc:title xml:lang="en">somnath banerjee</dc:title>
+            <dcterms:abstract xml:lang="en">somnath's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/peter-houmann/">
+            <dc:title xml:lang="sv">Statens Testforum</dc:title>
+            <dcterms:abstract xml:lang="sv">Peter's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/stelios-tzivakis/">
+            <dc:title xml:lang="en">stelios Tzivakis</dc:title>
+            <dcterms:abstract xml:lang="en">stelios's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/stephanie-odonnell/">
+            <dc:title xml:lang="en">Stephanie O'Donnell</dc:title>
+            <dcterms:abstract xml:lang="en">Stephanie's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/stephen-rapley/">
+            <dc:title xml:lang="en">Stephen Rapley</dc:title>
+            <dcterms:abstract xml:lang="en">Stephen's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/stephen-tozer-loft/">
+            <dc:title xml:lang="en">stephen tozer-loft</dc:title>
+            <dcterms:abstract xml:lang="en">stephen's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/steve-b/">
+            <dc:title xml:lang="en">steve b</dc:title>
+            <dcterms:abstract xml:lang="en">steve's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/steve-crozier/">
+            <dc:title xml:lang="en">steve crozier</dc:title>
+            <dcterms:abstract xml:lang="en">steve's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/steve-laframboise/">
+            <dc:title xml:lang="en">Steve Laframboise</dc:title>
+            <dcterms:abstract xml:lang="en">Steve's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/steve-wilkinson/">
+            <dc:title xml:lang="en">steve wilkinson</dc:title>
+            <dcterms:abstract xml:lang="en">steve's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/stewilli-willia/">
+            <dc:title xml:lang="en">STEwilli WILLIA</dc:title>
+            <dcterms:abstract xml:lang="en">STEwilli's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/surf-moc/">
+            <dc:title xml:lang="en">surf moc</dc:title>
+            <dcterms:abstract xml:lang="en">surf's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/susanne/">
+            <dc:title xml:lang="de">Susanne</dc:title>
+            <dcterms:abstract xml:lang="de">a test area for Susanne Clarke</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/t-t/">
+            <dc:title xml:lang="en">t t</dc:title>
+            <dcterms:abstract xml:lang="en">t's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/t-t-2/">
+            <dc:title xml:lang="en">t t</dc:title>
+            <dcterms:abstract xml:lang="en">t's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/taiwantest-tuchler/">
+            <dc:title xml:lang="en">taiwantest tuchler</dc:title>
+            <dcterms:abstract xml:lang="en">taiwantest's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tara-matthews/">
+            <dc:title xml:lang="en">Tara Matthews</dc:title>
+            <dcterms:abstract xml:lang="en">Tara's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ted-tunnicliffe/">
+            <dc:title xml:lang="en">Ted Tunnicliffe</dc:title>
+            <dcterms:abstract xml:lang="en">Ted's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/test/">
+            <dc:title xml:lang="en-gb">test &amp; &gt; &lt;</dc:title>
+            <dcterms:abstract xml:lang="en-gb">foo</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/test-123/">
+            <dc:title xml:lang="en-gb">Test 123</dc:title>
+            <dcterms:abstract xml:lang="en-gb">a test area for rick batchelor</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ulfsan/">
+            <dc:title xml:lang="sv">Test av editor som ger HTML och RDF metadata</dc:title>
+            <dcterms:abstract xml:lang="sv">ulf's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/test-test-2/">
+            <dc:title xml:lang="en">test test</dc:title>
+            <dcterms:abstract xml:lang="en">test's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/test-test/">
+            <dc:title xml:lang="en">test test</dc:title>
+            <dcterms:abstract xml:lang="en">test's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/testguy-whoo/">
+            <dc:title xml:lang="en">testguy whoo</dc:title>
+            <dcterms:abstract xml:lang="en">testguy's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/the-little-black-fish/">
+            <dc:title xml:lang="en-gb">The Little Black Fish</dc:title>
+            <dcterms:abstract xml:lang="en-gb">An Iranian children's story by Samad Behrangi (1939-1968)</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/thomas/">
+            <dc:title xml:lang="en-gb">Thomas</dc:title>
+            <dcterms:abstract xml:lang="en-gb">An area for Thomas Kay to test MKDoc</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/thomas-bremer/">
+            <dc:title xml:lang="en">thomas bremer</dc:title>
+            <dcterms:abstract xml:lang="en">thomas's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/thomas-hamlin/">
+            <dc:title xml:lang="en">Thomas Hamlin</dc:title>
+            <dcterms:abstract xml:lang="en">Thomas's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/thomas-thurner/">
+            <dc:title xml:lang="en">Thomas Thurner</dc:title>
+            <dcterms:abstract xml:lang="en">Thomas's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tim-kyle/">
+            <dc:title xml:lang="en">Tim Kyle</dc:title>
+            <dcterms:abstract xml:lang="en">Tim's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tisdale-bolke/">
+            <dc:title xml:lang="en">Tisdale Bolke</dc:title>
+            <dcterms:abstract xml:lang="en">Tisdale's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/titra-embermist/">
+            <dc:title xml:lang="en">Titra Embermist</dc:title>
+            <dcterms:abstract xml:lang="en">Titra's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tom-keene/">
+            <dc:title xml:lang="en">tom keene</dc:title>
+            <dcterms:abstract xml:lang="en">tom's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tom-keene-2/">
+            <dc:title xml:lang="en">tom keene</dc:title>
+            <dcterms:abstract xml:lang="en">tom's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tom-mcguigan/">
+            <dc:title xml:lang="en">Tom McGuigan</dc:title>
+            <dcterms:abstract xml:lang="en">Tom's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tom-moxon/">
+            <dc:title xml:lang="en">tom moxon</dc:title>
+            <dcterms:abstract xml:lang="en">tom's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tom-rathjen/">
+            <dc:title xml:lang="de">Tom Rathjen</dc:title>
+            <dcterms:abstract xml:lang="de">Tom's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tomas-duchoslav/">
+            <dc:title xml:lang="en">Tomas Duchoslav</dc:title>
+            <dcterms:abstract xml:lang="en">Tomas's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tombo-elephant/">
+            <dc:title xml:lang="en">tombo elephant</dc:title>
+            <dcterms:abstract xml:lang="en">tombo's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/tor-knudsen/">
+            <dc:title xml:lang="en">Tor Knudsen</dc:title>
+            <dcterms:abstract xml:lang="en">Tor's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/trevor-schofield/">
+            <dc:title xml:lang="en">Trevor Schofield</dc:title>
+            <dcterms:abstract xml:lang="en">Trevor's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ui-yiuooiu/">
+            <dc:title xml:lang="en">ui yiuooiu</dc:title>
+            <dcterms:abstract xml:lang="en">ui's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/ui-yiuooiu-2/">
+            <dc:title xml:lang="en">ui yiuooiu</dc:title>
+            <dcterms:abstract xml:lang="en">ui's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/user-host/">
+            <dc:title xml:lang="en">User Host</dc:title>
+            <dcterms:abstract xml:lang="en">User's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/val-maz/">
+            <dc:title xml:lang="en">val maz</dc:title>
+            <dcterms:abstract xml:lang="en">val's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/van-codder/">
+            <dc:title xml:lang="en">Van Codder</dc:title>
+            <dcterms:abstract xml:lang="en">Van's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/vanja-sudar/">
+            <dc:title xml:lang="en">Vanja Sudar</dc:title>
+            <dcterms:abstract xml:lang="en">Vanja's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/victor/">
+            <dc:title xml:lang="es">Víctor</dc:title>
+            <dcterms:abstract xml:lang="es">una zona de pruebas para el Víctor E Miyakawa</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/vikas-k/">
+            <dc:title xml:lang="en">vikas k</dc:title>
+            <dcterms:abstract xml:lang="en">vikas's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/vincent-benard/">
+            <dc:title xml:lang="fr">Vincent Bénard</dc:title>
+            <dcterms:abstract xml:lang="fr">Vincent Bénard</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/wes/">
+            <dc:title xml:lang="en">wes</dc:title>
+            <dcterms:abstract xml:lang="en">What will this do???</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/whoever/">
+            <dc:title xml:lang="en-gb">Whoever</dc:title>
+            <dcterms:abstract xml:lang="en-gb">This is just a test document for debugging purposes</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/william-william/">
+            <dc:title xml:lang="en">William William</dc:title>
+            <dcterms:abstract xml:lang="en">William's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/wooba-wooba/">
+            <dc:title xml:lang="en">wooba wooba</dc:title>
+            <dcterms:abstract xml:lang="en">wooba's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/wooba-wooba-2/">
+            <dc:title xml:lang="en">wooba wooba</dc:title>
+            <dcterms:abstract xml:lang="en">wooba's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/yemo/">
+            <dc:title xml:lang="en">Yemo</dc:title>
+            <dcterms:abstract xml:lang="en">Yemo Net Courrier</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/yiorgos-kastanakis/">
+            <dc:title xml:lang="en">YIORGOS KASTANAKIS</dc:title>
+            <dcterms:abstract xml:lang="en">YIORGOS's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/yuan-li-2/">
+            <dc:title xml:lang="en">yuan li</dc:title>
+            <dcterms:abstract xml:lang="en">yuan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/yuan-li/">
+            <dc:title xml:lang="en">yuan li</dc:title>
+            <dcterms:abstract xml:lang="en">yuan's test page.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/zefer/">
+            <dc:title xml:lang="en-gb">Zefer</dc:title>
+            <dcterms:abstract xml:lang="en-gb">A test page for David Dabbs.</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+        <rdf:li>
+          <rdf:Description rdf:about="http://testers.mkdoc.com/zhongnan/">
+            <dc:title xml:lang="en-gb">Zhongnan</dc:title>
+            <dcterms:abstract xml:lang="en-gb">a test area for Shen Zhongnan</dcterms:abstract>
+          </rdf:Description>
+        </rdf:li>
+  
+      </rdf:Seq>
+    </dcterms:hasPart>
+
+
+
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="http://mkdoc.com/">
+        <dc:title>The main MKDoc site</dc:title>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="mailto:solutions@mkdoc.com">
+        <dc:title>Contact MKDoc</dc:title>
+
+        <dcterms:abstract>Contact email address for MKDoc</dcterms:abstract>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="/signup/">
+        <dc:title>Signup for a test account</dc:title>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="http://lists.webarch.co.uk/mailman/listinfo/mkdoc-users">
+        <dc:title>MKDoc users email list</dc:title>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="dc.rdf">
+        <dc:title>dc.rdf</dc:title>
+
+        <dcterms:abstract>Dublin Core RDF Metadata for this page.</dcterms:abstract>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="print.html">
+        <dc:title>print.html</dc:title>
+
+        <dcterms:abstract>Printer friendly version of this page.</dcterms:abstract>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="rss090headline.rdf">
+        <dc:title>RSS 0.9</dc:title>
+
+        <dcterms:abstract>RSS 0.9 Headlines from child documents.</dcterms:abstract>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="rss091headline.rdf">
+        <dc:title>RSS 0.91</dc:title>
+
+        <dcterms:abstract>RSS 0.91 Headlines from child documents.</dcterms:abstract>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="rss100headline.rdf">
+        <dc:title>RSS 1.0</dc:title>
+
+        <dcterms:abstract>RSS 1.0 Headlines from child documents.</dcterms:abstract>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="http://mkdoc.com/help/howto/syndicate/">
+        <dc:title>How To Syndicate News from a MKDoc Website</dc:title>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+    <dcterms:references>
+      <rdf:Description rdf:about="http://mkdoc.com/help/1/">
+        <dc:title>Help Documentation for MKDoc 1.0</dc:title>
+
+      </rdf:Description>
+    </dcterms:references>
+  
+
+
+
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/peter/jean-michel/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/jean-michel/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/about/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/features/accessibility/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news-from-a-mkdoc-website/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news-from-a-mkdoc-website/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/jean-michel/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/jean/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/about/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/c/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/features/accessibility/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/mkdoc/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/temp/running-mkdoc-on-windows/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/jean/vive-la-bretagne/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/c/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/features/accessibility/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/mkdoc/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/temp/running-mkdoc-on-windows/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/about/vive-la-bretagne/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/c/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/temp/running-mkdoc-on-windows/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/mkdoc/vive-la-bretagne/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/features/accessibility/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/temp/running-mkdoc-on-windows/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/c/vive-la-bretagne/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/features/accessibility/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/temp/running-mkdoc-on-windows/vive-la-bretagne/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/features/accessibility/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/vive-la-bretagne/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/features/accessibility/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/accessibility/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/human-readable-web-addresses/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/features/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-09/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-091/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-10/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/javascript/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/javascript/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/javascript/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/javascript/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/javascript/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/javascript/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/javascript/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-tools/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-tools/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-tools/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-tools/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-tools/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/rss-tools/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/further-resources/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/further-resources/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/further-resources/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/further-resources/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/further-resources/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/syndicate-news/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/how-to/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/help/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ideas/test/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/david-diaz/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome-2/adam-tyson/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome-2/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/chris-croome-2/david-diaz/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/david-diaz/adam-tyson/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/david-diaz/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/david-diaz/andreas-giesenhagen/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/maisy/photo-3/temp/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/maisy/photo-3/temp/adam-tyson/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/maisy/photo-3/temp/alan-smith/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/maisy/photo-3/temp/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/maisy/photo-3/temp/andreas-giesenhagen/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ideas/test/adam-tyson/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ideas/test/alan-smith/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ideas/test/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ideas/test/andreas-giesenhagen/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ideas/test/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/adam-tyson/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/adam-tyson/alan-smith/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/adam-tyson/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/adam-tyson/andreas-giesenhagen/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/adam-tyson/antony-chan/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/adam-tyson/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/alan-smith/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/alan-smith/andreas-giesenhagen/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/alan-smith/antony-chan/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/alan-smith/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ana-baptista/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ana-baptista/antony-chan/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/ana-baptista/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/andreas-giesenhagen/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/andreas-giesenhagen/antony-chan/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/andreas-giesenhagen/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/antony-chan/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/antony-chan/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/japanese/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/amanda-croome/jruurii-mettaaddettaa/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/amanda-croome/jruurii-mettaaddettaa/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/amanda-croome/jruurii-mettaaddettaa/fabian-hartling/friends/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/amanda-croome/jruurii-mettaaddettaa/fabian-hartling/noshang-biao-nituite/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/amanda-croome/jruurii-mettaaddettaa/fabian-hartling/puppentheater-halle/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/puppentheater-halle/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/puppentheater-halle/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/puppentheater-halle/fabian-hartling/friends/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/puppentheater-halle/fabian-hartling/noshang-biao-nituite/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/foerstst/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/foerstst/fabian-hartling/friends/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/foerstst/fabian-hartling/noshang-biao-nituite/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/friends/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/friends/fabian-hartling/noshang-biao-nituite/" />
+  
+    <dcterms:replaces rdf:resource="http://testers.mkdoc.com/fabian-hartling/noshang-biao-nituite/" />
+  
+
+
+
+    <dc:rights xml:lang="en-gb">Copyright © 2001 MKDoc Ltd. </dc:rights>
+
+
+    <dcterms:medium>
+      <dcterms:IMT>
+        <rdf:value>text/html</rdf:value>
+        <rdfs:label>HTML</rdfs:label>
+      </dcterms:IMT>
+    </dcterms:medium>
+
+    <dc:type>
+      <dcterms:Text>
+        <rdfs:label>Text</rdfs:label>
+      </dcterms:Text>
+    </dc:type>
+
+    <dcterms:created>
+      <dcterms:W3CDTF>
+        <rdf:value>2001-03-23T18:50:09Z</rdf:value>
+        <rdfs:label>Created</rdfs:label>
+      </dcterms:W3CDTF>
+    </dcterms:created>
+
+    <dcterms:modified>
+      <dcterms:W3CDTF>
+        <rdf:value>2002-05-24T14:34:39Z</rdf:value>
+        <rdfs:label>Modified</rdfs:label>
+      </dcterms:W3CDTF>
+    </dcterms:modified>
+
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://purl.org/dc/terms/abstract">
+    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/description"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://purl.org/dc/terms/medium">
+    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/format"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://purl.org/dc/terms/created">
+    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/date"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://purl.org/dc/terms/modified">
+    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/date"/>
+  </rdf:Description>
+
+</rdf:RDF>

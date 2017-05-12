@@ -1,0 +1,29 @@
+Revision history for REST-Utils
+
+0.6     Wed Apr 25 19:50:58 EDT 2012
+        Workarounds for some test failures.
+
+0.5     Tue Apr 24 14:14:41 EDT 2012
+        Fix for RT#72337: perl 5.12 gives "Use of uninitialized value in
+        uc ....' warnings."  Thanks Paul W. Harvey for the patch.
+
+0.4     Tue Aug 31 22:20:53 EDT 2010
+        Removed the content_prefs() function as it isn't really helpful.
+
+        Added some functions for parsing MIME types the right way.
+
+        Made media_type() use the new MIME type parsing internally.
+
+0.3     Fri Aug 27 12:59:33 EDT 2010
+        Changed the return value of media_type() in cases where content
+        negotiation is not supported for a request method.  e.g. DELETE.
+
+        Improved some tests so they give better coverage.
+
+0.2     Sat Aug 21 15:54:44 EDT 2010
+        Mistake in Build.PL lead to wrong name for the module in places.
+        Documentation updates.
+        
+0.1     Sat Aug 21 02:14:20 EDT 2010
+        First version, released on an unsuspecting world.
+

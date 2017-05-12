@@ -1,0 +1,40 @@
+%# Never call a man a fool; borrow from him.
+
+<& /Foundry/Elements/Header, Title => 'Homepage', Refresh => $session{home_refresh_interval} &>
+<table width="100%" border="0" cellspacing="0" cellpadding="10">
+  <tr> 
+    <td align="left" valign="top" colspan="2">
+<&
+    /Foundry/Elements/Kwiki,
+    Repository	=> '.global',
+    IsAdmin	=> 0,
+    Script	=> 'index.html',
+    PageId	=> ($page_id || ($keywords ||= loc('HomePage'))),
+&>
+    </td>
+    <td valign="top" width='30%'>
+     <& /Foundry/Elements/News &>
+    </td>
+  </tr>
+  <tr><td valign="top">
+     <& /Foundry/Elements/Stats &>
+  </td><td valign="top">
+     <& /Foundry/Elements/TopDownloads &>
+  </td><td valign="bottom" align="center">
+<form style="margin: 0" action="/Foundry/index.html">
+    <& /Elements/Refresh, Name => 'HomeRefreshInterval', Default => $session {'home_refresh_interval'} &>
+    <input type="image" border="0" name="Action-Search" src="/img/Go.png" width="23" height="19" align="middle">
+</form>
+  </td></tr>
+</table>
+<& /Foundry/Elements/Footer &>
+
+<%INIT>
+if ($ARGS{'HomeRefreshInterval'}) {
+	$session{'home_refresh_interval'} = $ARGS{'HomeRefreshInterval'};
+}
+</%INIT>
+<%ARGS>
+$keywords => undef
+$page_id => undef
+</%ARGS>

@@ -1,0 +1,36 @@
+Build.PL
+Changes
+examples/simple.pl
+lib/Resource/Dispose.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+README.md
+t/010_use.t
+t/100_keyword.t
+t/200_error.t
+xt/check_changes.t
+xt/consistent_version_numbers.t
+xt/copyright.t
+xt/cover.pl
+xt/cpan_changes.t
+xt/cpan_meta.t
+xt/dist_manifest.t
+xt/distribution.t
+xt/eol.t
+xt/kwalitee.t
+xt/minimumversion.t
+xt/no_tabs.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+xt/pod_spell.t
+xt/pod_spellrc
+xt/pod_syntax.t
+xt/portability_files.t
+xt/signature.t
+SIGNATURE    Added here by Module::Build

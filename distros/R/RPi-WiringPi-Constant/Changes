@@ -1,0 +1,10 @@
+Revision history for RPi-WiringPi-Constant
+
+0.02
+        - added edge detection constants
+        - added PUD constants
+        - added setup mode constants
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

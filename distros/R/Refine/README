@@ -1,0 +1,41 @@
+NAME
+    Refine - Refine an instance with new methods
+
+VERSION
+    0.01
+
+DESCRIPTION
+    Refine is a module that export $_refine which can be used to add methods
+    object instances. Each $_refine call on the object will create a new
+    class with the new refined methods and rebless the instance into that
+    class, which keeps the original class as it was.
+
+    This is an EXPERIMENTAL release. The class generator might change in
+    future releases.
+
+SYNOPSIS
+      use Refine;
+      use Data::Dumper ();
+
+      my $obj = Some::Class->new;
+
+      # add the dump() method to the $obj instance
+      $obj->$_refine(
+        dump => sub { Data::Dumper->new([$_[0])->Terse(1)->SortKeys(1)->Dump },
+      );
+
+OPTIONAL MODULES
+    *   Sub::Name
+
+        If you have Sub::Name installed, the methods will have proper names,
+        instead of "__ANON__". This will make stacktraces easier to read.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

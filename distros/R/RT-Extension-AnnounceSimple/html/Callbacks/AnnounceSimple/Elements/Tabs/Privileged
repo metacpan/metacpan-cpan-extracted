@@ -1,0 +1,10 @@
+<%init>
+if ( $session{'CurrentUser'}->HasRight( Right => 'SuperUser', Object => RT->System ) ) {
+    my $menu = Menu()->child('admin')->child('tools')->child( announcesimple =>
+        title       => loc('Announce'),
+        description => loc('Display simple announcement as a banner on RT pages.'),
+        path        => '/Admin/Tools/AnnounceSimple.html',
+        sort_order  => -1,
+    );
+}
+</%init>

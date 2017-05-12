@@ -1,0 +1,8 @@
+    <groceries crackers=1>
+        <soup>2</soup>
+        <milk value="1"/>
+        <vegitables value="brocoli"/>
+        <vegitables>corn</vegitables>
+        <vegitables value="peas"/>
+</groceries>
+

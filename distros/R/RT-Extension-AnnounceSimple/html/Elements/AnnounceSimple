@@ -1,0 +1,23 @@
+<div class="results announce">
+
+<&| /Widgets/TitleBox, title => $title, class => 'error', hideable => 0 &>
+
+<ul class="action-results" style="list-style-type: none;">
+<li><% $announce %></li>
+</ul>
+
+</&>
+
+</div>
+<%init>
+return unless my $attr = $Object->FirstAttribute('AnnounceSimple');
+my $announce = $attr->Content;
+return unless length $announce;
+
+my $title = $Object->isa('RT::System')
+    ? loc('Global Announce')
+    : loc('Queue Announce');
+</%init>
+<%args>
+$Object
+</%args>

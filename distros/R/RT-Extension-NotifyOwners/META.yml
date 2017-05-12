@@ -1,0 +1,24 @@
+---
+abstract: 'Owner notifications for RT'
+author:
+  - 'Ian Norton <i.d.norton@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-NotifyOwners
+no_index:
+  directory:
+    - etc
+    - inc
+requires:
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

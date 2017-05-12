@@ -1,0 +1,102 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2015-01-26 12:14+0200\n"
+"Last-Translator: Emmanuel Lacour <elacour@home-dn.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: html/Elements/ShowLock:47
+#. ($TicketLabel, $u_str, $ago)
+msgid "%1 has been locked by %2 for %3"
+msgstr "%1 a été verrouillé par %2 depuis %3"
+
+#: html/Callbacks/RT-Extension-TicketLocking/Elements/Tabs/Privileged:27 html/Callbacks/RT-Extension-TicketLocking/RTIR/Elements/QueueTabs/Default:17 html/Callbacks/RT-Extension-TicketLocking/Ticket/Elements/Tabs/Default:21
+msgid "Break lock"
+msgstr "Supprimer le verrou"
+
+#: html/Elements/MyLocks:56
+msgid "Expires in"
+msgstr "Expire dans"
+
+#: html/Callbacks/RT-Extension-TicketLocking/Elements/Tabs/Privileged:34 html/Callbacks/RT-Extension-TicketLocking/RTIR/Elements/QueueTabs/Default:24 html/Callbacks/RT-Extension-TicketLocking/Ticket/Elements/Tabs/Default:27
+msgid "Lock"
+msgstr "Verrouiller"
+
+#: html/Elements/MyLocks:58
+msgid "Subject"
+msgstr "Sujet"
+
+#: lib/RT/Extension/TicketLocking.pm:351
+msgid "There is a lock with a higher priority on this ticket."
+msgstr "Il y a un verrou avec une priorité supérieure sur ce ticket."
+
+#: html/Elements/ShowLock:43
+msgid "This ticket"
+msgstr "Ce ticket"
+
+#: lib/RT/Extension/TicketLocking.pm:346
+msgid "This ticket was not locked."
+msgstr "Ce ticket n'a pas été verrouillé"
+
+#: html/Elements/ShowLock:26
+#. ($Id)
+msgid "Ticket #%1"
+msgstr "Ticket n°%1"
+
+#: html/Elements/MyLocks:49
+msgid "Tickets locked by you"
+msgstr "Tickets verrouillés par vous"
+
+#: html/Elements/MyLocks:58
+msgid "Time Locked"
+msgstr "Verrouillé depuis"
+
+#: html/Callbacks/RT-Extension-TicketLocking/Elements/Tabs/Privileged:21 html/Callbacks/RT-Extension-TicketLocking/RTIR/Elements/QueueTabs/Default:12 html/Callbacks/RT-Extension-TicketLocking/Ticket/Elements/Tabs/Default:16 html/Elements/MyLocks:77
+msgid "Unlock"
+msgstr "Déverrouiller"
+
+#: html/Elements/MyLocks:51
+msgid "Unlock All"
+msgstr "Tout déverrouiller"
+
+#: lib/RT/Extension/TicketLocking.pm:347
+msgid "You cannot unlock a ticket locked by another user."
+msgstr "Vous ne pouvez pas déverrouillé un tiket verrouillé par quelqu'un d'autre."
+
+#: html/Elements/ShowLock:31
+#. ($TicketLabel, $ago)
+msgid "You had %1 locked for %2. It is now unlocked"
+msgstr "Vous aviez %1 verrouillé depuis %2. Il est maintenant déverrouillé."
+
+#: html/Callbacks/RT-Extension-TicketLocking/RTIR/Display.html/ProcessArguments:27 html/Callbacks/RT-Extension-TicketLocking/RTIR/Incident/Display.html/ProcessArguments:26 html/Callbacks/RT-Extension-TicketLocking/Ticket/Display.html/ProcessArguments:26
+msgid "You have broken the lock on this ticket"
+msgstr "Vous avez supprimer le verrou sur ce ticket"
+
+#: html/Elements/ShowLock:37
+#. ($TicketLabel, $ago)
+msgid "You have had %1 locked for %2"
+msgstr "Vous avez verrouillé %1 depuis %2"
+
+#: html/Elements/ShowLock:35
+#. ($TicketLabel)
+msgid "You have locked %1"
+msgstr "Vous avez verrouillé %1"
+
+#: lib/RT/Extension/TicketLocking.pm:356
+#. ($duration)
+msgid "You have unlocked this ticket. It was locked for %1 seconds."
+msgstr "Vous avez déverrouillé ce ticket. Il était verrouillé depuis %1 secondes."
+
+#: html/Callbacks/RT-Extension-TicketLocking/RTIR/Display.html/ProcessArguments:12 html/Callbacks/RT-Extension-TicketLocking/RTIR/Incident/Display.html/ProcessArguments:12 html/Callbacks/RT-Extension-TicketLocking/Ticket/Display.html/ProcessArguments:12
+msgid "You now have a lock on this ticket"
+msgstr "Vous avez maintenant un verrou sur ce ticket"
+
+#: html/Callbacks/RT-Extension-TicketLocking/RTIR/Display.html/ProcessArguments:14 html/Callbacks/RT-Extension-TicketLocking/RTIR/Incident/Display.html/ProcessArguments:14 html/Callbacks/RT-Extension-TicketLocking/Ticket/Display.html/ProcessArguments:14
+msgid "Your attempt to lock this ticket failed"
+msgstr "Votre tentative pour verrouiller ce ticket a échoué"
+
+#: html/Elements/ShowLock:26 html/Elements/ShowLock:43
+msgid "this ticket"
+msgstr "ce ticket"
+

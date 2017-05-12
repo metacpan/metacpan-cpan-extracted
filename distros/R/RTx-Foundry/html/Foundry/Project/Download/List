@@ -1,0 +1,61 @@
+%# The best cure for insomnia is to get a lot of sleep.
+%#		-- W. C. Fields
+
+  <table width="100%" border="0" cellspacing="1" cellpadding="2" class="poptable" bgcolor="#AAE3DE">
+    <tr> 
+      <td class="tableTitle" width="40"><nobr><&|/l&>Version Number</&></nobr></td>
+      <td class="tableTitle" width="120"><nobr><&|/l&>Release Date</&></nobr></td>
+      <td class="tableTitle" width="40"><nobr><&|/l&>File Name</&></nobr></td>
+      <td class="tableTitle" width="120"><nobr><&|/l&>Description</&></nobr></td>
+      <td class="tableTitle" width="120"><nobr><&|/l&>Type</&></nobr></td>
+      <td class="tableTitle" width="100"><nobr><&|/l&>Size</&></nobr></td>
+      <td class="tableTitle" width="100"><nobr><&|/l&>Download #</&></nobr></td>
+    </tr>
+% foreach my $item (@{$List}[$Begin .. $Begin + $Size - 1]) {
+%     my $bg = 'ffffff';
+    <tr bgcolor='<% $bg %>'
+%     if ($item and my $rowspan = delete($ListCount->{$item->{ReleaseObj}->Id})) {
+      ><td height="20" rowspan="<% $rowspan+1 %>" align="right"><% $item->{ReleaseObj}->Subject %>&nbsp;</td>
+      <td height="20" rowspan="<% $rowspan+1 %>" align="center"><% eval { $item->{ReleaseObj}->StartsObj->AsDate } %></td></tr>
+%     redo;
+%     }
+%     if ($item) {
+	onMouseOver="this.style.backgroundColor='#D1FAFC'" 
+        onMouseOut="this.style.backgroundColor='<% $bg %>'"
+	style="cursor:hand" 
+	onClick="MM_goToURL('self','<% $item->{URL} %>');return document.MM_returnValue"
+%     } else { $item = { ReleaseObj => $RT::Nothing, Attachment => $RT::Nothing } }
+%     if (!$item->{Id}) {
+      ><td height="20"></td>
+      <td height="20"></td
+%     }
+      ><td height="20">
+% if ($item->{Id}) {
+      <a style="color: black" href="<% $item->{URL} %>"><% $item->{Attachment}->Filename %></a>
+% }
+      </td>
+      <td height="20"><% $item->{Description} %></td>
+      <td height="20"><% $item->{Attachment}->ContentType %></td>
+% my $size = $item->{Attachment}->ContentLength if $item->{Id};
+% $size =~ s/(^[-+]?\d+?(?=(?>(?:\d{3})+)(?!\d))|\G\d{3}(?=\d))/$1,/g if $size;
+      <td height="20" align="right"><% $size %></td>
+      <td height="20" align="right"><% $size ? ($item->{Attachment}->Attribute('Download') || 0) : '' %></td>
+    </tr>
+% }
+  </table>
+<%INIT>
+$List ||= [];
+$Size = @$List if @$List > $Size;
+</%INIT>
+<%ARGS>
+$Size	=> 14
+$List	=> []
+$Role	=> ''
+$Begin	=> 0
+$IDMap	=> {}
+$URL	=> ''
+$ARGS	=> {}
+$Item	=> {}
+$ListCount	=> {}
+$Queue
+</%ARGS>

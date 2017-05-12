@@ -1,0 +1,6 @@
+<&| /Widgets/TitleBox, title => loc("Sorting"), id => 'sorting' &>
+<& EditSort, %ARGS &>
+</&>
+<&| /Widgets/TitleBox, title => loc("Display Columns"), id => 'columns' &>
+<& /Search/Elements/EditFormat, IncludeTicketLinks => 0, %ARGS &>
+</&>

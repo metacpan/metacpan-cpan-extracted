@@ -1,0 +1,7 @@
+;; Dit is data voor de stream test
+(
+   oele=boele    ;; Wat commentaar erbij.
+   makkis=voele  ;; Nog wat commentaar.
+)
+;; Nog en expressie.
+("Dit is een string" (geneste lijst ()))

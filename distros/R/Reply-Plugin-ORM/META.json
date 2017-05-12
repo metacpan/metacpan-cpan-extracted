@@ -1,0 +1,87 @@
+{
+   "abstract" : "Reply + O/R Mapper",
+   "author" : [
+      "papix <mail@papix.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.15.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Reply-Plugin-ORM",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Compare" : "0",
+            "Module::Load" : "0",
+            "Path::Tiny" : "0",
+            "Reply" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Reply::Plugin::ORM" : {
+         "file" : "lib/Reply/Plugin/ORM.pm",
+         "version" : "0.01"
+      },
+      "Reply::Plugin::ORM::Otogiri" : {
+         "file" : "lib/Reply/Plugin/ORM/Otogiri.pm"
+      },
+      "Reply::Plugin::ORM::Teng" : {
+         "file" : "lib/Reply/Plugin/ORM/Teng.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/papix/Reply-Plugin-ORM/issues"
+      },
+      "homepage" : "https://github.com/papix/Reply-Plugin-ORM",
+      "repository" : {
+         "url" : "git://github.com/papix/Reply-Plugin-ORM.git",
+         "web" : "https://github.com/papix/Reply-Plugin-ORM"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Takuya Tsuchida <takuya.tsuchida@gmail.com>"
+   ]
+}

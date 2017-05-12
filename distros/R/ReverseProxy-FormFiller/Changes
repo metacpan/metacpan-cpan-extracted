@@ -1,0 +1,17 @@
+Revision history for ReverseProxy-FormFiller
+
+0.1    2013/04/10
+        First version
+
+0.2    2013/04/11
+        Fix bug with content-length, update doc
+
+0.3    2014/04/29
+        Add parameters 'publicFilledData', 'postDataSub' and 'javascript'
+
+0.4    2014/09/24
+        Fix bug with unquoted strings
+
+0.5    2014/10/02
+        Unfix bug with unquoted strings (was not a bug), improve POD
+

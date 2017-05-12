@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Redmine-Stat
+version:            0.01
+abstract:           Perl extension for dealing with Redmine Rest api. 
+author:
+    - Fedor A Borshev <fedor@shogo.ru>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Crypt::SSLeay:    0
+    File::Slurp:      0
+    IO::Socket::SSL:  0
+    LWP::UserAgent:   0
+    XML::LibXML:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

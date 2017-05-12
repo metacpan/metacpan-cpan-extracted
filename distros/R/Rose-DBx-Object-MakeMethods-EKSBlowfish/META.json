@@ -1,0 +1,53 @@
+{
+   "abstract" : "Create Blowfish-specific object methods for Rose::DB::Object-derived objects.",
+   "author" : [
+      "Holger Rupprecht <holger.rupprecht@gmx.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Rose-DBx-Object-MakeMethods-EKSBlowfish",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Rose::DBx::TestDB" : "0.05",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Eksblowfish::Bcrypt" : "0.009",
+            "Rose::DB" : "0.77",
+            "Rose::DB::Object" : "0.804"
+         }
+      }
+   },
+   "provides" : {
+      "Rose::DBx::Object::MakeMethods::EKSBlowfish" : {
+         "file" : "lib/Rose/DBx/Object/MakeMethods/EKSBlowfish.pm",
+         "version" : "0.07"
+      },
+      "Rose::DBx::Object::Metadata::Column::EKSBlowfish" : {
+         "file" : "lib/Rose/DBx/Object/Metadata/Column/EKSBlowfish.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.07"
+}

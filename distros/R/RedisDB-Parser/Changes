@@ -1,0 +1,35 @@
+2.22 Fri Oct 30 2015 Pavel Shaydo <zwon@cpan.org>
+    - parse method now returns number of parsed replies
+
+2.21 Tue Feb 10 2015 Pavel Shaydo <zwon@cpan.org>
+    - create special error objects for MOVED and ASK redirections from
+    redis cluster
+
+2.20 Sun Dec  1 2013 Pavel Shaydo <zwon@cpan.org>
+    - stable version, no code changes
+
+2.19_06 Sat Nov 30 2013 Pavel Shaydo <zwon@cpan.org>
+    - rename parser.[ch] into rdb_parser.[ch]
+    - improve documentation
+
+2.19_05 Fri Nov 29 2013 Pavel Shaydo <zwon@cpan.org>
+    - use Test::FailWarnings
+    - fix build dependencies in Makefile
+    - add test for utf8 option
+
+2.19_04 Wed Nov 27 2013 Pavel Shaydo <zwon@cpan.org>
+    - Document error_class attribute
+    - Load default error class in XS parser
+    - Add no-leak.t test
+
+2.19_03 Wed Nov 27 2013 Pavel Shaydo <zwon@cpan.org>
+    - Add RedisDB::Parser::Error class
+    - Add error_class attribute to parser
+    - Remove RedisDB dependency
+
+2.19_02 Mon Nov 25 2013 Pavel Shaydo <zwon@cpan.org>
+    - Add temporary dependency on RedisDB
+
+2.19_01 Sat Nov 23 2013 Pavel Shaydo <zwon@cpan.org>
+    - Extracted parser from RedisDB package
+

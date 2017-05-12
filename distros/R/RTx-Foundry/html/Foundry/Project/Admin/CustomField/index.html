@@ -1,0 +1,43 @@
+%# Today is the tomorrow you worried about yesterday
+<table cellpadding="0" cellspacing="0" border="0"><tr><td>
+<& /Edit/Global/CustomField/index.html,
+    %ARGS,
+    Queue => $QueueObj->Id,
+    Action => $Action,
+    ListDelete => $ListDelete &>
+</td></tr></table>
+<%INIT>
+my $Action = (
+    grep defined, map { /^Action-(.+?)(?:\.[xyXY])?[012]?$/ ? $1 : undef }
+    grep length $ARGS{$_}, keys %ARGS
+)[0] || 'Save';
+
+# don't let user touch reserved names!
+if (RT::CustomField->IsReservedName($ARGS{Name})) {
+    $m->print(
+	'<p><font color="red">* ',
+	loc("Cannot save as '[_1]', because it is a reserved name.", $ARGS{Name}),
+	'</font></p>',
+    );
+    delete $ARGS{Name};
+}
+
+if (!$session{CurrentUser}->HasRight( Object => $QueueObj, Right => 'AdminCustomFields')) {
+    my $ace = RT::ACE->new( $RT::SystemUser );
+    $ace->Create(
+	RightName       => 'AdminCustomFields',
+	Object          => $QueueObj,
+	PrincipalType   => 'Group',
+	PrincipalId     => $QueueObj->AdminCc->Id,
+    );
+}
+
+my $ListDelete = [];
+if ($ARGS{ListDelete}) {
+    $ListDelete = $ARGS{ListDelete};
+    $ListDelete = [ $ListDelete ] unless ref($ListDelete);
+}
+</%INIT>
+<%ARGS>
+$QueueObj
+</%ARGS>

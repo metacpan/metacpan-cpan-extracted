@@ -1,0 +1,280 @@
+%# A LISP programmer knows the value of everything, but the cost of nothing.
+ 
+<FORM METHOD=POST ACTION="index.html" style="margin: 0">
+<INPUT TYPE=HIDDEN NAME=Queue VALUE="<%$QueueObj->Id%>">
+
+<TABLE WIDTH=100% CELLPADDING="2" CELLSPACING="1">
+<TR><TD VALIGN=TOP rowspan="2">
+
+<table border="0" cellspacing="1" cellpadding="2" width="100%" class="poptable">
+<tr><td colspan="2" class="tableTitle"><&|/l&>Admins</&></td></tr>
+<& EditQueueWatchers, QueueObj => $QueueObj, Watchers => $QueueObj->AdminCc, Nonempty => 1, ReadOnly => !$IsAdmin, RoleCache => $RoleCache, Role => 'AdminCc' &>
+<tr><td colspan="2" class="tableTitle"><&|/l&>Members</&></td></tr>
+<& EditQueueWatchers, QueueObj => $QueueObj, Watchers => $QueueObj->Cc, ReadOnly => !$IsAdmin, RoleCache => $RoleCache, Role => 'Cc' &>
+</table>
+</TD>
+% if ($IsAdmin) {
+<td width="3%" align="center" valign="middle">
+    <img src="/img/ArrowLevelGreen.png" width="13" height="25">
+</td>
+<TD VALIGN=TOP>
+
+<table border="0" cellspacing="1" cellpadding="2" width="100%" class="poptable" bgcolor="#AAE3DE">
+<tr><td colspan="4" class="tableTitle"><&|/l&>Edit Staff</&></td></tr>
+<tr><td colspan="4" align="center">
+<&|/l&>Find people whose</&>
+<& SelectUsers &>
+<input type="image" border="0" src="/img/Go.png" width="23" height="19" align="middle">
+</td></tr>
+% if ($Users) {
+<tr><td class="tableTitle"><&|/l&>User</&></td>
+    <td class="tableTitle" colspan="3"><&|/l&>Role</&></td></tr>
+% while (my $u = $Users->Next ) {
+<tr><td bgcolor="white"><nobr><%$u->Name%>
+% if ($u->IsPublic('RealName')) {
+(<%$u->RealName%>)
+% }
+</nobr></td><td bgcolor="white" colspan="3"><nobr>
+<& SelectWatcherType,
+   Name => "Queue-AddWatcher-Principal-".$u->PrincipalId,
+   Scope => 'queue',
+   Disabled => ($u->Id == $MyPrincipalId),
+   Default => $RoleCache->{$u->Id},
+   RoleMap => $RoleMap,
+&>
+</nobr></td></tr>
+% }
+<tr><td align="right" colspan="4"><input type="submit" value="<&|/l&>Save</&>"></td></tr>
+% }
+</table></td></tr>
+<tr><td>&nbsp;
+</FORM><FORM METHOD=POST ACTION="index.html" style="margin: 0">
+</td><td>
+
+<table border="0" cellspacing="1" cellpadding="2" width="100%" class="poptable" bgcolor="#AAE3DE">
+<tr><td colspan="4" class="tableTitle"><&|/l&>Invite External Staff</&></td></tr>
+% foreach (@InviteResult) {
+<tr><td colspan="4">* <% $_ %></td></tr>
+% }
+<tr><td class="tableTitle" width="10%"><nobr><&|/l&>Email</&></nobr></td>
+    <td bgcolor="white" colspan="3"><input name="InviteEmail" style="width: 100%" value="<% $InviteEmail %>"></td></tr>
+<%DOC>
+<tr><td class="tableTitle" width="10%"><nobr><&|/l&>Invite Letter</&></nobr></td>
+    <td bgcolor="white" colspan="3"><textarea name="InviteLetter" wrap="hard" cols="50" rows="4" style="width: 100%"><% $InviteLetter %></textarea></td></tr>
+</%DOC>
+<tr><td class="tableTitle" width="10%"><nobr><&|/l&>Role</&></nobr></td>
+    <td bgcolor="white" colspan="3">
+<LABEL><INPUT TYPE="RADIO" VALUE="Cc" NAME="InviteRole"
+    <% ($InviteRole eq 'AdminCc') ? '' : 'CHECKED' %>><&|/l&>Member</&></LABEL>
+<LABEL><INPUT TYPE="RADIO" VALUE="AdminCc" NAME="InviteRole"
+    <% ($InviteRole eq 'AdminCc') ? 'CHECKED' : '' %>><&|/l&>Admin</&></LABEL>
+    </td></tr>
+<tr><td align="right" colspan="4"><input type="submit" name="Action-Invite" value="<&|/l&>Submit</&>"></td></tr>
+
+<tr><td colspan="4" class="tableTitle"><&|/l&>Past Invitees</&></td></tr>
+<tr><td class="tableTitle"><&|/l&>User Id</&></td>
+    <td class="tableTitle"><&|/l&>Email</&></td>
+    <td class="tableTitle"><&|/l&>Role</&></td>
+    <td class="tableTitle"><&|/l&>Status</&></td></tr>
+
+% my $Tickets = RT::Tickets->new($RT::SystemUser);
+% my $Date = RT::Date->new($RT::SystemUser);
+% $Date->Set(Format => 'unix', Value => time - (14 * 86400) );
+% $Tickets->LimitQueue( VALUE => RT::Queue->NameToId('MemberChange') );
+% $Tickets->LimitCreated( OPERATOR => '>', VALUE => $Date->ISO );
+% $Tickets->LimitSubject( OPERATOR => '=', VALUE => join(' ', "Invite", $_, $QueueObj->Id, $QueueObj->Name) ) for qw(AdminCc Cc);
+% $Tickets->OrderBy( FIELD => 'Id', ORDER => 'DESC' );
+% my %seen;
+% while (my $Ticket = $Tickets->Next) {
+%     my $Email = $Ticket->OwnerObj->Name;
+%     next if $seen{$Email}++ or $Email !~ /\@/;
+%     my $UserObj = RT::User->new($RT::SystemUser);
+%     $UserObj->LoadByCol( EmailAddress => $Email );
+%     my $Name = $UserObj->Name;
+%     $Name = '' if $Name eq $Email;
+%     my $Role = (split(/\s+/, $Ticket->Subject, 3))[1];
+<tr><td bgcolor="white"><% $Name %></td>
+    <td bgcolor="white"><% $Email %></td>
+    <td bgcolor="white"><%
+	loc($RoleMap->{$Name ? $RoleCache->{$UserObj->Id} : $Role})
+    %></td>
+    <td bgcolor="white"><%
+	loc($Name ? ($UserObj->Disabled ? 'Disabled' : 'Registered') : 'Unregistered')
+    %></td></tr>
+% }
+
+</table>
+</TD>
+% }
+</TR>
+</TABLE>
+
+
+</form>
+<p>
+
+<%INIT>
+
+my $current_tab;
+my ($field, $User, $Users, $Groups, $watcher);
+
+my $IsAdmin = $QueueObj->HasAdminCc($session{CurrentUser}->UserObj)
+    || $session{CurrentUser}->HasRight( Right => 'SuperUser', Object => $QueueObj );
+
+$QueueObj->CurrentUser($RT::SystemUser); # instant priv escalation!
+
+my $MyPrincipalId = $session{CurrentUser}->UserObj->PrincipalObj->Id;
+my @InviteResult;
+
+if ($IsAdmin and $ARGS{'Action-Invite'}) { INVITE: {
+    # First, make sure we have a valid email.
+    use Email::Valid;
+    $InviteEmail = Email::Valid->address( -address => $InviteEmail );
+    if (!$InviteEmail) {
+	push @InviteResult, loc("Invalid email address");
+	last INVITE;
+    }
+
+    # Next, make sure that email does not already exist in the system.
+    my $User = RT::User->new($RT::SystemUser);
+    $User->LoadByEmail( $InviteEmail );
+    if ($User->Id and $User->Privileged) {
+	($UserField, $UserOp, $UserString) = ('Name', '=', $User->Name);
+	push @InviteResult, loc("This email address already exists"),
+			    loc("Please use the form above to add this staff directly");
+	last INVITE;
+    }
+
+    # Then, make sure we did not already send an invitation mail.
+    if ($User->Id) {
+	my $Tickets = RT::Tickets->new($RT::SystemUser);
+	my $Date = RT::Date->new($RT::SystemUser);
+	$Date->Set(Format => 'unix', Value => time - (14 * 86400) );
+	$Tickets->LimitQueue( VALUE => RT::Queue->NameToId('MemberChange') );
+	$Tickets->LimitCreated( OPERATOR => '>', VALUE => $Date->ISO );
+	$Tickets->LimitOwner( OPERATOR => '=', VALUE => $User->Id );
+	$Tickets->LimitSubject( OPERATOR => '=', VALUE => join(' ', "Invite", $_, $QueueObj->Id, $QueueObj->Name) ) for qw(AdminCc Cc);
+	if ($Tickets->Count) {
+	    push @InviteResult, loc("This person has already received an invitation letter");
+	    last INVITE;
+	}
+    }
+    else {
+	$User->Create(
+	    Name => $InviteEmail,
+	    EmailAddress => $InviteEmail,
+	    Privileged => 0
+	);
+    }
+
+    my $MemberChange = RT::Queue->new($RT::SystemUser);
+    $MemberChange->Load('MemberChange') or die "Cannot load MemberChange";
+    $User->PrincipalObj->GrantRight(Object => $MemberChange, Right => 'OwnTicket');
+
+    # Finally, send out the invitation ticket.
+    my $TicketObj = RT::Ticket->new($session{'CurrentUser'});
+    $TicketObj->Create(
+	Queue => 'MemberChange',
+	Subject => join(' ', 'Invite', $InviteRole, $QueueObj->Id, $QueueObj->Name),
+	Requestor => [ $session{CurrentUser}->UserObj->Id ],
+	Owner => $User->Id,
+    );
+    push @InviteResult, loc("Invitation sent to [_1]", $InviteEmail),
+			'(' . loc("This invitation will expire in 14 days.") . ')';
+    $InviteEmail = $InviteRole = '';
+} }
+elsif ($IsAdmin) {
+    my ($code, $msg);
+
+    # Delete deletable watchers
+    foreach my $key (keys %ARGS) {
+        my $id = $QueueObj->Id;
+	my $Principal;
+	next unless $key =~ /^Queue-$id-DelWatcher-Type-.*?-Principal-(\d*)$/
+		or ($key =~ /^Queue-AddWatcher-Principal-(\d*)$/ and !$ARGS{$key});
+	next if $1 == $MyPrincipalId;
+
+	my $code;
+	$code ||= ($QueueObj->DeleteWatcher(
+	    Type => $_,
+	    PrincipalId => $1,
+	))[0] for qw(AdminCc Cc);
+
+	my $TicketObj = RT::Ticket->new($session{'CurrentUser'});
+	$TicketObj->Create(
+	    Queue => 'MemberChange',
+	    Subject => join(' ', 'Delete', 0, $QueueObj->Id, $QueueObj->Name),
+	    Requestor => [ $session{CurrentUser}->UserObj->Id ],
+	    Owner => $1,
+	) if $code;
+    }
+
+    # Add new watchers
+    foreach my $key (keys %ARGS) {
+	# They're in this order because otherwise $1 gets clobbered :/
+	next unless $ARGS{$key} =~ /^(AdminCc|Cc)$/
+		and $key =~ /^Queue-AddWatcher-Principal-(\d*)$/
+		and $1 != $MyPrincipalId; 
+
+	$RT::Logger->debug("Adding a watcher $1 to ".$ARGS{$key}."\n");
+
+	if ($ARGS{$key} eq 'AdminCc') {
+	    next if $QueueObj->HasAdminCc($1);
+	}
+	else {
+	    next if $QueueObj->HasCc($1);
+	}
+
+	# First, clear away the other status
+	($code, $msg) = $QueueObj->DeleteWatcher(
+	    Type => ( ($ARGS{$key} eq 'AdminCc') ? 'Cc' : 'AdminCc' ),
+	    PrincipalId => $1
+	);
+
+	my $verb = ($code ? 'Edit' : 'Add');
+
+	($code, $msg) = $QueueObj->AddWatcher(
+	    Type => $ARGS{$key},
+	    PrincipalId => $1
+	);
+	my $TicketObj = RT::Ticket->new($session{'CurrentUser'});
+	$TicketObj->Create(
+	    Queue => 'MemberChange',
+	    Subject => join(' ', $verb, $ARGS{$key}, $QueueObj->Id, $QueueObj->Name),
+	    Requestor => [ $session{CurrentUser}->UserObj->Id ],
+	    Owner => $1,
+	) if $code and $verb;
+    }
+}
+
+if (length $UserString) {
+    $Users = RT::Users->new($session{'CurrentUser'});
+    $Users->LimitToPrivileged;
+    $Users->Limit(
+	FIELD => $UserField,
+	VALUE => $UserString,
+	OPERATOR => $UserOp
+    );
+}
+
+$current_tab = 'Admin/Queues/People.html?id='.$QueueObj->id;
+
+my $RoleCache = {};
+my $RoleMap = {
+    Cc	    => 'Member',
+    AdminCc => 'Admin',
+    ''	    => 'none',
+};
+</%INIT>
+
+<%ARGS>
+$UserField => 'Name'
+$UserOp => '='
+$UserString => undef
+$InviteEmail => ''
+$InviteRole => 'Cc'
+$InviteLetter => ''
+$Type => undef
+$QueueObj
+</%ARGS>
+

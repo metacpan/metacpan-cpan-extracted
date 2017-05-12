@@ -1,0 +1,1 @@
+perl -T -I ../lib -I ../t named-pipe-activeperl.t 

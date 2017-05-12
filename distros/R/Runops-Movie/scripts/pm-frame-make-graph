@@ -1,0 +1,298 @@
+#!perl
+use strict;
+use warnings;
+use 5.010_000;
+use feature ':5.10';
+use Getopt::Long qw( GetOptions );
+use Runops::Movie::Util qw( printf_pretty_size );
+use File::Spec::Functions qw( catfile );
+use Carp::Always;
+use Alien::Judy;
+use Judy::1;
+use Judy::L;
+use Inline
+    C => 'DATA',
+    ( # Config:
+	OPTIMIZE => '-g',
+	CLEAN_AFTER_BUILD => 1,
+	INC => join( ' ',
+		     map { "-I$_" }
+		     Alien::Judy::inc_dirs()
+	),
+	LIBS => join( ' ',
+		      (
+		          map { "-L$_" }
+		          Alien::Judy::lib_dirs()
+		      ),
+		      '-lJudy'
+	)
+    );
+
+
+# Read options
+#
+my ( %in, %out );
+GetOptions(
+    help         => sub { die 'pod2usage( -verbose => 2 )' },
+    'dir=s'      => \my($dir),
+    (
+        map {; "$_=s" => \$in{$_}{name} }
+        qw( contains size shares function vertex )
+    ),
+    (
+        map {; "$_=s" => \$out{$_}{name} }
+        qw( fulledge rulledge arity )
+    )
+)
+  or die 'pod2usage( -verbose => 2 )';
+
+# --dir automagic
+#
+if ( $dir ) {
+    $in{$_}{name} //= catfile( $dir, "frame.$_" ) for keys %in;
+    $out{$_}{name} //= catfile( $dir, "frame.$_" ) for keys %out;
+}
+
+# Option validation
+#
+trace( 'No option validation' );
+
+# Add verticies
+#
+my $vertices = 0;
+{
+    say 'vertex(Id).';
+
+    printf_pretty_size( "Read $in{contains}{name} (%s)\n", -s $in{contains}{name} );
+    open my($fh), '<', $in{contains}{name}
+        or die "Can't read $in{contains}{name}: $!";
+    $vertices += 0;
+    vertex_read( $fh, $vertices, 'contains(%x,%x).', 2 );
+}
+
+{
+    printf_pretty_size( "Read $in{shares}{name} (%s)\n", -s $in{shares}{name} );
+    open my($fh), '<', $in{shares}{name}
+        or die "Can't read $in{shares}{name}: $!";
+    vertex_read( $fh, $vertices, 'shares(%x,%x).', 2 );
+}
+
+
+
+
+# Add missing vertices
+#
+{
+    say 'missing(vertex(Id)).';
+    printf_pretty_size( "Read $in{size}{name} (%s)\n", -s $in{size}{name} );
+    open my($fh), '<', $in{size}{name}
+        or die "Can't read $in{size}{name}: $!";
+    vertex_read( $fh, $vertices, 'size(%x,', 1 );
+}
+
+# Add edges, but only if they don't produce cycles
+#
+my $fulledge = 0;
+my $contained = 0;
+{
+    say 'edge(ParentId,ChildId).';
+    
+    for my $nm ( qw( contains shares ) ) {
+        my $file = $in{$nm}{name};
+        printf_pretty_size( "Read $file (%s)\n", -s $file );
+        open my($fh), '<', $file
+            or die "Can't open $file: $!";
+        add_edges( $fulledge, $contained, $fh, "$nm(%x,%x)." );
+    }
+}
+
+# Exterior nodes become property of 'root'
+#
+{
+    say q{edge(0,Id).};
+    
+    my $root = 0;
+    my $x = Judy::1::First( $vertices, 0 );
+    while ( defined $x ) {
+        if ( Judy::1::Test( $contained, $x ) ) {
+        }
+        else {
+            Judy::1::Set( $root, $x );
+        }
+
+        $x = Judy::1::Next( $vertices, $x );
+    }
+
+    Judy::L::Set( $fulledge, 0, $root );
+    Judy::1::Free( $contained );
+    Judy::1::Free( $vertices );
+}
+
+{
+    open my($fulledge_fh), '>', $out{fulledge}{name}
+        or die "Can't open $out{fulledge}{name} for writing: $!";
+    open my($rulledge_fh), '>', $out{rulledge}{name}
+        or die "Can't open $out{rulledge}{name} for writing: $!";
+    open my($arity_fh), '>', $out{arity}{name}
+        or die "Can't open $out{arity}{name} for writing: $!";
+
+    my ( undef, $yedge, $x ) = Judy::L::First($fulledge,0);
+    while ( $yedge ) {
+        my $xx = sprintf '%x', $x;
+
+        my $yarity = Judy::1::Count( $yedge, 0, -1 );
+        printf { $arity_fh } "arity(%x,%d).\n", $x, $yarity;
+
+        my $y = Judy::1::First( $yedge, 0 );
+        while ( defined $y ) {
+            printf { $fulledge_fh } "edge(%x,%x).\n", $x, $y;
+            printf { $rulledge_fh } "rdge(%x,%x).\n", $y, $x;
+
+            $y = Judy::1::Next( $yedge, $y );
+        }
+
+        Judy::1::Free($yedge);
+        (undef,$yedge,$x) = Judy::L::Next($fulledge,$x);
+    }
+    Judy::L::Free($fulledge);
+    printf_pretty_size( "Wrote $out{fulledge}{name} (%s)\n", -s $out{fulledge}{name} );
+    printf_pretty_size( "Wrote $out{rulledge}{name} (%s)\n", -s $out{rulledge}{name} );
+}
+
+sub trace {
+    if ( $Devel::Trace::TRACE ) {
+        goto &Carp::cluck;
+    }
+}
+
+__DATA__
+__C__
+#include <Judy.h>
+
+void
+vertex_read( PerlIO *fh, SV *vertices_sv, char *format, int n ) {
+    SV *line_sv;
+    char *line = 0;
+    STRLEN line_len = 0;
+    int x = 0;
+    int y = 0;
+    int Rc_int;
+
+    Pvoid_t vertices = SvIV( vertices_sv );
+    line_sv = newSVpv("",0);
+    while (sv_gets( line_sv, fh, 0 )) {
+        line = SvPV( line_sv, line_len );
+        if ( 2 == n ) {
+            if ( 2 != sscanf( line, format, &x, &y ) ) {
+                croak(line);
+            }
+            J1S(Rc_int,vertices,x);
+            J1S(Rc_int,vertices,y);
+        }
+        else if ( 1 == n ) {
+            if ( 1 != sscanf( line, format, &x  ) ) { 
+                croak(line);
+            }
+            J1S(Rc_int,vertices,x);
+        }
+    }
+    SvREFCNT_dec(line_sv);
+    sv_setiv( vertices_sv, vertices );
+}
+
+int
+is_self_loop_vertex( void *fulledge, int v ) {
+    Pvoid_t todo = 0x0;
+    Pvoid_t seen = 0x0;
+    int Rc_int = 0;
+    int found_y = 0;
+    Word_t x = 0;
+    Word_t y = 0;
+    Word_t freed;
+    Pvoid_t *pyedge;
+    Pvoid_t yedge;
+
+    /* The graph is empty */
+    if ( ! fulledge ) {
+        return 0;
+    }
+    
+    /* Start searching at 'v' */
+    J1S( Rc_int, todo, v );
+
+    /* Keep trying vertices */
+    while ( todo ) {
+
+        /* Unshift the next x vertex */
+        x = 0;
+        J1F( Rc_int, todo, x );
+        J1U( Rc_int, todo, x );
+
+        /* Fetch the x->y edge */
+        JLG( pyedge, fulledge, x );
+
+        if ( pyedge ) {
+            yedge = *pyedge;
+
+            /* Start looping over the keys in yedge */
+            y = 0;
+            J1F( found_y, yedge, y );
+
+            while ( found_y ) {
+
+                /* Found myself */
+                if ( v == y ) {
+                    J1FA( freed, todo );
+                    J1FA( freed, seen );
+
+                    return 1;
+                }
+
+                /* Has y been checked before? */
+                J1S( found_y, seen, y );
+                if ( ! found_y ) {
+                    /* Add y to the todo list */
+                    Rc_int = 0;
+                    J1S( Rc_int, todo, y );
+                    J1S( Rc_int, seen, y );
+
+                } /* if ! found_y */
+
+                /* Continue looping over the keys in yedge */
+                J1N( found_y, yedge, y );
+            } /* while found_y */
+        } /* if pyedge */
+    } /* while todo */
+
+    J1FA( freed, seen );
+
+    return 0;
+}
+
+void
+add_edges( SV *fulledge_sv, SV *contained_sv, PerlIO *fh, char *format ) {
+    char *line;
+    STRLEN line_len;
+    int Rc_int, x, y;
+    Pvoid_t *pyedge;
+    SV *line_sv = newSVpv("",0);
+    Pvoid_t fulledge  = SvIV(fulledge_sv);
+    Pvoid_t contained = SvIV(contained_sv);
+
+    while (sv_gets( line_sv, fh, 0 )) {
+        line = SvPV(line_sv,line_len);
+        if ( 2 != sscanf(line,format,&x,&y) ) {
+            croak(line);
+        }
+        if ( is_self_loop_vertex( fulledge, y ) ) {
+        }
+        else {
+            JLI(pyedge,fulledge,x);
+            J1S(Rc_int,*pyedge,y);
+            J1S(Rc_int,contained,y);
+        }
+    }
+    SvREFCNT_dec(line_sv);
+    sv_setiv(fulledge_sv,fulledge);
+    sv_setiv(contained_sv,contained);
+}

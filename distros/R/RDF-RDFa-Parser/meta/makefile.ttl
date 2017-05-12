@@ -1,0 +1,18 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Parser/project>
+	:perl_version_from _:main ;
+	:version_from _:main ;
+	:readme_from _:main ;
+	:test_requires "Test::More 0.61" , "HTTP::Response" ;
+	:recommends "Archive::Zip" ;
+	:requires "common::sense" , "Carp" , "Data::UUID" , "File::ShareDir" ,
+		"File::Temp 0.17", "HTML::HTML5::Parser" , "parent" ,
+		"HTML::HTML5::Sanity" , "LWP::UserAgent" ,
+		"RDF::Trine 0.135" , "Scalar::Util" , "Storable" , "URI::file" ,
+		"URI::Escape" , "URI", "XML::LibXML 1.66" , "XML::RegExp" .
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/RDF/RDFa/Parser.pm" .
+

@@ -1,0 +1,11 @@
+<%INIT>
+require RT::CIFMinimal;
+my $text = RT::CIFMinimal::ReportsByType($session{'CurrentUser'});
+
+$r->content_type('text/plain');
+$m->out($text);
+
+$m->abort();
+</%INIT>
+<%args>
+</%args>

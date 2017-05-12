@@ -1,0 +1,358 @@
+RDF-RDFa-Parser
+===============
+
+Created:      2009-01-13
+Home page:    <https://metacpan.org/release/RDF-RDFa-Parser>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDFa-Parser>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+1.097  2012-06-07  # RDFa 1.1 Release Candidate 7
+
+ - (Addition) Two new methods for RDF::TrineX::Parser::RDFa - rdfa_flavour
+   and rdfa_version.
+ - (Update) @role no longer respects @vocab.
+ - Add RDFa1.1+role test suite to 'xt' - tests all pass.
+
+1.096_04  2012-05-24  # RDFa 1.1 Release Candidate 6.04
+
+ - (Addition) RDF::TrineX::Parser::RDFa - a less crufty API layered on top
+   of RDF::RDFa::Parser.
+ - (Update) Implement minor changes for new version of Atom+RDFa draft
+   spec.
+
+1.096_03  2012-05-20  # RDFa 1.1 Release Candidate 6.03
+
+ - (Addition) New output_graph and processor_and_output_graph methods.
+ - (Addition) RDF::RDFa::Parser Distiller PSGI in the 'examples' directory.
+ - (Bugfix) Fix crash in RDFa version guessing.
+ - (Packaging) Lots more work on 'xt' tests - can now output EARL, which is
+   bundled in the 'meta' directory of the release.
+ - Allow unparsable markup (i.e. DOM cannot be generated) to result in a
+   simple error (reported via error callbacks, etc) rather than croaking.
+ - ERR_CODE_CURIE_UNDEFINED is now a warning, not an error.
+ - Slight improvements to processor_graph, to allow it to pass test cases
+   from RDFa 1.1 test suite.
+
+1.096_02  2012-05-17  # RDFa 1.1 Release Candidate 6.02
+
+ - (Addition) XHTML5 is now a host language in its own right - a mashup
+   between HTML5 and XHTML1, but with added xml:base support.
+ - (Bugfix) The xml:base attribute was being ignored in a few places when
+   it shouldn't have been.
+ - (Packaging) Now passing RDFa 1.1 test suite for RDFa 1.1 in XML, SVG and
+   XHTML5.
+ - (Packaging) Promote an old OpenDocument example to a test case.
+
+1.096_01  2012-05-16  # RDFa 1.1 Release Candidate 6.01
+
+ - (Addition) RDF::RDFa::Parser::InitialContext.
+ - (Addition) Support HTML5 <data> element, and @value attribute.
+ - (Addition) Support HTML5 <time> element, and @datetime attribute.
+ - (Bugfix) Support CURIEs which end in colon.
+ - (Bugfix) When _:foo found in a predicate, don't generate a random bnode
+   identifier, instead treat as a weird URI.
+ - (Packaging) Currently passing RDFa 1.1 test suite for RDFa 1.0 and 1.1
+   in HTML4, HTML5 and XHTML1 ('xt' tests, available in repo but not on
+   CPAN).
+ - (Packaging) Start cleaning up 'examples' directory.
+ - (Removal) Dropped a little relative URI resolution hack that I don't
+   think is needed any more.
+ - (Removal) Remove @profile support, plus entire profile mechanism.
+ - (Removal) Roll back @inlist plus @rev support.
+ - (Update) @vocab takes precedence over terms.
+ - (Update) Change RDFa 1.1 @typeof bindings; can bind to objects.
+ - (Update) Implement support for @property with resource objects.
+ - (Update) Replace rdfa:hasVocabulary predicate with rdfa:usesVocabulary.
+
+1.096  2011-10-13  # RDFa 1.1 Release Candidate 6
+
+ - (Packaging) Build package with Module::Package::RDF
+ - (Packaging) Move some tests from 't' to 'xt'.
+ - (Update) use 5.010
+ - Allow @inlist to work with @rev.
+
+1.095  2011-09-23  # RDFa 1.1 Release Candidate 5
+
+ - (Addition Update) Add 'inlist_attr' option, and enable it for RDFa 1.1.
+   This enables support for RDF Collections.
+ - (Addition Update) Add 'src_sets_object' option, and enable it for RDFa
+   1.1.
+ - (Addition Update) Add 'vocab_triple' option, and enable it for RDFa 1.1.
+ - (Addition Update) RDF::RDFa::Parser::Profile::RDFa11 for the default
+   RDFa 1.1 profile.
+ - (Addition) 'processor_graph' method.
+ - (Removal) RDF::RDFa::Parser no longer does any HTTP caching. Caching
+   should be handled at the application level.
+ - (Update) Change 'profiles' option to 'profile_attr', and disable it for
+   RDFa 1.1 to match forthcoming WD.
+
+1.094  2011-02-09  # RDFa 1.1 Release Candidate 4
+
+ - (Addition) Include 'tagsoup' configuration set for dealing with content
+   from the wild.
+ - (Addition) The opengraph method now recognises the old Open Graph
+   Protocol namespace for better backcompat.
+ - (Bugfix) @prefix wasn't working - ignored all but the first prefix.
+ - (Documentation Update) Copyright 2011.
+ - (Documentation) Improve SYNOPSIS section.
+ - (Update) Support new RDFa 1.1 feature where XMLLiterals are recursed
+   into.
+ - Issue warning when encountering a profile URI contains a fragment
+   identifier.
+ - Issue warning when encountering a profile that is not a valid URI.
+ - The opengraph method now returns the first value in the list when called
+   in scalar context. (Previously returned an arrayref.)
+
+1.093  2010-12-09  # RDFa 1.1 Release Candidate 3
+
+ - (Addition) Support @cite - not part of RDFa, but often provides useful
+   information.
+ - (Addition) Support @longdesc - not part of RDFa, but often provides
+   useful information.
+ - (Bugfix) Fix failure parsing embedded RDF/XML with blank nodes.
+ - (Bugfix) new_from_url didn't work when called without a Config object.
+ - @graph is now parsed like @about by default.
+ - Change cache directory.
+ - Clarify language around default prefix versus default vocabulary (or in
+   RDFa 1.0 default prefix versus 'no prefix'). This involved renaming a
+   couple of configuration options: prefix_default => vocab_default;
+   prefix_empty => prefix_default.
+ - Deprecated pretriple_literal and pretriple_resource callbacks - use
+   ontriple instead.
+ - IETF link types now use an aggressively cached copy of
+   http://www.iana.org/assignments/link-relations/link-relations.xml.
+ - Improve HTTP caching behaviour.
+ - Second parameter to ontriple callback is now a hashref of elements
+   rather than just the current element - this change is to help support
+   the RDFa API.
+ - Use official GRDDL profile URI for hard-coded support for GRDDL keywords
+   instead of previously used internal identifier.
+
+1.092  2010-10-20  # RDFa 1.1 Release Candidate 2
+
+ - (Bugfix) The final prefix defined in @prefix was being ignored due to a
+   regexp bug. Fixed.
+ - (Bugfix) There was an inconsistency between the code and documentation
+   for the name of the oncurie/ontoken callback. It's now called ontoken.
+ - If @graph support is enabled, and RDFa attributes are being used in a
+   non-standard namespace, assume @graph is in that namespace too.
+ - Load Profile modules via Module::Pluggable.
+ - RDFa Profiles establish both a case-sensitive and case-insensitive term
+   mapping.
+ - Reimplement RDFa 1.0 keyword concept using profiles.
+ - Strongly deprecate keyword_bundles config option - use default_profiles
+   instead.
+
+1.091  2010-10-06  # RDFa 1.1 Release Candidate 1
+
+ - (Addition) Support rdfa:vocabulary in Profiles.
+ - (Packaging) Add test cases covering @profile.
+ - Generate less-predictable blank node identifiers.
+ - Various clean-ups.
+
+1.09_11  2010-06-16  # RDFa 1.1 Preview 11
+
+ - (Addition) Support for OpenDocument's slightly unusual flavour of RDFa.
+ - (Documentation) Rearrange some of the documentation in the FEATURES
+   section.
+ - Auto-Config fixes and clean-ups.
+ - Various media-type handling clean-ups.
+
+1.09_10  2010-05-27  # RDFa 1.1 Preview 10
+
+ - UTF-8 fixes necessitating requiring a newer version of RDF::Trine.
+
+1.09_09  2010-05-26  # RDFa 1.1 Preview 9
+
+ - (Addition) Allow Config.pm to provide a list of default profiles to the
+   parser.
+ - (Addition) Handle <?profile ?> processing instructions.
+ - (Addition) Hard-coded the Yahoo SearchMonkey profile.
+ - Improved DataRSS support; differentiate between DataRSS and plain Atom.
+
+1.09_08  2010-05-21  # RDFa 1.1 Preview 8 - bugfix edition
+
+ - (Bugfix) Remove 'my' from a couple of lines.
+
+1.09_07  2010-05-21  # RDFa 1.1 Preview 8
+
+ - Allow an LWP::UserAgent to be supplied when configuring the parser.
+
+1.09_06  2010-05-05  # RDFa 1.1 Preview 7
+
+ - (Bugfix Packaging) Test Suite tests are failing on systems that don't
+   have RDF::Query; make these tests optional.
+ - (Bugfix) @profile properly supports multiple URIs.
+ - Support case-sensitive/-insensitive prefixes on a prefix-by-prefix basis
+   rather than parser-by-parser.
+
+1.09_05  2010-05-01  # RDFa 1.1 Preview 6
+
+ - (Bugfix Packaging) Tests require File::Slurp. Add this dep to
+   Makefile.PL.
+
+1.09_04  2010-04-24  # RDFa 1.1 Preview 5
+
+ - (Addition) Special Open Graph Protocol support.
+ - (Addition) new_from_url shortcut.
+ - (Bugfix) Fix auto_config.
+ - (Packaging Regression) Makefile.PL doesn't reflect proper requirements
+   from running tests.
+ - (Packaging Update) Integrate official RDFa test suite into module tests.
+ - (Packaging Update) Provide more inclusive XML DTD catalogue.
+
+1.09_03  2010-04-21  # RDFa 1.1 Preview 4
+
+ - (Addition) Support @role attribute.
+ - (Update) Use latest list of IANA terms from
+   draft-nottingham-http-link-header-09.txt.
+
+1.09_02  2010-04-21  # RDFa 1.1 Preview 3
+
+ - (Addition) New 'oncurie' callback.
+ - (Bugfix) Allow CURIEs to have zero-length suffixes.
+ - (Regression) Broke auto_config.
+ - Deprecate OPTS_XXXX functions in favour of a new
+   RDF::RDFa::Parser::Config object which allows host languages and RDFa
+   versions to be combined more flexibly.
+ - Refactor error handling code to add a new 'onerror' callback, and an
+   'errors' method to get a list of errors.
+
+1.09_01  2010-04-19  # RDFa 1.1 Preview 2
+
+ - (Bugfix Packaging) Fix packaging problem (profile modules were not in
+   MANIFEST).
+
+1.09_00  2010-04-19  # RDFa 1.1 Preview
+
+ - (Addition) Support @profile attribute to load externally-defined
+   keywords and terms.
+ - (Addition) Support @vocab attribute to set default attribute.
+ - (Bugfix) Don't use <img alt> in plain literal stringification.
+ - (Bugfix) Properly enforce scoping of prefix mappings (use Storable
+   qw/dclone/).
+ - (Regression) Broke support for CURIEs with zero-length suffxes.
+ - (Update) Change syntax of @prefix to match current RDFa 1.1 editors'
+   drafts.
+ - Refactor a lot of code, especially CURIE processing.
+
+1.00.002  2010-04-09
+
+ - (Bugfix) Properly enforce scoping of prefix mappings (use Storable
+   qw/dclone/).
+
+1.00.001  2010-03-26
+
+ - (Bugfix) Don't use <img alt> in plain literal stringification.
+
+1.00  2010-02-18  # Stable
+
+ - Release RDF::RDFa::Parser 1.00 and RDF::RDFa::Parser::Redland 1.00.
+
+1.00_02  2010-02-05  # 1.00 Preview''
+
+ - (Documentation) Document Atom support better.
+ - (Documentation) Document HTML support better.
+ - (Documentation) Document RDF/XML support better.
+ - (Documentation) Document SVG support better.
+ - Arrange methods in a more sensible order for documentation.
+
+1.00_01  2010-02-04  # 1.00 Preview'
+
+ - (Documentation) Fix double use of &consume in POD SYNOPSIS.
+ - (Update) POD NAME section short description to match description in CPAN
+   registered modules list.
+
+1.00_00  2010-01-29  # 1.00 Preview
+
+ - (Documentation) Correct name of XML::Atom::OWL module in POD.
+ - (Documentation) Document auto-config in non-XHTML XML.
+ - (Documentation) Improve named graph documentation.
+ - (Removal) &named_graphs no longer supported as a way to enable named
+   graph support.
+ - (Removal) &set_callbacks no longer supports old argument syntax.
+
+0.30  2010-01-18  # Version 3 (kinda)
+
+ - (Addition Packaging) Include a catalogue of doctypes to speed up XML
+   parsing.
+ - (Addition) Add support for a default prefix (different from empty
+   prefix).
+ - (Addition) Change set_callbacks parameters and support additional
+   callbacks.
+ - (Addition) Special support for RDFa in Atom (Yahoo's weirdly-named
+   'DataRSS').
+ - (Documentation Update) Copyright 2010.
+ - (Packaging Update) Upgrade distribution to my new packaging regime
+   (signatures, auto-generated changelogs, etc)
+
+0.22  2009-12-03
+
+ - (Addition) Add Auto Config feature.
+ - (Addition) Allow case-insensitive CURIE prefixes (optional, good for
+   HTML).
+ - (Addition) Allow suffix-less CURIEs without colons (optional).
+ - (Addition) Empty CURIE prefix can be configured (optional).
+ - (Addition) Flexible keyword extensibility (optional).
+ - (Addition) Make xml:lang support optional (enabled by default).
+ - (Addition) Special rel='alternate stylesheet' handling (optional, good
+   for HTML5).
+ - (Bugfix) Various test case compliance fixes (passes HTML4 and HTML5 test
+   suites)
+
+0.21  2009-11-28
+
+ - (Addition) Use RDF::Trine::Node::Literal::XML if it exists.
+ - (Bugfix) Various test case compliance fixes (passes XHTML test suite).
+
+0.20  2009-11-24  # Version 2 (kinda)
+
+ - (Addition) Add optional support for XFN 1.1 keywords.
+ - (Addition) Add optional support for embedded RDF/XML.
+ - (Addition) Add optional support for xml:base.
+ - (Addition) Allow various parsing options to be passed to constructor.
+ - (Removal) Diallow Safe CURIEs in @src/@href.
+ - (Update) Module SVN repository now at
+   <http://goddamn.co.uk/svn-web/perlmods/browse/>
+ - (Update) The graph() and graphs() methods now return RDF::Trine::Model
+   objects.
+ - Support for @lang now optional, off by default.
+ - Support for @prefix now optional, off by default.
+ - Support for HEAD, BODY and BASE elements now optional, on by default.
+ - Support for extended @rel/@rev now optional, off by default.
+ - Support for full URIs instead of CURIEs now optional, off by default.
+
+0.11  2009-01-19
+
+ - (Update) Make named graphs handling more predictable for triples spread
+   across multiple elements.
+
+0.10  2009-01-19
+
+ - (Addition Documentation) Improve documentation and include it inline in
+   the module code.
+ - (Addition Update) More test cases, including XML Literals and named
+   graphs.
+ - (Addition) Support for KjetilK's named graph idea.
+ - (Bugfix) Fix broken support for XML literals.
+
+0.04  2009-01-14
+
+ - (Addition) Include some test cases as part of the installation.
+ - (Addition) Provide graph() method to output graph.
+ - Rewrite callback stuff.
+
+0.03  2009-01-14
+
+ - (Bugfix) Bugfix for @property.
+
+0.02  2009-01-13
+
+ - (Bugfix) Fix bug in Turtle output.
+ - Add KjetilK's patch.
+ - Disable thing-described-by.org URIs by default.
+ - Make XML parser more tolerant.
+
+0.01  2009-01-13  # Original version
+
+

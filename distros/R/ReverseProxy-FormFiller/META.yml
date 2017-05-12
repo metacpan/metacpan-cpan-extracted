@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               ReverseProxy-FormFiller
+version:            0.5
+abstract:           Let Apache fill and submit any html form in place of the user
+author:
+    - FX Deltombe <fxdeltombe@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache2::Const:       0
+    Apache2::Filter:      0
+    Apache2::Log:         0
+    Apache2::RequestRec:  0
+    Apache2::RequestUtil:  0
+    Apache2::Response:    0
+    Test::More:           0
+    URI::Escape:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

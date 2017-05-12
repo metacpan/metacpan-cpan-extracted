@@ -1,0 +1,38 @@
+<div class="Rudesind-gallery-nav">
+% if (@subs) {
+ <h3 class="Rudesind-section-title">Sub <% @subs == 1 ? "Gallery" : "Galleries" %></h3>
+
+ <ul class="Rudesind-sub-gallery-list">
+%   foreach my $sub (@subs) {
+  <li><a href="<% $App->config->uri_root %>/<% $sub->path | h %>"><% $sub->title | h %></a></li>
+%   }
+ </ul>
+% }
+
+% if ( $gallery->has_caption ) {
+ <div class="Rudesind-caption">
+  <% $gallery->caption_as_html %>
+ </div>
+% }
+
+% if ( $App->is_admin ) {
+<p>
+<a href="<% $App->config->uri_root %>/admin/edit_caption.html?path=<% $gallery->path | h %>">Edit caption for this gallery</a>.
+</p>
+% }
+
+</div>
+
+% if (@images) {
+<& thumbnail_table.mas, images => \@images, gallery => $gallery, &>
+% }
+
+<%args>
+$gallery
+</%args>
+
+<%init>
+my @images = $gallery->images;
+
+my @subs = $gallery->subgalleries;
+</%init>

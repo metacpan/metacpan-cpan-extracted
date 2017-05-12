@@ -1,0 +1,11 @@
+<%init>
+return unless RT->Config->Get('EnableReminders');
+
+$tabs->{'e'} = {
+    title => loc('My reminders'),
+    path  => 'Tools/MyReminders.html',
+}
+</%init>
+<%args>
+$tabs => undef
+</%args>

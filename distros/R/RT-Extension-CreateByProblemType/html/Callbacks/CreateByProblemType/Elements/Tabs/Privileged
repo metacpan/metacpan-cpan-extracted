@@ -1,0 +1,5 @@
+<%INIT>
+if (RT->Config->Get('CreateByProblemType', $session{'CurrentUser'})) {
+    PageWidgets()->child( create_ticket => raw_html => $m->scomp('/Elements/CreateTicketByProblemType') );
+}
+</%INIT>

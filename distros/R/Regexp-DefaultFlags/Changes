@@ -1,0 +1,7 @@
+----------------------------------------------------------------------
+r8252:  autrijus | 2004-09-27T18:33:54.779668Z
+
+* This be 0.01 of Regexp::DefaultFlags.
+* Renamed from Regexp::Auto; suggested by Jesse Vincent.
+* Added tests; now at 100% coverage.
+----------------------------------------------------------------------

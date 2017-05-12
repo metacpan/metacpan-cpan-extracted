@@ -1,0 +1,48 @@
+{
+   "abstract" : "A Perl wrapper for the Reddit API.",
+   "author" : [
+      "\"Jeff Ober\" <\"jeffober@gmail.com\">"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Reddit-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Capture::Stderr" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path::Expand" : "1.02",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "URI::Encode" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.084"
+}

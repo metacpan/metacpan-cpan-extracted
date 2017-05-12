@@ -1,0 +1,12 @@
+This RT extension (designed for RT 3.4.5 and newer) implements a per-ticket "Wiki" whiteboard field.
+
+To install it, type:
+
+    perl Makefile.PL
+    make
+    make install
+
+
+The extension looks for a custom "wikitext" field called "Whiteboard" which applies to a 
+ticket being displayed. This way you can easily have different whiteboard fields with
+ different ACLs on different queues.

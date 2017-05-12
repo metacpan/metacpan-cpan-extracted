@@ -1,0 +1,27 @@
+---
+abstract: 'RT-Extension-IncrementPriority Extension'
+author:
+  - 'Joshua C. Randall <jcrandall@alum.mit.edu>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.14, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RT-Extension-IncrementPriority
+no_index:
+  directory:
+    - etc
+    - inc
+requires: {}
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://github.com/jrandall/rt-extension-incrementpriority
+version: '0.01'
+x_module_install_rtx_version: '0.37'
+x_requires_rt: 4.0.0
+x_rt_too_new: 4.4.0

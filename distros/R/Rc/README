@@ -1,0 +1,64 @@
+=head1 NAME
+
+Rc - parser and backends for 'rc' shell
+
+=head1 SYNOPSIS
+
+  rcconvert deparse script.rc > script.rc
+
+  rcconvert terse script.rc > script.terse
+
+  rcconvert sh script.rc > script.sh
+
+  rcconvert csh script.rc > script.csh
+
+=head1 DESCRIPTION
+
+I am disappointed by the lack of new development in Un*x shells.  It
+seems like the world has standardized on bash/tcsh (at best) or
+ksh/csh (at worst).  It seems that one cause of this is the difficulty
+of maintaining parallel versions of scripts for each type of shell.
+This module aims to silence that excuse at least.
+
+Available at http://www.perl.com/CPAN/authors/id/JPRIT/ !
+
+
+=head1 R!CENT CHANGES
+
+
+** 1998-11-21 RELEASE 0.03
+
+- Fix up rcconvert.
+
+- Slightly less broken csh backend and improvements to sh backend.
+
+
+** 1998-10-25 RELEASE 0.02
+
+- Skeletal Sh/Csh backends.
+
+- Portability tweaks (cpan-testers, thanks!).
+
+
+** 1998-10-23 RELEASE 0.01
+
+- First public release.
+
+
+Send any questions or comments to envy@listbox.com.
+
+If you'd like to subscribe to this mailing list, send email to
+majordomo@listbox.com.  Thanks!
+
+----------------------------------------------------------------------
+Copyright © 1998 Joshua Nathaniel Pritikin.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)
+
+Portions of this sortware include source code from the 'rc' shell.
+These portions are Copyright © 1991 Byron Rakitzis.  'rc' is free,
+open-source package and is available at most ftp sites that distribute
+GNU software.
